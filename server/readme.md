@@ -1,0 +1,6 @@
+- uv install
+- createdb axonhub
+- createuser axonhub
+- psql axonhub
+  - ALTER USER axonhub CREATEDB;
+- uv run python manage.py migrate

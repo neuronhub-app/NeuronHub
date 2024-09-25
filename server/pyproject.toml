@@ -1,0 +1,100 @@
+[project]
+name = "axonhub"
+version = "0.0.0.0"
+description = ""
+requires-python = ">=3.12"
+dependencies = [
+    "daphne>=4.1.2",
+    "humanize>=4.10.0",
+    "markdownify>=0.13.1",
+    "psycopg>=3.2.1",
+    "python-dateutil>=2.9.0.post0",
+    "python-dotenv>=1.0.1",
+    "python-environ>=0.4.54",
+    "rich>=13.8.0",
+    "sentry-sdk>=2.13.0",
+    "whitenoise>=6.7.0",
+
+    # django
+    "django>=5.1.1",
+    "django-allauth>=64.2.0",
+    "django-anymail>=11.1",
+    "django-cors-headers>=4.4.0",
+    "django-extensions>=3.2.3",
+        "ipython>=8.27.0",
+    "django-fieldsignals>=0.7.0",
+    "django-health-check>=3.18.3",
+    "django-simple-history>=3.7.0",
+    "dj-database-url>=2.2.0",
+    "strawberry-graphql>=0.239.2",
+        "strawberry-graphql-django>=0.47.1",
+
+    # django fields
+    "django-choices-field>=2.3.0",
+    "django-timezone-field>=7.0",
+
+    # django admin
+    "django-adminutils>=0.0.18",
+    "django-admin-sortable2>=2.2.2",
+    "django-admin-autocomplete-filter>=0.7.1",
+    "django-select2-admin-filters>=0.1.4",
+        "django-select2>=8.2.1",
+    "django-codemirror2>=0.2",
+    "django-hijack>=3.6.0",
+    "django-object-actions>=4.2.0",
+
+    # django dev
+    "django-debug-toolbar>=4.4.6",
+    "django-stubs>=5.0.4",
+        "django-stubs-ext>=5.0.4",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.6.3",
+    "faker>=28.1.0",
+    "objprint>=0.2.3",
+    "pytest>=8.3.2",
+        "pytest-django>=4.9.0",
+        "pytest-mock>=3.14.0",
+        "pytest-pspec>=0.0.4",
+        "pytest-rich>=0.1.1",
+]
+
+[tool.ruff]
+line-length = 97
+
+[tool.ruff.lint.isort]
+force-single-line = true
+lines-after-imports = 2
+known-first-party = ["axonhub"]
+
+[tool.ruff.lint]
+extend-select = [
+  "UP",  # pyupgrade: enforce modern python syntax
+]
+ignore = [
+    # good one juniors, but spill over and errors on good code
+    "E721",
+    # ignore unused vars rule, as they're used as comments/placeholders
+    "F841",
+    # 2 rules for multi-line string indent - sounds useless,
+    # use textwrap.dedent() - it's your responsibility. and flake8's fault for not detecting dedent()
+    "W291",
+    "W293",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "axonhub.settings"
+python_files = ["*__test.py"]
+addopts = [
+    "--no-migrations",
+    "--capture=no", # show print() stdout
+    "--color=yes",
+    "--code-highlight=yes",
+    "--no-header",
+    "--pspec", # allows to use docstrings instead of test function names
+]
+
+[tool.django-stubs]
+django_settings_module = "axonhub.settings"
