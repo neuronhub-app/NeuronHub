@@ -1,6 +1,6 @@
 import type {
-	ResultOf,
 	DocumentTypeDecoration,
+	ResultOf,
 	TypedDocumentNode,
 } from "@graphql-typed-document-node/core";
 import type { FragmentDefinitionNode } from "graphql";
@@ -81,5 +81,5 @@ export function isFragmentReady<TQuery, TFrag>(
 	const fragName = fragDef?.name?.value;
 
 	const fields = (fragName && deferredFields[fragName]) || [];
-	return fields.length > 0 && fields.every((field) => data && field in data);
+	return fields.length > 0 && fields.every(field => data && field in data);
 }

@@ -14,13 +14,15 @@
 		"jsx": "react-jsx",
 
 		"strict": false, // ts is too strict with fake types
-		"noUnusedParameters": true,
 		"noFallthroughCasesInSwitch": true,
 
+		"baseUrl": ".",
+
 		"paths": {
+			"": ["./node_modules/*"],
 			"~/*": ["./src/*"],
-			"styled-system": ["./styled-system/*"],
-		},
+			"styled-system": ["./styled-system/*"]
+		}
 	},
 	"include": ["src", "styled-system"],
 }
