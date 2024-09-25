@@ -1,0 +1,52 @@
+{
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"organizeImports": {
+		"enabled": true,
+	},
+	"json": {
+		"parser": {
+			"allowComments": true,
+		},
+		"formatter": {
+			"trailingCommas": "all",
+		},
+	},
+	"javascript": {
+		"formatter": {
+			"trailingCommas": "all",
+		},
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": true,
+			"suspicious": {
+				"noAssignInExpressions": "off",
+				"noExplicitAny": "off",
+			},
+			"correctness": {
+				"noUnusedVariables": "off",
+			},
+			"style": {
+				"noNonNullAssertion": "off",
+				"noUselessElse": "off", // helps with readability, sometimes
+			},
+		},
+	},
+	"formatter": {
+		"enabled": true,
+		"lineEnding": "lf",
+	},
+	"files": {
+		"include": [
+			"src/",
+			"package.json",
+			"biome.jsonc",
+			"tsconfig.jsonc",
+			"vite.config.ts",
+			"panda.config.ts",
+			"graphql/",
+		],
+		"ignore": [".output/"],
+	},
+}
