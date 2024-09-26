@@ -1,19 +1,21 @@
-import * as ReactDOM from "react-dom/client";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { createRoot } from "react-dom/client";
+import {
+	Route,
+	RouterProvider,
+	createBrowserRouter,
+	createRoutesFromElements,
+} from "react-router-dom";
 import { ImportForm } from "~/apps/import/ImportForm";
+import { RootLayout } from "~/routes/RootLayout.tsx";
 
-const router = createBrowserRouter([
-	{
-		path: "/",
-		element: (
-			<>
-				<h1>Fuck</h1>
-				<ImportForm />
-			</>
-		),
-	},
-]);
+const router = createBrowserRouter(
+	createRoutesFromElements(
+		<Route path="/" element={<RootLayout />}>
+			<Route path="import" element={<ImportForm />} />
+		</Route>,
+	),
+);
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+createRoot(document.getElementById("root")!).render(
 	<RouterProvider router={router} />,
 );

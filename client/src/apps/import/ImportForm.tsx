@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Box } from "styled-system/jsx";
+import { Box, VStack } from "styled-system/jsx";
 import { useSnapshot } from "valtio/react";
 import { proxy } from "valtio/vanilla";
 import { z } from "zod";
@@ -13,6 +13,7 @@ import { Field } from "~/components/ui/field";
 
 ImportForm.state = proxy({
 	value: {
+		githubUrl: "",
 		tags: [] as TagOption[],
 	},
 });
@@ -39,28 +40,29 @@ export function ImportForm() {
 				});
 			})}
 		>
-			<Field.Root invalid={Boolean(form.formState.errors?.githubUrl)}>
-				<Field.Label>Label</Field.Label>
-				<Field.Input placeholder="Placeholder" />
-				<Field.HelperText>Some additional Info</Field.HelperText>
-			</Field.Root>
+			<VStack gap={5} alignItems="flex-start">
+				<Field.Root invalid={Boolean(form.formState.errors?.githubUrl)}>
+					<Field.Label>GitHub link</Field.Label>
+					<Field.Input placeholder="https://github.com/organization/project" />
+				</Field.Root>
 
-			<Button loading={form.formState.isSubmitting} type="submit">
-				Submit
-			</Button>
+				<TagMultiSelect />
 
-			<Box>{JSON.stringify(form.formState.touchedFields)}</Box>
+				<Box>
+					{snap.value.tags.map(tag => (
+						<Box key={tag.value}>
+							{tag.label}
+							{tag.isVotePositive && ", positive"}
+						</Box>
+					))}
+				</Box>
 
-			<TagMultiSelect />
+				<Button loading={form.formState.isSubmitting} type="submit">
+					Submit
+				</Button>
 
-			<Box>
-				{snap.value.tags.map(tag => (
-					<Box key={tag.value}>
-						{tag.label}
-						{tag.isVotePositive && ", positive"}
-					</Box>
-				))}
-			</Box>
+				<Box>{JSON.stringify(form.formState.touchedFields)}</Box>
+			</VStack>
 		</form>
 	);
 }
