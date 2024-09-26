@@ -1,0 +1,57 @@
+"""
+Can only be resolved by authenticated users.
+
+When the condition fails, the following can be returned (following this priority):
+1) `OperationInfo`/`OperationMessage` if those types are allowed at the return type
+2) `null` in case the field is not mandatory (e.g. `String` or `[String]`)
+3) An empty list in case the field is a list (e.g. `[String]!`)
+4) An empty `Connection` in case the return type is a relay connection
+2) Otherwise, an error will be raised
+"""
+directive @IsAuthenticated repeatable on FIELD_DEFINITION
+
+type DjangoModelType {
+  pk: ID!
+}
+
+type Mutation {
+  logout: Boolean!
+  update_user(data: UserTypeInput!): UserType! @IsAuthenticated
+}
+
+input OneToManyInput {
+  set: ID
+}
+
+type Query {
+  user_current: UserType
+  tools: [ToolType!]!
+  tool(pk: ID!): ToolType!
+}
+
+type ToolType {
+  slug: String!
+  description: String
+  alternatives: [ToolType!]!
+  id: ID!
+  name: String!
+  domain: String!
+  crunchbase_url: String!
+  github_url: String!
+}
+
+type UserType {
+  id: ID!
+  email: String!
+  first_name: String!
+  last_name: String!
+  org: DjangoModelType
+}
+
+input UserTypeInput {
+  id: ID
+  email: String
+  first_name: String
+  last_name: String
+  org: OneToManyInput
+}

@@ -6,8 +6,9 @@
 		"dev": "vite --config vite.config.ts",
 		"build": "tsc && vite build",
 		"serve": "vite preview",
+		"format": "npx biome check --write",
 		"panda:codegen": "panda codegen",
-		"format": "npx biome check --write"
+		"graphql:codegen": "graphql-codegen --config src/codegen.ts"
 	},
 	"dependencies": {
 		"@ark-ui/react": "3.4.0",
@@ -33,10 +34,12 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.9.2",
+		"@graphql-codegen/cli": "^5.0.2",
+		"@graphql-codegen/client-preset": "^4.3.3",
 		"@pandacss/dev": "^0.46.1",
 		"@park-ui/panda-preset": "^0.42.0",
 		"@rollup/plugin-replace": "^5.0.7",
-		"@types/node": "^22.5.5",
+		"@types/node": "^22.7.2",
 		"@types/react": "^18.3.8",
 		"@types/react-dom": "^18.3.0",
 		"typescript": "^5.6.2",

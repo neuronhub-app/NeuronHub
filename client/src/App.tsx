@@ -5,17 +5,23 @@ import {
 	createBrowserRouter,
 	createRoutesFromElements,
 } from "react-router-dom";
-import { ImportForm } from "~/apps/import/ImportForm";
+import { Provider } from "urql";
+import { ReviewPostForm } from "~/apps/reviews/ReviewPostForm.tsx";
+import { urqlClient } from "~/client.ts";
 import { RootLayout } from "~/routes/RootLayout.tsx";
 
 const router = createBrowserRouter(
 	createRoutesFromElements(
 		<Route path="/" element={<RootLayout />}>
-			<Route path="import" element={<ImportForm />} />
+			<Route path="reviews">
+				<Route path="create" element={<ReviewPostForm />} />
+			</Route>
 		</Route>,
 	),
 );
 
 createRoot(document.getElementById("root")!).render(
-	<RouterProvider router={router} />,
+	<Provider value={urqlClient}>
+		<RouterProvider router={router} />
+	</Provider>,
 );

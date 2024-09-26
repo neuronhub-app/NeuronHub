@@ -4,17 +4,17 @@ import AsyncCreatableSelect from "react-select/async-creatable";
 
 import { Flex, HStack } from "styled-system/jsx";
 import { useSnapshot } from "valtio/react";
-import { ImportForm } from "~/apps/import/ImportForm.tsx";
+import { ReviewPostForm } from "~/apps/reviews/ReviewPostForm.tsx";
 import { IconButton } from "~/components/ui/icon-button.tsx";
 
 function filterTags(inputValue: string) {
-	return ImportForm.state.value.tags.filter(tag =>
+	return ReviewPostForm.state.value.tags.filter(tag =>
 		tag.label.toLowerCase().includes(inputValue.toLowerCase()),
 	);
 }
 
 export function TagMultiSelect() {
-	const snap = useSnapshot(ImportForm.state);
+	const snap = useSnapshot(ReviewPostForm.state);
 
 	return (
 		<Flex>
@@ -35,7 +35,7 @@ export function TagMultiSelect() {
 					})
 				}
 				onChange={multiValue => {
-					ImportForm.state.value.tags = multiValue.map(value => value);
+					ReviewPostForm.state.value.tags = multiValue.map(value => value);
 				}}
 				components={{
 					// Option,
@@ -58,7 +58,7 @@ export function TagMultiSelect() {
 									}
 									onClick={() => {
 										const optionValue = props.data.value;
-										const tag = ImportForm.state.value.tags.find(
+										const tag = ReviewPostForm.state.value.tags.find(
 											tag => tag.value === optionValue,
 										);
 										if (tag) {

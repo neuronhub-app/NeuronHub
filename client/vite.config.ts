@@ -42,6 +42,7 @@ export default defineConfig({
 function getAliasForProject() {
 	return {
 		"~": path.resolve(__dirname, "./src"),
+		"@/graphql": path.resolve(__dirname, "./graphql"),
 		"styled-system": path.resolve(__dirname, "./styled-system"),
 	};
 }

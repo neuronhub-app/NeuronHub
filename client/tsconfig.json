@@ -20,9 +20,18 @@
 
 		"paths": {
 			"": ["./node_modules/*"],
+			"@/graphql/*": ["./graphql/*"],
 			"~/*": ["./src/*"],
-			"styled-system": ["./styled-system/*"]
-		}
+			"styled-system": ["./styled-system/*"],
+		},
+
+		"plugins": [
+      {
+        "name": "gql.tada/ts-plugin",
+        "schema": "./../schema.graphql",
+        "tadaOutputLocation": "./graphql/graphql-env.d.ts"
+      }
+    ]
 	},
 	"include": ["src", "styled-system"],
 }
