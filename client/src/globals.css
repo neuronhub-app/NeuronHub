@@ -1,7 +1,6 @@
 @layer reset, base, tokens, recipes, utilities;
 
-body,
 html,
-#root {
+body {
 	height: 100%;
 }
