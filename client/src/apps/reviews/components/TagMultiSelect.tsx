@@ -1,20 +1,17 @@
-import { ThumbsUpIcon } from "lucide-react";
+import { MessageSquarePlus, ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { components } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
 
-import { Flex, HStack } from "styled-system/jsx";
-import { useSnapshot } from "valtio/react";
-import { ReviewPostForm } from "~/apps/reviews/ReviewPostForm.tsx";
-import { IconButton } from "~/components/ui/icon-button.tsx";
+import { Flex, HStack } from "@chakra-ui/react";
+import { IconButton } from "@chakra-ui/react";
+import type {
+	ReviewCreateForm,
+	TagOption,
+} from "~/apps/reviews/ReviewCreateForm";
 
-function filterTags(inputValue: string) {
-	return ReviewPostForm.state.value.tags.filter(tag =>
-		tag.label.toLowerCase().includes(inputValue.toLowerCase()),
-	);
-}
-
-export function TagMultiSelect() {
-	const snap = useSnapshot(ReviewPostForm.state);
+export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
+	const tags = props.form.watch("tags");
 
 	return (
 		<Flex>
@@ -22,51 +19,50 @@ export function TagMultiSelect() {
 				cacheOptions
 				defaultOptions
 				isMulti
-				loadOptions={(inputValue: string) =>
-					new Promise<TagOption[]>(resolve => {
-						setTimeout(() => {
-							const tagsFound = filterTags(inputValue);
-							if (tagsFound.length > 0) {
-								resolve(tagsFound);
-							} else {
-								resolve(tagOptions);
-							}
-						}, 500);
-					})
-				}
-				onChange={multiValue => {
-					ReviewPostForm.state.value.tags = multiValue.map(value => value);
+				loadOptions={async (inputValue: string) => {
+					await new Promise(resolve => setTimeout(resolve, 300));
+					const tagsFound = tagOptions.filter(tag =>
+						tag.label.toLowerCase().includes(inputValue.toLowerCase()),
+					);
+					if (tagsFound.length > 0) {
+						return tagsFound;
+					} else {
+						return tagOptions;
+					}
+				}}
+				onChange={(multiValue, actionMeta) => {
+					props.form.setValue(
+						"tags",
+						multiValue.map(value => value),
+					);
 				}}
 				components={{
-					// Option,
-
-					MultiValueLabel: props => (
-						<components.MultiValueLabel {...props}>
+					MultiValueLabel: propsMultiVal => (
+						<components.MultiValueLabel {...propsMultiVal}>
 							<HStack>
-								{props.children}
+								{propsMultiVal.children}
+
+								<VotingButton
+									option={propsMultiVal.data}
+									tags={tags as TagOption[]}
+									form={props.form}
+									voteType="upvote"
+								/>
+								<VotingButton
+									option={propsMultiVal.data}
+									tags={tags as TagOption[]}
+									form={props.form}
+									voteType="downvote"
+								/>
+
 								<IconButton
 									p={0}
 									size="xs"
 									variant="subtle"
-									color={
-										snap.value.tags.find(
-											tag =>
-												tag.value === props.data.value && tag.isVotePositive,
-										)
-											? "red"
-											: "gray"
-									}
-									onClick={() => {
-										const optionValue = props.data.value;
-										const tag = ReviewPostForm.state.value.tags.find(
-											tag => tag.value === optionValue,
-										);
-										if (tag) {
-											tag.isVotePositive = !tag.isVotePositive;
-										}
-									}}
+									color="gray"
+									type="button"
 								>
-									<ThumbsUpIcon size={10} />
+									<MessageSquarePlus size={10} />
 								</IconButton>
 							</HStack>
 						</components.MultiValueLabel>
@@ -79,21 +75,79 @@ export function TagMultiSelect() {
 	);
 }
 
-export interface TagOption {
-	readonly value: string;
-	readonly label: string;
-	isVotePositive?: boolean;
-}
-
 export const tagOptions: TagOption[] = [
-	{ value: "JavaScript", label: "JavaScript" },
-	{ value: "TypeScript", label: "TypeScript" },
-	{ value: "purple", label: "Purple" },
-	{ value: "red", label: "Red" },
-	{ value: "orange", label: "Orange" },
-	{ value: "yellow", label: "Yellow" },
-	{ value: "green", label: "Green" },
-	{ value: "forest", label: "Forest" },
-	{ value: "slate", label: "Slate" },
-	{ value: "silver", label: "Silver" },
+	{ isVotePositive: null, id: "JavaScript", label: "JavaScript" },
+	{ isVotePositive: null, id: "TypeScript", label: "TypeScript" },
+	{ isVotePositive: null, id: "purple", label: "Purple" },
+	{ isVotePositive: null, id: "red", label: "Red" },
+	{ isVotePositive: null, id: "orange", label: "Orange" },
+	{ isVotePositive: null, id: "yellow", label: "Yellow" },
+	{ isVotePositive: null, id: "green", label: "Green" },
+	{ isVotePositive: null, id: "forest", label: "Forest" },
+	{ isVotePositive: null, id: "slate", label: "Slate" },
+	{ isVotePositive: null, id: "silver", label: "Silver" },
 ];
+
+function VotingButton(props: {
+	option: TagOption;
+	tags: TagOption[];
+	form: ReviewCreateForm.FormType;
+	voteType: "upvote" | "downvote";
+}): ReactNode {
+	function handleVote(): void {
+		const optionValue = props.option.id;
+
+		const tagVotedRaw = props.tags.find(tag => tag.id === optionValue);
+		if (!tagVotedRaw) return;
+
+		const tagVoted = Object.assign({}, tagVotedRaw);
+
+		if (props.voteType === "upvote") {
+			tagVoted.isVotePositive =
+				tagVoted.isVotePositive === null || tagVoted.isVotePositive === false
+					? true
+					: null;
+		} else if (props.voteType === "downvote") {
+			tagVoted.isVotePositive =
+				tagVoted.isVotePositive === null || tagVoted.isVotePositive === true
+					? false
+					: null;
+		}
+
+		props.form.setValue("tags", [
+			...props.tags.filter(tag => tag.id !== optionValue),
+			tagVoted,
+		]);
+	}
+
+	const isActive =
+		props.voteType === "upvote"
+			? props.tags.some(
+					tag => tag.id === props.option.id && tag.isVotePositive === true,
+				)
+			: props.tags.some(
+					tag => tag.id === props.option.id && tag.isVotePositive === false,
+				);
+
+	const color = isActive
+		? props.voteType === "upvote"
+			? "green"
+			: "red"
+		: "gray";
+
+	return (
+		<IconButton
+			p={0}
+			size="xs"
+			variant="subtle"
+			color={color}
+			onClick={handleVote}
+		>
+			{props.voteType === "upvote" ? (
+				<ThumbsUpIcon size={10} />
+			) : (
+				<ThumbsDownIcon size={10} />
+			)}
+		</IconButton>
+	);
+}

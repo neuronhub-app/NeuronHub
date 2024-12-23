@@ -1,9 +1,10 @@
 {
 	"compilerOptions": {
-		// Vite copy, not reviewed
-		"target": "ES2020",
+		// Copied from Vite
+		// ES2020 replaced with ESNext for Chakra UI
+		"target": "ESNext",
 		"useDefineForClassFields": true,
-		"lib": ["ES2020", "DOM", "DOM.Iterable"],
+		"lib": ["ESNext", "DOM", "DOM.Iterable"],
 		"module": "ES6",
 		"skipLibCheck": true,
 

@@ -1,51 +1,40 @@
-import { forwardRef } from "react";
-import { Center, styled } from "styled-system/jsx";
-import { Spinner } from "./spinner";
+import type { ButtonProps as ChakraButtonProps } from "@chakra-ui/react";
 import {
-	Button as StyledButton,
-	type ButtonProps as StyledButtonProps,
-} from "./styled/button";
+	AbsoluteCenter,
+	Button as ChakraButton,
+	Span,
+	Spinner,
+} from "@chakra-ui/react";
+import * as React from "react";
 
 interface ButtonLoadingProps {
 	loading?: boolean;
 	loadingText?: React.ReactNode;
 }
 
-export interface ButtonProps extends StyledButtonProps, ButtonLoadingProps {}
+export interface ButtonProps extends ChakraButtonProps, ButtonLoadingProps {}
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-	(props, ref) => {
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+	function Button(props, ref) {
 		const { loading, disabled, loadingText, children, ...rest } = props;
-
-		const trulyDisabled = loading || disabled;
-
 		return (
-			<StyledButton disabled={trulyDisabled} ref={ref} {...rest}>
+			<ChakraButton disabled={loading || disabled} ref={ref} {...rest}>
 				{loading && !loadingText ? (
 					<>
-						<ButtonSpinner />
-						<styled.span opacity={0}>{children}</styled.span>
+						<AbsoluteCenter display="inline-flex">
+							<Spinner size="inherit" color="inherit" />
+						</AbsoluteCenter>
+						<Span opacity={0}>{children}</Span>
 					</>
-				) : loadingText ? (
-					loadingText
+				) : loading && loadingText ? (
+					<>
+						<Spinner size="inherit" color="inherit" />
+						{loadingText}
+					</>
 				) : (
 					children
 				)}
-			</StyledButton>
+			</ChakraButton>
 		);
 	},
-);
-
-Button.displayName = "Button";
-
-const ButtonSpinner = () => (
-	<Center
-		inline
-		position="absolute"
-		transform="translate(-50%, -50%)"
-		top="50%"
-		insetStart="50%"
-	>
-		<Spinner colorPalette="gray" />
-	</Center>
 );
