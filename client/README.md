@@ -7,3 +7,10 @@
 
 - bun run build
 - bun run preview
+
+### Upgrade
+
+With npm-check-updates.
+
+- bun run check-update
+- bun run upgrade

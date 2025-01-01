@@ -7,11 +7,13 @@
 		"build": "tsc && vite build",
 		"serve": "vite preview",
 		"format": "npx biome check --write",
+		"check-update": "bun run ncu",
+		"upgrade": "bun run ncu --upgrade && bun install",
 		"panda:codegen": "panda codegen",
 		"graphql:codegen": "graphql-codegen --config src/codegen.ts"
 	},
 	"dependencies": {
-		"@chakra-ui/react": "^3.2.3",
+		"@chakra-ui/react": "^3.2.4",
 		"@emotion/react": "^11.14.0",
 		"next-themes": "^0.4.4",
 
@@ -19,9 +21,9 @@
 		"react-dom": "^19.0.0",
 		"react-hook-form": "^7.54.2",
 		"react-hook-form-chakra": "^1.0.2",
-		"react-router": "^7.1.0",
+		"react-router": "^7.1.1",
 		"react-select": "^5.9.0",
-		"react-hot-toast": "^2.4.1",
+		"react-hot-toast": "^2.5.1",
 
 		"react-icons": "^5.4.0",
 		"lucide-react": "^0.469.0",
@@ -44,14 +46,16 @@
 		"@graphql-codegen/cli": "^5.0.3",
 		"@graphql-codegen/client-preset": "^4.5.1",
 
-		"@types/node": "^22.10.2",
+		"@types/node": "^22.10.3",
 		"@types/react": "^19.0.2",
 		"@types/react-dom": "^19.0.2",
 		"typescript": "^5.7.2",
 
-		"vite": "^6.0.5",
+		"vite": "^6.0.6",
 		"@vitejs/plugin-react": "^4.3.4",
 		"@rollup/plugin-replace": "^6.0.2",
-		"vite-tsconfig-paths": "^5.1.4"
+		"vite-tsconfig-paths": "^5.1.4",
+
+		"npm-check-updates": "^17.1.13"
 	}
 }
