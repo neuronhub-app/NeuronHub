@@ -1,17 +1,32 @@
+import { Flex, HStack } from "@chakra-ui/react";
+import { IconButton } from "@chakra-ui/react";
 import { MessageSquarePlus, ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { components } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
-
-import { Flex, HStack } from "@chakra-ui/react";
-import { IconButton } from "@chakra-ui/react";
 import type {
 	ReviewCreateForm,
 	TagOption,
 } from "~/apps/reviews/ReviewCreateForm";
+import { NeuronChakraField } from "~/components/forms/NeuronChakraField";
+import {
+	PopoverArrow,
+	PopoverBody,
+	PopoverContent,
+	PopoverRoot,
+	PopoverTrigger,
+} from "~/components/ui/popover";
 
 export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
 	const tags = props.form.watch("tags");
+
+	function getTagNumber(tag: TagOption): number {
+		return tags.findIndex(tagInTags => tagInTags.id === tag.id);
+	}
+
+	function getTagComment(tag: TagOption): string {
+		return tags[getTagNumber(tag)].comment ?? "";
+	}
 
 	return (
 		<Flex>
@@ -42,28 +57,48 @@ export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
 							<HStack>
 								{propsMultiVal.children}
 
-								<VotingButton
+								<VoteButton
 									option={propsMultiVal.data}
 									tags={tags as TagOption[]}
 									form={props.form}
 									voteType="upvote"
 								/>
-								<VotingButton
+								<VoteButton
 									option={propsMultiVal.data}
 									tags={tags as TagOption[]}
 									form={props.form}
 									voteType="downvote"
 								/>
 
-								<IconButton
-									p={0}
-									size="xs"
-									variant="subtle"
-									color="gray"
-									type="button"
-								>
-									<MessageSquarePlus size={10} />
-								</IconButton>
+								<PopoverRoot>
+									<PopoverTrigger asChild>
+										<IconButton
+											p={0}
+											size="xs"
+											variant="subtle"
+											color={
+												getTagComment(propsMultiVal.data) ? "gray.900" : "gray"
+											}
+											type="button"
+										>
+											<MessageSquarePlus size={10} />
+										</IconButton>
+									</PopoverTrigger>
+
+									<PopoverContent>
+										<PopoverArrow />
+										<PopoverBody>
+											<NeuronChakraField
+												isSaveOnEnterOrClick={true} // on-change save triggers re-render and drops Popover
+												form={props.form}
+												formRegister={props.form.register(
+													`tags.${getTagNumber(propsMultiVal.data)}.comment`,
+												)}
+												placeholder="Comment"
+											/>
+										</PopoverBody>
+									</PopoverContent>
+								</PopoverRoot>
 							</HStack>
 						</components.MultiValueLabel>
 					),
@@ -88,7 +123,7 @@ export const tagOptions: TagOption[] = [
 	{ isVotePositive: null, id: "silver", label: "Silver" },
 ];
 
-function VotingButton(props: {
+function VoteButton(props: {
 	option: TagOption;
 	tags: TagOption[];
 	form: ReviewCreateForm.FormType;

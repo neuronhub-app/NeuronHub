@@ -14,6 +14,7 @@ export interface TagOption {
 	readonly id: string;
 	readonly label: string;
 	isVotePositive: boolean | null;
+	comment?: string;
 }
 
 export namespace ReviewCreateForm {
@@ -28,6 +29,7 @@ export namespace ReviewCreateForm {
 				id: z.string(),
 				label: z.string(),
 				isVotePositive: z.boolean().nullable(),
+				comment: z.string().nullable(),
 			}),
 		),
 	});
@@ -60,12 +62,10 @@ export namespace ReviewCreateForm {
 				>
 					<VStack gap={5} alignItems="flex-start">
 						<NeuronChakraField
-							name="title"
 							form={form}
 							formRegister={form.register("title")}
 						/>
 						<NeuronChakraField
-							name="githubUrl"
 							label="GitHub link"
 							placeholder="https://github.com/organization/project"
 							form={form}

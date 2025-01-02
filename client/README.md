@@ -10,7 +10,7 @@
 
 ### Upgrade
 
-With npm-check-updates.
+Using npm-check-updates.
 
 - bun run check-update
 - bun run upgrade
