@@ -1,5 +1,5 @@
 ---
-reviewed_at: 2024.12.16
+reviewed_at: 2025.01.01
 ---
 
 ## Scopes
@@ -11,37 +11,29 @@ Write before `:`
 - feat
 - fix - bug fixes or reverts
 - refac - including cleanup
-- ui - visual changes in frontend/
+- ui - visual changes in client/
 - build - dependencies in pyproject.toml, package.json; frontend compilation, etc
 - ci - deployments and pipelines
 - docs
 - perf - performance
 - style - code style and formatting
 - test
-- sec - security
 
 ### Scopes
 
 Put in the brackets after Type, as `()`
 
-- monitor - sentry, datadog, etc. but not snyk (it's `sec` type) or PostHog
+- monitor - sentry, datadog, etc
 - track - PostHog or other changes re analytics and activity tracking
-- act - apps.actions, business logic for the Actions and the algorithm for generating them, Actions
-  Composer, services, models
-- crms
-- rls - row level security
 - auth - apps.auth or frontend logic for it, hijacking, permissions, etc
-- nylas
-- stats - apps.stats
 - admin - django admin related
-- prospect - backend or frontend for the prospecting feature
 - graphql - related to strawberry structure and/or graphql types
+- be - backend
+- fe - frontend
 
 Scopes for the `docs` type:
 - refac
 - glossary
-- be - backend
-- fe - frontend
 - readme - either backend or frontend or root
 
 ### Examples
