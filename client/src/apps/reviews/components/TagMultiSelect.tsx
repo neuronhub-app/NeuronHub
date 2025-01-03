@@ -83,16 +83,17 @@ export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
 								{propsMultiVal.children}
 
 								<VoteButton
-									option={propsMultiVal.data}
+									isPositive={true}
+									tagId={propsMultiVal.data.id}
+									// cast, since react-hook-forms fucks TagOption fields with Optional<> type
 									tags={tags as TagOption[]}
 									form={props.form}
-									voteType="upvote"
 								/>
 								<VoteButton
-									option={propsMultiVal.data}
+									isPositive={false}
+									tagId={propsMultiVal.data.id}
 									tags={tags as TagOption[]}
 									form={props.form}
-									voteType="downvote"
 								/>
 
 								<PopoverRoot>
@@ -114,7 +115,7 @@ export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
 										<PopoverArrow />
 										<PopoverBody>
 											<NeuronChakraField
-												isSaveOnEnterOrClick={true} // on-change save triggers re-render and drops Popover
+												isSaveOnEnterOrClick={true} // on-change save triggers re-render and drops Popover state
 												form={props.form}
 												formRegister={props.form.register(
 													`tags.${getTagNumber(propsMultiVal.data)}.comment`,
@@ -134,51 +135,25 @@ export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
 }
 
 function VoteButton(props: {
-	option: TagOption;
+	tagId: string;
 	tags: TagOption[];
 	form: ReviewCreateForm.FormType;
-	voteType: "upvote" | "downvote";
+	isPositive: boolean;
 }): ReactNode {
-	function handleVote(): void {
-		const optionValue = props.option.id;
+	function onVoteButtonClick(): void {
+		const tag = props.tags.find(tag => tag.id === props.tagId);
+		const tagUpdated = toggleTagVoteValue(tag, props.isPositive);
 
-		const tagVotedRaw = props.tags.find(tag => tag.id === optionValue);
-		if (!tagVotedRaw) return;
-
-		const tagVoted = Object.assign({}, tagVotedRaw);
-
-		if (props.voteType === "upvote") {
-			tagVoted.isVotePositive =
-				tagVoted.isVotePositive === null || tagVoted.isVotePositive === false
-					? true
-					: null;
-		} else if (props.voteType === "downvote") {
-			tagVoted.isVotePositive =
-				tagVoted.isVotePositive === null || tagVoted.isVotePositive === true
-					? false
-					: null;
-		}
-
-		props.form.setValue("tags", [
-			...props.tags.filter(tag => tag.id !== optionValue),
-			tagVoted,
-		]);
+		props.form.setValue(
+			"tags",
+			props.tags.map(tag => (tag.id === props.tagId ? tagUpdated : tag)),
+		);
 	}
 
-	const isActive =
-		props.voteType === "upvote"
-			? props.tags.some(
-					tag => tag.id === props.option.id && tag.isVotePositive === true,
-				)
-			: props.tags.some(
-					tag => tag.id === props.option.id && tag.isVotePositive === false,
-				);
-
-	const color = isActive
-		? props.voteType === "upvote"
-			? "green"
-			: "red"
-		: "gray";
+	const isButtonActive = props.tags.some(
+		tag => tag.id === props.tagId && tag.isVotePositive === props.isPositive,
+	);
+	const color = isButtonActive ? (props.isPositive ? "green" : "red") : "gray";
 
 	return (
 		<IconButton
@@ -186,13 +161,24 @@ function VoteButton(props: {
 			size="xs"
 			variant="subtle"
 			color={color}
-			onClick={handleVote}
+			onClick={onVoteButtonClick}
 		>
-			{props.voteType === "upvote" ? (
+			{props.isPositive ? (
 				<ThumbsUpIcon size={10} />
 			) : (
 				<ThumbsDownIcon size={10} />
 			)}
 		</IconButton>
 	);
+}
+
+function toggleTagVoteValue(tag: TagOption, isPositive: boolean): TagOption {
+	if (
+		(isPositive && tag.isVotePositive === true) ||
+		(!isPositive && tag.isVotePositive === false)
+	) {
+		return { ...tag, isVotePositive: null };
+	}
+
+	return { ...tag, isVotePositive: isPositive };
 }
