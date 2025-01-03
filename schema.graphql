@@ -14,6 +14,19 @@ type DjangoModelType {
   pk: ID!
 }
 
+input IDBaseFilterLookup {
+  """Exact match. Filter will be skipped on `null` value"""
+  exact: ID
+
+  """Assignment test. Filter will be skipped on `null` value"""
+  is_null: Boolean
+
+  """
+  Exact match of items in a given list. Filter will be skipped on `null` value
+  """
+  in_list: [ID!]
+}
+
 type Mutation {
   logout: Boolean!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
@@ -27,6 +40,74 @@ type Query {
   user_current: UserType
   tools: [ToolType!]!
   tool(pk: ID!): ToolType!
+  tool_tags(filters: ToolTagFilter): [ToolTagType!]!
+}
+
+input StrFilterLookup {
+  """Exact match. Filter will be skipped on `null` value"""
+  exact: String
+
+  """Assignment test. Filter will be skipped on `null` value"""
+  is_null: Boolean
+
+  """
+  Exact match of items in a given list. Filter will be skipped on `null` value
+  """
+  in_list: [String!]
+
+  """Case-insensitive exact match. Filter will be skipped on `null` value"""
+  i_exact: String
+
+  """
+  Case-sensitive containment test. Filter will be skipped on `null` value
+  """
+  contains: String
+
+  """
+  Case-insensitive containment test. Filter will be skipped on `null` value
+  """
+  i_contains: String
+
+  """Case-sensitive starts-with. Filter will be skipped on `null` value"""
+  starts_with: String
+
+  """Case-insensitive starts-with. Filter will be skipped on `null` value"""
+  i_starts_with: String
+
+  """Case-sensitive ends-with. Filter will be skipped on `null` value"""
+  ends_with: String
+
+  """Case-insensitive ends-with. Filter will be skipped on `null` value"""
+  i_ends_with: String
+
+  """
+  Case-sensitive regular expression match. Filter will be skipped on `null` value
+  """
+  regex: String
+
+  """
+  Case-insensitive regular expression match. Filter will be skipped on `null` value
+  """
+  i_regex: String
+}
+
+input ToolTagFilter {
+  id: IDBaseFilterLookup
+  name: StrFilterLookup
+  AND: ToolTagFilter
+  OR: ToolTagFilter
+  NOT: ToolTagFilter
+  DISTINCT: Boolean
+}
+
+type ToolTagType {
+  tools: [ToolType!]!
+  tag_parent: ToolTagType!
+  tag_children(filters: ToolTagFilter): [ToolTagType!]!
+  author: UserType!
+  id: ID!
+  name: String!
+  description: String!
 }
 
 type ToolType {

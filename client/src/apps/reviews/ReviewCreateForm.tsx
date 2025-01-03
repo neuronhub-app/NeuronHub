@@ -1,6 +1,5 @@
 import { Box, VStack } from "@chakra-ui/react";
 import { Heading } from "@chakra-ui/react";
-import { DevTool } from "@hookform/devtools";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -12,7 +11,7 @@ import { Button } from "~/components/ui/button";
 
 export interface TagOption {
 	readonly id: string;
-	readonly label: string;
+	readonly name: string;
 	isVotePositive: boolean | null;
 	comment?: string;
 }
@@ -27,7 +26,7 @@ export namespace ReviewCreateForm {
 		tags: z.array(
 			z.object({
 				id: z.string(),
-				label: z.string(),
+				name: z.string(),
 				isVotePositive: z.boolean().nullable(),
 				comment: z.string().nullable(),
 			}),
@@ -46,20 +45,20 @@ export namespace ReviewCreateForm {
 
 		const state = form.watch();
 
+		async function handleSubmit(values: z.infer<typeof schema>) {
+			return new Promise(resolve => {
+				setTimeout(() => {
+					toast.success("saved");
+					resolve(true);
+				}, 700);
+			});
+		}
+
 		return (
 			<VStack alignItems="flex-start">
 				<Heading fontSize="xl">Add review</Heading>
 
-				<form
-					onSubmit={form.handleSubmit(values => {
-						return new Promise(resolve => {
-							setTimeout(() => {
-								toast.success("saved");
-								resolve(true);
-							}, 700);
-						});
-					})}
-				>
+				<form onSubmit={form.handleSubmit(values => handleSubmit(values))}>
 					<VStack gap={5} alignItems="flex-start">
 						<NeuronChakraField
 							form={form}
@@ -76,8 +75,8 @@ export namespace ReviewCreateForm {
 
 						<Box>
 							{state.tags?.map(tag => (
-								<Box key={tag.id}>
-									{tag.label}
+								<Box key={tag.id ?? tag.name}>
+									{tag.name}
 									{tag.isVotePositive && ", positive"}
 								</Box>
 							))}
@@ -86,8 +85,6 @@ export namespace ReviewCreateForm {
 						<Button loading={form.formState.isSubmitting} type="submit">
 							Submit
 						</Button>
-
-						<DevTool control={form.control} />
 
 						<Box whiteSpace="pre">{JSON.stringify(state, null, 2)}</Box>
 					</VStack>

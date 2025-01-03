@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import strawberry
 import strawberry_django
+from strawberry import auto
 
 from neuronhub.apps.tools.models import Tool
 from neuronhub.apps.tools.models import ToolTag
@@ -27,6 +28,12 @@ class ToolType:
     alternatives: list[ToolType]
 
 
+@strawberry_django.filter(ToolTag, lookups=True)
+class ToolTagFilter:
+    id: auto
+    name: auto
+
+
 @strawberry_django.type(
     ToolTag,
     fields=[
@@ -34,6 +41,7 @@ class ToolType:
         "name",
         "description",
     ],
+    filters=ToolTagFilter,
 )
 class ToolTagType:
     tools: list[ToolType] = strawberry_django.field()
@@ -46,3 +54,4 @@ class ToolTagType:
 class ToolsQuery:
     tools: list[ToolType] = strawberry_django.field()
     tool: ToolType = strawberry_django.field()
+    tool_tags: list[ToolTagType] = strawberry_django.field()

@@ -4,6 +4,9 @@ import { MessageSquarePlus, ThumbsDownIcon, ThumbsUpIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { components } from "react-select";
 import AsyncCreatableSelect from "react-select/async-creatable";
+import { gql } from "urql";
+import { useClient } from "urql";
+
 import type {
 	ReviewCreateForm,
 	TagOption,
@@ -20,6 +23,8 @@ import {
 export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
 	const tags = props.form.watch("tags");
 
+	const client = useClient();
+
 	function getTagNumber(tag: TagOption): number {
 		return tags.findIndex(tagInTags => tagInTags.id === tag.id);
 	}
@@ -34,23 +39,43 @@ export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
 				cacheOptions
 				defaultOptions
 				isMulti
-				loadOptions={async (inputValue: string) => {
-					await new Promise(resolve => setTimeout(resolve, 300));
-					const tagsFound = tagOptions.filter(tag =>
-						tag.label.toLowerCase().includes(inputValue.toLowerCase()),
-					);
-					if (tagsFound.length > 0) {
-						return tagsFound;
-					} else {
-						return tagOptions;
-					}
-				}}
+				openMenuOnClick={false}
+				closeMenuOnSelect={false}
 				onChange={(multiValue, actionMeta) => {
 					props.form.setValue(
 						"tags",
 						multiValue.map(value => value),
 					);
 				}}
+				getNewOptionData={inputValue => ({
+					id: inputValue,
+					name: inputValue,
+					isVotePositive: null,
+				})}
+				loadOptions={async (inputValue: string) => {
+					const res = await client
+						.query(
+							gql(`
+								query ToolTagsQuery($name: String) {
+									tool_tags(filters: { name: {contains: $name} }) {
+										id
+										name
+									}
+								}
+							`),
+							{
+								name: inputValue,
+							},
+						)
+						.toPromise();
+
+					const tagsFound = res.data.tool_tags.filter(tag =>
+						tag.name.toLowerCase().includes(inputValue.toLowerCase()),
+					);
+					return tagsFound;
+				}}
+				getOptionLabel={(option: TagOption) => option.name}
+				getOptionValue={(option: TagOption) => option.id}
 				components={{
 					MultiValueLabel: propsMultiVal => (
 						<components.MultiValueLabel {...propsMultiVal}>
@@ -103,25 +128,10 @@ export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
 						</components.MultiValueLabel>
 					),
 				}}
-				openMenuOnClick={false}
-				closeMenuOnSelect={false}
 			/>
 		</Flex>
 	);
 }
-
-export const tagOptions: TagOption[] = [
-	{ isVotePositive: null, id: "JavaScript", label: "JavaScript" },
-	{ isVotePositive: null, id: "TypeScript", label: "TypeScript" },
-	{ isVotePositive: null, id: "purple", label: "Purple" },
-	{ isVotePositive: null, id: "red", label: "Red" },
-	{ isVotePositive: null, id: "orange", label: "Orange" },
-	{ isVotePositive: null, id: "yellow", label: "Yellow" },
-	{ isVotePositive: null, id: "green", label: "Green" },
-	{ isVotePositive: null, id: "forest", label: "Forest" },
-	{ isVotePositive: null, id: "slate", label: "Slate" },
-	{ isVotePositive: null, id: "silver", label: "Silver" },
-];
 
 function VoteButton(props: {
 	option: TagOption;

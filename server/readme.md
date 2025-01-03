@@ -1,7 +1,0 @@
-- uv init
-- uv sync
-- createdb neuronhub
-- createuser neuronhub
-- psql neuronhub
-  - ALTER USER neuronhub CREATEDB;
-- uv run python manage.py migrate
