@@ -20,7 +20,7 @@ export function NeuronChakraField<FormType>(
 	} & Omit<ChakraField.RootProps, "label">,
 ) {
 	const state = props.form.formState;
-	const { formRegister, ...propsRoot } = props;
+	const { formRegister, onChange, isSaveOnEnterOrClick, ...propsRoot } = props;
 
 	const [value, setValue] = useState<string>(
 		state.dirtyFields[formRegister.name],
@@ -39,9 +39,9 @@ export function NeuronChakraField<FormType>(
 				<Input
 					{...formRegister}
 					onChange={async event => {
-						if (props.isSaveOnEnterOrClick) {
-							setValue(event.target.value);
-						} else {
+						setValue(event.target.value);
+
+						if (!isSaveOnEnterOrClick) {
 							await formRegister.onChange(event);
 						}
 					}}
@@ -50,21 +50,22 @@ export function NeuronChakraField<FormType>(
 							await formRegister.onChange(event);
 						}
 					}}
+					onBlur={async event => {
+						if (isSaveOnEnterOrClick) {
+							await formRegister.onChange(event);
+						}
+					}}
 					placeholder={props.placeholder}
 					_invalid={state.errors?.[formRegister.name]}
 				/>
 
-				{props.isSaveOnEnterOrClick && (
+				{isSaveOnEnterOrClick && (
 					<IconButton
 						p={0}
 						variant="subtle"
 						color="gray"
 						type="button"
-						onClick={async () => {
-							await formRegister.onChange({
-								target: { value: value },
-							});
-						}}
+						onClick={() => formRegister.onChange({ target: { value: value } })}
 					>
 						<CheckIcon size={10} />
 					</IconButton>
