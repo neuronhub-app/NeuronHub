@@ -1,14 +1,13 @@
 {
 	"compilerOptions": {
-		// Copied from Vite
-		// ES2020 replaced with ESNext for Chakra UI
-		"target": "ESNext",
-		"useDefineForClassFields": true,
+		"target": "ESNext", // ES2020 from Vite, replaced with ESNext for Chakra
+		"module": "ESNext", // ES6 replace with ESNext for Chakra
 		"lib": ["ESNext", "DOM", "DOM.Iterable"],
-		"module": "ES6",
+		"moduleResolution": "Bundler", // by Vite and Chakra
+
+		"useDefineForClassFields": true,
 		"skipLibCheck": true,
 
-		"moduleResolution": "Bundler", // by Vite
 		"isolatedModules": true,
 		"moduleDetection": "force",
 		"noEmit": true,
@@ -24,7 +23,7 @@
 			"": ["./node_modules/*"],
 			"@/graphql/*": ["./graphql/*"],
 			"~/*": ["./src/*"],
-			"styled-system": ["./styled-system/*"],
+			"@/*": ["./src/*"],
 		},
 
 		"plugins": [
@@ -35,5 +34,5 @@
       }
     ]
 	},
-	"include": ["src", "styled-system"],
+	"include": ["src"],
 }

@@ -1,6 +1,0 @@
-@layer reset, base, tokens, recipes, utilities;
-
-html,
-body {
-	height: 100%;
-}
