@@ -5,7 +5,7 @@ import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-	root: path.resolve(__dirname, "src"), // Set the root to 'src'
+	root: path.resolve(__dirname, "src"),
 
 	server: {
 		port: 3000,
@@ -41,9 +41,9 @@ export default defineConfig({
 
 function getAliasForProject() {
 	return {
-		"~": path.resolve(__dirname, "./src"),
 		"@/graphql": path.resolve(__dirname, "./graphql"),
-		"styled-system": path.resolve(__dirname, "./styled-system"),
+		"~": path.resolve(__dirname, "./src"),
+		"@": path.resolve(__dirname, "./src"),
 	};
 }
 function getAliasReactRouterGenerated() {

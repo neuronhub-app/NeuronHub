@@ -6,7 +6,7 @@
 		"dev": "vite --config vite.config.ts",
 		"build": "tsc && vite build",
 		"serve": "vite preview",
-		"format": "npx biome check --write",
+		"format": "bun run biome check --write",
 		"check-update": "bun run ncu",
 		"upgrade": "bun run ncu --upgrade && bun install",
 		"panda:codegen": "panda codegen",
@@ -33,7 +33,7 @@
 
 		"valtio": "^2.1.2",
 		"zod": "^3.24.1",
-		"marked": "^15.0.4",
+		"marked": "^15.0.5",
 		"@sentry/react": "^8.47.0",
 
 		"urql": "^4.2.1",
@@ -46,12 +46,12 @@
 		"@graphql-codegen/cli": "^5.0.3",
 		"@graphql-codegen/client-preset": "^4.5.1",
 
-		"@types/node": "^22.10.3",
+		"@types/node": "^22.10.4",
 		"@types/react": "^19.0.2",
 		"@types/react-dom": "^19.0.2",
 		"typescript": "^5.7.2",
 
-		"vite": "^6.0.6",
+		"vite": "^6.0.7",
 		"@vitejs/plugin-react": "^4.3.4",
 		"@rollup/plugin-replace": "^6.0.2",
 		"vite-tsconfig-paths": "^5.1.4",

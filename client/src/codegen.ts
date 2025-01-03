@@ -2,7 +2,7 @@ import type { CodegenConfig } from "@graphql-codegen/cli";
 
 export default {
 	schema: "../schema.graphql",
-	documents: ["./**/*"],
+	documents: ["./src/**/*"],
 	ignoreNoDocuments: true, // for better experience with the watcher
 
 	generates: {

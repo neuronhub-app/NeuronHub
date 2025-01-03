@@ -1,10 +1,9 @@
 /.output
 /.vite
 
-# pandacss
-/styled-system
-
 /node_modules
 
 /logs
 *.log
+
+vite.config.js
