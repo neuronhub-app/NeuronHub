@@ -1,16 +1,31 @@
 import { TagMultiSelect } from "@/apps/reviews/components/TagMultiSelect";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
+import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
 import { FormChakraSlider } from "@/components/forms/FormChakraSlider";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { zStringEmpty } from "@/components/forms/zod";
 import { Button } from "@/components/ui/button";
-import { Box, Fieldset, Flex, HStack, Text, VStack } from "@chakra-ui/react";
+import {
+  Box,
+  Fieldset,
+  Flex,
+  HStack,
+  Icon,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { Heading } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatISO } from "date-fns";
+import { Webhook } from "lucide-react";
+import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { AiFillLayout } from "react-icons/ai";
+import { FaGithub, FaShoppingCart } from "react-icons/fa";
+import { FaBook } from "react-icons/fa";
+import { FaAppStoreIos } from "react-icons/fa";
 import { HiLockClosed, HiOutlineClock } from "react-icons/hi2";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
@@ -45,6 +60,14 @@ export namespace ReviewCreateForm {
     reviewed_at: z.string().date().optional(),
     content: z.string().optional(),
     content_private: z.string().optional(),
+    type: z.union([
+      z.literal("program"),
+      z.literal("material"),
+      z.literal("product"),
+      z.literal("app"),
+      z.literal("service"),
+      z.literal("other"),
+    ]),
     tags: z
       .array(
         z.object({
@@ -75,6 +98,7 @@ export namespace ReviewCreateForm {
       defaultValues: {
         rating: 50,
         reviewed_at: formatISO(new Date(), { representation: "date" }),
+        type: "program",
       },
     }) as FormType; // casting due to a type mess in react-hook-form. It was surfaced by adding `defaultValues` prop, without it casting isn't needed.
 
@@ -110,20 +134,34 @@ export namespace ReviewCreateForm {
                     formRegister={form.register("title")}
                     label="Name"
                   />
+                </HStack>
+              </Fieldset.Content>
+            </Fieldset.Root>
+
+            <FormChakraSegmentControl
+              form={form}
+              formRegister={form.register("type")}
+              label="Tool type"
+              items={[
+                getToolType("program", <FaGithub />),
+                getToolType("service", <AiFillLayout />),
+                getToolType("material", <FaBook />),
+                getToolType("app", <FaAppStoreIos />),
+                getToolType("product", <FaShoppingCart />),
+                getToolType("other", <Webhook />),
+              ]}
+            />
+
+            <Fieldset.Root>
+              <Fieldset.Content display="flex" flexDir="row">
+                {/* todo responsiveness */}
+                <HStack w="full" gap={style.gapMd}>
                   <FormChakraInput
                     label="Domain"
                     placeholder="name.com"
                     form={form}
                     formRegister={form.register("domain")}
                   />
-                </HStack>
-              </Fieldset.Content>
-            </Fieldset.Root>
-
-            <Fieldset.Root>
-              <Fieldset.Content display="flex" flexDir="row">
-                {/* todo responsiveness */}
-                <HStack w="full" gap={style.gapMd}>
                   <FormChakraInput
                     label="Source"
                     placeholder="Link or reference"
@@ -215,7 +253,7 @@ export namespace ReviewCreateForm {
                     form={form}
                     formRegister={form.register("is_private")}
                     label="Private"
-                    helperText="Until you change it"
+                    helperText="Review only visible to you"
                     icon={<HiLockClosed size={23} />}
                     minW="200px"
                   />
@@ -241,4 +279,16 @@ export namespace ReviewCreateForm {
       </VStack>
     );
   }
+}
+
+function getToolType(value: string, icon: ReactNode) {
+  return {
+    value: value,
+    label: (
+      <HStack>
+        <Icon fontSize="md">{icon}</Icon>
+        <Text textTransform="capitalize">{value}</Text>
+      </HStack>
+    ),
+  };
 }
