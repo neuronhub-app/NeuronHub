@@ -16,12 +16,12 @@ Setup
 - bun run build
 - bun run preview
 
-### Upgrade
+### Update
 
 Using npm-check-updates.
 
-- bun run check-update
-- bun run upgrade
+- bun run update-check
+- bun run update
 
 Caveats
 --------------------------------
