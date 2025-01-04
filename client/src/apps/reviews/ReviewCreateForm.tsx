@@ -35,7 +35,7 @@ import { z } from "zod";
 export interface TagOption {
   readonly id: string;
   readonly name: string;
-  isVotePositive: boolean | null;
+  is_vote_positive: boolean | null;
   comment?: string;
 }
 import { Checkbox } from "@/components/ui/checkbox";
@@ -72,7 +72,7 @@ export namespace ReviewCreateForm {
         z.object({
           id: z.string(),
           name: z.string(),
-          isVotePositive: z.boolean().nullable(),
+          is_vote_positive: z.boolean().nullable(),
           comment: z.string().nullable(),
         }),
       )

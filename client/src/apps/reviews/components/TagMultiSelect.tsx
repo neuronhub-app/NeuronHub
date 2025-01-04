@@ -55,7 +55,7 @@ export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
         getNewOptionData={inputValue => ({
           id: inputValue,
           name: inputValue,
-          isVotePositive: null,
+          is_vote_positive: null,
         })}
         loadOptions={async (inputValue: string) => {
           const res = await client
@@ -156,7 +156,7 @@ function VoteButton(props: {
   }
 
   const isButtonActive = props.tags.some(
-    tag => tag.id === props.tagId && tag.isVotePositive === props.isPositive,
+    tag => tag.id === props.tagId && tag.is_vote_positive === props.isPositive,
   );
   const color = isButtonActive ? (props.isPositive ? "green" : "red") : "gray";
 
@@ -179,11 +179,11 @@ function VoteButton(props: {
 
 function toggleTagVoteValue(tag: TagOption, isPositive: boolean): TagOption {
   if (
-    (isPositive && tag.isVotePositive === true) ||
-    (!isPositive && tag.isVotePositive === false)
+    (isPositive && tag.is_vote_positive === true) ||
+    (!isPositive && tag.is_vote_positive === false)
   ) {
-    return { ...tag, isVotePositive: null };
+    return { ...tag, is_vote_positive: null };
   }
 
-  return { ...tag, isVotePositive: isPositive };
+  return { ...tag, is_vote_positive: isPositive };
 }
