@@ -1,24 +1,25 @@
-import { Textarea } from "@chakra-ui/react";
+import { Tooltip } from "@/components/ui/tooltip";
+import { Box, Float, Icon, Textarea } from "@chakra-ui/react";
 import { Field as ChakraField } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
+import { FaMarkdown } from "react-icons/fa";
 
-export function FormChakraTextarea<FormType>(
-  props: {
-    form: UseFormReturn<FormType>;
-    formRegister: UseFormRegisterReturn;
-    placeholder?: string;
-    label?: ReactNode;
-    helperText?: ReactNode;
-    errorText?: ReactNode;
-    optionalText?: ReactNode;
-  } & Omit<ChakraField.RootProps, "label">,
-) {
+export function FormChakraTextarea<FormType>(props: {
+  form: UseFormReturn<FormType>;
+  formRegister: UseFormRegisterReturn;
+  placeholder?: string;
+  label?: ReactNode;
+  helperText?: ReactNode;
+  errorText?: ReactNode;
+  optionalText?: ReactNode;
+  isShowIconMarkdown?: boolean;
+  fieldProps?: Omit<ChakraField.RootProps, "label">;
+}) {
   const state = props.form.formState;
-  const { formRegister, helperText, ...propsRoot } = props;
 
   return (
-    <ChakraField.Root {...propsRoot}>
+    <ChakraField.Root {...props.fieldProps}>
       {props.label && (
         <ChakraField.Label>
           {props.label}
@@ -26,21 +27,41 @@ export function FormChakraTextarea<FormType>(
         </ChakraField.Label>
       )}
 
-      <Textarea
-        {...formRegister}
-        autoresize
-        onChange={event => formRegister.onChange(event)}
-        placeholder={props.placeholder}
-        aria-invalid={!!state.errors?.[formRegister.name]}
-        _hover={{ borderColor: "gray.300" }}
-      />
+      <Box w="full">
+        <Textarea
+          {...props.formRegister}
+          autoresize
+          onChange={event => props.formRegister.onChange(event)}
+          placeholder={props.placeholder}
+          aria-invalid={!!state.errors?.[props.formRegister.name]}
+          _hover={{ borderColor: "gray.300" }}
+        />
+        {props.isShowIconMarkdown && (
+          <Float offset="6" placement="bottom-end">
+            <Tooltip
+              content="Markdown supported"
+              openDelay={400}
+              closeDelay={100}
+              showArrow
+            >
+              <Icon
+                opacity={0.25}
+                _hover={{ opacity: 0.5, cursor: "context-menu" }}
+                fontSize="19px"
+              >
+                <FaMarkdown />
+              </Icon>
+            </Tooltip>
+          </Float>
+        )}
+      </Box>
 
-      {helperText && (
-        <ChakraField.HelperText>{helperText}</ChakraField.HelperText>
+      {props.helperText && (
+        <ChakraField.HelperText>{props.helperText}</ChakraField.HelperText>
       )}
-      {state.errors?.[formRegister.name]?.message && (
+      {state.errors?.[props.formRegister.name]?.message && (
         <ChakraField.ErrorText>
-          {state.errors?.[formRegister.name]?.message}
+          {state.errors?.[props.formRegister.name]?.message}
         </ChakraField.ErrorText>
       )}
     </ChakraField.Root>

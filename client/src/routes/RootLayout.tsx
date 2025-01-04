@@ -2,6 +2,7 @@ import { UserCurrentBox } from "@/apps/users/UserCurrentBox";
 import { Flex, VStack } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
 import { Text } from "@chakra-ui/react";
+import { getYear } from "date-fns";
 import { Webhook } from "lucide-react";
 import { Outlet } from "react-router";
 
@@ -57,7 +58,7 @@ export function RootLayout() {
         borderColor="gray.5"
       >
         <Text fontSize="sm" color="gray.7">
-          © 2024 NeuronHub
+          © {getYear(new Date())} NeuronHub
         </Text>
       </Flex>
     </VStack>

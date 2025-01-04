@@ -126,7 +126,7 @@ export namespace ReviewCreateForm {
                 <HStack w="full" gap={style.gapMd}>
                   <FormChakraInput
                     label="Source"
-                    placeholder="URL or name"
+                    placeholder="Link or reference"
                     form={form}
                     formRegister={form.register("source")}
                   />
@@ -167,9 +167,7 @@ export namespace ReviewCreateForm {
                 }}
               >
                 Rating{" "}
-                {formState.rating && (
-                  <Tag ml={2}>{formState.rating}</Tag>
-                )}
+                {formState.rating && <Tag ml={2}>{formState.rating}</Tag>}
               </Checkbox>
 
               <FormChakraSlider
@@ -201,29 +199,15 @@ export namespace ReviewCreateForm {
                 form={form}
                 formRegister={form.register("content")}
                 label="Content"
-                helperText="Markdown supported" // todo change to an icon
+                isShowIconMarkdown
               />
-
-              <VStack w="full" align="flex-start">
-                <Checkbox
-                  size="sm"
-                  onChange={() => {
-                    $state.isAddPrivateNote = !$state.isAddPrivateNote;
-                    if (!$state.isAddPrivateNote) {
-                      form.setValue("content_private", "");
-                    }
-                  }}
-                >
-                  Private note
-                </Checkbox>
-
-                <FormChakraTextarea
-                  hidden={!$state.isAddPrivateNote}
-                  form={form}
-                  formRegister={form.register("content_private")}
-                  placeholder="Only visible to you"
-                />
-              </VStack>
+              <FormChakraTextarea
+                form={form}
+                formRegister={form.register("content_private")}
+                label="Private note"
+                placeholder="Only visible to you"
+                isShowIconMarkdown
+              />
 
               <CheckboxGroup>
                 <Flex gap={style.gapMd}>
