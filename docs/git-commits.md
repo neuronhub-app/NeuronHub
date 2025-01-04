@@ -27,7 +27,7 @@ Put in the brackets after Type, as `()`
 - track - PostHog or other changes re analytics and activity tracking
 - auth - apps.auth or frontend logic for it, hijacking, permissions, etc
 - admin - django admin related
-- graphql - related to strawberry structure and/or graphql types
+- api - related to strawberry structure and/or graphql types
 - BE - backend
 - FE - frontend
 - tags - related to FE or BE tags implementation

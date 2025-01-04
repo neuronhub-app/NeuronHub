@@ -242,6 +242,7 @@ LOGGING = {
 }
 rich.traceback.install(
     width=900,
+    code_width=120,
     show_locals=True,
     extra_lines=4,
     locals_max_length=10,

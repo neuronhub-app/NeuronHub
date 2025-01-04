@@ -3,6 +3,7 @@
 
 export type introspection_types = {
   Boolean: unknown;
+  Decimal: unknown;
   DjangoModelType: {
     kind: "OBJECT";
     name: "DjangoModelType";
@@ -52,6 +53,14 @@ export type introspection_types = {
     kind: "OBJECT";
     name: "Mutation";
     fields: {
+      create_review: {
+        name: "create_review";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
       logout: {
         name: "logout";
         type: {
@@ -208,6 +217,145 @@ export type introspection_types = {
     ];
   };
   String: unknown;
+  ToolReviewDraftAlternative: {
+    kind: "INPUT_OBJECT";
+    name: "ToolReviewDraftAlternative";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "tool_id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "tool_alternative_id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "is_vote_positive";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+        defaultValue: null;
+      },
+    ];
+  };
+  ToolReviewTypeInput: {
+    kind: "INPUT_OBJECT";
+    name: "ToolReviewTypeInput";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "tool";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "INPUT_OBJECT"; name: "ToolTypeInput"; ofType: null };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "title";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "content";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "content_private";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "usage_status";
+        type: { kind: "ENUM"; name: "UsageStatus"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "shared_user_ids";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+            };
+          };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "shared_org_ids";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+            };
+          };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "rating";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Decimal"; ofType: null };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "is_private";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "tags";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: {
+                kind: "INPUT_OBJECT";
+                name: "ToolTagTypeInput";
+                ofType: null;
+              };
+            };
+          };
+        };
+        defaultValue: null;
+      },
+    ];
+  };
   ToolTagFilter: {
     kind: "INPUT_OBJECT";
     name: "ToolTagFilter";
@@ -327,6 +475,38 @@ export type introspection_types = {
       };
     };
   };
+  ToolTagTypeInput: {
+    kind: "INPUT_OBJECT";
+    name: "ToolTagTypeInput";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "id";
+        type: { kind: "SCALAR"; name: "ID"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "name";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "description";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "comment";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "is_vote_positive";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+    ];
+  };
   ToolType: {
     kind: "OBJECT";
     name: "ToolType";
@@ -400,6 +580,68 @@ export type introspection_types = {
         };
       };
     };
+  };
+  ToolTypeInput: {
+    kind: "INPUT_OBJECT";
+    name: "ToolTypeInput";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "name";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "description";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "github_url";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "crunchbase_url";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "domain";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "alternatives";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: {
+              kind: "INPUT_OBJECT";
+              name: "ToolReviewDraftAlternative";
+              ofType: null;
+            };
+          };
+        };
+        defaultValue: null;
+      },
+    ];
+  };
+  UsageStatus: {
+    name: "UsageStatus";
+    enumValues:
+      | "USING"
+      | "USED"
+      | "WANT_TO_USE"
+      | "INTERESTED"
+      | "NOT_INTERESTED";
   };
   UserType: {
     kind: "OBJECT";

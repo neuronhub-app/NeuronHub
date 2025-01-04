@@ -27,6 +27,8 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
+  /** Decimal (fixed-point) */
+  Decimal: { input: any; output: any };
 };
 
 export type DjangoModelType = {
@@ -45,8 +47,13 @@ export type IdBaseFilterLookup = {
 
 export type Mutation = {
   __typename?: "Mutation";
+  create_review: UserType;
   logout: Scalars["Boolean"]["output"];
   update_user: UserType;
+};
+
+export type MutationCreate_ReviewArgs = {
+  data: ToolReviewTypeInput;
 };
 
 export type MutationUpdate_UserArgs = {
@@ -100,6 +107,25 @@ export type StrFilterLookup = {
   starts_with?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type ToolReviewDraftAlternative = {
+  is_vote_positive: Scalars["Boolean"]["input"];
+  tool_alternative_id: Scalars["ID"]["input"];
+  tool_id: Scalars["ID"]["input"];
+};
+
+export type ToolReviewTypeInput = {
+  content?: InputMaybe<Scalars["String"]["input"]>;
+  content_private?: InputMaybe<Scalars["String"]["input"]>;
+  is_private?: InputMaybe<Scalars["Boolean"]["input"]>;
+  rating: Scalars["Decimal"]["input"];
+  shared_org_ids: Array<Scalars["ID"]["input"]>;
+  shared_user_ids: Array<Scalars["ID"]["input"]>;
+  tags: Array<ToolTagTypeInput>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+  tool: ToolTypeInput;
+  usage_status?: InputMaybe<UsageStatus>;
+};
+
 export type ToolTagFilter = {
   AND?: InputMaybe<ToolTagFilter>;
   DISTINCT?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -124,6 +150,14 @@ export type ToolTagTypeTag_ChildrenArgs = {
   filters?: InputMaybe<ToolTagFilter>;
 };
 
+export type ToolTagTypeInput = {
+  comment?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  id?: InputMaybe<Scalars["ID"]["input"]>;
+  is_vote_positive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+};
+
 export type ToolType = {
   __typename?: "ToolType";
   alternatives: Array<ToolType>;
@@ -135,6 +169,23 @@ export type ToolType = {
   name: Scalars["String"]["output"];
   slug: Scalars["String"]["output"];
 };
+
+export type ToolTypeInput = {
+  alternatives?: InputMaybe<Array<ToolReviewDraftAlternative>>;
+  crunchbase_url?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  domain?: InputMaybe<Scalars["String"]["input"]>;
+  github_url?: InputMaybe<Scalars["String"]["input"]>;
+  name: Scalars["String"]["input"];
+};
+
+export enum UsageStatus {
+  Interested = "INTERESTED",
+  NotInterested = "NOT_INTERESTED",
+  Used = "USED",
+  Using = "USING",
+  WantToUse = "WANT_TO_USE",
+}
 
 export type UserType = {
   __typename?: "UserType";
@@ -153,6 +204,15 @@ export type UserTypeInput = {
   org?: InputMaybe<OneToManyInput>;
 };
 
+export type ToolTagsQueryQueryVariables = Exact<{
+  name?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type ToolTagsQueryQuery = {
+  __typename?: "Query";
+  tool_tags: Array<{ __typename?: "ToolTagType"; id: string; name: string }>;
+};
+
 export type UserCurrentQueryVariables = Exact<{ [key: string]: never }>;
 
 export type UserCurrentQuery = {
@@ -164,6 +224,67 @@ export type UserCurrentQuery = {
   } | null;
 };
 
+export const ToolTagsQueryDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "ToolTagsQuery" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "name" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tool_tags" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filters" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "name" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "contains" },
+                            value: {
+                              kind: "Variable",
+                              name: { kind: "Name", value: "name" },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ToolTagsQueryQuery, ToolTagsQueryQueryVariables>;
 export const UserCurrentDocument = {
   kind: "Document",
   definitions: [

@@ -14,6 +14,8 @@ import * as types from "./graphql";
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
+  "\n\t\t\t\t\t\t\t\tquery ToolTagsQuery($name: String) {\n\t\t\t\t\t\t\t\t\ttool_tags(filters: { name: {contains: $name} }) {\n\t\t\t\t\t\t\t\t\t\tid\n\t\t\t\t\t\t\t\t\t\tname\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t":
+    types.ToolTagsQueryDocument,
   "\n\tquery UserCurrent {\n\t\tuser_current {\n\t\t\tid\n\t\t\tfirst_name\n\t\t}\n\t}\n":
     types.UserCurrentDocument,
 };
@@ -32,6 +34,12 @@ const documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(
+  source: "\n\t\t\t\t\t\t\t\tquery ToolTagsQuery($name: String) {\n\t\t\t\t\t\t\t\t\ttool_tags(filters: { name: {contains: $name} }) {\n\t\t\t\t\t\t\t\t\t\tid\n\t\t\t\t\t\t\t\t\t\tname\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t",
+): (typeof documents)["\n\t\t\t\t\t\t\t\tquery ToolTagsQuery($name: String) {\n\t\t\t\t\t\t\t\t\ttool_tags(filters: { name: {contains: $name} }) {\n\t\t\t\t\t\t\t\t\t\tid\n\t\t\t\t\t\t\t\t\t\tname\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -3,6 +3,7 @@ from strawberry.extensions import ParserCache
 from strawberry.schema.config import StrawberryConfig
 from strawberry.tools import merge_types
 
+from neuronhub.apps.tools.graphql.mutations import ToolsMutation
 from neuronhub.apps.tools.graphql.resolvers import ToolsQuery
 from neuronhub.apps.users.graphql.mutations import UserMutation
 from neuronhub.apps.users.graphql.resolvers import UsersQuery
@@ -18,7 +19,7 @@ Query = merge_types(
 
 
 @strawberry.type
-class Mutation(UserMutation):
+class Mutation(UserMutation, ToolsMutation):
     pass
 
 

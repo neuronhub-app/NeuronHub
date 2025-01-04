@@ -10,6 +10,9 @@ When the condition fails, the following can be returned (following this priority
 """
 directive @IsAuthenticated repeatable on FIELD_DEFINITION
 
+"""Decimal (fixed-point)"""
+scalar Decimal
+
 type DjangoModelType {
   pk: ID!
 }
@@ -30,6 +33,7 @@ input IDBaseFilterLookup {
 type Mutation {
   logout: Boolean!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
+  create_review(data: ToolReviewTypeInput!): UserType! @IsAuthenticated
 }
 
 input OneToManyInput {
@@ -91,6 +95,25 @@ input StrFilterLookup {
   i_regex: String
 }
 
+input ToolReviewDraftAlternative {
+  tool_id: ID!
+  tool_alternative_id: ID!
+  is_vote_positive: Boolean!
+}
+
+input ToolReviewTypeInput {
+  tool: ToolTypeInput!
+  title: String
+  content: String
+  content_private: String
+  usage_status: UsageStatus
+  shared_user_ids: [ID!]!
+  shared_org_ids: [ID!]!
+  rating: Decimal!
+  is_private: Boolean
+  tags: [ToolTagTypeInput!]!
+}
+
 input ToolTagFilter {
   id: IDBaseFilterLookup
   name: StrFilterLookup
@@ -110,6 +133,14 @@ type ToolTagType {
   description: String!
 }
 
+input ToolTagTypeInput {
+  id: ID
+  name: String
+  description: String
+  comment: String
+  is_vote_positive: Boolean
+}
+
 type ToolType {
   slug: String!
   description: String
@@ -119,6 +150,23 @@ type ToolType {
   domain: String!
   crunchbase_url: String!
   github_url: String!
+}
+
+input ToolTypeInput {
+  name: String!
+  description: String
+  github_url: String
+  crunchbase_url: String
+  domain: String
+  alternatives: [ToolReviewDraftAlternative!]
+}
+
+enum UsageStatus {
+  USING
+  USED
+  WANT_TO_USE
+  INTERESTED
+  NOT_INTERESTED
 }
 
 type UserType {
