@@ -47,7 +47,7 @@ export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
             multiValue.map(value => {
               // react-select recreates Objects on change and only preserves `id` and `label` fields,
               // while we need to preserve fields as `comment`
-              const tag = tags.find(tag => tag.id === value.id);
+              const tag = tags?.find(tag => tag.id === value.id);
               return tag ?? value;
             }),
           );

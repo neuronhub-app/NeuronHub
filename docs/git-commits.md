@@ -28,8 +28,9 @@ Put in the brackets after Type, as `()`
 - auth - apps.auth or frontend logic for it, hijacking, permissions, etc
 - admin - django admin related
 - graphql - related to strawberry structure and/or graphql types
-- be - backend
-- fe - frontend
+- BE - backend
+- FE - frontend
+- tags - related to FE or BE tags implementation
 
 Scopes for the `docs` type:
 - refac
