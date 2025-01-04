@@ -36,7 +36,10 @@ export const CheckboxCard = React.forwardRef<
   const hasContent = label || description || icon;
 
   return (
-    <ChakraCheckboxCard.Root {...rest} _hover={{ bg: "gray.50" }}>
+    <ChakraCheckboxCard.Root
+      {...rest}
+      _hover={{ bg: "gray.50", _dark: { bg: "gray.900" }, cursor: "pointer" }}
+    >
       <ChakraCheckboxCard.HiddenInput ref={ref} {...inputProps} />
       <ChakraCheckboxCard.Control>
         {indicatorPlacement === "start" && indicator}

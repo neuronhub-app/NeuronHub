@@ -12,6 +12,7 @@ export function FormChakraSlider<FormType>(props: {
   defaultValue?: number;
   maxW?: string;
   hidden?: boolean;
+  size?: "sm" | "md" | "lg";
 }) {
   const state = props.form.formState;
 
@@ -27,6 +28,7 @@ export function FormChakraSlider<FormType>(props: {
         >
           <Slider
             width="full"
+            size={props.size}
             maxW={props.maxW}
             onFocusChange={({ focusedIndex }) => {
               if (focusedIndex !== -1) {

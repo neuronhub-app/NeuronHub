@@ -34,7 +34,10 @@ export function FormChakraTextarea<FormType>(props: {
           onChange={event => props.formRegister.onChange(event)}
           placeholder={props.placeholder}
           aria-invalid={!!state.errors?.[props.formRegister.name]}
-          _hover={{ borderColor: "gray.300" }}
+          _hover={{
+            borderColor: "gray.300",
+            _dark: { borderColor: "gray.700" },
+          }}
         />
         {props.isShowIconMarkdown && (
           <Float offset="6" placement="bottom-end">
@@ -43,6 +46,7 @@ export function FormChakraTextarea<FormType>(props: {
               openDelay={400}
               closeDelay={100}
               showArrow
+              closeOnClick={false}
             >
               <Icon
                 opacity={0.25}

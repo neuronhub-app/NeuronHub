@@ -1,3 +1,7 @@
+/**
+ * Changes:
+ * - Root.minH="38px"
+ */
 import { For, SegmentGroup } from "@chakra-ui/react";
 import * as React from "react";
 
@@ -26,7 +30,7 @@ export const SegmentedControl = React.forwardRef<
   const data = React.useMemo(() => normalize(items), [items]);
 
   return (
-    <SegmentGroup.Root ref={ref} {...rest}>
+    <SegmentGroup.Root ref={ref} {...rest} minH="38px">
       <SegmentGroup.Indicator />
       <For each={data}>
         {item => (

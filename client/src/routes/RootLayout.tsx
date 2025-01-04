@@ -22,7 +22,10 @@ export function RootLayout() {
           p={padding}
           h="100%"
           borderRight="1px solid"
-          borderColor="gray.5"
+          borderColor="gray.300"
+          _dark={{
+            borderColor: "gray.700",
+          }}
         >
           <Flex
             id="sidebar-logo"
@@ -59,7 +62,10 @@ export function RootLayout() {
         align="flex-end"
         p={padding}
         borderTop="1px solid"
-        borderColor="gray.5"
+        borderColor="gray.300"
+        _dark={{
+          borderColor: "gray.700",
+        }}
       >
         <Text fontSize="sm" color="gray.7">
           © {getYear(new Date())} NeuronHub

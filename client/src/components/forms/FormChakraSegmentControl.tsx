@@ -16,6 +16,7 @@ export function FormChakraSegmentControl<FormType>(props: {
     value: string;
     label: ReactNode;
   }>;
+  size?: "sm" | "md" | "lg";
 }) {
   const errors = props.form.formState.errors?.[props.formRegister.name];
 
@@ -36,6 +37,7 @@ export function FormChakraSegmentControl<FormType>(props: {
             value={field.value as Path<FormType>}
             items={props.items}
             onValueChange={change => field.onChange(change.value)}
+            size={props.size}
           />
         </Field>
       )}

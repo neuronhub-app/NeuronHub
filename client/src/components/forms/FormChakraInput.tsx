@@ -70,12 +70,14 @@ export function FormChakraInput<FormType>(
             }}
             onBlur={async event => {
               if (isBatchStateChanges) {
-                console.log("onBlur", event.target.value);
                 await formRegister.onChange(event);
               }
             }}
             placeholder={props.placeholder}
-            _hover={{ borderColor: "gray.300" }}
+            _hover={{
+              borderColor: "gray.300",
+              _dark: { borderColor: "gray.700" },
+            }}
           />
         </InputGroup>
 
