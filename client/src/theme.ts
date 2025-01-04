@@ -16,12 +16,24 @@ const tokens = defineTokens({
       },
     },
   },
+  // seems to be broken either on MacOS or Chakra. I don't believe this need specification. But it barer works, and only if i use _hover.
+  // todo remove
+  cursor: {
+    button: { value: "pointer" },
+  },
 });
 
+// docs propose to use `createSystem(defaultBaseConfig, customConfig)`, but it doesn't work. Few other methods don't work either.
 export const system = createSystem(
   mergeConfigs(
     defaultConfig,
     defineConfig({
+      globalCss: {
+        html: {
+          colorPalette: "blue", // Set your default color palette here
+        },
+      },
+
       theme: {
         tokens,
         semanticTokens: {
@@ -30,6 +42,9 @@ export const system = createSystem(
               light: {
                 value: { base: "{colors.gray.50}", _dark: "{colors.gray.900}" },
               },
+            },
+            primary: {
+              value: "{colors.blue.500}",
             },
             //
             // gray: {

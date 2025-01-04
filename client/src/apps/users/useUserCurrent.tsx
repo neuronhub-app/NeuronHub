@@ -18,6 +18,7 @@ export const USER_CURRENT_QUERY = gql(`
 		user_current {
 			id
 			first_name
+      email
 		}
 	}
 `);

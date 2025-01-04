@@ -221,6 +221,7 @@ export type UserCurrentQuery = {
     __typename?: "UserType";
     id: string;
     first_name: string;
+    email: string;
   } | null;
 };
 
@@ -303,6 +304,7 @@ export const UserCurrentDocument = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "first_name" } },
+                { kind: "Field", name: { kind: "Name", value: "email" } },
               ],
             },
           },

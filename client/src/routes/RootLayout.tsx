@@ -1,76 +1,67 @@
-import { UserCurrentBox } from "@/apps/users/UserCurrentBox";
-import { ColorModeButton } from "@/components/ui/color-mode";
-import { Flex, VStack } from "@chakra-ui/react";
-import { Icon } from "@chakra-ui/react";
-import { Text } from "@chakra-ui/react";
-import { getYear } from "date-fns";
-import { Webhook } from "lucide-react";
+import { Logo, Sidebar } from "@/components/layout/Sidebar";
+import {
+  DrawerBackdrop,
+  DrawerCloseTrigger,
+  DrawerContent,
+  DrawerRoot,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
+import { Flex, Stack } from "@chakra-ui/react";
+import {
+  Container,
+  type ContainerProps,
+  HStack,
+  IconButton,
+} from "@chakra-ui/react";
+import { LuAlignRight } from "react-icons/lu";
 import { Outlet } from "react-router";
 
 export function RootLayout() {
-  const padding = 6;
-
   return (
-    <VStack h="100vh" gap={0} bg={{ base: "white", _dark: "black" }}>
-      <Flex w="100%" align="flex-start">
-        <VStack
-          id="sidebar"
-          as="aside"
-          flex={0}
-          alignItems="flex-start"
-          justify="space-between"
-          p={padding}
-          h="100%"
-          borderRight="1px solid"
-          borderColor="gray.300"
-          _dark={{
-            borderColor: "gray.700",
-          }}
-        >
-          <Flex
-            id="sidebar-logo"
-            direction="row"
-            align="center"
-            gap={2}
-            fontWeight="bold"
-            fontSize="xl"
-          >
-            <Icon color="blue.9" size="lg">
-              <Webhook />
-            </Icon>
-            <Text>NeuronHub</Text>
-          </Flex>
+    <>
+      <Navbar hideFrom="md" />
 
-          <Flex justify="space-between" w="full">
-            <UserCurrentBox />
-            <ColorModeButton />
-          </Flex>
-        </VStack>
+      <Flex flex="1" pos="relative">
+        <Sidebar hideBelow="md" maxH="100vh" pos="sticky" top={0} />
 
-        <VStack as="main" flex={4} alignItems="flex-start" p={padding} w="100%">
-          {<Outlet />}
-        </VStack>
+        <Stack pb="12" flex="1" alignItems="stretch">
+          <Container maxW="7xl" mt={6}>
+            {<Outlet />}
+          </Container>
+        </Stack>
       </Flex>
+    </>
+  );
+}
 
-      <Flex
-        id="footer"
-        as="footer"
-        flex={0}
-        direction="column"
-        w="100%"
-        h="100%"
-        align="flex-end"
-        p={padding}
-        borderTop="1px solid"
-        borderColor="gray.300"
-        _dark={{
-          borderColor: "gray.700",
-        }}
-      >
-        <Text fontSize="sm" color="gray.7">
-          © {getYear(new Date())} NeuronHub
-        </Text>
-      </Flex>
-    </VStack>
+export function Navbar(props: ContainerProps) {
+  return (
+    <Container
+      py="2.5"
+      background="bg.panel"
+      borderBottomWidth="1px"
+      {...props}
+    >
+      <HStack justify="space-between">
+        <Logo />
+
+        <DrawerRoot placement="start">
+          <DrawerTrigger asChild>
+            <IconButton
+              aria-label="Open Menu"
+              variant="ghost"
+              colorPalette="gray"
+            >
+              <LuAlignRight />
+            </IconButton>
+          </DrawerTrigger>
+          <DrawerBackdrop />
+          <DrawerContent>
+            <DrawerCloseTrigger colorPalette="gray" />
+            <Sidebar />
+          </DrawerContent>
+        </DrawerRoot>
+      </HStack>
+    </Container>
   );
 }
