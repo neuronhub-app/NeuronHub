@@ -22,9 +22,15 @@ import { Webhook } from "lucide-react";
 import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { FaShoppingCart } from "react-icons/fa";
-import { FaAppStoreIos, FaBook } from "react-icons/fa";
-import { FaCode, FaServer } from "react-icons/fa6";
+import { FaAppStoreIos, FaBook, FaShoppingCart, FaStar } from "react-icons/fa";
+import {
+  FaBookmark,
+  FaCircleXmark,
+  FaClockRotateLeft,
+  FaCode,
+  FaHeartPulse,
+  FaServer,
+} from "react-icons/fa6";
 import { HiLockClosed, HiOutlineClock } from "react-icons/hi2";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
@@ -67,6 +73,13 @@ export namespace ReviewCreateForm {
       z.literal("Service"),
       z.literal("Other"),
     ]),
+    usage_status: z.union([
+      z.literal("using"),
+      z.literal("used"),
+      z.literal("want_to_use"),
+      z.literal("interested"),
+      z.literal("not_interested"),
+    ]),
     tags: z
       .array(
         z.object({
@@ -98,6 +111,7 @@ export namespace ReviewCreateForm {
         rating: 50,
         reviewed_at: formatISO(new Date(), { representation: "date" }),
         type: "Program",
+        usage_status: "using",
       },
     }) as FormType; // casting due to a type mess in react-hook-form. It was surfaced by adding `defaultValues` prop, without it casting isn't needed.
 
@@ -131,7 +145,7 @@ export namespace ReviewCreateForm {
                   <FormChakraInput
                     form={form}
                     formRegister={form.register("title")}
-                    label={ `${formState.type === "Other" ? "Tool" : formState.type} name` }
+                    label={`${formState.type === "Other" ? "Tool" : formState.type} name`}
                   />
                 </HStack>
               </Fieldset.Content>
@@ -141,6 +155,7 @@ export namespace ReviewCreateForm {
               form={form}
               formRegister={form.register("type")}
               label="Type"
+              size="lg"
               items={[
                 getToolType("Program", <FaCode />),
                 getToolType("Service", <FaServer />),
@@ -242,6 +257,25 @@ export namespace ReviewCreateForm {
                 label="Review"
                 isShowIconMarkdown
               />
+
+              <FormChakraSegmentControl
+                form={form}
+                formRegister={form.register("usage_status")}
+                label="Usage status"
+                items={[
+                  getToolType("using", <FaHeartPulse />),
+                  getToolType("want_to_use", <FaBookmark />, "Want to use"),
+                  getToolType("used", <FaClockRotateLeft />),
+                  getToolType("interested", <FaStar />),
+                  getToolType(
+                    "not_interested",
+                    <FaCircleXmark />,
+                    "Not interested",
+                  ),
+                ]}
+                size="sm"
+              />
+
               <FormChakraTextarea
                 form={form}
                 formRegister={form.register("content_private")}
@@ -284,13 +318,13 @@ export namespace ReviewCreateForm {
   }
 }
 
-function getToolType(value: string, icon: ReactNode) {
+function getToolType(value: string, icon: ReactNode, label?: string) {
   return {
     value: value,
     label: (
       <HStack>
         <Icon fontSize="md">{icon}</Icon>
-        <Text textTransform="capitalize">{value}</Text>
+        <Text>{label ?? value.charAt(0).toUpperCase() + value.slice(1)}</Text>
       </HStack>
     ),
   };

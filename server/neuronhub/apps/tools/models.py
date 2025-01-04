@@ -1,5 +1,6 @@
 from django.core.validators import DomainNameValidator
 from django.db import models
+from django_choices_field import TextChoicesField
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
 
@@ -113,6 +114,14 @@ class ToolTagVote(ToolVoteModel):
         return f"{self.tool} - {self.tag} [{self.is_vote_positive}]"
 
 
+class UsageStatus(models.TextChoices):
+    USING = "using"
+    USED = "used"
+    WANT_TO_USE = "want_to_use", "Want to use"
+    INTERESTED = "interested"
+    NOT_INTERESTED = "not_interested", "Not interested"
+
+
 class ToolReview(TimeStampedModel):
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
 
@@ -122,6 +131,12 @@ class ToolReview(TimeStampedModel):
     source = models.CharField(max_length=255, blank=True)
 
     is_review_later = models.BooleanField(default=False)
+    usage_status = TextChoicesField(
+        choices_enum=UsageStatus,
+        default=None,
+        blank=True,
+        null=True,
+    )
 
     reviewed_at = models.DateTimeField(auto_now_add=True)
 
