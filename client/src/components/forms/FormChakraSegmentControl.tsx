@@ -3,6 +3,7 @@ import { SegmentedControl } from "@/components/ui/segmented-control";
 import type { ReactNode } from "react";
 import {
   Controller,
+  type Path,
   type UseFormRegisterReturn,
   type UseFormReturn,
 } from "react-hook-form";
@@ -21,7 +22,8 @@ export function FormChakraSegmentControl<FormType>(props: {
   return (
     <Controller
       control={props.form.control}
-      name={props.formRegister.name}
+      // react-hook-form types aren't good enough to accept a generic or detect it
+      name={props.formRegister.name as Path<FormType>}
       render={({ field }) => (
         <Field
           label={props.label}
@@ -31,7 +33,7 @@ export function FormChakraSegmentControl<FormType>(props: {
           <SegmentedControl
             onBlur={field.onBlur}
             name={field.name}
-            value={field.value}
+            value={field.value as Path<FormType>}
             items={props.items}
             onValueChange={change => field.onChange(change.value)}
           />

@@ -1,5 +1,5 @@
 ---
-reviewed_at: 2025.01.01
+reviewed_at: 2025.01.03
 ---
 
 ## Scopes
@@ -31,6 +31,7 @@ Put in the brackets after Type, as `()`
 - BE - backend
 - FE - frontend
 - tags - related to FE or BE tags implementation
+- types - TypeScript or Python typings
 
 Scopes for the `docs` type:
 - refac
