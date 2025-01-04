@@ -1,5 +1,4 @@
 from django.core.validators import DomainNameValidator
-from django.core.validators import MaxValueValidator
 from django.db import models
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
@@ -112,54 +111,6 @@ class ToolTagVote(ToolVoteModel):
 
     def __str__(self):
         return f"{self.tool} - {self.tag} [{self.is_vote_positive}]"
-
-
-class ToolTagRating(TimeStampedModel):
-    """
-    Global rating of a tag, not attached to any ToolReview.
-    """
-
-    tools = models.ManyToManyField(Tool, related_name="tags_rating", blank=True)
-
-    tag_parent = models.ForeignKey(
-        "self",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="tags_children",
-    )
-
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tags_rating")
-
-    class Meta:
-        unique_together = ["tag_parent", "name"]
-
-    def __str__(self):
-        return self.name
-
-
-class ToolTagVoteRating(ToolVoteModel):
-    """
-    Rating of a tag in a ToolReview.
-
-    Currently not implement, and perhaps redundant since we have ToolTagVote.
-    """
-
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
-    tag = models.ForeignKey(ToolTagRating, on_delete=models.CASCADE)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment = MarkdownField(blank=True)
-    rating = models.PositiveIntegerField(
-        validators=[MaxValueValidator(100)],
-        null=True,
-        blank=True,
-    )
-
-    def __str__(self):
-        return f"{self.tool} - {self.tag} [{self.rating}]"
 
 
 class ToolReview(TimeStampedModel):
