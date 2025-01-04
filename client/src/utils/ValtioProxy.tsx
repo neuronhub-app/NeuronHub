@@ -6,23 +6,23 @@ import { proxy, subscribe } from "valtio/vanilla";
  * Otherwise Valtio lies that T is just a plain object.
  */
 export class ValtioProxy<T extends object> {
-	private readonly proxyObject: T;
+  private readonly proxyObject: T;
 
-	constructor(initialState: T) {
-		this.proxyObject = proxy(initialState);
-	}
+  constructor(initialState: T) {
+    this.proxyObject = proxy(initialState);
+  }
 
-	get value(): T {
-		return this.proxyObject;
-	}
+  get value(): T {
+    return this.proxyObject;
+  }
 
-	useSnapshot() {
-		return {
-			value: useSnapshot(this.proxyObject),
-		};
-	}
+  useSnapshot() {
+    return {
+      value: useSnapshot(this.proxyObject),
+    };
+  }
 
-	subscribe(callback: (state: T) => void) {
-		return subscribe(this.proxyObject, () => callback(this.proxyObject));
-	}
+  subscribe(callback: (state: T) => void) {
+    return subscribe(this.proxyObject, () => callback(this.proxyObject));
+  }
 }
