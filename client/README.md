@@ -30,6 +30,8 @@ Caveats
 
 Immature, esp in combination with React 19. Eg when React runs the magic `useMemo()`, Chakra components try to supply `JSON.stringify()`, but if the Component has a prop with a cycled ref, the `stringify()` is going to throw a recursion error (keywords: stateNode, FiberNode).
 
+Some components, eg `SegmentControl`, have incorrect css that don't work without `ColorModeProvider`, hence it isn't feasible to remove it.
+
 ### zod.js
 
 The internal are convoluted and have odd dependencies. Eg fields stop being required if tsconfig.json's `compilerOptions::strict=false`.

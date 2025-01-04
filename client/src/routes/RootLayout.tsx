@@ -1,4 +1,5 @@
 import { UserCurrentBox } from "@/apps/users/UserCurrentBox";
+import { ColorModeButton } from "@/components/ui/color-mode";
 import { Flex, VStack } from "@chakra-ui/react";
 import { Icon } from "@chakra-ui/react";
 import { Text } from "@chakra-ui/react";
@@ -10,7 +11,7 @@ export function RootLayout() {
   const padding = 6;
 
   return (
-    <VStack h="100vh" gap={0}>
+    <VStack h="100vh" gap={0} bg={{ base: "white", _dark: "black" }}>
       <Flex w="100%" align="flex-start">
         <VStack
           id="sidebar"
@@ -37,7 +38,10 @@ export function RootLayout() {
             <Text>NeuronHub</Text>
           </Flex>
 
-          <UserCurrentBox />
+          <Flex justify="space-between" w="full">
+            <UserCurrentBox />
+            <ColorModeButton />
+          </Flex>
         </VStack>
 
         <VStack as="main" flex={4} alignItems="flex-start" p={padding} w="100%">

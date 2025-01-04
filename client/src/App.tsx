@@ -1,4 +1,4 @@
-import { ThemeProvider } from "next-themes";
+import { defaultSystem } from "@chakra-ui/react";
 import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";
 import {
@@ -11,8 +11,9 @@ import { Provider } from "urql";
 
 import { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
 import { urqlClient } from "@/client";
-import { Provider as ChakraProvider } from "@/components/ui/provider";
+import { ColorModeProvider } from "@/components/ui/color-mode";
 import { RootLayout } from "@/routes/RootLayout";
+import { ChakraProvider } from "@chakra-ui/react";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -26,11 +27,11 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById("root")!).render(
   <Provider value={urqlClient}>
-    <ThemeProvider forcedTheme="light">
-      <ChakraProvider>
+    <ChakraProvider value={defaultSystem}>
+      <ColorModeProvider>
         <RouterProvider router={router} />
         <Toaster position="bottom-center" gutter={8} />
-      </ChakraProvider>
-    </ThemeProvider>
+      </ColorModeProvider>
+    </ChakraProvider>
   </Provider>,
 );
