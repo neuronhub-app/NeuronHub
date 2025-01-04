@@ -111,27 +111,27 @@ export function TagMultiSelect(props: { form: ReviewCreateForm.FormType }) {
 										</IconButton>
 									</PopoverTrigger>
 
-									<PopoverContent>
-										<PopoverArrow />
-										<PopoverBody>
-											<NeuronChakraField
-												isSaveOnEnterOrClick={true} // on-change save triggers re-render and drops Popover state
-												form={props.form}
-												formRegister={props.form.register(
-													`tags.${getTagNumber(propsMultiVal.data)}.comment`,
-												)}
-												placeholder="Comment"
-											/>
-										</PopoverBody>
-									</PopoverContent>
-								</PopoverRoot>
-							</HStack>
-						</components.MultiValueLabel>
-					),
-				}}
-			/>
-		</Flex>
-	);
+                  <PopoverContent>
+                    <PopoverArrow />
+                    <PopoverBody>
+                      <FormChakraInput
+                        isBatchStateChanges={true} // on-change save triggers re-render and drops Popover state
+                        form={props.form}
+                        formRegister={props.form.register(
+                          `tags.${getTagNumber(propsMultiVal.data)}.comment`,
+                        )}
+                        placeholder="Comment"
+                      />
+                    </PopoverBody>
+                  </PopoverContent>
+                </PopoverRoot>
+              </HStack>
+            </components.MultiValueLabel>
+          ),
+        }}
+      />
+    </Flex>
+  );
 }
 
 function VoteButton(props: {

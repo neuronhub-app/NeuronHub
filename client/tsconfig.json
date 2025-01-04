@@ -13,7 +13,12 @@
 		"noEmit": true,
 		"jsx": "react-jsx",
 
-		"strict": false, // TSC reports errors of fake types
+		// strict=true fails on fake types. And TSC relies on JS and amateur npm packages, so it's fucked by design.
+		// I prefer strict=true with strong static checks, but even in 2025 it isn't feasible in JS ecosystem.
+		//
+		// Also zod.js requires strict=true (and probably strictNullChecks=true) to mark fields as "required" by default.
+		// It isn't worth it.
+		"strict": false,
 
 		"noFallthroughCasesInSwitch": true,
 
@@ -22,7 +27,6 @@
 		"paths": {
 			"": ["./node_modules/*"],
 			"@/graphql/*": ["./graphql/*"],
-			"~/*": ["./src/*"],
 			"@/*": ["./src/*"],
 		},
 

@@ -1,3 +1,11 @@
+---
+reviewed_at: 2025.01.03
+---
+
+
+Setup
+--------------------------------
+
 ### Install
 
 - bun install
@@ -14,3 +22,22 @@ Using npm-check-updates.
 
 - bun run check-update
 - bun run upgrade
+
+Caveats
+--------------------------------
+
+### chakra v3
+
+Immature, esp in combination with React 19. Eg when React runs the magic `useMemo()`, Chakra components try to supply `JSON.stringify()`, but if the Component has a prop with a cycled ref, the `stringify()` is going to throw a recursion error (keywords: stateNode, FiberNode).
+
+### zod.js
+
+The internal are convoluted and have odd dependencies. Eg fields stop being required if tsconfig.json's `compilerOptions::strict=false`.
+
+Generally plays badly with react-hook-form, especially with defaults (of any kind), and in particular `z.default()`.
+
+`z.date()` has changed over the years, and quite new, doesn't appear to be reliable.
+
+### react-select
+
+Drops metadata outside of `Option.id` and `Option.label` eg it keeps trying to drop `TagOption.comment`.
