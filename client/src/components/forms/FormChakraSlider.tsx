@@ -41,7 +41,6 @@ export function FormChakraSlider<FormType>(props: {
               field.onChange(value[0]);
             }}
             label={props.label}
-            showValue={true}
           />
         </Field>
       )}

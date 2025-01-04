@@ -22,10 +22,9 @@ import { Webhook } from "lucide-react";
 import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { AiFillLayout } from "react-icons/ai";
-import { FaGithub, FaShoppingCart } from "react-icons/fa";
-import { FaBook } from "react-icons/fa";
-import { FaAppStoreIos } from "react-icons/fa";
+import { FaShoppingCart } from "react-icons/fa";
+import { FaAppStoreIos, FaBook } from "react-icons/fa";
+import { FaCode, FaServer } from "react-icons/fa6";
 import { HiLockClosed, HiOutlineClock } from "react-icons/hi2";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
@@ -61,12 +60,12 @@ export namespace ReviewCreateForm {
     content: z.string().optional(),
     content_private: z.string().optional(),
     type: z.union([
-      z.literal("program"),
-      z.literal("material"),
-      z.literal("product"),
-      z.literal("app"),
-      z.literal("service"),
-      z.literal("other"),
+      z.literal("Program"),
+      z.literal("Material"),
+      z.literal("Product"),
+      z.literal("App"),
+      z.literal("Service"),
+      z.literal("Other"),
     ]),
     tags: z
       .array(
@@ -98,7 +97,7 @@ export namespace ReviewCreateForm {
       defaultValues: {
         rating: 50,
         reviewed_at: formatISO(new Date(), { representation: "date" }),
-        type: "program",
+        type: "Program",
       },
     }) as FormType; // casting due to a type mess in react-hook-form. It was surfaced by adding `defaultValues` prop, without it casting isn't needed.
 
@@ -132,7 +131,7 @@ export namespace ReviewCreateForm {
                   <FormChakraInput
                     form={form}
                     formRegister={form.register("title")}
-                    label="Name"
+                    label={ `${formState.type === "Other" ? "Tool" : formState.type} name` }
                   />
                 </HStack>
               </Fieldset.Content>
@@ -141,14 +140,14 @@ export namespace ReviewCreateForm {
             <FormChakraSegmentControl
               form={form}
               formRegister={form.register("type")}
-              label="Tool type"
+              label="Type"
               items={[
-                getToolType("program", <FaGithub />),
-                getToolType("service", <AiFillLayout />),
-                getToolType("material", <FaBook />),
-                getToolType("app", <FaAppStoreIos />),
-                getToolType("product", <FaShoppingCart />),
-                getToolType("other", <Webhook />),
+                getToolType("Program", <FaCode />),
+                getToolType("Service", <FaServer />),
+                getToolType("Material", <FaBook />),
+                getToolType("App", <FaAppStoreIos />),
+                getToolType("Product", <FaShoppingCart />),
+                getToolType("Other", <Webhook />),
               ]}
             />
 
@@ -186,47 +185,51 @@ export namespace ReviewCreateForm {
               </Fieldset.Content>
             </Fieldset.Root>
 
-            <VStack alignItems="flex-start" w="100%" maxW={style.maxW}>
-              <Checkbox
-                size="sm"
-                defaultChecked={true}
-                inputProps={{
-                  onChange: event => {
-                    $state.isRated = event.target.checked;
-                    if ($state.isRated) {
-                      form.setValue(
-                        "rating",
-                        form.formState.defaultValues?.rating,
-                      );
-                    } else {
-                      form.setValue("rating", null);
-                    }
-                  },
-                }}
-              >
-                Rating{" "}
-                {formState.rating && <Tag ml={2}>{formState.rating}</Tag>}
-              </Checkbox>
+            <HStack w="full" gap={style.gapXl} align="flex-start">
+              <VStack align="flex-start" w="full" gap={style.gapMd}>
+                <Checkbox
+                  defaultChecked={true}
+                  inputProps={{
+                    onChange: event => {
+                      $state.isRated = event.target.checked;
+                      if ($state.isRated) {
+                        form.setValue(
+                          "rating",
+                          form.formState.defaultValues?.rating,
+                        );
+                      } else {
+                        form.setValue("rating", null);
+                      }
+                    },
+                  }}
+                >
+                  Rating{" "}
+                  {formState.rating && (
+                    <Tag size="md" ml={2}>
+                      {formState.rating}
+                    </Tag>
+                  )}
+                </Checkbox>
 
-              <FormChakraSlider
-                hidden={!$state.isRated}
+                <FormChakraSlider
+                  hidden={!$state.isRated}
+                  form={form}
+                  control={form.control}
+                  formRegister={form.register("rating")}
+                />
+              </VStack>
+
+              <FormChakraInput
                 form={form}
-                control={form.control}
-                formRegister={form.register("rating")}
+                type="date"
+                formRegister={form.register("reviewed_at")}
+                label="Reviewed at"
                 maxW={style.maxW}
               />
-            </VStack>
-
-            <FormChakraInput
-              form={form}
-              type="date"
-              formRegister={form.register("reviewed_at")}
-              label="Reviewed at"
-              maxW={style.maxW}
-            />
+            </HStack>
 
             <VStack gap={style.gapXl} alignItems="flex-start" w="100%">
-              <VStack mt={4} align="flex-start">
+              <VStack align="flex-start">
                 <Text fontSize="sm" fontWeight="semibold">
                   Tags
                 </Text>
@@ -236,7 +239,7 @@ export namespace ReviewCreateForm {
               <FormChakraTextarea
                 form={form}
                 formRegister={form.register("content")}
-                label="Content"
+                label="Review"
                 isShowIconMarkdown
               />
               <FormChakraTextarea
