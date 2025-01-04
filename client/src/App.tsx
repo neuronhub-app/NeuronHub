@@ -1,4 +1,4 @@
-import { defaultSystem } from "@chakra-ui/react";
+import { system } from "@/theme";
 import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";
 import {
@@ -27,7 +27,7 @@ const router = createBrowserRouter(
 
 createRoot(document.getElementById("root")!).render(
   <Provider value={urqlClient}>
-    <ChakraProvider value={defaultSystem}>
+    <ChakraProvider value={system}>
       <ColorModeProvider>
         <RouterProvider router={router} />
         <Toaster position="bottom-center" gutter={8} />

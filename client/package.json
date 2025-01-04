@@ -9,7 +9,7 @@
     "format": "bun run biome check --write",
     "update-check": "bun run ncu",
     "update": "bun run ncu --upgrade && bun install",
-    "typegen": "@chakra-ui/cli typegen ./src/theme.ts",
+    "typegen": "npx @chakra-ui/cli typegen ./src/theme.ts",
     "graphql:codegen": "graphql-codegen --config src/codegen.ts"
   },
   "dependencies": {

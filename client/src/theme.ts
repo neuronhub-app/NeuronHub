@@ -1,4 +1,10 @@
-import { createSystem, defineConfig, defineTokens } from "@chakra-ui/react";
+import {
+  createSystem,
+  defaultConfig,
+  defineConfig,
+  defineTokens,
+  mergeConfigs,
+} from "@chakra-ui/react";
 
 const tokens = defineTokens({
   assets: {
@@ -13,9 +19,32 @@ const tokens = defineTokens({
 });
 
 export const system = createSystem(
-  defineConfig({
-    theme: {
-      tokens,
-    },
-  }),
+  mergeConfigs(
+    defaultConfig,
+    defineConfig({
+      theme: {
+        tokens,
+        semanticTokens: {
+          colors: {
+            bg: {
+              light: {
+                value: { base: "{colors.gray.50}", _dark: "{colors.gray.900}" },
+              },
+            },
+            //
+            // gray: {
+            //   100: { value: "{colors.gray.100}" },
+            //   200: { value: "{colors.gray.200}" },
+            //   300: { value: "{colors.gray.300}" },
+            // },
+          },
+        },
+
+        // breakpoints: {
+        //   sm: "320px",
+        //   md: "768px",
+        // },
+      },
+    }),
+  ),
 );

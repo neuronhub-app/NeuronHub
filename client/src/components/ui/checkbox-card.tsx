@@ -38,7 +38,7 @@ export const CheckboxCard = React.forwardRef<
   return (
     <ChakraCheckboxCard.Root
       {...rest}
-      _hover={{ bg: "gray.50", _dark: { bg: "gray.900" }, cursor: "pointer" }}
+      _hover={{ bg: "bg.light", _dark: { bg: "bg.light" }, cursor: "pointer" }}
     >
       <ChakraCheckboxCard.HiddenInput ref={ref} {...inputProps} />
       <ChakraCheckboxCard.Control>
