@@ -21,8 +21,14 @@ export function RootLayout() {
     <>
       <Navbar hideFrom="md" />
 
-      <Flex flex="1" pos="relative">
-        <Sidebar hideBelow="md" maxH="100vh" pos="sticky" top={0} />
+      <Flex flex="1" pos="relative" h="full">
+        <Sidebar
+          hideBelow="md"
+          maxH="100vh"
+          minH="100vh"
+          pos="sticky"
+          top={0}
+        />
 
         <Stack pb="12" flex="1" alignItems="stretch">
           <Container maxW="7xl" mt={6}>

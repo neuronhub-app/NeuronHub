@@ -2,6 +2,7 @@ import { useUserCurrent } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColorModeButton } from "@/components/ui/color-mode";
+import { urls } from "@/urls";
 import {
   Bleed,
   type ButtonProps,
@@ -12,25 +13,26 @@ import {
   type StackProps,
   Text,
 } from "@chakra-ui/react";
-import { Box, HStack, IconButton } from "@chakra-ui/react";
-import { Webhook } from "lucide-react";
-import type { ReactNode, SVGProps } from "react";
-import { FiMoreVertical } from "react-icons/fi";
+
+import { Box, HStack } from "@chakra-ui/react";
+import { MessageSquareText, Webhook } from "lucide-react";
+import type { SVGProps } from "react";
 import {
   LuBookmark,
-  LuCircleHelp,
   LuClock,
   LuLayoutDashboard,
   LuSettings,
 } from "react-icons/lu";
+import { type LinkProps, NavLink } from "react-router";
 
 const groups = [
   {
     title: "",
     links: [
-      { icon: LuLayoutDashboard, label: "Tools" },
-      { icon: LuClock, label: "Pending" },
-      { icon: LuBookmark, label: "Want to use" },
+      { to: "/tools", icon: LuLayoutDashboard, label: "Tools" },
+      { to: "/reviews/create", icon: MessageSquareText, label: "Reviews" },
+      { to: "/reviews/pending", icon: LuClock, label: "Pending" },
+      { to: "/wishlist", icon: LuBookmark, label: "Want to use" },
     ],
   },
 ];
@@ -70,12 +72,9 @@ export function Sidebar(props: StackProps) {
               <Stack gap="1">
                 {group.links.map((link, index) => (
                   <Bleed key={index as any} inline={styles.inline}>
-                    <SidebarLink
-                      aria-current={
-                        link.label === "Analysis" ? "page" : undefined
-                      }
-                    >
-                      <link.icon /> {link.label}
+                    <SidebarLink to={link.to}>
+                      <link.icon />
+                      {link.label}
                     </SidebarLink>
                   </Bleed>
                 ))}
@@ -88,19 +87,10 @@ export function Sidebar(props: StackProps) {
       <Stack gap="4">
         <Stack gap="1" px={0}>
           <Bleed inline={styles.inline}>
-            <SidebarLink>
-              <LuCircleHelp /> FAQ
+            <SidebarLink to={urls.user.settings.profile.path}>
+              <LuSettings />
+              Settings
             </SidebarLink>
-          </Bleed>
-
-          <Bleed inline={styles.inline}>
-            <SidebarLink>
-              <LuSettings /> Settings
-            </SidebarLink>
-          </Bleed>
-
-          <Bleed inline={styles.inline}>
-            <ColorModeButton />
           </Bleed>
         </Stack>
 
@@ -112,29 +102,31 @@ export function Sidebar(props: StackProps) {
   );
 }
 
-export function SidebarLink(
-  props: { children: ReactNode; href?: string } & ButtonProps,
-) {
-  const { children, href, ...buttonProps } = props;
+function SidebarLink(props: { to?: LinkProps["to"] } & ButtonProps) {
+  const { children, to, ...buttonProps } = props;
   return (
-    <Button
-      variant="ghost"
-      width="full"
-      justifyContent="start"
-      gap="3"
-      color="fg.muted"
-      _hover={{
-        bg: "colorPalette.subtle",
-        color: "colorPalette.fg",
-      }}
-      _currentPage={{
-        color: "colorPalette.fg",
-      }}
-      asChild
-      {...buttonProps}
-    >
-      <a href={href}>{children}</a>
-    </Button>
+    <NavLink to={to}>
+      {linkProps => (
+        <Button
+          variant="ghost"
+          width="full"
+          justifyContent="start"
+          gap="3"
+          color="fg.muted"
+          _hover={{
+            bg: "colorPalette.subtle",
+            color: "colorPalette.fg",
+          }}
+          _currentPage={{
+            color: "colorPalette.fg",
+          }}
+          aria-current={linkProps.isActive ? "page" : undefined}
+          {...buttonProps}
+        >
+          {children}
+        </Button>
+      )}
+    </NavLink>
   );
 }
 
@@ -144,7 +136,8 @@ export const UserProfile = () => {
   return (
     <HStack gap="3" justify="space-between">
       <HStack gap="3">
-        <Avatar src="https://i.pravatar.cc/300" />
+        {/*<Avatar src="https://i.pravatar.cc/300" />*/}
+        <Avatar name={userQuery?.user?.first_name} />
         <Box>
           <Text textStyle="sm" fontWeight="medium">
             {userQuery?.user?.first_name}
@@ -154,9 +147,7 @@ export const UserProfile = () => {
           </Text>
         </Box>
       </HStack>
-      <IconButton variant="ghost" colorPalette="gray" aria-label="Open Menu">
-        <FiMoreVertical />
-      </IconButton>
+      <ColorModeButton />
     </HStack>
   );
 };

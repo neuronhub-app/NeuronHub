@@ -1,8 +1,8 @@
-/**
- * Switched to Button with text. Will be replaced with User settings "Setting Profile With Theme".
- */
-import { SidebarLink } from "@/components/layout/Sidebar";
+"use client";
+
+import { Button } from "@/components/ui/button";
 import type { IconButtonProps } from "@chakra-ui/react";
+import { ClientOnly, Skeleton } from "@chakra-ui/react";
 import { ThemeProvider, useTheme } from "next-themes";
 import type { ThemeProviderProps } from "next-themes";
 import * as React from "react";
@@ -35,7 +35,7 @@ export function useColorModeValue<T>(light: T, dark: T) {
 
 export function ColorModeIcon() {
   const { colorMode } = useColorMode();
-  return colorMode === "light" ? <LuMoon /> : <LuSun />;
+  return colorMode === "light" ? <LuSun /> : <LuMoon />;
 }
 
 interface ColorModeButtonProps extends Omit<IconButtonProps, "aria-label"> {}
@@ -47,14 +47,23 @@ export const ColorModeButton = React.forwardRef<
   const { toggleColorMode } = useColorMode();
   const { colorMode } = useColorMode();
   return (
-    <SidebarLink
-      onClick={toggleColorMode}
-      aria-label="Toggle color mode"
-      ref={ref}
-      variant="ghost"
-    >
-      <ColorModeIcon />
-      {colorMode === "light" ? "Dark" : "Light"}
-    </SidebarLink>
+    <ClientOnly fallback={<Skeleton boxSize="8" />}>
+      <Button
+        onClick={toggleColorMode}
+        aria-label="Toggle color mode"
+        ref={ref}
+        variant="ghost"
+        colorPalette="gray"
+        {...props}
+        css={{
+          _icon: {
+            width: "5",
+            height: "5",
+          },
+        }}
+      >
+        <ColorModeIcon />
+      </Button>
+    </ClientOnly>
   );
 });
