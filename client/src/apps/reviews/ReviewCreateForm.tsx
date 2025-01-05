@@ -44,6 +44,7 @@ export interface TagOption {
   is_vote_positive: boolean | null;
   comment?: string;
 }
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tag } from "@/components/ui/tag";
 import { CheckboxGroup } from "@chakra-ui/react";
@@ -184,14 +185,12 @@ export namespace ReviewCreateForm {
                   />
                   <FormChakraInput
                     label="GitHub"
-                    placeholder="github.com/org/project"
                     form={form}
                     formRegister={form.register("github_url")}
                     startElement={<LuGithub />}
                   />
                   <FormChakraInput
                     label="Crunchbase"
-                    placeholder="crunchbase.com/org"
                     form={form}
                     formRegister={form.register("crunchbase_url")}
                     startElement={<SiCrunchbase />}
@@ -200,7 +199,21 @@ export namespace ReviewCreateForm {
               </Fieldset.Content>
             </Fieldset.Root>
 
-            <HStack w="full" gap={style.gapXl} align="flex-start">
+            <VStack gap={style.gapXl} alignItems="flex-start" w="100%">
+              <VStack align="flex-start">
+                <Text fontSize="sm" fontWeight="semibold">
+                  Tags
+                </Text>
+                <TagMultiSelect form={form} />
+              </VStack>
+
+              <FormChakraTextarea
+                form={form}
+                formRegister={form.register("content")}
+                label="Review"
+                isShowIconMarkdown
+              />
+
               <VStack align="flex-start" w="full" gap={style.gapMd}>
                 <Checkbox
                   defaultChecked={true}
@@ -234,47 +247,35 @@ export namespace ReviewCreateForm {
                 />
               </VStack>
 
-              <FormChakraInput
-                form={form}
-                type="date"
-                formRegister={form.register("reviewed_at")}
-                label="Reviewed at"
-                maxW={style.maxW}
-              />
-            </HStack>
+              <HStack justify="space-between" w="full" gap={style.gapMd}>
+                <FormChakraSegmentControl
+                  form={form}
+                  formRegister={form.register("usage_status")}
+                  label="Usage status"
+                  items={[
+                    getToolType("using", <FaHeartPulse />),
+                    getToolType("want_to_use", <FaBookmark />, "Want to use"),
+                    getToolType("used", <FaClockRotateLeft />),
+                    getToolType("interested", <FaStar />),
+                    getToolType(
+                      "not_interested",
+                      <FaCircleXmark />,
+                      "Not interested",
+                    ),
+                  ]}
+                  size="sm"
+                />
 
-            <VStack gap={style.gapXl} alignItems="flex-start" w="100%">
-              <VStack align="flex-start">
-                <Text fontSize="sm" fontWeight="semibold">
-                  Tags
-                </Text>
-                <TagMultiSelect form={form} />
-              </VStack>
-
-              <FormChakraTextarea
-                form={form}
-                formRegister={form.register("content")}
-                label="Review"
-                isShowIconMarkdown
-              />
-
-              <FormChakraSegmentControl
-                form={form}
-                formRegister={form.register("usage_status")}
-                label="Usage status"
-                items={[
-                  getToolType("using", <FaHeartPulse />),
-                  getToolType("want_to_use", <FaBookmark />, "Want to use"),
-                  getToolType("used", <FaClockRotateLeft />),
-                  getToolType("interested", <FaStar />),
-                  getToolType(
-                    "not_interested",
-                    <FaCircleXmark />,
-                    "Not interested",
-                  ),
-                ]}
-                size="sm"
-              />
+                <FormChakraInput
+                  form={form}
+                  formRegister={form.register("reviewed_at")}
+                  inputProps={{
+                    type: "date",
+                  }}
+                  label="Reviewed at"
+                  maxW={style.maxW}
+                />
+              </HStack>
 
               <FormChakraTextarea
                 form={form}

@@ -16,7 +16,11 @@ export function FormChakraInput<FormType>(
     helperText?: ReactNode;
     errorText?: ReactNode;
     optionalText?: ReactNode;
-    type?: "date";
+
+    inputProps?: {
+      type?: "date";
+      size?: "xs" | "sm" | "md" | "lg";
+    };
 
     startElement?: ReactNode;
 
@@ -28,13 +32,8 @@ export function FormChakraInput<FormType>(
   const state = props.form.formState;
 
   // extract props not for <Input>
-  const {
-    formRegister,
-    isBatchStateChanges,
-    type,
-    startElement,
-    ...propsRoot
-  } = props;
+  const { formRegister, isBatchStateChanges, startElement, ...propsRoot } =
+    props;
 
   const [value, setValue] = useState<string>(
     state.dirtyFields[formRegister.name],
@@ -51,11 +50,12 @@ export function FormChakraInput<FormType>(
           <Input
             {...formRegister}
             defaultValue={
-              type === "date"
+              props.inputProps?.type === "date"
                 ? formatISO(new Date(), { representation: "date" })
                 : state.dirtyFields[formRegister.name]
             }
-            type={type}
+            type={props.inputProps?.type}
+            size={props.inputProps?.size}
             onChange={async event => {
               setValue(event.target.value);
 
