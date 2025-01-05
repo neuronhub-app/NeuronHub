@@ -1,42 +1,42 @@
 {
-	"compilerOptions": {
-		"target": "ESNext", // ES2020 from Vite, replaced with ESNext for Chakra
-		"module": "ESNext", // ES6 replace with ESNext for Chakra
-		"lib": ["ESNext", "DOM", "DOM.Iterable"],
-		"moduleResolution": "Bundler", // by Vite and Chakra
+  "compilerOptions": {
+    "target": "ESNext", // ES2020 from Vite, replaced with ESNext for Chakra
+    "module": "ESNext", // ES6 replace with ESNext for Chakra
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "moduleResolution": "Bundler", // by Vite and Chakra
 
-		"useDefineForClassFields": true,
-		"skipLibCheck": true,
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
 
-		"isolatedModules": true,
-		"moduleDetection": "force",
-		"noEmit": true,
-		"jsx": "react-jsx",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
 
-		// strict=true fails on fake types. And TSC relies on JS and amateur npm packages, so it's fucked by design.
-		// I prefer strict=true with strong static checks, but even in 2025 it isn't feasible in JS ecosystem.
-		//
-		// Also zod.js requires strict=true (and probably strictNullChecks=true) to mark fields as "required" by default.
-		// It isn't worth it.
-		"strict": false,
+    // strict=true fails on fake types. And TSC relies on JS and amateur npm packages, so it's fucked by design.
+    // I prefer strict=true with strong static checks, but even in 2025 it isn't feasible in JS ecosystem.
+    //
+    // Also zod.js requires strict=true (and probably strictNullChecks=true) to mark fields as "required" by default.
+    // It isn't worth it.
+    "strict": false,
 
-		"noFallthroughCasesInSwitch": true,
+    "noFallthroughCasesInSwitch": true,
 
-		"baseUrl": ".",
+    "baseUrl": ".",
 
-		"paths": {
-			"": ["./node_modules/*"],
-			"@/graphql/*": ["./graphql/*"],
-			"@/*": ["./src/*"],
-		},
+    "paths": {
+      "": ["./node_modules/*"],
+      "@/graphql/*": ["./graphql/*"],
+      "@/*": ["./src/*"]
+    },
 
-		"plugins": [
+    "plugins": [
       {
         "name": "gql.tada/ts-plugin",
         "schema": "./../schema.graphql",
         "tadaOutputLocation": "./graphql/graphql-env.d.ts"
       }
     ]
-	},
-	"include": ["src"],
+  },
+  "include": ["src"]
 }

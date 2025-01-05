@@ -35,7 +35,6 @@
   },
   "formatter": {
     "enabled": true,
-    "lineEnding": "lf",
     "formatWithErrors": true,
     "indentStyle": "space"
   },
@@ -44,7 +43,7 @@
       "src/",
       "package.json",
       "biome.jsonc",
-      "tsconfig.jsonc",
+      "tsconfig.json",
       "vite.config.ts",
       "panda.config.ts",
       "graphql/"
