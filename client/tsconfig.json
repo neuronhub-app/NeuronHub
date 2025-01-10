@@ -23,7 +23,6 @@
     "baseUrl": ".",
 
     "paths": {
-      "": ["./node_modules/*"],
       "@/graphql/*": ["./graphql/*"],
       "@/*": ["./src/*"]
     },
@@ -34,9 +33,7 @@
         "schema": "./../schema.graphql",
         "tadaOutputLocation": "./graphql/graphql-env.d.ts"
       }
-    ],
-
-    "typeRoots": ["./node_modules/@types", "./src/types.d.ts"]
+    ]
   },
   "include": ["src"]
 }

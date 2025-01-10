@@ -1,5 +1,4 @@
 import * as path from "node:path";
-import rollupReplace from "@rollup/plugin-replace";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
@@ -10,16 +9,7 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  plugins: [
-    rollupReplace({
-      preventAssignment: true,
-      values: {
-        "process.env.NODE_ENV": JSON.stringify("development"),
-      },
-    }),
-    react(),
-    tsconfigPaths({ root: "./" }),
-  ],
+  plugins: [react(), tsconfigPaths({ root: "./" })],
 
   build: {
     rollupOptions: {
@@ -42,10 +32,10 @@ export default defineConfig({
 function getAliasForProject() {
   return {
     "@/graphql": path.resolve(__dirname, "./graphql"),
-    "~": path.resolve(__dirname, "./src"),
     "@": path.resolve(__dirname, "./src"),
   };
 }
+
 function getAliasReactRouterGenerated() {
   return {
     "react-router": path.resolve(
