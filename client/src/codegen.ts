@@ -1,3 +1,4 @@
+import * as fs from "node:fs";
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 /**
@@ -18,16 +19,18 @@ export default {
   generates: {
     "./graphql/": {
       preset: "client",
-      plugins: [],
-      config: {
-        useTypeImports: true,
-      },
-      presetConfig: {
-        gqlTagName: "gql",
-      },
     },
   },
   hooks: {
     afterAllFileWrite: ["bun run format"],
+    afterOneFileWrite: (file: string) => {
+      const isRedundantFile =
+        file.endsWith("fragment-masking.ts") ||
+        file.endsWith("index.ts") ||
+        file.endsWith("gql.ts");
+      if (isRedundantFile) {
+        fs.unlinkSync(file);
+      }
+    },
   },
 } as CodegenConfig;

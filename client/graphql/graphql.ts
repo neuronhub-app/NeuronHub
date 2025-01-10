@@ -40,6 +40,20 @@ export type IdBaseFilterLookup = {
   is_null?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
+export enum Importance {
+  ExtraLow = "EXTRA_LOW",
+  High = "HIGH",
+  Low = "LOW",
+  Medium = "MEDIUM",
+  Urgent = "URGENT",
+}
+
+export type ManyToManyInput = {
+  add?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  remove?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  set?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+};
+
 export type ManyToOneInput = {
   add?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   remove?: InputMaybe<Array<Scalars["ID"]["input"]>>;
@@ -77,6 +91,10 @@ export type QueryTool_TagsArgs = {
   filters?: InputMaybe<ToolTagFilter>;
 };
 
+export type QueryToolsArgs = {
+  filters?: InputMaybe<ToolFilter>;
+};
+
 export type StrFilterLookup = {
   /** Case-sensitive containment test. Filter will be skipped on `null` value */
   contains?: InputMaybe<Scalars["String"]["input"]>;
@@ -104,6 +122,16 @@ export type StrFilterLookup = {
   starts_with?: InputMaybe<Scalars["String"]["input"]>;
 };
 
+export type ToolFilter = {
+  AND?: InputMaybe<ToolFilter>;
+  DISTINCT?: InputMaybe<Scalars["Boolean"]["input"]>;
+  NOT?: InputMaybe<ToolFilter>;
+  OR?: InputMaybe<ToolFilter>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  id?: InputMaybe<IdBaseFilterLookup>;
+  name?: InputMaybe<StrFilterLookup>;
+};
+
 export type ToolReviewDraftAlternative = {
   is_vote_positive: Scalars["Boolean"]["input"];
   tool_alternative_id: Scalars["ID"]["input"];
@@ -113,14 +141,20 @@ export type ToolReviewDraftAlternative = {
 export type ToolReviewTypeInput = {
   content?: InputMaybe<Scalars["String"]["input"]>;
   content_private?: InputMaybe<Scalars["String"]["input"]>;
+  importance?: InputMaybe<Importance>;
   is_private?: InputMaybe<Scalars["Boolean"]["input"]>;
   rating: Scalars["Decimal"]["input"];
+  recommended_to_groups?: InputMaybe<ManyToManyInput>;
+  recommended_to_users?: InputMaybe<ManyToManyInput>;
   shared_org_ids: Array<Scalars["ID"]["input"]>;
   shared_user_ids: Array<Scalars["ID"]["input"]>;
   tags: Array<ToolTagTypeInput>;
   title?: InputMaybe<Scalars["String"]["input"]>;
   tool: ToolTypeInput;
   usage_status?: InputMaybe<UsageStatus>;
+  visibility?: InputMaybe<Visibility>;
+  visible_to_groups?: InputMaybe<ManyToManyInput>;
+  visible_to_users?: InputMaybe<ManyToManyInput>;
 };
 
 export type ToolTagFilter = {
@@ -148,6 +182,10 @@ export type ToolTagTypeTag_ChildrenArgs = {
   filters?: InputMaybe<ToolTagFilter>;
 };
 
+export type ToolTagTypeToolsArgs = {
+  filters?: InputMaybe<ToolFilter>;
+};
+
 export type ToolTagTypeInput = {
   comment?: InputMaybe<Scalars["String"]["input"]>;
   description?: InputMaybe<Scalars["String"]["input"]>;
@@ -165,7 +203,11 @@ export type ToolType = {
   github_url: Scalars["String"]["output"];
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
-  slug: Scalars["String"]["output"];
+  slug?: Maybe<Scalars["String"]["output"]>;
+};
+
+export type ToolTypeAlternativesArgs = {
+  filters?: InputMaybe<ToolFilter>;
 };
 
 export type ToolTypeInput = {
@@ -199,6 +241,7 @@ export type UserType = {
   first_name: Scalars["String"]["output"];
   id: Scalars["ID"]["output"];
   last_name: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
 };
 
 export type UserTypeInput = {
@@ -207,7 +250,16 @@ export type UserTypeInput = {
   first_name?: InputMaybe<Scalars["String"]["input"]>;
   id?: InputMaybe<Scalars["ID"]["input"]>;
   last_name?: InputMaybe<Scalars["String"]["input"]>;
+  name: Scalars["String"]["input"];
 };
+
+export enum Visibility {
+  Connections = "CONNECTIONS",
+  ConnectionGroups = "CONNECTION_GROUPS",
+  Internal = "INTERNAL",
+  Private = "PRIVATE",
+  Public = "PUBLIC",
+}
 
 export type ToolTagsQueryQueryVariables = Exact<{
   name?: InputMaybe<Scalars["String"]["input"]>;
@@ -218,6 +270,15 @@ export type ToolTagsQueryQuery = {
   tool_tags: Array<{ __typename?: "ToolTagType"; id: string; name: string }>;
 };
 
+export type ToolAlternativesQueryQueryVariables = Exact<{
+  name?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type ToolAlternativesQueryQuery = {
+  __typename?: "Query";
+  tools: Array<{ __typename?: "ToolType"; id: string; name: string }>;
+};
+
 export type UserCurrentQueryVariables = Exact<{ [key: string]: never }>;
 
 export type UserCurrentQuery = {
@@ -225,20 +286,13 @@ export type UserCurrentQuery = {
   user_current?: {
     __typename?: "UserType";
     id: string;
-    first_name: string;
-    last_name: string;
+    name: string;
     email: string;
     connection_groups: Array<{
       __typename?: "UserConnectionGroupType";
       id: string;
       name: string;
-      connections: Array<{
-        __typename?: "UserType";
-        id: string;
-        first_name: string;
-        last_name: string;
-        email: string;
-      }>;
+      connections: Array<{ __typename?: "UserType"; id: string; name: string }>;
     }>;
   } | null;
 };
@@ -321,6 +375,70 @@ export const ToolTagsQueryDocument = {
     },
   ],
 } as unknown as DocumentNode<ToolTagsQueryQuery, ToolTagsQueryQueryVariables>;
+export const ToolAlternativesQueryDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "ToolAlternativesQuery" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "name" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tools" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "filters" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "name" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "contains" },
+                            value: {
+                              kind: "Variable",
+                              name: { kind: "Name", value: "name" },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ToolAlternativesQueryQuery,
+  ToolAlternativesQueryQueryVariables
+>;
 export const UserCurrentDocument = {
   kind: "Document",
   definitions: [
@@ -338,8 +456,7 @@ export const UserCurrentDocument = {
               kind: "SelectionSet",
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "first_name" } },
-                { kind: "Field", name: { kind: "Name", value: "last_name" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
                 { kind: "Field", name: { kind: "Name", value: "email" } },
                 {
                   kind: "Field",
@@ -361,15 +478,7 @@ export const UserCurrentDocument = {
                             },
                             {
                               kind: "Field",
-                              name: { kind: "Name", value: "first_name" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "last_name" },
-                            },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "email" },
+                              name: { kind: "Name", value: "name" },
                             },
                           ],
                         },
