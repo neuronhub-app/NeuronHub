@@ -9,7 +9,7 @@
     "format": "bun run biome check --write",
     "update-check": "bun run ncu --packageManager=bun",
     "update": "bun run ncu --upgrade --packageManager=bun && bun install",
-    "typegen": "npx @chakra-ui/cli typegen ./src/theme.ts",
+    "typegen": "bunx @chakra-ui/cli typegen ./src/theme.ts",
     "graphql:codegen": "graphql-codegen --config src/codegen.ts"
   },
   "dependencies": {
@@ -22,6 +22,7 @@
     "react-hook-form": "^7.54.2",
     "react-hook-form-chakra": "^1.0.2",
     "react-router": "^7.1.1",
+    "react-hot-toast": "^2.5.1",
     "react-select": "^5.9.0",
     "chakra-react-select": "^6.0.0",
 
@@ -37,6 +38,7 @@
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "@sentry/react": "^8.48.0",
+    "envalid": "^8.0.0",
 
     "urql": "^4.2.1",
     "gql.tada": "^1.8.10",
