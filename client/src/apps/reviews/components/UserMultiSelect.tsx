@@ -46,7 +46,7 @@ export function UserMultiSelect(props: {
     });
   }, []);
 
-  const dialogInputRef = useRef<HTMLInputElement>(null);
+  const dialogInputRef = useRef<HTMLInputElement | null>(null);
 
   function getOptionNumber(optionId: string): number {
     return options!.findIndex(option => option.id === optionId);
@@ -112,10 +112,10 @@ export function UserMultiSelect(props: {
             {state.snap.isOptionDialogOpen && state.snap.userSelected && (
               <FormChakraInput
                 key={state.snap.userSelected.id}
-                form={props.form}
-                formRegister={props.form.register(
-                  `${props.fieldName}.${getOptionNumber(state.snap.userSelected.id)}.message`,
-                )}
+                field={{
+                  control: props.form.control,
+                  name: `${props.fieldName}.${getOptionNumber(state.snap.userSelected.id)}.message`,
+                }}
                 label="Message"
                 placeholder="A message for the give user to see"
               />
@@ -137,8 +137,9 @@ function getOptionsFiltered(filterInputValue?: string): UserSelectOption[] {
     );
   }
 
-  const connectionOptions = user.state.connections.filter(connection => filter(connection.name)).map(
-    connection => ({
+  const connectionOptions = user.state.connections
+    .filter(connection => filter(connection.name))
+    .map(connection => ({
       id: connection.id,
       label: connection.name,
       user: connection,
@@ -146,8 +147,9 @@ function getOptionsFiltered(filterInputValue?: string): UserSelectOption[] {
       message: null,
     }));
 
-  const groupOptions = user.state.current?.connection_groups.filter(group => filter(group.name)).map(
-    group => ({
+  const groupOptions = user.state.current?.connection_groups
+    .filter(group => filter(group.name))
+    .map(group => ({
       id: group.id,
       label: group.connections.length
         ? `${group.name || "Default"} (${group.connections.length})`
@@ -155,7 +157,8 @@ function getOptionsFiltered(filterInputValue?: string): UserSelectOption[] {
       group: group,
       user: null,
       message: null,
-    })).filter(option => option.group.name !== "");
+    }))
+    .filter(option => option.group.name !== "");
 
   if (groupOptions) {
     return [...groupOptions, ...connectionOptions];

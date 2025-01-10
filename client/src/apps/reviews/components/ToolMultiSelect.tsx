@@ -14,6 +14,7 @@ import { IconButton } from "@chakra-ui/react";
 import type { IconProps } from "@chakra-ui/react";
 import type { MessageSquarePlus } from "lucide-react";
 import type { ReactNode } from "react";
+import type { UseFormReturn } from "react-hook-form";
 import { components } from "react-select";
 
 import type {
@@ -22,7 +23,6 @@ import type {
 } from "@/apps/reviews/ReviewCreateForm";
 import { AsyncCreatableSelect } from "chakra-react-select";
 
-type ReviewSelectName = "tags" | "tool.alternatives";
 import { FaMessage, FaRegMessage } from "react-icons/fa6";
 import {
   MdOutlineThumbDown,
@@ -31,8 +31,10 @@ import {
   MdThumbUp,
 } from "react-icons/md";
 
+type ReviewSelectName = "tags" | "tool.alternatives";
+
 export function ToolMultiSelect(props: {
-  form: ReviewCreateForm.FormType;
+  form: UseFormReturn<ReviewCreateForm.FormSchema>;
   fieldName: ReviewSelectName;
   loadOptions: (inputValue: string) => Promise<ReviewSelectOption[]>;
   isAllowCreate?: boolean;
@@ -150,10 +152,10 @@ export function ToolMultiSelect(props: {
               <FormChakraInput
                 autoFocus={true}
                 key={state.snap.optionSelected.id}
-                form={props.form}
-                formRegister={props.form.register(
-                  `${props.fieldName}.${getOptionNumber(state.snap.optionSelected)}.comment`,
-                )}
+                field={{
+                  control: props.form.control,
+                  name: `${props.fieldName}.${getOptionNumber(state.snap.optionSelected)}.comment`,
+                }}
                 onKeyEnter={() => {
                   state.mutable.isDialogOpen = false;
                 }}

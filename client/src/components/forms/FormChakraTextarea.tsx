@@ -2,12 +2,15 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { Flex, Float, Icon, Textarea } from "@chakra-ui/react";
 import { Field as ChakraField } from "@chakra-ui/react";
 import type { ReactNode } from "react";
-import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
+import {
+  type FieldValues,
+  type UseControllerProps,
+  useController,
+} from "react-hook-form";
 import { FaMarkdown } from "react-icons/fa";
 
-export function FormChakraTextarea<FormType>(props: {
-  form: UseFormReturn<FormType>;
-  formRegister: UseFormRegisterReturn;
+export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
+  field: UseControllerProps<TFieldValues>;
   placeholder?: string;
   label?: ReactNode;
   helperText?: ReactNode;
@@ -16,7 +19,7 @@ export function FormChakraTextarea<FormType>(props: {
   isShowIconMarkdown?: boolean;
   fieldProps?: Omit<ChakraField.RootProps, "label">;
 }) {
-  const state = props.form.formState;
+  const { field, fieldState } = useController(props.field);
 
   return (
     <ChakraField.Root {...props.fieldProps}>
@@ -29,11 +32,10 @@ export function FormChakraTextarea<FormType>(props: {
 
       <Flex w="full">
         <Textarea
-          {...props.formRegister}
+          {...field}
           autoresize
-          onChange={event => props.formRegister.onChange(event)}
           placeholder={props.placeholder}
-          aria-invalid={!!state.errors?.[props.formRegister.name]}
+          aria-invalid={!!fieldState.error}
           _hover={{
             borderColor: "gray.300",
             _dark: { borderColor: "gray.700" },
@@ -63,9 +65,9 @@ export function FormChakraTextarea<FormType>(props: {
       {props.helperText && (
         <ChakraField.HelperText>{props.helperText}</ChakraField.HelperText>
       )}
-      {state.errors?.[props.formRegister.name]?.message && (
+      {fieldState.error?.message && (
         <ChakraField.ErrorText>
-          {state.errors?.[props.formRegister.name]?.message}
+          {fieldState.error?.message}
         </ChakraField.ErrorText>
       )}
     </ChakraField.Root>

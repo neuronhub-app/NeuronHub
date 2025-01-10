@@ -6,9 +6,9 @@ import { proxy } from "valtio";
 import { useSnapshot } from "valtio/react";
 
 export namespace user {
-  export const state = proxy({ current: null, connections: [] } as {
-    current: User | null;
-    connections: UserConnection[];
+  export const state = proxy({
+    current: null as User | null,
+    connections: [] as UserConnection[],
   });
 }
 

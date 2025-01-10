@@ -1,20 +1,16 @@
 import { Field } from "@/components/ui/field";
 import { InputGroup } from "@/components/ui/input-group";
-import { Group } from "@chakra-ui/react";
-import { Input as ChakraInput } from "@chakra-ui/react";
-import { formatISO } from "date-fns";
+import { Input } from "@chakra-ui/react";
 import { type ReactNode, useEffect, useRef } from "react";
-import type {
-  UseFormRegisterReturn,
-  UseFormReturn,
-  useForm,
+import {
+  type FieldValues,
+  type UseControllerProps,
+  useController,
 } from "react-hook-form";
 
-export interface FormChakraInputProps<
-  FormType extends ReturnType<typeof useForm>,
-> {
-  form: UseFormReturn<FormType>;
-  formRegister: UseFormRegisterReturn;
+export function FormChakraInput<TFieldValues extends FieldValues>(props: {
+  field: UseControllerProps<TFieldValues>;
+
   placeholder?: string;
   label?: ReactNode;
   helperText?: ReactNode;
@@ -32,18 +28,10 @@ export interface FormChakraInputProps<
   startElement?: ReactNode;
 
   maxW?: string;
-}
-
-export function FormChakraInput(props: FormChakraInputProps<any>) {
-  const state = props.form.formState;
-
-  // extract props not for <Input>
-  const { inputProps, startElement, onKeyEnter, formRegister, ...propsRoot } =
-    props;
+}) {
+  const { field, fieldState } = useController(props.field);
 
   const inputRef = useRef(null as HTMLInputElement | null);
-
-  const { ref, ...formRegisterRest } = formRegister;
 
   useEffect(() => {
     setTimeout(() => {
@@ -55,39 +43,31 @@ export function FormChakraInput(props: FormChakraInputProps<any>) {
 
   return (
     <Field
-      {...propsRoot}
-      invalid={Boolean(state.errors?.[formRegister.name])}
-      errorText={state.errors?.[formRegister.name]?.message as string} // @bad-inference
+      label={props.label}
+      invalid={!!fieldState.error}
+      errorText={fieldState.error?.message}
       maxW={props.maxW}
     >
-      <Group attached={false} w="100%">
-        <InputGroup w="full" startElement={startElement}>
-          <ChakraInput
-            {...formRegisterRest}
-            ref={e => {
-              ref(e);
-              inputRef.current = e; // you can still assign to ref
-            }}
-            onKeyDown={event => {
-              if (event.key === "Enter" && props.onKeyEnter) {
-                props.onKeyEnter();
-              }
-            }}
-            defaultValue={
-              inputProps?.type === "date"
-                ? formatISO(new Date(), { representation: "date" })
-                : state.dirtyFields[formRegister.name]
+      <InputGroup w="full" startElement={props.startElement}>
+        <Input
+          {...field}
+          ref={e => {
+            field.ref(e);
+            inputRef.current = e; // you can still assign to ref
+          }}
+          _hover={{
+            borderColor: "gray.300",
+            _dark: { borderColor: "gray.700" },
+          }}
+          type={props.inputProps?.type}
+          size={props.inputProps?.size}
+          onKeyDown={event => {
+            if (event.key === "Enter" && props.onKeyEnter) {
+              props.onKeyEnter();
             }
-            type={inputProps?.type}
-            size={inputProps?.size}
-            placeholder={props.placeholder}
-            _hover={{
-              borderColor: "gray.300",
-              _dark: { borderColor: "gray.700" },
-            }}
-          />
-        </InputGroup>
-      </Group>
+          }}
+        />
+      </InputGroup>
     </Field>
   );
 }

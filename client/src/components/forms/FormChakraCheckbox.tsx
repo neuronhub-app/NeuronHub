@@ -1,12 +1,13 @@
+import type { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
 import { Checkbox } from "@chakra-ui/react";
 import { Field as ChakraField } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
 
-export function FormChakraCheckboxField<FormType>(
+export function FormChakraCheckboxField(
   props: {
-    form: UseFormReturn<FormType>;
-    formRegister: UseFormRegisterReturn;
+    form: UseFormReturn<ReviewCreateForm.FormSchema>;
+    formRegister: UseFormRegisterReturn<"rating">;
     label?: ReactNode;
     helperText?: ReactNode;
     errorText?: ReactNode;
@@ -22,7 +23,6 @@ export function FormChakraCheckboxField<FormType>(
         <Checkbox.HiddenInput
           {...formRegister}
           onChange={event => formRegister.onChange(event)}
-          aria-invalid={state.errors?.[formRegister.name]}
         />
         <Checkbox.Control>
           <Checkbox.Indicator />
