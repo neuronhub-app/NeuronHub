@@ -43,18 +43,40 @@ export const system = createSystem(
                 value: { base: "{colors.gray.50}", _dark: "{colors.gray.900}" },
               },
             },
+            fg: {
+              "muted-button": {
+                value: {
+                  base: "{colors.gray.500}",
+                  _dark: "{colors.gray.500}",
+                },
+              },
+              "fieldset-title": {
+                value: {
+                  base: "{colors.gray.500}",
+                  _dark: "{colors.gray.500}",
+                },
+              },
+            },
             primary: {
               value: "{colors.blue.500}",
             },
-            //
             // gray: {
             //   100: { value: "{colors.gray.100}" },
             //   200: { value: "{colors.gray.200}" },
             //   300: { value: "{colors.gray.300}" },
             // },
           },
-        },
+          spacing: {
+            gap: {
+              label: { value: "{spacing.1.5}" },
 
+              sm: { value: "{spacing.1.5}" },
+              md: { value: "{spacing.4}" },
+              lg: { value: "{spacing.7}" },
+              xl: { value: "{spacing.10}" }, // todo set to Sidebar's Content padding
+            },
+          },
+        },
         // breakpoints: {
         //   sm: "320px",
         //   md: "768px",

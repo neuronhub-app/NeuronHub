@@ -13,10 +13,6 @@ directive @IsAuthenticated repeatable on FIELD_DEFINITION
 """Decimal (fixed-point)"""
 scalar Decimal
 
-type DjangoModelType {
-  pk: ID!
-}
-
 input IDBaseFilterLookup {
   """Exact match. Filter will be skipped on `null` value"""
   exact: ID
@@ -30,19 +26,35 @@ input IDBaseFilterLookup {
   in_list: [ID!]
 }
 
+enum Importance {
+  EXTRA_LOW
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+input ManyToManyInput {
+  add: [ID!]
+  remove: [ID!]
+  set: [ID!]
+}
+
+input ManyToOneInput {
+  add: [ID!]
+  remove: [ID!]
+  set: [ID!]
+}
+
 type Mutation {
   logout: Boolean!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   create_review(data: ToolReviewTypeInput!): UserType! @IsAuthenticated
 }
 
-input OneToManyInput {
-  set: ID
-}
-
 type Query {
   user_current: UserType
-  tools: [ToolType!]!
+  tools(filters: ToolFilter): [ToolType!]!
   tool(pk: ID!): ToolType!
   tool_tags(filters: ToolTagFilter): [ToolTagType!]!
 }
@@ -95,6 +107,16 @@ input StrFilterLookup {
   i_regex: String
 }
 
+input ToolFilter {
+  id: IDBaseFilterLookup
+  name: StrFilterLookup
+  description: String
+  AND: ToolFilter
+  OR: ToolFilter
+  NOT: ToolFilter
+  DISTINCT: Boolean
+}
+
 input ToolReviewDraftAlternative {
   tool_id: ID!
   tool_alternative_id: ID!
@@ -110,6 +132,12 @@ input ToolReviewTypeInput {
   shared_user_ids: [ID!]!
   shared_org_ids: [ID!]!
   rating: Decimal!
+  importance: Importance
+  visibility: Visibility
+  visible_to_users: ManyToManyInput
+  visible_to_groups: ManyToManyInput
+  recommended_to_users: ManyToManyInput
+  recommended_to_groups: ManyToManyInput
   is_private: Boolean
   tags: [ToolTagTypeInput!]!
 }
@@ -117,6 +145,7 @@ input ToolReviewTypeInput {
 input ToolTagFilter {
   id: IDBaseFilterLookup
   name: StrFilterLookup
+  description: StrFilterLookup
   AND: ToolTagFilter
   OR: ToolTagFilter
   NOT: ToolTagFilter
@@ -124,7 +153,7 @@ input ToolTagFilter {
 }
 
 type ToolTagType {
-  tools: [ToolType!]!
+  tools(filters: ToolFilter): [ToolType!]!
   tag_parent: ToolTagType!
   tag_children(filters: ToolTagFilter): [ToolTagType!]!
   author: UserType!
@@ -142,14 +171,14 @@ input ToolTagTypeInput {
 }
 
 type ToolType {
-  slug: String!
-  description: String
-  alternatives: [ToolType!]!
   id: ID!
+  slug: String
   name: String!
   domain: String!
   crunchbase_url: String!
   github_url: String!
+  description: String
+  alternatives(filters: ToolFilter): [ToolType!]!
 }
 
 input ToolTypeInput {
@@ -169,18 +198,34 @@ enum UsageStatus {
   NOT_INTERESTED
 }
 
+type UserConnectionGroupType {
+  id: ID!
+  name: String!
+  connections: [UserType!]!
+}
+
 type UserType {
   id: ID!
-  email: String!
   first_name: String!
   last_name: String!
-  org: DjangoModelType
+  name: String!
+  email: String!
+  connection_groups: [UserConnectionGroupType!]!
 }
 
 input UserTypeInput {
   id: ID
-  email: String
   first_name: String
   last_name: String
-  org: OneToManyInput
+  name: String!
+  email: String
+  connection_groups: ManyToOneInput
+}
+
+enum Visibility {
+  PRIVATE
+  CONNECTION_GROUPS
+  CONNECTIONS
+  INTERNAL
+  PUBLIC
 }

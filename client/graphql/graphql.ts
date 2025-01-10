@@ -14,9 +14,7 @@ export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
 export type MakeEmpty<
   T extends { [key: string]: unknown },
   K extends keyof T,
-> = {
-  [_ in K]?: never;
-};
+> = { [_ in K]?: never };
 export type Incremental<T> =
   | T
   | {
@@ -33,11 +31,6 @@ export type Scalars = {
   Decimal: { input: any; output: any };
 };
 
-export type DjangoModelType = {
-  __typename?: "DjangoModelType";
-  pk: Scalars["ID"]["output"];
-};
-
 export type IdBaseFilterLookup = {
   /** Exact match. Filter will be skipped on `null` value */
   exact?: InputMaybe<Scalars["ID"]["input"]>;
@@ -45,6 +38,12 @@ export type IdBaseFilterLookup = {
   in_list?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   /** Assignment test. Filter will be skipped on `null` value */
   is_null?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
+export type ManyToOneInput = {
+  add?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  remove?: InputMaybe<Array<Scalars["ID"]["input"]>>;
+  set?: InputMaybe<Array<Scalars["ID"]["input"]>>;
 };
 
 export type Mutation = {
@@ -60,10 +59,6 @@ export type MutationCreate_ReviewArgs = {
 
 export type MutationUpdate_UserArgs = {
   data: UserTypeInput;
-};
-
-export type OneToManyInput = {
-  set?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type Query = {
@@ -133,6 +128,7 @@ export type ToolTagFilter = {
   DISTINCT?: InputMaybe<Scalars["Boolean"]["input"]>;
   NOT?: InputMaybe<ToolTagFilter>;
   OR?: InputMaybe<ToolTagFilter>;
+  description?: InputMaybe<StrFilterLookup>;
   id?: InputMaybe<IdBaseFilterLookup>;
   name?: InputMaybe<StrFilterLookup>;
 };
@@ -189,21 +185,28 @@ export enum UsageStatus {
   WantToUse = "WANT_TO_USE",
 }
 
+export type UserConnectionGroupType = {
+  __typename?: "UserConnectionGroupType";
+  connections: Array<UserType>;
+  id: Scalars["ID"]["output"];
+  name: Scalars["String"]["output"];
+};
+
 export type UserType = {
   __typename?: "UserType";
+  connection_groups: Array<UserConnectionGroupType>;
   email: Scalars["String"]["output"];
   first_name: Scalars["String"]["output"];
   id: Scalars["ID"]["output"];
   last_name: Scalars["String"]["output"];
-  org?: Maybe<DjangoModelType>;
 };
 
 export type UserTypeInput = {
+  connection_groups?: InputMaybe<ManyToOneInput>;
   email?: InputMaybe<Scalars["String"]["input"]>;
   first_name?: InputMaybe<Scalars["String"]["input"]>;
   id?: InputMaybe<Scalars["ID"]["input"]>;
   last_name?: InputMaybe<Scalars["String"]["input"]>;
-  org?: InputMaybe<OneToManyInput>;
 };
 
 export type ToolTagsQueryQueryVariables = Exact<{
@@ -223,7 +226,20 @@ export type UserCurrentQuery = {
     __typename?: "UserType";
     id: string;
     first_name: string;
+    last_name: string;
     email: string;
+    connection_groups: Array<{
+      __typename?: "UserConnectionGroupType";
+      id: string;
+      name: string;
+      connections: Array<{
+        __typename?: "UserType";
+        id: string;
+        first_name: string;
+        last_name: string;
+        email: string;
+      }>;
+    }>;
   } | null;
 };
 
@@ -257,6 +273,23 @@ export const ToolTagsQueryDocument = {
                     {
                       kind: "ObjectField",
                       name: { kind: "Name", value: "name" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "contains" },
+                            value: {
+                              kind: "Variable",
+                              name: { kind: "Name", value: "name" },
+                            },
+                          },
+                        ],
+                      },
+                    },
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "description" },
                       value: {
                         kind: "ObjectValue",
                         fields: [
@@ -306,7 +339,44 @@ export const UserCurrentDocument = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "first_name" } },
+                { kind: "Field", name: { kind: "Name", value: "last_name" } },
                 { kind: "Field", name: { kind: "Name", value: "email" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "connection_groups" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "connections" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "first_name" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "last_name" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "email" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },

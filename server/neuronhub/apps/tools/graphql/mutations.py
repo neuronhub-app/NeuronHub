@@ -59,6 +59,13 @@ class ToolReviewTypeInput:
     shared_org_ids: list[strawberry.ID]
 
     rating: auto
+    importance: auto
+    visibility: auto
+
+    visible_to_users: auto
+    visible_to_groups: auto
+    recommended_to_users: auto
+    recommended_to_groups: auto
 
     is_private: auto
 

@@ -9,20 +9,22 @@ from neuronhub.apps.tools.models import ToolTag
 from neuronhub.apps.users.graphql.types import UserType
 
 
-@strawberry_django.type(
-    Tool,
-    fields=[
-        "id",
-        "name",
-        "slug",
-        "description",
-        "domain",
-        "crunchbase_url",
-        "github_url",
-    ],
-)
+@strawberry_django.filter(Tool, lookups=True)
+class ToolFilter:
+    id: auto
+    name: auto
+    description: str | None
+
+
+@strawberry_django.type(Tool, filters=ToolFilter)
 class ToolType:
-    slug: str
+    id: auto
+    slug: str | None
+    name: auto
+    domain: auto
+    crunchbase_url: auto
+    github_url: auto
+
     description: str | None
 
     alternatives: list[ToolType]
@@ -32,6 +34,7 @@ class ToolType:
 class ToolTagFilter:
     id: auto
     name: auto
+    description: auto
 
 
 @strawberry_django.type(

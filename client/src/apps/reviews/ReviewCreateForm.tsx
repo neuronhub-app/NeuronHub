@@ -1,7 +1,9 @@
-import { TagMultiSelect } from "@/apps/reviews/components/TagMultiSelect";
+import { ToolMultiSelect } from "@/apps/reviews/components/ToolMultiSelect";
+import { UserMultiSelect } from "@/apps/reviews/components/UserMultiSelect";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
+import { FormChakraSelect } from "@/components/forms/FormChakraSelect";
 import { FormChakraSlider } from "@/components/forms/FormChakraSlider";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { zStringEmpty } from "@/components/forms/zod";
@@ -28,21 +30,26 @@ import {
   FaCircleXmark,
   FaClockRotateLeft,
   FaCode,
+  FaGlobe,
   FaHeartPulse,
   FaServer,
+  FaShieldHalved,
+  FaUsers,
+  FaUsersGear,
 } from "react-icons/fa6";
 import { HiLockClosed, HiOutlineClock } from "react-icons/hi2";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
+import { gql, useClient } from "urql";
 import { proxy } from "valtio";
 import { useProxy } from "valtio/utils";
 import { z } from "zod";
 
-export interface TagOption {
+export interface ReviewSelectOption {
   readonly id: string;
   readonly name: string;
   is_vote_positive: boolean | null;
-  comment?: string;
+  comment: string | null;
 }
 
 import { Checkbox } from "@/components/ui/checkbox";
@@ -50,18 +57,55 @@ import { Tag } from "@/components/ui/tag";
 import { CheckboxGroup } from "@chakra-ui/react";
 
 export namespace ReviewCreateForm {
+  const toolMultiSelect = z.array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      is_vote_positive: z.boolean().nullable(),
+      comment: z.string().nullable(),
+    }),
+  ).optional();
+  const useMultiSelect = z.array(
+    z.object({
+      id: z.string(),
+      message: z.string().nullable(),
+      user: z.union([
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          email: z.string(),
+        }),
+        z.null(),
+        z.undefined(),
+      ]),
+      group: z.union([
+        z.object({
+          id: z.string(),
+          name: z.string(),
+        }),
+        z.null(),
+        z.undefined(),
+      ]),
+    }),
+  ).optional();
+
   export const schema = z.object({
+    tool: z.object({
+      title: z.string().min(1),
+      description: z.string().optional(),
+      domain: z.string().optional(),
+      github_url: z.union([
+        z.string().includes("github.com").includes("/"),
+        zStringEmpty(),
+      ]),
+      crunchbase_url: z.union([
+        z.string().includes("crunchbase.com").includes("/"),
+        zStringEmpty(),
+      ]),
+      alternatives: toolMultiSelect,
+    }),
     title: z.string().min(1),
-    domain: z.string().optional(),
     source: z.string().optional(),
-    github_url: z.union([
-      z.string().includes("github.com").includes("/"),
-      zStringEmpty(),
-    ]),
-    crunchbase_url: z.union([
-      z.string().includes("crunchbase.com").includes("/"),
-      zStringEmpty(),
-    ]),
     rating: z.number().min(0).max(100).optional(),
     reviewed_at: z.string().date().optional(),
     content: z.string().optional(),
@@ -81,26 +125,32 @@ export namespace ReviewCreateForm {
       z.literal("interested"),
       z.literal("not_interested"),
     ]),
-    tags: z
-      .array(
-        z.object({
-          id: z.string(),
-          name: z.string(),
-          is_vote_positive: z.boolean().nullable(),
-          comment: z.string().nullable(),
-        }),
-      )
-      .optional(),
-    is_private: z.boolean().optional(),
-    is_review_later: z.boolean().optional(),
+    visibility: z.union([
+      z.literal("private"),
+      z.literal("connection_groups"),
+      z.literal("connections"),
+      z.literal("internal"),
+      z.literal("public"),
+    ]),
+    importance: z.union([
+      z.literal("extra_low"),
+      z.literal("low"),
+      z.literal("medium"),
+      z.literal("high"),
+      z.literal("urgent"),
+    ]).optional(),
+    tags: toolMultiSelect,
+    recommend_to: useMultiSelect,
+    visible_to: useMultiSelect,
+    is_review_later: z.boolean({ coerce: true }).optional(),
   });
 
   export type FormType = ReturnType<
     typeof useForm<z.infer<typeof ReviewCreateForm.schema>>
   >;
+  export type FormSchema = z.infer<typeof schema>;
 
   const state = proxy({
-    isAddPrivateNote: false,
     isRated: true,
   });
 
@@ -113,9 +163,13 @@ export namespace ReviewCreateForm {
         reviewed_at: formatISO(new Date(), { representation: "date" }),
         type: "Program",
         usage_status: "using",
-      },
-    }) as FormType; // casting due to a type mess in react-hook-form. It was surfaced by adding `defaultValues` prop, without it casting isn't needed.
+        visibility: "private",
+        is_review_later: false,
+        importance: "medium",
+      } as Partial<z.infer<typeof schema>>,
+    }) as FormType; // casting due to a type issues in react-hook-form. It was surfaced by adding `defaultValues` prop, without it casting isn't needed.
 
+    const client = useClient();
     const $state = useProxy(state);
     const formState = form.watch();
 
@@ -128,54 +182,148 @@ export namespace ReviewCreateForm {
       });
     }
 
+    // todo remove
     const style = {
       maxW: "330px",
-      gapXl: 7,
-      gapMd: 4,
     };
 
+    function getToolTypeName(): string {
+      return formState.type === "Other" ? "Tool" : formState.type;
+    }
+
     return (
-      <VStack alignItems="flex-start" w="100%" maxW="900px" gap={style.gapXl}>
+      <VStack alignItems="flex-start" w="100%" maxW="900px" gap="gap.lg">
         <Heading fontSize="2xl">Add review</Heading>
 
-        <VStack asChild w="100%" alignItems="flex-start" gap={style.gapXl}>
+        <VStack asChild w="100%" alignItems="flex-start" gap="gap.xl">
           <form onSubmit={form.handleSubmit(values => handleSubmit(values))}>
             <Fieldset.Root>
-              <Fieldset.Content display="flex" flexDir="row">
-                <HStack w="full" align="flex-start" gap={style.gapMd}>
-                  <FormChakraInput
-                    form={form}
-                    formRegister={form.register("title")}
-                    label={`${formState.type === "Other" ? "Tool" : formState.type} name`}
-                  />
-                </HStack>
-              </Fieldset.Content>
-            </Fieldset.Root>
+              <Fieldset.Content display="flex" gap="gap.md">
+                <FormChakraSegmentControl
+                  form={form}
+                  formRegister={form.register("type")}
+                  label="Type"
+                  size="lg"
+                  items={[
+                    getToolType("Program", <FaCode />),
+                    getToolType("Service", <FaServer />),
+                    getToolType("Material", <FaBook />),
+                    getToolType("App", <FaAppStoreIos />),
+                    getToolType("Product", <FaShoppingCart />),
+                    getToolType("Other", <Webhook />),
+                  ]}
+                />
 
-            <FormChakraSegmentControl
-              form={form}
-              formRegister={form.register("type")}
-              label="Type"
-              size="lg"
-              items={[
-                getToolType("Program", <FaCode />),
-                getToolType("Service", <FaServer />),
-                getToolType("Material", <FaBook />),
-                getToolType("App", <FaAppStoreIos />),
-                getToolType("Product", <FaShoppingCart />),
-                getToolType("Other", <Webhook />),
-              ]}
-            />
+                <FormChakraInput
+                  form={form}
+                  formRegister={form.register("tool.title")}
+                  label={`${getToolTypeName()} name`}
+                />
 
-            <Fieldset.Root>
-              <Fieldset.Content display="flex" flexDir="row">
                 {/* todo responsiveness */}
-                <HStack w="full" gap={style.gapMd}>
+                <HStack w="full" gap="gap.md">
                   <FormChakraInput
                     label="Domain"
                     placeholder="name.com"
                     form={form}
-                    formRegister={form.register("domain")}
+                    formRegister={form.register("tool.domain")}
+                  />
+                  <FormChakraInput
+                    label="GitHub"
+                    form={form}
+                    formRegister={form.register("tool.github_url")}
+                    startElement={<LuGithub />}
+                  />
+                  <FormChakraInput
+                    label="Crunchbase"
+                    form={form}
+                    formRegister={form.register("tool.crunchbase_url")}
+                    startElement={<SiCrunchbase />}
+                  />
+                </HStack>
+
+                <FormChakraTextarea
+                  form={form}
+                  formRegister={form.register("tool.description")}
+                  label={`${getToolTypeName()} description`}
+                  placeholder=""
+                  isShowIconMarkdown
+                />
+
+                <VStack align="flex-start" w="full" gap="gap.sm">
+                  <Text fontSize="sm" fontWeight="semibold">
+                    Tags
+                  </Text>
+                  <ToolMultiSelect
+                    form={form}
+                    fieldName="tags"
+                    loadOptions={async (inputValue: string) => {
+                      const res = await client.query(
+                        gql(`
+                          query ToolTagsQuery($name: String) {
+                            tool_tags(filters: {
+                              name: {contains: $name}
+                              description: {contains: $name}
+                            }) {
+                              id
+                              name
+                            }
+                          }
+                        `),
+                        {
+                          name: inputValue,
+                        },
+                      ).toPromise();
+                      return res.data.tool_tags;
+                    }}
+                  />
+                </VStack>
+
+                <VStack align="flex-start" w="full" gap="gap.sm">
+                  <Text fontSize="sm" fontWeight="semibold">
+                    Alternatives
+                  </Text>
+                  <ToolMultiSelect
+                    form={form}
+                    fieldName="tool.alternatives"
+                    loadOptions={async (inputValue: string) => {
+                      const res = await client.query(
+                        gql(`
+                          query ToolAlternativesQuery($name: String) {
+                            tools(filters: { name: {contains: $name} }) {
+                              id
+                              name
+                            }
+                          }
+                        `),
+                        {
+                          name: inputValue,
+                        },
+                      ).toPromise();
+                      return res.data.tools;
+                    }}
+                  />
+                </VStack>
+              </Fieldset.Content>
+            </Fieldset.Root>
+
+            <Fieldset.Root>
+              <Fieldset.Legend fontSize="lg" color="fg.fieldset-title">
+                Review
+              </Fieldset.Legend>
+
+              <Fieldset.Content display="flex" gap="gap.lg">
+                <VStack gap="gap.lg" alignItems="flex-start" w="100%">
+                  <FormChakraInput
+                    form={form}
+                    formRegister={form.register("title")}
+                    label="Title"
+                  />
+                  <FormChakraTextarea
+                    form={form}
+                    formRegister={form.register("content")}
+                    label="Content"
+                    isShowIconMarkdown
                   />
                   <FormChakraInput
                     label="Source"
@@ -183,118 +331,141 @@ export namespace ReviewCreateForm {
                     form={form}
                     formRegister={form.register("source")}
                   />
-                  <FormChakraInput
-                    label="GitHub"
+
+                  <FormChakraTextarea
                     form={form}
-                    formRegister={form.register("github_url")}
-                    startElement={<LuGithub />}
+                    formRegister={form.register("content_private")}
+                    label="Private note"
+                    placeholder="Only visible to you"
+                    isShowIconMarkdown
                   />
-                  <FormChakraInput
-                    label="Crunchbase"
+
+                  <FormChakraSelect
                     form={form}
-                    formRegister={form.register("crunchbase_url")}
-                    startElement={<SiCrunchbase />}
+                    formRegister={form.register("importance")}
+                    label="Importance"
+                    fieldName="importance"
+                    placeholder="How important is it?"
+                    options={[
+                      { label: "Extra low", value: "extra_low" },
+                      { label: "Low", value: "low" },
+                      { label: "Medium", value: "medium" },
+                      { label: "High", value: "high" },
+                      { label: "Urgent", value: "urgent" },
+                    ]}
                   />
-                </HStack>
+
+                  <VStack align="flex-start" w="full" gap="gap.sm">
+                    <Checkbox
+                      defaultChecked={true}
+                      inputProps={{
+                        onChange: event => {
+                          $state.isRated = event.target.checked;
+                          if ($state.isRated) {
+                            form.setValue(
+                              "rating",
+                              form.formState.defaultValues?.rating,
+                            );
+                          } else {
+                            form.setValue("rating", undefined);
+                          }
+                        },
+                      }}
+                    >
+                      Rating{" "}
+                      {formState.rating && (
+                        <Tag size="md" ml={2}>
+                          {formState.rating}
+                        </Tag>
+                      )}
+                    </Checkbox>
+
+                    <FormChakraSlider
+                      hidden={!$state.isRated}
+                      form={form}
+                      control={form.control}
+                      formRegister={form.register("rating")}
+                    />
+                  </VStack>
+
+                  <HStack justify="space-between" w="full" gap="gap.md">
+                    <FormChakraSegmentControl
+                      form={form}
+                      formRegister={form.register("usage_status")}
+                      label="Usage status"
+                      items={[
+                        getToolType("using", <FaHeartPulse />),
+                        getToolType(
+                          "want_to_use",
+                          <FaBookmark />,
+                          "Want to use",
+                        ),
+                        getToolType("used", <FaClockRotateLeft />),
+                        getToolType("interested", <FaStar />),
+                        getToolType(
+                          "not_interested",
+                          <FaCircleXmark />,
+                          "Not interested",
+                        ),
+                      ]}
+                      size="sm"
+                    />
+
+                    <FormChakraInput
+                      form={form}
+                      formRegister={form.register("reviewed_at")}
+                      inputProps={{
+                        type: "date",
+                      }}
+                      label="Reviewed at"
+                      maxW={style.maxW}
+                    />
+                  </HStack>
+                </VStack>
+
+                <VStack align="flex-start">
+                  <FormChakraSegmentControl
+                    form={form}
+                    formRegister={form.register("visibility")}
+                    label="Visibility"
+                    items={[
+                      getToolType("private", <HiLockClosed />),
+                      getToolType(
+                        "connection_groups",
+                        <FaUsersGear />,
+                        "Connections selected",
+                      ),
+                      getToolType("connections", <FaUsers />),
+                      getToolType(
+                        "internal",
+                        <FaShieldHalved />,
+                        "Authenticated users",
+                      ),
+                      getToolType("public", <FaGlobe />),
+                    ]}
+                    size="sm"
+                  />
+                  {formState.visibility === "connection_groups" && (
+                    <UserMultiSelect
+                      form={form}
+                      fieldName="visible_to"
+                      placeholder="Select connections"
+                    />
+                  )}
+                </VStack>
+
+                <VStack align="flex-start" w="full" gap="gap.sm">
+                  <Text fontSize="sm" fontWeight="semibold">
+                    Recommend to
+                  </Text>
+                  <UserMultiSelect form={form} fieldName="recommend_to" />
+                </VStack>
               </Fieldset.Content>
             </Fieldset.Root>
 
-            <VStack gap={style.gapXl} alignItems="flex-start" w="100%">
-              <VStack align="flex-start">
-                <Text fontSize="sm" fontWeight="semibold">
-                  Tags
-                </Text>
-                <TagMultiSelect form={form} />
-              </VStack>
-
-              <FormChakraTextarea
-                form={form}
-                formRegister={form.register("content")}
-                label="Review"
-                isShowIconMarkdown
-              />
-
-              <VStack align="flex-start" w="full" gap={style.gapMd}>
-                <Checkbox
-                  defaultChecked={true}
-                  inputProps={{
-                    onChange: event => {
-                      $state.isRated = event.target.checked;
-                      if ($state.isRated) {
-                        form.setValue(
-                          "rating",
-                          form.formState.defaultValues?.rating,
-                        );
-                      } else {
-                        form.setValue("rating", null);
-                      }
-                    },
-                  }}
-                >
-                  Rating{" "}
-                  {formState.rating && (
-                    <Tag size="md" ml={2}>
-                      {formState.rating}
-                    </Tag>
-                  )}
-                </Checkbox>
-
-                <FormChakraSlider
-                  hidden={!$state.isRated}
-                  form={form}
-                  control={form.control}
-                  formRegister={form.register("rating")}
-                />
-              </VStack>
-
-              <HStack justify="space-between" w="full" gap={style.gapMd}>
-                <FormChakraSegmentControl
-                  form={form}
-                  formRegister={form.register("usage_status")}
-                  label="Usage status"
-                  items={[
-                    getToolType("using", <FaHeartPulse />),
-                    getToolType("want_to_use", <FaBookmark />, "Want to use"),
-                    getToolType("used", <FaClockRotateLeft />),
-                    getToolType("interested", <FaStar />),
-                    getToolType(
-                      "not_interested",
-                      <FaCircleXmark />,
-                      "Not interested",
-                    ),
-                  ]}
-                  size="sm"
-                />
-
-                <FormChakraInput
-                  form={form}
-                  formRegister={form.register("reviewed_at")}
-                  inputProps={{
-                    type: "date",
-                  }}
-                  label="Reviewed at"
-                  maxW={style.maxW}
-                />
-              </HStack>
-
-              <FormChakraTextarea
-                form={form}
-                formRegister={form.register("content_private")}
-                label="Private note"
-                placeholder="Only visible to you"
-                isShowIconMarkdown
-              />
-
+            <VStack align="flex-start" w="full" gap="gap.md">
               <CheckboxGroup>
-                <Flex gap={style.gapMd}>
-                  <FormChakraCheckboxCard
-                    form={form}
-                    formRegister={form.register("is_private")}
-                    label="Private"
-                    helperText="Review only visible to you"
-                    icon={<HiLockClosed size={23} />}
-                    minW="200px"
-                  />
+                <Flex gap="gap.md">
                   <FormChakraCheckboxCard
                     form={form}
                     formRegister={form.register("is_review_later")}

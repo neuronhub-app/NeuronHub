@@ -2,6 +2,13 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import UserConnectionGroup
+
+
+class UserConnectionGroupInline(admin.TabularInline):
+    model = UserConnectionGroup
+    extra = 0
+    autocomplete_fields = ["connections"]
 
 
 @admin.register(User)
@@ -37,6 +44,8 @@ class UserAdmin(UserAdmin):
                     "password",
                     "first_name",
                     "last_name",
+                    "avatar",
+                    "owner",
                     "last_login",
                     "date_joined",
                 ],
@@ -63,3 +72,6 @@ class UserAdmin(UserAdmin):
             },
         ),
     )
+    inlines = [
+        UserConnectionGroupInline,
+    ]

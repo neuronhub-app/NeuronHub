@@ -1,3 +1,4 @@
+import type { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
 import { Field } from "@/components/ui/field";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import type { ReactNode } from "react";
@@ -9,7 +10,7 @@ import {
 } from "react-hook-form";
 
 export function FormChakraSegmentControl<FormType>(props: {
-  form: UseFormReturn<FormType>;
+  form: UseFormReturn<ReviewCreateForm.FormType>;
   formRegister: UseFormRegisterReturn;
   label: string;
   items: Array<{

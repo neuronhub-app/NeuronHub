@@ -13,12 +13,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    // strict=true fails on fake types. And TSC relies on JS and amateur npm packages, so it's fucked by design.
-    // I prefer strict=true with strong static checks, but even in 2025 it isn't feasible in JS ecosystem.
+    // zod.js requires strict=true (and probably strictNullChecks=true) to mark fields as "required" by default.
     //
-    // Also zod.js requires strict=true (and probably strictNullChecks=true) to mark fields as "required" by default.
-    // It isn't worth it.
-    "strict": false,
+    // gql.tada doesn't work without it.
+    "strict": true,
 
     "noFallthroughCasesInSwitch": true,
 
@@ -36,7 +34,9 @@
         "schema": "./../schema.graphql",
         "tadaOutputLocation": "./graphql/graphql-env.d.ts"
       }
-    ]
+    ],
+
+    "typeRoots": ["./node_modules/@types", "./src/types.d.ts"]
   },
   "include": ["src"]
 }

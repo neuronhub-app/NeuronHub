@@ -1,45 +1,54 @@
 ---
-reviewed_at: 2025.01.03
+reviewed_at: 2025.01.09
 ---
-
 
 Setup
 --------------------------------
 
-### Install
+### Installation
 
-- bun install
-- bun run dev
+```bash
+bun install
+bun run dev
+```
 
-### Prod build
+### Production Build
 
-- bun run build
-- bun run preview
+```bash
+bun run build
+bun run preview
+```
 
-### Update
+### Package Updates
 
-Using npm-check-updates.
+Using npm-check-updates:
 
-- bun run update-check
-- bun run update
+```bash
+bun run update-check
+bun run update
+```
 
-Caveats
+Known Issues
 --------------------------------
+
+### react-hook-form
+
+`onChange` stops working if you pass `ref` to `<input>`. See [their docs](https://www.react-hook-form.com/faqs/#Howtosharerefusage) on how to access it.
+
+The package's architecture presents some challenges due to multiple implementation approaches for similar functionality, each with its own API and limitations. The [Chakra adapters](/client/src/components/forms) in this project are intentionally minimal and copy-pasted from chakra-ui documentation. I plan to migrate to a Chakra UI package as soon as it appears.
 
 ### chakra v3
 
-Immature, esp in combination with React 19. Eg when React runs the magic `useMemo()`, Chakra components try to supply `JSON.stringify()`, but if the Component has a prop with a cycled ref, the `stringify()` is going to throw a recursion error (keywords: stateNode, FiberNode).
-
-Some components, eg `SegmentControl`, have incorrect css that don't work without `ColorModeProvider`, hence it isn't feasible to remove it.
+Has stability issues, particularly when used with React 19:
+- React's `useMemo()` can conflict with Chakra components attempting to use `JSON.stringify()`, causing recursion errors when components have cyclic references (keywords: `stateNode`, `FiberNode`)
+- Some components, eg `SegmentControl`, have incorrect css that don't work without `ColorModeProvider` global styles.
 
 ### zod.js
 
-The internal are convoluted and have odd dependencies. Eg fields stop being required if tsconfig.json's `compilerOptions::strict=false`.
-
-Generally plays badly with react-hook-form, especially with defaults (of any kind), and in particular `z.default()`.
-
-`z.date()` has changed over the years, and quite new, doesn't appear to be reliable.
+- Internal behavior can be affected by TypeScript configuration (eg, required fields become optional without a warning if `compilerOptions::strict=false`)
+- Integration with react-hook-form can be challenging, especially regarding default values and the `z.default()` functionality
+- The `z.date()` has changed over the years, and quite new, doesn't appear to be reliable.
 
 ### react-select
 
-Drops metadata outside of `Option.id` and `Option.label` eg it keeps trying to drop `TagOption.comment`.
+Drops object properties that aren't defined as `Option.value` or `Option.label`. For example, `Option.comment` is consistently removed during onChange events.

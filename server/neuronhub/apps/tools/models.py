@@ -8,6 +8,7 @@ from neuronhub.apps.db.fields import MarkdownField
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import UserConnectionGroup
 
 
 class Tool(TimeStampedModel):
@@ -122,6 +123,22 @@ class UsageStatus(models.TextChoices):
     NOT_INTERESTED = "not_interested", "Not interested"
 
 
+class Visibility(models.TextChoices):
+    PRIVATE = "private"
+    CONNECTION_GROUPS = "connection_groups"
+    CONNECTIONS = "connections"
+    INTERNAL = "internal"
+    PUBLIC = "public"
+
+
+class Importance(models.TextChoices):
+    EXTRA_LOW = "extra_low"
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    URGENT = "urgent"
+
+
 class ToolReview(TimeStampedModel):
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
 
@@ -149,6 +166,39 @@ class ToolReview(TimeStampedModel):
     content_private = MarkdownField(blank=True, help_text="Visible only to the user")
 
     is_private = models.BooleanField(default=False)
+
+    importance = TextChoicesField(
+        choices_enum=Importance,
+        default=None,
+        blank=True,
+        null=True,
+    )
+
+    visibility = TextChoicesField(
+        choices_enum=Visibility,
+        default=Visibility.PRIVATE,
+    )
+    visible_to_users = models.ManyToManyField(
+        User,
+        related_name="tools_visible",
+        blank=True,
+    )
+    visible_to_groups = models.ManyToManyField(
+        UserConnectionGroup,
+        related_name="tools_visible",
+        blank=True,
+    )
+
+    recommended_to_users = models.ManyToManyField(
+        User,
+        related_name="tools_recommended",
+        blank=True,
+    )
+    recommended_to_groups = models.ManyToManyField(
+        UserConnectionGroup,
+        related_name="tools_recommended",
+        blank=True,
+    )
 
     tags = models.ManyToManyField(ToolTag, related_name="reviews", blank=True)
 

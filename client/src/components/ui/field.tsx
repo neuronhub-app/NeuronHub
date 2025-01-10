@@ -4,7 +4,7 @@ import * as React from "react";
 export interface FieldProps extends Omit<ChakraField.RootProps, "label"> {
   label?: React.ReactNode;
   helperText?: React.ReactNode;
-  errorText?: React.ReactNode;
+  errorText?: React.ReactNode | string;
   optionalText?: React.ReactNode;
 }
 

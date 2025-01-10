@@ -1,29 +1,31 @@
+from __future__ import annotations
+
 import strawberry_django
+from strawberry import auto
 
 from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import UserConnectionGroup
 
 
-@strawberry_django.type(
-    User,
-    fields=[
-        "id",
-        "first_name",
-        "last_name",
-        "email",
-        "org",
-    ],
-)
+@strawberry_django.type(User)
 class UserType:
-    pass
+    id: auto
+    first_name: auto
+    last_name: auto
+    name: auto
+    email: auto
+    connection_groups: list[UserConnectionGroupType]
 
 
-@strawberry_django.input(
-    User,
-    partial=True,
-    fields=[
-        "first_name",
-        "last_name",
-    ],
-)
+@strawberry_django.type(UserConnectionGroup)
+class UserConnectionGroupType:
+    id: auto
+    name: auto
+    connections: list[UserType]
+
+
+@strawberry_django.input(User, partial=True)
 class UserTypeInput(UserType):
-    pass
+    first_name: auto
+    last_name: auto
+    connection_groups: list[UserType]

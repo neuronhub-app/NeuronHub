@@ -14,9 +14,9 @@ import * as types from "./graphql";
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
-  "\n\t\t\t\t\t\t\t\tquery ToolTagsQuery($name: String) {\n\t\t\t\t\t\t\t\t\ttool_tags(filters: { name: {contains: $name} }) {\n\t\t\t\t\t\t\t\t\t\tid\n\t\t\t\t\t\t\t\t\t\tname\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t":
+  "\n              query ToolTagsQuery($name: String) {\n                tool_tags(filters: {\n                  name: {contains: $name}\n                  description: {contains: $name}\n                }) {\n                  id\n                  name\n                }\n              }\n            ":
     types.ToolTagsQueryDocument,
-  "\n\tquery UserCurrent {\n\t\tuser_current {\n\t\t\tid\n\t\t\tfirst_name\n      email\n\t\t}\n\t}\n":
+  "\n  query UserCurrent {\n    user_current {\n      id\n      first_name\n      last_name\n      email\n\n      connection_groups {\n        id\n        name\n        connections {\n          id\n          first_name\n          last_name\n          email\n        }\n      }\n    }\n  }\n":
     types.UserCurrentDocument,
 };
 
@@ -38,14 +38,14 @@ export function gql(source: string): unknown;
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: "\n\t\t\t\t\t\t\t\tquery ToolTagsQuery($name: String) {\n\t\t\t\t\t\t\t\t\ttool_tags(filters: { name: {contains: $name} }) {\n\t\t\t\t\t\t\t\t\t\tid\n\t\t\t\t\t\t\t\t\t\tname\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t",
-): (typeof documents)["\n\t\t\t\t\t\t\t\tquery ToolTagsQuery($name: String) {\n\t\t\t\t\t\t\t\t\ttool_tags(filters: { name: {contains: $name} }) {\n\t\t\t\t\t\t\t\t\t\tid\n\t\t\t\t\t\t\t\t\t\tname\n\t\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t\t}\n\t\t\t\t\t\t\t"];
+  source: "\n              query ToolTagsQuery($name: String) {\n                tool_tags(filters: {\n                  name: {contains: $name}\n                  description: {contains: $name}\n                }) {\n                  id\n                  name\n                }\n              }\n            ",
+): (typeof documents)["\n              query ToolTagsQuery($name: String) {\n                tool_tags(filters: {\n                  name: {contains: $name}\n                  description: {contains: $name}\n                }) {\n                  id\n                  name\n                }\n              }\n            "];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-  source: "\n\tquery UserCurrent {\n\t\tuser_current {\n\t\t\tid\n\t\t\tfirst_name\n      email\n\t\t}\n\t}\n",
-): (typeof documents)["\n\tquery UserCurrent {\n\t\tuser_current {\n\t\t\tid\n\t\t\tfirst_name\n      email\n\t\t}\n\t}\n"];
+  source: "\n  query UserCurrent {\n    user_current {\n      id\n      first_name\n      last_name\n      email\n\n      connection_groups {\n        id\n        name\n        connections {\n          id\n          first_name\n          last_name\n          email\n        }\n      }\n    }\n  }\n",
+): (typeof documents)["\n  query UserCurrent {\n    user_current {\n      id\n      first_name\n      last_name\n      email\n\n      connection_groups {\n        id\n        name\n        connections {\n          id\n          first_name\n          last_name\n          email\n        }\n      }\n    }\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

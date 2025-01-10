@@ -15,11 +15,19 @@ if typing.TYPE_CHECKING:
 
 
 async def create_review(author: User, data: ToolReviewTypeInput) -> ToolReview:
+    """
+    validate
+    - visible_to_* connection
+    - recommended_to_* connection
+
+    set
+    - author
+    """
     tool, _ = await Tool.objects.aget_or_create(
-        name=data.name,
-        description=data.description,
-        github_url=data.github_url,
-        domain=data.domain,
+        name=data.tool.name,
+        description=data.tool.description,
+        github_url=data.tool.github_url,
+        domain=data.tool.domain,
     )
     review = await ToolReview.objects.acreate(
         tool=tool,

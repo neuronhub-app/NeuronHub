@@ -1,5 +1,5 @@
 import { Tooltip } from "@/components/ui/tooltip";
-import { Box, Float, Icon, Textarea } from "@chakra-ui/react";
+import { Flex, Float, Icon, Textarea } from "@chakra-ui/react";
 import { Field as ChakraField } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
@@ -27,7 +27,7 @@ export function FormChakraTextarea<FormType>(props: {
         </ChakraField.Label>
       )}
 
-      <Box w="full">
+      <Flex w="full">
         <Textarea
           {...props.formRegister}
           autoresize
@@ -58,7 +58,7 @@ export function FormChakraTextarea<FormType>(props: {
             </Tooltip>
           </Float>
         )}
-      </Box>
+      </Flex>
 
       {props.helperText && (
         <ChakraField.HelperText>{props.helperText}</ChakraField.HelperText>

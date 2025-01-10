@@ -1,0 +1,37 @@
+import type { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
+import { Field } from "@/components/ui/field";
+import {
+  NativeSelectField,
+  NativeSelectRoot,
+} from "@/components/ui/native-select";
+import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
+
+export function FormChakraSelect(props: {
+  form: UseFormReturn<ReviewCreateForm.FormSchema>;
+  formRegister: UseFormRegisterReturn;
+  label: string;
+  placeholder?: string;
+  fieldName: "importance";
+  options: Array<{
+    label: string;
+    value: ReviewCreateForm.FormSchema["importance"];
+  }>;
+}) {
+  return (
+    <Field
+      label={props.label}
+      invalid={!!props.form.formState.errors[props.fieldName]}
+      errorText={props.form.formState.errors[props.fieldName]?.message}
+    >
+      <NativeSelectRoot width="240px">
+        <NativeSelectField {...props.formRegister}>
+          {props.options.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </NativeSelectField>
+      </NativeSelectRoot>
+    </Field>
+  );
+}

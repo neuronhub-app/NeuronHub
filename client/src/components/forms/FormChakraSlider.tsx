@@ -1,15 +1,15 @@
+import type { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
 import { Field } from "@/components/ui/field";
 import { Slider } from "@/components/ui/slider";
 import type { ReactNode } from "react";
 import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
 import { Controller } from "react-hook-form";
 
-export function FormChakraSlider<FormType>(props: {
-  form: UseFormReturn<FormType>;
-  formRegister: UseFormRegisterReturn;
+export function FormChakraSlider(props: {
+  form: UseFormReturn<ReviewCreateForm.FormSchema>;
+  formRegister: UseFormRegisterReturn<"rating">;
   control: any;
   label?: ReactNode;
-  defaultValue?: number;
   maxW?: string;
   hidden?: boolean;
   size?: "sm" | "md" | "lg";
@@ -36,7 +36,6 @@ export function FormChakraSlider<FormType>(props: {
               }
               field.onBlur();
             }}
-            defaultValue={[props.defaultValue]}
             name={field.name}
             value={[field.value]}
             onValueChange={({ value }) => {

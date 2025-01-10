@@ -25,7 +25,8 @@
       },
       "correctness": {
         "noUnusedVariables": "off",
-        "noUnusedImports": "info"
+        "noUnusedImports": "info",
+        "useExhaustiveDependencies": "off" // good but has bugs
       },
       "style": {
         "noNonNullAssertion": "off",
