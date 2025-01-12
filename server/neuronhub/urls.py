@@ -8,6 +8,7 @@ from django.db import connections
 from django.db.migrations.executor import MigrationExecutor
 from django.http import HttpResponse
 from django.urls import re_path
+from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
 from strawberry.django.views import AsyncGraphQLView
 
@@ -36,8 +37,8 @@ urlpatterns = [
         "api/",
         include(
             [
-                path("graphql", graphql_view),
-                path("graphql/<operation>", graphql_view),
+                path("graphql", csrf_exempt(graphql_view)),
+                path("graphql/<operation>", csrf_exempt(graphql_view)),
             ]
         ),
     ),

@@ -151,8 +151,8 @@ SITE_ID = 1
 STATIC_URL = "static/"
 ROOT_URLCONF = "neuronhub.urls"
 
-CLIENT_URL = env.str("CLIENT_URL", "http://localhost:3000")
 SERVER_URL = env.str("SERVER_URL", "http://localhost:8000")
+CLIENT_URL = env.str("CLIENT_URL", "http://localhost:3000")
 DOMAIN = env.str("DOMAIN", CLIENT_URL.replace("https://", "").replace("http://", ""))
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -167,18 +167,16 @@ CORS_URLS_REGEX = r"^/api/.*$"
 CORS_EXPOSE_HEADERS = ["X-CSRFToken"]
 
 SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN", None)
+# SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", False)
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 3600 * 24 * 30 # 1 months
 
 CORS_ALLOW_HEADERS = (
     *default_headers,
     "baggage",
     "sentry-trace",
 )
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:3000",
-    "https://localhost:3000",
-    CLIENT_URL,
-    SERVER_URL,
-]
+CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 ALLOWED_HOSTS = env.list(
     "ALLOWED_HOSTS",

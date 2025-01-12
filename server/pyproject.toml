@@ -44,14 +44,13 @@ dependencies = [
     "django-object-actions>=4.3.0",
 
     # django dev
-    "django-debug-toolbar>=4.4.6",
+    "django-debug-toolbar>=5.0.0a0",
     "django-stubs>=5.1.1",
-        "django-stubs-ext>=5.1.1",
 ]
 
 [tool.uv]
 dev-dependencies = [
-    "ruff>=0.8.3",
+    "ruff>=0.9.1",
     "faker>=28.1.0",
     "objprint>=0.3.0",
     "pytest>=8.3.4",
