@@ -39,19 +39,19 @@ export function ToolMultiSelect(props: {
   loadOptions: (inputValue: string) => Promise<ReviewSelectOption[]>;
   isAllowCreate?: boolean;
 }) {
-  const options = props.form.watch(props.fieldName);
+  const options = props.form.watch(props.fieldName)!;
 
   const state = useValtioProxyRef({
     isDialogOpen: false,
     optionSelected: null as ReviewSelectOption | null,
   });
 
-  function getOptionNumber(option: ReviewSelectOption): number {
-    return options!.findIndex(opt => opt.id === option.id);
+  function getOptionIndex(option: ReviewSelectOption): number {
+    return options!.findIndex(opt => opt.name === option.name);
   }
 
   function getOptionComment(option: ReviewSelectOption): string {
-    const optionNumber = getOptionNumber(option);
+    const optionNumber = getOptionIndex(option);
     return options![optionNumber].comment ?? "";
   }
 
@@ -68,7 +68,7 @@ export function ToolMultiSelect(props: {
             props.fieldName,
             multiValue.map(value => {
               // prevent react-select from recreating Option and resetting custom props
-              const option = options?.find(opt => opt.id === value.id);
+              const option = options?.find(opt => opt.name === value.name);
               return option ?? value;
             }),
           );
@@ -84,7 +84,7 @@ export function ToolMultiSelect(props: {
           return props.loadOptions(inputValue);
         }}
         getOptionLabel={(option: ReviewSelectOption) => option.name}
-        getOptionValue={(option: ReviewSelectOption) => option.id}
+        getOptionValue={(option: ReviewSelectOption) => option.name}
         components={{
           MultiValueLabel: propsMultiVal => (
             <components.MultiValueLabel {...propsMultiVal}>
@@ -94,16 +94,15 @@ export function ToolMultiSelect(props: {
                 <HStack gap="px">
                   <VoteButton
                     isPositive={true}
-                    optionId={propsMultiVal.data.id}
-                    // cast, since react-hook-forms fucks ReviewSelectOption fields with its default Optional<> type
-                    options={options as ReviewSelectOption[]}
+                    option={propsMultiVal.data}
+                    options={options}
                     form={props.form}
                     fieldName={props.fieldName}
                   />
                   <VoteButton
                     isPositive={false}
-                    optionId={propsMultiVal.data.id}
-                    options={options as ReviewSelectOption[]}
+                    option={propsMultiVal.data}
+                    options={options}
                     form={props.form}
                     fieldName={props.fieldName}
                   />
@@ -151,10 +150,10 @@ export function ToolMultiSelect(props: {
             {state.snap.isDialogOpen && state.snap.optionSelected && (
               <FormChakraInput
                 autoFocus={true}
-                key={state.snap.optionSelected.id}
+                key={state.snap.optionSelected.name}
                 field={{
                   control: props.form.control,
-                  name: `${props.fieldName}.${getOptionNumber(state.snap.optionSelected)}.comment`,
+                  name: `${props.fieldName}.${getOptionIndex(state.snap.optionSelected)}.comment`,
                 }}
                 onKeyEnter={() => {
                   state.mutable.isDialogOpen = false;
@@ -172,27 +171,29 @@ export function ToolMultiSelect(props: {
 }
 
 function VoteButton(props: {
-  optionId: string;
+  option: ReviewSelectOption;
   options: ReviewSelectOption[];
   form: ReviewCreateForm.FormType;
   fieldName: ReviewSelectName;
   isPositive: boolean;
 }): ReactNode {
   function onVoteButtonClick(): void {
-    const option = props.options.find(option => option.id === props.optionId)!;
+    const option = props.options.find(
+      option => option.name === props.option.name,
+    )!;
     const optionUpdated = toggleOptionVoteValue(option, props.isPositive);
 
     props.form.setValue(
       props.fieldName,
       props.options.map(option =>
-        option.id === props.optionId ? optionUpdated : option,
+        option.name === props.option.name ? optionUpdated : option,
       ),
     );
   }
 
   const isButtonActive = props.options.some(
     option =>
-      option.id === props.optionId &&
+      option.name === props.option.name &&
       option.is_vote_positive === props.isPositive,
   );
   let icon: typeof MdOutlineThumbUp;

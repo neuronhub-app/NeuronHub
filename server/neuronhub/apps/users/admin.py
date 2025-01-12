@@ -75,3 +75,17 @@ class UserAdmin(UserAdmin):
     inlines = [
         UserConnectionGroupInline,
     ]
+
+@admin.register(UserConnectionGroup)
+class UserConnectionGroupAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "user",
+    ]
+    search_fields = [
+        "name",
+    ]
+    autocomplete_fields = [
+        "user",
+        "connections",
+    ]

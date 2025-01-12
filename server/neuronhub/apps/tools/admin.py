@@ -25,12 +25,12 @@ class ToolAlternativeAdmin(admin.ModelAdmin):
         "tool",
         "tool_alternative",
         "is_vote_positive",
-        "user",
+        "author",
         "created_at",
     ]
     list_filter = [
         "is_vote_positive",
-        "user",
+        "author",
         "created_at",
     ]
 
@@ -92,4 +92,9 @@ class ToolReviewAdmin(admin.ModelAdmin):
         "tool",
         "orgs",
         "author",
+        "visible_to_users",
+        "visible_to_groups",
+        "recommended_to_users",
+        "recommended_to_groups",
+        "tags",
     ]

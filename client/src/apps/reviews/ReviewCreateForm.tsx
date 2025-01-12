@@ -1,5 +1,6 @@
 import { ToolMultiSelect } from "@/apps/reviews/components/ToolMultiSelect";
 import { UserMultiSelect } from "@/apps/reviews/components/UserMultiSelect";
+import { useFormService } from "@/apps/reviews/useFormService";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -8,16 +9,20 @@ import { FormChakraSlider } from "@/components/forms/FormChakraSlider";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { zStringEmpty } from "@/components/forms/zod";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tag } from "@/components/ui/tag";
+import { Importance, UsageStatus, Visibility } from "@/graphql/graphql";
 import {
   Box,
+  CheckboxGroup,
   Fieldset,
   Flex,
   HStack,
+  Heading,
   Icon,
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { Heading } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatISO } from "date-fns";
 import { Webhook } from "lucide-react";
@@ -46,15 +51,11 @@ import { useProxy } from "valtio/utils";
 import { z } from "zod";
 
 export interface ReviewSelectOption {
-  readonly id: string;
-  readonly name: string;
+  id: string;
+  name: string;
   is_vote_positive: boolean | null;
   comment: string | null;
 }
-
-import { Checkbox } from "@/components/ui/checkbox";
-import { Tag } from "@/components/ui/tag";
-import { CheckboxGroup } from "@chakra-ui/react";
 
 export namespace ReviewCreateForm {
   const toolMultiSelect = z
@@ -94,55 +95,49 @@ export namespace ReviewCreateForm {
 
   export const schema = z.object({
     tool: z.object({
-      title: z.string().min(1),
+      id: z.string().nullable(),
+      name: z.string().min(1),
+      type: z.union([
+        z.literal("Program"),
+        z.literal("Material"),
+        z.literal("Product"),
+        z.literal("App"),
+        z.literal("Service"),
+        z.literal("Other"),
+      ]),
       description: z.string().optional(),
       domain: z.string().optional(),
-      github_url: z.union([
-        z.string().includes("github.com").includes("/"),
-        zStringEmpty(),
-      ]),
-      crunchbase_url: z.union([
-        z.string().includes("crunchbase.com").includes("/"),
-        zStringEmpty(),
-      ]),
+      github_url: z
+        .union([
+          z.string().includes("github.com").includes("/"),
+          zStringEmpty(),
+        ])
+        .optional(),
+      crunchbase_url: z
+        .union([
+          z.string().includes("crunchbase.com").includes("/"),
+          zStringEmpty(),
+        ])
+        .optional(),
       alternatives: toolMultiSelect,
     }),
+    id: z.string().nullable(),
     title: z.string().min(1),
     source: z.string().optional(),
-    rating: z.number().min(0).max(100).optional(),
+    rating: z.number().min(0).max(100).nullable(),
     reviewed_at: z.string().date().optional(),
     content: z.string().optional(),
     content_private: z.string().optional(),
-    type: z.union([
-      z.literal("Program"),
-      z.literal("Material"),
-      z.literal("Product"),
-      z.literal("App"),
-      z.literal("Service"),
-      z.literal("Other"),
-    ]),
-    usage_status: z.union([
-      z.literal("using"),
-      z.literal("used"),
-      z.literal("want_to_use"),
-      z.literal("interested"),
-      z.literal("not_interested"),
-    ]),
-    visibility: z.union([
-      z.literal("private"),
-      z.literal("connection_groups"),
-      z.literal("connections"),
-      z.literal("internal"),
-      z.literal("public"),
-    ]),
+    usage_status: z.enum(
+      Object.values(UsageStatus) as [UsageStatus, ...UsageStatus[]], // @ts-bad-inference
+    ),
+    visibility: z.enum(
+      Object.values(Visibility) as [Visibility, ...Visibility[]], // @ts-bad-inference
+    ),
     importance: z
-      .union([
-        z.literal("extra_low"),
-        z.literal("low"),
-        z.literal("medium"),
-        z.literal("high"),
-        z.literal("urgent"),
-      ])
+      .enum(
+        Object.values(Importance) as [Importance, ...Importance[]], // @ts-bad-inference
+      )
       .optional(),
     tags: toolMultiSelect,
     recommend_to: useMultiSelect,
@@ -162,28 +157,33 @@ export namespace ReviewCreateForm {
       resolver: zodResolver(schema),
       reValidateMode: "onChange",
       defaultValues: {
+        tool: {
+          id: null,
+          type: "Program",
+        },
+        id: null,
         rating: 50,
         reviewed_at: formatISO(new Date(), { representation: "date" }),
-        type: "Program",
-        usage_status: "using",
-        visibility: "private",
+        usage_status: UsageStatus.Using,
+        visibility: Visibility.Private,
         is_review_later: false,
-        importance: "medium",
+        importance: Importance.Medium,
       },
     });
     const control = form.control;
 
     const client = useClient();
+    const formService = useFormService();
     const $state = useProxy(state);
     const formState = form.watch();
 
     async function handleSubmit(values: z.infer<typeof schema>) {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          toast.success("saved");
-          resolve(true);
-        }, 700);
-      });
+      const res = await formService.send(values);
+      if (res.success) {
+        toast.success("Review added");
+      } else {
+        toast.error(res.error);
+      }
     }
 
     // todo remove
@@ -192,7 +192,7 @@ export namespace ReviewCreateForm {
     };
 
     function getToolTypeName(): string {
-      return formState.type === "Other" ? "Tool" : formState.type;
+      return formState.tool.type === "Other" ? "Tool" : formState.tool.type;
     }
 
     return (
@@ -204,7 +204,7 @@ export namespace ReviewCreateForm {
             <Fieldset.Root>
               <Fieldset.Content display="flex" gap="gap.md">
                 <FormChakraSegmentControl
-                  field={{ control, name: "type" }}
+                  field={{ control, name: "tool.type" }}
                   label="Type"
                   size="lg"
                   items={[
@@ -218,7 +218,7 @@ export namespace ReviewCreateForm {
                 />
 
                 <FormChakraInput
-                  field={{ control, name: "tool.title" }}
+                  field={{ control, name: "tool.name" }}
                   label={`${getToolTypeName()} name`}
                 />
 
@@ -231,7 +231,10 @@ export namespace ReviewCreateForm {
                   />
                   <FormChakraInput
                     label="GitHub"
-                    field={{ control, name: "tool.github_url" }}
+                    field={{
+                      control,
+                      name: "tool.github_url",
+                    }}
                     startElement={<LuGithub />}
                   />
                   <FormChakraInput
@@ -259,19 +262,17 @@ export namespace ReviewCreateForm {
                       const res = await client
                         .query(
                           gql(`
-                          query ToolTagsQuery($name: String) {
-                            tool_tags(filters: {
-                              name: {contains: $name}
-                              description: {contains: $name}
-                            }) {
-                              id
-                              name
+                            query ToolTagsQuery($name: String) {
+                              tool_tags(filters: {
+                                name: {contains: $name}
+                                description: {contains: $name}
+                              }) {
+                                id
+                                name
+                              }
                             }
-                          }
-                        `),
-                          {
-                            name: inputValue,
-                          },
+                          `),
+                          { name: inputValue },
                         )
                         .toPromise();
                       return res.data.tool_tags;
@@ -290,16 +291,11 @@ export namespace ReviewCreateForm {
                       const res = await client
                         .query(
                           gql(`
-                          query ToolAlternativesQuery($name: String) {
-                            tools(filters: { name: {contains: $name} }) {
-                              id
-                              name
+                            query ToolAlternativesQuery($name: String) {
+                              tools(filters: { name: {contains: $name} }) { id, name }
                             }
-                          }
-                        `),
-                          {
-                            name: inputValue,
-                          },
+                          `),
+                          { name: inputValue },
                         )
                         .toPromise();
                       return res.data.tools;
@@ -345,11 +341,11 @@ export namespace ReviewCreateForm {
                     fieldName="importance"
                     placeholder="How important is it?"
                     options={[
-                      { label: "Extra low", value: "extra_low" },
-                      { label: "Low", value: "low" },
-                      { label: "Medium", value: "medium" },
-                      { label: "High", value: "high" },
-                      { label: "Urgent", value: "urgent" },
+                      { label: "Extra low", value: Importance.ExtraLow },
+                      { label: "Low", value: Importance.Low },
+                      { label: "Medium", value: Importance.Medium },
+                      { label: "High", value: Importance.High },
+                      { label: "Urgent", value: Importance.Urgent },
                     ]}
                   />
 
@@ -362,10 +358,10 @@ export namespace ReviewCreateForm {
                           if ($state.isRated) {
                             form.setValue(
                               "rating",
-                              form.formState.defaultValues?.rating,
+                              form.formState.defaultValues?.rating ?? null,
                             );
                           } else {
-                            form.setValue("rating", undefined);
+                            form.setValue("rating", null);
                           }
                         },
                       }}
@@ -389,16 +385,16 @@ export namespace ReviewCreateForm {
                       field={{ control, name: "usage_status" }}
                       label="Usage status"
                       items={[
-                        getToolType("using", <FaHeartPulse />),
+                        getToolType(UsageStatus.Using, <FaHeartPulse />),
                         getToolType(
-                          "want_to_use",
+                          UsageStatus.WantToUse,
                           <FaBookmark />,
                           "Want to use",
                         ),
-                        getToolType("used", <FaClockRotateLeft />),
-                        getToolType("interested", <FaStar />),
+                        getToolType(UsageStatus.Used, <FaClockRotateLeft />),
+                        getToolType(UsageStatus.Interested, <FaStar />),
                         getToolType(
-                          "not_interested",
+                          UsageStatus.NotInterested,
                           <FaCircleXmark />,
                           "Not interested",
                         ),
@@ -422,23 +418,23 @@ export namespace ReviewCreateForm {
                     field={{ control, name: "visibility" }}
                     label="Visibility"
                     items={[
-                      getToolType("private", <HiLockClosed />),
+                      getToolType(Visibility.Private, <HiLockClosed />),
                       getToolType(
-                        "connection_groups",
+                        Visibility.ConnectionGroups,
                         <FaUsersGear />,
                         "Connections selected",
                       ),
-                      getToolType("connections", <FaUsers />),
+                      getToolType(Visibility.Connections, <FaUsers />),
                       getToolType(
-                        "internal",
+                        Visibility.Internal,
                         <FaShieldHalved />,
                         "Authenticated users",
                       ),
-                      getToolType("public", <FaGlobe />),
+                      getToolType(Visibility.Public, <FaGlobe />),
                     ]}
                     size="sm"
                   />
-                  {formState.visibility === "connection_groups" && (
+                  {formState.visibility === Visibility.ConnectionGroups && (
                     <UserMultiSelect
                       form={form}
                       fieldName="visible_to"
@@ -489,7 +485,10 @@ function getToolType(value: string, icon: JSX.Element, label?: string) {
     label: (
       <HStack>
         <Icon fontSize="md">{icon}</Icon>
-        <Text>{label ?? value.charAt(0).toUpperCase() + value.slice(1)}</Text>
+        <Text>
+          {label ??
+            value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()}
+        </Text>
       </HStack>
     ),
   };

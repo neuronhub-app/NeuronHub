@@ -10,8 +10,8 @@ When the condition fails, the following can be returned (following this priority
 """
 directive @IsAuthenticated repeatable on FIELD_DEFINITION
 
-"""Decimal (fixed-point)"""
-scalar Decimal
+"""Date with time (isoformat)"""
+scalar DateTime
 
 input IDBaseFilterLookup {
   """Exact match. Filter will be skipped on `null` value"""
@@ -50,6 +50,10 @@ type Mutation {
   logout: Boolean!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   create_review(data: ToolReviewTypeInput!): UserType! @IsAuthenticated
+}
+
+input OneToManyInput {
+  set: ID
 }
 
 type Query {
@@ -107,6 +111,12 @@ input StrFilterLookup {
   i_regex: String
 }
 
+input ToolAlternativeTypeInput {
+  is_vote_positive: Boolean
+  tool_alternative: OneToManyInput!
+  comment: String
+}
+
 input ToolFilter {
   id: IDBaseFilterLookup
   name: StrFilterLookup
@@ -117,29 +127,24 @@ input ToolFilter {
   DISTINCT: Boolean
 }
 
-input ToolReviewDraftAlternative {
-  tool_id: ID!
-  tool_alternative_id: ID!
-  is_vote_positive: Boolean!
-}
-
 input ToolReviewTypeInput {
+  id: ID
   tool: ToolTypeInput!
   title: String
   content: String
   content_private: String
   usage_status: UsageStatus
-  shared_user_ids: [ID!]!
-  shared_org_ids: [ID!]!
-  rating: Decimal!
+  source: String
+  reviewed_at: DateTime
+  rating: Int
   importance: Importance
   visibility: Visibility
   visible_to_users: ManyToManyInput
   visible_to_groups: ManyToManyInput
   recommended_to_users: ManyToManyInput
   recommended_to_groups: ManyToManyInput
-  is_private: Boolean
-  tags: [ToolTagTypeInput!]!
+  is_review_later: Boolean
+  tags: [ToolTagTypeInput!]
 }
 
 input ToolTagFilter {
@@ -164,7 +169,7 @@ type ToolTagType {
 
 input ToolTagTypeInput {
   id: ID
-  name: String
+  name: String!
   description: String
   comment: String
   is_vote_positive: Boolean
@@ -182,12 +187,14 @@ type ToolType {
 }
 
 input ToolTypeInput {
+  id: ID
   name: String!
+  type: String!
   description: String
   github_url: String
   crunchbase_url: String
   domain: String
-  alternatives: [ToolReviewDraftAlternative!]
+  alternatives: [ToolAlternativeTypeInput!]
 }
 
 enum UsageStatus {

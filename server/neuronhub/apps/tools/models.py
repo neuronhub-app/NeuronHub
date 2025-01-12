@@ -1,5 +1,10 @@
+from typing import TYPE_CHECKING
+
 from django.core.validators import DomainNameValidator
+from django.core.validators import MaxValueValidator
+from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import ManyToManyField
 from django_choices_field import TextChoicesField
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
@@ -9,11 +14,13 @@ from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
+from django_stubs_ext.db.models import TypedModelMeta
 
 
 class Tool(TimeStampedModel):
     name = models.CharField(max_length=511)
     slug = AutoSlugField(populate_from="name", unique=True)
+    type = models.CharField(max_length=255, help_text="Program, Link, Article, etc")
 
     description = MarkdownField(blank=True)
 
@@ -35,6 +42,9 @@ class Tool(TimeStampedModel):
 
     history = HistoricalRecords(inherit=True)
 
+    class Meta:
+        unique_together = ["name", "domain"]
+
     def __str__(self):
         return self.name
 
@@ -55,15 +65,16 @@ class ToolStatsGithub(TimeStampedModel):
 
 
 class ToolVoteModel(TimeStampedModel):
-    is_vote_positive = models.BooleanField()
+    is_vote_positive = models.BooleanField(null=True, blank=True)
+    comment = MarkdownField(blank=True)
+    author: User
 
     class Meta:
         abstract = True
 
 
 class ToolAlternative(ToolVoteModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
     tool = models.ForeignKey(
         Tool,
         on_delete=models.CASCADE,
@@ -108,8 +119,11 @@ class ToolTagVote(ToolVoteModel):
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
     tag = models.ForeignKey(ToolTag, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    comment = MarkdownField(blank=True)
     is_vote_positive = models.BooleanField(null=True, blank=True)
+
+    class Meta(TypedModelMeta):
+        unique_together = ["tool", "tag", "author"]
+
 
     def __str__(self):
         return f"{self.tool} - {self.tag} [{self.is_vote_positive}]"
@@ -157,7 +171,7 @@ class ToolReview(TimeStampedModel):
 
     reviewed_at = models.DateTimeField(auto_now_add=True)
 
-    rating = models.DecimalField(max_digits=3, decimal_places=2)  # todo PositiveInteger
+    rating = models.PositiveIntegerField(blank=True, null=True, validators=[MinValueValidator(0), MaxValueValidator(100)],)
     rating_custom = models.JSONField(blank=True, null=True)
 
     title = models.CharField(max_length=511, blank=True)
@@ -178,23 +192,23 @@ class ToolReview(TimeStampedModel):
         choices_enum=Visibility,
         default=Visibility.PRIVATE,
     )
-    visible_to_users = models.ManyToManyField(
+    visible_to_users: ManyToManyField[User] = models.ManyToManyField(
         User,
         related_name="tools_visible",
         blank=True,
     )
-    visible_to_groups = models.ManyToManyField(
+    visible_to_groups: ManyToManyField[UserConnectionGroup] = models.ManyToManyField(
         UserConnectionGroup,
         related_name="tools_visible",
         blank=True,
     )
 
-    recommended_to_users = models.ManyToManyField(
+    recommended_to_users: ManyToManyField[User] = models.ManyToManyField(
         User,
         related_name="tools_recommended",
         blank=True,
     )
-    recommended_to_groups = models.ManyToManyField(
+    recommended_to_groups: ManyToManyField[UserConnectionGroup] = models.ManyToManyField(
         UserConnectionGroup,
         related_name="tools_recommended",
         blank=True,

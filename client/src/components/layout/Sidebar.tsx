@@ -105,7 +105,7 @@ export function Sidebar(props: StackProps) {
 function SidebarLink(props: { to?: LinkProps["to"] } & ButtonProps) {
   const { children, to, ...buttonProps } = props;
   return (
-    <NavLink to={to}>
+    <NavLink to={to ?? "/"}>
       {linkProps => (
         <Button
           variant="ghost"
@@ -137,10 +137,10 @@ export const UserProfile = () => {
     <HStack gap="3" justify="space-between">
       <HStack gap="3">
         {/*<Avatar src="https://i.pravatar.cc/300" />*/}
-        <Avatar name={userQuery?.user?.first_name} />
+        <Avatar name={userQuery?.user?.name} />
         <Box>
           <Text textStyle="sm" fontWeight="medium">
-            {userQuery?.user?.first_name}
+            {userQuery?.user?.name}
           </Text>
           <Text textStyle="sm" color="fg.muted">
             {userQuery?.user?.email}

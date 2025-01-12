@@ -12,6 +12,7 @@ from strawberry import auto
 from strawberry_django.permissions import IsAuthenticated
 
 from neuronhub.apps.tools.models import Tool
+from neuronhub.apps.tools.models import ToolAlternative
 from neuronhub.apps.tools.models import ToolReview
 from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.models import User
@@ -36,27 +37,29 @@ class ToolsMutation:
 
 @strawberry_django.input(Tool)
 class ToolTypeInput:
+    id: auto
     name: auto
+    type: auto
     description: str | None
 
     github_url: auto
     crunchbase_url: auto
     domain: auto
 
-    alternatives: list[ToolReviewDraftAlternative] | None
+    alternatives: list[ToolAlternativeTypeInput] | None
 
 
 @strawberry_django.input(ToolReview)
 class ToolReviewTypeInput:
+    id: auto
     tool: ToolTypeInput
 
     title: auto
     content: str | None
     content_private: str | None
     usage_status: auto
-
-    shared_user_ids: list[strawberry.ID]
-    shared_org_ids: list[strawberry.ID]
+    source: auto
+    reviewed_at: auto
 
     rating: auto
     importance: auto
@@ -64,18 +67,19 @@ class ToolReviewTypeInput:
 
     visible_to_users: auto
     visible_to_groups: auto
+
     recommended_to_users: auto
     recommended_to_groups: auto
 
-    is_private: auto
+    is_review_later: auto
 
-    tags: list[ToolTagTypeInput]
+    tags: list[ToolTagTypeInput] | None
 
 
 @strawberry.input
 class ToolTagTypeInput:
     id: strawberry.ID | None
-    name: str | None
+    name: str
     description: str | None
     comment: str | None
     is_vote_positive: bool | None
@@ -87,11 +91,11 @@ class RatingCustom(TypedDict):
     is_private: bool
 
 
-@strawberry.input
-class ToolReviewDraftAlternative:
-    tool_id: strawberry.ID
-    tool_alternative_id: strawberry.ID
-    is_vote_positive: bool
+@strawberry_django.input(ToolAlternative)
+class ToolAlternativeTypeInput:
+    is_vote_positive: auto
+    tool_alternative: auto
+    comment: str | None
 
 
 async def get_user(info: Info) -> User:
