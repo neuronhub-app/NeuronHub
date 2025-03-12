@@ -300,9 +300,9 @@ export type introspection_types = {
     ];
   };
   String: unknown;
-  ToolAlternative: {
+  ToolAlternativeTypeInput: {
     kind: "INPUT_OBJECT";
-    name: "ToolAlternative";
+    name: "ToolAlternativeTypeInput";
     isOneOf: false;
     inputFields: [
       {
@@ -720,7 +720,21 @@ export type introspection_types = {
     isOneOf: false;
     inputFields: [
       {
+        name: "id";
+        type: { kind: "SCALAR"; name: "ID"; ofType: null };
+        defaultValue: null;
+      },
+      {
         name: "name";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "type";
         type: {
           kind: "NON_NULL";
           name: never;
@@ -758,7 +772,7 @@ export type introspection_types = {
             name: never;
             ofType: {
               kind: "INPUT_OBJECT";
-              name: "ToolAlternative";
+              name: "ToolAlternativeTypeInput";
               ofType: null;
             };
           };
