@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 
 from django.core.validators import DomainNameValidator
 from django.core.validators import MaxValueValidator
