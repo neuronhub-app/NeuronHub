@@ -726,8 +726,8 @@ requires-dist = [
     { name = "python-environ", specifier = ">=0.4.54" },
     { name = "rich", specifier = ">=13.9.4" },
     { name = "sentry-sdk", specifier = ">=2.22.0" },
-    { name = "strawberry-graphql", specifier = ">=0.239.2" },
-    { name = "strawberry-graphql-django", specifier = ">=0.47.1" },
+    { name = "strawberry-graphql", specifier = ">=0.262.2" },
+    { name = "strawberry-graphql-django", specifier = ">=0.57.0" },
     { name = "whitenoise", specifier = ">=6.9.0" },
 ]
 

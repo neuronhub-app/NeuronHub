@@ -26,8 +26,8 @@ dependencies = [
     "django-health-check>=3.18.3",
     "django-simple-history>=3.8.0",
     "dj-database-url>=2.3.0",
-    "strawberry-graphql>=0.239.2",
-        "strawberry-graphql-django>=0.47.1",
+    "strawberry-graphql>=0.262.2",
+        "strawberry-graphql-django>=0.57.0",
 
     # django fields
     "django-choices-field>=2.3.0",
