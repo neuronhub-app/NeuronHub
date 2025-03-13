@@ -64,18 +64,18 @@ But shortening into non-cognitively memorized words is bad, eg:
 Shortening is bad when sentence the brain usually perceives as a set of "token" is turned into a rare mix of single abbreviations, eg:
 
 Bad
-- 🟦(BE): imprv auth w/ opt JWT tkn & upd usr mgmt admn
+- 🟦(BE) imprv auth w/ opt JWT tkn & upd usr mgmt admn
 
 Ok
-- 🟦(BE): improve auth w optimized JWT token; cleanup user mgmt admin
+- 🟦(BE) improve auth w optimized JWT token; cleanup user mgmt admin
 
 In first line include the issue/PR ID at the end, to render as a clickable link in the IDE/github list view.
 
 ### Examples
 
-- 🟩(tags): sort by user #1260
-- 🔶(tags): pagination of list view #1261
-- 🔶(API): prefetch on QS lists #1262
+- 🟩(tags) sort by user #1260
+- 🔶(tags) pagination of list view #1261
+- 🔶(API) prefetch on QS lists #1262
 
 ### Specs
 
