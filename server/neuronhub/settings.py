@@ -7,8 +7,10 @@ import django
 import django_stubs_ext
 import environ
 import rich.traceback
+import sentry_sdk
 from corsheaders.defaults import default_headers
 from dotenv import load_dotenv
+from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import StrawberryDjangoSettings
 
 
@@ -169,7 +171,7 @@ CORS_EXPOSE_HEADERS = ["X-CSRFToken"]
 SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN", None)
 # SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", False)
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 3600 * 24 * 30 # 1 months
+SESSION_COOKIE_AGE = 3600 * 24 * 30  # 1 months
 
 CORS_ALLOW_HEADERS = (
     *default_headers,
@@ -223,6 +225,21 @@ ACCOUNT_SESSION_REMEMBER = True
 ACCOUNT_SIGNUP_PASSWORD_ENTER_TWICE = False
 if DJANGO_ENV == DjangoEnv.PROD or DJANGO_ENV == DjangoEnv.STAGE:
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+
+
+IS_SENTRY_ENABLED = env.bool(
+    "IS_SENTRY_ENABLED", DJANGO_ENV in (DjangoEnv.PROD, DjangoEnv.STAGE)
+)
+if IS_SENTRY_ENABLED:
+    sentry_sdk.init(
+        dsn="https://examplePublicKey@o0.ingest.sentry.io/0",
+        send_default_pii=DJANGO_ENV is not DjangoEnv.PROD,
+        integrations=[
+            StrawberryIntegration(
+                async_execution=True,
+            ),
+        ],
+    )
 
 
 LOGGING = {
