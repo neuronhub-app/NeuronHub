@@ -76,6 +76,7 @@ class UserAdmin(UserAdmin):
         UserConnectionGroupInline,
     ]
 
+
 @admin.register(UserConnectionGroup)
 class UserConnectionGroupAdmin(admin.ModelAdmin):
     list_display = [

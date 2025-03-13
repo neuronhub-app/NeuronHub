@@ -4,20 +4,19 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tools', '0007_toolreview_tags_alter_tooltag_unique_together'),
+        ("tools", "0007_toolreview_tags_alter_tooltag_unique_together"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='historicaltoolreview',
-            old_name='user',
-            new_name='author',
+            model_name="historicaltoolreview",
+            old_name="user",
+            new_name="author",
         ),
         migrations.RenameField(
-            model_name='toolreview',
-            old_name='user',
-            new_name='author',
+            model_name="toolreview",
+            old_name="user",
+            new_name="author",
         ),
     ]

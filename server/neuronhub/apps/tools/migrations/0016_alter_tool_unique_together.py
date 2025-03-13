@@ -4,14 +4,13 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tools', '0015_rename_user_toolalternative_author_and_more'),
+        ("tools", "0015_rename_user_toolalternative_author_and_more"),
     ]
 
     operations = [
         migrations.AlterUniqueTogether(
-            name='tool',
-            unique_together={('name', 'domain')},
+            name="tool",
+            unique_together={("name", "domain")},
         ),
     ]

@@ -6,7 +6,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("orgs", "0001_initial"),
         ("tools", "0001_initial"),

@@ -1,12 +1,11 @@
 from django.conf import settings
 from django.contrib import admin
-from django.urls import include
-from django.urls import path
-
 from django.db import DEFAULT_DB_ALIAS
 from django.db import connections
 from django.db.migrations.executor import MigrationExecutor
 from django.http import HttpResponse
+from django.urls import include
+from django.urls import path
 from django.urls import re_path
 from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve

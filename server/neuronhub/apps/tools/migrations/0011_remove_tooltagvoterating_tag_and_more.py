@@ -4,28 +4,27 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tools', '0010_historicaltoolreview_is_review_later_and_more'),
+        ("tools", "0010_historicaltoolreview_is_review_later_and_more"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='tooltagvoterating',
-            name='tag',
+            model_name="tooltagvoterating",
+            name="tag",
         ),
         migrations.RemoveField(
-            model_name='tooltagvoterating',
-            name='author',
+            model_name="tooltagvoterating",
+            name="author",
         ),
         migrations.RemoveField(
-            model_name='tooltagvoterating',
-            name='tool',
+            model_name="tooltagvoterating",
+            name="tool",
         ),
         migrations.DeleteModel(
-            name='ToolTagRating',
+            name="ToolTagRating",
         ),
         migrations.DeleteModel(
-            name='ToolTagVoteRating',
+            name="ToolTagVoteRating",
         ),
     ]

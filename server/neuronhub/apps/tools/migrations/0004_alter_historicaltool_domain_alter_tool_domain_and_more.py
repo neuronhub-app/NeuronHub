@@ -3,11 +3,11 @@
 import django.core.validators
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("tools", "0003_remove_historicaltool_website_url_and_more"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -20,9 +20,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 max_length=255,
-                validators=[
-                    django.core.validators.DomainNameValidator(accept_idna=False)
-                ],
+                validators=[django.core.validators.DomainNameValidator(accept_idna=False)],
             ),
         ),
         migrations.AlterField(
@@ -31,9 +29,7 @@ class Migration(migrations.Migration):
             field=models.CharField(
                 blank=True,
                 max_length=255,
-                validators=[
-                    django.core.validators.DomainNameValidator(accept_idna=False)
-                ],
+                validators=[django.core.validators.DomainNameValidator(accept_idna=False)],
             ),
         ),
         migrations.CreateModel(

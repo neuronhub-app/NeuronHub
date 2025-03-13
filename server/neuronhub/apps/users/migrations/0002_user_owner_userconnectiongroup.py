@@ -2,28 +2,55 @@
 
 import django.db.models.deletion
 from django.conf import settings
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('users', '0001_initial'),
+        ("users", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='user',
-            name='owner',
-            field=models.ForeignKey(blank=True, help_text='Owner of this User (Alias) account.', null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="user",
+            name="owner",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Owner of this User (Alias) account.",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.CreateModel(
-            name='UserConnectionGroup',
+            name="UserConnectionGroup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=255)),
-                ('connections', models.ManyToManyField(related_name='connection_groups_reverse', related_query_name='connection_group_reverse', to=settings.AUTH_USER_MODEL)),
-                ('user', models.ForeignKey(help_text='Author of the Group', on_delete=django.db.models.deletion.CASCADE, related_name='connection_groups', related_query_name='connection_group', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("name", models.CharField(blank=True, max_length=255)),
+                (
+                    "connections",
+                    models.ManyToManyField(
+                        related_name="connection_groups_reverse",
+                        related_query_name="connection_group_reverse",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        help_text="Author of the Group",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="connection_groups",
+                        related_query_name="connection_group",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

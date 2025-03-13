@@ -4,10 +4,10 @@ import typing
 
 from django.core.exceptions import ValidationError
 
-from neuronhub.apps.tools.models import ToolAlternative
 from neuronhub.apps.tools.graphql.mutations import ToolTagTypeInput
 from neuronhub.apps.tools.graphql.mutations import ToolTypeInput
 from neuronhub.apps.tools.models import Tool
+from neuronhub.apps.tools.models import ToolAlternative
 from neuronhub.apps.tools.models import ToolReview
 from neuronhub.apps.tools.models import ToolTag
 from neuronhub.apps.tools.models import ToolTagVote
@@ -36,7 +36,7 @@ async def create_review(author: User, data: ToolReviewTypeInput) -> ToolReview:
             visibility=data.visibility,
             importance=data.importance,
             reviewed_at=data.reviewed_at,
-        )
+        ),
     )
 
     if data.tags:
@@ -52,7 +52,7 @@ async def _create_or_update_tool(
 ):
     tool, _ = await Tool.objects.aget_or_create(
         name=tool_data.name,
-        domain=tool_data.domain, # todo[UX-p5] validate unique on frontend
+        domain=tool_data.domain,  # todo[UX-p5] validate unique on frontend
         defaults=dict(
             description=tool_data.description,
             github_url=tool_data.github_url,
@@ -88,7 +88,7 @@ async def _create_or_add_tags(
                 name=tag_parent_name,
                 defaults=dict(
                     author=author,
-                )
+                ),
             )
         tags_to_create.append(
             ToolTag(
@@ -122,7 +122,7 @@ async def _create_or_add_tags(
                 defaults=dict(
                     comment=tag.comment,
                     is_vote_positive=tag.is_vote_positive,
-                )
+                ),
             )
 
     return [*tags_created, *tags_existing]
@@ -132,17 +132,23 @@ async def _set_visibility_and_recommended(
     review: ToolReview,
     data: ToolReviewTypeInput,
 ):
-    user_connection_groups = review.author.connection_groups.all().prefetch_related("connections")
-    user_connections = [connection for group in user_connection_groups for connection in group.connections.all()]
+    user_connection_groups = review.author.connection_groups.all().prefetch_related(
+        "connections"
+    )
+    user_connections = [
+        connection for group in user_connection_groups for connection in group.connections.all()
+    ]
 
     for connection_input in [
-        *data.visible_to_users, *data.recommended_to_users,
+        *data.visible_to_users,
+        *data.recommended_to_users,
     ]:
         if connection_input not in user_connections:
             raise ValidationError(f"Connection not found: {connection_input}")
 
     for connection_group_input in [
-        *data.visible_to_groups, *data.recommended_to_groups,
+        *data.visible_to_groups,
+        *data.recommended_to_groups,
     ]:
         if connection_group_input not in user_connection_groups:
             raise ValidationError(f"Connection group not found: {connection_group_input}")
