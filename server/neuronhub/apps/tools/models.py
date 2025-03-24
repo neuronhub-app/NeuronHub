@@ -12,6 +12,9 @@ from django_countries.fields import CountryField
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
 
+from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
+from neuronhub.apps.anonymizer.registry import anonymizable_field
+from neuronhub.apps.anonymizer.registry import anonymizer
 from neuronhub.apps.db.fields import MarkdownField
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.orgs.models import Org
@@ -106,9 +109,10 @@ class ToolStatsGithub(TimeStampedModel):
         return self.tool.name
 
 
-class ToolVoteModel(TimeStampedModel):
+@anonymizer.register
+class ToolVoteModel(AnonimazableTimeStampedModel):
     is_vote_positive = models.BooleanField(null=True, blank=True)
-    comment = MarkdownField(blank=True)
+    comment = anonymizable_field(MarkdownField(blank=True))
     author: User
 
     class Meta:
@@ -135,7 +139,8 @@ class ToolAlternative(ToolVoteModel):
         return f"{self.tool} - {self.tool_alternative} [pos={self.is_vote_positive.__str__().lower()}]"
 
 
-class ToolTag(TimeStampedModel):
+@anonymizer.register
+class ToolTag(AnonimazableTimeStampedModel):
     tools = models.ManyToManyField(Tool, related_name="tags", blank=True)
 
     tag_parent = models.ForeignKey(
@@ -164,6 +169,7 @@ class ToolTag(TimeStampedModel):
         return self.name
 
 
+@anonymizer.register
 class ToolTagVote(ToolVoteModel):
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
     tag = models.ForeignKey(ToolTag, on_delete=models.CASCADE)
@@ -201,7 +207,8 @@ class Importance(models.TextChoices):
     EXTRA_HIGH = "extra_high"
 
 
-class ToolReview(TimeStampedModel):
+@anonymizer.register
+class ToolReview(AnonimazableTimeStampedModel):
     tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
 
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tools")
@@ -209,15 +216,13 @@ class ToolReview(TimeStampedModel):
 
     source = models.CharField(max_length=255, blank=True)
 
-    is_review_later = models.BooleanField(default=False)
-    usage_status = TextChoicesField(
-        choices_enum=UsageStatus,
-        default=None,
+    rating = models.PositiveIntegerField(
         blank=True,
         null=True,
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
     )
 
-    reviewed_at = models.DateTimeField(auto_now_add=True)
+    reviewed_at = anonymizable_field(models.DateTimeField(auto_now_add=True))
 
     rating_trust = models.PositiveIntegerField(
         blank=True,
@@ -226,12 +231,20 @@ class ToolReview(TimeStampedModel):
     )
     rating_custom = models.JSONField(blank=True, null=True)
 
-    title = models.CharField(max_length=511, blank=True)
+    title = anonymizable_field(
+        models.CharField(max_length=511, blank=True),
+    )
+    content = anonymizable_field(
+        MarkdownField(blank=True),
+    )
+    content_private = anonymizable_field(
+        MarkdownField(blank=True, help_text="Visible only to the user"),
+    )
 
-    content = MarkdownField(blank=True)
-    content_private = MarkdownField(blank=True, help_text="Visible only to the user")
-
+    is_review_later = models.BooleanField(default=False)
     is_private = models.BooleanField(default=False)
+
+    tags = models.ManyToManyField(ToolTag, related_name="reviews", blank=True)
 
     importance = TextChoicesField(
         choices_enum=Importance,
@@ -239,36 +252,47 @@ class ToolReview(TimeStampedModel):
         blank=True,
         null=True,
     )
-
+    usage_status = TextChoicesField(
+        choices_enum=UsageStatus,
+        default=None,
+        blank=True,
+        null=True,
+    )
     visibility = TextChoicesField(
         choices_enum=Visibility,
         default=Visibility.PRIVATE,
     )
-    visible_to_users: ManyToManyField[User] = models.ManyToManyField(
-        User,
-        related_name="tools_visible",
-        blank=True,
+    visible_to_users: ManyToManyField[User] = anonymizable_field(
+        models.ManyToManyField(
+            User,
+            related_name="tools_visible",
+            blank=True,
+        ),
     )
-    visible_to_groups: ManyToManyField[UserConnectionGroup] = models.ManyToManyField(
-        UserConnectionGroup,
-        related_name="tools_visible",
-        blank=True,
-    )
-
-    recommended_to_users: ManyToManyField[User] = models.ManyToManyField(
-        User,
-        related_name="tools_recommended",
-        blank=True,
-    )
-    recommended_to_groups: ManyToManyField[UserConnectionGroup] = models.ManyToManyField(
-        UserConnectionGroup,
-        related_name="tools_recommended",
-        blank=True,
+    visible_to_groups: ManyToManyField[UserConnectionGroup] = anonymizable_field(
+        models.ManyToManyField(
+            UserConnectionGroup,
+            related_name="tools_visible",
+            blank=True,
+        ),
     )
 
-    tags = models.ManyToManyField(ToolTag, related_name="reviews", blank=True)
+    recommended_to_users: ManyToManyField[User] = anonymizable_field(
+        models.ManyToManyField(
+            User,
+            related_name="tools_recommended",
+            blank=True,
+        ),
+    )
+    recommended_to_groups: ManyToManyField[UserConnectionGroup] = anonymizable_field(
+        models.ManyToManyField(
+            UserConnectionGroup,
+            related_name="tools_recommended",
+            blank=True,
+        ),
+    )
 
-    history = HistoricalRecords(inherit=True)
+    history = HistoricalRecords(cascade_delete_history=True)
 
     def __str__(self):
         return f"{self.title or self.tool.name} [{self.rating}]"
