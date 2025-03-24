@@ -1,19 +1,31 @@
-from dataclasses import dataclass
+from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+from asgiref.sync import async_to_sync
 from django.http import HttpRequest
 from django.test import RequestFactory
 from django.test import TestCase
 from strawberry.types import ExecutionResult
 
 from neuronhub.apps.tests.test_gen import Gen
-from neuronhub.apps.users.models import User
 from neuronhub.graphql import schema
 
 
+if TYPE_CHECKING:
+    from neuronhub.apps.users.models import User
+
+
 class NeuronTestCase(TestCase):
-    def setUp(self):
-        super().setUp()
-        self.gen = Gen()
+    gen: Gen
+    user: User
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.gen = async_to_sync(Gen.create)()
+        cls.user = cls.gen.users.user_default
 
     def graphql_query(
         self,
