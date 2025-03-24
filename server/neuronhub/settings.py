@@ -49,14 +49,16 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "django_object_actions",
+    "django_countries",
     "adminutils",
     "corsheaders",
     "anymail",
     "simple_history",
     "codemirror2",
     "strawberry_django",
-    "neuronhub.apps.orgs",
+    "neuronhub.apps.db",
     "neuronhub.apps.users",
+    "neuronhub.apps.orgs",
     "neuronhub.apps.tools",
 ]
 
@@ -152,6 +154,7 @@ ROOT_URLCONF = "neuronhub.urls"
 SERVER_URL = env.str("SERVER_URL", "http://localhost:8000")
 CLIENT_URL = env.str("CLIENT_URL", "http://localhost:3000")
 DOMAIN = env.str("DOMAIN", CLIENT_URL.replace("https://", "").replace("http://", ""))
+DOMAIN_PROD = "neuronhub.io"
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [

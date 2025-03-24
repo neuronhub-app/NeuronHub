@@ -21,7 +21,6 @@ class ToolType:
     id: auto
     slug: str | None
     name: auto
-    domain: auto
     crunchbase_url: auto
     github_url: auto
 

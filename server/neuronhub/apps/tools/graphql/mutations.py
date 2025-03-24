@@ -44,7 +44,6 @@ class ToolTypeInput:
 
     github_url: auto
     crunchbase_url: auto
-    domain: auto
 
     alternatives: list[ToolAlternativeTypeInput] | None
 

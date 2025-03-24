@@ -1,11 +1,15 @@
+from __future__ import annotations
+
+import logging
+
 from django.core.validators import DomainNameValidator
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import ManyToManyField
 from django_choices_field import TextChoicesField
+from django_countries.fields import CountryField
 from django_extensions.db.fields import AutoSlugField
-from django_stubs_ext.db.models import TypedModelMeta
 from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.db.fields import MarkdownField
@@ -15,10 +19,24 @@ from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
 
 
-class Tool(TimeStampedModel):
+logger = logging.getLogger(__name__)
+
+
+class CompanyOwnership(TimeStampedModel):
+    """
+    Private, Public, Non-profit, etc
+    """
+
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Company(TimeStampedModel):
     name = models.CharField(max_length=511)
     slug = AutoSlugField(populate_from="name", unique=True)
-    type = models.CharField(max_length=255, help_text="Program, Link, Article, etc")
 
     description = MarkdownField(blank=True)
 
@@ -27,6 +45,32 @@ class Tool(TimeStampedModel):
         blank=True,
         max_length=255,
     )
+
+    country = CountryField(blank=True)
+
+    ownership = models.ForeignKey(CompanyOwnership, on_delete=models.PROTECT)
+
+    is_single_product = models.BooleanField(default=False)
+
+    crunchbase_url = models.URLField(blank=True)
+    github_url = models.URLField(blank=True)
+
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.name
+
+
+class Tool(TimeStampedModel):
+    name = models.CharField(max_length=511)
+    slug = AutoSlugField(populate_from="name", unique=True)
+    type = models.CharField(max_length=255, help_text="Program, Link, Article, etc")
+
+    description = MarkdownField(blank=True)
+
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
+
+    url = models.URLField(blank=True)
 
     crunchbase_url = models.URLField(blank=True)
     github_url = models.URLField(blank=True)
@@ -38,10 +82,10 @@ class Tool(TimeStampedModel):
         related_name="alternatives_to",
     )
 
-    history = HistoricalRecords(inherit=True)
+    history = HistoricalRecords()
 
     class Meta:
-        unique_together = ["name", "domain"]
+        unique_together = ["name", "company"]
 
     def __str__(self):
         return self.name
@@ -71,6 +115,7 @@ class ToolVoteModel(TimeStampedModel):
         abstract = True
 
 
+@anonymizer.register
 class ToolAlternative(ToolVoteModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     tool = models.ForeignKey(
@@ -104,7 +149,13 @@ class ToolTag(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tags")
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="tags",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         unique_together = ["tag_parent", "name"]
@@ -119,7 +170,7 @@ class ToolTagVote(ToolVoteModel):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     is_vote_positive = models.BooleanField(null=True, blank=True)
 
-    class Meta(TypedModelMeta):
+    class Meta:
         unique_together = ["tool", "tag", "author"]
 
     def __str__(self):
@@ -147,7 +198,7 @@ class Importance(models.TextChoices):
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
-    URGENT = "urgent"
+    EXTRA_HIGH = "extra_high"
 
 
 class ToolReview(TimeStampedModel):
@@ -168,7 +219,7 @@ class ToolReview(TimeStampedModel):
 
     reviewed_at = models.DateTimeField(auto_now_add=True)
 
-    rating = models.PositiveIntegerField(
+    rating_trust = models.PositiveIntegerField(
         blank=True,
         null=True,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
