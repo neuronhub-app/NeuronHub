@@ -33,6 +33,7 @@ In brackets `()` after the Type, as:
 - API - related to strawberry structure and/or graphql types
 - tags - related to FE or BE tags implementation
 - brows - browser extension
+- settings - django settings.py
 
 Scopes for the docs (`?`) type:
 - refac
