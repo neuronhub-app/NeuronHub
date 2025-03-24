@@ -14,7 +14,7 @@ The Type is written before the commit, as:
 - `~` - refactor, cleanups, perf, etc (no intentional changes, additions/deletions, hence `~`)
 - `=` - tests (stability improvements that should be unable to damage anything runtime related, hence the double horizontal line)
 - `^` - CI, dependencies, compiler configs, etc (improvements of deploy, hence the arrow up)
-- `|` - visual-only changes, eg in `client/` (most often no code review needed, hence neutral line)
+- `@` - visual-only changes, eg in `client/`, most often no code review needed (no better idea than `@`, since it's kind of... decorative?)
 - `?` - docs (answering potential questions)
 - `#` - code style and formatting (python comments symbol, that's often used for `# type - ignore`)
 
