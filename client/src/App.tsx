@@ -50,7 +50,7 @@ const router = createBrowserRouter(
 createRoot(document.getElementById("root")!).render(
   <Provider value={urqlClient}>
     <ChakraProvider value={system}>
-      <ColorModeProvider>
+      <ColorModeProvider enableSystem={true}>
         <RouterProvider router={router} />
         <Toaster position="bottom-center" gutter={8} />
       </ColorModeProvider>
