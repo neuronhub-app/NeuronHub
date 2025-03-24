@@ -4,7 +4,6 @@ from pathlib import Path
 
 import dj_database_url
 import django
-import django_stubs_ext
 import environ
 import rich.traceback
 import sentry_sdk
@@ -12,9 +11,6 @@ from corsheaders.defaults import default_headers
 from dotenv import load_dotenv
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import StrawberryDjangoSettings
-
-
-django_stubs_ext.monkeypatch()
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
