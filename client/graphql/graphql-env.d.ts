@@ -37,7 +37,7 @@ export type introspection_types = {
   };
   Importance: {
     name: "Importance";
-    enumValues: "EXTRA_LOW" | "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+    enumValues: "EXTRA_LOW" | "LOW" | "MEDIUM" | "HIGH" | "EXTRA_HIGH";
   };
   Int: unknown;
   ManyToManyInput: {
@@ -184,6 +184,22 @@ export type introspection_types = {
           kind: "NON_NULL";
           name: never;
           ofType: { kind: "OBJECT"; name: "ToolType"; ofType: null };
+        };
+      };
+      tool_reviews: {
+        name: "tool_reviews";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "ToolReviewType"; ofType: null };
+            };
+          };
         };
       };
       tool_tags: {
@@ -375,6 +391,204 @@ export type introspection_types = {
         defaultValue: null;
       },
     ];
+  };
+  ToolReviewType: {
+    kind: "OBJECT";
+    name: "ToolReviewType";
+    fields: {
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      content: {
+        name: "content";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      importance: {
+        name: "importance";
+        type: { kind: "ENUM"; name: "Importance"; ofType: null };
+      };
+      is_private: {
+        name: "is_private";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
+      is_review_later: {
+        name: "is_review_later";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
+      rating: {
+        name: "rating";
+        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+      };
+      rating_trust: {
+        name: "rating_trust";
+        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+      };
+      recommended_to_groups: {
+        name: "recommended_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: {
+                kind: "OBJECT";
+                name: "UserConnectionGroupType";
+                ofType: null;
+              };
+            };
+          };
+        };
+      };
+      recommended_to_users: {
+        name: "recommended_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      reviewed_at: {
+        name: "reviewed_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      source: {
+        name: "source";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      tags: {
+        name: "tags";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "ToolTagType"; ofType: null };
+            };
+          };
+        };
+      };
+      title: {
+        name: "title";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      tool: {
+        name: "tool";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "ToolType"; ofType: null };
+        };
+      };
+      updated_at: {
+        name: "updated_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      usage_status: {
+        name: "usage_status";
+        type: { kind: "ENUM"; name: "UsageStatus"; ofType: null };
+      };
+      visibility: {
+        name: "visibility";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "Visibility"; ofType: null };
+        };
+      };
+      visible_to_groups: {
+        name: "visible_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: {
+                kind: "OBJECT";
+                name: "UserConnectionGroupType";
+                ofType: null;
+              };
+            };
+          };
+        };
+      };
+      visible_to_users: {
+        name: "visible_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+    };
   };
   ToolReviewTypeInput: {
     kind: "INPUT_OBJECT";
@@ -676,14 +890,6 @@ export type introspection_types = {
         name: "description";
         type: { kind: "SCALAR"; name: "String"; ofType: null };
       };
-      domain: {
-        name: "domain";
-        type: {
-          kind: "NON_NULL";
-          name: never;
-          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
-        };
-      };
       github_url: {
         name: "github_url";
         type: {
@@ -754,11 +960,6 @@ export type introspection_types = {
       },
       {
         name: "crunchbase_url";
-        type: { kind: "SCALAR"; name: "String"; ofType: null };
-        defaultValue: null;
-      },
-      {
-        name: "domain";
         type: { kind: "SCALAR"; name: "String"; ofType: null };
         defaultValue: null;
       },

@@ -31,7 +31,7 @@ enum Importance {
   LOW
   MEDIUM
   HIGH
-  URGENT
+  EXTRA_HIGH
 }
 
 input ManyToManyInput {
@@ -59,6 +59,7 @@ input OneToManyInput {
 type Query {
   user_current: UserType
   tools(filters: ToolFilter): [ToolType!]!
+  tool_reviews: [ToolReviewType!]!
   tool(pk: ID!): ToolType!
   tool_tags(filters: ToolTagFilter): [ToolTagType!]!
 }
@@ -127,6 +128,29 @@ input ToolFilter {
   DISTINCT: Boolean
 }
 
+type ToolReviewType {
+  id: ID!
+  reviewed_at: DateTime!
+  updated_at: DateTime!
+  tool: ToolType!
+  author: UserType!
+  source: String!
+  title: String!
+  content: String!
+  rating: Int
+  rating_trust: Int
+  is_review_later: Boolean!
+  is_private: Boolean!
+  tags(filters: ToolTagFilter): [ToolTagType!]!
+  importance: Importance
+  usage_status: UsageStatus
+  visibility: Visibility!
+  visible_to_users: [UserType!]!
+  visible_to_groups: [UserConnectionGroupType!]!
+  recommended_to_users: [UserType!]!
+  recommended_to_groups: [UserConnectionGroupType!]!
+}
+
 input ToolReviewTypeInput {
   id: ID
   tool: ToolTypeInput!
@@ -158,13 +182,13 @@ input ToolTagFilter {
 }
 
 type ToolTagType {
+  id: ID!
+  name: String!
+  description: String!
   tools(filters: ToolFilter): [ToolType!]!
   tag_parent: ToolTagType!
   tag_children(filters: ToolTagFilter): [ToolTagType!]!
   author: UserType!
-  id: ID!
-  name: String!
-  description: String!
 }
 
 input ToolTagTypeInput {
@@ -179,7 +203,6 @@ type ToolType {
   id: ID!
   slug: String
   name: String!
-  domain: String!
   crunchbase_url: String!
   github_url: String!
   description: String
@@ -193,7 +216,6 @@ input ToolTypeInput {
   description: String
   github_url: String
   crunchbase_url: String
-  domain: String
   alternatives: [ToolAlternativeTypeInput!]
 }
 
