@@ -1,4 +1,5 @@
 [project]
+
 name = "neuronhub"
 version = "0.1.0.0"
 description = ""
@@ -48,7 +49,9 @@ dependencies = [
     "django-debug-toolbar ~= 5.0.1",
 ]
 
+
 [tool.uv]
+
 dev-dependencies = [
     "ruff ~= 0.9.10",
     "faker ~= 37.0.0",
@@ -60,17 +63,23 @@ dev-dependencies = [
         "pytest-rich ~= 0.2.0",
 ]
 
+
 [tool.ruff]
+
 line-length = 97
 
+
 [tool.ruff.lint.isort]
+
 force-single-line = true
 lines-after-imports = 2
 known-first-party = ["neuronhub"]
 
+
 [tool.ruff.lint]
+
 extend-select = [
-  "UP",  # pyupgrade: enforce modern python syntax
+    "UP",  # pyupgrade: enforce modern python syntax
 ]
 ignore = [
     # "drop unused vars", don't want as they're used as links/docs
@@ -81,7 +90,9 @@ ignore = [
     "W293",
 ]
 
+
 [tool.pytest.ini_options]
+
 DJANGO_SETTINGS_MODULE = "neuronhub.settings"
 python_files = ["*__test.py"]
 addopts = [
@@ -96,6 +107,3 @@ filterwarnings = [
     "ignore::DeprecationWarning:environ.compat",
     "ignore::DeprecationWarning:functools",
 ]
-
-[tool.django-stubs]
-django_settings_module = "neuronhub.settings"
