@@ -1,7 +1,2 @@
-<details>
-  <summary>Table of Contents</summary>
-
-  - one
-  - two
-
-</details>
+- [server/ README](/server/README.md)
+- [client/ README](/client/README.md)

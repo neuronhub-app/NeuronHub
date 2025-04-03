@@ -1,3 +1,5 @@
+### Setup
+
 - uv init
 - uv sync
 - createdb neuronhub
