@@ -69,6 +69,9 @@ is_anonymizable_attr_name = "_is_anonymizable_field"
 
 
 def anonymizable_field[F: Field](field: F) -> F:
+    """
+    Helps to avoid forgetting to mark all anonymizable fields
+    """
     setattr(field, is_anonymizable_attr_name, True)
     return field
 

@@ -3,8 +3,6 @@ from __future__ import annotations
 import logging
 
 from django.core.validators import DomainNameValidator
-from django.core.validators import MaxValueValidator
-from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import ManyToManyField
 from django_choices_field import TextChoicesField
@@ -38,6 +36,8 @@ class CompanyOwnership(TimeStampedModel):
 
 
 class Company(TimeStampedModel):
+    ownership = models.ForeignKey(CompanyOwnership, on_delete=models.SET_NULL, null=True)
+
     name = models.CharField(max_length=511)
     slug = AutoSlugField(populate_from="name", unique=True)
 
@@ -51,8 +51,6 @@ class Company(TimeStampedModel):
 
     country = CountryField(blank=True)
 
-    ownership = models.ForeignKey(CompanyOwnership, on_delete=models.PROTECT)
-
     is_single_product = models.BooleanField(default=False)
 
     crunchbase_url = models.URLField(blank=True)
@@ -64,26 +62,64 @@ class Company(TimeStampedModel):
         return self.name
 
 
+@anonymizer.register
+class ToolTag(AnonimazableTimeStampedModel):
+    tag_parent = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="tags_children",
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        related_name="tags",
+        blank=True,
+        null=True,
+    )
+
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    is_important = models.BooleanField(
+        default=False,
+        help_text="An important Tag is highly informative of its Tool - it's shown before all others and displays an icon",
+    )
+
+    class Meta:
+        unique_together = ["tag_parent", "name"]
+
+    def __str__(self):
+        if self.tag_parent:
+            return f"{self.tag_parent} / {self.name}"
+        return self.name
+
+
 class Tool(TimeStampedModel):
+    company = models.ForeignKey(Company, on_delete=models.SET_NULL, null=True, blank=True)
+    alternatives = models.ManyToManyField(
+        "self",
+        through="ToolAlternative",
+        symmetrical=False,  # todo ~ clarify
+        related_name="alternatives_to",
+    )
+    tags = models.ManyToManyField(
+        ToolTag,
+        related_name="tools",
+        related_query_name="tool",
+        blank=True,
+    )
+
     name = models.CharField(max_length=511)
     slug = AutoSlugField(populate_from="name", unique=True)
     type = models.CharField(max_length=255, help_text="Program, Link, Article, etc")
 
     description = MarkdownField(blank=True)
 
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
-
     url = models.URLField(blank=True)
 
     crunchbase_url = models.URLField(blank=True)
     github_url = models.URLField(blank=True)
-
-    alternatives = models.ManyToManyField(
-        "self",
-        through="ToolAlternative",
-        symmetrical=False,
-        related_name="alternatives_to",
-    )
 
     history = HistoricalRecords()
 
@@ -121,7 +157,7 @@ class ToolVoteModel(AnonimazableTimeStampedModel):
 
 @anonymizer.register
 class ToolAlternative(ToolVoteModel):
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     tool = models.ForeignKey(
         Tool,
         on_delete=models.CASCADE,
@@ -140,40 +176,10 @@ class ToolAlternative(ToolVoteModel):
 
 
 @anonymizer.register
-class ToolTag(AnonimazableTimeStampedModel):
-    tools = models.ManyToManyField(Tool, related_name="tags", blank=True)
-
-    tag_parent = models.ForeignKey(
-        "self",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="tags_children",
-    )
-
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
-
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name="tags",
-        blank=True,
-        null=True,
-    )
-
-    class Meta:
-        unique_together = ["tag_parent", "name"]
-
-    def __str__(self):
-        return self.name
-
-
-@anonymizer.register
 class ToolTagVote(ToolVoteModel):
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
-    tag = models.ForeignKey(ToolTag, on_delete=models.CASCADE)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    tool = models.ForeignKey(Tool, on_delete=models.CASCADE, related_name="votes")
+    tag = models.ForeignKey(ToolTag, on_delete=models.CASCADE, related_name="votes")
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     is_vote_positive = models.BooleanField(null=True, blank=True)
 
     class Meta:
@@ -209,73 +215,12 @@ class Importance(models.TextChoices):
 
 @anonymizer.register
 class ToolReview(AnonimazableTimeStampedModel):
-    tool = models.ForeignKey(Tool, on_delete=models.CASCADE)
+    tool = models.ForeignKey(Tool, on_delete=models.PROTECT)
 
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="tools")
+    author = models.ForeignKey(User, on_delete=models.PROTECT, related_name="tools")
     orgs = models.ManyToManyField(Org, related_name="tools", blank=True)
 
-    source = models.CharField(max_length=255, blank=True)
-
-    rating = models.PositiveIntegerField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-    )
-
-    reviewed_at = anonymizable_field(models.DateTimeField(auto_now_add=True))
-
-    rating_trust = models.PositiveIntegerField(
-        blank=True,
-        null=True,
-        validators=[MinValueValidator(0), MaxValueValidator(100)],
-    )
-    rating_custom = models.JSONField(blank=True, null=True)
-
-    title = anonymizable_field(
-        models.CharField(max_length=511, blank=True),
-    )
-    content = anonymizable_field(
-        MarkdownField(blank=True),
-    )
-    content_private = anonymizable_field(
-        MarkdownField(blank=True, help_text="Visible only to the user"),
-    )
-
-    is_review_later = models.BooleanField(default=False)
-    is_private = models.BooleanField(default=False)
-
-    tags = models.ManyToManyField(ToolTag, related_name="reviews", blank=True)
-
-    importance = TextChoicesField(
-        choices_enum=Importance,
-        default=None,
-        blank=True,
-        null=True,
-    )
-    usage_status = TextChoicesField(
-        choices_enum=UsageStatus,
-        default=None,
-        blank=True,
-        null=True,
-    )
-    visibility = TextChoicesField(
-        choices_enum=Visibility,
-        default=Visibility.PRIVATE,
-    )
-    visible_to_users: ManyToManyField[User] = anonymizable_field(
-        models.ManyToManyField(
-            User,
-            related_name="tools_visible",
-            blank=True,
-        ),
-    )
-    visible_to_groups: ManyToManyField[UserConnectionGroup] = anonymizable_field(
-        models.ManyToManyField(
-            UserConnectionGroup,
-            related_name="tools_visible",
-            blank=True,
-        ),
-    )
+    tool_tags = models.ManyToManyField(ToolTag, related_name="reviews", blank=True)
 
     recommended_to_users: ManyToManyField[User] = anonymizable_field(
         models.ManyToManyField(
@@ -292,7 +237,109 @@ class ToolReview(AnonimazableTimeStampedModel):
         ),
     )
 
+    visible_to_users: ManyToManyField[User] = anonymizable_field(
+        models.ManyToManyField(
+            User,
+            related_name="tools_visible",
+            blank=True,
+        ),
+    )
+    visible_to_groups: ManyToManyField[UserConnectionGroup] = anonymizable_field(
+        models.ManyToManyField(
+            UserConnectionGroup,
+            related_name="tools_visible",
+            blank=True,
+        ),
+    )
+    visibility = TextChoicesField(
+        choices_enum=Visibility,
+        default=Visibility.PRIVATE,
+    )
+
+    source = models.CharField(max_length=255, blank=True)
+
+    # 5 categories: very dissatisfied, dissatisfied, neutral, satisfied, very satisfied
+    rating = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+    experience_hours = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+    )
+    importance = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+
+    reviewed_at = anonymizable_field(models.DateTimeField(auto_now_add=True))
+
+    title = anonymizable_field(
+        models.CharField(max_length=511, blank=True),
+    )
+    content = anonymizable_field(MarkdownField(blank=True))
+    content_pros = anonymizable_field(MarkdownField(blank=True))
+    content_cons = anonymizable_field(MarkdownField(blank=True))
+    content_private = anonymizable_field(
+        MarkdownField(blank=True, help_text="Visible only to the user"),
+    )
+
+    is_review_later = models.BooleanField(default=False)
+    is_private = models.BooleanField(default=False)
+
+    # tags = models.ManyToManyField(ToolReviewTag, blank=True)
+
+    usage_status = TextChoicesField(
+        choices_enum=UsageStatus,
+        default=None,
+        blank=True,
+        null=True,
+    )
+
     history = HistoricalRecords(cascade_delete_history=True)
 
     def __str__(self):
         return f"{self.title or self.tool.name} [{self.rating}]"
+
+
+class ReviewTagName(models.TextChoices):
+    # general
+    value = "value", "Value"
+    ease_of_use = "ease_of_use", "Ease of use"
+    a_must = "a_must", "A must"  # todo ~ rename "a_must_have"
+
+    # software
+    expectations = "expectations", "Expectations"
+    stability = "stability", "Stability"
+    controversial = "controversial", "Controversial"
+    privacy = "privacy", "Privacy"
+    open_source = "open_source", "Open Source"
+
+    # goods
+    quality = "quality", "Quality"
+
+    # article
+    changed_my_mind = "changed_my_mind", "Changed my mind"
+    read_fully = "read_fully", "Read fully"
+
+
+class ToolReviewTag(TimeStampedModel):
+    review = models.ForeignKey(
+        ToolReview,
+        on_delete=models.CASCADE,
+        related_name="tags",
+        blank=True,
+        null=True,
+    )
+    name = TextChoicesField(choices_enum=ReviewTagName)
+    is_vote_positive = models.BooleanField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ["review", "name"]
+
+    def __str__(self):
+        return self.name

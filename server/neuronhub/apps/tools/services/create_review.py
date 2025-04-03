@@ -41,7 +41,7 @@ async def create_review(author: User, data: ToolReviewTypeInput) -> ToolReview:
 
     if data.tags:
         tool_tags = await _create_or_add_tags(tool, author, tags_input=data.tags)
-        review.tags.add([tag.id for tag in tool_tags])
+        review.tool_tags.add([tag.id for tag in tool_tags])
 
     return review
 

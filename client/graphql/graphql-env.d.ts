@@ -4,6 +4,7 @@
 export type introspection_types = {
   Boolean: unknown;
   DateTime: unknown;
+  Decimal: unknown;
   ID: unknown;
   IDBaseFilterLookup: {
     kind: "INPUT_OBJECT";
@@ -35,11 +36,6 @@ export type introspection_types = {
       },
     ];
   };
-  Importance: {
-    name: "Importance";
-    enumValues: "EXTRA_LOW" | "LOW" | "MEDIUM" | "HIGH" | "EXTRA_HIGH";
-  };
-  Int: unknown;
   ManyToManyInput: {
     kind: "INPUT_OBJECT";
     name: "ManyToManyInput";
@@ -178,6 +174,14 @@ export type introspection_types = {
     kind: "OBJECT";
     name: "Query";
     fields: {
+      me: {
+        name: "me";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
       tool: {
         name: "tool";
         type: {
@@ -412,6 +416,22 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "String"; ofType: null };
         };
       };
+      content_cons: {
+        name: "content_cons";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      content_pros: {
+        name: "content_pros";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
       id: {
         name: "id";
         type: {
@@ -422,7 +442,7 @@ export type introspection_types = {
       };
       importance: {
         name: "importance";
-        type: { kind: "ENUM"; name: "Importance"; ofType: null };
+        type: { kind: "SCALAR"; name: "Decimal"; ofType: null };
       };
       is_private: {
         name: "is_private";
@@ -442,11 +462,7 @@ export type introspection_types = {
       };
       rating: {
         name: "rating";
-        type: { kind: "SCALAR"; name: "Int"; ofType: null };
-      };
-      rating_trust: {
-        name: "rating_trust";
-        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+        type: { kind: "SCALAR"; name: "Decimal"; ofType: null };
       };
       recommended_to_groups: {
         name: "recommended_to_groups";
@@ -498,22 +514,6 @@ export type introspection_types = {
           kind: "NON_NULL";
           name: never;
           ofType: { kind: "SCALAR"; name: "String"; ofType: null };
-        };
-      };
-      tags: {
-        name: "tags";
-        type: {
-          kind: "NON_NULL";
-          name: never;
-          ofType: {
-            kind: "LIST";
-            name: never;
-            ofType: {
-              kind: "NON_NULL";
-              name: never;
-              ofType: { kind: "OBJECT"; name: "ToolTagType"; ofType: null };
-            };
-          };
         };
       };
       title: {
@@ -641,12 +641,12 @@ export type introspection_types = {
       },
       {
         name: "rating";
-        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+        type: { kind: "SCALAR"; name: "Decimal"; ofType: null };
         defaultValue: null;
       },
       {
         name: "importance";
-        type: { kind: "ENUM"; name: "Importance"; ofType: null };
+        type: { kind: "SCALAR"; name: "Decimal"; ofType: null };
         defaultValue: null;
       },
       {
@@ -772,6 +772,14 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
         };
       };
+      is_important: {
+        name: "is_important";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
       name: {
         name: "name";
         type: {
@@ -820,6 +828,22 @@ export type introspection_types = {
           };
         };
       };
+      votes: {
+        name: "votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "ToolTagVoteType"; ofType: null };
+            };
+          };
+        };
+      };
     };
   };
   ToolTagTypeInput: {
@@ -857,6 +881,32 @@ export type introspection_types = {
         defaultValue: null;
       },
     ];
+  };
+  ToolTagVoteType: {
+    kind: "OBJECT";
+    name: "ToolTagVoteType";
+    fields: {
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      is_vote_positive: {
+        name: "is_vote_positive";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+      };
+    };
   };
   ToolType: {
     kind: "OBJECT";
@@ -917,6 +967,22 @@ export type introspection_types = {
       slug: {
         name: "slug";
         type: { kind: "SCALAR"; name: "String"; ofType: null };
+      };
+      tags: {
+        name: "tags";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "ToolTagType"; ofType: null };
+            };
+          };
+        };
       };
     };
   };

@@ -1,4 +1,5 @@
 import { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
+import { ReviewList } from "@/apps/reviews/ReviewList";
 import { UserSettingsLayout } from "@/apps/users/settings/UserSettingsLayout";
 import { urqlClient } from "@/client";
 import { ColorModeProvider } from "@/components/ui/color-mode";
@@ -21,7 +22,7 @@ import { ProfileSettings } from "./apps/users/settings/profile/ProfileSettings";
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<RootLayout />}>
-      <Route path={urls.reviews.$}>
+      <Route path={urls.reviews.$} element={<ReviewList />}>
         <Route
           path={urls.reviews.create.$}
           element={<ReviewCreateForm.Comp />}

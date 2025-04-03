@@ -10,10 +10,12 @@ from faker.proxy import UniqueProxy
 
 if TYPE_CHECKING:
     from neuronhub.apps.users.models import User
+    from neuronhub.apps.tools.models import Tool
 
 
 class Gen:
     users: UsersGen
+    tools: ToolsGen
     faker: UniqueProxy
     faker_non_unique: Faker
 
@@ -40,6 +42,7 @@ class Gen:
         self.random_seeded = faker.random
 
         self.users = await UsersGen.create(faker=self.faker)
+        self.tools = ToolsGen(faker=self.faker, user=self.users.user_default)
 
         return self
 
@@ -108,3 +111,27 @@ class UsersGen:
                     is_get_or_create=True,
                     is_attach_org=is_attach_org,
                 )
+
+
+@dataclass
+class ToolsGen:
+    faker: UniqueProxy
+    user: User
+
+    async def create(
+        self,
+        name: str = None,
+        type: str = None,
+        description: str = None,
+        url: str = None,
+        crunchbase_url: str = None,
+    ) -> Tool:
+        from neuronhub.apps.tools.models import Tool
+
+        return await Tool.objects.acreate(
+            name="PyCharm",
+            type="Program",
+            crunchbase_url="crunchbase.com/organization/jetbrains",
+            description="PyCharm is an integrated development environment (IDE) used in computer programming, specifically for the Python language. It is developed by the Czech company JetBrains.",
+            url="jetbrains.com/pycharm",
+        )

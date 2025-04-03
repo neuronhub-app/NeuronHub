@@ -1,5 +1,6 @@
 from django.contrib import admin
 
+from neuronhub.apps.tools.models import Company
 from neuronhub.apps.tools.models import Tool
 from neuronhub.apps.tools.models import ToolAlternative
 from neuronhub.apps.tools.models import ToolReview
@@ -7,11 +8,42 @@ from neuronhub.apps.tools.models import ToolStatsGithub
 from neuronhub.apps.tools.models import ToolTag
 
 
+class ToolAlternativeInline(admin.TabularInline):
+    model = ToolAlternative
+    fk_name = "tool"
+    extra = 0
+    autocomplete_fields = ["tool_alternative", "author"]
+    fields = [
+        "tool_alternative",
+        "is_vote_positive",
+        "author",
+    ]
+
+
 @admin.register(Tool)
 class ToolAdmin(admin.ModelAdmin):
     list_display = [
         "name",
         "slug",
+        "created_at",
+    ]
+    search_fields = [
+        "name",
+    ]
+    autocomplete_fields = [
+        "tags",
+        "alternatives",
+    ]
+    inlines = [
+        ToolAlternativeInline,
+    ]
+
+
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "description",
         "created_at",
     ]
     search_fields = [
@@ -62,11 +94,7 @@ class ToolTagAdmin(admin.ModelAdmin):
     search_fields = [
         "name",
     ]
-    filter_horizontal = [
-        "tools",
-    ]
     autocomplete_fields = [
-        "tools",
         "tag_parent",
         "author",
     ]
@@ -96,5 +124,5 @@ class ToolReviewAdmin(admin.ModelAdmin):
         "visible_to_groups",
         "recommended_to_users",
         "recommended_to_groups",
-        "tags",
+        "tool_tags",
     ]

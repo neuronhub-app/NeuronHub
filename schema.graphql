@@ -13,6 +13,9 @@ directive @IsAuthenticated repeatable on FIELD_DEFINITION
 """Date with time (isoformat)"""
 scalar DateTime
 
+"""Decimal (fixed-point)"""
+scalar Decimal
+
 input IDBaseFilterLookup {
   """Exact match. Filter will be skipped on `null` value"""
   exact: ID
@@ -24,14 +27,6 @@ input IDBaseFilterLookup {
   Exact match of items in a given list. Filter will be skipped on `null` value
   """
   in_list: [ID!]
-}
-
-enum Importance {
-  EXTRA_LOW
-  LOW
-  MEDIUM
-  HIGH
-  EXTRA_HIGH
 }
 
 input ManyToManyInput {
@@ -58,10 +53,11 @@ input OneToManyInput {
 
 type Query {
   user_current: UserType
+  me: UserType!
   tools(filters: ToolFilter): [ToolType!]!
-  tool_reviews: [ToolReviewType!]!
   tool(pk: ID!): ToolType!
   tool_tags(filters: ToolTagFilter): [ToolTagType!]!
+  tool_reviews: [ToolReviewType!]!
 }
 
 input StrFilterLookup {
@@ -137,12 +133,12 @@ type ToolReviewType {
   source: String!
   title: String!
   content: String!
-  rating: Int
-  rating_trust: Int
+  content_pros: String!
+  content_cons: String!
+  rating: Decimal
   is_review_later: Boolean!
   is_private: Boolean!
-  tags(filters: ToolTagFilter): [ToolTagType!]!
-  importance: Importance
+  importance: Decimal
   usage_status: UsageStatus
   visibility: Visibility!
   visible_to_users: [UserType!]!
@@ -160,8 +156,8 @@ input ToolReviewTypeInput {
   usage_status: UsageStatus
   source: String
   reviewed_at: DateTime
-  rating: Int
-  importance: Importance
+  rating: Decimal
+  importance: Decimal
   visibility: Visibility
   visible_to_users: ManyToManyInput
   visible_to_groups: ManyToManyInput
@@ -185,10 +181,12 @@ type ToolTagType {
   id: ID!
   name: String!
   description: String!
+  is_important: Boolean!
   tools(filters: ToolFilter): [ToolType!]!
   tag_parent: ToolTagType!
   tag_children(filters: ToolTagFilter): [ToolTagType!]!
   author: UserType!
+  votes: [ToolTagVoteType!]!
 }
 
 input ToolTagTypeInput {
@@ -199,6 +197,12 @@ input ToolTagTypeInput {
   is_vote_positive: Boolean
 }
 
+type ToolTagVoteType {
+  id: ID!
+  is_vote_positive: Boolean
+  author: UserType!
+}
+
 type ToolType {
   id: ID!
   slug: String
@@ -207,6 +211,7 @@ type ToolType {
   github_url: String!
   description: String
   alternatives(filters: ToolFilter): [ToolType!]!
+  tags(filters: ToolTagFilter): [ToolTagType!]!
 }
 
 input ToolTypeInput {
