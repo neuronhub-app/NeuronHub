@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 
 import { Box, HStack } from "@chakra-ui/react";
-import { MessageSquareText, Webhook } from "lucide-react";
+import { MessageSquareText } from "lucide-react";
 import type { SVGProps } from "react";
 import {
   LuBookmark,
@@ -23,6 +23,7 @@ import {
   LuLayoutDashboard,
   LuSettings,
 } from "react-icons/lu";
+import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink } from "react-router";
 
 const groups = [
@@ -55,7 +56,7 @@ export function Sidebar(props: StackProps) {
       <Stack gap="6">
         <Flex alignSelf="start" align="center" gap={3}>
           <Icon color="primary" size="xl">
-            <Webhook />
+            <PiGraph />
           </Icon>
           <Text fontSize="1.4rem" fontWeight="bold">
             NeuronHub
