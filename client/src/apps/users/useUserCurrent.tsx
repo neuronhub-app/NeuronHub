@@ -13,9 +13,7 @@ export namespace user {
 }
 
 export function useUserCurrent() {
-  const [{ data, error, fetching }] = useQuery<UserQuery>({
-    query: UserQueryDoc,
-  });
+  const [{ data, error, fetching }] = useQuery({ query: UserQueryDoc });
 
   const snap = useSnapshot(user.state);
 
@@ -23,7 +21,7 @@ export function useUserCurrent() {
     if (data?.user_current) {
       const connectionsRaw = data.user_current.connection_groups.flatMap(
         group => group.connections,
-      ) as UserConnection[]; // @bad-inference
+      );
       const connectionsUniqueMap = new Map(
         connectionsRaw.map(conn => [`${conn.id}-${conn.name}`, conn]),
       );
