@@ -1,4 +1,4 @@
-import type { ReviewTag } from "@/apps/reviews/ReviewList";
+import type { ReviewTag } from "@/apps/reviews/list/index";
 import { Icon, Tag, Wrap } from "@chakra-ui/react";
 // @ts-ignore
 import type { SystemProperties } from "@chakra-ui/react/dist/types/styled-system/generated/system.gen";
@@ -17,12 +17,16 @@ import { SiKotlin } from "react-icons/si";
 
 export function ToolTags(props: { tags: ReviewTag[] }) {
   props.tags.sort((a, b) => {
-    if (a.is_important && !b.is_important) {
-      return -1;
-    } else if (!a.is_important && b.is_important) {
-      return 1;
+    // First sort by is_important
+    if (a.is_important !== b.is_important) {
+      return a.is_important ? -1 : 1;
     }
-    return 0;
+
+    // Then sort by the number of positive votes
+    const aPositiveVotes = a.votes.filter(vote => vote.is_vote_positive).length;
+    const bPositiveVotes = b.votes.filter(vote => vote.is_vote_positive).length;
+
+    return bPositiveVotes - aPositiveVotes; // Higher positive votes first
   });
 
   return (

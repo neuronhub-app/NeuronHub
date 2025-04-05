@@ -206,7 +206,7 @@ async def _create_review_ghostly(user: User, alternatives: list[Tool] = None):
         tool=tool,
         author=user,
         title="Haven't tried, heard good things from HN: embeddable, Zig based",
-        usage_status=UsageStatus.WANT_TO_USE,
+        usage_status=UsageStatus.INTERESTED,
     )
     await create_review_tags(
         review=review,

@@ -44,5 +44,6 @@ class Command(BaseCommand):
                     is_delete_orgs=options["is_delete_orgs"],
                 )
             )
+            logger.info("Database stubs repopulated successfully")
         except KeyboardInterrupt:
             logger.info("Interrupted")

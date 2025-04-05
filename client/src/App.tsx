@@ -1,5 +1,5 @@
 import { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
-import { ReviewList } from "@/apps/reviews/ReviewList";
+import { ReviewList } from "@/apps/reviews/list";
 import { UserSettingsLayout } from "@/apps/users/settings/UserSettingsLayout";
 import { urqlClient } from "@/client";
 import { ColorModeProvider } from "@/components/ui/color-mode";
