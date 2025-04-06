@@ -23,7 +23,10 @@ const tokens = defineTokens({
   },
 });
 
-const secondary = "indigo";
+export namespace theme {
+  export const secondary = "teal";
+}
+const secondary = "teal";
 
 // docs propose to use `createSystem(defaultBaseConfig, customConfig)`, but it doesn't work. Few other methods don't work either.
 export const system = createSystem(
@@ -41,7 +44,7 @@ export const system = createSystem(
         semanticTokens: {
           colors: {
             primary: {
-              value: "{colors.blue.500}",
+              value: { base: "{colors.blue.500}", _dark: "{colors.blue.400}" },
             },
 
             fg: {
@@ -57,7 +60,12 @@ export const system = createSystem(
                   _dark: "{colors.slate.500}",
                 },
               },
-              secondary: { value: `{colors.${secondary}.400}` },
+              secondary: {
+                value: {
+                  base: `{colors.${secondary}.600}`,
+                  _dark: `{colors.${secondary}.500}`,
+                },
+              },
               muted: {
                 value: {
                   _light: "{colors.slate.700}",
@@ -83,6 +91,21 @@ export const system = createSystem(
                 value: {
                   base: "{colors.slate.muted}",
                   _dark: "{colors.slate.muted}",
+                },
+              },
+
+              secondary: {
+                light: {
+                  value: {
+                    base: `{colors.${secondary}.100}`,
+                    _dark: `{colors.${secondary}.950}`,
+                  },
+                },
+                medium: {
+                  value: {
+                    base: `{colors.${secondary}.500/80}`,
+                    _dark: `{colors.${secondary}.700}`,
+                  },
                 },
               },
             },

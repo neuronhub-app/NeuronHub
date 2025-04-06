@@ -1,22 +1,22 @@
 import { RatingBars } from "@/apps/reviews/list/RatingBars";
 import { ToolTags } from "@/apps/reviews/list/ToolTag";
 import { UsageStatusBlock } from "@/apps/reviews/list/UsageStatus";
+import { VoteButtons } from "@/apps/reviews/list/VoteButtons";
 import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/ui/prose";
 import { graphql } from "@/gql-tada";
 import {
-  Flex,
   For,
   HStack,
   Heading,
   Icon,
-  IconButton,
   Show,
   Stack,
+  Text,
 } from "@chakra-ui/react";
 import type { ResultOf } from "@graphql-typed-document-node/core";
 import { marked } from "marked";
-import { FaChevronDown, FaChevronUp, FaPlus } from "react-icons/fa6";
+import { FaPlus } from "react-icons/fa6";
 import { useQuery } from "urql";
 
 export function ReviewList() {
@@ -44,21 +44,34 @@ export function ReviewList() {
         >
           {review => (
             <HStack key={review.id} gap="gap.lg" align="flex-start">
-              <Stack align="center" color="slate.muted">
-                <VoteButton isVotePositive={true} />
-                <Flex>3</Flex>
-                <VoteButton isVotePositive={false} />
-              </Stack>
+              <VoteButtons />
 
-              <Stack>
-                <Heading fontSize="md" lineHeight={1.6}>
-                  {review.title}
+              <Stack gap="gap.sm">
+                <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">
+                  {review.tool.name}
                 </Heading>
 
-                <HStack gap="gap.lg">
-                  <RatingBars title="Rating" rating={review.rating} />
-                  <RatingBars title="Importance" rating={review.importance} />
-                  <UsageStatusBlock status={review.usage_status} />
+                <Show when={review.title}>
+                  <Text fontWeight="bold" color="fg.muted">
+                    {review.title}
+                  </Text>
+                </Show>
+
+                <HStack gap="gap.xl">
+                  <RatingBars
+                    rating={review.rating}
+                    type="rating"
+                    color="fg.secondary"
+                  />
+                  <RatingBars
+                    rating={review.importance}
+                    type="importance"
+                    color="fg.secondary"
+                  />
+                  <UsageStatusBlock
+                    status={review.usage_status}
+                    color="fg.secondary"
+                  />
                 </HStack>
 
                 <Show when={review.content}>
@@ -98,21 +111,6 @@ export function ReviewList() {
         </For>
       </Stack>
     </Stack>
-  );
-}
-
-function VoteButton(props: { isVotePositive: boolean }) {
-  return (
-    <IconButton
-      aria-label={props.isVotePositive ? "Upvote" : "Downvote"}
-      variant="subtle"
-      colorPalette="slate"
-      borderRadius="lg"
-      color="white"
-      size="xs"
-    >
-      {props.isVotePositive ? <FaChevronUp /> : <FaChevronDown />}
-    </IconButton>
   );
 }
 

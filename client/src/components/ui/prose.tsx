@@ -10,7 +10,6 @@ export const Prose = chakra("div", {
   base: {
     color: "fg.muted",
     maxWidth: "65ch",
-    fontSize: "sm",
     lineHeight: "1.5em",
     "& p": {
       marginTop: padding,
@@ -291,13 +290,13 @@ export const Prose = chakra("div", {
     },
     size: {
       sm: {
-        fontSize: "xs",
-      },
-      md: {
         fontSize: "sm",
       },
-      lg: {
+      md: {
         fontSize: "md",
+      },
+      lg: {
+        fontSize: "lg",
       },
     },
   },

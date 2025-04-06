@@ -1,24 +1,25 @@
 import type { UsageStatus } from "@/apps/reviews/list/index";
 import { Flex, Icon, Text } from "@chakra-ui/react";
-import { PiPulse } from "react-icons/pi";
+// @ts-ignore
+import type { SystemProperties } from "@chakra-ui/react/dist/types/styled-system/generated/system.gen";
+import { BiPulse } from "react-icons/bi";
 
-export function UsageStatusBlock(props: { status: UsageStatus | null }) {
+export function UsageStatusBlock(props: {
+  status: UsageStatus | null;
+  color: SystemProperties["color"];
+}) {
   if (!props.status) {
     return null;
   }
   const statusLabel = statuses[props.status];
   return (
     <Flex align="center" gap={1}>
-      <Icon
-        boxSize={4.5}
-        p={1}
-        bg="slate.muted"
-        color="white"
-        borderRadius="sm"
-      >
-        <PiPulse />
+      <Icon boxSize={7} color={props.color}>
+        <BiPulse />
       </Icon>
-      <Text>{statusLabel}</Text>
+      <Text fontSize="sm" color="fg.muted" mb="1px">
+        {statusLabel}
+      </Text>
     </Flex>
   );
 }
