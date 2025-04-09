@@ -1,5 +1,5 @@
 ---
-reviewed_at: 2025.03.24
+reviewed_at: 2025.04.05
 ---
 
 The project is using a symbol-based iteration over the [conventionalcommits.org](https://www.conventionalcommits.org).
@@ -10,7 +10,7 @@ Emojis aren't used due to the cognitive overhead in interpreting their platform-
 
 The Type is written before the commit, as:
 - `+` - features (additions)
-- `-` - bug fixes and reverts (removals)
+- `-` - bug fixes and reverts/removals
 - `~` - refactor, cleanups, perf, etc (no intentional changes, additions/deletions, hence `~`)
 - `=` - tests (stability improvements that should be unable to damage anything runtime related, hence the double horizontal line)
 - `^` - CI, dependencies, compiler configs, etc (improvements of deploy, hence the arrow up)
@@ -18,7 +18,7 @@ The Type is written before the commit, as:
 - `?` - docs (answering potential questions)
 - `#` - code style and formatting (python comments symbol, that's often used for `# type - ignore`)
 
-Adding `!` as a second char indicates the size of the changes. Not all commits are equals - eg squashed PRs can represent disproportional amount of changes, comparing to adding a feature as a new text input somewhere.
+Adding `!` as a second char indicates the size/importance of the changes. Eg squashed PRs can contain dozens KLOC, vs adding a new text input.
 
 ### Scopes
 
