@@ -21,18 +21,18 @@ from neuronhub.apps.users.graphql.types import UserType
 class ToolFilter:
     id: auto
     name: auto
-    description: str | None
+    description: auto
 
 
 @strawberry_django.type(Tool, filters=ToolFilter)
 class ToolType:
     id: auto
-    slug: str | None
+    slug: auto
     name: auto
     crunchbase_url: auto
     github_url: auto
 
-    description: str | None
+    description: auto
 
     alternatives: list[ToolType]
 
@@ -51,9 +51,9 @@ class ToolReviewType:
     source: auto
 
     title: auto
-    content: str
-    content_pros: str
-    content_cons: str
+    content: auto
+    content_pros: auto
+    content_cons: auto
 
     rating: auto
     importance: auto
