@@ -1,11 +1,7 @@
 import { Field } from "@/components/ui/field";
 import { Slider } from "@/components/ui/slider";
 import type { ReactNode } from "react";
-import {
-  type FieldValues,
-  type UseControllerProps,
-  useController,
-} from "react-hook-form";
+import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
 
 export function FormChakraSlider<TFieldValues extends FieldValues>(props: {
   field: UseControllerProps<TFieldValues>;

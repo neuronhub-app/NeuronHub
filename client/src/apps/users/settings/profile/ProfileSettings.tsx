@@ -1,14 +1,7 @@
 import { AvatarUpload } from "@/apps/users/settings/profile/AvatarUpload";
 import { Field } from "@/components/ui/field";
 import { InputGroup } from "@/components/ui/input-group";
-import {
-  Button,
-  Container,
-  HStack,
-  Input,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Button, Container, HStack, Input, Stack, Text } from "@chakra-ui/react";
 import { Textarea } from "@chakra-ui/react";
 import { LuTriangleAlert } from "react-icons/lu";
 import { LuLinkedin, LuTwitter } from "react-icons/lu";
@@ -56,9 +49,8 @@ export function ProfileSettings() {
             Danger Zone
           </HStack>
           <Text color="fg.muted" textStyle="sm">
-            Once you delete your account, there is no going back. All of your
-            information will be lost. Before you go, please download your
-            information.
+            Once you delete your account, there is no going back. All of your information will be
+            lost. Before you go, please download your information.
           </Text>
           <Button colorPalette="red" mt="2">
             Delete account

@@ -161,12 +161,7 @@ export const SystemModeIcon = (props: React.SVGProps<SVGSVGElement>) => (
         fill="#30363D"
       />
       <path opacity="0.3" d="M173 59H29V71H173V59Z" fill="#34D058" />
-      <path
-        opacity="0.6"
-        d="M0 0H228V24H0V0Z"
-        fill="#BCC8D4"
-        fillOpacity="0.15"
-      />
+      <path opacity="0.6" d="M0 0H228V24H0V0Z" fill="#BCC8D4" fillOpacity="0.15" />
       <path
         d="M42 9H16C14.3431 9 13 10.3431 13 12C13 13.6569 14.3431 15 16 15H42C43.6569 15 45 13.6569 45 12C45 10.3431 43.6569 9 42 9Z"
         fill="#D1D5DA"

@@ -4,9 +4,7 @@ import type { ReactNode } from "react";
 import { type UseControllerProps, useController } from "react-hook-form";
 import type { FieldValues } from "react-hook-form";
 
-export function FormChakraSegmentControl<
-  TFieldValues extends FieldValues,
->(props: {
+export function FormChakraSegmentControl<TFieldValues extends FieldValues>(props: {
   field: UseControllerProps<TFieldValues>;
   label: string;
   items: Array<{

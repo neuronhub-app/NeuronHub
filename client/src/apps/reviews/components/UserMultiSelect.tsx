@@ -14,16 +14,11 @@ import { DialogBackdrop, Flex, HStack } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { components } from "react-select";
 
-import type {
-  ReviewCreateForm,
-  ReviewSelectOption,
-} from "@/apps/reviews/ReviewCreateForm";
+import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/ReviewCreateForm";
 import { AsyncCreatableSelect } from "chakra-react-select";
 import { subscribe } from "valtio/vanilla";
 
-export type UserSelectOption = NonNullable<
-  ReviewCreateForm.FormSchema["recommend_to"]
->[number];
+export type UserSelectOption = NonNullable<ReviewCreateForm.FormSchema["recommend_to"]>[number];
 
 export function UserMultiSelect(props: {
   form: ReviewCreateForm.FormType;
@@ -74,9 +69,7 @@ export function UserMultiSelect(props: {
             }),
           );
         }}
-        loadOptions={async (inputValue: string) =>
-          getOptionsFiltered(inputValue)
-        }
+        loadOptions={async (inputValue: string) => getOptionsFiltered(inputValue)}
         getOptionLabel={option => (option as any)?.label}
         getOptionValue={(option: UserSelectOption) => {
           const prefix = option.group ? "group" : "user";
@@ -131,10 +124,7 @@ export function UserMultiSelect(props: {
 function getOptionsFiltered(filterInputValue?: string): UserSelectOption[] {
   function filter(optionName: string) {
     const isNoFilter = !filterInputValue || filterInputValue === "";
-    return (
-      isNoFilter ||
-      optionName.toLowerCase().includes(filterInputValue.toLowerCase())
-    );
+    return isNoFilter || optionName.toLowerCase().includes(filterInputValue.toLowerCase());
   }
 
   const connectionOptions = user.state.connections

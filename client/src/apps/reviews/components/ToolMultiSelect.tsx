@@ -17,19 +17,11 @@ import type { ReactNode } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { components } from "react-select";
 
-import type {
-  ReviewCreateForm,
-  ReviewSelectOption,
-} from "@/apps/reviews/ReviewCreateForm";
+import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/ReviewCreateForm";
 import { AsyncCreatableSelect } from "chakra-react-select";
 
 import { FaMessage, FaRegMessage } from "react-icons/fa6";
-import {
-  MdOutlineThumbDown,
-  MdOutlineThumbUp,
-  MdThumbDown,
-  MdThumbUp,
-} from "react-icons/md";
+import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
 
 type ReviewSelectName = "tags" | "tool.alternatives";
 
@@ -111,16 +103,8 @@ export function ToolMultiSelect(props: {
                       state.mutable.optionSelected = propsMultiVal.data;
                       state.mutable.isDialogOpen = true;
                     }}
-                    icon={
-                      getOptionComment(propsMultiVal.data)
-                        ? FaMessage
-                        : FaRegMessage
-                    }
-                    color={
-                      getOptionComment(propsMultiVal.data)
-                        ? "fg.info"
-                        : "fg.muted-button"
-                    }
+                    icon={getOptionComment(propsMultiVal.data) ? FaMessage : FaRegMessage}
+                    color={getOptionComment(propsMultiVal.data) ? "fg.info" : "fg.muted-button"}
                     iconSize=".75rem"
                   />
                 </HStack>
@@ -178,23 +162,17 @@ function VoteButton(props: {
   isPositive: boolean;
 }): ReactNode {
   function onVoteButtonClick(): void {
-    const option = props.options.find(
-      option => option.name === props.option.name,
-    )!;
+    const option = props.options.find(option => option.name === props.option.name)!;
     const optionUpdated = toggleOptionVoteValue(option, props.isPositive);
 
     props.form.setValue(
       props.fieldName,
-      props.options.map(option =>
-        option.name === props.option.name ? optionUpdated : option,
-      ),
+      props.options.map(option => (option.name === props.option.name ? optionUpdated : option)),
     );
   }
 
   const isButtonActive = props.options.some(
-    option =>
-      option.name === props.option.name &&
-      option.is_vote_positive === props.isPositive,
+    option => option.name === props.option.name && option.is_vote_positive === props.isPositive,
   );
   let icon: typeof MdOutlineThumbUp;
   if (props.isPositive) {
@@ -210,9 +188,7 @@ function VoteButton(props: {
   }
   return (
     <OptionButton
-      color={
-        isButtonActive ? (props.isPositive ? "green.fg" : "red.fg") : "gray.500"
-      }
+      color={isButtonActive ? (props.isPositive ? "green.fg" : "red.fg") : "gray.500"}
       onClick={onVoteButtonClick}
       icon={icon}
     />

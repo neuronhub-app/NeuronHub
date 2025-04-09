@@ -1,9 +1,6 @@
 import type { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
 import { Field } from "@/components/ui/field";
-import {
-  NativeSelectField,
-  NativeSelectRoot,
-} from "@/components/ui/native-select";
+import { NativeSelectField, NativeSelectRoot } from "@/components/ui/native-select";
 import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
 
 export function FormChakraSelect(props: {

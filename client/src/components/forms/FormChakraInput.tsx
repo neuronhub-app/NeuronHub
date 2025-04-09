@@ -2,11 +2,7 @@ import { Field } from "@/components/ui/field";
 import { InputGroup } from "@/components/ui/input-group";
 import { Input } from "@chakra-ui/react";
 import { type ReactNode, useEffect, useRef } from "react";
-import {
-  type FieldValues,
-  type UseControllerProps,
-  useController,
-} from "react-hook-form";
+import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
 
 export function FormChakraInput<TFieldValues extends FieldValues>(props: {
   field: UseControllerProps<TFieldValues>;

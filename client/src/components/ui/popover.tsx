@@ -7,30 +7,28 @@ interface PopoverContentProps extends ChakraPopover.ContentProps {
   portalRef?: React.RefObject<HTMLElement>;
 }
 
-export const PopoverContent = React.forwardRef<
-  HTMLDivElement,
-  PopoverContentProps
->(function PopoverContent(props, ref) {
-  const { portalled = true, portalRef, ...rest } = props;
-  return (
-    <Portal disabled={!portalled} container={portalRef}>
-      <ChakraPopover.Positioner>
-        <ChakraPopover.Content ref={ref} {...rest} />
-      </ChakraPopover.Positioner>
-    </Portal>
-  );
-});
+export const PopoverContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
+  function PopoverContent(props, ref) {
+    const { portalled = true, portalRef, ...rest } = props;
+    return (
+      <Portal disabled={!portalled} container={portalRef}>
+        <ChakraPopover.Positioner>
+          <ChakraPopover.Content ref={ref} {...rest} />
+        </ChakraPopover.Positioner>
+      </Portal>
+    );
+  },
+);
 
-export const PopoverArrow = React.forwardRef<
-  HTMLDivElement,
-  ChakraPopover.ArrowProps
->(function PopoverArrow(props, ref) {
-  return (
-    <ChakraPopover.Arrow {...props} ref={ref}>
-      <ChakraPopover.ArrowTip />
-    </ChakraPopover.Arrow>
-  );
-});
+export const PopoverArrow = React.forwardRef<HTMLDivElement, ChakraPopover.ArrowProps>(
+  function PopoverArrow(props, ref) {
+    return (
+      <ChakraPopover.Arrow {...props} ref={ref}>
+        <ChakraPopover.ArrowTip />
+      </ChakraPopover.Arrow>
+    );
+  },
+);
 
 export const PopoverCloseTrigger = React.forwardRef<
   HTMLButtonElement,

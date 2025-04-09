@@ -2,11 +2,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { Flex, Float, Icon, Textarea } from "@chakra-ui/react";
 import { Field as ChakraField } from "@chakra-ui/react";
 import type { ReactNode } from "react";
-import {
-  type FieldValues,
-  type UseControllerProps,
-  useController,
-} from "react-hook-form";
+import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
 import { FaMarkdown } from "react-icons/fa";
 
 export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
@@ -62,13 +58,9 @@ export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
         )}
       </Flex>
 
-      {props.helperText && (
-        <ChakraField.HelperText>{props.helperText}</ChakraField.HelperText>
-      )}
+      {props.helperText && <ChakraField.HelperText>{props.helperText}</ChakraField.HelperText>}
       {fieldState.error?.message && (
-        <ChakraField.ErrorText>
-          {fieldState.error?.message}
-        </ChakraField.ErrorText>
+        <ChakraField.ErrorText>{fieldState.error?.message}</ChakraField.ErrorText>
       )}
     </ChakraField.Root>
   );

@@ -32,11 +32,7 @@ export const Connections = () => {
           <Table.Header>
             <Table.Row>
               {columns.map(column => (
-                <Show
-                  key={column.key}
-                  when={!column.hidden}
-                  fallback={<Table.ColumnHeader />}
-                >
+                <Show key={column.key} when={!column.hidden} fallback={<Table.ColumnHeader />}>
                   <Table.ColumnHeader>{column.name}</Table.ColumnHeader>
                 </Show>
               ))}

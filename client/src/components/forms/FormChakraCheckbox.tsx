@@ -35,9 +35,7 @@ export function FormChakraCheckboxField(
         )}
       </Checkbox.Root>
 
-      {props.helperText && (
-        <ChakraField.HelperText>{props.helperText}</ChakraField.HelperText>
-      )}
+      {props.helperText && <ChakraField.HelperText>{props.helperText}</ChakraField.HelperText>}
       {state.errors?.[formRegister.name]?.message && (
         <ChakraField.ErrorText>
           {state.errors?.[formRegister.name]?.message}

@@ -20,9 +20,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
         <ChakraCheckbox.Control _hover={{ borderColor: "gray.300" }}>
           {icon || <ChakraCheckbox.Indicator />}
         </ChakraCheckbox.Control>
-        {children != null && (
-          <ChakraCheckbox.Label>{children}</ChakraCheckbox.Label>
-        )}
+        {children != null && <ChakraCheckbox.Label>{children}</ChakraCheckbox.Label>}
       </ChakraCheckbox.Root>
     );
   },

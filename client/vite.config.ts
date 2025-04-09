@@ -38,13 +38,7 @@ function getAliasForProject() {
 
 function getAliasReactRouterGenerated() {
   return {
-    "react-router": path.resolve(
-      __dirname,
-      "../../packages/react-router/index.ts",
-    ),
-    "react-router-dom": path.resolve(
-      __dirname,
-      "../../packages/react-router-dom/index.tsx",
-    ),
+    "react-router": path.resolve(__dirname, "../../packages/react-router/index.ts"),
+    "react-router-dom": path.resolve(__dirname, "../../packages/react-router-dom/index.tsx"),
   };
 }

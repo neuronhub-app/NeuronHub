@@ -31,20 +31,14 @@ export function useFormService() {
             set: visible_to?.filter(option => option.user).map(user => user.id),
           },
           visible_to_groups: {
-            set: visible_to
-              ?.filter(option => option.group)
-              .map(group => group.id),
+            set: visible_to?.filter(option => option.group).map(group => group.id),
           },
 
           recommended_to_users: {
-            set: values.recommend_to
-              ?.filter(option => option.user)
-              .map(user => user.id),
+            set: values.recommend_to?.filter(option => option.user).map(user => user.id),
           },
           recommended_to_groups: {
-            set: values.recommend_to
-              ?.filter(option => option.group)
-              .map(group => group.id),
+            set: values.recommend_to?.filter(option => option.group).map(group => group.id),
           },
 
           ...valuesRest,
