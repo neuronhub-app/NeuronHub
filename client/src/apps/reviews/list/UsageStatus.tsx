@@ -1,12 +1,10 @@
-import type { UsageStatus } from "@/apps/reviews/list/index";
-import { Flex, Icon, Text } from "@chakra-ui/react";
-// @ts-ignore
-import type { SystemProperties } from "@chakra-ui/react/dist/types/styled-system/generated/system.gen";
+import type { ReviewType } from "@/apps/reviews/list/index";
+import { Flex, Icon, type JsxStyleProps, Text } from "@chakra-ui/react";
 import { BiPulse } from "react-icons/bi";
 
 export function UsageStatusBlock(props: {
-  status: UsageStatus | null;
-  color: SystemProperties["color"];
+  status: ReviewType["usage_status"] | null;
+  color: JsxStyleProps["color"];
 }) {
   if (!props.status) {
     return null;
@@ -24,7 +22,7 @@ export function UsageStatusBlock(props: {
   );
 }
 
-const statuses: Record<NonNullable<UsageStatus>, string> = {
+const statuses: Record<NonNullable<ReviewType["usage_status"]>, string> = {
   USING: "Using",
   WANT_TO_USE: "Want to use",
   INTERESTED: "Interested",

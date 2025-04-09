@@ -9,7 +9,7 @@
     "format": "bun run biome check --write",
     "update-check": "bun run ncu --packageManager=bun",
     "update": "bun run ncu --upgrade --packageManager=bun && bun install",
-    "typegen": "bunx @chakra-ui/cli typegen ./src/theme.ts",
+    "typegen": "bunx @chakra-ui/cli typegen src/theme/theme.ts",
     "graphql:codegen": "graphql-codegen --config src/codegen.ts"
   },
   "dependencies": {
@@ -21,7 +21,7 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.55.0",
     "react-hook-form-chakra": "^1.0.2",
-    "react-router": "^7.4.1",
+    "react-router": "^7.5.0",
     "react-hot-toast": "^2.5.2",
     "react-select": "^5.10.1",
     "chakra-react-select": "^6.1.0",
@@ -30,14 +30,14 @@
     "react-icons": "^5.5.0",
 
     "@hookform/resolvers": "^5.0.1",
-    "@hookform/devtools": "^4.3.3",
+    "@hookform/devtools": "^4.4.0",
 
     "valtio": "^2.1.4",
     "zod": "^3.24.2",
     "marked": "^15.0.7",
     "date-fns": "^4.1.0",
-    "date-fns-tz": "^3.2.0",
-    "@sentry/react": "^9.10.1",
+    "@date-fns/tz": "^1.2.0",
+    "@sentry/react": "^9.11.0",
     "envalid": "^8.0.0",
 
     "urql": "^4.2.2",
@@ -56,11 +56,11 @@
     "@types/node": "^22.14.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.1",
-    "typescript": "^5.8.2",
+    "typescript": "^5.8.3",
 
     "@redux-devtools/extension": "^3.3.0",
 
-    "vite": "^6.2.4",
+    "vite": "^6.2.5",
     "@vitejs/plugin-react": "^4.3.4",
     "@rollup/plugin-replace": "^6.0.2",
     "vite-tsconfig-paths": "^5.1.4",

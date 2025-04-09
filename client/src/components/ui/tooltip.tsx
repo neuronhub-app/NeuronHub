@@ -1,4 +1,9 @@
+/**
+ * - added `positioning` prop
+ */
+
 import { Tooltip as ChakraTooltip, Portal } from "@chakra-ui/react";
+import type { PositioningOptions } from "@zag-js/tooltip";
 import * as React from "react";
 
 export interface TooltipProps extends ChakraTooltip.RootProps {
@@ -8,6 +13,7 @@ export interface TooltipProps extends ChakraTooltip.RootProps {
   content: React.ReactNode;
   contentProps?: ChakraTooltip.ContentProps;
   disabled?: boolean;
+  positioning?: PositioningOptions;
 }
 
 export const Tooltip = React.forwardRef<HTMLDivElement, TooltipProps>(

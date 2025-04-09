@@ -1,19 +1,16 @@
 import { RatingBars } from "@/apps/reviews/list/RatingBars";
+import { ReviewAuthor } from "@/apps/reviews/list/ReviewAuthor";
+import { ReviewButtons } from "@/apps/reviews/list/ReviewButtons";
+import { ReviewButtonsVote } from "@/apps/reviews/list/ReviewButtonsVote";
+import { ReviewDatetime } from "@/apps/reviews/list/ReviewDatetime";
+import { ReviewListSidebar } from "@/apps/reviews/list/ReviewListSidebar";
 import { ToolTags } from "@/apps/reviews/list/ToolTag";
 import { UsageStatusBlock } from "@/apps/reviews/list/UsageStatus";
-import { VoteButtons } from "@/apps/reviews/list/VoteButtons";
 import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/ui/prose";
 import { graphql } from "@/gql-tada";
-import {
-  For,
-  HStack,
-  Heading,
-  Icon,
-  Show,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
+import { Flex, For, HStack, Heading, Icon, Show, Stack, Text } from "@chakra-ui/react";
 import type { ResultOf } from "@graphql-typed-document-node/core";
 import { marked } from "marked";
 import { FaPlus } from "react-icons/fa6";
@@ -26,7 +23,8 @@ export function ReviewList() {
     <Stack gap="gap.lg">
       <HStack justify="space-between">
         <Heading size="2xl">Reviews</Heading>
-        <Button size="sm" variant="subtle">
+
+        <Button size="md" variant="subtle">
           <Icon boxSize={3}>
             <FaPlus />
           </Icon>
@@ -37,79 +35,93 @@ export function ReviewList() {
       {fetching && <p>Loading...</p>}
       {error && <p>Error: {error.message}</p>}
 
-      <Stack gap="gap.xl">
-        <For
-          each={data?.tool_reviews}
-          fallback={<Heading>No reviews yet</Heading>}
-        >
-          {review => (
-            <HStack key={review.id} gap="gap.lg" align="flex-start">
-              <VoteButtons />
+      <Flex flex="1" pos="relative" gap="gap.xl">
+        <Stack gap="gap.xl">
+          <For each={data?.tool_reviews} fallback={<Heading>No reviews yet</Heading>}>
+            {review => (
+              <HStack key={review.id} gap="gap.md" align="flex-start">
+                <Stack>
+                  <ReviewButtonsVote />
+                  <ReviewButtons review={review} />
+                </Stack>
 
-              <Stack gap="gap.sm">
-                <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">
-                  {review.tool.name}
-                </Heading>
+                <Stack
+                  w="full"
+                  gap="gap.md"
+                  bg="bg.light"
+                  p="gap.md"
+                  borderRadius="lg"
+                  {...getOutlineContrastStyle({ variant: "subtle" })}
+                >
+                  <Stack gap="gap.sm">
+                    <ReviewDatetime review={review} style={{ lineHeight: 1 }} />
+                    <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">
+                      {review.tool.name}
+                    </Heading>
 
-                <Show when={review.title}>
-                  <Text fontWeight="bold" color="fg.muted">
-                    {review.title}
-                  </Text>
-                </Show>
+                    <Show when={review.title}>
+                      <Text fontWeight="bold" color="fg.muted">
+                        {review.title}
+                      </Text>
+                    </Show>
 
-                <HStack gap="gap.xl">
-                  <RatingBars
-                    rating={review.rating}
-                    type="rating"
-                    color="fg.secondary"
-                  />
-                  <RatingBars
-                    rating={review.importance}
-                    type="importance"
-                    color="fg.secondary"
-                  />
-                  <UsageStatusBlock
-                    status={review.usage_status}
-                    color="fg.secondary"
-                  />
-                </HStack>
+                    <HStack gap="gap.lg">
+                      <RatingBars rating={review.rating} type="rating" color="fg.secondary" />
+                      <RatingBars
+                        rating={review.importance}
+                        type="importance"
+                        color="fg.secondary"
+                      />
+                      <RatingBars
+                        rating={review.experience_hours}
+                        type="experience"
+                        color="fg.secondary"
+                        boxSize={6}
+                      />
+                      <UsageStatusBlock status={review.usage_status} color="fg.secondary" />
+                    </HStack>
 
-                <Show when={review.content}>
-                  <Prose
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml:
-                    dangerouslySetInnerHTML={{
-                      __html: marked.parse(review.content),
-                    }}
-                    size="md"
-                  />
-                </Show>
-                <Show when={review.content_pros}>
-                  <Prose
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml:
-                    dangerouslySetInnerHTML={{
-                      __html: marked.parse(review.content_pros),
-                    }}
-                    size="md"
-                    variant="pros"
-                  />
-                </Show>
-                <Show when={review.content_cons}>
-                  <Prose
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml:
-                    dangerouslySetInnerHTML={{
-                      __html: marked.parse(review.content_cons),
-                    }}
-                    size="md"
-                    variant="cons"
-                  />
-                </Show>
+                    <Show when={review.content}>
+                      <Prose
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml:
+                        dangerouslySetInnerHTML={{
+                          __html: marked.parse(review.content),
+                        }}
+                        size="md"
+                      />
+                    </Show>
+                    <Show when={review.content_pros}>
+                      <Prose
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml:
+                        dangerouslySetInnerHTML={{
+                          __html: marked.parse(review.content_pros),
+                        }}
+                        size="md"
+                        variant="pros"
+                      />
+                    </Show>
+                    <Show when={review.content_cons}>
+                      <Prose
+                        // biome-ignore lint/security/noDangerouslySetInnerHtml:
+                        dangerouslySetInnerHTML={{
+                          __html: marked.parse(review.content_cons),
+                        }}
+                        size="md"
+                        variant="cons"
+                      />
+                    </Show>
+                  </Stack>
 
-                <ToolTags tags={review.tool.tags} />
-              </Stack>
-            </HStack>
-          )}
-        </For>
-      </Stack>
+                  <ToolTags tags={review.tool.tags} />
+                  <ReviewAuthor author={review.author} />
+                </Stack>
+              </HStack>
+            )}
+          </For>
+        </Stack>
+
+        <ReviewListSidebar />
+      </Flex>
     </Stack>
   );
 }
@@ -117,6 +129,26 @@ export function ReviewList() {
 export const ReviewListDoc = graphql(`
   query ReviewList {
     tool_reviews {
+      id
+      title
+      content
+      content_pros
+      content_cons
+      importance
+      is_private
+      is_review_later
+      usage_status
+      rating
+      source
+      reviewed_at
+      experience_hours
+      author {
+        id
+        name
+        avatar {
+          url
+        }
+      }
       tool {
         id
         name
@@ -143,20 +175,10 @@ export const ReviewListDoc = graphql(`
           }
         }
       }
-      id
-      title
-      content
-      content_pros
-      content_cons
-      importance
-      is_private
-      is_review_later
-      usage_status
-      rating
-      source
     }
   }
 `);
-type ReviewListResult = ResultOf<typeof ReviewListDoc>["tool_reviews"];
-export type ReviewTag = ReviewListResult[number]["tool"]["tags"][number];
-export type UsageStatus = ReviewListResult[number]["usage_status"];
+
+type ReviewListType = ResultOf<typeof ReviewListDoc>["tool_reviews"];
+export type ReviewType = ReviewListType[number];
+export type ReviewTagType = ReviewType["tool"]["tags"][number];

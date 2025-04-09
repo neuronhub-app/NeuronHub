@@ -1,21 +1,14 @@
-import type { ReviewTag } from "@/apps/reviews/list/index";
-import { Icon, Tag, Wrap } from "@chakra-ui/react";
-// @ts-ignore
-import type { SystemProperties } from "@chakra-ui/react/dist/types/styled-system/generated/system.gen";
+import type { ReviewTagType } from "@/apps/reviews/list/index";
+import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
+import { Icon, type JsxStyleProps, Tag, Wrap } from "@chakra-ui/react";
 import type { IconType } from "react-icons";
 import { BiLogoDjango } from "react-icons/bi";
 import { DiOpensource } from "react-icons/di";
-import {
-  FaApple,
-  FaCode,
-  FaLinux,
-  FaPython,
-  FaTerminal,
-} from "react-icons/fa6";
+import { FaApple, FaCode, FaLinux, FaPython, FaTerminal } from "react-icons/fa6";
 import { GoLaw } from "react-icons/go";
 import { SiKotlin } from "react-icons/si";
 
-export function ToolTags(props: { tags: ReviewTag[] }) {
+export function ToolTags(props: { tags: ReviewTagType[] }) {
   props.tags.sort((a, b) => {
     // First sort by is_important
     if (a.is_important !== b.is_important) {
@@ -38,27 +31,29 @@ export function ToolTags(props: { tags: ReviewTag[] }) {
   );
 }
 
-export function ToolTag(props: { tag: ReviewTag }) {
+export function ToolTag(props: { tag: ReviewTagType }) {
   const iconInfo = getToolIconInfo(props.tag);
 
   let votesSum = 0;
   for (const vote of props.tag.votes) {
     votesSum += vote.is_vote_positive ? 1 : -1;
   }
-  let tagColor = "gray";
+  let tagColor = "gray.500";
   if (votesSum > 0) {
-    tagColor = "green";
+    tagColor = "teal.700";
   } else if (votesSum < 0) {
-    tagColor = "red";
+    tagColor = "orange.500";
   }
 
   return (
     <Tag.Root
       key={props.tag.id}
       aria-label={props.tag.description}
-      colorPalette={tagColor}
+      colorPalette="gray"
       variant="subtle"
-      opacity={0.7}
+      size="lg"
+      {...getOutlineContrastStyle({ variant: "subtle" })}
+      opacity={tagColor === "gray" ? 0.8 : 1}
     >
       {iconInfo && (
         <Tag.StartElement {...iconInfo.props}>
@@ -71,7 +66,7 @@ export function ToolTag(props: { tag: ReviewTag }) {
   );
 }
 
-function getToolIconInfo(tag: ReviewTag) {
+function getToolIconInfo(tag: ReviewTagType) {
   if (!tag.is_important) {
     return null;
   }
@@ -89,7 +84,7 @@ function getToolIconInfo(tag: ReviewTag) {
 const icons: {
   [key: string]: {
     icon: IconType;
-    props?: SystemProperties;
+    props?: JsxStyleProps;
   };
 } = {
   License: { icon: GoLaw },

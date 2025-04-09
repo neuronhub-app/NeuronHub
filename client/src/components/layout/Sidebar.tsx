@@ -17,12 +17,8 @@ import {
 import { Box, HStack } from "@chakra-ui/react";
 import { MessageSquareText } from "lucide-react";
 import type { SVGProps } from "react";
-import {
-  LuBookmark,
-  LuClock,
-  LuLayoutDashboard,
-  LuSettings,
-} from "react-icons/lu";
+import { FaRegBookmark } from "react-icons/fa6";
+import { LuLayoutDashboard, LuLibrary, LuSettings } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink } from "react-router";
 
@@ -32,8 +28,8 @@ const groups = [
     links: [
       { to: "/tools", icon: LuLayoutDashboard, label: "Tools" },
       { to: "/reviews/create", icon: MessageSquareText, label: "Reviews" },
-      { to: "/reviews/pending", icon: LuClock, label: "Pending" },
-      { to: "/wishlist", icon: LuBookmark, label: "Want to use" },
+      { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
+      { to: "/library", icon: LuLibrary, label: "Library" },
     ],
   },
 ];

@@ -16,6 +16,17 @@ scalar DateTime
 """Decimal (fixed-point)"""
 scalar Decimal
 
+type DjangoFileType {
+  name: String!
+  path: String!
+  size: Int!
+  url: String!
+}
+
+type DjangoModelType {
+  pk: ID!
+}
+
 input IDBaseFilterLookup {
   """Exact match. Filter will be skipped on `null` value"""
   exact: ID
@@ -44,6 +55,7 @@ input ManyToOneInput {
 type Mutation {
   logout: Boolean!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
+  toggle_user_review_list(review_pk: ID!, review_list_name: UserReviewListName!, is_added: Boolean!): Boolean! @IsAuthenticated
   create_review(data: ToolReviewTypeInput!): UserType! @IsAuthenticated
 }
 
@@ -136,11 +148,12 @@ type ToolReviewType {
   content_pros: String!
   content_cons: String!
   rating: Decimal
-  is_review_later: Boolean!
-  is_private: Boolean!
   importance: Decimal
+  experience_hours: Int
   usage_status: UsageStatus
   visibility: Visibility!
+  is_review_later: Boolean!
+  is_private: Boolean!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
   recommended_to_users: [UserType!]!
@@ -224,6 +237,8 @@ input ToolTypeInput {
   alternatives: [ToolAlternativeTypeInput!]
 }
 
+scalar Upload
+
 enum UsageStatus {
   USING
   USED
@@ -238,6 +253,12 @@ type UserConnectionGroupType {
   connections: [UserType!]!
 }
 
+enum UserReviewListName {
+  REVIEWS_READ_LATER
+  REVIEWS_STARRED
+  REVIEWS_LIBRARY
+}
+
 type UserType {
   id: ID!
   first_name: String!
@@ -245,6 +266,9 @@ type UserType {
   name: String!
   email: String!
   connection_groups: [UserConnectionGroupType!]!
+  avatar: DjangoFileType
+  reviews_read_later: [DjangoModelType!]!
+  reviews_library: [DjangoModelType!]!
 }
 
 input UserTypeInput {
@@ -254,6 +278,9 @@ input UserTypeInput {
   name: String!
   email: String
   connection_groups: ManyToOneInput
+  avatar: Upload
+  reviews_read_later: ManyToManyInput
+  reviews_library: ManyToManyInput
 }
 
 enum Visibility {

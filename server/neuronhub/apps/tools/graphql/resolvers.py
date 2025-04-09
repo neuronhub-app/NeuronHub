@@ -56,13 +56,14 @@ class ToolReviewType:
     content_cons: str
 
     rating: auto
+    importance: auto
+    experience_hours: auto
+
+    usage_status: auto
+    visibility: auto
 
     is_review_later: auto
     is_private: auto
-
-    importance: auto
-    usage_status: auto
-    visibility: auto
 
     visible_to_users: list[UserType]
     visible_to_groups: list[UserConnectionGroupType]

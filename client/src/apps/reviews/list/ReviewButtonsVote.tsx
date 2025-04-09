@@ -1,28 +1,23 @@
 import { Flex, IconButton, Stack } from "@chakra-ui/react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 
-export function VoteButtons() {
+export function ReviewButtonsVote() {
   return (
     <Stack align="center" color="slate.muted">
-      <VoteButton isVotePositive={true} />
+      <ReviewVoteButton isVotePositive={true} />
       <Flex>0</Flex>
-      <VoteButton isVotePositive={false} />
+      <ReviewVoteButton isVotePositive={false} />
     </Stack>
   );
 }
 
-function VoteButton(props: { isVotePositive: boolean }) {
+function ReviewVoteButton(props: { isVotePositive: boolean }) {
   return (
     <IconButton
       aria-label={props.isVotePositive ? "Upvote" : "Downvote"}
-      variant="ghost"
+      variant="subtle-ghost"
       borderRadius="lg"
-      size="xs"
-      colorPalette="slate"
-      color="slate.300"
-      _hover={{
-        color: "slate.muted",
-      }}
+      size="sm"
     >
       {props.isVotePositive ? <FaChevronUp /> : <FaChevronDown />}
     </IconButton>

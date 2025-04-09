@@ -5,17 +5,65 @@ export type introspection_types = {
   Boolean: unknown;
   DateTime: unknown;
   Decimal: unknown;
+  DjangoFileType: {
+    kind: "OBJECT";
+    name: "DjangoFileType";
+    fields: {
+      name: {
+        name: "name";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      path: {
+        name: "path";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      size: {
+        name: "size";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Int"; ofType: null };
+        };
+      };
+      url: {
+        name: "url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+    };
+  };
+  DjangoModelType: {
+    kind: "OBJECT";
+    name: "DjangoModelType";
+    fields: {
+      pk: {
+        name: "pk";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+    };
+  };
   ID: unknown;
   IDBaseFilterLookup: {
     kind: "INPUT_OBJECT";
     name: "IDBaseFilterLookup";
     isOneOf: false;
     inputFields: [
-      {
-        name: "exact";
-        type: { kind: "SCALAR"; name: "ID"; ofType: null };
-        defaultValue: null;
-      },
+      { name: "exact"; type: { kind: "SCALAR"; name: "ID"; ofType: null }; defaultValue: null },
       {
         name: "is_null";
         type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
@@ -36,6 +84,7 @@ export type introspection_types = {
       },
     ];
   };
+  Int: unknown;
   ManyToManyInput: {
     kind: "INPUT_OBJECT";
     name: "ManyToManyInput";
@@ -148,6 +197,14 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
         };
       };
+      toggle_user_review_list: {
+        name: "toggle_user_review_list";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
       update_user: {
         name: "update_user";
         type: {
@@ -163,11 +220,7 @@ export type introspection_types = {
     name: "OneToManyInput";
     isOneOf: false;
     inputFields: [
-      {
-        name: "set";
-        type: { kind: "SCALAR"; name: "ID"; ofType: null };
-        defaultValue: null;
-      },
+      { name: "set"; type: { kind: "SCALAR"; name: "ID"; ofType: null }; defaultValue: null },
     ];
   };
   Query: {
@@ -335,11 +388,7 @@ export type introspection_types = {
         type: {
           kind: "NON_NULL";
           name: never;
-          ofType: {
-            kind: "INPUT_OBJECT";
-            name: "OneToManyInput";
-            ofType: null;
-          };
+          ofType: { kind: "INPUT_OBJECT"; name: "OneToManyInput"; ofType: null };
         };
         defaultValue: null;
       },
@@ -357,11 +406,7 @@ export type introspection_types = {
     inputFields: [
       {
         name: "id";
-        type: {
-          kind: "INPUT_OBJECT";
-          name: "IDBaseFilterLookup";
-          ofType: null;
-        };
+        type: { kind: "INPUT_OBJECT"; name: "IDBaseFilterLookup"; ofType: null };
         defaultValue: null;
       },
       {
@@ -432,6 +477,10 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "String"; ofType: null };
         };
       };
+      experience_hours: {
+        name: "experience_hours";
+        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+      };
       id: {
         name: "id";
         type: {
@@ -460,10 +509,7 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
         };
       };
-      rating: {
-        name: "rating";
-        type: { kind: "SCALAR"; name: "Decimal"; ofType: null };
-      };
+      rating: { name: "rating"; type: { kind: "SCALAR"; name: "Decimal"; ofType: null } };
       recommended_to_groups: {
         name: "recommended_to_groups";
         type: {
@@ -475,11 +521,7 @@ export type introspection_types = {
             ofType: {
               kind: "NON_NULL";
               name: never;
-              ofType: {
-                kind: "OBJECT";
-                name: "UserConnectionGroupType";
-                ofType: null;
-              };
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
             };
           };
         };
@@ -563,11 +605,7 @@ export type introspection_types = {
             ofType: {
               kind: "NON_NULL";
               name: never;
-              ofType: {
-                kind: "OBJECT";
-                name: "UserConnectionGroupType";
-                ofType: null;
-              };
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
             };
           };
         };
@@ -595,11 +633,7 @@ export type introspection_types = {
     name: "ToolReviewTypeInput";
     isOneOf: false;
     inputFields: [
-      {
-        name: "id";
-        type: { kind: "SCALAR"; name: "ID"; ofType: null };
-        defaultValue: null;
-      },
+      { name: "id"; type: { kind: "SCALAR"; name: "ID"; ofType: null }; defaultValue: null },
       {
         name: "tool";
         type: {
@@ -687,11 +721,7 @@ export type introspection_types = {
           ofType: {
             kind: "NON_NULL";
             name: never;
-            ofType: {
-              kind: "INPUT_OBJECT";
-              name: "ToolTagTypeInput";
-              ofType: null;
-            };
+            ofType: { kind: "INPUT_OBJECT"; name: "ToolTagTypeInput"; ofType: null };
           };
         };
         defaultValue: null;
@@ -705,11 +735,7 @@ export type introspection_types = {
     inputFields: [
       {
         name: "id";
-        type: {
-          kind: "INPUT_OBJECT";
-          name: "IDBaseFilterLookup";
-          ofType: null;
-        };
+        type: { kind: "INPUT_OBJECT"; name: "IDBaseFilterLookup"; ofType: null };
         defaultValue: null;
       },
       {
@@ -851,11 +877,7 @@ export type introspection_types = {
     name: "ToolTagTypeInput";
     isOneOf: false;
     inputFields: [
-      {
-        name: "id";
-        type: { kind: "SCALAR"; name: "ID"; ofType: null };
-        defaultValue: null;
-      },
+      { name: "id"; type: { kind: "SCALAR"; name: "ID"; ofType: null }; defaultValue: null },
       {
         name: "name";
         type: {
@@ -964,10 +986,7 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "String"; ofType: null };
         };
       };
-      slug: {
-        name: "slug";
-        type: { kind: "SCALAR"; name: "String"; ofType: null };
-      };
+      slug: { name: "slug"; type: { kind: "SCALAR"; name: "String"; ofType: null } };
       tags: {
         name: "tags";
         type: {
@@ -991,11 +1010,7 @@ export type introspection_types = {
     name: "ToolTypeInput";
     isOneOf: false;
     inputFields: [
-      {
-        name: "id";
-        type: { kind: "SCALAR"; name: "ID"; ofType: null };
-        defaultValue: null;
-      },
+      { name: "id"; type: { kind: "SCALAR"; name: "ID"; ofType: null }; defaultValue: null },
       {
         name: "name";
         type: {
@@ -1037,25 +1052,17 @@ export type introspection_types = {
           ofType: {
             kind: "NON_NULL";
             name: never;
-            ofType: {
-              kind: "INPUT_OBJECT";
-              name: "ToolAlternativeTypeInput";
-              ofType: null;
-            };
+            ofType: { kind: "INPUT_OBJECT"; name: "ToolAlternativeTypeInput"; ofType: null };
           };
         };
         defaultValue: null;
       },
     ];
   };
+  Upload: unknown;
   UsageStatus: {
     name: "UsageStatus";
-    enumValues:
-      | "USING"
-      | "USED"
-      | "WANT_TO_USE"
-      | "INTERESTED"
-      | "NOT_INTERESTED";
+    enumValues: "USING" | "USED" | "WANT_TO_USE" | "INTERESTED" | "NOT_INTERESTED";
   };
   UserConnectionGroupType: {
     kind: "OBJECT";
@@ -1095,10 +1102,15 @@ export type introspection_types = {
       };
     };
   };
+  UserReviewListName: {
+    name: "UserReviewListName";
+    enumValues: "REVIEWS_READ_LATER" | "REVIEWS_STARRED" | "REVIEWS_LIBRARY";
+  };
   UserType: {
     kind: "OBJECT";
     name: "UserType";
     fields: {
+      avatar: { name: "avatar"; type: { kind: "OBJECT"; name: "DjangoFileType"; ofType: null } };
       connection_groups: {
         name: "connection_groups";
         type: {
@@ -1110,11 +1122,7 @@ export type introspection_types = {
             ofType: {
               kind: "NON_NULL";
               name: never;
-              ofType: {
-                kind: "OBJECT";
-                name: "UserConnectionGroupType";
-                ofType: null;
-              };
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
             };
           };
         };
@@ -1159,6 +1167,54 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "String"; ofType: null };
         };
       };
+      reviews_library: {
+        name: "reviews_library";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      reviews_read_later: {
+        name: "reviews_read_later";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      reviews_starred: {
+        name: "reviews_starred";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
     };
   };
   UserTypeInput: {
@@ -1166,11 +1222,7 @@ export type introspection_types = {
     name: "UserTypeInput";
     isOneOf: false;
     inputFields: [
-      {
-        name: "id";
-        type: { kind: "SCALAR"; name: "ID"; ofType: null };
-        defaultValue: null;
-      },
+      { name: "id"; type: { kind: "SCALAR"; name: "ID"; ofType: null }; defaultValue: null },
       {
         name: "first_name";
         type: { kind: "SCALAR"; name: "String"; ofType: null };
@@ -1200,16 +1252,31 @@ export type introspection_types = {
         type: { kind: "INPUT_OBJECT"; name: "ManyToOneInput"; ofType: null };
         defaultValue: null;
       },
+      {
+        name: "avatar";
+        type: { kind: "SCALAR"; name: "Upload"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "reviews_read_later";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "reviews_starred";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "reviews_library";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
     ];
   };
   Visibility: {
     name: "Visibility";
-    enumValues:
-      | "PRIVATE"
-      | "CONNECTION_GROUPS"
-      | "CONNECTIONS"
-      | "INTERNAL"
-      | "PUBLIC";
+    enumValues: "PRIVATE" | "CONNECTION_GROUPS" | "CONNECTIONS" | "INTERNAL" | "PUBLIC";
   };
 };
 

@@ -1,9 +1,10 @@
 import { Tooltip } from "@/components/ui/tooltip";
-import { Box, Flex, For, HStack, Icon, Stack, Text } from "@chakra-ui/react";
-// @ts-ignore
-import type { SystemProperties } from "@chakra-ui/react/dist/types/styled-system/generated/system.gen";
+import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
+import { Box, Flex, For, HStack, Icon, type JsxStyleProps, Stack, Text } from "@chakra-ui/react";
 import { FaRegStar } from "react-icons/fa6";
 import { HiMiniChartBar } from "react-icons/hi2";
+import { MdOutlineSpeed } from "react-icons/md";
+
 /**
  * Converts 100 base rating to a 5 boxes rating, where the last box is filled by %.
  * Eg
@@ -11,9 +12,10 @@ import { HiMiniChartBar } from "react-icons/hi2";
  * - rating = 65 → box 4/5 filled with 25% background
  */
 export function RatingBars(props: {
-  type: "rating" | "importance";
+  type: "rating" | "importance" | "experience";
   rating: string | number | unknown;
-  color: SystemProperties["color"];
+  color: JsxStyleProps["color"];
+  boxSize?: JsxStyleProps["boxSize"];
 }) {
   if (!props.rating) {
     return null;
@@ -22,7 +24,8 @@ export function RatingBars(props: {
   const rating0to100 = Number(props.rating);
 
   function getBoxFillPercentage(boxNumber: 1 | 2 | 3 | 4 | 5): number {
-    const rating0to5 = rating0to100 / 20;
+    const rating0to5 =
+      props.type === "experience" ? getExperienceRating0to5(rating0to100) : rating0to100 / 20;
 
     if (boxNumber <= rating0to5) {
       return 100;
@@ -34,6 +37,14 @@ export function RatingBars(props: {
       return 0;
     }
     return fillPercent0to1 * 100;
+  }
+
+  let icon = <FaRegStar />;
+  if (props.type === "importance") {
+    icon = <HiMiniChartBar />;
+  }
+  if (props.type === "experience") {
+    icon = <MdOutlineSpeed />;
   }
 
   return (
@@ -49,8 +60,8 @@ export function RatingBars(props: {
       closeDelay={300}
     >
       <HStack align="center">
-        <Icon color={props.color} boxSize={6}>
-          {props.type === "importance" ? <HiMiniChartBar /> : <FaRegStar />}
+        <Icon color={props.color} boxSize={props.boxSize ?? 5}>
+          {icon}
         </Icon>
 
         <Flex h="fit-content">
@@ -59,28 +70,21 @@ export function RatingBars(props: {
               {boxNumber => (
                 <Box
                   key={boxNumber}
-                  w="8"
+                  w="6"
                   h="15px"
                   _first={{ borderLeftRadius: "md" }}
                   _last={{ borderRightRadius: "md" }}
                   _notFirst={{ ml: { base: "-1px", _dark: "-1px" } }}
-                  //
-                  // below mixes in `outline` w oklab to match <Box> background → eyes comfort+
-                  // learnt from https://tailwindcss.com/docs/colors palette
                   backgroundGradient={`
-                  linear-gradient(
-                    to right,
-                    {colors.bg.secondary.medium} 0%,
-                    {colors.bg.secondary.medium} ${getBoxFillPercentage(boxNumber)}%,
-                    {colors.bg.secondary.light} ${getBoxFillPercentage(boxNumber)}%,
-                    {colors.bg.secondary.light} 100%
-                  )`}
-                  outline="1px solid"
-                  outlineOffset={"calc(1px * -1)"}
-                  outlineColor={{
-                    base: "color-mix(in oklab, #000 7%, transparent)",
-                    _dark: "color-mix(in oklab, #fff 14%, transparent)",
-                  }}
+                    linear-gradient(
+                      to right,
+                      {colors.bg.secondary.medium} 0%,
+                      {colors.bg.secondary.medium} ${getBoxFillPercentage(boxNumber)}%,
+                      {colors.bg.secondary.light} ${getBoxFillPercentage(boxNumber)}%,
+                      {colors.bg.secondary.light} 100%
+                    )
+                  `}
+                  {...getOutlineContrastStyle()}
                 />
               )}
             </For>
@@ -89,4 +93,41 @@ export function RatingBars(props: {
       </HStack>
     </Tooltip>
   );
+}
+
+function getExperienceRating0to5(hours: number): number {
+  // 1. 0-40h
+  // 2. 100h
+  // 3. 350 (4h over few months)
+  // 4. 700 (4h over half a year)
+  // 5. 1'500h (4h over 1+ years)
+  // 6. 3'000h (4h over 2+ years)
+  // 7. 7'000h+ (4h over 5+ years)
+  // 8. 14'000h+ (4h over 10+ years)
+  // 9. 28'000h+ (8h over 10+ years)
+  if (hours <= 40) {
+    return 0.5;
+  }
+  if (hours <= 100) {
+    return 1;
+  }
+  if (hours <= 350) {
+    return 1.5;
+  }
+  if (hours <= 700) {
+    return 2;
+  }
+  if (hours <= 1_500) {
+    return 2.5;
+  }
+  if (hours <= 3_000) {
+    return 3;
+  }
+  if (hours <= 7_000) {
+    return 3.5;
+  }
+  if (hours <= 14_000) {
+    return 4;
+  }
+  return 4.5;
 }

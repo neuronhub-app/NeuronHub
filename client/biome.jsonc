@@ -30,6 +30,7 @@
       },
       "style": {
         "noNonNullAssertion": "off",
+        "noUnusedTemplateLiteral": "off", // graphql highlight doesn't work with quotes instead of a literal
         "noUselessElse": "off" // helps with readability, on rare occasions
       }
     }
@@ -37,7 +38,8 @@
   "formatter": {
     "enabled": true,
     "formatWithErrors": true,
-    "indentStyle": "space"
+    "indentStyle": "space",
+    "lineWidth": 97
   },
   "files": {
     "include": [

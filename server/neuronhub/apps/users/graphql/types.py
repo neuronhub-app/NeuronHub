@@ -15,6 +15,10 @@ class UserType:
     name: auto
     email: auto
     connection_groups: list[UserConnectionGroupType]
+    avatar: auto
+
+    reviews_read_later: auto
+    reviews_library: auto
 
 
 @strawberry_django.type(UserConnectionGroup)
@@ -29,3 +33,6 @@ class UserTypeInput(UserType):
     first_name: auto
     last_name: auto
     connection_groups: list[UserType]
+
+    reviews_read_later: auto
+    reviews_library: auto

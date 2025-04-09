@@ -1,9 +1,11 @@
 import asyncio
 import dataclasses
+import datetime
 import logging
 import textwrap
 
 from asgiref.sync import sync_to_async
+from django.utils import timezone
 
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.tests.test_gen import Gen
@@ -109,6 +111,7 @@ async def _create_review_pycharm(user: User):
         rating=67,
         importance=83,
         experience_hours=17_000,
+        reviewed_at=timezone.now() - datetime.timedelta(days=8, hours=5, minutes=30),
     )
     await create_review_tags(
         review=review,
@@ -156,7 +159,7 @@ async def _create_review_iterm(user: User):
         title="Good shortcuts and render config, actively maintained",
         content=textwrap.dedent(
             """
-            - Performant native render (Objective-C/Swift)
+            - Fast native render (Objective-C/Swift)
             - no extra features, like history/fish/llm/etc
             """
         ),
@@ -205,8 +208,9 @@ async def _create_review_ghostly(user: User, alternatives: list[Tool] = None):
     review = await ToolReview.objects.acreate(
         tool=tool,
         author=user,
-        title="Haven't tried, heard good things from HN: embeddable, Zig based",
+        title="Haven't tried, heard good things from HN - embeddable, Zig-based",
         usage_status=UsageStatus.INTERESTED,
+        reviewed_at=timezone.now() - datetime.timedelta(days=35),
     )
     await create_review_tags(
         review=review,

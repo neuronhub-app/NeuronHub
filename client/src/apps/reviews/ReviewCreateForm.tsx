@@ -4,14 +4,13 @@ import { useFormService } from "@/apps/reviews/useFormService";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
-import { FormChakraSelect } from "@/components/forms/FormChakraSelect";
 import { FormChakraSlider } from "@/components/forms/FormChakraSlider";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { zStringEmpty } from "@/components/forms/zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tag } from "@/components/ui/tag";
-import { Importance, UsageStatus, Visibility } from "@/graphql/graphql";
+import { UsageStatus, Visibility } from "@/graphql/graphql";
 import {
   Box,
   CheckboxGroup,
@@ -108,16 +107,10 @@ export namespace ReviewCreateForm {
       description: z.string().optional(),
       domain: z.string().optional(),
       github_url: z
-        .union([
-          z.string().includes("github.com").includes("/"),
-          zStringEmpty(),
-        ])
+        .union([z.string().includes("github.com").includes("/"), zStringEmpty()])
         .optional(),
       crunchbase_url: z
-        .union([
-          z.string().includes("crunchbase.com").includes("/"),
-          zStringEmpty(),
-        ])
+        .union([z.string().includes("crunchbase.com").includes("/"), zStringEmpty()])
         .optional(),
       alternatives: toolMultiSelect,
     }),
@@ -134,11 +127,11 @@ export namespace ReviewCreateForm {
     visibility: z.enum(
       Object.values(Visibility) as [Visibility, ...Visibility[]], // @ts-bad-inference
     ),
-    importance: z
-      .enum(
-        Object.values(Importance) as [Importance, ...Importance[]], // @ts-bad-inference
-      )
-      .optional(),
+    // importance: z
+    //   .enum(
+    //     Object.values(Importance) as [Importance, ...Importance[]], // @ts-bad-inference
+    //   )
+    //   .optional(),
     tags: toolMultiSelect,
     recommend_to: useMultiSelect,
     visible_to: useMultiSelect,
@@ -167,7 +160,7 @@ export namespace ReviewCreateForm {
         usage_status: UsageStatus.Using,
         visibility: Visibility.Private,
         is_review_later: false,
-        importance: Importance.Medium,
+        // importance: Importance.Medium,
       },
     });
     const control = form.control;
@@ -312,10 +305,7 @@ export namespace ReviewCreateForm {
 
               <Fieldset.Content display="flex" gap="gap.lg">
                 <VStack gap="gap.lg" alignItems="flex-start" w="100%">
-                  <FormChakraInput
-                    field={{ control, name: "title" }}
-                    label="Title"
-                  />
+                  <FormChakraInput field={{ control, name: "title" }} label="Title" />
                   <FormChakraTextarea
                     field={{ control, name: "content" }}
                     label="Content"
@@ -334,20 +324,20 @@ export namespace ReviewCreateForm {
                     isShowIconMarkdown
                   />
 
-                  <FormChakraSelect
-                    form={form}
-                    formRegister={form.register("importance")}
-                    label="Importance"
-                    fieldName="importance"
-                    placeholder="How important is it?"
-                    options={[
-                      { label: "Extra low", value: Importance.ExtraLow },
-                      { label: "Low", value: Importance.Low },
-                      { label: "Medium", value: Importance.Medium },
-                      { label: "High", value: Importance.High },
-                      { label: "Urgent", value: Importance.Urgent },
-                    ]}
-                  />
+                  {/*<FormChakraSelect*/}
+                  {/*  form={form}*/}
+                  {/*  formRegister={form.register("importance")}*/}
+                  {/*  label="Importance"*/}
+                  {/*  fieldName="importance"*/}
+                  {/*  placeholder="How important is it?"*/}
+                  {/*  options={[*/}
+                  {/*    { label: "Extra low", value: Importance.ExtraLow },*/}
+                  {/*    { label: "Low", value: Importance.Low },*/}
+                  {/*    { label: "Medium", value: Importance.Medium },*/}
+                  {/*    { label: "High", value: Importance.High },*/}
+                  {/*    { label: "Urgent", value: Importance.Urgent },*/}
+                  {/*  ]}*/}
+                  {/*/>*/}
 
                   <VStack align="flex-start" w="full" gap="gap.sm">
                     <Checkbox
@@ -386,11 +376,7 @@ export namespace ReviewCreateForm {
                       label="Usage status"
                       items={[
                         getToolType(UsageStatus.Using, <FaHeartPulse />),
-                        getToolType(
-                          UsageStatus.WantToUse,
-                          <FaBookmark />,
-                          "Want to use",
-                        ),
+                        getToolType(UsageStatus.WantToUse, <FaBookmark />, "Want to use"),
                         getToolType(UsageStatus.Used, <FaClockRotateLeft />),
                         getToolType(UsageStatus.Interested, <FaStar />),
                         getToolType(
@@ -485,10 +471,7 @@ function getToolType(value: string, icon: JSX.Element, label?: string) {
     label: (
       <HStack>
         <Icon fontSize="md">{icon}</Icon>
-        <Text>
-          {label ??
-            value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()}
-        </Text>
+        <Text>{label ?? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()}</Text>
       </HStack>
     ),
   };

@@ -5,6 +5,7 @@ import logging
 from django.core.validators import DomainNameValidator
 from django.db import models
 from django.db.models import ManyToManyField
+from django.utils import timezone
 from django_choices_field import TextChoicesField
 from django_countries.fields import CountryField
 from django_extensions.db.fields import AutoSlugField
@@ -256,6 +257,17 @@ class ToolReview(AnonimazableTimeStampedModel):
         default=Visibility.PRIVATE,
     )
 
+    users_read_later = models.ManyToManyField(
+        User,
+        related_name="reviews_read_later",
+        blank=True,
+    )
+    users_library = models.ManyToManyField(
+        User,
+        related_name="reviews_library",
+        blank=True,
+    )
+
     source = models.CharField(max_length=255, blank=True)
 
     # 5 categories: very dissatisfied, dissatisfied, neutral, satisfied, very satisfied
@@ -276,7 +288,7 @@ class ToolReview(AnonimazableTimeStampedModel):
         null=True,
     )
 
-    reviewed_at = anonymizable_field(models.DateTimeField(auto_now_add=True))
+    reviewed_at = anonymizable_field(models.DateTimeField(default=timezone.now, blank=True))
 
     title = anonymizable_field(
         models.CharField(max_length=511, blank=True),

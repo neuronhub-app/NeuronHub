@@ -46,6 +46,9 @@ export const UserQueryDoc = graphql(`
       id
       name
       email
+      
+      reviews_library { pk }
+      reviews_read_later { pk }
 
       connection_groups {
         id
