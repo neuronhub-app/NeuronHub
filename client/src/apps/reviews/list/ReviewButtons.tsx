@@ -64,9 +64,6 @@ function ReviewButton(props: {
     case UserReviewListName.ReviewsReadLater:
       userField = "reviews_read_later";
       break;
-    case UserReviewListName.ReviewsStarred:
-      userField = "reviews_starred";
-      break;
     case UserReviewListName.ReviewsLibrary:
       userField = "reviews_library";
       break;

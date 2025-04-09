@@ -14,7 +14,6 @@ from neuronhub.apps.users.models import User
 
 class UserReviewListName(Enum):
     REVIEWS_READ_LATER = "reviews_read_later"
-    REVIEWS_STARRED = "reviews_starred"
     REVIEWS_LIBRARY = "reviews_library"
 
 

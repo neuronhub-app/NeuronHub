@@ -1199,22 +1199,6 @@ export type introspection_types = {
           };
         };
       };
-      reviews_starred: {
-        name: "reviews_starred";
-        type: {
-          kind: "NON_NULL";
-          name: never;
-          ofType: {
-            kind: "LIST";
-            name: never;
-            ofType: {
-              kind: "NON_NULL";
-              name: never;
-              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
-            };
-          };
-        };
-      };
     };
   };
   UserTypeInput: {
@@ -1259,11 +1243,6 @@ export type introspection_types = {
       },
       {
         name: "reviews_read_later";
-        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
-        defaultValue: null;
-      },
-      {
-        name: "reviews_starred";
         type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
         defaultValue: null;
       },
