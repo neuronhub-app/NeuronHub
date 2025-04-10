@@ -5,7 +5,7 @@ import { FaUser } from "react-icons/fa";
 import { FaBell } from "react-icons/fa";
 import { NavLink, Outlet, useLocation } from "react-router";
 
-export function UserSettingsLayout() {
+export default function UserSettingsLayout() {
   const { pathname } = useLocation();
 
   const tabs = [

@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite --config vite.config.ts",
+    "dev": "react-router dev",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "format": "bun run biome check --write",
@@ -13,15 +13,19 @@
     "graphql:codegen": "graphql-codegen --config src/codegen.ts"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.15.0",
+    "@chakra-ui/react": "^3.15.1",
     "@emotion/react": "^11.14.0",
     "next-themes": "^0.4.6",
 
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-router": "^7.5.0",
+    "@react-router/dev": "^7.5.0",
+    "@react-router/node": "^7.5.0",
+    "isbot": "^5.1.26",
+
     "react-hook-form": "^7.55.0",
     "react-hook-form-chakra": "^1.0.2",
-    "react-router": "^7.5.0",
     "react-hot-toast": "^2.5.2",
     "react-select": "^5.10.1",
     "chakra-react-select": "^6.1.0",
@@ -34,10 +38,10 @@
 
     "valtio": "^2.1.4",
     "zod": "^3.24.2",
-    "marked": "^15.0.7",
+    "marked": "^15.0.8",
     "date-fns": "^4.1.0",
     "@date-fns/tz": "^1.2.0",
-    "@sentry/react": "^9.11.0",
+    "@sentry/react": "^9.12.0",
     "envalid": "^8.0.0",
 
     "urql": "^4.2.2",
@@ -45,7 +49,7 @@
     "graphql": "^16.10.0"
   },
   "devDependencies": {
-    "@chakra-ui/cli": "^3.15.0",
+    "@chakra-ui/cli": "^3.15.1",
     "globby": "^14.1.0",
 
     "@biomejs/biome": "^1.9.4",
@@ -55,16 +59,16 @@
 
     "@types/node": "^22.14.0",
     "@types/react": "^19.1.0",
-    "@types/react-dom": "^19.1.1",
+    "@types/react-dom": "^19.1.2",
     "typescript": "^5.8.3",
 
     "@redux-devtools/extension": "^3.3.0",
 
-    "vite": "^6.2.5",
+    "vite": "^6.2.6",
     "@vitejs/plugin-react": "^4.3.4",
     "@rollup/plugin-replace": "^6.0.2",
     "vite-tsconfig-paths": "^5.1.4",
 
-    "npm-check-updates": "^17.1.16"
+    "npm-check-updates": "^17.1.18"
   }
 }

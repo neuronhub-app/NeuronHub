@@ -1,9 +1,7 @@
-/.output
-/.vite
-
-/node_modules
+.output/
+.vite/
+.react-router/
+node_modules/
 
 /logs
 *.log
-
-vite.config.js

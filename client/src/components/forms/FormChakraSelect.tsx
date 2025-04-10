@@ -1,4 +1,4 @@
-import type { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
+import type { ReviewCreateForm } from "@/apps/reviews/create";
 import { Field } from "@/components/ui/field";
 import { NativeSelectField, NativeSelectRoot } from "@/components/ui/native-select";
 import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";

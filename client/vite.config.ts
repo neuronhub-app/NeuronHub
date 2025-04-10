@@ -1,21 +1,15 @@
 import * as path from "node:path";
-import react from "@vitejs/plugin-react";
+import { reactRouter } from "@react-router/dev/vite";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
-  root: path.resolve(__dirname, "src"),
+  root: __dirname,
 
   server: {
     port: 3000,
   },
-  plugins: [react(), tsconfigPaths({ root: "./" })],
-
-  build: {
-    rollupOptions: {
-      input: path.resolve(__dirname, "src/index.html"),
-    },
-  },
+  plugins: [reactRouter(), tsconfigPaths()],
 
   resolve: process.env.USE_SOURCE
     ? {

@@ -1,6 +1,6 @@
 import { ToolMultiSelect } from "@/apps/reviews/components/ToolMultiSelect";
 import { UserMultiSelect } from "@/apps/reviews/components/UserMultiSelect";
-import { useFormService } from "@/apps/reviews/useFormService";
+import { useFormService } from "@/apps/reviews/create/useFormService";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -48,6 +48,10 @@ import { gql, useClient } from "urql";
 import { proxy } from "valtio";
 import { useProxy } from "valtio/utils";
 import { z } from "zod";
+
+export default function ReviewCreateRoute() {
+  return <ReviewCreateForm.Comp />;
+}
 
 export interface ReviewSelectOption {
   id: string;

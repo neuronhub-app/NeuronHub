@@ -1,4 +1,4 @@
-import type { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
+import type { ReviewCreateForm } from "@/apps/reviews/create";
 import { Checkbox } from "@chakra-ui/react";
 import { Field as ChakraField } from "@chakra-ui/react";
 import type { ReactNode } from "react";

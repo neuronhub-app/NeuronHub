@@ -14,7 +14,7 @@ import {
 } from "@chakra-ui/react";
 import { LuSearch, LuUserPlus } from "react-icons/lu";
 
-export const Connections = () => {
+export default function Connections() {
   return (
     <Container py="10" px={0}>
       <Stack gap="8">
@@ -53,7 +53,7 @@ export const Connections = () => {
       </Stack>
     </Container>
   );
-};
+}
 
 interface Item {
   name: string;

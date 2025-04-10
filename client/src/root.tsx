@@ -1,0 +1,41 @@
+import { ColorModeProvider } from "@/components/ui/color-mode";
+import { system } from "@/theme/theme";
+import { urqlClient } from "@/urql/urqlClient";
+import { ChakraProvider } from "@chakra-ui/react";
+import type { ReactNode } from "react";
+import { Toaster } from "react-hot-toast";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
+import {} from "react-router";
+import { Provider } from "urql";
+
+export function Layout(props: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>NeuronHub</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        {props.children}
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
+}
+
+export default function Root() {
+  return (
+    <Provider value={urqlClient}>
+      <ChakraProvider value={system}>
+        <ColorModeProvider enableSystem={true}>
+          <Outlet />
+          <Toaster position="bottom-center" gutter={8} />
+        </ColorModeProvider>
+      </ChakraProvider>
+    </Provider>
+  );
+}

@@ -11,7 +11,17 @@ import { Container, type ContainerProps, HStack, IconButton } from "@chakra-ui/r
 import { LuAlignRight } from "react-icons/lu";
 import { Outlet } from "react-router";
 
-export function RootLayout() {
+export function links() {
+  return [
+    // {
+    //   rel: "icon",
+    //   href: "/favicon.png",
+    //   type: "image/png",
+    // },
+  ];
+}
+
+export default function RootLayout() {
   return (
     <>
       <Navbar hideFrom="md" />

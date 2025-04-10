@@ -6,7 +6,7 @@ import { Textarea } from "@chakra-ui/react";
 import { LuTriangleAlert } from "react-icons/lu";
 import { LuLinkedin, LuTwitter } from "react-icons/lu";
 
-export function ProfileSettings() {
+export default function Profile() {
   return (
     <Container maxW="xl" py={10} m={0} px={1}>
       <Stack gap="20">

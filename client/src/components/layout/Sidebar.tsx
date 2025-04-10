@@ -27,7 +27,7 @@ const groups = [
     title: "",
     links: [
       { to: "/tools", icon: LuLayoutDashboard, label: "Tools" },
-      { to: "/reviews/create", icon: MessageSquareText, label: "Reviews" },
+      { to: "/reviews", icon: MessageSquareText, label: "Reviews" },
       { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
       { to: "/library", icon: LuLibrary, label: "Library" },
     ],

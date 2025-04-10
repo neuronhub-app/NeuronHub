@@ -65,7 +65,7 @@ const SliderMarks = React.forwardRef<HTMLDivElement, SliderMarksProps>(
           const value = typeof mark === "number" ? mark : mark.value;
           const label = typeof mark === "number" ? undefined : mark.label;
           return (
-            <ChakraSlider.Marker key={index as any} value={value}>
+            <ChakraSlider.Marker key={index satisfies number} value={value}>
               <ChakraSlider.MarkerIndicator />
               {label}
             </ChakraSlider.Marker>

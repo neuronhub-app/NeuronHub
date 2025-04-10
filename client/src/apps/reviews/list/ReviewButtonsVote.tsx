@@ -1,4 +1,4 @@
-import type { ReviewType } from "@/apps/reviews/list/index";
+import type { ReviewType } from "@/apps/reviews/list";
 import { user } from "@/apps/users/useUserCurrent";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/urql/mutateAndRefetch";

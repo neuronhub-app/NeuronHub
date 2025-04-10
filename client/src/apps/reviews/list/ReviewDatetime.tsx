@@ -1,4 +1,4 @@
-import type { ReviewType } from "@/apps/reviews/list/index";
+import type { ReviewType } from "@/apps/reviews/list";
 import { Tooltip } from "@/components/ui/tooltip";
 import { type JsxStyleProps, Text } from "@chakra-ui/react";
 import { differenceInDays, format, formatDistanceToNowStrict, isSameYear } from "date-fns";

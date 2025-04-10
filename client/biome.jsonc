@@ -51,6 +51,6 @@
       "panda.config.ts",
       "graphql/"
     ],
-    "ignore": [".output/", ".vite/"]
+    "ignore": [".output/", ".vite/", ".react-router"]
   }
 }

@@ -1,4 +1,4 @@
-import type { ReviewType } from "@/apps/reviews/list/index";
+import type { ReviewType } from "@/apps/reviews/list";
 import { Flex, Icon, type JsxStyleProps, Text } from "@chakra-ui/react";
 import { BiPulse } from "react-icons/bi";
 

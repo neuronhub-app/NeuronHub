@@ -1,4 +1,4 @@
-import type { ReviewType } from "@/apps/reviews/list/index";
+import type { ReviewType } from "@/apps/reviews/list";
 import { Avatar, Flex, Text } from "@chakra-ui/react";
 
 export function ReviewAuthor(props: { author: ReviewType["author"] }) {

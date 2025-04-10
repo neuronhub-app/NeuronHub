@@ -1,4 +1,4 @@
-import type { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
+import type { ReviewCreateForm } from "@/apps/reviews/create";
 import { CheckboxCard } from "@/components/ui/checkbox-card";
 import { CheckboxCardIndicator, Float, Icon } from "@chakra-ui/react";
 import type { ReactElement, ReactNode } from "react";

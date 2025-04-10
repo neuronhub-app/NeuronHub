@@ -17,7 +17,7 @@ import type { ReactNode } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { components } from "react-select";
 
-import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/ReviewCreateForm";
+import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create";
 import { AsyncCreatableSelect } from "chakra-react-select";
 
 import { FaMessage, FaRegMessage } from "react-icons/fa6";

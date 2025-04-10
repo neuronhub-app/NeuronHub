@@ -14,9 +14,14 @@ import { Flex, For, HStack, Heading, Icon, Show, Stack, Text } from "@chakra-ui/
 import type { ResultOf } from "@graphql-typed-document-node/core";
 import { marked } from "marked";
 import { FaPlus } from "react-icons/fa6";
+import { NavLink } from "react-router";
 import { useQuery } from "urql";
 
-export function ReviewList() {
+export default function ReviewListRoute() {
+  return <ReviewList />;
+}
+
+function ReviewList() {
   const [{ data, error, fetching }] = useQuery({ query: ReviewListDoc });
 
   return (
@@ -24,12 +29,14 @@ export function ReviewList() {
       <HStack justify="space-between">
         <Heading size="2xl">Reviews</Heading>
 
-        <Button size="md" variant="subtle">
-          <Icon boxSize={3}>
-            <FaPlus />
-          </Icon>
-          Create
-        </Button>
+        <NavLink to="/reviews/create">
+          <Button size="md" variant="subtle">
+            <Icon boxSize={3}>
+              <FaPlus />
+            </Icon>
+            Create
+          </Button>
+        </NavLink>
       </HStack>
 
       {fetching && <p>Loading...</p>}

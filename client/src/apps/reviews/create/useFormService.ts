@@ -1,4 +1,4 @@
-import type { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
+import type { ReviewCreateForm } from "@/apps/reviews/create";
 import { graphql } from "@/gql-tada";
 import { captureException } from "@sentry/react";
 import { useClient } from "urql";

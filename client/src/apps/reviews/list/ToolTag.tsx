@@ -1,4 +1,4 @@
-import type { ReviewTagType } from "@/apps/reviews/list/index";
+import type { ReviewTagType } from "@/apps/reviews/list";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 import { Icon, type JsxStyleProps, Tag, Wrap } from "@chakra-ui/react";
 import type { IconType } from "react-icons";
