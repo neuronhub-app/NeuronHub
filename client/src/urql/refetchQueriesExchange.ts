@@ -27,11 +27,23 @@ export async function refetchAllQueries() {
   }
 
   return new Promise<void>(resolve => {
+    let pendingTotal = 0;
+    const pendingStep = 12;
+    const pendingMax = 1000;
+
     function resolveIfCompleted() {
       if (state.opsRefetching.size === 0) {
         resolve();
       } else {
-        setTimeout(resolveIfCompleted, 12);
+        pendingTotal += pendingStep;
+        if (pendingTotal > pendingMax) {
+          console.warn(
+            "Refetch time out. Happens if react-router v7 navigates back & forth. It prob kills urql operations/subscriptions, while this Exchange doesn't listen to unmount events.",
+          );
+          resolve();
+        } else {
+          setTimeout(resolveIfCompleted, pendingStep);
+        }
       }
     }
 
