@@ -10,26 +10,6 @@ const state = proxy({
   opsRefetching: new Set<OperationKey>(),
 });
 
-export function refetchExchange(input: ExchangeInput): ExchangeIO {
-  return ops$ => {
-    return pipe(
-      pipe(
-        ops$,
-        tap((op: Operation) => {
-          const isRefetchable = op.kind === "query" || op.kind === "teardown";
-          if (isRefetchable) {
-            state.opsToRefetch.set(op.key, op);
-          }
-        }),
-      ),
-      input.forward,
-      tap(opResult => {
-        state.opsRefetching.delete(opResult.operation.key);
-      }),
-    );
-  };
-}
-
 /**
  * reexecuteOperation() only triggers queries with listeners, eg mounted useQuery()
  *
@@ -57,4 +37,24 @@ export async function refetchAllQueries() {
 
     resolveIfCompleted();
   });
+}
+
+export function refetchQueriesExchange(input: ExchangeInput): ExchangeIO {
+  return ops$ => {
+    return pipe(
+      pipe(
+        ops$,
+        tap((op: Operation) => {
+          const isRefetchable = op.kind === "query" || op.kind === "teardown";
+          if (isRefetchable) {
+            state.opsToRefetch.set(op.key, op);
+          }
+        }),
+      ),
+      input.forward,
+      tap(opResult => {
+        state.opsRefetching.delete(opResult.operation.key);
+      }),
+    );
+  };
 }

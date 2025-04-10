@@ -24,14 +24,14 @@ export function ReviewButtonsVote(props: { review: ReviewType }) {
 
   return (
     <Stack align="center" color="slate.muted">
-      <ReviewVoteButton reviewId={props.review.id} isVotePositive={true} />
+      <VoteButton reviewId={props.review.id} isVotePositive={true} />
       <Flex>{votesSum}</Flex>
-      <ReviewVoteButton reviewId={props.review.id} isVotePositive={false} />
+      <VoteButton reviewId={props.review.id} isVotePositive={false} />
     </Stack>
   );
 }
 
-function ReviewVoteButton(props: { reviewId: string; isVotePositive: boolean }) {
+function VoteButton(props: { reviewId: string; isVotePositive: boolean }) {
   const userSnap = useSnapshot(user.state);
 
   const state = useValtioProxyRef({
