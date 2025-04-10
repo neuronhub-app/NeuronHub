@@ -13,6 +13,7 @@ from neuronhub.apps.tools.models import ToolReview
 from neuronhub.apps.tools.models import ToolTag
 from neuronhub.apps.tools.models import ToolTagVote
 from neuronhub.apps.tools.models import Visibility
+from neuronhub.apps.users.graphql.types import ToolReviewVoteType
 from neuronhub.apps.users.graphql.types import UserConnectionGroupType
 from neuronhub.apps.users.graphql.types import UserType
 
@@ -69,6 +70,8 @@ class ToolReviewType:
     visible_to_groups: list[UserConnectionGroupType]
     recommended_to_users: list[UserType]
     recommended_to_groups: list[UserConnectionGroupType]
+
+    votes: list[ToolReviewVoteType]
 
 
 @strawberry_django.type(ToolTagVote)

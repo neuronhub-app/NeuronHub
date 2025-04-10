@@ -213,6 +213,14 @@ export type introspection_types = {
           ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
         };
       };
+      vote_review: {
+        name: "vote_review";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
     };
   };
   OneToManyInput: {
@@ -416,7 +424,7 @@ export type introspection_types = {
       },
       {
         name: "description";
-        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        type: { kind: "INPUT_OBJECT"; name: "StrFilterLookup"; ofType: null };
         defaultValue: null;
       },
       {
@@ -626,6 +634,22 @@ export type introspection_types = {
           };
         };
       };
+      votes: {
+        name: "votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "ToolReviewVoteType"; ofType: null };
+            };
+          };
+        };
+      };
     };
   };
   ToolReviewTypeInput: {
@@ -727,6 +751,32 @@ export type introspection_types = {
         defaultValue: null;
       },
     ];
+  };
+  ToolReviewVoteType: {
+    kind: "OBJECT";
+    name: "ToolReviewVoteType";
+    fields: {
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      is_vote_positive: {
+        name: "is_vote_positive";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+      };
+      review: {
+        name: "review";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+        };
+      };
+    };
   };
   ToolTagFilter: {
     kind: "INPUT_OBJECT";
@@ -960,7 +1010,11 @@ export type introspection_types = {
       };
       description: {
         name: "description";
-        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
       };
       github_url: {
         name: "github_url";
@@ -986,7 +1040,14 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "String"; ofType: null };
         };
       };
-      slug: { name: "slug"; type: { kind: "SCALAR"; name: "String"; ofType: null } };
+      slug: {
+        name: "slug";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
       tags: {
         name: "tags";
         type: {
@@ -1104,7 +1165,7 @@ export type introspection_types = {
   };
   UserReviewListName: {
     name: "UserReviewListName";
-    enumValues: "REVIEWS_READ_LATER" | "REVIEWS_STARRED" | "REVIEWS_LIBRARY";
+    enumValues: "REVIEWS_READ_LATER" | "REVIEWS_LIBRARY";
   };
   UserType: {
     kind: "OBJECT";
@@ -1199,6 +1260,22 @@ export type introspection_types = {
           };
         };
       };
+      tool_review_votes: {
+        name: "tool_review_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "ToolReviewVoteType"; ofType: null };
+            };
+          };
+        };
+      };
     };
   };
   UserTypeInput: {
@@ -1249,6 +1326,11 @@ export type introspection_types = {
       {
         name: "reviews_library";
         type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "tool_review_votes";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToOneInput"; ofType: null };
         defaultValue: null;
       },
     ];

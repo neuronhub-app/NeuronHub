@@ -50,6 +50,14 @@ export const UserQueryDoc = graphql(`
       reviews_library { pk }
       reviews_read_later { pk }
 
+      tool_review_votes {
+        id
+        is_vote_positive
+        review {
+          pk
+        }
+      }
+
       connection_groups {
         id
         name

@@ -1,11 +1,11 @@
 import { ReviewCreateForm } from "@/apps/reviews/ReviewCreateForm";
 import { ReviewList } from "@/apps/reviews/list";
 import { UserSettingsLayout } from "@/apps/users/settings/UserSettingsLayout";
-import { urqlClient } from "@/client";
 import { ColorModeProvider } from "@/components/ui/color-mode";
 import { RootLayout } from "@/routes/RootLayout";
 import { system } from "@/theme/theme";
 import { urls } from "@/urls";
+import { urqlClient } from "@/urqlClient";
 import { ChakraProvider } from "@chakra-ui/react";
 import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";

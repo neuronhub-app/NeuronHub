@@ -41,7 +41,7 @@ export function ReviewList() {
             {review => (
               <HStack key={review.id} gap="gap.md" align="flex-start">
                 <Stack>
-                  <ReviewButtonsVote />
+                  <ReviewButtonsVote review={review} />
                   <ReviewButtons review={review} />
                 </Stack>
 
@@ -148,6 +148,10 @@ export const ReviewListDoc = graphql(`
         avatar {
           url
         }
+      }
+      votes {
+        id
+        is_vote_positive
       }
       tool {
         id

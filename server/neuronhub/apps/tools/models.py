@@ -318,6 +318,21 @@ class ToolReview(AnonimazableTimeStampedModel):
         return f"{self.title or self.tool.name} [{self.rating}]"
 
 
+@anonymizer.register
+class ToolReviewVote(ToolVoteModel):
+    review = models.ForeignKey(ToolReview, on_delete=models.CASCADE, related_name="votes")
+    author = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name="tool_review_votes"
+    )
+    is_vote_positive = models.BooleanField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ["review", "author"]
+
+    def __str__(self):
+        return f"{self.review} - {self.author} [{self.is_vote_positive}]"
+
+
 class ReviewTagName(models.TextChoices):
     # general
     value = "value", "Value"

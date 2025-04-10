@@ -57,6 +57,7 @@ type Mutation {
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   toggle_user_review_list(review_pk: ID!, review_list_name: UserReviewListName!, is_added: Boolean!): Boolean! @IsAuthenticated
   create_review(data: ToolReviewTypeInput!): UserType! @IsAuthenticated
+  vote_review(review_id: ID!, is_vote_positive: Boolean): Boolean! @IsAuthenticated
 }
 
 input OneToManyInput {
@@ -129,7 +130,7 @@ input ToolAlternativeTypeInput {
 input ToolFilter {
   id: IDBaseFilterLookup
   name: StrFilterLookup
-  description: String
+  description: StrFilterLookup
   AND: ToolFilter
   OR: ToolFilter
   NOT: ToolFilter
@@ -158,6 +159,7 @@ type ToolReviewType {
   visible_to_groups: [UserConnectionGroupType!]!
   recommended_to_users: [UserType!]!
   recommended_to_groups: [UserConnectionGroupType!]!
+  votes: [ToolReviewVoteType!]!
 }
 
 input ToolReviewTypeInput {
@@ -178,6 +180,12 @@ input ToolReviewTypeInput {
   recommended_to_groups: ManyToManyInput
   is_review_later: Boolean
   tags: [ToolTagTypeInput!]
+}
+
+type ToolReviewVoteType {
+  id: ID!
+  review: DjangoModelType!
+  is_vote_positive: Boolean
 }
 
 input ToolTagFilter {
@@ -218,11 +226,11 @@ type ToolTagVoteType {
 
 type ToolType {
   id: ID!
-  slug: String
+  slug: String!
   name: String!
   crunchbase_url: String!
   github_url: String!
-  description: String
+  description: String!
   alternatives(filters: ToolFilter): [ToolType!]!
   tags(filters: ToolTagFilter): [ToolTagType!]!
 }
@@ -268,6 +276,7 @@ type UserType {
   avatar: DjangoFileType
   reviews_read_later: [DjangoModelType!]!
   reviews_library: [DjangoModelType!]!
+  tool_review_votes: [ToolReviewVoteType!]!
 }
 
 input UserTypeInput {
@@ -280,6 +289,7 @@ input UserTypeInput {
   avatar: Upload
   reviews_read_later: ManyToManyInput
   reviews_library: ManyToManyInput
+  tool_review_votes: ManyToOneInput
 }
 
 enum Visibility {

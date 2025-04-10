@@ -291,7 +291,6 @@ export type UserConnectionGroupType = {
 export enum UserReviewListName {
   ReviewsLibrary = "REVIEWS_LIBRARY",
   ReviewsReadLater = "REVIEWS_READ_LATER",
-  ReviewsStarred = "REVIEWS_STARRED",
 }
 
 export type UserType = {

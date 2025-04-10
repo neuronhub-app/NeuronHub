@@ -14,6 +14,7 @@ from strawberry_django.permissions import IsAuthenticated
 from neuronhub.apps.tools.models import Tool
 from neuronhub.apps.tools.models import ToolAlternative
 from neuronhub.apps.tools.models import ToolReview
+from neuronhub.apps.tools.models import ToolReviewVote
 from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.models import User
 
@@ -33,6 +34,20 @@ class ToolsMutation:
         review = await create_review(author, data)
 
         return cast(UserType, author)
+
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def vote_review(
+        self,
+        review_id: strawberry.ID,
+        is_vote_positive: bool | None,
+        info: Info,
+    ) -> bool:
+        await ToolReviewVote.objects.aupdate_or_create(
+            author=info.context.request.user,
+            review_id=review_id,
+            defaults={"is_vote_positive": is_vote_positive},
+        )
+        return True
 
 
 @strawberry_django.input(Tool)

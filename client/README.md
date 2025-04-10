@@ -30,6 +30,10 @@ Biome is immature. And their Jetbrains plugin often needs cache resets, and eg a
 Known Issues
 --------------------------------
 
+### urql
+
+In `const [result, reexecuteQuery] = useQuery(...)` the `reexecuteQuery()` doesn't reexecute query, without using `reexecuteQuery({ requestPolicy: "network-only" })`. See urql-graphql/urql/issues#1395. Makes no sense but whatever.
+
 ### react-hook-form
 
 `onChange` stops working if you pass `ref` to `<input>`. See [their docs](https://www.react-hook-form.com/faqs/#Howtosharerefusage) on how to access it.
