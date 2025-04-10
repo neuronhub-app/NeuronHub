@@ -1165,7 +1165,7 @@ export type introspection_types = {
   };
   UserReviewListName: {
     name: "UserReviewListName";
-    enumValues: "REVIEWS_READ_LATER" | "REVIEWS_LIBRARY";
+    enumValues: "reviews_read_later" | "reviews_library";
   };
   UserType: {
     kind: "OBJECT";

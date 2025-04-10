@@ -2,7 +2,7 @@ import type { ReviewType } from "@/apps/reviews/list/index";
 import { user } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import { graphql } from "@/gql-tada";
-import { UserReviewListName, type UserType } from "@/graphql/graphql";
+import { UserReviewListName } from "@/graphql/graphql";
 import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { For, IconButton, Stack } from "@chakra-ui/react";
@@ -15,14 +15,14 @@ import { useSnapshot } from "valtio/react";
 export function ReviewButtons(props: { review: ReviewType }) {
   const buttons: Array<ComponentProps<typeof ReviewButton>> = [
     {
-      field: UserReviewListName.ReviewsReadLater,
+      fieldName: UserReviewListName.ReviewsReadLater,
       iconPresent: <FaBookmark />,
       iconNotPresent: <FaRegBookmark />,
       reviewId: props.review.id,
       label: "Reading list",
     },
     {
-      field: UserReviewListName.ReviewsLibrary,
+      fieldName: UserReviewListName.ReviewsLibrary,
       iconPresent: <LuLibrary />,
       iconNotPresent: <LuLibrary />,
       reviewId: props.review.id,
@@ -34,7 +34,7 @@ export function ReviewButtons(props: { review: ReviewType }) {
     <Stack gap="gap.sm">
       <For each={buttons}>
         {propsChild => (
-          <ErrorBoundary key={propsChild.field}>
+          <ErrorBoundary key={propsChild.fieldName}>
             <ReviewButton {...propsChild} />
           </ErrorBoundary>
         )}
@@ -44,7 +44,7 @@ export function ReviewButtons(props: { review: ReviewType }) {
 }
 
 function ReviewButton(props: {
-  field: UserReviewListName;
+  fieldName: UserReviewListName;
   iconNotPresent: ReactNode;
   iconPresent: ReactNode;
   reviewId: string;
@@ -57,27 +57,15 @@ function ReviewButton(props: {
     isAdded: false,
   });
 
-  let userField: keyof UserType;
-  switch (props.field) {
-    case UserReviewListName.ReviewsReadLater:
-      userField = "reviews_read_later";
-      break;
-    case UserReviewListName.ReviewsLibrary:
-      userField = "reviews_library";
-      break;
-    default:
-      throw new Error();
-  }
-
   useEffect(() => {
     if (!userSnap.current) {
       return;
     }
-    const isInList = userSnap.current[userField].some(
+    const isInList = userSnap.current[props.fieldName].some(
       (review: { pk: string }) => review.pk === props.reviewId,
     );
     state.mutable.isAdded = isInList;
-  }, [userSnap.current?.[userField]]);
+  }, [userSnap.current?.[props.fieldName]]);
 
   const label = `${state.snap.isAdded ? "Remove from" : "Add to"} ${props.label}`;
 
@@ -104,7 +92,7 @@ function ReviewButton(props: {
             ),
             {
               reviewId: props.reviewId,
-              reviewListName: props.field,
+              reviewListName: props.fieldName,
               isAdded: !state.snap.isAdded,
             },
           );

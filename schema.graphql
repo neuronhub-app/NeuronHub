@@ -262,8 +262,8 @@ type UserConnectionGroupType {
 }
 
 enum UserReviewListName {
-  REVIEWS_READ_LATER
-  REVIEWS_LIBRARY
+  reviews_read_later
+  reviews_library
 }
 
 type UserType {

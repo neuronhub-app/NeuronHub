@@ -67,6 +67,7 @@ export type Mutation = {
   logout: Scalars["Boolean"]["output"];
   toggle_user_review_list: Scalars["Boolean"]["output"];
   update_user: UserType;
+  vote_review: Scalars["Boolean"]["output"];
 };
 
 export type MutationCreate_ReviewArgs = {
@@ -81,6 +82,11 @@ export type MutationToggle_User_Review_ListArgs = {
 
 export type MutationUpdate_UserArgs = {
   data: UserTypeInput;
+};
+
+export type MutationVote_ReviewArgs = {
+  is_vote_positive?: InputMaybe<Scalars["Boolean"]["input"]>;
+  review_id: Scalars["ID"]["input"];
 };
 
 export type OneToManyInput = {
@@ -147,7 +153,7 @@ export type ToolFilter = {
   DISTINCT?: InputMaybe<Scalars["Boolean"]["input"]>;
   NOT?: InputMaybe<ToolFilter>;
   OR?: InputMaybe<ToolFilter>;
-  description?: InputMaybe<Scalars["String"]["input"]>;
+  description?: InputMaybe<StrFilterLookup>;
   id?: InputMaybe<IdBaseFilterLookup>;
   name?: InputMaybe<StrFilterLookup>;
 };
@@ -175,6 +181,7 @@ export type ToolReviewType = {
   visibility: Visibility;
   visible_to_groups: Array<UserConnectionGroupType>;
   visible_to_users: Array<UserType>;
+  votes: Array<ToolReviewVoteType>;
 };
 
 export type ToolReviewTypeInput = {
@@ -195,6 +202,13 @@ export type ToolReviewTypeInput = {
   visibility?: InputMaybe<Visibility>;
   visible_to_groups?: InputMaybe<ManyToManyInput>;
   visible_to_users?: InputMaybe<ManyToManyInput>;
+};
+
+export type ToolReviewVoteType = {
+  __typename?: "ToolReviewVoteType";
+  id: Scalars["ID"]["output"];
+  is_vote_positive?: Maybe<Scalars["Boolean"]["output"]>;
+  review: DjangoModelType;
 };
 
 export type ToolTagFilter = {
@@ -247,11 +261,11 @@ export type ToolType = {
   __typename?: "ToolType";
   alternatives: Array<ToolType>;
   crunchbase_url: Scalars["String"]["output"];
-  description?: Maybe<Scalars["String"]["output"]>;
+  description: Scalars["String"]["output"];
   github_url: Scalars["String"]["output"];
   id: Scalars["ID"]["output"];
   name: Scalars["String"]["output"];
-  slug?: Maybe<Scalars["String"]["output"]>;
+  slug: Scalars["String"]["output"];
   tags: Array<ToolTagType>;
 };
 
@@ -289,8 +303,8 @@ export type UserConnectionGroupType = {
 };
 
 export enum UserReviewListName {
-  ReviewsLibrary = "REVIEWS_LIBRARY",
-  ReviewsReadLater = "REVIEWS_READ_LATER",
+  ReviewsLibrary = "reviews_library",
+  ReviewsReadLater = "reviews_read_later",
 }
 
 export type UserType = {
@@ -304,7 +318,7 @@ export type UserType = {
   name: Scalars["String"]["output"];
   reviews_library: Array<DjangoModelType>;
   reviews_read_later: Array<DjangoModelType>;
-  reviews_starred: Array<DjangoModelType>;
+  tool_review_votes: Array<ToolReviewVoteType>;
 };
 
 export type UserTypeInput = {
@@ -317,7 +331,7 @@ export type UserTypeInput = {
   name: Scalars["String"]["input"];
   reviews_library?: InputMaybe<ManyToManyInput>;
   reviews_read_later?: InputMaybe<ManyToManyInput>;
-  reviews_starred?: InputMaybe<ManyToManyInput>;
+  tool_review_votes?: InputMaybe<ManyToOneInput>;
 };
 
 export enum Visibility {
@@ -346,16 +360,23 @@ export type ToolAlternativesQueryQuery = {
   tools: Array<{ __typename?: "ToolType"; id: string; name: string }>;
 };
 
-export type AddToListReadLaterMutationVariables = Exact<{
+export type Toggle_User_Review_ListMutationVariables = Exact<{
   reviewId: Scalars["ID"]["input"];
   reviewListName: UserReviewListName;
   isAdded: Scalars["Boolean"]["input"];
 }>;
 
-export type AddToListReadLaterMutation = {
+export type Toggle_User_Review_ListMutation = {
   __typename?: "Mutation";
   toggle_user_review_list: boolean;
 };
+
+export type Vote_ReviewMutationVariables = Exact<{
+  reviewId: Scalars["ID"]["input"];
+  isVotePositive?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type Vote_ReviewMutation = { __typename?: "Mutation"; vote_review: boolean };
 
 export type ReviewListQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -382,6 +403,11 @@ export type ReviewListQuery = {
       name: string;
       avatar?: { __typename?: "DjangoFileType"; url: string } | null;
     };
+    votes: Array<{
+      __typename?: "ToolReviewVoteType";
+      id: string;
+      is_vote_positive?: boolean | null;
+    }>;
     tool: {
       __typename?: "ToolType";
       id: string;
@@ -425,7 +451,12 @@ export type UserCurrentQuery = {
     email: string;
     reviews_library: Array<{ __typename?: "DjangoModelType"; pk: string }>;
     reviews_read_later: Array<{ __typename?: "DjangoModelType"; pk: string }>;
-    reviews_starred: Array<{ __typename?: "DjangoModelType"; pk: string }>;
+    tool_review_votes: Array<{
+      __typename?: "ToolReviewVoteType";
+      id: string;
+      is_vote_positive?: boolean | null;
+      review: { __typename?: "DjangoModelType"; pk: string };
+    }>;
     connection_groups: Array<{
       __typename?: "UserConnectionGroupType";
       id: string;
@@ -565,13 +596,13 @@ export const ToolAlternativesQueryDocument = {
     },
   ],
 } as unknown as DocumentNode<ToolAlternativesQueryQuery, ToolAlternativesQueryQueryVariables>;
-export const AddToListReadLaterDocument = {
+export const Toggle_User_Review_ListDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
       operation: "mutation",
-      name: { kind: "Name", value: "AddToListReadLater" },
+      name: { kind: "Name", value: "toggle_user_review_list" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
@@ -626,7 +657,56 @@ export const AddToListReadLaterDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<AddToListReadLaterMutation, AddToListReadLaterMutationVariables>;
+} as unknown as DocumentNode<
+  Toggle_User_Review_ListMutation,
+  Toggle_User_Review_ListMutationVariables
+>;
+export const Vote_ReviewDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "vote_review" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "reviewId" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "isVotePositive" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Boolean" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "vote_review" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "review_id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "reviewId" } },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "is_vote_positive" },
+                value: { kind: "Variable", name: { kind: "Name", value: "isVotePositive" } },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<Vote_ReviewMutation, Vote_ReviewMutationVariables>;
 export const ReviewListDocument = {
   kind: "Document",
   definitions: [
@@ -672,6 +752,17 @@ export const ReviewListDocument = {
                           selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
                         },
                       },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "votes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
                     ],
                   },
                 },
@@ -831,10 +922,21 @@ export const UserCurrentDocument = {
                 },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "reviews_starred" },
+                  name: { kind: "Name", value: "tool_review_votes" },
                   selectionSet: {
                     kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "pk" } }],
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "review" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "pk" } }],
+                        },
+                      },
+                    ],
                   },
                 },
                 {

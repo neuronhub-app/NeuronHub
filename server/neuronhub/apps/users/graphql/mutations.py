@@ -13,8 +13,8 @@ from neuronhub.apps.users.models import User
 
 
 class UserReviewListName(Enum):
-    REVIEWS_READ_LATER = "reviews_read_later"
-    REVIEWS_LIBRARY = "reviews_library"
+    reviews_read_later = "reviews_read_later"
+    reviews_library = "reviews_library"
 
 
 @strawberry.type
