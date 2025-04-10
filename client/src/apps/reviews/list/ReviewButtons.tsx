@@ -3,6 +3,7 @@ import { user } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import { graphql } from "@/gql-tada";
 import { UserReviewListName, type UserType } from "@/graphql/graphql";
+import { refetchAllQueries } from "@/urql/refetchExchange";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { For, IconButton, Stack } from "@chakra-ui/react";
 import { ErrorBoundary, captureException } from "@sentry/react";
@@ -59,7 +60,7 @@ function ReviewButton(props: {
     isAdded: false,
   });
 
-  let userField: keyof UserType = "reviews_library";
+  let userField: keyof UserType;
   switch (props.field) {
     case UserReviewListName.ReviewsReadLater:
       userField = "reviews_read_later";
@@ -100,14 +101,7 @@ function ReviewButton(props: {
             isAdded,
           });
           if (res.success) {
-            // todo ~ replace with urql network/cache, this shit will bite back
-            if (isAdded) {
-              user.state.current![userField].push({ pk: props.reviewId });
-            } else {
-              user.state.current![userField] = user.state.current![userField].filter(
-                (review: { pk: string }) => review.pk !== props.reviewId,
-              );
-            }
+            await refetchAllQueries();
           } else {
             toast.error(res.error);
           }

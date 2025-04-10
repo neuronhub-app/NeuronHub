@@ -5,7 +5,7 @@ import { ColorModeProvider } from "@/components/ui/color-mode";
 import { RootLayout } from "@/routes/RootLayout";
 import { system } from "@/theme/theme";
 import { urls } from "@/urls";
-import { urqlClient } from "@/urqlClient";
+import { urqlClient } from "@/urql/urqlClient";
 import { ChakraProvider } from "@chakra-ui/react";
 import { createRoot } from "react-dom/client";
 import { Toaster } from "react-hot-toast";

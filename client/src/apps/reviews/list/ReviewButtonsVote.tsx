@@ -1,7 +1,7 @@
 import type { ReviewType } from "@/apps/reviews/list/index";
 import { user } from "@/apps/users/useUserCurrent";
 import { graphql } from "@/gql-tada";
-import { refreshAllQueries } from "@/urqlClient";
+import { refetchAllQueries } from "@/urql/refetchExchange";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { Flex, IconButton, Stack } from "@chakra-ui/react";
 import { captureException } from "@sentry/react";
@@ -11,6 +11,9 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import { useClient } from "urql";
 import { useSnapshot } from "valtio/react";
 
+/**
+ * Note is_vote_positive has 3 values: true, false, null
+ */
 export function ReviewButtonsVote(props: { review: ReviewType }) {
   let votesSum = 0;
   for (const vote of props.review.votes) {
@@ -66,7 +69,7 @@ function ReviewVoteButton(props: { reviewId: string; isVotePositive: boolean }) 
           isVotePositive: isVotePositive,
         });
         if (res.success) {
-          refreshAllQueries();
+          await refetchAllQueries();
         } else {
           toast.error(res.error);
         }
