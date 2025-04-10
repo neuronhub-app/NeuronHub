@@ -3,15 +3,13 @@ import { user } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import { graphql } from "@/gql-tada";
 import { UserReviewListName, type UserType } from "@/graphql/graphql";
-import { refetchAllQueries } from "@/urql/refetchExchange";
+import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { For, IconButton, Stack } from "@chakra-ui/react";
-import { ErrorBoundary, captureException } from "@sentry/react";
+import { ErrorBoundary } from "@sentry/react";
 import { type ComponentProps, type ReactNode, useEffect } from "react";
-import toast from "react-hot-toast";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { LuLibrary } from "react-icons/lu";
-import { useClient } from "urql";
 import { useSnapshot } from "valtio/react";
 
 export function ReviewButtons(props: { review: ReviewType }) {
@@ -52,7 +50,6 @@ function ReviewButton(props: {
   reviewId: string;
   label: string;
 }) {
-  const client = useClient();
   const userSnap = useSnapshot(user.state);
 
   const state = useValtioProxyRef({
@@ -93,18 +90,24 @@ function ReviewButton(props: {
             return;
           }
           state.mutable.isLoading = true;
-          const isAdded = !state.snap.isAdded;
-          const res = await toggleUserReviewList({
-            client: client,
-            reviewId: props.reviewId,
-            reviewListName: props.field,
-            isAdded,
-          });
-          if (res.success) {
-            await refetchAllQueries();
-          } else {
-            toast.error(res.error);
-          }
+          await mutateAndRefetch(
+            graphql(
+              `
+                mutation toggle_user_review_list(
+                  $reviewId: ID!, $reviewListName: UserReviewListName!, $isAdded: Boolean!
+                ) {
+                  toggle_user_review_list(
+                    review_pk: $reviewId, review_list_name: $reviewListName, is_added: $isAdded
+                  )
+                }
+              `,
+            ),
+            {
+              reviewId: props.reviewId,
+              reviewListName: props.field,
+              isAdded: !state.snap.isAdded,
+            },
+          );
           state.mutable.isLoading = false;
         }}
         data-state={state.snap.isAdded ? "checked" : "unchecked"}
@@ -116,38 +119,4 @@ function ReviewButton(props: {
       </IconButton>
     </Tooltip>
   );
-}
-
-async function toggleUserReviewList(args: {
-  client: ReturnType<typeof useClient>;
-  reviewId: string;
-  reviewListName: UserReviewListName;
-  isAdded: boolean;
-}) {
-  const res = await args.client
-    .mutation(
-      graphql(
-        `
-          mutation toggle_user_review_list(
-            $reviewId: ID!,
-            $reviewListName: UserReviewListName!,
-            $isAdded: Boolean!
-          ) {
-            toggle_user_review_list(
-              review_pk: $reviewId,
-              review_list_name: $reviewListName
-              is_added: $isAdded
-            )
-          }
-        `,
-      ),
-      args,
-    )
-    .toPromise();
-
-  if (res.error) {
-    captureException(res.error);
-    return { success: false, error: res.error.message } as const;
-  }
-  return { success: true } as const;
 }

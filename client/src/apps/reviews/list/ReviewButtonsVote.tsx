@@ -1,14 +1,11 @@
 import type { ReviewType } from "@/apps/reviews/list/index";
 import { user } from "@/apps/users/useUserCurrent";
 import { graphql } from "@/gql-tada";
-import { refetchAllQueries } from "@/urql/refetchExchange";
+import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { Flex, IconButton, Stack } from "@chakra-ui/react";
-import { captureException } from "@sentry/react";
 import { useEffect } from "react";
-import toast from "react-hot-toast";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
-import { useClient } from "urql";
 import { useSnapshot } from "valtio/react";
 
 /**
@@ -35,7 +32,6 @@ export function ReviewButtonsVote(props: { review: ReviewType }) {
 }
 
 function ReviewVoteButton(props: { reviewId: string; isVotePositive: boolean }) {
-  const client = useClient();
   const userSnap = useSnapshot(user.state);
 
   const state = useValtioProxyRef({
@@ -63,16 +59,18 @@ function ReviewVoteButton(props: { reviewId: string; isVotePositive: boolean }) 
         if (state.snap.isVotePositive === null) {
           isVotePositive = props.isVotePositive;
         }
-        const res = await toggleUserReviewVote({
-          client,
-          reviewId: props.reviewId,
-          isVotePositive: isVotePositive,
-        });
-        if (res.success) {
-          await refetchAllQueries();
-        } else {
-          toast.error(res.error);
-        }
+        await mutateAndRefetch(
+          graphql(`
+            mutation vote_review($reviewId: ID!, $isVotePositive: Boolean) {
+              vote_review(review_id: $reviewId, is_vote_positive: $isVotePositive)
+            }
+          `),
+          {
+            reviewId: props.reviewId,
+            isVotePositive,
+          },
+        );
+
         state.mutable.isLoading = false;
       }}
       data-state={state.snap.isVotePositive === props.isVotePositive ? "checked" : "unchecked"}
@@ -84,29 +82,4 @@ function ReviewVoteButton(props: { reviewId: string; isVotePositive: boolean }) 
       {props.isVotePositive ? <FaChevronUp /> : <FaChevronDown />}
     </IconButton>
   );
-}
-
-async function toggleUserReviewVote(args: {
-  client: ReturnType<typeof useClient>;
-  reviewId: string;
-  isVotePositive: boolean | null;
-}) {
-  const res = await args.client
-    .mutation(
-      graphql(
-        `
-          mutation vote_review($reviewId: ID!, $isVotePositive: Boolean) {
-            vote_review(review_id: $reviewId, is_vote_positive: $isVotePositive)
-          }
-        `,
-      ),
-      args,
-    )
-    .toPromise();
-
-  if (res.error) {
-    captureException(res.error);
-    return { success: false, error: res.error.message } as const;
-  }
-  return { success: true } as const;
 }
