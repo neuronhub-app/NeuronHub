@@ -2,14 +2,10 @@ import * as fs from "node:fs";
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 /**
- * The project relies on gql.tada instead of codegen.
+ * The project uses gql.tada instead of codegen.
+ * But some types are require codegen, eg Enums.
  *
- * But some types are cleaner to extract with codegen,
- * than use gql.tada unwrappers.
- *
- * Also helps with Enum extraction.
- *
- * And can be useful to hardcode allowed queries/mutations.
+ * And can help with hardcoding allowed queries/mutations in the future.
  */
 export default {
   schema: "../schema.graphql",
@@ -28,7 +24,9 @@ export default {
         file.endsWith("fragment-masking.ts") ||
         file.endsWith("index.ts") ||
         file.endsWith("gql.ts");
+
       if (isRedundantFile) {
+        // delete, we use gql.tada for it
         fs.unlinkSync(file);
       }
     },
