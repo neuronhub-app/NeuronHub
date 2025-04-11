@@ -36,6 +36,7 @@ class UserType:
     last_name: auto
     name: auto
     email: auto
+    username: auto
     connection_groups: list[UserConnectionGroupType]
     avatar: auto
 

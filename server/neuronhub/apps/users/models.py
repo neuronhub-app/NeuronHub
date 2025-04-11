@@ -6,7 +6,21 @@ from neuronhub.apps.orgs.models import Org
 
 
 class User(AbstractUser):
-    email = models.EmailField(unique=True)
+    owner = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,  # cascade for privacy, warning is on the frontend
+        null=True,
+        blank=True,
+        help_text="Owner of this User (Alias), if any",
+    )
+    org = models.ForeignKey(
+        Org,
+        on_delete=models.SET_NULL,
+        related_name="users",
+        null=True,
+        blank=True,
+    )
+    email = models.EmailField(unique=True, blank=True)
     first_name = models.CharField(blank=True, max_length=255)
     last_name = models.CharField(blank=True, max_length=255)
 
@@ -16,37 +30,20 @@ class User(AbstractUser):
         null=True,
     )
 
-    owner = models.ForeignKey(
-        "self",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        help_text="Owner of this User (Alias) account.",
-    )
-    org = models.ForeignKey(
-        Org,
-        on_delete=models.SET_NULL,
-        related_name="users",
-        null=True,
-        blank=True,
-    )
-
-    username = None
-    USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = []
-
     @model_property(cached=True)
     def name(self) -> str:
         if self.first_name or self.last_name:
             return f"{self.first_name} {self.last_name}".strip()
-        return self.email
+        return self.username
 
     def __str__(self) -> str:
-        return str(self.email)
+        return str(self.username)
 
 
 class UserConnectionGroup(models.Model):
     name = models.CharField(max_length=255, blank=True)
+
+    # todo ~ rename to author
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
