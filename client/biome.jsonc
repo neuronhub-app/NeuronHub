@@ -25,12 +25,12 @@
       },
       "correctness": {
         "noUnusedVariables": "off",
-        "noUnusedImports": "info",
-        "useExhaustiveDependencies": "off" // good but has bugs
+        "noUnusedImports": "info", // unqualified to define "unused"
+        "useExhaustiveDependencies": "off" // unqualified to define "dependencies"
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noUnusedTemplateLiteral": "off", // graphql highlight doesn't work with quotes instead of a literal
+        "noUnusedTemplateLiteral": "off", // graphql IDEA highlight doesn't work with quotes instead of a literal
         "noUselessElse": "off" // helps with readability, on rare occasions
       }
     }
