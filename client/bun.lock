@@ -4,6 +4,7 @@
     "": {
       "name": "neuronhub",
       "dependencies": {
+        "@0no-co/graphqlsp": "^1.12.16",
         "@chakra-ui/react": "^3.15.1",
         "@date-fns/tz": "^1.2.0",
         "@emotion/react": "^11.14.0",
