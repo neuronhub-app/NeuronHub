@@ -1,5 +1,5 @@
 ---
-reviewed_at: 2025.03.28
+reviewed_at: 2025.04.10
 ---
 
 Setup
@@ -25,14 +25,14 @@ bun run update
 
 Set your IDE to run Biome on save, eg with [Biome JetBrains plugins](https://plugins.jetbrains.com/plugin/22761-biome).
 
-Biome is immature. And their Jetbrains plugin often needs cache resets, and eg a manual pointer to `neuronhub/client/biome.jsonc`.
+Biome is immature. And their Jetbrains plugin often needs cache resets (IDE restart), and eg a manual pointer to `neuronhub/client/biome.jsonc`.
 
 Known Issues
 --------------------------------
 
 ### urql
 
-In `const [result, reexecuteQuery] = useQuery(...)` the `reexecuteQuery()` doesn't reexecute query, without using `reexecuteQuery({ requestPolicy: "network-only" })`. See urql-graphql/urql/issues#1395. Makes no sense but whatever.
+In `const [result, reexecuteQuery] = useQuery(...)` the `reexecuteQuery()` doesn't reexecute query, unless you `reexecuteQuery({ requestPolicy: "network-only" })`. See urql-graphql/urql/issues#1395.
 
 ### react-hook-form
 
