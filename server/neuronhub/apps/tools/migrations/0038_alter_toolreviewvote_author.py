@@ -6,16 +6,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('tools', '0037_toolreviewvote'),
+        ("tools", "0037_toolreviewvote"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='toolreviewvote',
-            name='author',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='tool_review_votes', to=settings.AUTH_USER_MODEL),
+            model_name="toolreviewvote",
+            name="author",
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="tool_review_votes",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import migrations
 from django.db import models
 
+import neuronhub.apps.anonymizer.fields
 import neuronhub.apps.tools.models
 
 
@@ -45,7 +46,7 @@ class Migration(migrations.Migration):
                     ("internal", "Internal"),
                     ("public", "Public"),
                 ],
-                choices_enum=neuronhub.apps.tools.models.Visibility,
+                choices_enum=neuronhub.apps.anonymizer.fields.Visibility,
                 default="private",
                 max_length=17,
             ),
@@ -93,7 +94,7 @@ class Migration(migrations.Migration):
                     ("internal", "Internal"),
                     ("public", "Public"),
                 ],
-                choices_enum=neuronhub.apps.tools.models.Visibility,
+                choices_enum=neuronhub.apps.anonymizer.fields.Visibility,
                 default="private",
                 max_length=17,
             ),
