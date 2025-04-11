@@ -8,11 +8,12 @@ from strawberry import Info
 from strawberry import auto
 from strawberry_django.auth.utils import aget_current_user
 
+from neuronhub.apps.comments.graphql.types import CommentType
 from neuronhub.apps.tools.models import Tool
 from neuronhub.apps.tools.models import ToolReview
 from neuronhub.apps.tools.models import ToolTag
 from neuronhub.apps.tools.models import ToolTagVote
-from neuronhub.apps.tools.models import Visibility
+from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.users.graphql.types import ToolReviewVoteType
 from neuronhub.apps.users.graphql.types import UserConnectionGroupType
 from neuronhub.apps.users.graphql.types import UserType
@@ -73,6 +74,8 @@ class ToolReviewType:
 
     votes: list[ToolReviewVoteType]
 
+    comments: list[CommentType]
+
 
 @strawberry_django.type(ToolTagVote)
 class ToolTagVoteType:
@@ -112,7 +115,7 @@ class ToolsQuery:
     @strawberry_django.field()
     async def tool_reviews(self, info: Info) -> list[ToolReviewType]:
         if user := await aget_current_user(info):
-            # todo !! filter by user
+            # todo !! permissions
             reviews = ToolReview.objects.filter()
         else:
             reviews = ToolReview.objects.filter(
@@ -120,3 +123,9 @@ class ToolsQuery:
                 visibility=Visibility.PUBLIC,
             )
         return cast(list[ToolReviewType], reviews)
+
+    @strawberry_django.field()
+    async def tool_review(self, id: strawberry.ID, info: Info) -> ToolReviewType:
+        # todo !! permissions
+        review = await ToolReview.objects.filter(id=id).afirst()
+        return cast(ToolReviewType, review)

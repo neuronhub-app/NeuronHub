@@ -1,19 +1,27 @@
-import { RatingBars } from "@/apps/reviews/list/RatingBars";
+import { ReviewCard } from "@/apps/reviews/components/ReviewCard";
+import { ReviewFragment } from "@/apps/reviews/graphqlFragments";
 import { ReviewAuthor } from "@/apps/reviews/list/ReviewAuthor";
 import { ReviewButtons } from "@/apps/reviews/list/ReviewButtons";
 import { ReviewButtonsVote } from "@/apps/reviews/list/ReviewButtonsVote";
-import { ReviewDatetime } from "@/apps/reviews/list/ReviewDatetime";
 import { ReviewListSidebar } from "@/apps/reviews/list/ReviewListSidebar";
 import { ToolTags } from "@/apps/reviews/list/ToolTag";
-import { UsageStatusBlock } from "@/apps/reviews/list/UsageStatus";
 import { Button } from "@/components/ui/button";
-import { Prose } from "@/components/ui/prose";
 import { graphql } from "@/gql-tada";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
-import { Flex, For, HStack, Heading, Icon, Show, Stack, Text } from "@chakra-ui/react";
+import {
+  Flex,
+  For,
+  HStack,
+  Heading,
+  Icon,
+  IconButton,
+  Link,
+  Show,
+  Stack,
+} from "@chakra-ui/react";
 import type { ResultOf } from "@graphql-typed-document-node/core";
-import { marked } from "marked";
-import { FaPlus } from "react-icons/fa6";
+import { BsChatLeftTextFill } from "react-icons/bs";
+import { FaGithub, FaPlus } from "react-icons/fa6";
 import { NavLink } from "react-router";
 import { useQuery } from "urql";
 
@@ -60,67 +68,42 @@ function ReviewList() {
                   borderRadius="lg"
                   {...getOutlineContrastStyle({ variant: "subtle" })}
                 >
-                  <Stack gap="gap.sm">
-                    <ReviewDatetime review={review} style={{ lineHeight: 1 }} />
-                    <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">
-                      {review.tool.name}
-                    </Heading>
-
-                    <Show when={review.title}>
-                      <Text fontWeight="bold" color="fg.muted">
-                        {review.title}
-                      </Text>
-                    </Show>
-
-                    <HStack gap="gap.lg">
-                      <RatingBars rating={review.rating} type="rating" color="fg.secondary" />
-                      <RatingBars
-                        rating={review.importance}
-                        type="importance"
-                        color="fg.secondary"
-                      />
-                      <RatingBars
-                        rating={review.experience_hours}
-                        type="experience"
-                        color="fg.secondary"
-                        boxSize={6}
-                      />
-                      <UsageStatusBlock status={review.usage_status} color="fg.secondary" />
-                    </HStack>
-
-                    <Show when={review.content}>
-                      <Prose
-                        // biome-ignore lint/security/noDangerouslySetInnerHtml:
-                        dangerouslySetInnerHTML={{
-                          __html: marked.parse(review.content),
-                        }}
-                        size="md"
-                      />
-                    </Show>
-                    <Show when={review.content_pros}>
-                      <Prose
-                        // biome-ignore lint/security/noDangerouslySetInnerHtml:
-                        dangerouslySetInnerHTML={{
-                          __html: marked.parse(review.content_pros),
-                        }}
-                        size="md"
-                        variant="pros"
-                      />
-                    </Show>
-                    <Show when={review.content_cons}>
-                      <Prose
-                        // biome-ignore lint/security/noDangerouslySetInnerHtml:
-                        dangerouslySetInnerHTML={{
-                          __html: marked.parse(review.content_cons),
-                        }}
-                        size="md"
-                        variant="cons"
-                      />
-                    </Show>
-                  </Stack>
+                  <ReviewCard review={review} />
 
                   <ToolTags tags={review.tool.tags} />
-                  <ReviewAuthor author={review.author} />
+
+                  <HStack justify="space-between">
+                    <ReviewAuthor author={review.author} />
+
+                    <HStack>
+                      <Show when={review.source}>
+                        <Link href={review.source}>Source</Link>
+                      </Show>
+                      <Show when={review.tool.github_url}>
+                        <Link
+                          href={`https://${review.tool.github_url}`}
+                          color="fg.subtle"
+                          variant="underline"
+                        >
+                          <Icon>
+                            <FaGithub />
+                          </Icon>
+                          Github
+                        </Link>
+                      </Show>
+                    </HStack>
+                  </HStack>
+
+                  <NavLink to={`/reviews/${review.id}`}>
+                    <IconButton
+                      variant="plain"
+                      colorPalette="gray"
+                      aria-label="Comments"
+                      color="fg.subtle"
+                    >
+                      <BsChatLeftTextFill /> {review.comments.length}
+                    </IconButton>
+                  </NavLink>
                 </Stack>
               </HStack>
             )}
@@ -133,62 +116,19 @@ function ReviewList() {
   );
 }
 
-export const ReviewListDoc = graphql(`
-  query ReviewList {
-    tool_reviews {
-      id
-      title
-      content
-      content_pros
-      content_cons
-      importance
-      is_private
-      is_review_later
-      usage_status
-      rating
-      source
-      reviewed_at
-      experience_hours
-      author {
-        id
-        name
-        avatar {
-          url
-        }
-      }
-      votes {
-        id
-        is_vote_positive
-      }
-      tool {
-        id
-        name
-        tags {
+export const ReviewListDoc = graphql(
+  `
+    query ReviewList {
+      tool_reviews {
+        ...ToolReview
+        comments {
           id
-          name
-          description
-          is_important
-          tag_parent {
-            id
-            name
-          }
-          author {
-            id
-            name
-          }
-          votes {
-            id
-            author {
-              id
-              name
-            }
-            is_vote_positive
-          }
         }
       }
     }
-  }
-`);
+  `,
+  [ReviewFragment],
+);
 
 type ReviewListType = ResultOf<typeof ReviewListDoc>["tool_reviews"];
 export type ReviewType = ReviewListType[number];

@@ -10,6 +10,17 @@ When the condition fails, the following can be returned (following this priority
 """
 directive @IsAuthenticated repeatable on FIELD_DEFINITION
 
+type CommentType {
+  id: ID!
+  parent: CommentType
+  visibility: Visibility!
+  author: UserType!
+  seen_by_users: [DjangoModelType!]!
+  content: String!
+  created_at: DateTime!
+  updated_at: DateTime!
+}
+
 """Date with time (isoformat)"""
 scalar DateTime
 
@@ -71,6 +82,7 @@ type Query {
   tool(pk: ID!): ToolType!
   tool_tags(filters: ToolTagFilter): [ToolTagType!]!
   tool_reviews: [ToolReviewType!]!
+  tool_review(id: ID!): ToolReviewType!
 }
 
 input StrFilterLookup {
@@ -160,6 +172,7 @@ type ToolReviewType {
   recommended_to_users: [UserType!]!
   recommended_to_groups: [UserConnectionGroupType!]!
   votes: [ToolReviewVoteType!]!
+  comments: [CommentType!]!
 }
 
 input ToolReviewTypeInput {
@@ -272,6 +285,7 @@ type UserType {
   last_name: String!
   name: String!
   email: String!
+  username: String!
   connection_groups: [UserConnectionGroupType!]!
   avatar: DjangoFileType
   reviews_read_later: [DjangoModelType!]!
@@ -285,6 +299,7 @@ input UserTypeInput {
   last_name: String
   name: String!
   email: String
+  username: String
   connection_groups: ManyToOneInput
   avatar: Upload
   reviews_read_later: ManyToManyInput
@@ -294,6 +309,7 @@ input UserTypeInput {
 
 enum Visibility {
   PRIVATE
+  USERS_SELECTED
   CONNECTION_GROUPS
   CONNECTIONS
   INTERNAL

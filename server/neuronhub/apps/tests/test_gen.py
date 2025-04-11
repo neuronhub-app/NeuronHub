@@ -4,18 +4,24 @@ import asyncio
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from asgiref.sync import sync_to_async
 from faker import Faker
-from faker.proxy import UniqueProxy
+from faker.proxy import UniqueProxy  # type: ignore[import]
+
+from neuronhub.apps.anonymizer.fields import Visibility
 
 
 if TYPE_CHECKING:
     from neuronhub.apps.users.models import User
     from neuronhub.apps.tools.models import Tool
+    from neuronhub.apps.tools.models import ToolReview
+    from neuronhub.apps.comments.models import Comment
 
 
 class Gen:
     users: UsersGen
     tools: ToolsGen
+    comments: CommentsGen
     faker: UniqueProxy
     faker_non_unique: Faker
 
@@ -43,6 +49,9 @@ class Gen:
 
         self.users = await UsersGen.create(faker=self.faker)
         self.tools = ToolsGen(faker=self.faker, user=self.users.user_default)
+        self.comments = CommentsGen(
+            faker=self.faker, user=self.users.user_default, tools=self.tools
+        )
 
         return self
 
@@ -77,10 +86,12 @@ class UsersGen:
         first_name = first_name or self.faker.first_name()
         if is_get_or_create:
             user, _ = await User.objects.aget_or_create(
+                username=email or self.faker.user_name(),
                 email=email or self.faker.email(domain=self.user_email_domain),
             )
         else:
             user = await User.objects.acreate(
+                username=email or self.faker.user_name(),
                 email=email or self.faker.email(domain=self.user_email_domain),
             )
         user.first_name = first_name or self.faker.first_name()
@@ -103,7 +114,7 @@ class UsersGen:
         if self.user_default:
             return self.user_default
         else:
-            if user_default := await User.objects.filter(email="admin@localhost").afirst():
+            if user_default := await User.objects.filter(email=self.user_email).afirst():
                 return user_default
             else:
                 return await self.user(
@@ -132,6 +143,48 @@ class ToolsGen:
             name="PyCharm",
             type="Program",
             crunchbase_url="crunchbase.com/organization/jetbrains",
-            description="PyCharm is an integrated development environment (IDE) used in computer programming, specifically for the Python language. It is developed by the Czech company JetBrains.",
+            description="PyCharm is an integrated development environment (IDE) used in computer programming, "
+            "specifically for the Python language. It is developed by the Czech company JetBrains.",
             url="jetbrains.com/pycharm",
         )
+
+    async def create_review(
+        self,
+        tool: Tool = None,
+        title: str = None,
+    ) -> ToolReview:
+        from neuronhub.apps.tools.models import ToolReview
+
+        return await ToolReview.objects.acreate(
+            tool=tool or await self.create(),
+            title=title or self.faker.text(),
+            author=self.user,
+        )
+
+
+@dataclass
+class CommentsGen:
+    faker: UniqueProxy
+    user: User
+
+    tools: ToolsGen
+
+    async def create(
+        self,
+        review: ToolReview = None,
+        author: User = None,
+        visibility: Visibility = Visibility.INTERNAL,
+        visible_to_users: list[User] = None,
+    ) -> Comment:
+        from neuronhub.apps.comments.models import Comment
+
+        comment = await Comment.objects.acreate(
+            content_object=review or await self.tools.create_review(),
+            author=author or self.user,
+            content=self.faker.text(),
+            visibility=visibility,
+        )
+        if visible_to_users:
+            await sync_to_async(comment.visible_to_users.set)(visible_to_users)
+
+        return comment

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.validators import DomainNameValidator
 from django.db import models
 from django.db.models import ManyToManyField
@@ -10,10 +11,12 @@ from django_choices_field import TextChoicesField
 from django_countries.fields import CountryField
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
+from neuronhub.apps.anonymizer.fields import Visibility
 
 from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable_field
 from neuronhub.apps.anonymizer.registry import anonymizer
+from neuronhub.apps.comments.models import Comment
 from neuronhub.apps.db.fields import MarkdownField
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.orgs.models import Org
@@ -110,6 +113,7 @@ class Tool(TimeStampedModel):
         related_query_name="tool",
         blank=True,
     )
+    comments = GenericRelation(Comment)
 
     name = models.CharField(max_length=511)
     slug = AutoSlugField(populate_from="name", unique=True)
@@ -198,14 +202,6 @@ class UsageStatus(models.TextChoices):
     NOT_INTERESTED = "not_interested", "Not interested"
 
 
-class Visibility(models.TextChoices):
-    PRIVATE = "private"
-    CONNECTION_GROUPS = "connection_groups"
-    CONNECTIONS = "connections"
-    INTERNAL = "internal"
-    PUBLIC = "public"
-
-
 class Importance(models.TextChoices):
     EXTRA_LOW = "extra_low"
     LOW = "low"
@@ -252,10 +248,7 @@ class ToolReview(AnonimazableTimeStampedModel):
             blank=True,
         ),
     )
-    visibility = TextChoicesField(
-        choices_enum=Visibility,
-        default=Visibility.PRIVATE,
-    )
+    visibility = TextChoicesField(choices_enum=Visibility, default=Visibility.PRIVATE)
 
     users_read_later = models.ManyToManyField(
         User,
@@ -267,6 +260,8 @@ class ToolReview(AnonimazableTimeStampedModel):
         related_name="reviews_library",
         blank=True,
     )
+
+    comments = GenericRelation(Comment)
 
     source = models.CharField(max_length=255, blank=True)
 

@@ -3,6 +3,77 @@
 
 export type introspection_types = {
   Boolean: unknown;
+  CommentType: {
+    kind: "OBJECT";
+    name: "CommentType";
+    fields: {
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      content: {
+        name: "content";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      created_at: {
+        name: "created_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      parent: { name: "parent"; type: { kind: "OBJECT"; name: "CommentType"; ofType: null } };
+      seen_by_users: {
+        name: "seen_by_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      updated_at: {
+        name: "updated_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      visibility: {
+        name: "visibility";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "Visibility"; ofType: null };
+        };
+      };
+    };
+  };
   DateTime: unknown;
   Decimal: unknown;
   DjangoFileType: {
@@ -251,6 +322,14 @@ export type introspection_types = {
           ofType: { kind: "OBJECT"; name: "ToolType"; ofType: null };
         };
       };
+      tool_review: {
+        name: "tool_review";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "ToolReviewType"; ofType: null };
+        };
+      };
       tool_reviews: {
         name: "tool_reviews";
         type: {
@@ -459,6 +538,22 @@ export type introspection_types = {
           kind: "NON_NULL";
           name: never;
           ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      comments: {
+        name: "comments";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "CommentType"; ofType: null };
+            };
+          };
         };
       };
       content: {
@@ -1276,6 +1371,14 @@ export type introspection_types = {
           };
         };
       };
+      username: {
+        name: "username";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
     };
   };
   UserTypeInput: {
@@ -1309,6 +1412,11 @@ export type introspection_types = {
         defaultValue: null;
       },
       {
+        name: "username";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
         name: "connection_groups";
         type: { kind: "INPUT_OBJECT"; name: "ManyToOneInput"; ofType: null };
         defaultValue: null;
@@ -1337,7 +1445,13 @@ export type introspection_types = {
   };
   Visibility: {
     name: "Visibility";
-    enumValues: "PRIVATE" | "CONNECTION_GROUPS" | "CONNECTIONS" | "INTERNAL" | "PUBLIC";
+    enumValues:
+      | "PRIVATE"
+      | "USERS_SELECTED"
+      | "CONNECTION_GROUPS"
+      | "CONNECTIONS"
+      | "INTERNAL"
+      | "PUBLIC";
   };
 };
 

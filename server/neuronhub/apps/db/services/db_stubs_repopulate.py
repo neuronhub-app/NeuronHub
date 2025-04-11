@@ -49,12 +49,12 @@ async def db_stubs_repopulate(
     gen = await Gen.create()
     user = await gen.users.get_user_default()
 
-    await _create_review_pycharm(user)
+    await _create_review_pycharm(user, gen=gen)
     tool = await _create_review_iterm(user)
     await _create_review_ghostly(user, alternatives=[tool])
 
 
-async def _create_review_pycharm(user: User):
+async def _create_review_pycharm(user: User, gen: Gen):
     pycharm = await Tool.objects.acreate(
         name="PyCharm",
         type="Program",
@@ -123,6 +123,7 @@ async def _create_review_pycharm(user: User):
             ReviewTagParams(ReviewTagName.ease_of_use, is_vote_pos=False),
         ],
     )
+    await gen.comments.create(review=review, author=user)
 
 
 async def _create_review_iterm(user: User):
