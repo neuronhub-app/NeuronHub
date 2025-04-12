@@ -12,13 +12,14 @@ import { LuAlignRight } from "react-icons/lu";
 import { Outlet } from "react-router";
 
 export function links() {
-  return [
-    // {
-    //   rel: "icon",
-    //   href: "/favicon.png",
-    //   type: "image/png",
-    // },
+  const faviconLinks = [
+    { rel: "icon", type: "image/svg+xml", href: "/favicon/favicon.svg" },
+    { rel: "icon", type: "image/png", href: "/favicon/favicon-96x96.png", sizes: "96x96" },
+    { rel: "shortcut icon", href: "/favicon/favicon.ico" },
+    { rel: "apple-touch-icon", href: "/favicon/apple-touch-icon.png", sizes: "180x180" },
+    { rel: "manifest", href: "/favicon/site.webmanifest" },
   ];
+  return faviconLinks;
 }
 
 export default function RootLayout() {
