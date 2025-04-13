@@ -57,9 +57,12 @@ export function refetchQueriesExchange(input: ExchangeInput): ExchangeIO {
       pipe(
         ops$,
         tap((op: Operation) => {
-          const isRefetchable = op.kind === "query" || op.kind === "teardown";
+          const isRefetchable = op.kind === "query";
           if (isRefetchable) {
             state.opsToRefetch.set(op.key, op);
+          }
+          if (op.kind === "teardown") {
+            state.opsToRefetch.delete(op.key);
           }
         }),
       ),
