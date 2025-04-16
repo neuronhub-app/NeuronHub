@@ -86,8 +86,7 @@ class ToolStatsGithubAdmin(admin.ModelAdmin):
 @admin.register(ToolTag)
 class ToolTagAdmin(admin.ModelAdmin):
     list_display = [
-        "name",
-        "tag_parent",
+        "_get_name_full",
         "author",
         "created_at",
     ]
@@ -99,12 +98,19 @@ class ToolTagAdmin(admin.ModelAdmin):
         "author",
     ]
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("tag_parent__tag_parent__tag_parent")
+
     def get_search_results(self, request, queryset, search_term):
         queryset, may_have_duplicates = super().get_search_results(
             request, queryset, search_term
         )
         # filter out parent tags, which just look like noise duplicates
         return queryset.filter(tag_parent__isnull=False), may_have_duplicates
+
+    @admin.display(description="name")
+    def _get_name_full(self, obj: ToolTag):
+        return str(obj)
 
 
 @admin.register(ToolReview)
