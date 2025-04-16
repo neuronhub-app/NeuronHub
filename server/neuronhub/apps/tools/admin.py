@@ -99,6 +99,13 @@ class ToolTagAdmin(admin.ModelAdmin):
         "author",
     ]
 
+    def get_search_results(self, request, queryset, search_term):
+        queryset, may_have_duplicates = super().get_search_results(
+            request, queryset, search_term
+        )
+        # filter out parent tags, which just look like noise duplicates
+        return queryset.filter(tag_parent__isnull=False), may_have_duplicates
+
 
 @admin.register(ToolReview)
 class ToolReviewAdmin(admin.ModelAdmin):

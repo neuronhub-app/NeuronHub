@@ -56,8 +56,13 @@ export default function ReviewCreateRoute() {
 export interface ReviewSelectOption {
   id: string;
   name: string;
-  is_vote_positive: boolean | null;
-  comment: string | null;
+
+  // tag fields
+  tag_parent?: { id: string; name: string };
+
+  // tool fields
+  is_vote_positive?: boolean | null;
+  comment?: string | null;
 }
 
 export namespace ReviewCreateForm {
@@ -66,8 +71,8 @@ export namespace ReviewCreateForm {
       z.object({
         id: z.string(),
         name: z.string(),
-        is_vote_positive: z.boolean().nullable(),
-        comment: z.string().nullable(),
+        is_vote_positive: z.boolean().nullable().optional(),
+        comment: z.string().nullable().optional(),
       }),
     )
     .optional();
@@ -256,23 +261,23 @@ export namespace ReviewCreateForm {
                     form={form}
                     fieldName="tags"
                     loadOptions={async (inputValue: string) => {
-                      const res = await client
-                        .query(
-                          gql(`
-                            query ToolTagsQuery($name: String) {
-                              tool_tags(filters: {
-                                name: {contains: $name}
-                                description: {contains: $name}
-                              }) {
-                                id
-                                name
-                              }
+                      const query = graphql(`
+                        query ToolTagsQuery($name: String) {
+                          tool_tags(filters: {
+                            name: {contains: $name}
+                            description: {contains: $name}
+                          }) {
+                            id
+                            name
+                            tag_parent {
+                              id
+                              name
                             }
-                          `),
-                          { name: inputValue },
-                        )
-                        .toPromise();
-                      return res.data.tool_tags;
+                          }
+                        }
+                      `);
+                      const res = await client.query(query, { name: inputValue }).toPromise();
+                      return res.data!.tool_tags.filter(tag => tag.tag_parent === null);
                     }}
                   />
                 </VStack>

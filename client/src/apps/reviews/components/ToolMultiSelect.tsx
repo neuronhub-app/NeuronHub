@@ -59,7 +59,7 @@ export function ToolMultiSelect(props: {
           props.form.setValue(
             props.fieldName,
             multiValue.map(value => {
-              // prevent react-select from recreating Option and resetting custom props
+              // prevent react-select from recreating Option and resetting properties of `ReviewSelectOption`
               const option = options?.find(opt => opt.name === value.name);
               return option ?? value;
             }),
