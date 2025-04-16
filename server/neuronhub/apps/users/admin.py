@@ -14,16 +14,16 @@ class UserConnectionGroupInline(admin.TabularInline):
 @admin.register(User)
 class UserAdmin(UserAdmin):
     list_display = [
+        "username",
         "email",
-        "first_name",
-        "last_name",
+        "name",
         "is_active",
         "is_staff",
         "date_joined",
         "last_login",
     ]
     search_fields = [
-        "id",
+        "username",
         "email",
         "first_name",
         "last_name",
@@ -40,6 +40,7 @@ class UserAdmin(UserAdmin):
             None,
             {
                 "fields": [
+                    "username",
                     "email",
                     "password",
                     "first_name",

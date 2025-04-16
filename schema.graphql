@@ -280,12 +280,11 @@ enum UserReviewListName {
 }
 
 type UserType {
-  id: ID!
+  id: String!
+  username: String!
   first_name: String!
   last_name: String!
-  name: String!
   email: String!
-  username: String!
   connection_groups: [UserConnectionGroupType!]!
   avatar: DjangoFileType
   reviews_read_later: [DjangoModelType!]!
@@ -294,12 +293,11 @@ type UserType {
 }
 
 input UserTypeInput {
-  id: ID
+  id: String
+  username: String
   first_name: String
   last_name: String
-  name: String!
   email: String
-  username: String
   connection_groups: ManyToOneInput
   avatar: Upload
   reviews_read_later: ManyToManyInput
@@ -310,8 +308,10 @@ input UserTypeInput {
 enum Visibility {
   PRIVATE
   USERS_SELECTED
-  CONNECTION_GROUPS
+  CONNECTION_GROUPS_SELECTED
   CONNECTIONS
+  SUBSCRIBERS_PAID
+  SUBSCRIBERS
   INTERNAL
   PUBLIC
 }

@@ -31,12 +31,13 @@ class ToolReviewVoteType:
 
 @strawberry_django.type(User)
 class UserType:
-    id: auto
+    # For privacy only username is exposed
+    id: auto = strawberry_django.field(field_name="username")
+    username: auto
+
     first_name: auto
     last_name: auto
-    name: auto
     email: auto
-    username: auto
     connection_groups: list[UserConnectionGroupType]
     avatar: auto
 

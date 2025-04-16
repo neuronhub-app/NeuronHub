@@ -23,7 +23,7 @@ export function useUserCurrent() {
         group => group.connections,
       );
       const connectionsUniqueMap = new Map(
-        connectionsRaw.map(conn => [`${conn.id}-${conn.name}`, conn]),
+        connectionsRaw.map(conn => [`${conn.id}-${conn.username}`, conn]),
       );
       const connectionsUnique = Array.from(connectionsUniqueMap.values());
 
@@ -44,7 +44,7 @@ export const UserQueryDoc = graphql(`
   query UserCurrent {
     user_current {
       id
-      name
+      username
       email
       
       reviews_library { pk }
@@ -64,7 +64,7 @@ export const UserQueryDoc = graphql(`
 
         connections {
           id
-          name
+          username
         }
       }
     }
@@ -76,5 +76,5 @@ export type User = NonNullable<UserQuery["user_current"]>;
 export type UserConnectionGroup = User["connection_groups"][number];
 // @bad-inference otherwise `name: unknown`
 export type UserConnection = UserConnectionGroup["connections"][number] & {
-  name: string;
+  username: string;
 };

@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
             field=django_choices_field.fields.TextChoicesField(
                 choices=[
                     ("private", "Private"),
-                    ("connection_groups", "Connection Groups"),
+                    ("connection_groups_selected", "Connection Groups"),
                     ("connections", "Connections"),
                     ("internal", "Internal"),
                     ("public", "Public"),
@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
             field=django_choices_field.fields.TextChoicesField(
                 choices=[
                     ("private", "Private"),
-                    ("connection_groups", "Connection Groups"),
+                    ("connection_groups_selected", "Connection Groups"),
                     ("connections", "Connections"),
                     ("internal", "Internal"),
                     ("public", "Public"),

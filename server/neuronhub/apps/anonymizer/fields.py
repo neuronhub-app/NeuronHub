@@ -4,9 +4,18 @@ from django.db import models
 
 
 class Visibility(models.TextChoices):
+    """
+    Ordered by most to least sensitive.
+    """
+
     PRIVATE = "private"
     USERS_SELECTED = "users_selected"
-    CONNECTION_GROUPS = "connection_groups"  # todo ~ rename CONNECTIONS_GROUPS_SELECTED
-    CONNECTIONS = "connections"  # todo ~ rename CONNECTIONS_ALL
+
+    # remove
+    CONNECTION_GROUPS_SELECTED = "connection_groups_selected"
+
+    CONNECTIONS = "connections"
+    SUBSCRIBERS_PAID = "subscribers_paid"
+    SUBSCRIBERS = "subscribers"
     INTERNAL = "internal"
     PUBLIC = "public"

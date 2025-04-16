@@ -48,7 +48,7 @@ async def _get_review_comments(
             author__connection_group__connections__in=[user],
         )
         is_allowed_by_connection_group = Q(
-            visibility=Visibility.CONNECTION_GROUPS,
+            visibility=Visibility.CONNECTION_GROUPS_SELECTED,
             visible_to_groups__connections__in=[user],
         )
         comments = comments.filter(

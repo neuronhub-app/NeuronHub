@@ -409,12 +409,10 @@ export namespace ReviewCreateForm {
                     label="Visibility"
                     items={[
                       getToolType(Visibility.Private, <HiLockClosed />),
-                      getToolType(
-                        Visibility.ConnectionGroups,
-                        <FaUsersGear />,
-                        "Connections selected",
-                      ),
+                      getToolType(Visibility.UsersSelected, <FaUsersGear />, "Users selected"),
                       getToolType(Visibility.Connections, <FaUsers />),
+                      getToolType(Visibility.SubscribersPaid, <FaUsers />, "Subscribers (paid)"),
+                      getToolType(Visibility.Subscribers, <FaUsers />),
                       getToolType(
                         Visibility.Internal,
                         <FaShieldHalved />,
@@ -424,11 +422,21 @@ export namespace ReviewCreateForm {
                     ]}
                     size="sm"
                   />
-                  {formState.visibility === Visibility.ConnectionGroups && (
+                  {formState.visibility in
+                    [
+                      Visibility.UsersSelected,
+                      Visibility.Connections,
+                      Visibility.SubscribersPaid,
+                      Visibility.Subscribers,
+                    ] && (
                     <UserMultiSelect
                       form={form}
                       fieldName="visible_to"
-                      placeholder="Select connections"
+                      placeholder={
+                        formState.visibility === Visibility.UsersSelected
+                          ? "Select users"
+                          : "Make visible to selected users if desired"
+                      }
                     />
                   )}
                 </VStack>

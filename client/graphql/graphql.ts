@@ -27,6 +27,18 @@ export type Scalars = {
   Upload: { input: any; output: any };
 };
 
+export type CommentType = {
+  __typename?: "CommentType";
+  author: UserType;
+  content: Scalars["String"]["output"];
+  created_at: Scalars["DateTime"]["output"];
+  id: Scalars["ID"]["output"];
+  parent?: Maybe<CommentType>;
+  seen_by_users: Array<DjangoModelType>;
+  updated_at: Scalars["DateTime"]["output"];
+  visibility: Visibility;
+};
+
 export type DjangoFileType = {
   __typename?: "DjangoFileType";
   name: Scalars["String"]["output"];
@@ -97,6 +109,7 @@ export type Query = {
   __typename?: "Query";
   me: UserType;
   tool: ToolType;
+  tool_review: ToolReviewType;
   tool_reviews: Array<ToolReviewType>;
   tool_tags: Array<ToolTagType>;
   tools: Array<ToolType>;
@@ -105,6 +118,10 @@ export type Query = {
 
 export type QueryToolArgs = {
   pk: Scalars["ID"]["input"];
+};
+
+export type QueryTool_ReviewArgs = {
+  id: Scalars["ID"]["input"];
 };
 
 export type QueryTool_TagsArgs = {
@@ -161,6 +178,7 @@ export type ToolFilter = {
 export type ToolReviewType = {
   __typename?: "ToolReviewType";
   author: UserType;
+  comments: Array<CommentType>;
   content: Scalars["String"]["output"];
   content_cons: Scalars["String"]["output"];
   content_pros: Scalars["String"]["output"];
@@ -319,6 +337,7 @@ export type UserType = {
   reviews_library: Array<DjangoModelType>;
   reviews_read_later: Array<DjangoModelType>;
   tool_review_votes: Array<ToolReviewVoteType>;
+  username: Scalars["String"]["output"];
 };
 
 export type UserTypeInput = {
@@ -332,14 +351,18 @@ export type UserTypeInput = {
   reviews_library?: InputMaybe<ManyToManyInput>;
   reviews_read_later?: InputMaybe<ManyToManyInput>;
   tool_review_votes?: InputMaybe<ManyToOneInput>;
+  username?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export enum Visibility {
   Connections = "CONNECTIONS",
-  ConnectionGroups = "CONNECTION_GROUPS",
+  ConnectionGroupsSelected = "CONNECTION_GROUPS_SELECTED",
   Internal = "INTERNAL",
   Private = "PRIVATE",
   Public = "PUBLIC",
+  Subscribers = "SUBSCRIBERS",
+  SubscribersPaid = "SUBSCRIBERS_PAID",
+  UsersSelected = "USERS_SELECTED",
 }
 
 export type ToolTagsQueryQueryVariables = Exact<{
@@ -348,7 +371,12 @@ export type ToolTagsQueryQueryVariables = Exact<{
 
 export type ToolTagsQueryQuery = {
   __typename?: "Query";
-  tool_tags: Array<{ __typename?: "ToolTagType"; id: string; name: string }>;
+  tool_tags: Array<{
+    __typename?: "ToolTagType";
+    id: string;
+    name: string;
+    tag_parent: { __typename?: "ToolTagType"; id: string; name: string };
+  }>;
 };
 
 export type ToolAlternativesQueryQueryVariables = Exact<{
@@ -359,6 +387,90 @@ export type ToolAlternativesQueryQuery = {
   __typename?: "Query";
   tools: Array<{ __typename?: "ToolType"; id: string; name: string }>;
 };
+
+export type CreateReviewMutationVariables = Exact<{
+  input: ToolReviewTypeInput;
+}>;
+
+export type CreateReviewMutation = {
+  __typename?: "Mutation";
+  create_review: { __typename?: "UserType"; id: string };
+};
+
+export type ReviewDetailQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type ReviewDetailQuery = {
+  __typename?: "Query";
+  tool_review: {
+    __typename?: "ToolReviewType";
+    comments: Array<{
+      __typename?: "CommentType";
+      id: string;
+      created_at: any;
+      content: string;
+      visibility: Visibility;
+      author: {
+        __typename?: "UserType";
+        id: string;
+        username: string;
+        avatar?: { __typename?: "DjangoFileType"; url: string } | null;
+      };
+      parent?: { __typename?: "CommentType"; id: string } | null;
+    }>;
+  } & { " $fragmentRefs"?: { ToolReviewFragment: ToolReviewFragment } };
+};
+
+export type ToolReviewFragment = {
+  __typename?: "ToolReviewType";
+  id: string;
+  title: string;
+  content: string;
+  content_pros: string;
+  content_cons: string;
+  importance?: any | null;
+  is_private: boolean;
+  is_review_later: boolean;
+  usage_status?: UsageStatus | null;
+  rating?: any | null;
+  source: string;
+  reviewed_at: any;
+  experience_hours?: number | null;
+  author: {
+    __typename?: "UserType";
+    id: string;
+    username: string;
+    avatar?: { __typename?: "DjangoFileType"; url: string } | null;
+  };
+  votes: Array<{
+    __typename?: "ToolReviewVoteType";
+    id: string;
+    is_vote_positive?: boolean | null;
+  }>;
+  tool: {
+    __typename?: "ToolType";
+    id: string;
+    name: string;
+    github_url: string;
+    crunchbase_url: string;
+    tags: Array<{
+      __typename?: "ToolTagType";
+      id: string;
+      name: string;
+      description: string;
+      is_important: boolean;
+      tag_parent: { __typename?: "ToolTagType"; id: string; name: string };
+      author: { __typename?: "UserType"; id: string; username: string };
+      votes: Array<{
+        __typename?: "ToolTagVoteType";
+        id: string;
+        is_vote_positive?: boolean | null;
+        author: { __typename?: "UserType"; id: string; username: string };
+      }>;
+    }>;
+  };
+} & { " $fragmentName"?: "ToolReviewFragment" };
 
 export type Toggle_User_Review_ListMutationVariables = Exact<{
   reviewId: Scalars["ID"]["input"];
@@ -382,62 +494,12 @@ export type ReviewListQueryVariables = Exact<{ [key: string]: never }>;
 
 export type ReviewListQuery = {
   __typename?: "Query";
-  tool_reviews: Array<{
-    __typename?: "ToolReviewType";
-    id: string;
-    title: string;
-    content: string;
-    content_pros: string;
-    content_cons: string;
-    importance?: any | null;
-    is_private: boolean;
-    is_review_later: boolean;
-    usage_status?: UsageStatus | null;
-    rating?: any | null;
-    source: string;
-    reviewed_at: any;
-    experience_hours?: number | null;
-    author: {
-      __typename?: "UserType";
-      id: string;
-      name: string;
-      avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-    };
-    votes: Array<{
-      __typename?: "ToolReviewVoteType";
-      id: string;
-      is_vote_positive?: boolean | null;
-    }>;
-    tool: {
-      __typename?: "ToolType";
-      id: string;
-      name: string;
-      tags: Array<{
-        __typename?: "ToolTagType";
-        id: string;
-        name: string;
-        description: string;
-        is_important: boolean;
-        tag_parent: { __typename?: "ToolTagType"; id: string; name: string };
-        author: { __typename?: "UserType"; id: string; name: string };
-        votes: Array<{
-          __typename?: "ToolTagVoteType";
-          id: string;
-          is_vote_positive?: boolean | null;
-          author: { __typename?: "UserType"; id: string; name: string };
-        }>;
-      }>;
-    };
-  }>;
-};
-
-export type CreateReviewMutationVariables = Exact<{
-  input: ToolReviewTypeInput;
-}>;
-
-export type CreateReviewMutation = {
-  __typename?: "Mutation";
-  create_review: { __typename?: "UserType"; id: string };
+  tool_reviews: Array<
+    {
+      __typename?: "ToolReviewType";
+      comments: Array<{ __typename?: "CommentType"; id: string }>;
+    } & { " $fragmentRefs"?: { ToolReviewFragment: ToolReviewFragment } }
+  >;
 };
 
 export type UserCurrentQueryVariables = Exact<{ [key: string]: never }>;
@@ -447,7 +509,7 @@ export type UserCurrentQuery = {
   user_current?: {
     __typename?: "UserType";
     id: string;
-    name: string;
+    username: string;
     email: string;
     reviews_library: Array<{ __typename?: "DjangoModelType"; pk: string }>;
     reviews_read_later: Array<{ __typename?: "DjangoModelType"; pk: string }>;
@@ -466,6 +528,135 @@ export type UserCurrentQuery = {
   } | null;
 };
 
+export const ToolReviewFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ToolReview" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "ToolReviewType" } },
+      directives: [{ kind: "Directive", name: { kind: "Name", value: "_unmask" } }],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "content" } },
+          { kind: "Field", name: { kind: "Name", value: "content_pros" } },
+          { kind: "Field", name: { kind: "Name", value: "content_cons" } },
+          { kind: "Field", name: { kind: "Name", value: "importance" } },
+          { kind: "Field", name: { kind: "Name", value: "is_private" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_later" } },
+          { kind: "Field", name: { kind: "Name", value: "usage_status" } },
+          { kind: "Field", name: { kind: "Name", value: "rating" } },
+          { kind: "Field", name: { kind: "Name", value: "source" } },
+          { kind: "Field", name: { kind: "Name", value: "reviewed_at" } },
+          { kind: "Field", name: { kind: "Name", value: "experience_hours" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "author" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "avatar" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "votes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tool" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "github_url" } },
+                { kind: "Field", name: { kind: "Name", value: "crunchbase_url" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "tags" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_important" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "tag_parent" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "username" } },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "votes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "author" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "username" } },
+                                ],
+                              },
+                            },
+                            { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ToolReviewFragment, unknown>;
 export const ToolTagsQueryDocument = {
   kind: "Document",
   definitions: [
@@ -530,6 +721,17 @@ export const ToolTagsQueryDocument = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "name" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "tag_parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -596,6 +798,254 @@ export const ToolAlternativesQueryDocument = {
     },
   ],
 } as unknown as DocumentNode<ToolAlternativesQueryQuery, ToolAlternativesQueryQueryVariables>;
+export const CreateReviewDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CreateReview" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ToolReviewTypeInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "create_review" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "data" },
+                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreateReviewMutation, CreateReviewMutationVariables>;
+export const ReviewDetailDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "ReviewDetail" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tool_review" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolReview" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "comments" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "username" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "url" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "created_at" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "parent" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "content" } },
+                      { kind: "Field", name: { kind: "Name", value: "visibility" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ToolReview" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "ToolReviewType" } },
+      directives: [{ kind: "Directive", name: { kind: "Name", value: "_unmask" } }],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "content" } },
+          { kind: "Field", name: { kind: "Name", value: "content_pros" } },
+          { kind: "Field", name: { kind: "Name", value: "content_cons" } },
+          { kind: "Field", name: { kind: "Name", value: "importance" } },
+          { kind: "Field", name: { kind: "Name", value: "is_private" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_later" } },
+          { kind: "Field", name: { kind: "Name", value: "usage_status" } },
+          { kind: "Field", name: { kind: "Name", value: "rating" } },
+          { kind: "Field", name: { kind: "Name", value: "source" } },
+          { kind: "Field", name: { kind: "Name", value: "reviewed_at" } },
+          { kind: "Field", name: { kind: "Name", value: "experience_hours" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "author" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "avatar" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "votes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tool" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "github_url" } },
+                { kind: "Field", name: { kind: "Name", value: "crunchbase_url" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "tags" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_important" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "tag_parent" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "username" } },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "votes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "author" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                  { kind: "Field", name: { kind: "Name", value: "username" } },
+                                ],
+                              },
+                            },
+                            { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ReviewDetailQuery, ReviewDetailQueryVariables>;
 export const Toggle_User_Review_ListDocument = {
   kind: "Document",
   definitions: [
@@ -723,78 +1173,121 @@ export const ReviewListDocument = {
             selectionSet: {
               kind: "SelectionSet",
               selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolReview" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "comments" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ToolReview" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "ToolReviewType" } },
+      directives: [{ kind: "Directive", name: { kind: "Name", value: "_unmask" } }],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "content" } },
+          { kind: "Field", name: { kind: "Name", value: "content_pros" } },
+          { kind: "Field", name: { kind: "Name", value: "content_cons" } },
+          { kind: "Field", name: { kind: "Name", value: "importance" } },
+          { kind: "Field", name: { kind: "Name", value: "is_private" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_later" } },
+          { kind: "Field", name: { kind: "Name", value: "usage_status" } },
+          { kind: "Field", name: { kind: "Name", value: "rating" } },
+          { kind: "Field", name: { kind: "Name", value: "source" } },
+          { kind: "Field", name: { kind: "Name", value: "reviewed_at" } },
+          { kind: "Field", name: { kind: "Name", value: "experience_hours" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "author" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "title" } },
-                { kind: "Field", name: { kind: "Name", value: "content" } },
-                { kind: "Field", name: { kind: "Name", value: "content_pros" } },
-                { kind: "Field", name: { kind: "Name", value: "content_cons" } },
-                { kind: "Field", name: { kind: "Name", value: "importance" } },
-                { kind: "Field", name: { kind: "Name", value: "is_private" } },
-                { kind: "Field", name: { kind: "Name", value: "is_review_later" } },
-                { kind: "Field", name: { kind: "Name", value: "usage_status" } },
-                { kind: "Field", name: { kind: "Name", value: "rating" } },
-                { kind: "Field", name: { kind: "Name", value: "source" } },
-                { kind: "Field", name: { kind: "Name", value: "reviewed_at" } },
-                { kind: "Field", name: { kind: "Name", value: "experience_hours" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "author" },
+                  name: { kind: "Name", value: "avatar" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "votes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tool" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "github_url" } },
+                { kind: "Field", name: { kind: "Name", value: "crunchbase_url" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "tags" },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [
                       { kind: "Field", name: { kind: "Name", value: "id" } },
                       { kind: "Field", name: { kind: "Name", value: "name" } },
+                      { kind: "Field", name: { kind: "Name", value: "description" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_important" } },
                       {
                         kind: "Field",
-                        name: { kind: "Name", value: "avatar" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
-                        },
-                      },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "votes" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
-                    ],
-                  },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "tool" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "name" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "tags" },
+                        name: { kind: "Name", value: "tag_parent" },
                         selectionSet: {
                           kind: "SelectionSet",
                           selections: [
                             { kind: "Field", name: { kind: "Name", value: "id" } },
                             { kind: "Field", name: { kind: "Name", value: "name" } },
-                            { kind: "Field", name: { kind: "Name", value: "description" } },
-                            { kind: "Field", name: { kind: "Name", value: "is_important" } },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "tag_parent" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "name" } },
-                                ],
-                              },
-                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "username" } },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "votes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
                             {
                               kind: "Field",
                               name: { kind: "Name", value: "author" },
@@ -802,35 +1295,11 @@ export const ReviewListDocument = {
                                 kind: "SelectionSet",
                                 selections: [
                                   { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  { kind: "Field", name: { kind: "Name", value: "name" } },
+                                  { kind: "Field", name: { kind: "Name", value: "username" } },
                                 ],
                               },
                             },
-                            {
-                              kind: "Field",
-                              name: { kind: "Name", value: "votes" },
-                              selectionSet: {
-                                kind: "SelectionSet",
-                                selections: [
-                                  { kind: "Field", name: { kind: "Name", value: "id" } },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "author" },
-                                    selectionSet: {
-                                      kind: "SelectionSet",
-                                      selections: [
-                                        { kind: "Field", name: { kind: "Name", value: "id" } },
-                                        { kind: "Field", name: { kind: "Name", value: "name" } },
-                                      ],
-                                    },
-                                  },
-                                  {
-                                    kind: "Field",
-                                    name: { kind: "Name", value: "is_vote_positive" },
-                                  },
-                                ],
-                              },
-                            },
+                            { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
                           ],
                         },
                       },
@@ -845,46 +1314,6 @@ export const ReviewListDocument = {
     },
   ],
 } as unknown as DocumentNode<ReviewListQuery, ReviewListQueryVariables>;
-export const CreateReviewDocument = {
-  kind: "Document",
-  definitions: [
-    {
-      kind: "OperationDefinition",
-      operation: "mutation",
-      name: { kind: "Name", value: "CreateReview" },
-      variableDefinitions: [
-        {
-          kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "input" } },
-          type: {
-            kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "ToolReviewTypeInput" } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "create_review" },
-            arguments: [
-              {
-                kind: "Argument",
-                name: { kind: "Name", value: "data" },
-                value: { kind: "Variable", name: { kind: "Name", value: "input" } },
-              },
-            ],
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<CreateReviewMutation, CreateReviewMutationVariables>;
 export const UserCurrentDocument = {
   kind: "Document",
   definitions: [
@@ -902,7 +1331,7 @@ export const UserCurrentDocument = {
               kind: "SelectionSet",
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
-                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
                 { kind: "Field", name: { kind: "Name", value: "email" } },
                 {
                   kind: "Field",

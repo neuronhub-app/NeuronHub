@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from strawberry_django.descriptors import model_property
@@ -6,6 +8,9 @@ from neuronhub.apps.orgs.models import Org
 
 
 class User(AbstractUser):
+    #: non-public for privacy. Only username may be shown to User owner or others
+    id_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+
     owner = models.ForeignKey(
         "self",
         on_delete=models.CASCADE,  # cascade for privacy, warning is on the frontend

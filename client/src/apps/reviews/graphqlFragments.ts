@@ -17,7 +17,7 @@ export const ReviewFragment = graphql(`
     experience_hours
     author {
       id
-      name
+      username
       avatar {
         url
       }
@@ -42,13 +42,13 @@ export const ReviewFragment = graphql(`
         }
         author {
           id
-          name
+          username
         }
         votes {
           id
           author {
             id
-            name
+            username
           }
           is_vote_positive
         }

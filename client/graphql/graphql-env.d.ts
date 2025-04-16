@@ -1448,8 +1448,10 @@ export type introspection_types = {
     enumValues:
       | "PRIVATE"
       | "USERS_SELECTED"
-      | "CONNECTION_GROUPS"
+      | "CONNECTION_GROUPS_SELECTED"
       | "CONNECTIONS"
+      | "SUBSCRIBERS_PAID"
+      | "SUBSCRIBERS"
       | "INTERNAL"
       | "PUBLIC";
   };
