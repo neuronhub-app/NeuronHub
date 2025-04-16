@@ -28,7 +28,6 @@ async def create_tag(
             if tag_parent_name_raw := names[tag_index - 1] if tag_index > 0 else None:
                 tag_parent, _ = await ToolTag.objects.aget_or_create(
                     name=tag_parent_name_raw.strip(),
-                    tool=tool,
                     defaults={
                         "author": author,
                     },
@@ -36,22 +35,22 @@ async def create_tag(
 
                 tag, _ = await ToolTag.objects.aget_or_create(
                     name=tag_name,
-                    tool=tool,
                     tag_parent=tag_parent,
                     defaults={
                         "author": author,
                         "is_important": is_important,
                     },
                 )
+                await sync_to_async(tool.tags.add)(tag)
     else:
         tag, _ = await ToolTag.objects.aget_or_create(
             name=name_raw.strip(),
-            tool=tool,
             defaults={
                 "author": author,
                 "is_important": is_important,
             },
         )
+        await sync_to_async(tool.tags.add)(tag)
 
     if is_vote_positive is not None:
         if not tool:
