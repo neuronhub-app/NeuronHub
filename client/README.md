@@ -1,20 +1,18 @@
 ---
-reviewed_at: 2025.04.10
+reviewed_at: 2025.04.15
 ---
 
 Setup
 --------------------------------
 
-### Installation
+### Setup
 
 ```bash
 bun install
 bun run dev
 ```
 
-### Package Updates
-
-Using npm-check-updates:
+### Upgrade
 
 ```bash
 bun run update-check
@@ -25,7 +23,7 @@ bun run update
 
 Set your IDE to run Biome on save, eg with [Biome JetBrains plugins](https://plugins.jetbrains.com/plugin/22761-biome).
 
-Biome is immature. And their Jetbrains plugin often needs cache resets (IDE restart), and eg a manual pointer to `neuronhub/client/biome.jsonc`.
+Biome is immature. Their Jetbrains plugin often needs cache resets (restarts), and eg a manual pointer to `neuronhub/client/biome.jsonc`.
 
 Known Issues
 --------------------------------
@@ -36,7 +34,7 @@ v7 HMR triggers a hard reload on every change to a file with the Route's `export
 
 ### urql
 
-In `const [result, reexecuteQuery] = useQuery(...)` the `reexecuteQuery()` doesn't reexecute query, unless you `reexecuteQuery({ requestPolicy: "network-only" })`. See urql-graphql/urql/issues#1395.
+In `const [result, reexecuteQuery] = useQuery(...)` the `reexecuteQuery` doesn't work w/o `reexecuteQuery({ requestPolicy: "network-only" })`. See urql-graphql/urql/issues#1395.
 
 ### react-hook-form
 
@@ -55,6 +53,8 @@ Immature, eg with React 19:
 - Runtime is affected tsconfig.json, eg required fields become optional wo a warning if `compilerOptions::strict=false`
 - Integration with react-hook-form can be hard, re default values and `z.default()`
 - `z.date()` isn't stable
+
+Zod v4 fixes some, to be upgraded.
 
 ### react-select
 

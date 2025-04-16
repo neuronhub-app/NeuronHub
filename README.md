@@ -1,2 +1,5 @@
-- [server/ README](/server/README.md)
-- [client/ README](/client/README.md)
+READMEs:
+- [server/](/server/README.md)
+- [client/](/client/README.md)
+
+Also see project's [architecture](/docs/architecture.md).

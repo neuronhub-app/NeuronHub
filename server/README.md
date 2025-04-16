@@ -1,3 +1,7 @@
+---
+reviewed_at: 2025.04.15
+---
+
 ### Setup
 
 - uv init
@@ -12,7 +16,7 @@
 - uv run python manage.py runserver
 
 
-### Update
+### Upgrade
 ```
 uv lock --upgrade
 ```
