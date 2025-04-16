@@ -1,0 +1,9 @@
+editor: pycharm
+auto-commits: false
+read:
+  - docs/private/neuronhub/publish-later/code-style.md
+  - docs/code-style-for-llm.md
+lint-cmd:
+  - cd server && uv run ruff format .
+  - cd client && bun run format
+analytics: false

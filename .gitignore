@@ -3,3 +3,8 @@
 docs/private/
 
 .env*
+
+# aider
+.aider*
+!.aiderignore
+!.aider.conf.yml
