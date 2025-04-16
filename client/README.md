@@ -30,6 +30,10 @@ Biome is immature. And their Jetbrains plugin often needs cache resets (IDE rest
 Known Issues
 --------------------------------
 
+### react-router
+
+v7 HMR triggers a hard reload on every change to a file with the Route's `export default` component, so keep only the route params code in the `index.tsx`. 
+
 ### urql
 
 In `const [result, reexecuteQuery] = useQuery(...)` the `reexecuteQuery()` doesn't reexecute query, unless you `reexecuteQuery({ requestPolicy: "network-only" })`. See urql-graphql/urql/issues#1395.
