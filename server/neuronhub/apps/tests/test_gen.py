@@ -16,12 +16,14 @@ if TYPE_CHECKING:
     from neuronhub.apps.tools.models import Tool
     from neuronhub.apps.tools.models import ToolReview
     from neuronhub.apps.comments.models import Comment
+    from neuronhub.apps.posts.models import Post
 
 
 class Gen:
     users: UsersGen
     tools: ToolsGen
     comments: CommentsGen
+    posts: PostsGen
     faker: UniqueProxy
     faker_non_unique: Faker
 
@@ -52,6 +54,7 @@ class Gen:
         self.comments = CommentsGen(
             faker=self.faker, user=self.users.user_default, tools=self.tools
         )
+        self.posts = PostsGen(faker=self.faker, user=self.users.user_default, tools=self.tools)
 
         return self
 
@@ -131,22 +134,47 @@ class ToolsGen:
 
     async def create(
         self,
-        name: str = None,
-        type: str = None,
-        description: str = None,
-        url: str = None,
-        crunchbase_url: str = None,
+        name: str = "",
+        type: str = "",
+        description: str = "",
+        url: str = "",
+        crunchbase_url: str = "",
+        github_url: str = "",
+        company_name: str = None,
+        company_domain: str = None,
+        company_country: str = None,
+        company_ownership_name: str = "Private",
+        is_single_product: bool = False,
     ) -> Tool:
         from neuronhub.apps.tools.models import Tool
+        from neuronhub.apps.tools.models import Company
+        from neuronhub.apps.db.services.db_stubs_repopulate import create_company_ownership
 
-        return await Tool.objects.acreate(
-            name="PyCharm",
-            type="Program",
-            crunchbase_url="crunchbase.com/organization/jetbrains",
-            description="PyCharm is an integrated development environment (IDE) used in computer programming, "
-            "specifically for the Python language. It is developed by the Czech company JetBrains.",
-            url="jetbrains.com/pycharm",
+        company = None
+        if company_name:
+            ownership = await create_company_ownership(company_ownership_name)
+            company, _ = await Company.objects.aget_or_create(
+                name=company_name,
+                defaults={
+                    "domain": company_domain or self.faker.domain_name(),
+                    "country": company_country or self.faker.country_code(),
+                    "ownership": ownership,
+                    "is_single_product": is_single_product,
+                },
+            )
+
+        tool, _ = await Tool.objects.aget_or_create(
+            name=name or self.faker.company(),
+            defaults={
+                "type": type or "Software",
+                "description": description or self.faker.text(),
+                "url": url or self.faker.url(),
+                "crunchbase_url": crunchbase_url,
+                "github_url": github_url,
+                "company": company,
+            },
         )
+        return tool
 
     async def create_review(
         self,
@@ -188,3 +216,29 @@ class CommentsGen:
             await sync_to_async(comment.visible_to_users.set)(visible_to_users)
 
         return comment
+
+
+@dataclass
+class PostsGen:
+    faker: UniqueProxy
+    user: User
+    tools: ToolsGen
+
+    async def create(
+        self,
+        title: str,
+        content: str = "",
+        tool: Tool = None,
+        author: User = None,
+        visibility: Visibility = Visibility.PUBLIC,
+    ) -> Post:
+        from neuronhub.apps.posts.models import Post
+
+        post = await Post.objects.acreate(
+            title=title,
+            content=content or self.faker.text(max_nb_chars=500),
+            author=author or self.user,
+            tool=tool,
+            visibility=visibility,
+        )
+        return post

@@ -8,6 +8,9 @@ from asgiref.sync import sync_to_async
 from django.utils import timezone
 
 from neuronhub.apps.orgs.models import Org
+from neuronhub.apps.posts.models import Post  # Import Post model
+from neuronhub.apps.posts.models import PostTagVote
+from neuronhub.apps.posts.models import PostVote
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.tools.models import Company
 from neuronhub.apps.tools.models import CompanyOwnership
@@ -32,6 +35,9 @@ async def db_stubs_repopulate(
     is_delete_orgs: bool = False,
 ) -> None:
     if is_delete_tools:
+        await PostTagVote.objects.all().adelete()
+        await PostVote.objects.all().adelete()
+        await Post.objects.all().adelete()
         await ToolTagVote.objects.all().adelete()
         await ToolTag.objects.all().adelete()
         await ToolAlternative.objects.all().adelete()
@@ -50,23 +56,26 @@ async def db_stubs_repopulate(
     user = await gen.users.get_user_default()
 
     await _create_review_pycharm(user, gen=gen)
-    tool = await _create_review_iterm(user)
-    await _create_review_ghostly(user, alternatives=[tool])
+    tool_iterm = await _create_review_iterm(user, gen=gen)
+    await _create_review_ghostly(user, alternatives=[tool_iterm], gen=gen)
+    tool_unifi = await _create_tool_unifi_network(user, gen=gen)
+    tool_aider = await _create_tool_aider(user, gen=gen)
+
+    # Create Posts
+    await _create_posts(user, gen=gen, tool_unifi=tool_unifi, tool_aider=tool_aider)
 
 
 async def _create_review_pycharm(user: User, gen: Gen):
-    pycharm = await Tool.objects.acreate(
+    pycharm = await gen.tools.create(
         name="PyCharm",
         type="Program",
         crunchbase_url="crunchbase.com/organization/jetbrains",
         description="PyCharm is an integrated development environment (IDE) used in computer programming, specifically for the Python language. It is developed by the Czech company JetBrains.",
         url="jetbrains.com/pycharm",
-        company=await Company.objects.acreate(
-            name="JetBrains",
-            domain="jetbrains.com",
-            country="NL",
-            ownership=await create_company_ownership("Private"),
-        ),
+        company_name="JetBrains",
+        company_domain="jetbrains.com",
+        company_country="NL",
+        company_ownership_name="Private",
     )
 
     await create_tags(
@@ -126,20 +135,18 @@ async def _create_review_pycharm(user: User, gen: Gen):
     await gen.comments.create(review=review, author=user)
 
 
-async def _create_review_iterm(user: User):
-    tool = await Tool.objects.acreate(
+async def _create_review_iterm(user: User, gen: Gen):
+    tool = await gen.tools.create(
         name="iTerm2",
         type="Program",
         crunchbase_url="crunchbase.com/organization/iterm2",
         github_url="github.com/gnachman/iTerm2",
         description="iTerm2 is a terminal emulator for macOS that does amazing things. It brings the terminal into the modern age with features you never knew you always wanted.",
-        company=await Company.objects.acreate(
-            name="iTerm2",
-            domain="iterm2.com",
-            country="US",
-            is_single_product=True,
-            ownership=await create_company_ownership("Private"),
-        ),
+        company_name="iTerm2",
+        company_domain="iterm2.com",
+        company_country="US",
+        is_single_product=True,
+        company_ownership_name="Private",
     )
 
     await create_tags(
@@ -181,8 +188,8 @@ async def _create_review_iterm(user: User):
     return tool
 
 
-async def _create_review_ghostly(user: User, alternatives: list[Tool] = None):
-    tool = await Tool.objects.acreate(
+async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Tool] = None):
+    tool = await gen.tools.create(
         name="Ghostty",
         type="Program",
         github_url="github.com/ghostty-org/ghostty",
@@ -218,6 +225,79 @@ async def _create_review_ghostly(user: User, alternatives: list[Tool] = None):
         params=[
             ReviewTagParams(ReviewTagName.expectations, is_vote_pos=True),
         ],
+    )
+
+
+async def _create_tool_unifi_network(user: User, gen: Gen) -> Tool:
+    tool = await gen.tools.create(
+        name="UniFi Network",
+        type="Software",
+        description="Ubiquiti UniFi Network Application for managing UniFi networking devices.",
+        url="ui.com/cloud-gateways",
+        company_name="Ubiquiti",
+        company_domain="ui.com",
+        company_country="US",
+        company_ownership_name="Public",
+    )
+    await create_tags(
+        tool=tool,
+        author=user,
+        params=[
+            TagParams("Software / Network Management", is_vote_pos=True, is_important=True),
+            TagParams("Hardware / Networking", is_vote_pos=True),
+            TagParams("Business / License-free", is_vote_pos=True),
+            TagParams("Dev / Self-hosted", is_important=True, is_vote_pos=True),
+            TagParams("Dev / License / Proprietary"),
+        ],
+    )
+    return tool
+
+
+async def _create_tool_aider(user: User, gen: Gen) -> Tool:
+    tool = await gen.tools.create(
+        name="Aider",
+        type="Software",
+        description="Aider is most popular on HN CLI-first AI coder wrapper. Owned by one angel SWE, for now anyway.",
+        url="aider.chat",
+        github_url="github.com/paul-gauthier/aider",
+        company_name="Aider",
+        company_domain="aider.chat",
+        is_single_product=True,
+        company_ownership_name="Private",
+    )
+    await create_tags(
+        tool=tool,
+        author=user,
+        params=[
+            TagParams("Software / Dev Tool", is_vote_pos=True, is_important=True),
+            TagParams("Dev / AI", is_vote_pos=True),
+            TagParams("Dev / CLI", is_vote_pos=True),
+            TagParams("Dev / Python"),
+            TagParams("Dev / License / Apache 2.0", is_important=True),
+        ],
+    )
+    return tool
+
+
+async def _create_posts(user: User, gen: Gen, tool_unifi: Tool, tool_aider: Tool):
+    await gen.posts.create(
+        title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this",
+        content=textwrap.dedent(
+            """
+            From LLM:
+            > 1. No UI solution - requires custom scripts that survive firmware updates and enforce routing rules, eg see the dead github.com/peacey/split-vpn
+            > 2. Can create a separate VLAN for VPN traffic with custom policy routing through config.gateway.json
+            """
+        ),
+        tool=tool_unifi,
+        author=user,
+    )
+
+    await gen.posts.create(
+        title="Aider leaderboards are becoming popular on HN for new models assessment",
+        content="https://aider.chat/docs/leaderboards",
+        tool=tool_aider,
+        author=user,
     )
 
 
