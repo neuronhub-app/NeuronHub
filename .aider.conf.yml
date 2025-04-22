@@ -1,3 +1,8 @@
+#gui: true
+dark-mode: true
+watch-files: true
+lint-cmd: ./.run/format.sh
+
 editor: pycharm
 auto-commits: false
 analytics: false

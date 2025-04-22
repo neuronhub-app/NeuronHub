@@ -67,22 +67,101 @@ type Mutation {
   logout: Boolean!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   toggle_user_review_list(review_pk: ID!, review_list_name: UserReviewListName!, is_added: Boolean!): Boolean! @IsAuthenticated
+  create_post(data: PostTypeInput!): UserType! @IsAuthenticated
+  vote_post(id: ID!, is_vote_positive: Boolean): Boolean! @IsAuthenticated
   create_review(data: ToolReviewTypeInput!): UserType! @IsAuthenticated
-  vote_review(review_id: ID!, is_vote_positive: Boolean): Boolean! @IsAuthenticated
+  vote_review(id: ID!, is_vote_positive: Boolean): Boolean! @IsAuthenticated
 }
 
 input OneToManyInput {
   set: ID
 }
 
+interface PostInterface {
+  id: ID!
+  tool: ToolType
+  author: UserType!
+  title: String!
+  content: String!
+  source: String!
+  updated_at: DateTime!
+  visibility: Visibility!
+  visible_to_users: [UserType!]!
+  visible_to_groups: [UserConnectionGroupType!]!
+  recommended_to_users: [UserType!]!
+  recommended_to_groups: [UserConnectionGroupType!]!
+  votes: [PostVoteInterface!]!
+  comments: [CommentType!]!
+}
+
+type PostReviewType implements PostInterface {
+  id: ID!
+  tool: ToolType!
+  author: UserType!
+  title: String!
+  content: String!
+  source: String!
+  updated_at: DateTime!
+  visibility: Visibility!
+  visible_to_users: [UserType!]!
+  visible_to_groups: [UserConnectionGroupType!]!
+  recommended_to_users: [UserType!]!
+  recommended_to_groups: [UserConnectionGroupType!]!
+  votes: [PostReviewVoteType!]!
+  comments: [CommentType!]!
+  reviewed_at: DateTime!
+  rating: Decimal
+  importance: Decimal
+  experience_hours: Int
+  usage_status: UsageStatus
+  is_review_later: Boolean!
+  is_private: Boolean!
+}
+
+type PostReviewVoteType implements PostVoteInterface {
+  id: ID!
+  author: UserType!
+  is_vote_positive: Boolean
+}
+
+type PostType implements PostInterface {
+  id: ID!
+  tool: ToolType
+  author: UserType!
+  title: String!
+  content: String!
+  source: String!
+  updated_at: DateTime!
+  visibility: Visibility!
+  visible_to_users: [UserType!]!
+  visible_to_groups: [UserConnectionGroupType!]!
+  recommended_to_users: [UserType!]!
+  recommended_to_groups: [UserConnectionGroupType!]!
+  votes: [PostVoteInterface!]!
+  comments: [CommentType!]!
+}
+
+input PostTypeInput {
+  title: String
+  content: String
+}
+
+interface PostVoteInterface {
+  id: ID!
+  author: UserType!
+  is_vote_positive: Boolean
+}
+
 type Query {
   user_current: UserType
+  posts: [PostType!]!
+  post(id: ID!): PostType!
   me: UserType!
   tools(filters: ToolFilter): [ToolType!]!
   tool(pk: ID!): ToolType!
   tool_tags(filters: ToolTagFilter): [ToolTagType!]!
-  tool_reviews: [ToolReviewType!]!
-  tool_review(id: ID!): ToolReviewType!
+  tool_reviews: [PostReviewType!]!
+  tool_review(id: ID!): PostReviewType!
 }
 
 input StrFilterLookup {
@@ -149,32 +228,6 @@ input ToolFilter {
   DISTINCT: Boolean
 }
 
-type ToolReviewType {
-  id: ID!
-  reviewed_at: DateTime!
-  updated_at: DateTime!
-  tool: ToolType!
-  author: UserType!
-  source: String!
-  title: String!
-  content: String!
-  content_pros: String!
-  content_cons: String!
-  rating: Decimal
-  importance: Decimal
-  experience_hours: Int
-  usage_status: UsageStatus
-  visibility: Visibility!
-  is_review_later: Boolean!
-  is_private: Boolean!
-  visible_to_users: [UserType!]!
-  visible_to_groups: [UserConnectionGroupType!]!
-  recommended_to_users: [UserType!]!
-  recommended_to_groups: [UserConnectionGroupType!]!
-  votes: [ToolReviewVoteType!]!
-  comments: [CommentType!]!
-}
-
 input ToolReviewTypeInput {
   id: ID
   tool: ToolTypeInput!
@@ -217,7 +270,7 @@ type ToolTagType {
   description: String!
   is_important: Boolean!
   tools(filters: ToolFilter): [ToolType!]!
-  tag_parent: ToolTagType!
+  tag_parent: ToolTagType
   tag_children(filters: ToolTagFilter): [ToolTagType!]!
   author: UserType!
   votes: [ToolTagVoteType!]!
