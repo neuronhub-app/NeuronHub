@@ -1,0 +1,6 @@
+# server
+**/server/**/migrations/**
+
+# client
+/client/graphql/
+/client/public/favicon/

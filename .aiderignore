@@ -1,6 +1,0 @@
-# server
-migrations/
-
-# client
-graphql/
-public/favicon/
