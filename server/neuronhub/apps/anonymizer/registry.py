@@ -1,4 +1,6 @@
 """
+Framework for anonymizing registered Django models, that have an `author` field + timestamps + extra.
+
 Process:
 - randomize timestamps by few days (to prevent correlation back to the author)
 - set `author` to the "Anonym" User instance
@@ -40,13 +42,13 @@ async def anonymize_user_data(
         email=f"anon@{settings.DOMAIN_PROD}",
         first_name="Anonym",
     )
-    for model in anonymizer.models:
-        instances = model.objects.filter(author=user)
-        for instance in model.objects.filter(author=user):
+    for model_anonymizable in anonymizer.models:
+        instances = model_anonymizable.objects.filter(author=user)
+        for instance in model_anonymizable.objects.filter(author=user):
             instance.anonymize(user_anon, is_erase_text_content)
-        await model.objects.abulk_update(
+        await model_anonymizable.objects.abulk_update(
             instances,
-            model.get_anonymizable_fields(),
+            model_anonymizable.get_anonymizable_fields(),
         )
 
     if is_delete_user:
@@ -56,7 +58,7 @@ async def anonymize_user_data(
 class AnonymizerRegistry:
     models: list[type[AnonimazableTimeStampedModel]] = []
 
-    def register(self, cls: type[AnonimazableTimeStampedModel]):
+    def register[M: AnonimazableTimeStampedModel](self, cls: type[M]) -> type[M]:
         assert issubclass(cls, AnonimazableTimeStampedModel)
         self.models.append(cls)
         return cls
