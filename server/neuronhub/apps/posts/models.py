@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.db.models import CharField
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
 
@@ -21,6 +22,7 @@ from neuronhub.apps.anonymizer.registry import anonymizer
 from neuronhub.apps.users.models import User
 
 
+# todo ~ add PostInterfaceModel + meta enforce
 @anonymizer.register
 class Post(AnonimazableTimeStampedModel):
     tool = models.ForeignKey(Tool, on_delete=models.SET_NULL, null=True, blank=True)
@@ -68,6 +70,7 @@ class Post(AnonimazableTimeStampedModel):
         models.CharField(max_length=140),
     )
     content = anonymizable_field(MarkdownField(blank=True))
+    source = CharField(max_length=140, blank=True)
 
     history = HistoricalRecords(cascade_delete_history=True)
 
