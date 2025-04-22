@@ -85,6 +85,8 @@ class ToolTag(AnonimazableTimeStampedModel):
 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+
+    # todo ! move to M2M-through, since it's bound to its tools.Tool or tools.Review or posts.Post
     is_important = models.BooleanField(
         default=False,
         help_text="An important Tag is highly informative of its Tool - it's shown before all others and displays an icon",
@@ -210,6 +212,8 @@ class Importance(models.TextChoices):
     EXTRA_HIGH = "extra_high"
 
 
+# todo ~ rename to PostReview
+# todo ~ move to apps.post_reviews
 @anonymizer.register
 class ToolReview(AnonimazableTimeStampedModel):
     tool = models.ForeignKey(Tool, on_delete=models.PROTECT)
@@ -283,7 +287,7 @@ class ToolReview(AnonimazableTimeStampedModel):
         null=True,
     )
 
-    reviewed_at = anonymizable_field(models.DateTimeField(default=timezone.now, blank=True))
+    reviewed_at = anonymizable_field(models.DateTimeField(default=timezone.now))
 
     title = anonymizable_field(
         models.CharField(max_length=511, blank=True),
@@ -313,6 +317,9 @@ class ToolReview(AnonimazableTimeStampedModel):
         return f"{self.title or self.tool.name} [{self.rating}]"
 
 
+PostReview = ToolReview
+
+
 @anonymizer.register
 class ToolReviewVote(ToolVoteModel):
     review = models.ForeignKey(ToolReview, on_delete=models.CASCADE, related_name="votes")
@@ -326,6 +333,9 @@ class ToolReviewVote(ToolVoteModel):
 
     def __str__(self):
         return f"{self.review} - {self.author} [{self.is_vote_positive}]"
+
+
+PostReviewVote = ToolReviewVote
 
 
 class ReviewTagName(models.TextChoices):
