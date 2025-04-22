@@ -8,6 +8,7 @@ import type { introspection } from "@/graphql/graphql-env.d.ts";
 import { initGraphQLTada } from "gql.tada";
 
 export const graphql = initGraphQLTada<{
+  disableMasking: true; // afaik - useless abstraction
   introspection: introspection;
 }>();
 
