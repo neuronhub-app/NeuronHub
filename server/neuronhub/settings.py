@@ -256,13 +256,14 @@ LOGGING = {
         "level": "INFO",
     },
 }
+
+_line_width = 120
 rich.traceback.install(
-    width=900,
-    code_width=120,
+    width=None,  # max-width=100vw, so who cares
+    code_width=_line_width,
     show_locals=True,
-    extra_lines=4,
-    locals_max_length=10,
-    locals_max_string=200,
+    locals_max_length=1,  # crop vars to 1 newline, eg cls
+    locals_max_string=_line_width,
     suppress=[django],
 )
 
