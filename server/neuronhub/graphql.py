@@ -7,6 +7,8 @@ from strawberry_django.fields.types import field_type_map
 from strawberry_django.optimizer import DjangoOptimizerExtension
 
 from neuronhub.apps.db.fields import MarkdownField
+from neuronhub.apps.posts.graphql.mutations import PostsMutation
+from neuronhub.apps.posts.graphql.resolvers import PostsQuery
 from neuronhub.apps.tools.graphql.mutations import ToolsMutation
 from neuronhub.apps.tools.graphql.resolvers import ToolsQuery
 from neuronhub.apps.users.graphql.mutations import UserMutation
@@ -17,13 +19,14 @@ Query = merge_types(
     "Query",
     types=(
         UsersQuery,
+        PostsQuery,
         ToolsQuery,
     ),
 )
 
 
 @strawberry.type
-class Mutation(UserMutation, ToolsMutation):
+class Mutation(UserMutation, PostsMutation, ToolsMutation):
     pass
 
 

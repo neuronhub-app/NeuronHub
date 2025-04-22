@@ -38,13 +38,13 @@ class ToolsMutation:
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def vote_review(
         self,
-        review_id: strawberry.ID,
+        id: strawberry.ID,
         is_vote_positive: bool | None,
         info: Info,
     ) -> bool:
         await ToolReviewVote.objects.aupdate_or_create(
             author=info.context.request.user,
-            review_id=review_id,
+            review_id=id,
             defaults={"is_vote_positive": is_vote_positive},
         )
         return True
