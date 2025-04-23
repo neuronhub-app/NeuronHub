@@ -1,5 +1,4 @@
-import type { ResultOf } from "@graphql-typed-document-node/core";
-import { graphql } from "gql.tada";
+import { type ResultOf, graphql } from "gql.tada";
 import { useEffect } from "react";
 import { useQuery } from "urql";
 import { proxy } from "valtio";
@@ -45,6 +44,7 @@ export const UserQueryDoc = graphql(`
     user_current {
       id
       username
+      name: username
       email
       
       reviews_library { pk }
@@ -65,6 +65,7 @@ export const UserQueryDoc = graphql(`
         connections {
           id
           username
+          name: username
         }
       }
     }
