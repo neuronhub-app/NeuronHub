@@ -1,4 +1,4 @@
-import type { ReviewTagType } from "@/apps/reviews/list";
+import type { ToolTag } from "@/graphql/fragments/tools";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 import { Icon, type JsxStyleProps, Tag, Wrap } from "@chakra-ui/react";
 import type { IconType } from "react-icons";
@@ -8,7 +8,7 @@ import { FaApple, FaCode, FaLinux, FaPython, FaTerminal } from "react-icons/fa6"
 import { GoLaw } from "react-icons/go";
 import { SiKotlin } from "react-icons/si";
 
-export function ToolTags(props: { tags: ReviewTagType[] }) {
+export function ToolTags(props: { tags: ToolTag[] }) {
   props.tags.sort((a, b) => {
     // First sort by is_important
     if (a.is_important !== b.is_important) {
@@ -25,13 +25,13 @@ export function ToolTags(props: { tags: ReviewTagType[] }) {
   return (
     <Wrap>
       {props.tags.map(tag => (
-        <ToolTag key={tag.id} tag={tag} />
+        <ToolTagElem key={tag.id} tag={tag} />
       ))}
     </Wrap>
   );
 }
 
-export function ToolTag(props: { tag: ReviewTagType }) {
+function ToolTagElem(props: { tag: ToolTag }) {
   const iconInfo = getToolIconInfo(props.tag);
 
   let votesSum = 0;
@@ -66,7 +66,7 @@ export function ToolTag(props: { tag: ReviewTagType }) {
   );
 }
 
-function getToolIconInfo(tag: ReviewTagType) {
+function getToolIconInfo(tag: ToolTag) {
   if (!tag.is_important) {
     return null;
   }

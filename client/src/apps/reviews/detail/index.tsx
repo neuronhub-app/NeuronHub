@@ -1,14 +1,14 @@
 import type { Route } from "@/../.react-router/types/src/apps/reviews/detail/+types/index";
-import { ReviewCard } from "@/apps/reviews/components/ReviewCard";
-import { ReviewFragment } from "@/apps/reviews/graphqlFragments";
+import { PostCard } from "@/components/posts/PostCard";
 import { graphql } from "@/gql-tada";
+import { PostReviewFragment } from "@/graphql/fragments/reviews";
 import { datetime } from "@/utils/date-fns";
 import { For, HStack, Heading, Stack, Text } from "@chakra-ui/react";
 import { useQuery } from "urql";
 
 export default function ReviewDetail(props: Route.ComponentProps) {
   const [{ data, error, fetching }] = useQuery({
-    query: ReviewDetailDoc,
+    query: PostReviewDetailDoc,
     variables: { id: props.params.id },
   });
 
@@ -20,7 +20,7 @@ export default function ReviewDetail(props: Route.ComponentProps) {
 
       {data?.tool_review && (
         <Stack gap="gap.xl">
-          <ReviewCard review={data!.tool_review} />
+          <PostCard post={data!.tool_review} />
 
           <For each={data.tool_review.comments}>
             {comment => (
@@ -41,29 +41,13 @@ export default function ReviewDetail(props: Route.ComponentProps) {
   );
 }
 
-export const ReviewDetailDoc = graphql(
+const PostReviewDetailDoc = graphql(
   `
-  query ReviewDetail($id: ID!) {
-    tool_review(id: $id) {
-      ...ToolReview,
-      comments {
-        id
-        author {
-          id
-          username
-          avatar {
-            url
-          }
-        }
-        created_at
-        parent {
-          id
-        }
-        content
-        visibility
+    query PostReviewDetail($id: ID!) {
+      tool_review(id: $id) {
+        ...PostReviewFragment
       }
     }
-  }
-`,
-  [ReviewFragment],
+  `,
+  [PostReviewFragment],
 );

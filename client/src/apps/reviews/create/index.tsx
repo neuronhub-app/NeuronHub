@@ -1,5 +1,5 @@
-import { ToolMultiSelect } from "@/apps/reviews/components/ToolMultiSelect";
-import { UserMultiSelect } from "@/apps/reviews/components/UserMultiSelect";
+import { ToolMultiSelect } from "@/apps/reviews/create/ToolMultiSelect";
+import { UserMultiSelect } from "@/apps/reviews/create/UserMultiSelect";
 import { useFormService } from "@/apps/reviews/create/useFormService";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
@@ -10,7 +10,7 @@ import { zStringEmpty } from "@/components/forms/zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tag } from "@/components/ui/tag";
-import { UsageStatus, Visibility } from "@/graphql/graphql";
+import { type ID, graphql } from "@/gql-tada";
 import {
   Box,
   CheckboxGroup,
@@ -19,6 +19,7 @@ import {
   HStack,
   Heading,
   Icon,
+  Show,
   Text,
   VStack,
 } from "@chakra-ui/react";
@@ -48,19 +49,24 @@ import { gql, useClient } from "urql";
 import { proxy } from "valtio";
 import { useProxy } from "valtio/utils";
 import { z } from "zod";
+import { UsageStatus, Visibility } from "~/graphql/graphql";
 
 export default function ReviewCreateRoute() {
   return <ReviewCreateForm.Comp />;
 }
 
 export interface ReviewSelectOption {
-  id: string;
+  id: ID;
   name: string;
 
+  // --------------
   // tag fields
-  tag_parent?: { id: string; name: string };
+  // --------------
+  tag_parent?: { id: ID; name: string } | null;
 
+  // --------------
   // tool fields
+  // --------------
   is_vote_positive?: boolean | null;
   comment?: string | null;
 }

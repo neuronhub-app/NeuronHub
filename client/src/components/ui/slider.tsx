@@ -50,6 +50,7 @@ function SliderThumbs(props: { value?: number[] }) {
     </For>
   );
 }
+
 interface SliderMarksProps {
   marks?: Array<number | { value: number; label: React.ReactNode }>;
 }

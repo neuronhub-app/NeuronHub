@@ -1,19 +1,32 @@
-import type { ReviewType } from "@/apps/reviews/list";
+import type { Post } from "@/apps/posts/list/PostList";
+import type { PostReview } from "@/apps/reviews/list/PostReviewList";
 import { user } from "@/apps/users/useUserCurrent";
-import { graphql } from "@/gql-tada";
+import type { ID } from "@/gql-tada";
 import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { Flex, IconButton, Stack } from "@chakra-ui/react";
+import type { TadaDocumentNode } from "gql.tada";
 import { useEffect } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import { useSnapshot } from "valtio/react";
 
+type VoteMutation = TadaDocumentNode<
+  { vote_review: boolean } | { vote_post: boolean },
+  {
+    id: ID;
+    isVotePositive: boolean | null;
+  }
+>;
+
 /**
  * Note is_vote_positive has 3 values: true, false, null
  */
-export function ReviewButtonsVote(props: { review: ReviewType }) {
+export function PostButtonsVote(props: {
+  post: Post | PostReview;
+  mutation: VoteMutation;
+}) {
   let votesSum = 0;
-  for (const vote of props.review.votes) {
+  for (const vote of props.post.votes) {
     if (vote.is_vote_positive === true) {
       votesSum++;
     }
@@ -24,14 +37,14 @@ export function ReviewButtonsVote(props: { review: ReviewType }) {
 
   return (
     <Stack align="center" color="slate.muted">
-      <VoteButton reviewId={props.review.id} isVotePositive={true} />
+      <VoteButton id={props.post.id} mutation={props.mutation} isVotePositive={true} />
       <Flex>{votesSum}</Flex>
-      <VoteButton reviewId={props.review.id} isVotePositive={false} />
+      <VoteButton id={props.post.id} mutation={props.mutation} isVotePositive={false} />
     </Stack>
   );
 }
 
-function VoteButton(props: { reviewId: string; isVotePositive: boolean }) {
+function VoteButton(props: { id: ID; isVotePositive: boolean; mutation: VoteMutation }) {
   const userSnap = useSnapshot(user.state);
 
   const state = useValtioProxyRef({
@@ -41,7 +54,7 @@ function VoteButton(props: { reviewId: string; isVotePositive: boolean }) {
 
   useEffect(() => {
     const userVote = userSnap.current?.tool_review_votes.find(
-      vote => vote.review.pk === props.reviewId,
+      vote => vote.review.pk === props.id,
     );
     state.mutable.isVotePositive = userVote?.is_vote_positive ?? null;
   }, [userSnap.current?.tool_review_votes]);
@@ -59,17 +72,7 @@ function VoteButton(props: { reviewId: string; isVotePositive: boolean }) {
         if (state.snap.isVotePositive === null) {
           isVotePositive = props.isVotePositive;
         }
-        await mutateAndRefetch(
-          graphql(`
-            mutation vote_review($reviewId: ID!, $isVotePositive: Boolean) {
-              vote_review(review_id: $reviewId, is_vote_positive: $isVotePositive)
-            }
-          `),
-          {
-            reviewId: props.reviewId,
-            isVotePositive,
-          },
-        );
+        await mutateAndRefetch(props.mutation, { id: props.id, isVotePositive });
 
         state.mutable.isLoading = false;
       }}

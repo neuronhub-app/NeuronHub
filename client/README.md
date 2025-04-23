@@ -1,5 +1,5 @@
 ---
-reviewed_at: 2025.04.15
+reviewed_at: 2025.04.22
 ---
 
 Setup
@@ -23,7 +23,7 @@ bun run update
 
 Set your IDE to run Biome on save, eg with [Biome JetBrains plugins](https://plugins.jetbrains.com/plugin/22761-biome).
 
-Biome is immature. Their Jetbrains plugin often needs cache resets (restarts), and eg a manual pointer to `neuronhub/client/biome.jsonc`.
+Biome is immature. The JetBrains plugin often needs cache resets (restarts), and eg a manual path to `neuronhub/client/biome.jsonc`.
 
 Known Issues
 --------------------------------
@@ -32,9 +32,19 @@ Known Issues
 
 v7 HMR triggers a hard reload on every change to a file with the Route's `export default` component, so keep only the route params code in the `index.tsx`. 
 
+Don't know what's up with `import("../index.js")` bugs, but hey, it's JS. Be grateful it compiles. For now.
+
 ### urql
 
 In `const [result, reexecuteQuery] = useQuery(...)` the `reexecuteQuery` doesn't work w/o `reexecuteQuery({ requestPolicy: "network-only" })`. See urql-graphql/urql/issues#1395.
+
+### gql-tada
+
+Immature, unstable, but still ~better than codegen.
+
+Re fragment collocation and masking/unmasking, I'll quote an LLM:
+- overengineering dressed up as "safety"
+- any time you need paragraphs to explain why your abstraction is "actually good for you," it's your problem
 
 ### react-hook-form
 

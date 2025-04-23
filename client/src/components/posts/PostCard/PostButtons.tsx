@@ -1,8 +1,10 @@
-import type { ReviewType } from "@/apps/reviews/list";
+import type { Post } from "@/apps/posts/list/PostList";
+import type { PostReview } from "@/apps/reviews/list/PostReviewList";
+
 import { user } from "@/apps/users/useUserCurrent";
+import { PostButtonShare } from "@/components/posts/PostCard/PostButtonShare";
 import { Tooltip } from "@/components/ui/tooltip";
-import { graphql } from "@/gql-tada";
-import { UserReviewListName } from "@/graphql/graphql";
+import { type ID, graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { For, IconButton, Stack } from "@chakra-ui/react";
@@ -11,21 +13,22 @@ import { type ComponentProps, type ReactNode, useEffect } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { LuLibrary } from "react-icons/lu";
 import { useSnapshot } from "valtio/react";
+import { UserReviewListName } from "~/graphql/graphql";
 
-export function ReviewButtons(props: { review: ReviewType }) {
+export function PostButtons(props: { post: Post | PostReview }) {
   const buttons: Array<ComponentProps<typeof ReviewButton>> = [
     {
       fieldName: UserReviewListName.ReviewsReadLater,
       iconPresent: <FaBookmark />,
       iconNotPresent: <FaRegBookmark />,
-      reviewId: props.review.id,
+      reviewId: props.post.id,
       label: "Reading list",
     },
     {
       fieldName: UserReviewListName.ReviewsLibrary,
       iconPresent: <LuLibrary />,
       iconNotPresent: <LuLibrary />,
-      reviewId: props.review.id,
+      reviewId: props.post.id,
       label: "Library",
     },
   ];
@@ -39,6 +42,7 @@ export function ReviewButtons(props: { review: ReviewType }) {
           </ErrorBoundary>
         )}
       </For>
+      <PostButtonShare reviewId={props.post.id} />
     </Stack>
   );
 }
@@ -47,7 +51,7 @@ function ReviewButton(props: {
   fieldName: UserReviewListName;
   iconNotPresent: ReactNode;
   iconPresent: ReactNode;
-  reviewId: string;
+  reviewId: ID;
   label: string;
 }) {
   const userSnap = useSnapshot(user.state);
@@ -62,7 +66,7 @@ function ReviewButton(props: {
       return;
     }
     const isInList = userSnap.current[props.fieldName].some(
-      (review: { pk: string }) => review.pk === props.reviewId,
+      (review: { pk: ID }) => review.pk === props.reviewId,
     );
     state.mutable.isAdded = isInList;
   }, [userSnap.current?.[props.fieldName]]);

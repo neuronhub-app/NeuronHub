@@ -1,7 +1,8 @@
-import type { ReviewType } from "@/apps/reviews/list";
+import type { Post } from "@/apps/posts/list/PostList";
+import type { PostReview } from "@/apps/reviews/list/PostReviewList";
 import { Avatar, Flex, Text } from "@chakra-ui/react";
 
-export function ReviewAuthor(props: { author: ReviewType["author"] }) {
+export function PostAuthor(props: { author: PostReview["author"] | Post["author"] }) {
   return (
     <Flex align="center" gap="gap.sm">
       <Avatar.Root size="2xs" variant="subtle" colorPalette="gray">

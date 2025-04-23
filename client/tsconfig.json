@@ -23,15 +23,16 @@
     "baseUrl": ".",
 
     "paths": {
-      "@/graphql/*": ["./graphql/*"],
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "~/graphql/*": ["./graphql/*"]
     },
 
     "plugins": [
       {
         "name": "gql.tada/ts-plugin",
         "schema": "./../schema.graphql",
-        "tadaOutputLocation": "./graphql/graphql-env.d.ts"
+        "tadaOutputLocation": "./graphql/graphql-env.d.ts",
+        "shouldCheckForColocatedFragments": false // see [[client/readme.md]]
       }
     ]
   },

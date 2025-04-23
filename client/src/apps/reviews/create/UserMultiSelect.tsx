@@ -14,7 +14,7 @@ import { DialogBackdrop, Flex, HStack } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { components } from "react-select";
 
-import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create";
+import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create/index";
 import { AsyncCreatableSelect } from "chakra-react-select";
 import { subscribe } from "valtio/vanilla";
 
@@ -128,10 +128,10 @@ function getOptionsFiltered(filterInputValue?: string): UserSelectOption[] {
   }
 
   const connectionOptions = user.state.connections
-    .filter(connection => filter(connection.name))
+    .filter(connection => filter(connection.username))
     .map(connection => ({
       id: connection.id,
-      label: connection.name,
+      label: connection.username,
       user: connection,
       group: null,
       message: null,

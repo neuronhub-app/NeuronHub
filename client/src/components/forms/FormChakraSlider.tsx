@@ -9,6 +9,7 @@ export function FormChakraSlider<TFieldValues extends FieldValues>(props: {
   maxW?: string;
   hidden?: boolean;
   size?: "sm" | "md" | "lg";
+  marks?: number[];
 }) {
   const { field, fieldState } = useController(props.field);
 
@@ -34,6 +35,7 @@ export function FormChakraSlider<TFieldValues extends FieldValues>(props: {
           field.onChange(value[0]);
         }}
         label={props.label}
+        marks={props.marks}
       />
     </Field>
   );

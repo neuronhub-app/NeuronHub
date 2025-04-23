@@ -25,7 +25,7 @@ export default defineConfig({
 
 function getAliasForProject() {
   return {
-    "@/graphql": path.resolve(__dirname, "./graphql"),
+    "~/graphql": path.resolve(__dirname, "./graphql"),
     "@": path.resolve(__dirname, "./src"),
   };
 }
