@@ -6,7 +6,7 @@ import django_choices_field.fields
 import django_countries.fields
 import django_extensions.db.fields
 import neuronhub.apps.db.fields
-import neuronhub.apps.tools.models
+import neuronhub.apps.tools.migrations._deprecated
 import simple_history.models
 from django.conf import settings
 from django.db import migrations, models
@@ -125,7 +125,7 @@ class Migration(migrations.Migration):
                     ("high", "High"),
                     ("extra_high", "Extra High"),
                 ],
-                choices_enum=neuronhub.apps.tools.models.Importance,
+                choices_enum=neuronhub.apps.tools.migrations._deprecated.Importance,
                 default=None,
                 max_length=10,
                 null=True,
@@ -143,7 +143,7 @@ class Migration(migrations.Migration):
                     ("high", "High"),
                     ("extra_high", "Extra High"),
                 ],
-                choices_enum=neuronhub.apps.tools.models.Importance,
+                choices_enum=neuronhub.apps.tools.migrations._deprecated.Importance,
                 default=None,
                 max_length=10,
                 null=True,

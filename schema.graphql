@@ -10,17 +10,6 @@ When the condition fails, the following can be returned (following this priority
 """
 directive @IsAuthenticated repeatable on FIELD_DEFINITION
 
-type CommentType {
-  id: ID!
-  parent: CommentType
-  visibility: Visibility!
-  author: UserType!
-  seen_by_users: [DjangoModelType!]!
-  content: String!
-  created_at: DateTime!
-  updated_at: DateTime!
-}
-
 """Date with time (isoformat)"""
 scalar DateTime
 
@@ -66,70 +55,65 @@ input ManyToOneInput {
 type Mutation {
   logout: Boolean!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
-  toggle_user_review_list(review_pk: ID!, review_list_name: UserReviewListName!, is_added: Boolean!): Boolean! @IsAuthenticated
+  update_user_list(id: ID!, list_field_name: UserListName!, is_added: Boolean!): Boolean! @IsAuthenticated
   create_post(data: PostTypeInput!): UserType! @IsAuthenticated
-  vote_post(id: ID!, is_vote_positive: Boolean): Boolean! @IsAuthenticated
-  create_review(data: ToolReviewTypeInput!): UserType! @IsAuthenticated
-  vote_review(id: ID!, is_vote_positive: Boolean): Boolean! @IsAuthenticated
+  create_post_review(data: PostTypeInput!): UserType! @IsAuthenticated
+  create_post_comment(data: PostTypeInput!): PostType! @IsAuthenticated
+  update_post(data: PostTypeInput!): PostType! @IsAuthenticated
+  create_or_update_post_vote(id: ID!, is_vote_positive: Boolean, is_important: Boolean, is_changed_my_mind: Boolean): Boolean! @IsAuthenticated
+  update_post_seen_status(id: ID!): Boolean! @IsAuthenticated
 }
 
 input OneToManyInput {
   set: ID
 }
 
-interface PostInterface {
-  id: ID!
-  tool: ToolType
-  author: UserType!
-  title: String!
-  content: String!
-  source: String!
-  updated_at: DateTime!
-  visibility: Visibility!
-  visible_to_users: [UserType!]!
-  visible_to_groups: [UserConnectionGroupType!]!
-  recommended_to_users: [UserType!]!
-  recommended_to_groups: [UserConnectionGroupType!]!
-  votes: [PostVoteInterface!]!
-  comments: [CommentType!]!
+input PostTagFilter {
+  id: IDBaseFilterLookup
+  name: StrFilterLookup
+  description: StrFilterLookup
+  AND: PostTagFilter
+  OR: PostTagFilter
+  NOT: PostTagFilter
+  DISTINCT: Boolean
 }
 
-type PostReviewType implements PostInterface {
+type PostTagType {
   id: ID!
-  tool: ToolType!
+  name: String!
+  description: String!
+  posts: [PostType!]!
+  tag_parent: PostTagType
+  tag_children(filters: PostTagFilter): [PostTagType!]!
   author: UserType!
-  title: String!
-  content: String!
-  source: String!
-  updated_at: DateTime!
-  visibility: Visibility!
-  visible_to_users: [UserType!]!
-  visible_to_groups: [UserConnectionGroupType!]!
-  recommended_to_users: [UserType!]!
-  recommended_to_groups: [UserConnectionGroupType!]!
-  votes: [PostReviewVoteType!]!
-  comments: [CommentType!]!
-  reviewed_at: DateTime!
-  rating: Decimal
-  importance: Decimal
-  experience_hours: Int
-  usage_status: UsageStatus
-  is_review_later: Boolean!
-  is_private: Boolean!
+  votes: [PostTagVoteType!]!
 }
 
-type PostReviewVoteType implements PostVoteInterface {
+input PostTagTypeInput {
+  id: ID
+  name: String!
+  description: String!
+  is_vote_positive: Boolean
+  is_important: Boolean
+}
+
+type PostTagVoteType {
   id: ID!
   author: UserType!
   is_vote_positive: Boolean
+  is_changed_my_mind: Boolean!
+  is_important: Boolean
 }
 
-type PostType implements PostInterface {
+type PostType {
   id: ID!
-  tool: ToolType
   author: UserType!
+  seen_by_users: [DjangoModelType!]!
+  children: [PostType!]!
+  type: PostTypeEnum!
   title: String!
   content: String!
+  content_private: String!
   source: String!
   updated_at: DateTime!
   visibility: Visibility!
@@ -137,31 +121,57 @@ type PostType implements PostInterface {
   visible_to_groups: [UserConnectionGroupType!]!
   recommended_to_users: [UserType!]!
   recommended_to_groups: [UserConnectionGroupType!]!
-  votes: [PostVoteInterface!]!
-  comments: [CommentType!]!
+  tags(filters: PostTagFilter): [PostTagType!]!
+  votes: [PostVoteType!]!
+}
+
+enum PostTypeEnum {
+  Post
+  Tool
+  Review
+  Comment
 }
 
 input PostTypeInput {
+  parent: OneToManyInput
+  children: ManyToOneInput
+  alternatives: ManyToManyInput
   title: String
   content: String
+  content_private: String
+  visibility: Visibility
+  visible_to_users: ManyToManyInput
+  visible_to_groups: ManyToManyInput
+  recommended_to_users: ManyToManyInput
+  recommended_to_groups: ManyToManyInput
+  tags: [PostTagTypeInput!]
+  source: String
+  seen_by_users: ManyToManyInput
+  review_usage_status: UsageStatus
+  review_rating: Decimal
+  review_experience_hours: Int
+  review_importance: Decimal
+  reviewed_at: DateTime
+  domain: String
+  github_url: String
+  crunchbase_url: String
+  url: String
 }
 
-interface PostVoteInterface {
+type PostVoteType {
   id: ID!
+  post: PostType!
   author: UserType!
   is_vote_positive: Boolean
+  is_changed_my_mind: Boolean
 }
 
 type Query {
   user_current: UserType
+  tags(filters: PostTagFilter): [PostTagType!]!
   posts: [PostType!]!
   post(id: ID!): PostType!
-  me: UserType!
-  tools(filters: ToolFilter): [ToolType!]!
-  tool(pk: ID!): ToolType!
-  tool_tags(filters: ToolTagFilter): [ToolTagType!]!
-  tool_reviews: [PostReviewType!]!
-  tool_review(id: ID!): PostReviewType!
+  comments(post_id: ID!): [PostType!]!
 }
 
 input StrFilterLookup {
@@ -212,105 +222,6 @@ input StrFilterLookup {
   i_regex: String
 }
 
-input ToolAlternativeTypeInput {
-  is_vote_positive: Boolean
-  tool_alternative: OneToManyInput!
-  comment: String
-}
-
-input ToolFilter {
-  id: IDBaseFilterLookup
-  name: StrFilterLookup
-  description: StrFilterLookup
-  AND: ToolFilter
-  OR: ToolFilter
-  NOT: ToolFilter
-  DISTINCT: Boolean
-}
-
-input ToolReviewTypeInput {
-  id: ID
-  tool: ToolTypeInput!
-  title: String
-  content: String
-  content_private: String
-  usage_status: UsageStatus
-  source: String
-  reviewed_at: DateTime
-  rating: Decimal
-  importance: Decimal
-  visibility: Visibility
-  visible_to_users: ManyToManyInput
-  visible_to_groups: ManyToManyInput
-  recommended_to_users: ManyToManyInput
-  recommended_to_groups: ManyToManyInput
-  is_review_later: Boolean
-  tags: [ToolTagTypeInput!]
-}
-
-type ToolReviewVoteType {
-  id: ID!
-  review: DjangoModelType!
-  is_vote_positive: Boolean
-}
-
-input ToolTagFilter {
-  id: IDBaseFilterLookup
-  name: StrFilterLookup
-  description: StrFilterLookup
-  AND: ToolTagFilter
-  OR: ToolTagFilter
-  NOT: ToolTagFilter
-  DISTINCT: Boolean
-}
-
-type ToolTagType {
-  id: ID!
-  name: String!
-  description: String!
-  is_important: Boolean!
-  tools(filters: ToolFilter): [ToolType!]!
-  tag_parent: ToolTagType
-  tag_children(filters: ToolTagFilter): [ToolTagType!]!
-  author: UserType!
-  votes: [ToolTagVoteType!]!
-}
-
-input ToolTagTypeInput {
-  id: ID
-  name: String!
-  description: String
-  comment: String
-  is_vote_positive: Boolean
-}
-
-type ToolTagVoteType {
-  id: ID!
-  is_vote_positive: Boolean
-  author: UserType!
-}
-
-type ToolType {
-  id: ID!
-  slug: String!
-  name: String!
-  crunchbase_url: String!
-  github_url: String!
-  description: String!
-  alternatives(filters: ToolFilter): [ToolType!]!
-  tags(filters: ToolTagFilter): [ToolTagType!]!
-}
-
-input ToolTypeInput {
-  id: ID
-  name: String!
-  type: String!
-  description: String
-  github_url: String
-  crunchbase_url: String
-  alternatives: [ToolAlternativeTypeInput!]
-}
-
 scalar Upload
 
 enum UsageStatus {
@@ -327,9 +238,9 @@ type UserConnectionGroupType {
   connections: [UserType!]!
 }
 
-enum UserReviewListName {
-  reviews_read_later
-  reviews_library
+enum UserListName {
+  read_later
+  library
 }
 
 type UserType {
@@ -340,22 +251,20 @@ type UserType {
   email: String!
   connection_groups: [UserConnectionGroupType!]!
   avatar: DjangoFileType
-  reviews_read_later: [DjangoModelType!]!
-  reviews_library: [DjangoModelType!]!
-  tool_review_votes: [ToolReviewVoteType!]!
+  post_votes: [PostVoteType!]!
+  read_later: [DjangoModelType!]!
+  library: [DjangoModelType!]!
 }
 
 input UserTypeInput {
-  id: String
   username: String
   first_name: String
   last_name: String
   email: String
   connection_groups: ManyToOneInput
   avatar: Upload
-  reviews_read_later: ManyToManyInput
-  reviews_library: ManyToManyInput
-  tool_review_votes: ManyToOneInput
+  read_later: ManyToManyInput
+  library: ManyToManyInput
 }
 
 enum Visibility {

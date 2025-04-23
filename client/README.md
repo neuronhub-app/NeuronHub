@@ -32,7 +32,7 @@ Known Issues
 
 v7 HMR triggers a hard reload on every change to a file with the Route's `export default` component, so keep only the route params code in the `index.tsx`. 
 
-Don't know what's up with `import("../index.js")` bugs, but hey, it's JS. Be grateful it compiles. For now.
+Don't know what's up with `import("../index.js")` bugs, but hey, it's JS. Be grateful it compiles. For now. (Related to react-router#12453)
 
 ### urql
 

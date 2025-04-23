@@ -2,7 +2,9 @@
 
 import django.db.models.deletion
 import django_choices_field.fields
-import neuronhub.apps.tools.models
+
+import neuronhub.apps.posts.models.posts
+import neuronhub.apps.posts.models.reviews
 from django.conf import settings
 from django.db import migrations, models
 
@@ -76,7 +78,7 @@ class Migration(migrations.Migration):
                     ("changed_my_mind", "Changed my mind"),
                     ("read_fully", "Read fully"),
                 ],
-                choices_enum=neuronhub.apps.tools.models.ReviewTagName,
+                choices_enum=neuronhub.apps.posts.models.reviews.ReviewTagName,
                 max_length=15,
             ),
         ),

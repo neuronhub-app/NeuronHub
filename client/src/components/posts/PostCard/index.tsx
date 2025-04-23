@@ -23,13 +23,11 @@ export function PostCard(props: { post: Post | PostReview }) {
         </Heading>
       )}
 
-      {isPostReview && (
-        <NavLink to={`/reviews/${post.id}`}>
-          <Text fontWeight="bold" color="fg.muted">
-            {post.title}
-          </Text>
-        </NavLink>
-      )}
+      <NavLink to={`/reviews/${post.id}`}>
+        <Text fontWeight="bold" color="fg.muted">
+          {post.title}
+        </Text>
+      </NavLink>
 
       {isPostReview && (
         <HStack gap="gap.lg">

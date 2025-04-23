@@ -3,7 +3,7 @@
 import django_choices_field.fields
 from django.db import migrations
 
-import neuronhub.apps.tools.models
+import neuronhub.apps.posts.models
 
 
 class Migration(migrations.Migration):
@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                     ("interested", "Interested"),
                     ("not_interested", "Not interested"),
                 ],
-                choices_enum=neuronhub.apps.tools.models.UsageStatus,
+                choices_enum=neuronhub.apps.posts.models.UsageStatus,
                 default=None,
                 max_length=14,
                 null=True,
@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                     ("interested", "Interested"),
                     ("not_interested", "Not interested"),
                 ],
-                choices_enum=neuronhub.apps.tools.models.UsageStatus,
+                choices_enum=neuronhub.apps.posts.models.UsageStatus,
                 default=None,
                 max_length=14,
                 null=True,

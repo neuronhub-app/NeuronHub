@@ -8,21 +8,17 @@ from asgiref.sync import sync_to_async
 from django.utils import timezone
 
 from neuronhub.apps.orgs.models import Org
-from neuronhub.apps.posts.models import Post  # Import Post model
-from neuronhub.apps.posts.models import PostTagVote
-from neuronhub.apps.posts.models import PostVote
+from neuronhub.apps.posts.models import PostRelated
+from neuronhub.apps.posts.models import UsageStatus
+from neuronhub.apps.posts.models.posts import Post  # Import Post model
+from neuronhub.apps.posts.models.posts import PostTag
+from neuronhub.apps.posts.models.posts import PostTagVote
+from neuronhub.apps.posts.models.posts import PostVote
 from neuronhub.apps.tests.test_gen import Gen
-from neuronhub.apps.tools.models import Company
-from neuronhub.apps.tools.models import CompanyOwnership
-from neuronhub.apps.tools.models import ReviewTagName
-from neuronhub.apps.tools.models import Tool
-from neuronhub.apps.tools.models import ToolAlternative
-from neuronhub.apps.tools.models import ToolReview
-from neuronhub.apps.tools.models import ToolReviewTag
-from neuronhub.apps.tools.models import ToolTag
-from neuronhub.apps.tools.models import ToolTagVote
-from neuronhub.apps.tools.models import UsageStatus
-from neuronhub.apps.tools.services.create_tag import create_tag
+from neuronhub.apps.posts.models.tools import ToolCompany
+from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
+from neuronhub.apps.posts.models.reviews import ReviewTagName
+from neuronhub.apps.posts.services.create_tag import create_tag
 from neuronhub.apps.users.models import User
 
 
@@ -35,18 +31,18 @@ async def db_stubs_repopulate(
     is_delete_orgs: bool = False,
 ) -> None:
     if is_delete_tools:
-        await PostTagVote.objects.all().adelete()
-        await PostVote.objects.all().adelete()
-        await Post.objects.all().adelete()
-        await ToolTagVote.objects.all().adelete()
-        await ToolTag.objects.all().adelete()
-        await ToolAlternative.objects.all().adelete()
-        await ToolReview.objects.all().adelete()
-        await Tool.objects.all().adelete()
-        await Company.objects.all().adelete()
+        for model in [
+            # posts:
+            PostTagVote,
+            PostTag,
+            PostVote,
+            Post,
+            PostRelated,
+            ToolCompany,
+        ]:
+            await model.objects.all().adelete()
 
     if is_delete_orgs:
-        # todo[+](test) restore orgs
         await Org.objects.all().adelete()
 
     if is_delete_users:
@@ -62,20 +58,25 @@ async def db_stubs_repopulate(
     tool_aider = await _create_tool_aider(user, gen=gen)
 
     # Create Posts
-    await _create_posts(user, gen=gen, tool_unifi=tool_unifi, tool_aider=tool_aider)
+    await _create_posts(user, gen=gen, post_unifi=tool_unifi, post_aider=tool_aider)
 
 
 async def _create_review_pycharm(user: User, gen: Gen):
-    pycharm = await gen.tools.create(
-        name="PyCharm",
-        type="Program",
-        crunchbase_url="crunchbase.com/organization/jetbrains",
-        description="PyCharm is an integrated development environment (IDE) used in computer programming, specifically for the Python language. It is developed by the Czech company JetBrains.",
-        url="jetbrains.com/pycharm",
-        company_name="JetBrains",
-        company_domain="jetbrains.com",
-        company_country="NL",
-        company_ownership_name="Private",
+    pycharm = await gen.posts.create(
+        gen.posts.Params(
+            type=Post.Type.Tool,
+            title="PyCharm",
+            tool_type=Post.ToolType.Program,
+            crunchbase_url="crunchbase.com/organization/jetbrains",
+            content="PyCharm is an integrated development environment (IDE) used in computer programming, "
+            "specifically "
+            "for the Python language. It is developed by the Czech company JetBrains.",
+            url="jetbrains.com/pycharm",
+            company_name="JetBrains",
+            company_domain="jetbrains.com",
+            company_country="NL",
+            company_ownership_name="Private",
+        )
     )
 
     await create_tags(
@@ -98,11 +99,12 @@ async def _create_review_pycharm(user: User, gen: Gen):
             TagParams("Business / Free Trial"),
         ],
     )
-    review = await ToolReview.objects.acreate(
-        tool=pycharm,
+    review = await Post.objects.acreate(
+        type=Post.Type.Review,
+        parent=pycharm,
         author=user,
         title="Fine, haven't seen better for Python or Django",
-        content_pros=textwrap.dedent(
+        review_content_pros=textwrap.dedent(
             """
             - Better than VS Code for Python
             - Python/Django stubs and completions
@@ -110,43 +112,47 @@ async def _create_review_pycharm(user: User, gen: Gen):
             - Git UI and shortcuts
             """
         ),
-        content_cons=textwrap.dedent(
+        review_content_cons=textwrap.dedent(
             """
             - JS/TS integration performance has been improving, but still not as good as VS Code
             - Bugs are frequent. Less than in VS Code, but still a lot
             """
         ),
-        usage_status=UsageStatus.USING,
-        rating=67,
-        importance=83,
-        experience_hours=17_000,
+        review_usage_status=UsageStatus.USING,
+        review_rating=67,
+        review_importance=83,
+        review_experience_hours=17_000,
         reviewed_at=timezone.now() - datetime.timedelta(days=8, hours=5, minutes=30),
     )
     await create_review_tags(
-        review=review,
+        post=review,
         params=[
             ReviewTagParams(ReviewTagName.expectations, is_vote_pos=True),
             ReviewTagParams(ReviewTagName.stability, is_vote_pos=False),
             ReviewTagParams(ReviewTagName.value, is_vote_pos=True),
-            ReviewTagParams(ReviewTagName.a_must, is_vote_pos=True),
+            ReviewTagParams(ReviewTagName.a_must_have, is_vote_pos=True),
             ReviewTagParams(ReviewTagName.ease_of_use, is_vote_pos=False),
         ],
     )
-    await gen.comments.create(review=review, author=user)
+    await gen.posts.create(gen.posts.Params(Post.Type.Comment, parent=review, author=user))
 
 
 async def _create_review_iterm(user: User, gen: Gen):
-    tool = await gen.tools.create(
-        name="iTerm2",
-        type="Program",
-        crunchbase_url="crunchbase.com/organization/iterm2",
-        github_url="github.com/gnachman/iTerm2",
-        description="iTerm2 is a terminal emulator for macOS that does amazing things. It brings the terminal into the modern age with features you never knew you always wanted.",
-        company_name="iTerm2",
-        company_domain="iterm2.com",
-        company_country="US",
-        is_single_product=True,
-        company_ownership_name="Private",
+    tool = await gen.posts.create(
+        gen.posts.Params(
+            title="iTerm2",
+            type=Post.Type.Review,
+            tool_type=Post.ToolType.Program,
+            crunchbase_url="crunchbase.com/organization/iterm2",
+            github_url="github.com/gnachman/iTerm2",
+            content="iTerm2 is a terminal emulator for macOS that does amazing things. It brings the terminal into "
+            "the modern age with features you never knew you always wanted.",
+            company_name="iTerm2",
+            company_domain="iterm2.com",
+            company_country="US",
+            is_single_product=True,
+            company_ownership_name="Private",
+        )
     )
 
     await create_tags(
@@ -161,8 +167,9 @@ async def _create_review_iterm(user: User, gen: Gen):
         ],
     )
 
-    review = await ToolReview.objects.acreate(
-        tool=tool,
+    review = await Post.objects.acreate(
+        type=Post.Type.Review,
+        parent=tool,
         author=user,
         title="Good shortcuts and render config, actively maintained",
         content=textwrap.dedent(
@@ -171,13 +178,13 @@ async def _create_review_iterm(user: User, gen: Gen):
             - no extra features, like history/fish/llm/etc
             """
         ),
-        usage_status=UsageStatus.USING,
-        rating=75,
-        importance=51,
-        experience_hours=7_000,
+        review_usage_status=UsageStatus.USING,
+        review_rating=75,
+        review_importance=51,
+        review_experience_hours=7_000,
     )
     await create_review_tags(
-        review=review,
+        post=review,
         params=[
             ReviewTagParams(ReviewTagName.open_source, is_vote_pos=True),
             ReviewTagParams(ReviewTagName.stability, is_vote_pos=True),
@@ -188,12 +195,18 @@ async def _create_review_iterm(user: User, gen: Gen):
     return tool
 
 
-async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Tool] = None):
-    tool = await gen.tools.create(
-        name="Ghostty",
-        type="Program",
-        github_url="github.com/ghostty-org/ghostty",
-        description="Ghostty is a terminal emulator that differentiates itself by being fast, feature-rich, and native.Performance is a category where people start getting really argumentative, so the only claim I make is that Ghostty aims to be in the same class as the fastest terminal emulators",
+async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] = None):
+    tool = await gen.posts.create(
+        gen.posts.Params(
+            title="Ghostty",
+            type=Post.Type.Tool,
+            tool_type=Post.ToolType.Program,
+            github_url="github.com/ghostty-org/ghostty",
+            content="Ghostty is a terminal emulator that differentiates itself by being fast, feature-rich, "
+            "and native.Performance is a category where people start getting really argumentative, "
+            "so the only claim I make is that Ghostty aims to be in the same class as the fastest terminal "
+            "emulators",
+        )
     )
 
     if alternatives:
@@ -213,31 +226,35 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Tool] 
         ],
     )
 
-    review = await ToolReview.objects.acreate(
-        tool=tool,
+    review = await Post.objects.acreate(
+        type=Post.Type.Review,
+        parent=tool,
         author=user,
         title="Haven't tried, heard good things from HN - embeddable, Zig-based",
-        usage_status=UsageStatus.INTERESTED,
+        review_usage_status=UsageStatus.INTERESTED,
         reviewed_at=timezone.now() - datetime.timedelta(days=35),
     )
     await create_review_tags(
-        review=review,
+        post=review,
         params=[
             ReviewTagParams(ReviewTagName.expectations, is_vote_pos=True),
         ],
     )
 
 
-async def _create_tool_unifi_network(user: User, gen: Gen) -> Tool:
-    tool = await gen.tools.create(
-        name="UniFi Network",
-        type="Software",
-        description="Ubiquiti UniFi Network Application for managing UniFi networking devices.",
-        url="ui.com/cloud-gateways",
-        company_name="Ubiquiti",
-        company_domain="ui.com",
-        company_country="US",
-        company_ownership_name="Public",
+async def _create_tool_unifi_network(user: User, gen: Gen) -> Post:
+    tool = await gen.posts.create(
+        gen.posts.Params(
+            title="UniFi Network)",
+            type=Post.Type.Tool,
+            tool_type=Post.ToolType.Program,
+            content="Ubiquiti UniFi Network Application for managing UniFi networking devices.",
+            url="ui.com/cloud-gateways",
+            company_name="Ubiquiti",
+            company_domain="ui.com",
+            company_country="US",
+            company_ownership_name="Public",
+        )
     )
     await create_tags(
         tool=tool,
@@ -253,17 +270,20 @@ async def _create_tool_unifi_network(user: User, gen: Gen) -> Tool:
     return tool
 
 
-async def _create_tool_aider(user: User, gen: Gen) -> Tool:
-    tool = await gen.tools.create(
-        name="Aider",
-        type="Software",
-        description="Aider is most popular on HN CLI-first AI coder wrapper. Owned by one angel SWE, for now anyway.",
-        url="aider.chat",
-        github_url="github.com/paul-gauthier/aider",
-        company_name="Aider",
-        company_domain="aider.chat",
-        is_single_product=True,
-        company_ownership_name="Private",
+async def _create_tool_aider(user: User, gen: Gen) -> Post:
+    tool = await gen.posts.create(
+        gen.posts.Params(
+            title="Aider",
+            type=Post.Type.Tool,
+            tool_type=Post.ToolType.Program,
+            content="Aider is most popular on HN CLI-first AI coder wrapper. Owned by one angel SWE, for now anyway.",
+            url="aider.chat",
+            github_url="github.com/paul-gauthier/aider",
+            company_name="Aider",
+            company_domain="aider.chat",
+            is_single_product=True,
+            company_ownership_name="Private",
+        )
     )
     await create_tags(
         tool=tool,
@@ -279,30 +299,35 @@ async def _create_tool_aider(user: User, gen: Gen) -> Tool:
     return tool
 
 
-async def _create_posts(user: User, gen: Gen, tool_unifi: Tool, tool_aider: Tool):
+async def _create_posts(user: User, gen: Gen, post_unifi: Post, post_aider: Post):
     await gen.posts.create(
-        title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this",
-        content=textwrap.dedent(
-            """
-            From LLM:
-            > 1. No UI solution - requires custom scripts that survive firmware updates and enforce routing rules, eg see the dead github.com/peacey/split-vpn
-            > 2. Can create a separate VLAN for VPN traffic with custom policy routing through config.gateway.json
-            """
-        ),
-        tool=tool_unifi,
-        author=user,
+        gen.posts.Params(
+            title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this)",
+            content=textwrap.dedent(
+                """
+                From LLM:
+                > 1. No UI solution - requires custom scripts that survive firmware updates and enforce routing rules, 
+                eg see the dead github.com/peacey/split-vpn
+                > 2. Can create a separate VLAN for VPN traffic with custom policy routing through config.gateway.json
+                """
+            ),
+            parent=post_unifi,
+            author=user,
+        )
     )
 
     await gen.posts.create(
-        title="Aider leaderboards are becoming popular on HN for new models assessment",
-        content="https://aider.chat/docs/leaderboards",
-        tool=tool_aider,
-        author=user,
+        gen.posts.Params(
+            title="Aider leaderboards are becoming popular on HN for new models assessment)",
+            content="https://aider.chat/docs/leaderboards",
+            parent=post_aider,
+            author=user,
+        )
     )
 
 
-async def create_company_ownership(name: str) -> CompanyOwnership:
-    ownership, _ = await CompanyOwnership.objects.aget_or_create(name=name)
+async def create_company_ownership(name: str) -> "ToolCompanyOwnership":
+    ownership, _ = await ToolCompanyOwnership.objects.aget_or_create(name=name)
     return ownership
 
 
@@ -313,12 +338,12 @@ class TagParams:
     is_important: bool = False
 
 
-async def create_tags(tool: Tool, author: User, params: list[TagParams]):
+async def create_tags(tool: Post, author: User, params: list[TagParams]):
     await asyncio.gather(
         *[
             create_tag(
                 name_raw=param.name,
-                tool=tool,
+                post=tool,
                 author=author,
                 is_vote_positive=param.is_vote_pos,
                 is_important=param.is_important,
@@ -334,12 +359,13 @@ class ReviewTagParams:
     is_vote_pos: bool | None = None
 
 
-async def create_review_tags(review: ToolReview, params: list[ReviewTagParams]):
+async def create_review_tags(post: Post, params: list[ReviewTagParams]):
+    tag = await PostTag.objects.acreate(name=ReviewTagName.expectations.value)
     await asyncio.gather(
         *[
-            ToolReviewTag.objects.acreate(
-                review=review,
-                name=param.name.value,
+            PostTagVote.objects.acreate(
+                post=post,
+                tag=tag,
                 is_vote_positive=param.is_vote_pos,
             )
             for param in params

@@ -1,7 +1,7 @@
 import strawberry_django
 from strawberry import auto
 
-from neuronhub.apps.tools.models import ToolReviewVote
+from neuronhub.apps.posts.graphql.types_lazy import PostVoteTypeLazy
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
 
@@ -13,25 +13,9 @@ class UserConnectionGroupType:
     connections: list["UserType"]
 
 
-@strawberry_django.type(ToolReviewVote)
-class ToolReviewVoteType:
-    """
-    moving it to apps.tools breaks strawberry weird loading
-
-    strawberry.lazy("neuronhub.apps.tools.resolvers") doesn't work. Neither does the string type, while it should.
-    All other apps.tool types are in RAM, but ToolReviewVote is missing.
-
-    Loads with this crunch. Whatever. Strawberry will prob fix it later.
-    """
-
-    id: auto
-    review: auto
-    is_vote_positive: auto
-
-
 @strawberry_django.type(User)
 class UserType:
-    # For privacy only username is exposed
+    # for privacy only username is exposed
     id: auto = strawberry_django.field(field_name="username")
     username: auto
 
@@ -41,17 +25,20 @@ class UserType:
     connection_groups: list[UserConnectionGroupType]
     avatar: auto
 
-    reviews_read_later: auto
-    reviews_library: auto
+    post_votes: list[PostVoteTypeLazy]
 
-    tool_review_votes: list[ToolReviewVoteType]
+    read_later: auto
+    library: auto
 
 
 @strawberry_django.input(User, partial=True)
-class UserTypeInput(UserType):
+class UserTypeInput:
+    username: auto
     first_name: auto
     last_name: auto
-    connection_groups: list[UserType]
+    email: auto
+    connection_groups: list[UserConnectionGroupType]
+    avatar: auto
 
-    reviews_read_later: auto
-    reviews_library: auto
+    read_later: auto
+    library: auto

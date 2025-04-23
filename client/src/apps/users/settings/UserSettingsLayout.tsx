@@ -1,4 +1,4 @@
-import { urls } from "@/urls";
+import { urls } from "@/routes";
 import { For, Tabs } from "@chakra-ui/react";
 import { FaUsers } from "react-icons/fa";
 import { FaUser } from "react-icons/fa";

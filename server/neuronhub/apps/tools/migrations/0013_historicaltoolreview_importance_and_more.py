@@ -6,7 +6,7 @@ from django.db import migrations
 from django.db import models
 
 import neuronhub.apps.anonymizer.fields
-import neuronhub.apps.tools.models
+import neuronhub.apps.tools.migrations._deprecated
 
 
 class Migration(migrations.Migration):
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                     ("high", "High"),
                     ("urgent", "Urgent"),
                 ],
-                choices_enum=neuronhub.apps.tools.models.Importance,
+                choices_enum=neuronhub.apps.tools.migrations._deprecated.Importance,
                 default=None,
                 max_length=9,
                 null=True,
@@ -63,7 +63,7 @@ class Migration(migrations.Migration):
                     ("high", "High"),
                     ("urgent", "Urgent"),
                 ],
-                choices_enum=neuronhub.apps.tools.models.Importance,
+                choices_enum=neuronhub.apps.tools.migrations._deprecated.Importance,
                 default=None,
                 max_length=9,
                 null=True,

@@ -6,8 +6,9 @@ import { Icon, IconButton } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { FaShare } from "react-icons/fa6";
 import { useSnapshot } from "valtio/react";
+import type { ListFieldName } from "~/graphql/graphql";
 
-export function PostButtonShare(props: { reviewId: ID }) {
+export function PostButtonShare(props: { id: ID; fieldName: ListFieldName }) {
   const userSnap = useSnapshot(user.state);
 
   const state = useValtioProxyRef({
@@ -15,15 +16,15 @@ export function PostButtonShare(props: { reviewId: ID }) {
     isAdded: false,
   });
 
+  const userLibrary = userSnap.current?.[props.fieldName];
+
   useEffect(() => {
     if (!userSnap.current) {
       return;
     }
-    const isInList = userSnap.current.reviews_library.some(
-      (review: { pk: ID }) => review.pk === props.reviewId,
-    );
-    state.mutable.isAdded = isInList;
-  }, [userSnap.current?.reviews_library]);
+    const isInList = userLibrary?.some((review: { pk: ID }) => review.pk === props.id);
+    state.mutable.isAdded = isInList ?? false;
+  }, [userLibrary]);
 
   return (
     <Tooltip content="Share" positioning={{ placement: "left" }}>

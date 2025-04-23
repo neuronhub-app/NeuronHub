@@ -2,7 +2,7 @@ import { useUserCurrent } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColorModeButton } from "@/components/ui/color-mode";
-import { urls } from "@/urls";
+import { urls } from "@/routes";
 import {
   Bleed,
   type ButtonProps,
@@ -18,6 +18,7 @@ import { Box, HStack } from "@chakra-ui/react";
 import { MessageSquareText } from "lucide-react";
 import type { SVGProps } from "react";
 import { FaRegBookmark } from "react-icons/fa6";
+import { GoCommentDiscussion } from "react-icons/go";
 import { LuLayoutDashboard, LuLibrary, LuSettings } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink } from "react-router";
@@ -27,6 +28,7 @@ const groups = [
     title: "",
     links: [
       { to: "/tools", icon: LuLayoutDashboard, label: "Tools" },
+      { to: "/posts", icon: GoCommentDiscussion, label: "Posts" },
       { to: "/reviews", icon: MessageSquareText, label: "Reviews" },
       { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
       { to: "/library", icon: LuLibrary, label: "Library" },

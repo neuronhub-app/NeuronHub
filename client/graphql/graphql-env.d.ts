@@ -156,6 +156,10 @@ export type introspection_types = {
     ];
   };
   Int: unknown;
+  ListFieldName: {
+    name: "ListFieldName";
+    enumValues: "read_later_posts" | "read_later_reviews" | "library_posts" | "library_reviews";
+  };
   ManyToManyInput: {
     kind: "INPUT_OBJECT";
     name: "ManyToManyInput";
@@ -276,8 +280,8 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
         };
       };
-      toggle_user_review_list: {
-        name: "toggle_user_review_list";
+      mutate_user_list: {
+        name: "mutate_user_list";
         type: {
           kind: "NON_NULL";
           name: never;
@@ -859,7 +863,7 @@ export type introspection_types = {
             ofType: {
               kind: "NON_NULL";
               name: never;
-              ofType: { kind: "INTERFACE"; name: "PostVoteInterface"; ofType: null };
+              ofType: { kind: "OBJECT"; name: "PostVoteType"; ofType: null };
             };
           };
         };
@@ -908,7 +912,41 @@ export type introspection_types = {
         type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
       };
     };
-    possibleTypes: "PostReviewVoteType";
+    possibleTypes: "PostReviewVoteType" | "PostVoteType";
+  };
+  PostVoteType: {
+    kind: "OBJECT";
+    name: "PostVoteType";
+    fields: {
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      is_vote_positive: {
+        name: "is_vote_positive";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+      };
+      post: {
+        name: "post";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+        };
+      };
+    };
   };
   Query: {
     kind: "OBJECT";
@@ -1667,10 +1705,6 @@ export type introspection_types = {
       };
     };
   };
-  UserReviewListName: {
-    name: "UserReviewListName";
-    enumValues: "reviews_read_later" | "reviews_library";
-  };
   UserType: {
     kind: "OBJECT";
     name: "UserType";
@@ -1724,8 +1758,8 @@ export type introspection_types = {
           ofType: { kind: "SCALAR"; name: "String"; ofType: null };
         };
       };
-      reviews_library: {
-        name: "reviews_library";
+      library_comments: {
+        name: "library_comments";
         type: {
           kind: "NON_NULL";
           name: never;
@@ -1740,8 +1774,120 @@ export type introspection_types = {
           };
         };
       };
-      reviews_read_later: {
-        name: "reviews_read_later";
+      library_posts: {
+        name: "library_posts";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      library_reviews: {
+        name: "library_reviews";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      library_tools: {
+        name: "library_tools";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      post_votes: {
+        name: "post_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+      read_later_comments: {
+        name: "read_later_comments";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      read_later_posts: {
+        name: "read_later_posts";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      read_later_reviews: {
+        name: "read_later_reviews";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      read_later_tools: {
+        name: "read_later_tools";
         type: {
           kind: "NON_NULL";
           name: never;
@@ -1787,7 +1933,6 @@ export type introspection_types = {
     name: "UserTypeInput";
     isOneOf: false;
     inputFields: [
-      { name: "id"; type: { kind: "SCALAR"; name: "String"; ofType: null }; defaultValue: null },
       {
         name: "username";
         type: { kind: "SCALAR"; name: "String"; ofType: null };
@@ -1819,18 +1964,43 @@ export type introspection_types = {
         defaultValue: null;
       },
       {
-        name: "reviews_read_later";
+        name: "read_later_posts";
         type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
         defaultValue: null;
       },
       {
-        name: "reviews_library";
+        name: "read_later_tools";
         type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
         defaultValue: null;
       },
       {
-        name: "tool_review_votes";
-        type: { kind: "INPUT_OBJECT"; name: "ManyToOneInput"; ofType: null };
+        name: "read_later_comments";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "read_later_reviews";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "library_posts";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "library_tools";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "library_comments";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "library_reviews";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
         defaultValue: null;
       },
     ];

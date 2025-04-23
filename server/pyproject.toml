@@ -19,6 +19,7 @@ dependencies = [
         "ipython ~= 9.0.0",
     "strawberry-graphql ~= 0.263.2",
         "strawberry-graphql-django ~= 0.58.0",
+    "django-stubs ~= 5.2.0",
 
     # django fields
     "django-choices-field ~= 2.3.0",
@@ -48,6 +49,7 @@ dependencies = [
     "markdownify ~= 1.1.0",
     "rich ~= 14.0.0",
     "sentry-sdk ~= 2.25.1",
+
 ]
 
 
@@ -63,6 +65,10 @@ dev-dependencies = [
         "pytest-pspec ~= 0.0.4",
         "pytest-rich ~= 0.2.0",
 ]
+
+
+[tool.django-stubs]
+    django_settings_module = "neuronhub.settings"
 
 
 [tool.ruff]

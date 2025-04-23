@@ -47,13 +47,23 @@ export const UserQueryDoc = graphql(`
       name: username
       email
       
-      reviews_library { pk }
-      reviews_read_later { pk }
+      library_posts { pk }
+      library_reviews { pk }
+      
+      read_later_posts { pk }
+      read_later_reviews { pk }
 
       tool_review_votes {
         id
         is_vote_positive
         review {
+          pk
+        }
+      }
+      post_votes {
+        id
+        is_vote_positive
+        post {
           pk
         }
       }

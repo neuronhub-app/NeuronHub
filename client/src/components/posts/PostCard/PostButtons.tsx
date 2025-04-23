@@ -5,6 +5,7 @@ import { user } from "@/apps/users/useUserCurrent";
 import { PostButtonShare } from "@/components/posts/PostCard/PostButtonShare";
 import { Tooltip } from "@/components/ui/tooltip";
 import { type ID, graphql } from "@/gql-tada";
+import { isPostReviewType } from "@/graphql/fragments/reviews";
 import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { For, IconButton, Stack } from "@chakra-ui/react";
@@ -13,22 +14,25 @@ import { type ComponentProps, type ReactNode, useEffect } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { LuLibrary } from "react-icons/lu";
 import { useSnapshot } from "valtio/react";
-import { UserReviewListName } from "~/graphql/graphql";
+import { ListFieldName } from "~/graphql/graphql";
 
+// todo ~ put into PostCard [[./index.tsx]]
 export function PostButtons(props: { post: Post | PostReview }) {
+  const isPostReview = isPostReviewType(props.post);
+
   const buttons: Array<ComponentProps<typeof ReviewButton>> = [
     {
-      fieldName: UserReviewListName.ReviewsReadLater,
+      fieldName: isPostReview ? ListFieldName.ReadLaterReviews : ListFieldName.ReadLaterPosts,
       iconPresent: <FaBookmark />,
       iconNotPresent: <FaRegBookmark />,
-      reviewId: props.post.id,
+      id: props.post.id,
       label: "Reading list",
     },
     {
-      fieldName: UserReviewListName.ReviewsLibrary,
+      fieldName: isPostReview ? ListFieldName.LibraryReviews : ListFieldName.LibraryPosts,
       iconPresent: <LuLibrary />,
       iconNotPresent: <LuLibrary />,
-      reviewId: props.post.id,
+      id: props.post.id,
       label: "Library",
     },
   ];
@@ -42,16 +46,19 @@ export function PostButtons(props: { post: Post | PostReview }) {
           </ErrorBoundary>
         )}
       </For>
-      <PostButtonShare reviewId={props.post.id} />
+      <PostButtonShare
+        id={props.post.id}
+        fieldName={isPostReview ? ListFieldName.LibraryReviews : ListFieldName.LibraryPosts}
+      />
     </Stack>
   );
 }
 
 function ReviewButton(props: {
-  fieldName: UserReviewListName;
+  fieldName: ListFieldName;
   iconNotPresent: ReactNode;
   iconPresent: ReactNode;
-  reviewId: ID;
+  id: ID;
   label: string;
 }) {
   const userSnap = useSnapshot(user.state);
@@ -66,7 +73,7 @@ function ReviewButton(props: {
       return;
     }
     const isInList = userSnap.current[props.fieldName].some(
-      (review: { pk: ID }) => review.pk === props.reviewId,
+      (review: { pk: ID }) => review.pk === props.id,
     );
     state.mutable.isAdded = isInList;
   }, [userSnap.current?.[props.fieldName]]);
@@ -85,19 +92,19 @@ function ReviewButton(props: {
           await mutateAndRefetch(
             graphql(
               `
-                mutation toggle_user_review_list(
-                  $reviewId: ID!, $reviewListName: UserReviewListName!, $isAdded: Boolean!
+                mutation mutate_user_list(
+                  $id: ID!, $list_field_name: ListFieldName!, $is_added: Boolean!
                 ) {
-                  toggle_user_review_list(
-                    review_pk: $reviewId, review_list_name: $reviewListName, is_added: $isAdded
+                  mutate_user_list(
+                    id: $id, list_field_name: $list_field_name, is_added: $is_added
                   )
                 }
               `,
             ),
             {
-              reviewId: props.reviewId,
-              reviewListName: props.fieldName,
-              isAdded: !state.snap.isAdded,
+              id: props.id,
+              list_field_name: props.fieldName,
+              is_added: !state.snap.isAdded,
             },
           );
           state.mutable.isLoading = false;

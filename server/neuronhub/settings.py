@@ -4,6 +4,7 @@ from pathlib import Path
 
 import dj_database_url
 import django
+import django_stubs_ext
 import environ
 import rich.traceback
 import sentry_sdk
@@ -12,6 +13,8 @@ from dotenv import load_dotenv
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import StrawberryDjangoSettings
 
+
+django_stubs_ext.monkeypatch()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
@@ -28,7 +31,6 @@ DJANGO_ENV = DjangoEnv(env.str("DJANGO_ENV", DjangoEnv.LOCAL.value))
 
 if DJANGO_ENV is DjangoEnv.LOCAL:
     load_dotenv(os.path.join(BASE_DIR, ".env.local"), override=True)
-
 
 SECRET_KEY = env.str(
     "SECRET_KEY", "django-insecure-u_nt^p$$c611a&(jd*wbs58ziu4=o3%ps%@4zpv9=(8ix&8k7i"
@@ -58,7 +60,6 @@ INSTALLED_APPS = [
     "strawberry_django",
     "neuronhub.apps.db",
     "neuronhub.apps.users",
-    "neuronhub.apps.comments",
     "neuronhub.apps.orgs",
     "neuronhub.apps.tools",
     "neuronhub.apps.posts",
@@ -117,7 +118,6 @@ if DJANGO_ENV is DjangoEnv.LOCAL:
     context_processors: list[str] = TEMPLATES[0]["OPTIONS"]["context_processors"]
     context_processors.insert(0, "django.template.context_processors.debug")
 
-
 WSGI_APPLICATION = "neuronhub.wsgi.application"
 ASGI_APPLICATION = "neuronhub.asgi.application"
 
@@ -136,7 +136,6 @@ else:
         )
     }
 
-
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_L10N = False  # to make admin dates readable
@@ -146,9 +145,7 @@ DATETIME_FORMAT = "Y.m.d H:i"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
 SITE_ID = 1
-
 
 STATIC_URL = "static/"
 ROOT_URLCONF = "neuronhub.urls"
@@ -194,13 +191,11 @@ RENDER_EXTERNAL_HOSTNAME = env.str("RENDER_EXTERNAL_HOSTNAME", "")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
-
 EMAIL_BACKEND = env.str("EMAIL_BACKEND", "anymail.backends.postmark.EmailBackend")
 EMAIL_USE_TLS = True
 ANYMAIL = {
     "POSTMARK_SERVER_TOKEN": env.str("POSTMARK_SERVER_TOKEN", ""),
 }
-
 
 AUTH_USER_MODEL = "users.User"
 AUTH_PASSWORD_VALIDATORS = [
@@ -227,7 +222,6 @@ ACCOUNT_SESSION_REMEMBER = True
 if DJANGO_ENV == DjangoEnv.LOCAL:
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
 
-
 IS_SENTRY_ENABLED = env.bool(
     "IS_SENTRY_ENABLED", DJANGO_ENV in (DjangoEnv.PROD, DjangoEnv.STAGE)
 )
@@ -241,7 +235,6 @@ if IS_SENTRY_ENABLED:
             ),
         ],
     )
-
 
 LOGGING = {
     "version": 1,
@@ -267,7 +260,6 @@ rich.traceback.install(
     suppress=[django],
 )
 
-
 DEFAULT_DJANGO_SETTINGS = StrawberryDjangoSettings(
     FIELD_DESCRIPTION_FROM_HELP_TEXT=True,
     TYPE_DESCRIPTION_FROM_MODEL_DOCSTRING=True,
@@ -275,7 +267,7 @@ DEFAULT_DJANGO_SETTINGS = StrawberryDjangoSettings(
     MUTATIONS_DEFAULT_ARGUMENT_NAME="data",
     MUTATIONS_DEFAULT_HANDLE_ERRORS=False,
     MAP_AUTO_ID_AS_GLOBAL_ID=False,
-    DEFAULT_PK_FIELD_NAME="pk",
+    DEFAULT_PK_FIELD_NAME="id",  # default is "pk" - nice intention, but dumb - "id" is soft-required in django, alas
     USE_DEPRECATED_FILTERS=False,
     PAGINATION_DEFAULT_LIMIT=300,
 )

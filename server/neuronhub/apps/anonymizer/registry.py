@@ -58,7 +58,9 @@ async def anonymize_user_data(
 class AnonymizerRegistry:
     models: list[type[AnonimazableTimeStampedModel]] = []
 
-    def register[M: AnonimazableTimeStampedModel](self, cls: type[M]) -> type[M]:
+    # the generic limiter breaks pycharm stubs
+    # def register[M: AnonimazableTimeStampedModel]
+    def register[M](self, cls: type[M]) -> type[M]:
         assert issubclass(cls, AnonimazableTimeStampedModel)
         self.models.append(cls)
         return cls
@@ -70,7 +72,7 @@ anonymizer = AnonymizerRegistry()
 is_anonymizable_attr_name = "_is_anonymizable_field"
 
 
-def anonymizable_field[F: Field](field: F) -> F:
+def anonymizable[F: Field](field: F) -> F:
     """
     Helps to avoid forgetting to mark all anonymizable fields
     """
@@ -79,8 +81,8 @@ def anonymizable_field[F: Field](field: F) -> F:
 
 
 class AnonimazableTimeStampedModel(TimeStampedModel):
-    created_at = anonymizable_field(models.DateTimeField(auto_now_add=True))
-    updated_at = anonymizable_field(models.DateTimeField(auto_now=True))
+    created_at = anonymizable(models.DateTimeField(auto_now_add=True))
+    updated_at = anonymizable(models.DateTimeField(auto_now=True))
 
     author: User
     history: HistoricalRecords | None = None

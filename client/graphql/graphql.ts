@@ -61,6 +61,13 @@ export type IdBaseFilterLookup = {
   is_null?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
+export enum ListFieldName {
+  LibraryPosts = "library_posts",
+  LibraryReviews = "library_reviews",
+  ReadLaterPosts = "read_later_posts",
+  ReadLaterReviews = "read_later_reviews",
+}
+
 export type ManyToManyInput = {
   add?: InputMaybe<Array<Scalars["ID"]["input"]>>;
   remove?: InputMaybe<Array<Scalars["ID"]["input"]>>;
@@ -78,7 +85,7 @@ export type Mutation = {
   create_post: UserType;
   create_review: UserType;
   logout: Scalars["Boolean"]["output"];
-  toggle_user_review_list: Scalars["Boolean"]["output"];
+  mutate_user_list: Scalars["Boolean"]["output"];
   update_user: UserType;
   vote_post: Scalars["Boolean"]["output"];
   vote_review: Scalars["Boolean"]["output"];
@@ -92,10 +99,10 @@ export type MutationCreate_ReviewArgs = {
   data: ToolReviewTypeInput;
 };
 
-export type MutationToggle_User_Review_ListArgs = {
+export type MutationMutate_User_ListArgs = {
+  id: Scalars["ID"]["input"];
   is_added: Scalars["Boolean"]["input"];
-  review_list_name: UserReviewListName;
-  review_pk: Scalars["ID"]["input"];
+  list_field_name: ListFieldName;
 };
 
 export type MutationUpdate_UserArgs = {
@@ -180,7 +187,7 @@ export type PostType = PostInterface & {
   visibility: Visibility;
   visible_to_groups: Array<UserConnectionGroupType>;
   visible_to_users: Array<UserType>;
-  votes: Array<PostVoteInterface>;
+  votes: Array<PostVoteType>;
 };
 
 export type PostTypeInput = {
@@ -192,6 +199,14 @@ export type PostVoteInterface = {
   author: UserType;
   id: Scalars["ID"]["output"];
   is_vote_positive?: Maybe<Scalars["Boolean"]["output"]>;
+};
+
+export type PostVoteType = PostVoteInterface & {
+  __typename?: "PostVoteType";
+  author: UserType;
+  id: Scalars["ID"]["output"];
+  is_vote_positive?: Maybe<Scalars["Boolean"]["output"]>;
+  post: DjangoModelType;
 };
 
 export type Query = {
@@ -388,11 +403,6 @@ export type UserConnectionGroupType = {
   name: Scalars["String"]["output"];
 };
 
-export enum UserReviewListName {
-  ReviewsLibrary = "reviews_library",
-  ReviewsReadLater = "reviews_read_later",
-}
-
 export type UserType = {
   __typename?: "UserType";
   avatar?: Maybe<DjangoFileType>;
@@ -401,8 +411,15 @@ export type UserType = {
   first_name: Scalars["String"]["output"];
   id: Scalars["String"]["output"];
   last_name: Scalars["String"]["output"];
-  reviews_library: Array<DjangoModelType>;
-  reviews_read_later: Array<DjangoModelType>;
+  library_comments: Array<DjangoModelType>;
+  library_posts: Array<DjangoModelType>;
+  library_reviews: Array<DjangoModelType>;
+  library_tools: Array<DjangoModelType>;
+  post_votes: Array<PostVoteType>;
+  read_later_comments: Array<DjangoModelType>;
+  read_later_posts: Array<DjangoModelType>;
+  read_later_reviews: Array<DjangoModelType>;
+  read_later_tools: Array<DjangoModelType>;
   tool_review_votes: Array<ToolReviewVoteType>;
   username: Scalars["String"]["output"];
 };
@@ -412,11 +429,15 @@ export type UserTypeInput = {
   connection_groups?: InputMaybe<ManyToOneInput>;
   email?: InputMaybe<Scalars["String"]["input"]>;
   first_name?: InputMaybe<Scalars["String"]["input"]>;
-  id?: InputMaybe<Scalars["String"]["input"]>;
   last_name?: InputMaybe<Scalars["String"]["input"]>;
-  reviews_library?: InputMaybe<ManyToManyInput>;
-  reviews_read_later?: InputMaybe<ManyToManyInput>;
-  tool_review_votes?: InputMaybe<ManyToOneInput>;
+  library_comments?: InputMaybe<ManyToManyInput>;
+  library_posts?: InputMaybe<ManyToManyInput>;
+  library_reviews?: InputMaybe<ManyToManyInput>;
+  library_tools?: InputMaybe<ManyToManyInput>;
+  read_later_comments?: InputMaybe<ManyToManyInput>;
+  read_later_posts?: InputMaybe<ManyToManyInput>;
+  read_later_reviews?: InputMaybe<ManyToManyInput>;
+  read_later_tools?: InputMaybe<ManyToManyInput>;
   username?: InputMaybe<Scalars["String"]["input"]>;
 };
 
@@ -430,6 +451,17 @@ export enum Visibility {
   SubscribersPaid = "SUBSCRIBERS_PAID",
   UsersSelected = "USERS_SELECTED",
 }
+
+export type PostDetailQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type PostDetailQuery = {
+  __typename?: "Query";
+  post: { __typename?: "PostType" } & {
+    " $fragmentRefs"?: { PostDetailFragmentFragment: PostDetailFragmentFragment };
+  };
+};
 
 export type PostListQueryVariables = Exact<{ [key: string]: never }>;
 
@@ -481,7 +513,7 @@ export type PostReviewDetailQueryVariables = Exact<{
 export type PostReviewDetailQuery = {
   __typename?: "Query";
   tool_review: { __typename?: "PostReviewType" } & {
-    " $fragmentRefs"?: { PostReviewFragmentFragment: PostReviewFragmentFragment };
+    " $fragmentRefs"?: { PostReviewDetailFragmentFragment: PostReviewDetailFragmentFragment };
   };
 };
 
@@ -506,13 +538,21 @@ export type UserCurrentQuery = {
     username: string;
     email: string;
     name: string;
-    reviews_library: Array<{ __typename?: "DjangoModelType"; pk: string }>;
-    reviews_read_later: Array<{ __typename?: "DjangoModelType"; pk: string }>;
+    library_posts: Array<{ __typename?: "DjangoModelType"; pk: string }>;
+    library_reviews: Array<{ __typename?: "DjangoModelType"; pk: string }>;
+    read_later_posts: Array<{ __typename?: "DjangoModelType"; pk: string }>;
+    read_later_reviews: Array<{ __typename?: "DjangoModelType"; pk: string }>;
     tool_review_votes: Array<{
       __typename?: "ToolReviewVoteType";
       id: string;
       is_vote_positive?: boolean | null;
       review: { __typename?: "DjangoModelType"; pk: string };
+    }>;
+    post_votes: Array<{
+      __typename?: "PostVoteType";
+      id: string;
+      is_vote_positive?: boolean | null;
+      post: { __typename?: "DjangoModelType"; pk: string };
     }>;
     connection_groups: Array<{
       __typename?: "UserConnectionGroupType";
@@ -542,16 +582,13 @@ export type Vote_PostMutationVariables = Exact<{
 
 export type Vote_PostMutation = { __typename?: "Mutation"; vote_post: boolean };
 
-export type Toggle_User_Review_ListMutationVariables = Exact<{
-  reviewId: Scalars["ID"]["input"];
-  reviewListName: UserReviewListName;
-  isAdded: Scalars["Boolean"]["input"];
+export type Mutate_User_ListMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  list_field_name: ListFieldName;
+  is_added: Scalars["Boolean"]["input"];
 }>;
 
-export type Toggle_User_Review_ListMutation = {
-  __typename?: "Mutation";
-  toggle_user_review_list: boolean;
-};
+export type Mutate_User_ListMutation = { __typename?: "Mutation"; mutate_user_list: boolean };
 
 type PostWithoutToolFragment_PostReviewType_Fragment = {
   __typename?: "PostReviewType";
@@ -587,11 +624,7 @@ type PostWithoutToolFragment_PostType_Fragment = {
     username: string;
     avatar?: { __typename?: "DjangoFileType"; url: string } | null;
   };
-  votes: Array<{
-    __typename?: "PostReviewVoteType";
-    id: string;
-    is_vote_positive?: boolean | null;
-  }>;
+  votes: Array<{ __typename?: "PostVoteType"; id: string; is_vote_positive?: boolean | null }>;
   comments: Array<{ __typename?: "CommentType"; id: string }>;
 } & { " $fragmentName"?: "PostWithoutToolFragment_PostType_Fragment" };
 
@@ -667,6 +700,13 @@ export type PostCommentsFragmentFragment =
   | PostCommentsFragment_PostReviewType_Fragment
   | PostCommentsFragment_PostType_Fragment;
 
+export type PostDetailFragmentFragment = ({ __typename?: "PostType" } & {
+  " $fragmentRefs"?: {
+    PostFragment_PostType_Fragment: PostFragment_PostType_Fragment;
+    PostCommentsFragment_PostType_Fragment: PostCommentsFragment_PostType_Fragment;
+  };
+}) & { " $fragmentName"?: "PostDetailFragmentFragment" };
+
 export type PostReviewFragmentFragment = ({
   __typename?: "PostReviewType";
   importance?: any | null;
@@ -682,9 +722,15 @@ export type PostReviewFragmentFragment = ({
 } & {
   " $fragmentRefs"?: {
     PostWithoutToolFragment_PostReviewType_Fragment: PostWithoutToolFragment_PostReviewType_Fragment;
-    PostCommentsFragment_PostReviewType_Fragment: PostCommentsFragment_PostReviewType_Fragment;
   };
 }) & { " $fragmentName"?: "PostReviewFragmentFragment" };
+
+export type PostReviewDetailFragmentFragment = ({ __typename?: "PostReviewType" } & {
+  " $fragmentRefs"?: {
+    PostReviewFragmentFragment: PostReviewFragmentFragment;
+    PostCommentsFragment_PostReviewType_Fragment: PostCommentsFragment_PostReviewType_Fragment;
+  };
+}) & { " $fragmentName"?: "PostReviewDetailFragmentFragment" };
 
 export type ToolTagFragmentFragment = {
   __typename?: "ToolTagType";
@@ -1139,6 +1185,229 @@ export const PostCommentsFragmentFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<PostCommentsFragmentFragment, unknown>;
+export const PostDetailFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostDetailFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostFragment" } },
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostCommentsFragment" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostWithoutToolFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostInterface" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "content" } },
+          { kind: "Field", name: { kind: "Name", value: "source" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "author" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "avatar" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "votes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "comments" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ToolTagFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "ToolTagType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tag_parent" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "author" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "votes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "username" } },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ToolFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "ToolType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "github_url" } },
+          { kind: "Field", name: { kind: "Name", value: "crunchbase_url" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tags" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolTagFragment" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostInterface" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostWithoutToolFragment" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tool" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolFragment" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostCommentsFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostInterface" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "comments" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "username" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatar" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "created_at" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "content" } },
+                { kind: "Field", name: { kind: "Name", value: "visibility" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PostDetailFragmentFragment, unknown>;
 export const PostReviewFragmentFragmentDoc = {
   kind: "Document",
   definitions: [
@@ -1167,7 +1436,6 @@ export const PostReviewFragmentFragmentDoc = {
               ],
             },
           },
-          { kind: "FragmentSpread", name: { kind: "Name", value: "PostCommentsFragment" } },
         ],
       },
     },
@@ -1306,6 +1574,186 @@ export const PostReviewFragmentFragmentDoc = {
         ],
       },
     },
+  ],
+} as unknown as DocumentNode<PostReviewFragmentFragment, unknown>;
+export const PostReviewDetailFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostReviewDetailFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostReviewType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostReviewFragment" } },
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostCommentsFragment" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostWithoutToolFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostInterface" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "content" } },
+          { kind: "Field", name: { kind: "Name", value: "source" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "author" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "avatar" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "votes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "comments" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ToolTagFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "ToolTagType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tag_parent" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "author" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "votes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "username" } },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ToolFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "ToolType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "github_url" } },
+          { kind: "Field", name: { kind: "Name", value: "crunchbase_url" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tags" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolTagFragment" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostReviewFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostReviewType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostWithoutToolFragment" } },
+          { kind: "Field", name: { kind: "Name", value: "importance" } },
+          { kind: "Field", name: { kind: "Name", value: "is_private" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_later" } },
+          { kind: "Field", name: { kind: "Name", value: "usage_status" } },
+          { kind: "Field", name: { kind: "Name", value: "rating" } },
+          { kind: "Field", name: { kind: "Name", value: "experience_hours" } },
+          { kind: "Field", name: { kind: "Name", value: "reviewed_at" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tool" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolFragment" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
     {
       kind: "FragmentDefinition",
       name: { kind: "Name", value: "PostCommentsFragment" },
@@ -1357,7 +1805,267 @@ export const PostReviewFragmentFragmentDoc = {
       },
     },
   ],
-} as unknown as DocumentNode<PostReviewFragmentFragment, unknown>;
+} as unknown as DocumentNode<PostReviewDetailFragmentFragment, unknown>;
+export const PostDetailDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "PostDetail" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "post" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "PostDetailFragment" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostWithoutToolFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostInterface" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "content" } },
+          { kind: "Field", name: { kind: "Name", value: "source" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "author" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "avatar" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "votes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "comments" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ToolTagFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "ToolTagType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tag_parent" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "author" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "username" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "votes" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "username" } },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ToolFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "ToolType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "github_url" } },
+          { kind: "Field", name: { kind: "Name", value: "crunchbase_url" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tags" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolTagFragment" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostInterface" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostWithoutToolFragment" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tool" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolFragment" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostCommentsFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostInterface" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "comments" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "username" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatar" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "created_at" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "content" } },
+                { kind: "Field", name: { kind: "Name", value: "visibility" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostDetailFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostFragment" } },
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostCommentsFragment" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PostDetailQuery, PostDetailQueryVariables>;
 export const PostListDocument = {
   kind: "Document",
   definitions: [
@@ -1753,7 +2461,10 @@ export const PostReviewDetailDocument = {
             selectionSet: {
               kind: "SelectionSet",
               selections: [
-                { kind: "FragmentSpread", name: { kind: "Name", value: "PostReviewFragment" } },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "PostReviewDetailFragment" },
+                },
               ],
             },
           },
@@ -1897,6 +2608,34 @@ export const PostReviewDetailDocument = {
     },
     {
       kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PostReviewFragment" },
+      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostReviewType" } },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostWithoutToolFragment" } },
+          { kind: "Field", name: { kind: "Name", value: "importance" } },
+          { kind: "Field", name: { kind: "Name", value: "is_private" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_later" } },
+          { kind: "Field", name: { kind: "Name", value: "usage_status" } },
+          { kind: "Field", name: { kind: "Name", value: "rating" } },
+          { kind: "Field", name: { kind: "Name", value: "experience_hours" } },
+          { kind: "Field", name: { kind: "Name", value: "reviewed_at" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "tool" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolFragment" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
       name: { kind: "Name", value: "PostCommentsFragment" },
       typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostInterface" } },
       selectionSet: {
@@ -1947,29 +2686,12 @@ export const PostReviewDetailDocument = {
     },
     {
       kind: "FragmentDefinition",
-      name: { kind: "Name", value: "PostReviewFragment" },
+      name: { kind: "Name", value: "PostReviewDetailFragment" },
       typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostReviewType" } },
       selectionSet: {
         kind: "SelectionSet",
         selections: [
-          { kind: "FragmentSpread", name: { kind: "Name", value: "PostWithoutToolFragment" } },
-          { kind: "Field", name: { kind: "Name", value: "importance" } },
-          { kind: "Field", name: { kind: "Name", value: "is_private" } },
-          { kind: "Field", name: { kind: "Name", value: "is_review_later" } },
-          { kind: "Field", name: { kind: "Name", value: "usage_status" } },
-          { kind: "Field", name: { kind: "Name", value: "rating" } },
-          { kind: "Field", name: { kind: "Name", value: "experience_hours" } },
-          { kind: "Field", name: { kind: "Name", value: "reviewed_at" } },
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "tool" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "FragmentSpread", name: { kind: "Name", value: "ToolFragment" } },
-              ],
-            },
-          },
+          { kind: "FragmentSpread", name: { kind: "Name", value: "PostReviewFragment" } },
           { kind: "FragmentSpread", name: { kind: "Name", value: "PostCommentsFragment" } },
         ],
       },
@@ -2136,56 +2858,6 @@ export const ReviewListDocument = {
     },
     {
       kind: "FragmentDefinition",
-      name: { kind: "Name", value: "PostCommentsFragment" },
-      typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostInterface" } },
-      selectionSet: {
-        kind: "SelectionSet",
-        selections: [
-          {
-            kind: "Field",
-            name: { kind: "Name", value: "comments" },
-            selectionSet: {
-              kind: "SelectionSet",
-              selections: [
-                { kind: "Field", name: { kind: "Name", value: "id" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "author" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "username" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "avatar" },
-                        selectionSet: {
-                          kind: "SelectionSet",
-                          selections: [{ kind: "Field", name: { kind: "Name", value: "url" } }],
-                        },
-                      },
-                    ],
-                  },
-                },
-                { kind: "Field", name: { kind: "Name", value: "created_at" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "parent" },
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
-                  },
-                },
-                { kind: "Field", name: { kind: "Name", value: "content" } },
-                { kind: "Field", name: { kind: "Name", value: "visibility" } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-    {
-      kind: "FragmentDefinition",
       name: { kind: "Name", value: "PostReviewFragment" },
       typeCondition: { kind: "NamedType", name: { kind: "Name", value: "PostReviewType" } },
       selectionSet: {
@@ -2209,7 +2881,6 @@ export const ReviewListDocument = {
               ],
             },
           },
-          { kind: "FragmentSpread", name: { kind: "Name", value: "PostCommentsFragment" } },
         ],
       },
     },
@@ -2241,7 +2912,7 @@ export const UserCurrentDocument = {
                 { kind: "Field", name: { kind: "Name", value: "email" } },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "reviews_library" },
+                  name: { kind: "Name", value: "library_posts" },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [{ kind: "Field", name: { kind: "Name", value: "pk" } }],
@@ -2249,7 +2920,23 @@ export const UserCurrentDocument = {
                 },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "reviews_read_later" },
+                  name: { kind: "Name", value: "library_reviews" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "pk" } }],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "read_later_posts" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "pk" } }],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "read_later_reviews" },
                   selectionSet: {
                     kind: "SelectionSet",
                     selections: [{ kind: "Field", name: { kind: "Name", value: "pk" } }],
@@ -2266,6 +2953,25 @@ export const UserCurrentDocument = {
                       {
                         kind: "Field",
                         name: { kind: "Name", value: "review" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "pk" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "post_votes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "post" },
                         selectionSet: {
                           kind: "SelectionSet",
                           selections: [{ kind: "Field", name: { kind: "Name", value: "pk" } }],
@@ -2401,17 +3107,17 @@ export const Vote_PostDocument = {
     },
   ],
 } as unknown as DocumentNode<Vote_PostMutation, Vote_PostMutationVariables>;
-export const Toggle_User_Review_ListDocument = {
+export const Mutate_User_ListDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
       operation: "mutation",
-      name: { kind: "Name", value: "toggle_user_review_list" },
+      name: { kind: "Name", value: "mutate_user_list" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "reviewId" } },
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
           type: {
             kind: "NonNullType",
             type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
@@ -2419,15 +3125,15 @@ export const Toggle_User_Review_ListDocument = {
         },
         {
           kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "reviewListName" } },
+          variable: { kind: "Variable", name: { kind: "Name", value: "list_field_name" } },
           type: {
             kind: "NonNullType",
-            type: { kind: "NamedType", name: { kind: "Name", value: "UserReviewListName" } },
+            type: { kind: "NamedType", name: { kind: "Name", value: "ListFieldName" } },
           },
         },
         {
           kind: "VariableDefinition",
-          variable: { kind: "Variable", name: { kind: "Name", value: "isAdded" } },
+          variable: { kind: "Variable", name: { kind: "Name", value: "is_added" } },
           type: {
             kind: "NonNullType",
             type: { kind: "NamedType", name: { kind: "Name", value: "Boolean" } },
@@ -2439,22 +3145,22 @@ export const Toggle_User_Review_ListDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "toggle_user_review_list" },
+            name: { kind: "Name", value: "mutate_user_list" },
             arguments: [
               {
                 kind: "Argument",
-                name: { kind: "Name", value: "review_pk" },
-                value: { kind: "Variable", name: { kind: "Name", value: "reviewId" } },
+                name: { kind: "Name", value: "id" },
+                value: { kind: "Variable", name: { kind: "Name", value: "id" } },
               },
               {
                 kind: "Argument",
-                name: { kind: "Name", value: "review_list_name" },
-                value: { kind: "Variable", name: { kind: "Name", value: "reviewListName" } },
+                name: { kind: "Name", value: "list_field_name" },
+                value: { kind: "Variable", name: { kind: "Name", value: "list_field_name" } },
               },
               {
                 kind: "Argument",
                 name: { kind: "Name", value: "is_added" },
-                value: { kind: "Variable", name: { kind: "Name", value: "isAdded" } },
+                value: { kind: "Variable", name: { kind: "Name", value: "is_added" } },
               },
             ],
           },
@@ -2462,7 +3168,4 @@ export const Toggle_User_Review_ListDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<
-  Toggle_User_Review_ListMutation,
-  Toggle_User_Review_ListMutationVariables
->;
+} as unknown as DocumentNode<Mutate_User_ListMutation, Mutate_User_ListMutationVariables>;

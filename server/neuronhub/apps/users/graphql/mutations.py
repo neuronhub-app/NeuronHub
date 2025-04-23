@@ -1,4 +1,3 @@
-from enum import Enum
 from typing import cast
 
 import strawberry
@@ -7,14 +6,10 @@ from strawberry import Info
 from strawberry_django import auth
 from strawberry_django.permissions import IsAuthenticated
 
+from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.graphql.types import UserTypeInput
 from neuronhub.apps.users.models import User
-
-
-class UserReviewListName(Enum):
-    reviews_read_later = "reviews_read_later"
-    reviews_library = "reviews_library"
 
 
 @strawberry.type
@@ -36,16 +31,20 @@ class UserMutation:
         return cast(UserType, user)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def toggle_user_review_list(
+    async def update_user_list(
         self,
-        review_pk: strawberry.ID,
-        review_list_name: UserReviewListName,
+        id: strawberry.ID,
+        list_field_name: UserListName,
         is_added: bool,
         info: Info,
     ) -> bool:
         user: User = info.context.request.user
+
+        field_name = list_field_name.value
+        assert getattr(user, field_name), f"Check User.{field_name} field existence"
+
         if is_added:
-            await sync_to_async(getattr(user, review_list_name.value).add)(review_pk)
+            await sync_to_async(getattr(user, field_name).add)(id)
         else:
-            await sync_to_async(getattr(user, review_list_name.value).remove)(review_pk)
+            await sync_to_async(getattr(user, field_name).remove)(id)
         return True
