@@ -68,7 +68,7 @@
     "vite": "^6.3.2",
     "@vitejs/plugin-react": "^4.4.1",
     "@rollup/plugin-replace": "^6.0.2",
-    "vite-tsconfig-paths": "^5.1.4",
+    "vite-tsconfig-paths": "^6.0.0-beta.3",
 
     "npm-check-updates": "^18.0.0"
   }

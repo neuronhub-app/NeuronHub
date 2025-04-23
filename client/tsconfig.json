@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext", // ES2020 from Vite, replaced with ESNext for Chakra
-    "module": "ESNext", // ES6 replace with ESNext for Chakra
+    "module": "ESNext", // ES6 replaced with ESNext for Chakra
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleResolution": "Bundler", // by Vite and Chakra
 
@@ -24,7 +24,11 @@
 
     "paths": {
       "@/*": ["./src/*"],
-      "~/graphql/*": ["./graphql/*"]
+
+      // generated
+      // todo ~ move to a subdir
+      "~/graphql/*": ["./graphql/*"],
+      "~/react-router/*": ["./.react-router/types/src/apps/*"]
     },
 
     "plugins": [
