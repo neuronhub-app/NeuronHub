@@ -1,69 +1,70 @@
 [project]
 
 name = "neuronhub"
-version = "0.1.0.0"
+version = "0.0.0.0"
 description = ""
 requires-python = "~=3.13"
 dependencies = [
     # django
-    "django ~= 5.2",
-    "django-allauth ~= 65.7.0",
-    "django-anymail ~= 13.0",
-    "django-cors-headers ~= 4.7.0",
-    "django-fieldsignals ~= 0.7.0",
-    "django-health-check ~= 3.18.3",
-    "django-simple-history ~= 3.8.0",
-    "django-countries ~= 7.6.1",
-    "dj-database-url ~= 2.3.0",
-    "django-extensions ~= 3.2.3",
-        "ipython ~= 9.0.0",
-    "strawberry-graphql ~= 0.263.2",
-        "strawberry-graphql-django ~= 0.58.0",
-    "django-stubs ~= 5.2.0",
+    "django == 5.2",
+    "django-allauth == 65.*",
+    "django-anymail == 13.0",
+    "django-cors-headers == 4.*",
+    "django-fieldsignals == 0.*",
+    "django-health-check == 3.18.3",
+    "django-simple-history == 3.*",
+    "django-countries == 7.6.1",
+    "dj-database-url == 2.*",
+    "django-extensions == 3.2.3",
+        "ipython == 9.*",
+    "strawberry-graphql ~= 0.273.0",
+        "strawberry-graphql-django ~= 0.61.0",
+    "django-stubs == 5.*",
 
     # django fields
-    "django-choices-field ~= 2.3.0",
-    "django-timezone-field ~= 7.1",
+    "django-choices-field == 2.*",
+    "django-timezone-field == 7.1",
 
     # django admin
-    "django-admin-sortable2 ~= 2.2.6",
-    "django-admin-autocomplete-filter ~= 0.7.1",
-    "django-adminutils ~= 0.0.23",
-    "django-select2-admin-filters ~= 0.1.4",
-        "django-select2 ~= 8.4.0",
-    "django-codemirror2 ~= 0.2",
-    "django-hijack ~= 3.7.1",
-    "django-object-actions ~= 4.3.0",
-    "django-debug-toolbar ~= 5.1.0",
+    "django-admin-sortable2 == 2.2.6",
+    "django-admin-autocomplete-filter == 0.7.1",
+    "django-adminutils == 0.0.28",
+    "django-select2-admin-filters == 0.1.4",
+        "django-select2 == 8.*",
+    "django-codemirror2 == 0.2",
+    "django-hijack == 3.7.1",
+    "django-object-actions == 4.*",
+    "django-debug-toolbar == 5.*",
 
     # server
-    "daphne ~= 4.1.2",
-    "whitenoise ~= 6.9.0",
-    "psycopg ~= 3.2.6",
+    "daphne == 4.1.2",
+    "whitenoise == 6.*",
+    "psycopg == 3.2.6",
 
     # utils
-    "python-dateutil ~= 2.9.0",
-    "python-dotenv ~= 1.1.0",
-    "python-environ ~= 0.4.54",
-    "humanize ~= 4.12.2",
-    "markdownify ~= 1.1.0",
-    "rich ~= 14.0.0",
-    "sentry-sdk ~= 2.25.1",
-
+    "python-dateutil == 2.*",
+    "python-dotenv == 1.*",
+    "python-environ == 0.4.54",
+    "humanize == 4.12.2",
+    "markdownify == 1.*",
+    "rich == 14.*",
+    "sentry-sdk == 2.25.1",
 ]
 
 
 [tool.uv]
 
 dev-dependencies = [
-    "ruff ~= 0.11.5",
-    "faker ~= 37.0.0",
-    "objprint ~= 0.3.0",
-    "pytest ~= 8.3.5",
-        "pytest-django ~= 4.10.0",
-        "pytest-mock ~= 3.14.0",
+    "ruff == 0.11.*",
+    "faker == 37.*",
+    "objprint == 0.*",
+    "pip == 25.*",
+    "wat == 0.6.*",
+    "pytest == 8.*",
+        "pytest-django == 4.*",
+        "pytest-mock == 3.*",
         "pytest-pspec ~= 0.0.4",
-        "pytest-rich ~= 0.2.0",
+        "pytest-rich == 0.*",
 ]
 
 
