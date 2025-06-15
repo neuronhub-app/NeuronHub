@@ -5,6 +5,8 @@ import { FaRegStar } from "react-icons/fa6";
 import { HiMiniChartBar } from "react-icons/hi2";
 import { MdOutlineSpeed } from "react-icons/md";
 
+type RatingType = "rating" | "importance" | "experience";
+
 /**
  * Converts 100 base rating to a 5 boxes rating, where the last box is filled by %.
  * Eg
@@ -12,7 +14,7 @@ import { MdOutlineSpeed } from "react-icons/md";
  * - rating = 65 → box 4/5 filled with 25% background
  */
 export function RatingBars(props: {
-  type: "rating" | "importance" | "experience";
+  type: RatingType;
   rating: string | number | unknown;
   color: JsxStyleProps["color"];
   boxSize?: JsxStyleProps["boxSize"];
@@ -51,7 +53,7 @@ export function RatingBars(props: {
     <Tooltip
       content={
         <Stack>
-          <Text textTransform="capitalize">{`${props.type}: ${Math.round(rating0to100)}%`}</Text>
+          <Text textTransform="capitalize">{getTooltipContent(props.type, rating0to100)}</Text>
         </Stack>
       }
       showArrow
@@ -93,6 +95,22 @@ export function RatingBars(props: {
       </HStack>
     </Tooltip>
   );
+}
+
+function getTooltipContent(type: RatingType, rating: number): string {
+  const contentStart = `${type}:`;
+  let contentEnd = "";
+  if (type === "rating") {
+    contentEnd = `${Math.round(rating)}%`;
+  }
+  if (type === "importance") {
+    contentEnd = `${Math.round(rating)}%`;
+  }
+  if (type === "experience") {
+    // renders hours with a `'` for readability
+    contentEnd = `${Math.round(rating).toLocaleString("en-US", { useGrouping: true })}h`;
+  }
+  return `${contentStart} ${contentEnd}`;
 }
 
 function getExperienceRating0to5(hours: number): number {
