@@ -1,14 +1,13 @@
-import type { Post } from "@/apps/posts/list/PostList";
-import type { PostReview } from "@/apps/reviews/list/PostReviewList";
+import type { PostFragmentType } from "@/graphql/fragments/posts";
 import { Avatar, Flex, Text } from "@chakra-ui/react";
 
-export function PostAuthor(props: { author: PostReview["author"] | Post["author"] }) {
+export function PostAuthor(props: { author: PostFragmentType["author"] }) {
   return (
     <Flex align="center" gap="gap.sm">
       <Avatar.Root size="2xs" variant="subtle" colorPalette="gray">
-        <Avatar.Fallback name={props.author.username} />
+        <Avatar.Fallback name={props.author?.username} />
         <Avatar.Image
-          src={props.author.avatar?.url}
+          src={props.author?.avatar?.url}
           filter="grayscale(0.4)"
           _hover={{
             filter: "grayscale(0)",
@@ -16,7 +15,7 @@ export function PostAuthor(props: { author: PostReview["author"] | Post["author"
         />
       </Avatar.Root>
       <Text fontSize="sm" color="fg.muted">
-        {props.author.username}
+        {props.author?.username}
       </Text>
     </Flex>
   );

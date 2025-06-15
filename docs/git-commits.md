@@ -8,7 +8,7 @@ Emojis aren't used due to the cognitive overhead in interpreting their platform-
 
 ### Type
 
-The Type is written before the commit, as:
+The Type is written before the commit. Values:
 - `+` - features (additions)
 - `-` - bug fixes and reverts/removals
 - `~` - refactor, cleanups, perf, etc (no intentional changes, additions/deletions, hence `~`)
@@ -22,12 +22,10 @@ Adding `!` as a second char indicates the size/importance of the changes. Eg squ
 
 ### Scopes
 
-In brackets `()` after the Type, as:
-- BE - backend
-- FE - frontend
+After the Type following a space. Values:
 - monitor - sentry, datadog, etc
 - track - PostHog or other changes re analytics and activity tracking
-- auth - apps.auth or frontend logic for it, hijacking, permissions, etc
+- users - apps.users or frontend logic for it, hijacking, permissions, etc
 - admin - django admin related
 - types - TypeScript or Python typings
 - API - related to strawberry structure and/or graphql types

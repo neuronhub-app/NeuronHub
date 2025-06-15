@@ -25,6 +25,15 @@ Set your IDE to run Biome on save, eg with [Biome JetBrains plugins](https://plu
 
 Biome is immature. The JetBrains plugin often needs cache resets (restarts), and eg a manual path to `neuronhub/client/biome.jsonc`.
 
+Unusual techniques
+--------------------------------
+
+To avoid GraphQL stale cache, each mutation is triggered using [`async mutateAndRefetch`](./src/urql/mutateAndRefetch.ts),
+which calls [`refetchAllQueries`](./src/urql/refetchQueriesExchange.ts) - refetching all mounted (eg by `urlq.useQuery()`)
+Queries. The `mutateAndRefetch` doesn't return to the caller until all queries are refetched.
+
+This will likely grow overly expensive on the server, and too annoying to the end-user, but atm it takes just a ~second.
+
 Known Issues
 --------------------------------
 

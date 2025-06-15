@@ -1,11 +1,8 @@
-import type { Post } from "@/apps/posts/list/PostList";
-import type { PostReview } from "@/apps/reviews/list/PostReviewList";
-
 import { user } from "@/apps/users/useUserCurrent";
+import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostButtonShare } from "@/components/posts/PostCard/PostButtonShare";
 import { Tooltip } from "@/components/ui/tooltip";
 import { type ID, graphql } from "@/gql-tada";
-import { isPostReviewType } from "@/graphql/fragments/reviews";
 import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { For, IconButton, Stack } from "@chakra-ui/react";
@@ -14,22 +11,21 @@ import { type ComponentProps, type ReactNode, useEffect } from "react";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { LuLibrary } from "react-icons/lu";
 import { useSnapshot } from "valtio/react";
-import { ListFieldName } from "~/graphql/graphql";
+import { UserListName } from "~/graphql/graphql";
 
-// todo ~ put into PostCard [[./index.tsx]]
-export function PostButtons(props: { post: Post | PostReview }) {
-  const isPostReview = isPostReviewType(props.post);
-
+// todo ~ put into PostCard [[./index.tsx]], and leave only `export ReviewButton`
+// this is overly complex & abstract for a child component
+export function PostButtons(props: { post: PostListItemType }) {
   const buttons: Array<ComponentProps<typeof ReviewButton>> = [
     {
-      fieldName: isPostReview ? ListFieldName.ReadLaterReviews : ListFieldName.ReadLaterPosts,
+      fieldName: UserListName.ReadLater,
       iconPresent: <FaBookmark />,
       iconNotPresent: <FaRegBookmark />,
       id: props.post.id,
       label: "Reading list",
     },
     {
-      fieldName: isPostReview ? ListFieldName.LibraryReviews : ListFieldName.LibraryPosts,
+      fieldName: UserListName.Library,
       iconPresent: <LuLibrary />,
       iconNotPresent: <LuLibrary />,
       id: props.post.id,
@@ -40,22 +36,19 @@ export function PostButtons(props: { post: Post | PostReview }) {
   return (
     <Stack gap="gap.sm">
       <For each={buttons}>
-        {propsChild => (
-          <ErrorBoundary key={propsChild.fieldName}>
-            <ReviewButton {...propsChild} />
+        {buttonProps => (
+          <ErrorBoundary key={buttonProps.fieldName}>
+            <ReviewButton {...buttonProps} />
           </ErrorBoundary>
         )}
       </For>
-      <PostButtonShare
-        id={props.post.id}
-        fieldName={isPostReview ? ListFieldName.LibraryReviews : ListFieldName.LibraryPosts}
-      />
+      <PostButtonShare id={props.post.id} fieldName={UserListName.Library} />
     </Stack>
   );
 }
 
 function ReviewButton(props: {
-  fieldName: ListFieldName;
+  fieldName: UserListName;
   iconNotPresent: ReactNode;
   iconPresent: ReactNode;
   id: ID;
@@ -72,11 +65,11 @@ function ReviewButton(props: {
     if (!userSnap.current) {
       return;
     }
-    const isInList = userSnap.current[props.fieldName].some(
-      (review: { pk: ID }) => review.pk === props.id,
+    const isInList = userSnap.current[props.fieldName]?.some(
+      (post: { pk: ID }) => post.pk === props.id,
     );
     state.mutable.isAdded = isInList;
-  }, [userSnap.current?.[props.fieldName]]);
+  }, [userSnap.current, props.fieldName, props.id]);
 
   const label = `${state.snap.isAdded ? "Remove from" : "Add to"} ${props.label}`;
 
@@ -92,11 +85,15 @@ function ReviewButton(props: {
           await mutateAndRefetch(
             graphql(
               `
-                mutation mutate_user_list(
-                  $id: ID!, $list_field_name: ListFieldName!, $is_added: Boolean!
+                mutation update_user_list(
+                  $id: ID!
+                  $list_field_name: UserListName!
+                  $is_added: Boolean!
                 ) {
-                  mutate_user_list(
-                    id: $id, list_field_name: $list_field_name, is_added: $is_added
+                  update_user_list(
+                    id: $id
+                    list_field_name: $list_field_name
+                    is_added: $is_added
                   )
                 }
               `,

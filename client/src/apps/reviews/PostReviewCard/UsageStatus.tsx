@@ -1,9 +1,9 @@
-import type { PostReview } from "@/apps/reviews/list/PostReviewList";
+import type { PostReviewFragmentType } from "@/graphql/fragments/reviews";
 import { Flex, Icon, type JsxStyleProps, Text } from "@chakra-ui/react";
 import { BiPulse } from "react-icons/bi";
 
 export function UsageStatusBlock(props: {
-  status: PostReview["usage_status"] | null;
+  status: PostReviewFragmentType["review_usage_status"] | null;
   color: JsxStyleProps["color"];
 }) {
   if (!props.status) {
@@ -22,7 +22,7 @@ export function UsageStatusBlock(props: {
   );
 }
 
-const statuses: Record<NonNullable<PostReview["usage_status"]>, string> = {
+const statuses: Record<NonNullable<PostReviewFragmentType["review_usage_status"]>, string> = {
   USING: "Using",
   WANT_TO_USE: "Want to use",
   INTERESTED: "Interested",

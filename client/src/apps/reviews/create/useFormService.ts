@@ -58,8 +58,8 @@ export function useFormService() {
 }
 
 const CreateReviewDoc = graphql(`
-  mutation CreateReview($input: ToolReviewTypeInput!) {
-    create_review(data: $input) {
+  mutation CreatePostReview($input: PostTypeInput!) {
+    create_post(data: $input) {
       id
     }
   }

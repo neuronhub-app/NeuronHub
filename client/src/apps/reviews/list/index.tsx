@@ -1,5 +1,5 @@
 import { PostReviewList } from "@/apps/reviews/list/PostReviewList";
 
-export default function ReviewListRoute() {
+export default function PostReviewListRoute() {
   return <PostReviewList />;
 }

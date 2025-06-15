@@ -1,0 +1,31 @@
+import { type FragmentOf, graphql } from "@/gql-tada";
+
+export const PostTagFragment = graphql(`
+  fragment PostTagFragment on PostTagType {
+    id
+    votes {
+      id
+      is_vote_positive
+      author {
+        id
+        # todo ! is this a sec leak? can we use hashes?
+        username
+      }
+    }
+
+    name
+    description
+    is_important
+    
+    tag_parent {
+      id
+      name
+    }
+    author {
+      id
+      username
+    }
+  }
+`);
+
+export type PostTagFragmentType = FragmentOf<typeof PostTagFragment>;

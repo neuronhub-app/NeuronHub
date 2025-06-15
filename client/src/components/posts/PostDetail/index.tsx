@@ -1,14 +1,15 @@
 import { PostCard } from "@/components/posts/PostCard";
 import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
-import type { PostReviewDetailType } from "@/graphql/fragments/reviews";
+import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { datetime } from "@/utils/date-fns";
 import { For, HStack, Heading, Stack, Text } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import type { CombinedError } from "urql";
+import { PostTypeEnum } from "~/graphql/graphql";
 
 export function PostDetail(props: {
   title: string;
-  post: PostDetailFragmentType | PostReviewDetailType | undefined;
+  post: PostDetailFragmentType | PostReviewDetailFragmentType | undefined;
   isLoading: boolean;
   error?: CombinedError;
   children?: ReactNode;
@@ -23,18 +24,20 @@ export function PostDetail(props: {
         <Stack gap="gap.xl">
           <PostCard post={props.post} />
 
-          <For each={props.post.comments}>
-            {comment => (
-              <Stack key={comment.id} gap="gap.sm">
-                <HStack justify="space-between">
-                  <Heading size="lg">{comment.author.username}</Heading>
-                  <Text color="fg.subtle" fontSize="sm">
-                    {datetime.relative(comment.created_at)}
-                  </Text>
-                </HStack>
-                <p>{comment.content}</p>
-              </Stack>
-            )}
+          <For each={props.post.children}>
+            {comment =>
+              comment.type === PostTypeEnum.Comment && (
+                <Stack key={comment.id} gap="gap.sm">
+                  <HStack justify="space-between">
+                    <Heading size="lg">{comment.author.username}</Heading>
+                    <Text color="fg.subtle" fontSize="sm">
+                      {datetime.relative(comment.created_at)}
+                    </Text>
+                  </HStack>
+                  <p>{comment.content}</p>
+                </Stack>
+              )
+            }
           </For>
         </Stack>
       )}

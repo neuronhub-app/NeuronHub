@@ -1,16 +1,20 @@
 import { type FragmentOf, graphql } from "@/gql-tada";
-import { ToolFragment } from "@/graphql/fragments/tools";
+import { PostTagFragment } from "@/graphql/fragments/tags";
 
-/*
- * A fix for `tool` nullability - ie since Graphql lacks syntax `tool! { ...ToolFragment }`
- */
-export const PostWithoutToolFragment = graphql(
+export const PostFragment = graphql(
   `
-    fragment PostWithoutToolFragment on PostInterface {
+    fragment PostFragment on PostTypeI {
       id
+      __typename
+      type
       title
       content
       source
+      crunchbase_url
+      github_url
+      url
+      domain
+      
       author {
         id
         username
@@ -22,33 +26,42 @@ export const PostWithoutToolFragment = graphql(
         id
         is_vote_positive
       }
-      comments {
+      children {
         id
+        type
+        content
+        author {
+          id
+          username
+        }
+        created_at
+        updated_at
       }
-      
+      parent {
+        id
+        __typename
+        title
+        tags {
+          ...PostTagFragment
+        }
+      }
       updated_at
-    }
-  `,
-);
 
-export const PostFragment = graphql(
-  `
-    fragment PostFragment on PostInterface {
-      ...PostWithoutToolFragment
-
-      tool {
-        ...ToolFragment
+      tags {
+        ...PostTagFragment
       }
     }
   `,
-  [PostWithoutToolFragment, ToolFragment],
+  [PostTagFragment],
 );
 
 export const PostCommentsFragment = graphql(
   `
-    fragment PostCommentsFragment on PostInterface {
-      comments {
+    fragment PostCommentsFragment on PostTypeI {
+      children {
         id
+        type
+        __typename
         author {
           id
           username
@@ -56,12 +69,13 @@ export const PostCommentsFragment = graphql(
             url
           }
         }
-        created_at
         parent {
           id
         }
         content
         visibility
+        created_at
+        updated_at
       }
     }
   `,
@@ -69,12 +83,14 @@ export const PostCommentsFragment = graphql(
 
 export const PostDetailFragment = graphql(
   `
-    fragment PostDetailFragment on PostType {
+    fragment PostDetailFragment on PostTypeI {
       ...PostFragment
       ...PostCommentsFragment
     }
   `,
   [PostFragment, PostCommentsFragment],
 );
+
+export type PostFragmentType = FragmentOf<typeof PostFragment>;
 
 export type PostDetailFragmentType = FragmentOf<typeof PostDetailFragment>;

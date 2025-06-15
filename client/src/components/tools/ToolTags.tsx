@@ -1,4 +1,4 @@
-import type { ToolTag } from "@/graphql/fragments/tools";
+import type { PostTagFragmentType } from "@/graphql/fragments/tags";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 import { Icon, type JsxStyleProps, Tag, Wrap } from "@chakra-ui/react";
 import type { IconType } from "react-icons";
@@ -8,7 +8,7 @@ import { FaApple, FaCode, FaLinux, FaPython, FaTerminal } from "react-icons/fa6"
 import { GoLaw } from "react-icons/go";
 import { SiKotlin } from "react-icons/si";
 
-export function ToolTags(props: { tags: ToolTag[] }) {
+export function ToolTags(props: { tags: PostTagFragmentType[] }) {
   props.tags.sort((a, b) => {
     // First sort by is_important
     if (a.is_important !== b.is_important) {
@@ -31,7 +31,7 @@ export function ToolTags(props: { tags: ToolTag[] }) {
   );
 }
 
-function ToolTagElem(props: { tag: ToolTag }) {
+function ToolTagElem(props: { tag: PostTagFragmentType }) {
   const iconInfo = getToolIconInfo(props.tag);
 
   let votesSum = 0;
@@ -66,7 +66,7 @@ function ToolTagElem(props: { tag: ToolTag }) {
   );
 }
 
-function getToolIconInfo(tag: ToolTag) {
+function getToolIconInfo(tag: PostTagFragmentType) {
   if (!tag.is_important) {
     return null;
   }

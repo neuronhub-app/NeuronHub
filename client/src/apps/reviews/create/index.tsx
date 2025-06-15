@@ -300,7 +300,7 @@ export namespace ReviewCreateForm {
                     loadOptions={async (inputValue: string) => {
                       const query = graphql(`
                         query ToolTagsQuery($name: String) {
-                          tool_tags(filters: {
+                          tags(filters: {
                             name: {contains: $name}
                             description: {contains: $name}
                           }) {
@@ -314,7 +314,7 @@ export namespace ReviewCreateForm {
                         }
                       `);
                       const res = await client.query(query, { name: inputValue }).toPromise();
-                      return res.data!.tool_tags.filter(tag => tag.tag_parent === null);
+                      return res.data!.tags.filter(tag => tag.tag_parent === null);
                     }}
                   />
                 </VStack>
@@ -330,14 +330,20 @@ export namespace ReviewCreateForm {
                       const res = await client
                         .query(
                           gql(`
-                            query ToolAlternativesQuery($name: String) {
-                              tools(filters: { name: {contains: $name} }) { id, name }
+                            query PostToolAlternativesQuery($name: String) {
+                              posts(filters: {
+                                type: {exact: Post}
+                                title: {contains: $name}
+                              }) {
+                                id
+                                title
+                              }
                             }
                           `),
                           { name: inputValue },
                         )
                         .toPromise();
-                      return res.data.tools;
+                      return res.data.posts;
                     }}
                   />
                 </VStack>

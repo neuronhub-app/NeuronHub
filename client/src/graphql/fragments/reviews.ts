@@ -1,29 +1,20 @@
-import type { Post } from "@/apps/posts/list/PostList";
-import type { PostReview } from "@/apps/reviews/list/PostReviewList";
 import { type FragmentOf, graphql } from "@/gql-tada";
-import { PostCommentsFragment, PostWithoutToolFragment } from "@/graphql/fragments/posts";
-import { ToolFragment } from "@/graphql/fragments/tools";
+import { PostCommentsFragment, type PostFragmentType } from "@/graphql/fragments/posts";
+import { PostFragment } from "@/graphql/fragments/posts";
 
 export const PostReviewFragment = graphql(
   `
     fragment PostReviewFragment on PostReviewType {
-      ...PostWithoutToolFragment
+      ...PostFragment
 
-      importance
-      is_private
-      is_review_later
-      usage_status
-      rating
-      experience_hours
-
+      review_importance
+      review_usage_status
+      review_rating
+      review_experience_hours
       reviewed_at
-
-      tool {
-        ...ToolFragment
-      }
     }
   `,
-  [ToolFragment, PostWithoutToolFragment],
+  [PostFragment],
 );
 
 export const PostReviewDetailFragment = graphql(
@@ -35,8 +26,11 @@ export const PostReviewDetailFragment = graphql(
   `,
   [PostReviewFragment, PostCommentsFragment],
 );
-export type PostReviewDetailType = FragmentOf<typeof PostReviewDetailFragment>;
+export type PostReviewDetailFragmentType = FragmentOf<typeof PostReviewDetailFragment>;
+export type PostReviewFragmentType = FragmentOf<typeof PostReviewFragment>;
 
-export function isPostReviewType(post: Post | PostReview): post is PostReview {
+export function isPostReviewType(
+  post: PostFragmentType | PostReviewFragmentType,
+): post is PostReviewFragmentType {
   return post.__typename === "PostReviewType";
 }

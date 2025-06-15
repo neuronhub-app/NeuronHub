@@ -6,9 +6,12 @@ import { Icon, IconButton } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { FaShare } from "react-icons/fa6";
 import { useSnapshot } from "valtio/react";
-import type { ListFieldName } from "~/graphql/graphql";
+import type { UserListName } from "~/graphql/graphql";
 
-export function PostButtonShare(props: { id: ID; fieldName: ListFieldName }) {
+// todo ? add mutation & field Post.users_shared?
+// not sure it's needed, as UserList can't store metadata re to whom it was shared, so it would make it too complex.
+// The idea was to send a "share message" to another User.
+export function PostButtonShare(props: { id: ID; fieldName: UserListName }) {
   const userSnap = useSnapshot(user.state);
 
   const state = useValtioProxyRef({
@@ -22,9 +25,9 @@ export function PostButtonShare(props: { id: ID; fieldName: ListFieldName }) {
     if (!userSnap.current) {
       return;
     }
-    const isInList = userLibrary?.some((review: { pk: ID }) => review.pk === props.id);
+    const isInList = userLibrary?.some((post: { pk: ID }) => post.pk === props.id);
     state.mutable.isAdded = isInList ?? false;
-  }, [userLibrary]);
+  }, [userLibrary, props.id]);
 
   return (
     <Tooltip content="Share" positioning={{ placement: "left" }}>

@@ -3,6 +3,7 @@ import { gap } from "@/theme/theme";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { Checkbox, CheckboxGroup, Fieldset, For, Stack, Text } from "@chakra-ui/react";
 
+// todo !! rename to PostListSidebar
 export function ReviewListSidebar() {
   return (
     <Stack p={{ base: gap.md, md: gap.lg }} bg="bg.panel" align="flex-start" w="fit-content">

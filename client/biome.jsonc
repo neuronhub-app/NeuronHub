@@ -44,13 +44,12 @@
   "files": {
     "include": [
       "src/",
-      "package.json",
       "biome.jsonc",
       "tsconfig.json",
       "vite.config.ts",
       "panda.config.ts",
       "graphql/"
     ],
-    "ignore": [".output/", ".vite/", ".react-router"]
+    "ignore": [".output/", ".vite/", ".react-router", "package.json"]
   }
 }
