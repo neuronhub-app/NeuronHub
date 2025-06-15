@@ -7,6 +7,7 @@ import textwrap
 from asgiref.sync import sync_to_async
 from django.utils import timezone
 
+from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.models import PostRelated
 from neuronhub.apps.posts.models import UsageStatus
@@ -76,6 +77,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
             company_domain="jetbrains.com",
             company_country="NL",
             company_ownership_name="Private",
+            visibility=Visibility.PUBLIC,
         )
     )
 
@@ -123,6 +125,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
         review_importance=83,
         review_experience_hours=17_000,
         reviewed_at=timezone.now() - datetime.timedelta(days=8, hours=5, minutes=30),
+        visibility=Visibility.PUBLIC,
     )
     await create_review_tags(
         post=review,
@@ -141,7 +144,7 @@ async def _create_review_iterm(user: User, gen: Gen):
     tool = await gen.posts.create(
         gen.posts.Params(
             title="iTerm2",
-            type=Post.Type.Review,
+            type=Post.Type.Tool,
             tool_type=Post.ToolType.Program,
             crunchbase_url="crunchbase.com/organization/iterm2",
             github_url="github.com/gnachman/iTerm2",
@@ -182,6 +185,7 @@ async def _create_review_iterm(user: User, gen: Gen):
         review_rating=75,
         review_importance=51,
         review_experience_hours=7_000,
+        visibility=Visibility.PUBLIC,
     )
     await create_review_tags(
         post=review,
@@ -233,6 +237,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
         title="Haven't tried, heard good things from HN - embeddable, Zig-based",
         review_usage_status=UsageStatus.INTERESTED,
         reviewed_at=timezone.now() - datetime.timedelta(days=35),
+        visibility=Visibility.PUBLIC,
     )
     await create_review_tags(
         post=review,
