@@ -9,12 +9,12 @@ from neuronhub.apps.orgs.models import Org
 
 
 class User(AbstractUser):
-    #: non-public for privacy. Only username may be shown to User owner or others
+    #: non-public for privacy. Only username may be shown to User's owner or others
     id_uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     owner = models.ForeignKey(
         "self",
-        on_delete=models.CASCADE,  # cascade for privacy, warning is on the frontend
+        on_delete=models.CASCADE,  # cascade for privacy, warn is in UI
         null=True,
         blank=True,
         help_text="Owner of this User (Alias), if any",
@@ -26,9 +26,7 @@ class User(AbstractUser):
         null=True,
         blank=True,
     )
-    email = models.EmailField(unique=True, blank=True)
-    first_name = models.CharField(blank=True, max_length=255)
-    last_name = models.CharField(blank=True, max_length=255)
+    email = models.EmailField(unique=True, blank=True)  # override unique=False
 
     avatar = models.FileField(
         upload_to="avatars/",
