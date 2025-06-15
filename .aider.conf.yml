@@ -5,6 +5,7 @@ lint-cmd: ./.run/format.sh
 
 editor: pycharm
 auto-commits: false
+cache-prompts: true # idk why false by default
 analytics: false
 gitignore: false
 read:
