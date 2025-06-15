@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import textwrap
 
 from django.db import models
 from django.db.models import CharField
@@ -196,6 +197,7 @@ class PostVote(AnonimazableTimeStampedModel):
         return f"{self.post} - {self.author} [{self.is_vote_positive}]"
 
 
+@anonymizer.register
 class PostTag(AnonimazableTimeStampedModel):
     tag_parent = models.ForeignKey(
         "self",
@@ -211,7 +213,32 @@ class PostTag(AnonimazableTimeStampedModel):
         null=True,
     )
     name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    description = anonymizable(models.TextField(blank=True))
+
+    is_review_tag = models.BooleanField(
+        default=False,
+        help_text=textwrap.dedent(
+            """
+            A special tag, shows the accumulative public opinion of the given topic, 
+            with either positive '+' or negative '-' symbol and color. For a Software Tool it could be: 
+            Privacy; Controversial; Mature; Expectation; FOSS, etc. 
+            They're mostly defined the Django admins.
+            """
+        ),
+    )
+    is_important = models.BooleanField(
+        default=False,
+        help_text=textwrap.dedent(
+            """
+            A highly informative PostTag - shown before other tags with a visual icon 
+            (eg macOS, Windows, TypeScript).
+            And helps users to easily identify tools that work on their OS or tool. 
+            A Post author could set it to place the Tag at the start of other tags.
+            """
+        ),
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         unique_together = ["tag_parent", "name"]
@@ -224,29 +251,27 @@ class PostTag(AnonimazableTimeStampedModel):
 
 @anonymizer.register
 class PostTagVote(AnonimazableTimeStampedModel):
+    """
+    A vote on a PostTag of the given Post.
+    """
+
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="tag_votes")
-    tag = models.ForeignKey(PostTag, on_delete=models.CASCADE, related_name="post_votes")
+    tag = models.ForeignKey(PostTag, on_delete=models.CASCADE, related_name="votes")
     author = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="post_tag_votes"
     )
 
     is_vote_positive = models.BooleanField(null=True, blank=True)
     is_changed_my_mind = models.BooleanField(default=False)
-    is_important = models.BooleanField(
-        default=False,
-        help_text="An important Tag is highly informative of its Tool - it's shown before all others and displays an "
-        "icon",
-        null=True,
-        blank=True,
-    )
 
     class Meta:
         unique_together = ["post", "tag", "author"]
 
     def __str__(self):
-        return f"{self.post} - {self.tag} [{self.is_vote_positive}]"
+        return f"{self.tag} [{self.is_vote_positive}]"
 
 
+# todo ? rename to PostRelatedVote (to indicate it's a Vote first of all)
 @anonymizer.register
 class PostRelated(AnonimazableTimeStampedModel):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)

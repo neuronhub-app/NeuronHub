@@ -195,3 +195,6 @@ class PostsGen:
             await sync_to_async(post.visible_to_users.set)(params.visible_to_users)
 
         return post
+
+
+PostParams = PostsGen.Params

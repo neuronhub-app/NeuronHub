@@ -46,14 +46,15 @@ class ToolCompanyAdmin(admin.ModelAdmin):
 class PostAdmin(SimpleHistoryAdmin):
     inlines = [PostTagInline]
 
-    list_display = (
+    list_display = [
+        "type",
+        "parent",
         "title",
         "author",
-        "parent",
         "visibility",
         "created_at",
         "updated_at",
-    )
+    ]
     list_filter = [
         "visibility",
         "created_at",

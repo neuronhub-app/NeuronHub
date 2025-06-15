@@ -2,6 +2,7 @@ import strawberry_django
 from strawberry import auto
 
 from neuronhub.apps.posts.graphql.types_lazy import PostVoteTypeLazy
+from neuronhub.apps.posts.graphql.types_lazy import PostTagVoteTypeLazy
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
 
@@ -26,6 +27,7 @@ class UserType:
     avatar: auto
 
     post_votes: list[PostVoteTypeLazy]
+    post_tag_votes: list[PostTagVoteTypeLazy]
 
     read_later: auto
     library: auto

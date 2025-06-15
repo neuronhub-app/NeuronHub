@@ -1,26 +1,37 @@
 from __future__ import annotations
 
+
 import strawberry
 import strawberry_django
+from asgiref.sync import async_to_sync
 from django.db.models import QuerySet
 from strawberry import Info
 from strawberry import auto
+from strawberry_django.auth.utils import get_current_user
 
 from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
+from neuronhub.apps.posts.services.filter_posts_by_user import filter_posts_by_user
 from neuronhub.apps.users.graphql.types import UserConnectionGroupType
 from neuronhub.apps.users.graphql.types import UserType
 
 
-@strawberry_django.type(Post)
-class PostType:
+@strawberry_django.filter_type(Post, lookups=True)
+class PostFilter:
+    type: auto
+    title: auto
+
+
+@strawberry_django.interface(Post)
+class PostTypeI:
     id: auto
     author: UserType
     seen_by_users: auto
 
-    children: list[PostType]
+    parent: PostTypeI | None
+    children: list[PostTypeI]
 
     type: auto
 
@@ -39,31 +50,7 @@ class PostType:
 
     tags: list[PostTagType]
     votes: list[PostVoteType]
-
-    @classmethod
-    def resolve_type(cls, value: Post, info: Info, parent_type) -> type[PostType]:
-        assert isinstance(value, Post)
-        match value.type:
-            case Post.Type.Post:
-                return PostType
-            case Post.Type.Tool:
-                return PostToolType
-            case Post.Type.Review:
-                return PostReviewType
-            case Post.Type.Comment:
-                return PostCommentType
-            case _:
-                raise TypeError()
-
-    @classmethod
-    def get_queryset(cls, qs: QuerySet[Post], info: Info) -> QuerySet[Post]:
-        return qs
-
-
-@strawberry_django.type(Post)
-class PostToolType(PostType):
-    tool_type: auto
-    alternatives: list[PostToolType]
+    tag_votes: list[PostTagVoteType]
 
     company: auto
     domain: auto
@@ -71,19 +58,49 @@ class PostToolType(PostType):
     crunchbase_url: auto
     github_url: auto
 
+    created_at: auto
+    updated_at: auto
+
+    @classmethod
+    def get_queryset(cls, queryset: QuerySet[Post], info: Info) -> QuerySet[Post]:
+        user = get_current_user(info)
+        return async_to_sync(filter_posts_by_user)(user, posts=queryset)
+
+
+@strawberry_django.type(Post, filters=PostFilter)
+class PostType(PostTypeI):
+    id: auto
+
 
 @strawberry_django.type(Post)
-class PostReviewType(PostType):
+class PostToolType(PostTypeI):
+    tool_type: auto
+
+    # todo !! must be PostRelatedType
+    alternatives: list[PostToolType]
+
+
+@strawberry_django.type(Post)
+class PostReviewType(PostTypeI):
     parent: PostToolType | None
 
     review_usage_status: auto
     review_rating: auto
     review_importance: auto
+    review_experience_hours: auto
     reviewed_at: auto
 
+    @classmethod
+    def get_queryset(cls, queryset: QuerySet[Post], info: Info) -> QuerySet[Post]:
+        user = get_current_user(info)
+        return async_to_sync(filter_posts_by_user)(
+            user=user,
+            posts=queryset.filter(type=Post.Type.Review),
+        )
 
-@strawberry_django.type(Post)
-class PostCommentType(PostType):
+
+@strawberry_django.type(Post, filters=PostFilter)
+class PostCommentType(PostTypeI):
     parent: PostCommentType | None
     children: list[PostCommentType]
 
@@ -91,7 +108,7 @@ class PostCommentType(PostType):
 @strawberry_django.type(PostVote)
 class PostVoteType:
     id: auto
-    post: PostType
+    post: PostTypeI
     author: UserType
     is_vote_positive: auto
     is_changed_my_mind: auto
@@ -99,6 +116,8 @@ class PostVoteType:
 
 @strawberry_django.input(Post, partial=True)
 class PostTypeInput:
+    id: auto
+
     parent: auto
     children: auto
     alternatives: auto
@@ -148,13 +167,15 @@ class PostTagFilter:
 @strawberry_django.type(PostTag, filters=PostTagFilter)
 class PostTagType:
     id: auto
-    name: auto
-    description: auto
     posts: list[PostType]
     tag_parent: PostTagType | None
+    votes: list[PostTagVoteType]
     tag_children: list[PostTagType]
     author: UserType
-    votes: list[PostTagVoteType]
+
+    name: auto
+    description: auto
+    is_important: auto
 
 
 @strawberry_django.type(PostTagVote)
@@ -164,7 +185,6 @@ class PostTagVoteType:
 
     is_vote_positive: auto
     is_changed_my_mind: auto
-    is_important: auto
 
 
 @strawberry.input

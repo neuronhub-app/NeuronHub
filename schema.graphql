@@ -58,14 +58,84 @@ type Mutation {
   update_user_list(id: ID!, list_field_name: UserListName!, is_added: Boolean!): Boolean! @IsAuthenticated
   create_post(data: PostTypeInput!): UserType! @IsAuthenticated
   create_post_review(data: PostTypeInput!): UserType! @IsAuthenticated
-  create_post_comment(data: PostTypeInput!): PostType! @IsAuthenticated
+  create_post_comment(data: PostTypeInput!): PostCommentType! @IsAuthenticated
   update_post(data: PostTypeInput!): PostType! @IsAuthenticated
-  create_or_update_post_vote(id: ID!, is_vote_positive: Boolean, is_important: Boolean, is_changed_my_mind: Boolean): Boolean! @IsAuthenticated
+  create_or_update_post_vote(id: ID!, is_vote_positive: Boolean, is_changed_my_mind: Boolean = null): Boolean! @IsAuthenticated
   update_post_seen_status(id: ID!): Boolean! @IsAuthenticated
 }
 
 input OneToManyInput {
   set: ID
+}
+
+type PostCommentType implements PostTypeI {
+  id: ID!
+  author: UserType!
+  seen_by_users: [DjangoModelType!]!
+  parent: PostCommentType
+  children(filters: PostFilter): [PostCommentType!]!
+  type: PostTypeEnum!
+  title: String!
+  content: String!
+  content_private: String!
+  source: String!
+  updated_at: DateTime!
+  visibility: Visibility!
+  visible_to_users: [UserType!]!
+  visible_to_groups: [UserConnectionGroupType!]!
+  recommended_to_users: [UserType!]!
+  recommended_to_groups: [UserConnectionGroupType!]!
+  tags(filters: PostTagFilter): [PostTagType!]!
+  votes: [PostVoteType!]!
+  tag_votes: [PostTagVoteType!]!
+  company: DjangoModelType
+  domain: String!
+  url: String!
+  crunchbase_url: String!
+  github_url: String!
+  created_at: DateTime!
+}
+
+input PostFilter {
+  type: PostTypeEnumFilterLookup
+  title: StrFilterLookup
+  AND: PostFilter
+  OR: PostFilter
+  NOT: PostFilter
+  DISTINCT: Boolean
+}
+
+type PostReviewType implements PostTypeI {
+  id: ID!
+  author: UserType!
+  seen_by_users: [DjangoModelType!]!
+  parent: PostToolType
+  children: [PostTypeI!]!
+  type: PostTypeEnum!
+  title: String!
+  content: String!
+  content_private: String!
+  source: String!
+  updated_at: DateTime!
+  visibility: Visibility!
+  visible_to_users: [UserType!]!
+  visible_to_groups: [UserConnectionGroupType!]!
+  recommended_to_users: [UserType!]!
+  recommended_to_groups: [UserConnectionGroupType!]!
+  tags(filters: PostTagFilter): [PostTagType!]!
+  votes: [PostVoteType!]!
+  tag_votes: [PostTagVoteType!]!
+  company: DjangoModelType
+  domain: String!
+  url: String!
+  crunchbase_url: String!
+  github_url: String!
+  created_at: DateTime!
+  review_usage_status: UsageStatus
+  review_rating: Decimal
+  review_importance: Decimal
+  review_experience_hours: Int
+  reviewed_at: DateTime!
 }
 
 input PostTagFilter {
@@ -80,13 +150,14 @@ input PostTagFilter {
 
 type PostTagType {
   id: ID!
-  name: String!
-  description: String!
-  posts: [PostType!]!
+  posts(filters: PostFilter): [PostType!]!
   tag_parent: PostTagType
+  votes: [PostTagVoteType!]!
   tag_children(filters: PostTagFilter): [PostTagType!]!
   author: UserType!
-  votes: [PostTagVoteType!]!
+  name: String!
+  description: String!
+  is_important: Boolean
 }
 
 input PostTagTypeInput {
@@ -102,14 +173,14 @@ type PostTagVoteType {
   author: UserType!
   is_vote_positive: Boolean
   is_changed_my_mind: Boolean!
-  is_important: Boolean
 }
 
-type PostType {
+type PostToolType implements PostTypeI {
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
-  children: [PostType!]!
+  parent: PostTypeI
+  children: [PostTypeI!]!
   type: PostTypeEnum!
   title: String!
   content: String!
@@ -123,6 +194,43 @@ type PostType {
   recommended_to_groups: [UserConnectionGroupType!]!
   tags(filters: PostTagFilter): [PostTagType!]!
   votes: [PostVoteType!]!
+  tag_votes: [PostTagVoteType!]!
+  company: DjangoModelType
+  domain: String!
+  url: String!
+  crunchbase_url: String!
+  github_url: String!
+  created_at: DateTime!
+  tool_type: ToolType
+  alternatives: [PostToolType!]!
+}
+
+type PostType implements PostTypeI {
+  id: ID!
+  author: UserType!
+  seen_by_users: [DjangoModelType!]!
+  parent: PostTypeI
+  children: [PostTypeI!]!
+  type: PostTypeEnum!
+  title: String!
+  content: String!
+  content_private: String!
+  source: String!
+  updated_at: DateTime!
+  visibility: Visibility!
+  visible_to_users: [UserType!]!
+  visible_to_groups: [UserConnectionGroupType!]!
+  recommended_to_users: [UserType!]!
+  recommended_to_groups: [UserConnectionGroupType!]!
+  tags(filters: PostTagFilter): [PostTagType!]!
+  votes: [PostVoteType!]!
+  tag_votes: [PostTagVoteType!]!
+  company: DjangoModelType
+  domain: String!
+  url: String!
+  crunchbase_url: String!
+  github_url: String!
+  created_at: DateTime!
 }
 
 enum PostTypeEnum {
@@ -132,7 +240,84 @@ enum PostTypeEnum {
   Comment
 }
 
+input PostTypeEnumFilterLookup {
+  """Exact match. Filter will be skipped on `null` value"""
+  exact: PostTypeEnum
+
+  """Assignment test. Filter will be skipped on `null` value"""
+  is_null: Boolean
+
+  """
+  Exact match of items in a given list. Filter will be skipped on `null` value
+  """
+  in_list: [PostTypeEnum!]
+
+  """Case-insensitive exact match. Filter will be skipped on `null` value"""
+  i_exact: PostTypeEnum
+
+  """
+  Case-sensitive containment test. Filter will be skipped on `null` value
+  """
+  contains: PostTypeEnum
+
+  """
+  Case-insensitive containment test. Filter will be skipped on `null` value
+  """
+  i_contains: PostTypeEnum
+
+  """Case-sensitive starts-with. Filter will be skipped on `null` value"""
+  starts_with: PostTypeEnum
+
+  """Case-insensitive starts-with. Filter will be skipped on `null` value"""
+  i_starts_with: PostTypeEnum
+
+  """Case-sensitive ends-with. Filter will be skipped on `null` value"""
+  ends_with: PostTypeEnum
+
+  """Case-insensitive ends-with. Filter will be skipped on `null` value"""
+  i_ends_with: PostTypeEnum
+
+  """
+  Case-sensitive regular expression match. Filter will be skipped on `null` value
+  """
+  regex: PostTypeEnum
+
+  """
+  Case-insensitive regular expression match. Filter will be skipped on `null` value
+  """
+  i_regex: PostTypeEnum
+}
+
+interface PostTypeI {
+  id: ID!
+  author: UserType!
+  seen_by_users: [DjangoModelType!]!
+  parent: PostTypeI
+  children: [PostTypeI!]!
+  type: PostTypeEnum!
+  title: String!
+  content: String!
+  content_private: String!
+  source: String!
+  updated_at: DateTime!
+  visibility: Visibility!
+  visible_to_users: [UserType!]!
+  visible_to_groups: [UserConnectionGroupType!]!
+  recommended_to_users: [UserType!]!
+  recommended_to_groups: [UserConnectionGroupType!]!
+  tags(filters: PostTagFilter): [PostTagType!]!
+  votes: [PostVoteType!]!
+  tag_votes: [PostTagVoteType!]!
+  company: DjangoModelType
+  domain: String!
+  url: String!
+  crunchbase_url: String!
+  github_url: String!
+  created_at: DateTime!
+}
+
 input PostTypeInput {
+  id: ID
   parent: OneToManyInput
   children: ManyToOneInput
   alternatives: ManyToManyInput
@@ -160,7 +345,7 @@ input PostTypeInput {
 
 type PostVoteType {
   id: ID!
-  post: PostType!
+  post: PostTypeI!
   author: UserType!
   is_vote_positive: Boolean
   is_changed_my_mind: Boolean
@@ -168,10 +353,15 @@ type PostVoteType {
 
 type Query {
   user_current: UserType
+  post(pk: ID!): PostType
+  post_tool(pk: ID!): PostToolType
+  post_review(pk: ID!): PostReviewType
+  post_comment(pk: ID!): PostCommentType
+  posts(filters: PostFilter): [PostType!]!
+  post_tools: [PostToolType!]!
+  post_reviews: [PostReviewType!]!
+  post_comments(filters: PostFilter): [PostCommentType!]!
   tags(filters: PostTagFilter): [PostTagType!]!
-  posts: [PostType!]!
-  post(id: ID!): PostType!
-  comments(post_id: ID!): [PostType!]!
 }
 
 input StrFilterLookup {
@@ -222,6 +412,14 @@ input StrFilterLookup {
   i_regex: String
 }
 
+enum ToolType {
+  Program
+  Material
+  SaaS
+  App
+  Other
+}
+
 scalar Upload
 
 enum UsageStatus {
@@ -252,6 +450,7 @@ type UserType {
   connection_groups: [UserConnectionGroupType!]!
   avatar: DjangoFileType
   post_votes: [PostVoteType!]!
+  post_tag_votes: [PostTagVoteType!]!
   read_later: [DjangoModelType!]!
   library: [DjangoModelType!]!
 }

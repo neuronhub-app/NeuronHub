@@ -38,7 +38,10 @@ async def create_tag(
     else:
         tag, _ = await PostTag.objects.aget_or_create(
             name=name_raw.strip(),
-            defaults={"author": author},
+            defaults={
+                "author": author,
+                "is_important": is_important,
+            },
         )
         await sync_to_async(post.tags.add)(tag)
 
@@ -50,10 +53,7 @@ async def create_tag(
             post=post,
             tag=tag,
             author=author,
-            defaults={
-                "is_vote_positive": is_vote_positive,
-                "is_important": is_important,
-            },
+            defaults={"is_vote_positive": is_vote_positive},
         )
 
     await sync_to_async(post.tags.add)(tag)

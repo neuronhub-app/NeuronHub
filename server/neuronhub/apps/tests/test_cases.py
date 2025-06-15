@@ -27,16 +27,16 @@ class NeuronTestCase(TestCase):
         cls.gen = async_to_sync(Gen.create)()
         cls.user = cls.gen.users.user_default
 
-    def graphql_query(
+    async def graphql_query(
         self,
         query: str,
         variables: dict = None,
         user_authed: User | None = None,
     ) -> ExecutionResult:
         request = RequestFactory().get("/graphql")
-        request.user = user_authed
+        request.user = user_authed or self.user
 
-        return schema.execute_sync(
+        return await schema.execute(
             query,
             variable_values=variables,
             context_value=Context(request=request),

@@ -14,3 +14,4 @@ _posts_types = lazy("neuronhub.apps.posts.graphql.types")
 
 PostTypeLazy: PostType = Annotated["PostType", _posts_types]
 PostVoteTypeLazy: PostVoteType = Annotated["PostVoteType", _posts_types]
+PostTagVoteTypeLazy: PostVoteType = Annotated["PostTagVoteType", _posts_types]

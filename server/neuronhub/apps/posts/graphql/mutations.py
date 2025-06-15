@@ -6,6 +6,7 @@ from strawberry import Info
 from strawberry_django.auth.utils import aget_current_user
 from strawberry_django.permissions import IsAuthenticated
 
+from neuronhub.apps.posts.graphql.types import PostCommentType
 from neuronhub.apps.posts.graphql.types import PostType
 from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.models import Post
@@ -40,7 +41,7 @@ class PostsMutation:
         return cast(UserType, author)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def create_post_comment(self, data: PostTypeInput, info: Info) -> PostType:
+    async def create_post_comment(self, data: PostTypeInput, info: Info) -> PostCommentType:
         user = await aget_current_user(info)
 
         comment = await Post.objects.acreate(
@@ -52,7 +53,7 @@ class PostsMutation:
         await sync_to_async(comment.visible_to_users.set)(data.visible_to_users)
         await sync_to_async(comment.visible_to_groups.set)(data.visible_to_groups)
 
-        return cast(PostType, comment)
+        return cast(PostCommentType, comment)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def update_post(self, data: PostTypeInput, info: Info) -> PostType:
@@ -75,9 +76,8 @@ class PostsMutation:
         self,
         id: strawberry.ID,
         is_vote_positive: bool | None,
-        is_important: bool | None,
-        is_changed_my_mind: bool | None,
         info: Info,
+        is_changed_my_mind: bool | None = None,
     ) -> bool:
         await PostVote.objects.aupdate_or_create(
             author=info.context.request.user,
@@ -85,7 +85,6 @@ class PostsMutation:
             defaults={
                 "is_vote_positive": is_vote_positive,
                 "is_changed_my_mind": is_changed_my_mind,
-                "is_important": is_important,
             },
         )
         return True
