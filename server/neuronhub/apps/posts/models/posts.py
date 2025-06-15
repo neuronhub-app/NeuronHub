@@ -11,6 +11,7 @@ from simple_history.models import HistoricalRecords
 
 from django.db.models import ManyToManyField
 
+from neuronhub.apps.admin.utils.convert_md_to_html_for_admin import convert_md_to_html_for_admin
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable
@@ -70,7 +71,16 @@ class Post(AnonimazableTimeStampedModel):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        help_text="Can link to a PostTool (type=review), PostReview (type=comment), PostComment (type=comment)",
+        help_text=(
+            convert_md_to_html_for_admin(
+                """
+                Can link to possible Post.Type, depending on your current Type:
+                - PostTool for Post|Review|Comment
+                - PostReview for Post|Tool
+                - PostComment for Post|Tool|Review|Comment
+                """
+            )
+        ),
         related_name="children",
     )
 
