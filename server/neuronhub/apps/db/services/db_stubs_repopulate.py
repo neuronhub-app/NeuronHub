@@ -365,7 +365,12 @@ class ReviewTagParams:
 
 
 async def create_review_tags(post: Post, params: list[ReviewTagParams]):
-    tag = await PostTag.objects.acreate(name=ReviewTagName.expectations.value)
+    tag, _ = await PostTag.objects.aget_or_create(
+        name=ReviewTagName.expectations.value,
+        defaults={
+            "is_review_tag": True,
+        },
+    )
     await asyncio.gather(
         *[
             PostTagVote.objects.acreate(

@@ -18,6 +18,8 @@ async def create_tag(
     is_vote_positive: bool = None,
     is_important: bool = False,
 ) -> PostTag | None:
+    post_tag_defaults = dict(author=author, is_important=is_important)
+
     if "/" in name_raw:
         tag: PostTag | None = None
         names = name_raw.split("/")
@@ -27,21 +29,18 @@ async def create_tag(
             if tag_parent_name_raw := names[tag_index - 1] if tag_index > 0 else None:
                 tag_parent, _ = await PostTag.objects.aget_or_create(
                     name=tag_parent_name_raw.strip(),
-                    defaults={"author": author},
+                    defaults=post_tag_defaults,
                 )
                 tag, _ = await PostTag.objects.aget_or_create(
                     name=tag_name,
                     tag_parent=tag_parent,
-                    defaults={"author": author},
+                    defaults=post_tag_defaults,
                 )
                 await sync_to_async(post.tags.add)(tag)
     else:
         tag, _ = await PostTag.objects.aget_or_create(
             name=name_raw.strip(),
-            defaults={
-                "author": author,
-                "is_important": is_important,
-            },
+            defaults=post_tag_defaults,
         )
         await sync_to_async(post.tags.add)(tag)
 
