@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     "neuronhub.apps.db",
     "neuronhub.apps.users",
     "neuronhub.apps.orgs",
-    "neuronhub.apps.tools",
     "neuronhub.apps.posts",
 ]
 
