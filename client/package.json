@@ -20,8 +20,9 @@
     "react": "^19.1.0",
       "react-dom": "^19.1.0",
     "react-router": "^7.6.2",
-    "@react-router/dev": "^7.6.2",
-    "@react-router/node": "^7.6.2",
+      "@react-router/dev": "^7.6.2",
+      "@react-router/node": "^7.6.2",
+      "isbot": "^5.1.28",
 
     "react-hot-toast": "^2.5.2",
     "react-select": "^5.10.1",
