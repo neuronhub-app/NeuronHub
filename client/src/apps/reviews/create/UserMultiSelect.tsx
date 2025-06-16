@@ -1,3 +1,9 @@
+import { DialogBackdrop, Flex, HStack } from "@chakra-ui/react";
+import { AsyncCreatableSelect } from "chakra-react-select";
+import { useEffect, useRef } from "react";
+import { components } from "react-select";
+import { subscribe } from "valtio/vanilla";
+import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create/index";
 import { user } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
@@ -10,13 +16,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
-import { DialogBackdrop, Flex, HStack } from "@chakra-ui/react";
-import { useEffect, useRef } from "react";
-import { components } from "react-select";
-
-import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create/index";
-import { AsyncCreatableSelect } from "chakra-react-select";
-import { subscribe } from "valtio/vanilla";
 
 export type UserSelectOption = NonNullable<ReviewCreateForm.FormSchema["recommend_to"]>[number];
 
@@ -59,7 +58,7 @@ export function UserMultiSelect(props: {
         placeholder={props.placeholder}
         isValidNewOption={() => false} // disable creation
         closeMenuOnSelect={false}
-        onChange={(multiValue, actionMeta) => {
+        onChange={(multiValue, _actionMeta) => {
           props.form.setValue(
             props.fieldName,
             multiValue.map(value => {

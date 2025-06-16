@@ -1,5 +1,3 @@
-import type { PostTagFragmentType } from "@/graphql/fragments/tags";
-import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 import { Icon, type JsxStyleProps, Tag, Wrap } from "@chakra-ui/react";
 import type { IconType } from "react-icons";
 import { BiLogoDjango } from "react-icons/bi";
@@ -7,6 +5,8 @@ import { DiOpensource } from "react-icons/di";
 import { FaApple, FaCode, FaLinux, FaPython, FaTerminal } from "react-icons/fa6";
 import { GoLaw } from "react-icons/go";
 import { SiKotlin } from "react-icons/si";
+import type { PostTagFragmentType } from "@/graphql/fragments/tags";
+import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 export function ToolTags(props: { tags: PostTagFragmentType[] }) {
   props.tags.sort((a, b) => {

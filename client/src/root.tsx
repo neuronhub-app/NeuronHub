@@ -1,12 +1,11 @@
-import { ColorModeProvider } from "@/components/ui/color-mode";
-import { system } from "@/theme/theme";
-import { urqlClient } from "@/urql/urqlClient";
 import { ChakraProvider } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
-import {} from "react-router";
 import { Provider } from "urql";
+import { ColorModeProvider } from "@/components/ui/color-mode";
+import { system } from "@/theme/theme";
+import { urqlClient } from "@/urql/urqlClient";
 
 export function Layout(props: { children: ReactNode }) {
   return (

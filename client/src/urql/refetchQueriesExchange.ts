@@ -1,7 +1,7 @@
-import { urqlClient } from "@/urql/urqlClient";
-import type { ExchangeIO, ExchangeInput, Operation } from "urql";
+import type { ExchangeInput, ExchangeIO, Operation } from "urql";
 import { proxy } from "valtio/index";
 import { pipe, tap } from "wonka";
+import { urqlClient } from "@/urql/urqlClient";
 
 type OperationKey = number;
 

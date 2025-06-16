@@ -1,4 +1,4 @@
-import { type ResultOf, graphql } from "gql.tada";
+import { graphql, type ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { useQuery } from "urql";
 import { proxy } from "valtio";

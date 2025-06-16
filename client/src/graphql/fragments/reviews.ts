@@ -1,6 +1,9 @@
 import { type FragmentOf, graphql } from "@/gql-tada";
-import { PostCommentsFragment, type PostFragmentType } from "@/graphql/fragments/posts";
-import { PostFragment } from "@/graphql/fragments/posts";
+import {
+  PostCommentsFragment,
+  PostFragment,
+  type PostFragmentType,
+} from "@/graphql/fragments/posts";
 
 export const PostReviewFragment = graphql(
   `

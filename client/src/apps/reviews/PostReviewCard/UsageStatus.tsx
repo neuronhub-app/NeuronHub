@@ -1,6 +1,6 @@
-import type { PostReviewFragmentType } from "@/graphql/fragments/reviews";
 import { Flex, Icon, type JsxStyleProps, Text } from "@chakra-ui/react";
 import { BiPulse } from "react-icons/bi";
+import type { PostReviewFragmentType } from "@/graphql/fragments/reviews";
 
 export function UsageStatusBlock(props: {
   status: PostReviewFragmentType["review_usage_status"] | null;

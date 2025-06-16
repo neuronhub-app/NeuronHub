@@ -1,9 +1,9 @@
-import { refetchAllQueries } from "@/urql/refetchQueriesExchange";
-import { urqlClient } from "@/urql/urqlClient";
 import { captureException } from "@sentry/react";
 import type { TadaDocumentNode } from "gql.tada";
 import toast from "react-hot-toast";
 import type { AnyVariables } from "urql";
+import { refetchAllQueries } from "@/urql/refetchQueriesExchange";
+import { urqlClient } from "@/urql/urqlClient";
 
 export async function mutateAndRefetch<
   Data = any,

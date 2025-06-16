@@ -1,8 +1,7 @@
-import type { ReviewCreateForm } from "@/apps/reviews/create";
-import { Checkbox } from "@chakra-ui/react";
-import { Field as ChakraField } from "@chakra-ui/react";
+import { Field as ChakraField, Checkbox } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
+import type { ReviewCreateForm } from "@/apps/reviews/create";
 
 export function FormChakraCheckboxField(
   props: {

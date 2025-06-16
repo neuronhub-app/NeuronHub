@@ -1,9 +1,9 @@
-import { Tooltip } from "@/components/ui/tooltip";
-import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 import { Box, Flex, For, HStack, Icon, type JsxStyleProps, Stack, Text } from "@chakra-ui/react";
 import { FaRegStar } from "react-icons/fa6";
 import { HiMiniChartBar } from "react-icons/hi2";
 import { MdOutlineSpeed } from "react-icons/md";
+import { Tooltip } from "@/components/ui/tooltip";
+import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 type RatingType = "rating" | "importance" | "experience";
 

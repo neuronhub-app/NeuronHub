@@ -1,7 +1,7 @@
+import { useQuery } from "urql";
 import { ListContainer } from "@/components/posts/ListContainer";
 import { graphql } from "@/gql-tada";
 import { PostFragment } from "@/graphql/fragments/posts";
-import { useQuery } from "urql";
 
 export function PostList() {
   const [{ data, error, fetching }] = useQuery({

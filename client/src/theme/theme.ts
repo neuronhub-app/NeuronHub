@@ -1,5 +1,3 @@
-import { theme } from "@/theme/colors";
-import { recipes } from "@/theme/recipes";
 import {
   createSystem,
   defaultConfig,
@@ -7,6 +5,8 @@ import {
   defineTokens,
   mergeConfigs,
 } from "@chakra-ui/react";
+import { theme } from "@/theme/colors";
+import { recipes } from "@/theme/recipes";
 
 const tokens = defineTokens({
   assets: {

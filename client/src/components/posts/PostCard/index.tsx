@@ -1,12 +1,12 @@
+import { Heading, HStack, Show, Stack, Text } from "@chakra-ui/react";
+import { marked } from "marked";
+import { NavLink } from "react-router";
 import { RatingBars } from "@/apps/reviews/PostReviewCard/RatingBars";
 import { UsageStatusBlock } from "@/apps/reviews/PostReviewCard/UsageStatus";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { Prose } from "@/components/ui/prose";
 import { isPostReviewType } from "@/graphql/fragments/reviews";
-import { HStack, Heading, Show, Stack, Text } from "@chakra-ui/react";
-import { marked } from "marked";
-import { NavLink } from "react-router";
 
 // todo ~ if it has too many isPostReviewType -> it must be a comp
 export function PostCard(props: { post: PostListItemType }) {
@@ -44,10 +44,8 @@ export function PostCard(props: { post: PostListItemType }) {
 
       <Show when={post.content}>
         <Prose
-          // biome-ignore lint/security/noDangerouslySetInnerHtml:
-          dangerouslySetInnerHTML={{
-            __html: marked.parse(post.content),
-          }}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: it's cleaned by server
+          dangerouslySetInnerHTML={{ __html: marked.parse(post.content) }}
           size="md"
         />
       </Show>

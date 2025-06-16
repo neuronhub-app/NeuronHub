@@ -1,10 +1,10 @@
 "use client";
 
+import { Button, Stack, Text, useEnvironmentContext } from "@chakra-ui/react";
+import { useState } from "react";
 import { Avatar } from "@/components/ui/avatar";
 import type { FileUploadRootProps } from "@/components/ui/file-button";
 import { FileUploadRoot, FileUploadTrigger } from "@/components/ui/file-button";
-import { Button, Stack, Text, useEnvironmentContext } from "@chakra-ui/react";
-import { useState } from "react";
 
 interface PhotoUploadProps extends FileUploadRootProps {
   src?: string;

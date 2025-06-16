@@ -1,6 +1,6 @@
+import { Client, cacheExchange, fetchExchange } from "urql";
 import { makeUrlsReadableExchange } from "@/urql/makeUrlsReadableExchange";
 import { refetchQueriesExchange } from "@/urql/refetchQueriesExchange";
-import { Client, cacheExchange, fetchExchange } from "urql";
 
 export const urqlClient = new Client({
   url: "http://localhost:8000/api/graphql",

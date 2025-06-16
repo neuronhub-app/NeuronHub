@@ -1,5 +1,5 @@
-import type { PostFragmentType } from "@/graphql/fragments/posts";
 import { Avatar, Flex, Text } from "@chakra-ui/react";
+import type { PostFragmentType } from "@/graphql/fragments/posts";
 
 export function PostAuthor(props: { author: PostFragmentType["author"] }) {
   return (

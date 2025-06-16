@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error
 import type { SemanticTokenDefinition } from "@chakra-ui/react/dist/types/styled-system/types";
 
 export namespace theme {

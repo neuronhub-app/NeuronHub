@@ -1,12 +1,12 @@
-import { user } from "@/apps/users/useUserCurrent";
-import type { PostListItemType } from "@/components/posts/ListContainer";
-import { type ID, graphql } from "@/gql-tada";
-import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { Flex, IconButton, Stack } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import { useSnapshot } from "valtio/react";
+import { user } from "@/apps/users/useUserCurrent";
+import type { PostListItemType } from "@/components/posts/ListContainer";
+import { graphql, type ID } from "@/gql-tada";
+import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
+import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 /**
  * Note is_vote_positive has 3 values: true, false, null

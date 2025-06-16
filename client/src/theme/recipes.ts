@@ -1,5 +1,5 @@
 import { defineRecipe } from "@chakra-ui/react";
-// @ts-ignore
+// @ts-expect-error
 import type { SystemConfig } from "@chakra-ui/react/dist/types/styled-system/types";
 
 export const recipes: SystemConfig["theme"]["recipes"] = {

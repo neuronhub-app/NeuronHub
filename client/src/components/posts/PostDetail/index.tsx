@@ -1,10 +1,10 @@
+import { For, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import type { ReactNode } from "react";
+import type { CombinedError } from "urql";
 import { PostCard } from "@/components/posts/PostCard";
 import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { datetime } from "@/utils/date-fns";
-import { For, HStack, Heading, Stack, Text } from "@chakra-ui/react";
-import type { ReactNode } from "react";
-import type { CombinedError } from "urql";
 import { PostTypeEnum } from "~/graphql/graphql";
 
 export function PostDetail(props: {

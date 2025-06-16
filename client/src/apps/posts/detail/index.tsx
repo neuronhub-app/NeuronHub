@@ -1,8 +1,7 @@
+import { useQuery } from "urql";
 import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
 import { PostDetailFragment } from "@/graphql/fragments/posts";
-import {} from "@chakra-ui/react";
-import { useQuery } from "urql";
 import type { Route } from "~/react-router/posts/detail/+types/index";
 
 export default function PostDetailRoute(props: Route.ComponentProps) {

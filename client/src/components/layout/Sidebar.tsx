@@ -1,20 +1,15 @@
-import { useUserCurrent } from "@/apps/users/useUserCurrent";
-import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { ColorModeButton } from "@/components/ui/color-mode";
-import { urls } from "@/routes";
 import {
   Bleed,
+  Box,
   type ButtonProps,
   Flex,
+  HStack,
   Icon,
   Separator,
   Stack,
   type StackProps,
   Text,
 } from "@chakra-ui/react";
-
-import { Box, HStack } from "@chakra-ui/react";
 import { MessageSquareText } from "lucide-react";
 import type { SVGProps } from "react";
 import { FaRegBookmark } from "react-icons/fa6";
@@ -22,6 +17,11 @@ import { GoCommentDiscussion } from "react-icons/go";
 import { LuLayoutDashboard, LuLibrary, LuSettings } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink } from "react-router";
+import { useUserCurrent } from "@/apps/users/useUserCurrent";
+import { Avatar } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { ColorModeButton } from "@/components/ui/color-mode";
+import { urls } from "@/routes";
 
 const groups = [
   {

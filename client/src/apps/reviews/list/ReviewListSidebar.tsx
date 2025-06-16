@@ -1,7 +1,7 @@
+import { Checkbox, CheckboxGroup, Fieldset, For, Stack, Text } from "@chakra-ui/react";
 import { Radio, RadioGroup } from "@/components/ui/radio";
 import { gap } from "@/theme/theme";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
-import { Checkbox, CheckboxGroup, Fieldset, For, Stack, Text } from "@chakra-ui/react";
 
 // todo !! rename to PostListSidebar
 export function ReviewListSidebar() {

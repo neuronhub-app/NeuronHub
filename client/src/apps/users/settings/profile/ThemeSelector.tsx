@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/nursery/useUniqueElementIds: a dumb rule for those SVG nodes */
 import { Flex, RadioCard, Text } from "@chakra-ui/react";
 
 export function ThemeSelector() {

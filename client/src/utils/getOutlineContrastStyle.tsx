@@ -1,6 +1,4 @@
-import type { JsxStyleProps } from "@chakra-ui/react";
-// @ts-ignore
-import type { StackProps } from "@chakra-ui/react/dist/types/components/stack/stack";
+import type { StackProps } from "@chakra-ui/react";
 
 /**
  * It creates a gentle 7% (or 14%) contrast outline, while perfectly matching the HTMLElement's color.
@@ -8,9 +6,7 @@ import type { StackProps } from "@chakra-ui/react/dist/types/components/stack/st
  *
  * Learnt from https://tailwindcss.com/docs/colors palette.
  */
-export function getOutlineContrastStyle(props?: {
-  variant: "subtle";
-}): JsxStyleProps | StackProps {
+export function getOutlineContrastStyle(props?: { variant: "subtle" }): StackProps {
   return {
     outline: "1px solid",
     outlineOffset: "calc(1px * -1)",

@@ -1,3 +1,14 @@
+import type { IconProps } from "@chakra-ui/react";
+import { DialogBackdrop, Flex, HStack, Icon, IconButton } from "@chakra-ui/react";
+import { AsyncCreatableSelect } from "chakra-react-select";
+import type { MessageSquarePlus } from "lucide-react";
+import type { ReactNode } from "react";
+import type { UseFormReturn } from "react-hook-form";
+import { FaMessage, FaRegMessage } from "react-icons/fa6";
+import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
+import { components } from "react-select";
+
+import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create/index";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogBody,
@@ -9,19 +20,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
-import { DialogBackdrop, Flex, HStack, Icon } from "@chakra-ui/react";
-import { IconButton } from "@chakra-ui/react";
-import type { IconProps } from "@chakra-ui/react";
-import type { MessageSquarePlus } from "lucide-react";
-import type { ReactNode } from "react";
-import type { UseFormReturn } from "react-hook-form";
-import { components } from "react-select";
-
-import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create/index";
-import { AsyncCreatableSelect } from "chakra-react-select";
-
-import { FaMessage, FaRegMessage } from "react-icons/fa6";
-import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
 
 type ReviewSelectName = "tags" | "tool.alternatives";
 
@@ -55,7 +53,7 @@ export function ToolMultiSelect(props: {
         isMulti
         isClearable={false}
         closeMenuOnSelect={false}
-        onChange={(multiValue, actionMeta) => {
+        onChange={(multiValue, _actionMeta) => {
           props.form.setValue(
             props.fieldName,
             multiValue.map(value => {

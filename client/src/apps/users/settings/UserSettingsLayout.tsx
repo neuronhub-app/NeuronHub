@@ -1,9 +1,7 @@
-import { urls } from "@/routes";
 import { For, Tabs } from "@chakra-ui/react";
-import { FaUsers } from "react-icons/fa";
-import { FaUser } from "react-icons/fa";
-import { FaBell } from "react-icons/fa";
+import { FaBell, FaUser, FaUsers } from "react-icons/fa";
 import { NavLink, Outlet, useLocation } from "react-router";
+import { urls } from "@/routes";
 
 export default function UserSettingsLayout() {
   const { pathname } = useLocation();

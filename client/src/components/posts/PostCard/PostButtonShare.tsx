@@ -1,11 +1,11 @@
-import { user } from "@/apps/users/useUserCurrent";
-import { Tooltip } from "@/components/ui/tooltip";
-import type { ID } from "@/gql-tada";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { Icon, IconButton } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { FaShare } from "react-icons/fa6";
 import { useSnapshot } from "valtio/react";
+import { user } from "@/apps/users/useUserCurrent";
+import { Tooltip } from "@/components/ui/tooltip";
+import type { ID } from "@/gql-tada";
+import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import type { UserListName } from "~/graphql/graphql";
 
 // todo + (UI) 1. clipboard action on click

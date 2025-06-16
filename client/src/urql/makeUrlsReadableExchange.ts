@@ -1,5 +1,5 @@
 import type { OperationDefinitionNode } from "graphql/language/ast";
-import type { ExchangeIO, ExchangeInput, Operation } from "urql";
+import type { ExchangeInput, ExchangeIO, Operation } from "urql";
 import { pipe, tap } from "wonka";
 
 /**

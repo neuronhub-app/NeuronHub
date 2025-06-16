@@ -1,3 +1,13 @@
+import {
+  Container,
+  type ContainerProps,
+  Flex,
+  HStack,
+  IconButton,
+  Stack,
+} from "@chakra-ui/react";
+import { LuAlignRight } from "react-icons/lu";
+import { Outlet } from "react-router";
 import { Logo, Sidebar } from "@/components/layout/Sidebar";
 import {
   DrawerBackdrop,
@@ -6,10 +16,6 @@ import {
   DrawerRoot,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Flex, Stack } from "@chakra-ui/react";
-import { Container, type ContainerProps, HStack, IconButton } from "@chakra-ui/react";
-import { LuAlignRight } from "react-icons/lu";
-import { Outlet } from "react-router";
 
 export function links() {
   const faviconLinks = [

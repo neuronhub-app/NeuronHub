@@ -1,9 +1,8 @@
-import { env } from "@/env";
-import type {} from "@redux-devtools/extension"; // see valtio docs re devtool types
 import { useEffect, useRef } from "react";
 import { useSnapshot } from "valtio/react";
 import { devtools } from "valtio/utils";
 import { proxy } from "valtio/vanilla";
+import { env } from "@/env";
 
 /**
  * Used instead of useState by default.

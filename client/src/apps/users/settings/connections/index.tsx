@@ -1,6 +1,3 @@
-import { MemberActions } from "@/apps/users/settings/connections/ConnectionActions";
-import { Avatar } from "@/components/ui/avatar";
-import { InputGroup } from "@/components/ui/input-group";
 import {
   Badge,
   Button,
@@ -13,6 +10,9 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { LuSearch, LuUserPlus } from "react-icons/lu";
+import { MemberActions } from "@/apps/users/settings/connections/ConnectionActions";
+import { Avatar } from "@/components/ui/avatar";
+import { InputGroup } from "@/components/ui/input-group";
 
 export default function Connections() {
   return (

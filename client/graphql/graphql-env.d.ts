@@ -2424,6 +2424,22 @@ export type introspection_types = {
           };
         };
       };
+      post_tag_votes: {
+        name: "post_tag_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagVoteType"; ofType: null };
+            };
+          };
+        };
+      };
       post_votes: {
         name: "post_votes";
         type: {

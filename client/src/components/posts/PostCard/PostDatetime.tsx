@@ -1,6 +1,6 @@
+import { type JsxStyleProps, Text } from "@chakra-ui/react";
 import { Tooltip } from "@/components/ui/tooltip";
 import { datetime } from "@/utils/date-fns";
-import { type JsxStyleProps, Text } from "@chakra-ui/react";
 
 export function PostDatetime(props: { datetimeStr: string | unknown; style?: JsxStyleProps }) {
   return (
