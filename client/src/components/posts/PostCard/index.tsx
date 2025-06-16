@@ -30,6 +30,7 @@ export function PostCard(props: { post: PostListItemType }) {
 
       {isPostReviewType(post) && (
         <HStack gap="gap.lg">
+          <UsageStatusBlock status={post.review_usage_status} color="fg.secondary" />
           <RatingBars rating={post.review_rating} type="rating" color="fg.secondary" />
           <RatingBars rating={post.review_importance} type="importance" color="fg.secondary" />
           <RatingBars
@@ -38,7 +39,6 @@ export function PostCard(props: { post: PostListItemType }) {
             color="fg.secondary"
             boxSize={6}
           />
-          <UsageStatusBlock status={post.review_usage_status} color="fg.secondary" />
         </HStack>
       )}
 

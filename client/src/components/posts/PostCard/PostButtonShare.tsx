@@ -8,9 +8,8 @@ import { FaShare } from "react-icons/fa6";
 import { useSnapshot } from "valtio/react";
 import type { UserListName } from "~/graphql/graphql";
 
-// todo ? add mutation & field Post.users_shared?
-// not sure it's needed, as UserList can't store metadata re to whom it was shared, so it would make it too complex.
-// The idea was to send a "share message" to another User.
+// todo + (UI) 1. clipboard action on click
+// todo + (UI) 2. mutate Post.recommended_to_users/groups
 export function PostButtonShare(props: { id: ID; fieldName: UserListName }) {
   const userSnap = useSnapshot(user.state);
 
