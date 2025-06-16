@@ -276,6 +276,10 @@ export type PostToolType = PostTypeI & {
   votes: Array<PostVoteType>;
 };
 
+export type PostToolTypeAlternativesArgs = {
+  filters?: InputMaybe<PostFilter>;
+};
+
 export type PostToolTypeTagsArgs = {
   filters?: InputMaybe<PostTagFilter>;
 };
@@ -449,6 +453,10 @@ export type QueryPost_ToolArgs = {
   pk: Scalars["ID"]["input"];
 };
 
+export type QueryPost_ToolsArgs = {
+  filters?: InputMaybe<PostFilter>;
+};
+
 export type QueryPostsArgs = {
   filters?: InputMaybe<PostFilter>;
 };
@@ -595,7 +603,7 @@ export type PostToolAlternativesQueryQueryVariables = Exact<{
 
 export type PostToolAlternativesQueryQuery = {
   __typename?: "Query";
-  posts: Array<{ __typename?: "PostType"; id: string; title: string }>;
+  post_tools: Array<{ __typename?: "PostToolType"; id: string; title: string }>;
 };
 
 export type CreatePostReviewMutationVariables = Exact<{
@@ -2942,7 +2950,7 @@ export const PostToolAlternativesQueryDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "posts" },
+            name: { kind: "Name", value: "post_tools" },
             arguments: [
               {
                 kind: "Argument",
@@ -2950,20 +2958,6 @@ export const PostToolAlternativesQueryDocument = {
                 value: {
                   kind: "ObjectValue",
                   fields: [
-                    {
-                      kind: "ObjectField",
-                      name: { kind: "Name", value: "type" },
-                      value: {
-                        kind: "ObjectValue",
-                        fields: [
-                          {
-                            kind: "ObjectField",
-                            name: { kind: "Name", value: "exact" },
-                            value: { kind: "EnumValue", value: "Post" },
-                          },
-                        ],
-                      },
-                    },
                     {
                       kind: "ObjectField",
                       name: { kind: "Name", value: "title" },

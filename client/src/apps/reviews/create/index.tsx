@@ -32,7 +32,7 @@ import {
 import { HiLockClosed, HiOutlineClock } from "react-icons/hi2";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
-import { gql, useClient } from "urql";
+import { useClient } from "urql";
 import { proxy } from "valtio";
 import { useProxy } from "valtio/utils";
 import { z } from "zod";
@@ -329,12 +329,9 @@ export namespace ReviewCreateForm {
                     loadOptions={async (inputValue: string) => {
                       const res = await client
                         .query(
-                          gql(`
+                          graphql(`
                             query PostToolAlternativesQuery($name: String) {
-                              posts(filters: {
-                                type: {exact: Post}
-                                title: {contains: $name}
-                              }) {
+                              post_tools( filters: {title: { contains: $name} } ) {
                                 id
                                 title
                               }
@@ -343,7 +340,11 @@ export namespace ReviewCreateForm {
                           { name: inputValue },
                         )
                         .toPromise();
-                      return res.data.posts;
+                      if (!res.data) {
+                        toast.error("Failed to load alternatives");
+                        return [];
+                      }
+                      return res.data.post_tools.map(p => ({ id: p.id, name: p.title }));
                     }}
                   />
                 </VStack>
@@ -450,80 +451,6 @@ export namespace ReviewCreateForm {
                     />
                   </HStack>
                 </VStack>
-
-                {/*<VStack align="flex-start">*/}
-                {/*  <Slider*/}
-                {/*    defaultValue={[1]}*/}
-                {/*    width="700px"*/}
-                {/*    marks={[*/}
-                {/*      {*/}
-                {/*        value: 1,*/}
-                {/*        label: (*/}
-                {/*          <Flex align="center" gap="gap.sm">*/}
-                {/*            <HiLockClosed />*/}
-                {/*            Private*/}
-                {/*          </Flex>*/}
-                {/*        ),*/}
-                {/*      },*/}
-                {/*      {*/}
-                {/*        value: 2,*/}
-                {/*        label: (*/}
-                {/*          <Flex align="center" gap="gap.sm">*/}
-                {/*            <FaUsersGear />*/}
-                {/*            Users selected*/}
-                {/*          </Flex>*/}
-                {/*        ),*/}
-                {/*      },*/}
-                {/*      {*/}
-                {/*        value: 3,*/}
-                {/*        label: (*/}
-                {/*          <Flex align="center" gap="gap.sm">*/}
-                {/*            <FaUsers />*/}
-                {/*            Connections*/}
-                {/*          </Flex>*/}
-                {/*        ),*/}
-                {/*      },*/}
-                {/*      {*/}
-                {/*        value: 4,*/}
-                {/*        label: (*/}
-                {/*          <Flex align="center" gap="gap.sm">*/}
-                {/*            <FaUsers />*/}
-                {/*            Subscribers paid*/}
-                {/*          </Flex>*/}
-                {/*        ),*/}
-                {/*      },*/}
-                {/*      {*/}
-                {/*        value: 5,*/}
-                {/*        label: (*/}
-                {/*          <Flex align="center" gap="gap.sm">*/}
-                {/*            <FaUsers />*/}
-                {/*            Subscribers*/}
-                {/*          </Flex>*/}
-                {/*        ),*/}
-                {/*      },*/}
-                {/*      {*/}
-                {/*        value: 6,*/}
-                {/*        label: (*/}
-                {/*          <Flex align="center" gap="gap.sm">*/}
-                {/*            <FaShieldHalved />*/}
-                {/*            Internal*/}
-                {/*          </Flex>*/}
-                {/*        ),*/}
-                {/*      },*/}
-                {/*      {*/}
-                {/*        value: 7,*/}
-                {/*        label: (*/}
-                {/*          <Flex align="center" gap="gap.sm">*/}
-                {/*            <FaGlobe />*/}
-                {/*            Public*/}
-                {/*          </Flex>*/}
-                {/*        ),*/}
-                {/*      },*/}
-                {/*    ]}*/}
-                {/*    max={7}*/}
-                {/*    min={1}*/}
-                {/*  />*/}
-                {/*</VStack>*/}
 
                 <VStack align="flex-start">
                   <FormChakraSegmentControl

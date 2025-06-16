@@ -24,8 +24,12 @@ class PostFilter:
     title: auto
 
 
+# seems as a bug in PyCharm re PyDataclass
+# noinspection PyDataclass
 @strawberry_django.interface(Post)
 class PostTypeI:
+    TYPE: Post.Type = Post.Type.Post
+
     id: auto
     author: UserType
     seen_by_users: auto
@@ -63,25 +67,33 @@ class PostTypeI:
 
     @classmethod
     def get_queryset(cls, queryset: QuerySet[Post], info: Info) -> QuerySet[Post]:
+        if not cls.TYPE:
+            raise NotImplementedError("Define TYPE.")
         user = get_current_user(info)
-        return async_to_sync(filter_posts_by_user)(user, posts=queryset)
+        return async_to_sync(filter_posts_by_user)(user, posts=queryset.filter(type=cls.TYPE))
 
 
 @strawberry_django.type(Post, filters=PostFilter)
 class PostType(PostTypeI):
-    id: auto
+    TYPE = Post.Type.Post
 
 
-@strawberry_django.type(Post)
+# noinspection PyDataclass
+@strawberry_django.type(Post, filters=PostFilter)
 class PostToolType(PostTypeI):
+    TYPE = Post.Type.Tool
+
     tool_type: auto
 
     # todo !! must be PostRelatedType
     alternatives: list[PostToolType]
 
 
+# noinspection PyDataclass
 @strawberry_django.type(Post)
 class PostReviewType(PostTypeI):
+    TYPE = Post.Type.Review
+
     parent: PostToolType | None
 
     review_usage_status: auto
@@ -90,17 +102,12 @@ class PostReviewType(PostTypeI):
     review_experience_hours: auto
     reviewed_at: auto
 
-    @classmethod
-    def get_queryset(cls, queryset: QuerySet[Post], info: Info) -> QuerySet[Post]:
-        user = get_current_user(info)
-        return async_to_sync(filter_posts_by_user)(
-            user=user,
-            posts=queryset.filter(type=Post.Type.Review),
-        )
 
-
+# noinspection PyDataclass
 @strawberry_django.type(Post, filters=PostFilter)
 class PostCommentType(PostTypeI):
+    TYPE = Post.Type.Comment
+
     parent: PostCommentType | None
     children: list[PostCommentType]
 

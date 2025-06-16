@@ -202,7 +202,7 @@ type PostToolType implements PostTypeI {
   github_url: String!
   created_at: DateTime!
   tool_type: ToolType
-  alternatives: [PostToolType!]!
+  alternatives(filters: PostFilter): [PostToolType!]!
 }
 
 type PostType implements PostTypeI {
@@ -358,7 +358,7 @@ type Query {
   post_review(pk: ID!): PostReviewType
   post_comment(pk: ID!): PostCommentType
   posts(filters: PostFilter): [PostType!]!
-  post_tools: [PostToolType!]!
+  post_tools(filters: PostFilter): [PostToolType!]!
   post_reviews: [PostReviewType!]!
   post_comments(filters: PostFilter): [PostCommentType!]!
   tags(filters: PostTagFilter): [PostTagType!]!
