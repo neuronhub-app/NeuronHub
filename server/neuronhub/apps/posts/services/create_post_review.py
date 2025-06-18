@@ -94,7 +94,7 @@ async def _create_or_add_tags(
                 tools=[tool],
                 tag_parent=tag_parent,
                 name=tag_name,
-                description=tag_to_create.description,
+                comment=tag_to_create.comment,
                 author=author,
             )
         )
@@ -112,14 +112,14 @@ async def _create_or_add_tags(
     )
 
     for tag in tags_input:
-        is_tag_vote_needed = tag.is_vote_positive or tag.description or tag.is_important
+        is_tag_vote_needed = tag.is_vote_positive or tag.is_important
         if is_tag_vote_needed:
             await PostTagVote.objects.aupdate_or_create(
                 tool=tool,
                 tag=tag.id,
                 author=author,
                 defaults=dict(
-                    comment=tag.description,
+                    comment=tag.comment,
                     is_vote_positive=tag.is_vote_positive,
                     is_important=tag.is_important,
                 ),

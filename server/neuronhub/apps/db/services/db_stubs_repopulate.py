@@ -106,16 +106,12 @@ async def _create_review_pycharm(user: User, gen: Gen):
         parent=pycharm,
         author=user,
         title="Fine, haven't seen better for Python or Django",
-        review_content_pros=textwrap.dedent(
+        content=textwrap.dedent(
             """
             - Better than VS Code for Python
             - Python/Django stubs and completions
             - Debugger
             - Git UI and shortcuts
-            """
-        ),
-        review_content_cons=textwrap.dedent(
-            """
             - JS/TS integration performance has been improving, but still not as good as VS Code
             - Bugs are frequent. Less than in VS Code, but still a lot
             """

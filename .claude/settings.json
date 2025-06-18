@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv sync)",
+      "Bash(uv run python manage.py db_stubs_repopulate)",
+      "Bash(uv run python manage.py makemigrations)",
+      "Bash(uv run python manage.py migrate)",
+      "Bash(uv run python manage.py runserver)",
+      "Bash(uv run pytest:*)",
+      "Bash(bun run dev)",
+      "Bash(bun run tsc)",
+      "Bash(bun run update)",
+      "Bash(bun run install)",
+      "Bash(lp)",
+      "Bash(git:*)",
+      "Bash(./run/format.sh)",
+      "Bash(./run/gen-types-and-format.sh)"
+    ],
+    "deny": [
+      "Bash(curl:*)"
+    ]
+  }
+}

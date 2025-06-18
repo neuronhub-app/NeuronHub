@@ -35,7 +35,7 @@ import { SiCrunchbase } from "react-icons/si";
 import { useClient } from "urql";
 import { proxy } from "valtio";
 import { useProxy } from "valtio/utils";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { ToolMultiSelect } from "@/apps/reviews/create/ToolMultiSelect";
 import { UserMultiSelect } from "@/apps/reviews/create/UserMultiSelect";
 import { useFormService } from "@/apps/reviews/create/useFormService";
@@ -55,6 +55,8 @@ export default function ReviewCreateRoute() {
   return <ReviewCreateForm.Comp />;
 }
 
+// todo ~ discard and use eg two Fragments for input/output
+// why is it an interface? gql.tada is shit - prob that's why. Technically i should use an extract of the gql Input
 export interface ReviewSelectOption {
   id: ID;
   name: string;
@@ -65,7 +67,7 @@ export interface ReviewSelectOption {
   tag_parent?: { id: ID; name: string } | null;
 
   // --------------
-  // tool fields
+  // parent fields
   // --------------
   is_vote_positive?: boolean | null;
   comment?: string | null;
@@ -108,10 +110,10 @@ export namespace ReviewCreateForm {
     .optional();
 
   export const schema = z.object({
-    tool: z.object({
+    parent: z.object({
       id: z.string().nullable(),
       name: z.string().min(1),
-      type: z.union([
+      tool_type: z.union([
         z.literal("Program"),
         z.literal("Material"),
         z.literal("Product"),
@@ -119,7 +121,7 @@ export namespace ReviewCreateForm {
         z.literal("Service"),
         z.literal("Other"),
       ]),
-      description: z.string().optional(),
+      content: z.string().optional(),
       domain: z.string().optional(),
       github_url: z
         .union([z.string().includes("github.com").includes("/"), zStringEmpty()])
@@ -132,25 +134,21 @@ export namespace ReviewCreateForm {
     id: z.string().nullable(),
     title: z.string().min(1),
     source: z.string().optional(),
-    rating: z.number().min(0).max(100).nullable(),
-    reviewed_at: z.string().date().optional(),
     content: z.string().optional(),
     content_private: z.string().optional(),
-    usage_status: z.enum(
+    review_rating: z.number().min(0).max(100).nullable(),
+    review_importance: z.number().optional(),
+    review_usage_status: z.enum(
       Object.values(UsageStatus) as [UsageStatus, ...UsageStatus[]], // @ts-bad-inference
     ),
+    reviewed_at: z.iso.date().optional(),
     visibility: z.enum(
       Object.values(Visibility) as [Visibility, ...Visibility[]], // @ts-bad-inference
     ),
-    // importance: z
-    //   .enum(
-    //     Object.values(Importance) as [Importance, ...Importance[]], // @ts-bad-inference
-    //   )
-    //   .optional(),
     tags: toolMultiSelect,
     recommend_to: useMultiSelect,
     visible_to: useMultiSelect,
-    is_review_later: z.boolean({ coerce: true }).optional(),
+    is_review_later: z.boolean().optional(),
   });
 
   export type FormSchema = z.infer<typeof schema>;
@@ -160,19 +158,20 @@ export namespace ReviewCreateForm {
     isRated: true,
   });
 
+  // todo ~ move out to fix HRM of react-router - otherwise reloads on every save
   export function Comp() {
     const form = useForm<FormSchema>({
       resolver: zodResolver(schema),
       reValidateMode: "onChange",
       defaultValues: {
-        tool: {
+        parent: {
           id: null,
-          type: "Program",
+          tool_type: "Program",
         },
         id: null,
-        rating: 50,
+        review_rating: 50,
         reviewed_at: formatISO(new Date(), { representation: "date" }),
-        usage_status: UsageStatus.Using,
+        review_usage_status: UsageStatus.Using,
         visibility: Visibility.Private,
         is_review_later: false,
         // importance: Importance.Medium,
@@ -200,7 +199,7 @@ export namespace ReviewCreateForm {
     };
 
     function getToolTypeName(): string {
-      return formState.tool.type === "Other" ? "Tool" : formState.tool.type;
+      return formState.parent.tool_type === "Other" ? "Tool" : formState.parent.tool_type;
     }
 
     return (
@@ -212,7 +211,7 @@ export namespace ReviewCreateForm {
             <Fieldset.Root>
               <Fieldset.Content display="flex" gap="gap.md">
                 <FormChakraSegmentControl
-                  field={{ control, name: "tool.type" }}
+                  field={{ control, name: "parent.tool_type" }}
                   label="Type"
                   size="lg"
                   items={[
@@ -225,66 +224,66 @@ export namespace ReviewCreateForm {
                   ]}
                 />
 
-                <Show when={formState.tool.type === "Program"}>
+                <Show when={formState.parent.tool_type === "Program"}>
                   <Text color="fg.muted" fontSize="xs">
                     A Git repository, with statistics that can be pulled from it
                   </Text>
                 </Show>
-                <Show when={formState.tool.type === "Service"}>
+                <Show when={formState.parent.tool_type === "Service"}>
                   <Text color="fg.muted" fontSize="xs">
                     An online service, eg Notion, Claude, Claude API, AWS, GCP, etc
                   </Text>
                 </Show>
-                <Show when={formState.tool.type === "App"}>
+                <Show when={formState.parent.tool_type === "App"}>
                   <Text color="fg.muted" fontSize="xs">
                     Desktop app, mobile, etc
                   </Text>
                 </Show>
-                <Show when={formState.tool.type === "Material"}>
+                <Show when={formState.parent.tool_type === "Material"}>
                   <Text color="fg.muted" fontSize="xs">
                     Blog article, publication, book, etc
                   </Text>
                 </Show>
-                <Show when={formState.tool.type === "Product"}>
+                <Show when={formState.parent.tool_type === "Product"}>
                   <Text color="fg.muted" fontSize="xs">
-                    A physical product or a tool
+                    A physical product or a parent
                   </Text>
                 </Show>
-                <Show when={formState.tool.type === "Other"}>
+                <Show when={formState.parent.tool_type === "Other"}>
                   <Text color="fg.muted" fontSize="xs">
-                    A tool that doesn't fit any other category
+                    A parent that doesn't fit any other category
                   </Text>
                 </Show>
 
                 <FormChakraInput
-                  field={{ control, name: "tool.name" }}
+                  field={{ control, name: "parent.name" }}
                   label={`${getToolTypeName()} name`}
                 />
 
-                {/* todo responsiveness */}
+                {/* todo ? responsiveness */}
                 <HStack w="full" gap="gap.md">
                   <FormChakraInput
                     label="Domain"
                     placeholder="name.com"
-                    field={{ control, name: "tool.domain" }}
+                    field={{ control, name: "parent.domain" }}
                   />
                   <FormChakraInput
                     label="GitHub"
                     field={{
                       control,
-                      name: "tool.github_url",
+                      name: "parent.github_url",
                     }}
                     startElement={<LuGithub />}
                   />
                   <FormChakraInput
                     label="Crunchbase"
-                    field={{ control, name: "tool.crunchbase_url" }}
+                    field={{ control, name: "parent.crunchbase_url" }}
                     startElement={<SiCrunchbase />}
                   />
                 </HStack>
 
                 <FormChakraTextarea
-                  field={{ control, name: "tool.description" }}
+                  field={{ control, name: "parent.content" }}
                   label={`${getToolTypeName()} description`}
                   placeholder=""
                   isShowIconMarkdown
@@ -325,7 +324,7 @@ export namespace ReviewCreateForm {
                   </Text>
                   <ToolMultiSelect
                     form={form}
-                    fieldName="tool.alternatives"
+                    fieldName="parent.alternatives"
                     loadOptions={async (inputValue: string) => {
                       const res = await client
                         .query(
@@ -344,7 +343,10 @@ export namespace ReviewCreateForm {
                         toast.error("Failed to load alternatives");
                         return [];
                       }
-                      return res.data.post_tools.map(p => ({ id: p.id, name: p.title }));
+                      return res.data.post_tools.map(p => ({
+                        id: p.id,
+                        name: p.title,
+                      }));
                     }}
                   />
                 </VStack>
@@ -400,32 +402,32 @@ export namespace ReviewCreateForm {
                           $state.isRated = event.target.checked;
                           if ($state.isRated) {
                             form.setValue(
-                              "rating",
-                              form.formState.defaultValues?.rating ?? null,
+                              "review_rating",
+                              form.formState.defaultValues?.review_rating ?? null,
                             );
                           } else {
-                            form.setValue("rating", null);
+                            form.setValue("review_rating", null);
                           }
                         },
                       }}
                     >
                       Rating{" "}
-                      {formState.rating && (
+                      {formState.review_rating && (
                         <Tag size="md" ml={2}>
-                          {formState.rating}
+                          {formState.review_rating}
                         </Tag>
                       )}
                     </Checkbox>
 
                     <FormChakraSlider
                       hidden={!$state.isRated}
-                      field={{ control, name: "rating" }}
+                      field={{ control, name: "review_rating" }}
                     />
                   </VStack>
 
                   <HStack justify="space-between" w="full" gap="gap.md">
                     <FormChakraSegmentControl
-                      field={{ control, name: "usage_status" }}
+                      field={{ control, name: "review_usage_status" }}
                       label="Usage status"
                       items={[
                         getToolType(UsageStatus.Using, <FaHeartPulse />),

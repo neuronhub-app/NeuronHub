@@ -38,7 +38,7 @@ export async function refetchAllQueries() {
         pendingTotal += pendingStep;
         if (pendingTotal > pendingMax) {
           console.warn(
-            "Refetch time out. Happens if react-router v7 navigates back & forth. It prob kills urql operations/subscriptions, while this Exchange doesn't listen to unmount events.",
+            "Refetch timed out. Happens if react-router v7 navigates back & forth. It prob kills urql operations/subscriptions, while this Exchange doesn't listen to unmount events.",
           );
           resolve();
         } else {
@@ -68,6 +68,11 @@ export function refetchQueriesExchange(input: ExchangeInput): ExchangeIO {
       ),
       input.forward,
       tap(opResult => {
+        // todo ~ not working - on react-router nav to a cached page it breaks, eg:
+        // 1. open /posts/
+        // 2. open /reviews/
+        // 3. go back to /posts/ (here we load the old PostList from react-router cache)
+        // 4. try to vote on a Post → [[refetchQueriesExchange.ts#refetchAllQueries]] won't reload query=PostList, because it was... never mounted?
         state.opsRefetching.delete(opResult.operation.key);
       }),
     );

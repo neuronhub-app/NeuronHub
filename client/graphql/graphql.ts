@@ -110,14 +110,12 @@ export type MutationUpdate_User_ListArgs = {
   list_field_name: UserListName;
 };
 
-export type OneToManyInput = {
-  set?: InputMaybe<Scalars["ID"]["input"]>;
-};
-
 export type PostCommentType = PostTypeI & {
   __typename?: "PostCommentType";
+  TYPE?: Maybe<PostTypeEnum>;
   author: UserType;
   children: Array<PostCommentType>;
+  comments: Array<PostCommentType>;
   company?: Maybe<DjangoModelType>;
   content: Scalars["String"]["output"];
   content_private: Scalars["String"]["output"];
@@ -147,6 +145,10 @@ export type PostCommentTypeChildrenArgs = {
   filters?: InputMaybe<PostFilter>;
 };
 
+export type PostCommentTypeCommentsArgs = {
+  filters?: InputMaybe<PostFilter>;
+};
+
 export type PostCommentTypeTagsArgs = {
   filters?: InputMaybe<PostTagFilter>;
 };
@@ -162,8 +164,10 @@ export type PostFilter = {
 
 export type PostReviewType = PostTypeI & {
   __typename?: "PostReviewType";
+  TYPE?: Maybe<PostTypeEnum>;
   author: UserType;
   children: Array<PostTypeI>;
+  comments: Array<PostCommentType>;
   company?: Maybe<DjangoModelType>;
   content: Scalars["String"]["output"];
   content_private: Scalars["String"]["output"];
@@ -192,6 +196,10 @@ export type PostReviewType = PostTypeI & {
   visible_to_groups: Array<UserConnectionGroupType>;
   visible_to_users: Array<UserType>;
   votes: Array<PostVoteType>;
+};
+
+export type PostReviewTypeCommentsArgs = {
+  filters?: InputMaybe<PostFilter>;
 };
 
 export type PostReviewTypeTagsArgs = {
@@ -230,7 +238,7 @@ export type PostTagTypeTag_ChildrenArgs = {
 };
 
 export type PostTagTypeInput = {
-  description: Scalars["String"]["input"];
+  comment?: InputMaybe<Scalars["String"]["input"]>;
   id?: InputMaybe<Scalars["ID"]["input"]>;
   is_important?: InputMaybe<Scalars["Boolean"]["input"]>;
   is_vote_positive?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -247,9 +255,11 @@ export type PostTagVoteType = {
 
 export type PostToolType = PostTypeI & {
   __typename?: "PostToolType";
+  TYPE?: Maybe<PostTypeEnum>;
   alternatives: Array<PostToolType>;
   author: UserType;
   children: Array<PostTypeI>;
+  comments: Array<PostCommentType>;
   company?: Maybe<DjangoModelType>;
   content: Scalars["String"]["output"];
   content_private: Scalars["String"]["output"];
@@ -280,14 +290,20 @@ export type PostToolTypeAlternativesArgs = {
   filters?: InputMaybe<PostFilter>;
 };
 
+export type PostToolTypeCommentsArgs = {
+  filters?: InputMaybe<PostFilter>;
+};
+
 export type PostToolTypeTagsArgs = {
   filters?: InputMaybe<PostTagFilter>;
 };
 
 export type PostType = PostTypeI & {
   __typename?: "PostType";
+  TYPE?: Maybe<PostTypeEnum>;
   author: UserType;
   children: Array<PostTypeI>;
+  comments: Array<PostCommentType>;
   company?: Maybe<DjangoModelType>;
   content: Scalars["String"]["output"];
   content_private: Scalars["String"]["output"];
@@ -311,6 +327,10 @@ export type PostType = PostTypeI & {
   visible_to_groups: Array<UserConnectionGroupType>;
   visible_to_users: Array<UserType>;
   votes: Array<PostVoteType>;
+};
+
+export type PostTypeCommentsArgs = {
+  filters?: InputMaybe<PostFilter>;
 };
 
 export type PostTypeTagsArgs = {
@@ -352,8 +372,10 @@ export type PostTypeEnumFilterLookup = {
 };
 
 export type PostTypeI = {
+  TYPE?: Maybe<PostTypeEnum>;
   author: UserType;
   children: Array<PostTypeI>;
+  comments: Array<PostCommentType>;
   company?: Maybe<DjangoModelType>;
   content: Scalars["String"]["output"];
   content_private: Scalars["String"]["output"];
@@ -379,20 +401,24 @@ export type PostTypeI = {
   votes: Array<PostVoteType>;
 };
 
+export type PostTypeICommentsArgs = {
+  filters?: InputMaybe<PostFilter>;
+};
+
 export type PostTypeITagsArgs = {
   filters?: InputMaybe<PostTagFilter>;
 };
 
 export type PostTypeInput = {
   alternatives?: InputMaybe<ManyToManyInput>;
-  children?: InputMaybe<ManyToOneInput>;
   content?: InputMaybe<Scalars["String"]["input"]>;
   content_private?: InputMaybe<Scalars["String"]["input"]>;
   crunchbase_url?: InputMaybe<Scalars["String"]["input"]>;
   domain?: InputMaybe<Scalars["String"]["input"]>;
   github_url?: InputMaybe<Scalars["String"]["input"]>;
   id?: InputMaybe<Scalars["ID"]["input"]>;
-  parent?: InputMaybe<OneToManyInput>;
+  is_review_later?: InputMaybe<Scalars["Boolean"]["input"]>;
+  parent?: InputMaybe<PostTypeInput>;
   recommended_to_groups?: InputMaybe<ManyToManyInput>;
   recommended_to_users?: InputMaybe<ManyToManyInput>;
   review_experience_hours?: InputMaybe<Scalars["Int"]["input"]>;
@@ -404,6 +430,7 @@ export type PostTypeInput = {
   source?: InputMaybe<Scalars["String"]["input"]>;
   tags?: InputMaybe<Array<PostTagTypeInput>>;
   title?: InputMaybe<Scalars["String"]["input"]>;
+  tool_type?: InputMaybe<ToolType>;
   url?: InputMaybe<Scalars["String"]["input"]>;
   visibility?: InputMaybe<Visibility>;
   visible_to_groups?: InputMaybe<ManyToManyInput>;
@@ -720,7 +747,7 @@ type PostFragment_PostCommentType_Fragment = {
     avatar?: { __typename?: "DjangoFileType"; url: string } | null;
   };
   votes: Array<{ __typename?: "PostVoteType"; id: string; is_vote_positive?: boolean | null }>;
-  children: Array<{
+  comments: Array<{
     __typename?: "PostCommentType";
     id: string;
     type: PostTypeEnum;
@@ -765,44 +792,15 @@ type PostFragment_PostReviewType_Fragment = {
     avatar?: { __typename?: "DjangoFileType"; url: string } | null;
   };
   votes: Array<{ __typename?: "PostVoteType"; id: string; is_vote_positive?: boolean | null }>;
-  children: Array<
-    | {
-        __typename?: "PostCommentType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-    | {
-        __typename?: "PostReviewType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-    | {
-        __typename?: "PostToolType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-    | {
-        __typename?: "PostType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-  >;
+  comments: Array<{
+    __typename?: "PostCommentType";
+    id: string;
+    type: PostTypeEnum;
+    content: string;
+    created_at: any;
+    updated_at: any;
+    author: { __typename?: "UserType"; id: string; username: string };
+  }>;
   parent?: {
     __typename: "PostToolType";
     id: string;
@@ -839,44 +837,15 @@ type PostFragment_PostToolType_Fragment = {
     avatar?: { __typename?: "DjangoFileType"; url: string } | null;
   };
   votes: Array<{ __typename?: "PostVoteType"; id: string; is_vote_positive?: boolean | null }>;
-  children: Array<
-    | {
-        __typename?: "PostCommentType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-    | {
-        __typename?: "PostReviewType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-    | {
-        __typename?: "PostToolType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-    | {
-        __typename?: "PostType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-  >;
+  comments: Array<{
+    __typename?: "PostCommentType";
+    id: string;
+    type: PostTypeEnum;
+    content: string;
+    created_at: any;
+    updated_at: any;
+    author: { __typename?: "UserType"; id: string; username: string };
+  }>;
   parent?:
     | {
         __typename: "PostCommentType";
@@ -945,44 +914,15 @@ type PostFragment_PostType_Fragment = {
     avatar?: { __typename?: "DjangoFileType"; url: string } | null;
   };
   votes: Array<{ __typename?: "PostVoteType"; id: string; is_vote_positive?: boolean | null }>;
-  children: Array<
-    | {
-        __typename?: "PostCommentType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-    | {
-        __typename?: "PostReviewType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-    | {
-        __typename?: "PostToolType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-    | {
-        __typename?: "PostType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        created_at: any;
-        updated_at: any;
-        author: { __typename?: "UserType"; id: string; username: string };
-      }
-  >;
+  comments: Array<{
+    __typename?: "PostCommentType";
+    id: string;
+    type: PostTypeEnum;
+    content: string;
+    created_at: any;
+    updated_at: any;
+    author: { __typename?: "UserType"; id: string; username: string };
+  }>;
   parent?:
     | {
         __typename: "PostCommentType";
@@ -1040,7 +980,7 @@ export type PostFragmentFragment =
 
 type PostCommentsFragment_PostCommentType_Fragment = {
   __typename?: "PostCommentType";
-  children: Array<{
+  comments: Array<{
     __typename: "PostCommentType";
     id: string;
     type: PostTypeEnum;
@@ -1060,242 +1000,62 @@ type PostCommentsFragment_PostCommentType_Fragment = {
 
 type PostCommentsFragment_PostReviewType_Fragment = {
   __typename?: "PostReviewType";
-  children: Array<
-    | {
-        __typename: "PostCommentType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?: { __typename?: "PostCommentType"; id: string } | null;
-      }
-    | {
-        __typename: "PostReviewType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?: { __typename?: "PostToolType"; id: string } | null;
-      }
-    | {
-        __typename: "PostToolType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?:
-          | { __typename?: "PostCommentType"; id: string }
-          | { __typename?: "PostReviewType"; id: string }
-          | { __typename?: "PostToolType"; id: string }
-          | { __typename?: "PostType"; id: string }
-          | null;
-      }
-    | {
-        __typename: "PostType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?:
-          | { __typename?: "PostCommentType"; id: string }
-          | { __typename?: "PostReviewType"; id: string }
-          | { __typename?: "PostToolType"; id: string }
-          | { __typename?: "PostType"; id: string }
-          | null;
-      }
-  >;
+  comments: Array<{
+    __typename: "PostCommentType";
+    id: string;
+    type: PostTypeEnum;
+    content: string;
+    visibility: Visibility;
+    created_at: any;
+    updated_at: any;
+    author: {
+      __typename?: "UserType";
+      id: string;
+      username: string;
+      avatar?: { __typename?: "DjangoFileType"; url: string } | null;
+    };
+    parent?: { __typename?: "PostCommentType"; id: string } | null;
+  }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostReviewType_Fragment" };
 
 type PostCommentsFragment_PostToolType_Fragment = {
   __typename?: "PostToolType";
-  children: Array<
-    | {
-        __typename: "PostCommentType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?: { __typename?: "PostCommentType"; id: string } | null;
-      }
-    | {
-        __typename: "PostReviewType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?: { __typename?: "PostToolType"; id: string } | null;
-      }
-    | {
-        __typename: "PostToolType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?:
-          | { __typename?: "PostCommentType"; id: string }
-          | { __typename?: "PostReviewType"; id: string }
-          | { __typename?: "PostToolType"; id: string }
-          | { __typename?: "PostType"; id: string }
-          | null;
-      }
-    | {
-        __typename: "PostType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?:
-          | { __typename?: "PostCommentType"; id: string }
-          | { __typename?: "PostReviewType"; id: string }
-          | { __typename?: "PostToolType"; id: string }
-          | { __typename?: "PostType"; id: string }
-          | null;
-      }
-  >;
+  comments: Array<{
+    __typename: "PostCommentType";
+    id: string;
+    type: PostTypeEnum;
+    content: string;
+    visibility: Visibility;
+    created_at: any;
+    updated_at: any;
+    author: {
+      __typename?: "UserType";
+      id: string;
+      username: string;
+      avatar?: { __typename?: "DjangoFileType"; url: string } | null;
+    };
+    parent?: { __typename?: "PostCommentType"; id: string } | null;
+  }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostToolType_Fragment" };
 
 type PostCommentsFragment_PostType_Fragment = {
   __typename?: "PostType";
-  children: Array<
-    | {
-        __typename: "PostCommentType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?: { __typename?: "PostCommentType"; id: string } | null;
-      }
-    | {
-        __typename: "PostReviewType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?: { __typename?: "PostToolType"; id: string } | null;
-      }
-    | {
-        __typename: "PostToolType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?:
-          | { __typename?: "PostCommentType"; id: string }
-          | { __typename?: "PostReviewType"; id: string }
-          | { __typename?: "PostToolType"; id: string }
-          | { __typename?: "PostType"; id: string }
-          | null;
-      }
-    | {
-        __typename: "PostType";
-        id: string;
-        type: PostTypeEnum;
-        content: string;
-        visibility: Visibility;
-        created_at: any;
-        updated_at: any;
-        author: {
-          __typename?: "UserType";
-          id: string;
-          username: string;
-          avatar?: { __typename?: "DjangoFileType"; url: string } | null;
-        };
-        parent?:
-          | { __typename?: "PostCommentType"; id: string }
-          | { __typename?: "PostReviewType"; id: string }
-          | { __typename?: "PostToolType"; id: string }
-          | { __typename?: "PostType"; id: string }
-          | null;
-      }
-  >;
+  comments: Array<{
+    __typename: "PostCommentType";
+    id: string;
+    type: PostTypeEnum;
+    content: string;
+    visibility: Visibility;
+    created_at: any;
+    updated_at: any;
+    author: {
+      __typename?: "UserType";
+      id: string;
+      username: string;
+      avatar?: { __typename?: "DjangoFileType"; url: string } | null;
+    };
+    parent?: { __typename?: "PostCommentType"; id: string } | null;
+  }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostType_Fragment" };
 
 export type PostCommentsFragmentFragment =
@@ -1489,7 +1249,7 @@ export const PostFragmentFragmentDoc = {
           },
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -1623,7 +1383,7 @@ export const PostCommentsFragmentFragmentDoc = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -1791,7 +1551,7 @@ export const PostDetailFragmentFragmentDoc = {
           },
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -1862,7 +1622,7 @@ export const PostDetailFragmentFragmentDoc = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -2034,7 +1794,7 @@ export const PostReviewFragmentFragmentDoc = {
           },
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -2220,7 +1980,7 @@ export const PostReviewDetailFragmentFragmentDoc = {
           },
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -2307,7 +2067,7 @@ export const PostReviewDetailFragmentFragmentDoc = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -2500,7 +2260,7 @@ export const PostDetailDocument = {
           },
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -2571,7 +2331,7 @@ export const PostDetailDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -2784,7 +2544,7 @@ export const PostListDocument = {
           },
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -3182,7 +2942,7 @@ export const PostReviewDetailDocument = {
           },
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -3269,7 +3029,7 @@ export const PostReviewDetailDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -3457,7 +3217,7 @@ export const ReviewListDocument = {
           },
           {
             kind: "Field",
-            name: { kind: "Name", value: "children" },
+            name: { kind: "Name", value: "comments" },
             selectionSet: {
               kind: "SelectionSet",
               selections: [

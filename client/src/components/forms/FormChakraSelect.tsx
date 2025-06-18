@@ -8,10 +8,10 @@ export function FormChakraSelect(props: {
   formRegister: UseFormRegisterReturn;
   label: string;
   placeholder?: string;
-  fieldName: "importance";
+  fieldName: "review_importance";
   options: Array<{
     label: string;
-    value: ReviewCreateForm.FormSchema["importance"];
+    value: ReviewCreateForm.FormSchema["review_importance"];
   }>;
 }) {
   return (

@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-type ReviewSelectName = "tags" | "tool.alternatives";
+type ReviewSelectName = "tags" | "parent.alternatives";
 
 export function ToolMultiSelect(props: {
   form: UseFormReturn<ReviewCreateForm.FormSchema>;
@@ -66,8 +66,6 @@ export function ToolMultiSelect(props: {
         getNewOptionData={inputValue => ({
           id: inputValue,
           name: inputValue,
-          is_vote_positive: null,
-          comment: null,
         })}
         loadOptions={async (inputValue: string) => {
           // todo throttle

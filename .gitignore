@@ -3,9 +3,10 @@
 docs/private/
 
 server/.env.local
+**__pycache__**
+**.pyc
 
 # aider
 .aider*
 !.aider/.aiderignore
 !.aider.conf.yml
-.aider*

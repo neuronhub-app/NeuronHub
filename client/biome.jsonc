@@ -57,6 +57,7 @@
     "includes": [
       "src/**",
       "graphql/**",
+      "!graphql/graphql-env.d.ts", // gql isn't meant to be lintable
 
       "biome.jsonc",
       "tsconfig.json",

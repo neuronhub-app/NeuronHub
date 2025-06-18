@@ -1,5 +1,5 @@
 ---
-reviewed_at: 2025.04.22
+reviewed_at: 2025.06.17
 ---
 
 Setup
@@ -15,15 +15,12 @@ bun run dev
 ### Upgrade
 
 ```bash
-bun run update-check
 bun run update
 ```
 
 ### Code formatting
 
-Set your IDE to run Biome on save, eg with [Biome JetBrains plugins](https://plugins.jetbrains.com/plugin/22761-biome).
-
-Biome is immature. The JetBrains plugin often needs cache resets (restarts), and eg a manual path to `neuronhub/client/biome.jsonc`.
+Run Biome JetBrains plugin on save.
 
 Unusual techniques
 --------------------------------
@@ -41,7 +38,7 @@ Known Issues
 
 v7 HMR triggers a hard reload on every change to a file with the Route's `export default` component, so keep only the route params code in the `index.tsx`. 
 
-Don't know what's up with `import("../index.js")` bugs, but hey, it's JS. Be grateful it compiles. For now. (Related to react-router#12453)
+Don't know what's up with `import("../index.js")` bugs, but it's just JS. (Related to react-router#12453)
 
 ### urql
 
@@ -49,11 +46,7 @@ In `const [result, reexecuteQuery] = useQuery(...)` the `reexecuteQuery` doesn't
 
 ### gql-tada
 
-Immature, unstable, but still ~better than codegen.
-
-Re fragment collocation and masking/unmasking, I'll quote an LLM:
-- overengineering dressed up as "safety"
-- any time you need paragraphs to explain why your abstraction is "actually good for you," it's your problem
+Immature, unstable, but ~better than codegen.
 
 ### react-hook-form
 
@@ -69,7 +62,7 @@ Immature, eg with React 19:
 
 ### zod.js
 
-- Runtime is affected tsconfig.json, eg required fields become optional wo a warning if `compilerOptions::strict=false`
+- Runtime is affected by tsconfig.json, eg required fields become optional wo a warning if `compilerOptions::strict=false`
 - Integration with react-hook-form can be hard, re default values and `z.default()`
 - `z.date()` isn't stable
 

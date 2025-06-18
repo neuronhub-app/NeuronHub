@@ -64,16 +64,14 @@ type Mutation {
   update_post_seen_status(id: ID!): Boolean! @IsAuthenticated
 }
 
-input OneToManyInput {
-  set: ID
-}
-
 type PostCommentType implements PostTypeI {
+  TYPE: PostTypeEnum
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
   parent: PostCommentType
   children(filters: PostFilter): [PostCommentType!]!
+  comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
   title: String!
   content: String!
@@ -106,11 +104,13 @@ input PostFilter {
 }
 
 type PostReviewType implements PostTypeI {
+  TYPE: PostTypeEnum
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
   parent: PostToolType
   children: [PostTypeI!]!
+  comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
   title: String!
   content: String!
@@ -163,7 +163,7 @@ type PostTagType {
 input PostTagTypeInput {
   id: ID
   name: String!
-  description: String!
+  comment: String
   is_vote_positive: Boolean
   is_important: Boolean
 }
@@ -176,11 +176,13 @@ type PostTagVoteType {
 }
 
 type PostToolType implements PostTypeI {
+  TYPE: PostTypeEnum
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!
+  comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
   title: String!
   content: String!
@@ -206,11 +208,13 @@ type PostToolType implements PostTypeI {
 }
 
 type PostType implements PostTypeI {
+  TYPE: PostTypeEnum
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!
+  comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
   title: String!
   content: String!
@@ -289,11 +293,13 @@ input PostTypeEnumFilterLookup {
 }
 
 interface PostTypeI {
+  TYPE: PostTypeEnum
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!
+  comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
   title: String!
   content: String!
@@ -318,8 +324,7 @@ interface PostTypeI {
 
 input PostTypeInput {
   id: ID
-  parent: OneToManyInput
-  children: ManyToOneInput
+  parent: PostTypeInput
   alternatives: ManyToManyInput
   title: String
   content: String
@@ -336,7 +341,9 @@ input PostTypeInput {
   review_rating: Decimal
   review_experience_hours: Int
   review_importance: Decimal
+  is_review_later: Boolean
   reviewed_at: DateTime
+  tool_type: ToolType
   domain: String
   github_url: String
   crunchbase_url: String

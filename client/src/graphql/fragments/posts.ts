@@ -26,7 +26,7 @@ export const PostFragment = graphql(
         id
         is_vote_positive
       }
-      children {
+      comments {
         id
         type
         content
@@ -58,7 +58,7 @@ export const PostFragment = graphql(
 export const PostCommentsFragment = graphql(
   `
     fragment PostCommentsFragment on PostTypeI {
-      children {
+      comments {
         id
         type
         __typename

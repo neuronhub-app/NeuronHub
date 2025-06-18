@@ -121,7 +121,7 @@ export function ListContainer(props: {
                       color="gray.300"
                       _hover={{ color: "slate.400" }}
                     >
-                      <BsChatLeftTextFill /> <Text color="gray.400">{post.children.length}</Text>
+                      <BsChatLeftTextFill /> <Text color="gray.400">{post.comments.length}</Text>
                     </IconButton>
                   </NavLink>
                 </Stack>

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 
 import strawberry
 import strawberry_django
@@ -18,6 +19,9 @@ from neuronhub.apps.users.graphql.types import UserConnectionGroupType
 from neuronhub.apps.users.graphql.types import UserType
 
 
+logger = logging.getLogger(__name__)
+
+
 @strawberry_django.filter_type(Post, lookups=True)
 class PostFilter:
     type: auto
@@ -28,7 +32,7 @@ class PostFilter:
 # noinspection PyDataclass
 @strawberry_django.interface(Post)
 class PostTypeI:
-    TYPE: Post.Type = Post.Type.Post
+    TYPE: Post.Type | None = None
 
     id: auto
     author: UserType
@@ -68,10 +72,10 @@ class PostTypeI:
 
     @classmethod
     def get_queryset(cls, queryset: QuerySet[Post], info: Info) -> QuerySet[Post]:
-        if not cls.TYPE:
-            raise NotImplementedError("Define TYPE.")
         user = get_current_user(info)
-        return async_to_sync(filter_posts_by_user)(user, posts=queryset.filter(type=cls.TYPE))
+        if cls.TYPE:
+            queryset = queryset.filter(type=cls.TYPE)
+        return async_to_sync(filter_posts_by_user)(user, posts=queryset)
 
 
 @strawberry_django.type(Post, filters=PostFilter)
@@ -125,10 +129,8 @@ class PostVoteType:
 @strawberry_django.input(Post, partial=True)
 class PostTypeInput:
     id: auto
-    tool_type: auto
 
-    parent: auto
-    children: auto
+    parent: PostTypeInput | None
     alternatives: auto
 
     title: auto
@@ -152,9 +154,11 @@ class PostTypeInput:
     review_rating: auto
     review_experience_hours: auto
     review_importance: auto
+    is_review_later: auto
     reviewed_at: auto
 
     # tool fields
+    tool_type: auto
     domain: auto
     github_url: auto
     crunchbase_url: auto

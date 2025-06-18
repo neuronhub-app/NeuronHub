@@ -9,7 +9,9 @@ import type { Scalars } from "~/graphql/graphql";
 import type { introspection } from "~/graphql/graphql-env.d.ts";
 
 export const graphql = initGraphQLTada<{
-  disableMasking: true; // afaik - useless abstraction
+  // Re fragment unmasking: overengineered.
+  // It's bad when paragraphs are written saying "this abstraction is actually good for you"
+  disableMasking: true;
   introspection: introspection;
 }>();
 

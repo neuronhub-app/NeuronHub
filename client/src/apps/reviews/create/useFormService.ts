@@ -16,35 +16,44 @@ export function useFormService() {
     } = values;
 
     const res = await client
-      .mutation(CreateReviewDoc, {
-        input: {
-          tool: {
-            alternatives: alternatives?.map(alternative => ({
-              tool_alternative: { set: alternative.id },
-              is_vote_positive: alternative.is_vote_positive,
-              comment: alternative.comment,
-            })),
-            ...toolRest,
-          },
+      .mutation(
+        graphql(`
+          mutation CreatePostReview($input: PostTypeInput!) {
+            create_post(data: $input) {
+              id
+            }
+          }
+        `),
+        {
+          input: {
+            tool: {
+              alternatives: alternatives?.map(alternative => ({
+                tool_alternative: { set: alternative.id },
+                is_vote_positive: alternative.is_vote_positive,
+                comment: alternative.comment,
+              })),
+              ...toolRest,
+            },
 
-          visible_to_users: {
-            set: visible_to?.filter(option => option.user).map(user => user.id),
-          },
-          visible_to_groups: {
-            set: visible_to?.filter(option => option.group).map(group => group.id),
-          },
+            visible_to_users: {
+              set: visible_to?.filter(option => option.user).map(user => user.id),
+            },
+            visible_to_groups: {
+              set: visible_to?.filter(option => option.group).map(group => group.id),
+            },
 
-          recommended_to_users: {
-            set: values.recommend_to?.filter(option => option.user).map(user => user.id),
-          },
-          recommended_to_groups: {
-            set: values.recommend_to?.filter(option => option.group).map(group => group.id),
-          },
+            recommended_to_users: {
+              set: values.recommend_to?.filter(option => option.user).map(user => user.id),
+            },
+            recommended_to_groups: {
+              set: values.recommend_to?.filter(option => option.group).map(group => group.id),
+            },
 
-          ...valuesRest,
-          tags,
+            ...valuesRest,
+            tags,
+          },
         },
-      })
+      )
       .toPromise();
     if (res.error) {
       captureException(res.error);
@@ -56,11 +65,3 @@ export function useFormService() {
     send: sendSubmitMutation,
   };
 }
-
-const CreateReviewDoc = graphql(`
-  mutation CreatePostReview($input: PostTypeInput!) {
-    create_post(data: $input) {
-      id
-    }
-  }
-`);

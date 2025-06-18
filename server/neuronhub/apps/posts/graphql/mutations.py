@@ -26,7 +26,6 @@ class PostsMutation:
     ) -> UserType:
         author: User = info.context.request.user
         review = await create_post_review(author, data)
-
         return cast(UserType, author)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
@@ -37,7 +36,6 @@ class PostsMutation:
     ) -> UserType:
         author: User = info.context.request.user
         review = await create_post_review(author, data)
-
         return cast(UserType, author)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
@@ -80,8 +78,8 @@ class PostsMutation:
         is_changed_my_mind: bool | None = None,
     ) -> bool:
         await PostVote.objects.aupdate_or_create(
-            author=info.context.request.user,
             post_id=id,
+            author=info.context.request.user,
             defaults={
                 "is_vote_positive": is_vote_positive,
                 "is_changed_my_mind": is_changed_my_mind,

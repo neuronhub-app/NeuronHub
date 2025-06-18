@@ -158,8 +158,6 @@ class Post(AnonimazableTimeStampedModel):
     # review fields
     # ---------------------
 
-    review_content_pros = anonymizable(MarkdownField(blank=True))
-    review_content_cons = anonymizable(MarkdownField(blank=True))
     review_rating = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -176,6 +174,10 @@ class Post(AnonimazableTimeStampedModel):
         default=None,
         blank=True,
         null=True,
+    )
+    is_review_later = models.BooleanField(
+        default=False,
+        help_text="Would be better as a M2M with a through model on Post.users_read_later, but that's a bit too complex atm. It indicates a review with `content` that's more like a note re why User might want to review it or not.",
     )
     reviewed_at = anonymizable(models.DateTimeField(default=timezone.now))
 
@@ -271,6 +273,9 @@ class PostTagVote(AnonimazableTimeStampedModel):
         User, on_delete=models.SET_NULL, null=True, related_name="post_tag_votes"
     )
 
+    comment = anonymizable(
+        MarkdownField(blank=True, help_text="Eg clarifying author's opinion re the tag")
+    )
     is_vote_positive = models.BooleanField(null=True, blank=True)
     is_changed_my_mind = models.BooleanField(default=False)
 

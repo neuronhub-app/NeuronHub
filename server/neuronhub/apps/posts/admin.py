@@ -193,8 +193,6 @@ class PostAdmin(SimpleHistoryAdmin):
                     "review_experience_hours",
                     "review_importance",
                     "review_usage_status",
-                    "review_content_pros",
-                    "review_content_cons",
                     "reviewed_at",
                 )
             },
