@@ -6,16 +6,16 @@ description = ""
 requires-python = "~=3.13"
 dependencies = [
     # django
-    "django == 5.2",
+    "django == 5.2.*",
     "django-allauth == 65.*",
-    "django-anymail == 13.0",
+    "django-anymail == 13.*",
     "django-cors-headers == 4.*",
     "django-fieldsignals == 0.*",
-    "django-health-check == 3.18.3",
+    "django-health-check == 3.*",
     "django-simple-history == 3.*",
-    "django-countries == 7.6.1",
-    "dj-database-url == 2.*",
-    "django-extensions == 3.2.3",
+    "django-countries == 7.*",
+    "dj-database-url == 3.*",
+    "django-extensions == 4.*",
         "ipython == 9.*",
     "strawberry-graphql ~= 0.273.0",
         "strawberry-graphql-django ~= 0.61.0",
@@ -23,32 +23,32 @@ dependencies = [
 
     # django fields
     "django-choices-field == 2.*",
-    "django-timezone-field == 7.1",
+    "django-timezone-field == 7.*",
 
     # django admin
-    "django-admin-sortable2 == 2.2.6",
-    "django-admin-autocomplete-filter == 0.7.1",
-    "django-adminutils == 0.0.28",
-    "django-select2-admin-filters == 0.1.4",
+    "django-admin-sortable2 == 2.*",
+    "django-admin-autocomplete-filter == 0.7.*",
+    "django-adminutils ~= 0.0.28",
+    "django-select2-admin-filters == 0.1.*",
         "django-select2 == 8.*",
-    "django-codemirror2 == 0.2",
-    "django-hijack == 3.7.1",
-    "django-object-actions == 4.*",
+    "django-codemirror2 == 0.2.*",
+    "django-hijack == 3.*",
+    "django-object-actions == 5.*",
     "django-debug-toolbar == 5.*",
 
     # server
-    "daphne == 4.1.2",
+    "daphne == 4.*",
     "whitenoise == 6.*",
-    "psycopg == 3.2.6",
+    "psycopg[binary] == 3.*",
 
     # utils
     "python-dateutil == 2.*",
     "python-dotenv == 1.*",
-    "python-environ == 0.4.54",
-    "humanize == 4.12.2",
+    "python-environ == 0.4.*",
+    "humanize == 4.*",
     "markdownify == 1.*",
     "rich == 14.*",
-    "sentry-sdk == 2.25.1",
+    "sentry-sdk == 2.*",
 ]
 
 
