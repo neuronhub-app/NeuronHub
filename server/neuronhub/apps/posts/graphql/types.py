@@ -36,6 +36,7 @@ class PostTypeI:
 
     parent: PostTypeI | None
     children: list[PostTypeI]
+    comments: list[PostCommentType] = strawberry_django.field(field_name="children")
 
     type: auto
 
@@ -124,6 +125,7 @@ class PostVoteType:
 @strawberry_django.input(Post, partial=True)
 class PostTypeInput:
     id: auto
+    tool_type: auto
 
     parent: auto
     children: auto
@@ -198,6 +200,6 @@ class PostTagVoteType:
 class PostTagTypeInput:
     id: strawberry.ID | None
     name: str
-    description: str
+    comment: str | None
     is_vote_positive: bool | None
     is_important: bool | None

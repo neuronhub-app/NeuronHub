@@ -129,6 +129,7 @@ class PostsGen:
         author: User = None
         visibility: Visibility = Visibility.PUBLIC
         visible_to_users: list[User] = None
+
         # tools
         # ------
         tool_type: Post.ToolType = Post.ToolType.Program
@@ -158,7 +159,7 @@ class PostsGen:
             )
         )
 
-    async def create(self, params: Params = Params()) -> Post:
+    async def create(self, params: Params = Params(type=Post.Type.Post)) -> Post:
         from neuronhub.apps.posts.models import Post
         from neuronhub.apps.posts.models import ToolCompany
         from neuronhub.apps.db.services.db_stubs_repopulate import create_company_ownership

@@ -7,7 +7,7 @@ from neuronhub.apps.tests.test_gen import PostParams
 class PostResolversTest(NeuronTestCase):
     async def test_query_post_by_id(self):
         post = await self.gen.posts.create()
-        await self.gen.posts.comment(post=post, author=self.user)
+        c = await self.gen.posts.comment(post=post, author=self.user)
 
         resp = await self.graphql_query(
             """
@@ -15,7 +15,7 @@ class PostResolversTest(NeuronTestCase):
                     post(pk: $id) {
                         id
                         content
-                        children {
+                        comments {
                             id
                             content
                         }
@@ -26,7 +26,7 @@ class PostResolversTest(NeuronTestCase):
         )
 
         assert resp.errors is None
-        assert type(resp.data["post"]["children"][0]["content"]) is str
+        assert type(resp.data["post"]["comments"][0]["content"]) is str
 
     async def test_posts_query(self):
         post = await self.gen.posts.create()
