@@ -10,6 +10,7 @@ from strawberry import Info
 from strawberry import auto
 from strawberry_django.auth.utils import get_current_user
 
+from neuronhub.apps.posts.models import PostTypeEnum
 from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
@@ -29,10 +30,9 @@ class PostFilter:
 
 
 # seems as a bug in PyCharm re PyDataclass
-# noinspection PyDataclass
 @strawberry_django.interface(Post)
 class PostTypeI:
-    TYPE: Post.Type | None = None
+    TYPE: PostTypeEnum
 
     id: auto
     author: UserType
@@ -49,7 +49,6 @@ class PostTypeI:
     content_private: auto
 
     source: auto
-    updated_at: auto
 
     visibility: auto
     visible_to_users: list[UserType]
@@ -114,7 +113,7 @@ class PostCommentType(PostTypeI):
     TYPE = Post.Type.Comment
 
     parent: PostCommentType | None
-    children: list[PostCommentType]
+    comments: list[PostCommentType]
 
 
 @strawberry_django.type(PostVote)
@@ -143,7 +142,7 @@ class PostTypeInput:
     recommended_to_users: auto
     recommended_to_groups: auto
 
-    tags: list[PostTagTypeInput] | None
+    tags: list[PostTagTypeInput]
 
     source: auto
 
@@ -163,6 +162,8 @@ class PostTypeInput:
     github_url: auto
     crunchbase_url: auto
     url: auto
+
+
 
 
 # ---------------------

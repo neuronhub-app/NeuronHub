@@ -1,0 +1,7 @@
+{
+  "enabledMcpjsonServers": [
+    "puppeteer",
+    "memory",
+    "sequential-thinking"
+  ]
+}

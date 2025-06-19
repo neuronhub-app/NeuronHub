@@ -9,7 +9,7 @@ export default [
     ]),
     ...prefix("/posts", [
       route("/", "./apps/posts/list/index.tsx"),
-      route("/create", "./apps/reviews/create/index.tsx"), // todo ! add post create page
+      route("/create", "./apps/posts/create/index.tsx"),
       route("/:id", "./apps/posts/detail/index.tsx"),
     ]),
     ...prefix("/user/settings", [

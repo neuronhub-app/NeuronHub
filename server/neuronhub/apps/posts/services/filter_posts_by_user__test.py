@@ -2,13 +2,12 @@ from asgiref.sync import sync_to_async
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.posts.services.filter_posts_by_user import filter_posts_by_user
-from neuronhub.apps.posts.models import Post
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
 class VisibilityTest(NeuronTestCase):
     async def test_visibility_by_connections(self):
-        parent: Post = await self.gen.posts.create()
+        parent = await self.gen.posts.create()
 
         user = self.user
         user2 = await self.gen.users.user()

@@ -42,8 +42,11 @@ class PostsMutation:
     async def create_post_comment(self, data: PostTypeInput, info: Info) -> PostCommentType:
         user = await aget_current_user(info)
 
+        if not data.parent:
+            raise ValueError("Parent is required for creating a comment")
+
         comment = await Post.objects.acreate(
-            author=user,
+            author=cast(User, user),
             parent=data.parent.id,
             content=data.content,
             visibility=data.visibility,
@@ -91,5 +94,5 @@ class PostsMutation:
     async def update_post_seen_status(self, id: strawberry.ID, info: Info) -> bool:
         user = await aget_current_user(info)
         post = await Post.objects.aget(id=id)
-        await sync_to_async(post.seen_by_users.add)(user.id)
+        await sync_to_async(post.seen_by_users.add)(cast(User, user).id)
         return True

@@ -55,6 +55,8 @@ async def create_tag(
             defaults={"is_vote_positive": is_vote_positive},
         )
 
-    await sync_to_async(post.tags.add)(tag)
+    if not tag:
+        raise ValueError("Bug in tag creation")
 
+    await sync_to_async(post.tags.add)(tag)
     return tag

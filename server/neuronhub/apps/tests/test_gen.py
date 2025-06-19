@@ -2,15 +2,17 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+from random import Random
 
 from asgiref.sync import sync_to_async
 from faker import Faker
-from faker.proxy import UniqueProxy  # type: ignore[import]
+from faker.proxy import UniqueProxy  # type: ignore[attr-defined]
 
 from neuronhub.apps.anonymizer.fields import Visibility
 
 from neuronhub.apps.users.models import User
 from neuronhub.apps.posts.models import Post
+from neuronhub.apps.posts.models.types import PostTypeEnum
 
 
 class Gen:
@@ -18,6 +20,7 @@ class Gen:
     posts: PostsGen
     faker: UniqueProxy
     faker_non_unique: Faker
+    random_seeded: Random
 
     @classmethod
     async def create(
@@ -42,6 +45,9 @@ class Gen:
         self.random_seeded = faker.random
 
         self.users = await UsersGen.create(faker=self.faker)
+        if self.users.user_default is None:
+            raise ValueError("Gen.create() failed")
+
         self.posts = PostsGen(faker=self.faker, user=self.users.user_default)
 
         return self
@@ -51,8 +57,8 @@ class Gen:
 class UsersGen:
     faker: UniqueProxy
 
-    user_default: User = None
-    user_default_task: asyncio.Task = None
+    user_default: User | None = None
+    user_default_task: asyncio.Task | None = None
     user_email_local_addr = "test.bot"
     user_email_domain = "neuronhub.io"
     user_email = f"{user_email_local_addr}@{user_email_domain}"
@@ -122,13 +128,13 @@ class PostsGen:
 
     @dataclass
     class Params:
-        type: Post.Type = Post.Type.Post
-        parent: Post = None
+        type: PostTypeEnum = Post.Type.Post
+        parent: Post | None = None
         title: str = ""
         content: str = ""
-        author: User = None
+        author: User | None = None
         visibility: Visibility = Visibility.PUBLIC
-        visible_to_users: list[User] = None
+        visible_to_users: list[User] | None = None
 
         # tools
         # ------
@@ -136,9 +142,9 @@ class PostsGen:
         url: str = ""
         crunchbase_url: str = ""
         github_url: str = ""
-        company_name: str = None
-        company_domain: str = None
-        company_country: str = None
+        company_name: str | None = None
+        company_domain: str | None = None
+        company_country: str | None = None
         company_ownership_name: str = "Private"
         is_single_product: bool = False
 

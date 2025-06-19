@@ -8,10 +8,11 @@ from strawberry import lazy
 if TYPE_CHECKING:
     from neuronhub.apps.posts.graphql.types import PostType
     from neuronhub.apps.posts.graphql.types import PostVoteType
+    from neuronhub.apps.posts.graphql.types import PostTagVoteType
 
 
 _posts_types = lazy("neuronhub.apps.posts.graphql.types")
 
-PostTypeLazy: PostType = Annotated["PostType", _posts_types]
-PostVoteTypeLazy: PostVoteType = Annotated["PostVoteType", _posts_types]
-PostTagVoteTypeLazy: PostVoteType = Annotated["PostTagVoteType", _posts_types]
+PostTypeLazy = Annotated["PostType", _posts_types]
+PostVoteTypeLazy = Annotated["PostVoteType", _posts_types]
+PostTagVoteTypeLazy = Annotated["PostTagVoteType", _posts_types]

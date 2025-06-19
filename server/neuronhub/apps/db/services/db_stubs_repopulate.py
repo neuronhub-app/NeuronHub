@@ -41,7 +41,7 @@ async def db_stubs_repopulate(
             PostRelated,
             ToolCompany,
         ]:
-            await model.objects.all().adelete()
+            await model._default_manager.all().adelete()
 
     if is_delete_orgs:
         await Org.objects.all().adelete()

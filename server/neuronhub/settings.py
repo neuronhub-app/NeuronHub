@@ -101,7 +101,7 @@ if IS_DEBUG_TOOLBAR_ENABLED:
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "server/templates"],
+        "DIRS": [BASE_DIR / "neuronhub/templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [

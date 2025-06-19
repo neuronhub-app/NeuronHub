@@ -19,7 +19,7 @@ dependencies = [
         "ipython == 9.*",
     "strawberry-graphql ~= 0.274.0",
         "strawberry-graphql-django ~= 0.62.0",
-    "django-stubs == 5.*",
+    "django-stubs[compatible-mypy] == 5.*",
 
     # django fields
     "django-choices-field == 2.*",
@@ -68,13 +68,43 @@ dev-dependencies = [
 ]
 
 
+[tool.mypy]
+    python_version = "3.13"
+    plugins = ["mypy_django_plugin.main"]
+    explicit_package_bases = true
+    ignore_missing_imports = true
+    implicit_optional = true
+    show_error_codes = true
+
+[[tool.mypy.overrides]]
+    module = "*.migrations.*"
+    ignore_errors = true
+
+[[tool.mypy.overrides]]
+    module = "*.settings"
+    ignore_errors = true
+
+[[tool.mypy.overrides]]
+    module = [
+        "allauth.*",
+        "wat.*",
+        "faker.*",
+    ]
+    ignore_missing_imports = true
+    ignore_errors = true
+
+[[tool.mypy.overrides]]
+    # wat package is unlintable
+    module = "neuronhub.apps.tests.utils"
+    ignore_errors = true
+
+
 [tool.django-stubs]
     django_settings_module = "neuronhub.settings"
 
 
 [tool.ruff]
-
-line-length = 97
+    line-length = 97
 
 
 [tool.ruff.lint.isort]

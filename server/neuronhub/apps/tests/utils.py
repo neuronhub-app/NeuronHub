@@ -13,13 +13,13 @@ def _log_sync(*objects: QuerySet | Any, is_long: bool = False, title: str = None
     print("\n")
     if title:
         print(title)
-    wat_configured = wat.color.nodocs
+    wat_configured = wat.color.nodocs  # type: ignore
     for object_arg in objects:
         match object_arg:
             case QuerySet():
-                wat_configured.short(object_arg)
+                wat_configured.short(object_arg)  # type: ignore
             case _:
                 if is_long:
-                    wat_configured.public(object_arg)
+                    wat_configured.public(object_arg)  # type: ignore
                 else:
-                    wat_configured.short(object_arg)
+                    wat_configured.short(object_arg)  # type: ignore

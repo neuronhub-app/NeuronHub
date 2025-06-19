@@ -86,12 +86,12 @@ class Post(AnonimazableTimeStampedModel):
 
     alternatives = models.ManyToManyField(
         "self",
-        through="PostRelated",
+        through="posts.PostRelated",
         symmetrical=False,  # todo ~ clarify why
         related_name="alternatives_to",
     )
 
-    tags = ManyToManyField("PostTag", related_name="posts", blank=True)
+    tags = ManyToManyField("posts.PostTag", related_name="posts", blank=True)
 
     author = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
 
@@ -113,18 +113,18 @@ class Post(AnonimazableTimeStampedModel):
     # permissions
     # ---------------------
 
-    recommended_to_users = anonymizable(
+    recommended_to_users = anonymizable(  # type: ignore[var-annotated]
         models.ManyToManyField(User, related_name="posts_recommended", blank=True),
     )
-    recommended_to_groups = anonymizable(
+    recommended_to_groups = anonymizable(  # type: ignore[var-annotated]
         models.ManyToManyField(
             UserConnectionGroup, related_name="posts_recommended", blank=True
         ),
     )
-    visible_to_users = anonymizable(
+    visible_to_users = anonymizable(  # type: ignore[var-annotated]
         models.ManyToManyField(User, related_name="posts_visible", blank=True),
     )
-    visible_to_groups = anonymizable(
+    visible_to_groups = anonymizable(  # type: ignore[var-annotated]
         models.ManyToManyField(UserConnectionGroup, related_name="posts_visible", blank=True),
     )
     visibility = TextChoicesField(Visibility, default=Visibility.PRIVATE)

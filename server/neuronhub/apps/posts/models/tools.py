@@ -60,8 +60,8 @@ class ToolCompany(TimeStampedModel):
 
 
 class PostToolStatsGithub(TimeStampedModel):
-    post: Post = models.OneToOneField(
-        "Post", on_delete=models.CASCADE, related_name="stats_github"
+    post = models.OneToOneField(
+        "posts.Post", on_delete=models.CASCADE, related_name="stats_github"
     )
 
     stars = models.IntegerField()

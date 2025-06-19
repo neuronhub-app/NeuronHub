@@ -20,7 +20,7 @@ if typing.TYPE_CHECKING:
 async def create_post_review(author: User, data: PostTypeInput) -> Post:
     tool = await _create_or_update_tool(data.parent, author)
 
-    post_review = await Post.objects.acreate(
+    post_review, _ = await Post.objects.aget_or_update(
         parent=tool,
         author=author,
         defaults=dict(
@@ -34,6 +34,7 @@ async def create_post_review(author: User, data: PostTypeInput) -> Post:
             review_usage_status=data.review_usage_status,
             review_importance=data.review_importance,
             reviewed_at=data.reviewed_at,
+            is_review_later=data.is_review_later,
         ),
     )
 

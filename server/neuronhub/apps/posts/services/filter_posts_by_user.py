@@ -1,3 +1,4 @@
+from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import AnonymousUser
 from django.db.models import Q
@@ -9,8 +10,8 @@ from neuronhub.apps.posts.models import Post
 
 
 async def filter_posts_by_user(
-    user: AbstractUser | AnonymousUser,
-    posts: QuerySet[Post] | QuerySet[Post, Post] = None,
+    user: AbstractUser | AnonymousUser | AbstractBaseUser,
+    posts: QuerySet[Post] | None = None,
 ) -> QuerySet[Post]:
     """
     Used in [[PostTypeI#get_queryset]] - ie globally in GraphQL.

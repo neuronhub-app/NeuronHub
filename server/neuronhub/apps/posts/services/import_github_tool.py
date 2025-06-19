@@ -1,12 +1,12 @@
-from neuronhub.apps.posts.models.tools import Tool
-from neuronhub.apps.posts.models.tools import ToolStatsGithub
+from neuronhub.apps.posts.models import Post
+from neuronhub.apps.posts.models import PostToolStatsGithub
 
 
-async def import_github_tool(url_raw: str) -> Tool:
+async def import_github_tool(url_raw: str) -> Post:
     url = _clean_url(url_raw)
-    tool, is_created = await Tool.objects.aget_or_create(github_url=url)
+    tool, is_created = await Post.objects.aget_or_create(github_url=url)
 
-    stats, _ = await ToolStatsGithub.objects.aget_or_create(tool=tool)
+    stats, _ = await PostToolStatsGithub.objects.aget_or_create(tool=tool)
     stats.stars = 0
     stats.kloc = 0
     await stats.asave()

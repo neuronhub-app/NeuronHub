@@ -52,7 +52,9 @@ class PostTagInline(admin.TabularInline):
         "is_review_tag",
     ]
     raw_id_fields = [_meta_model]
-    readonly_fields = fields[1:]  # must be readonly
+
+    # all must be readonly except 1
+    readonly_fields = fields[1:]  # type: ignore
 
     ordering = [f"-{_meta_model}__is_important", f"-{_meta_model}__created_at"]
 

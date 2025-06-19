@@ -10,3 +10,5 @@ server/.env.local
 .aider*
 !.aider/.aiderignore
 !.aider.conf.yml
+
+.claude/prompts/local/**

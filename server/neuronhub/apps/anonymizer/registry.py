@@ -43,13 +43,15 @@ async def anonymize_user_data(
         first_name="Anonym",
     )
     for model_anonymizable in anonymizer.models:
-        instances = model_anonymizable.objects.filter(author=user)
-        for instance in model_anonymizable.objects.filter(author=user):
+        # All registered models have an author field, but mypy can't see it on the abstract base
+        instances = list(model_anonymizable._default_manager.filter(author=user))  # type: ignore[misc]
+        for instance in instances:
             instance.anonymize(user_anon, is_erase_text_content)
-        await model_anonymizable.objects.abulk_update(
-            instances,
-            model_anonymizable.get_anonymizable_fields(),
-        )
+        if instances:
+            await model_anonymizable._default_manager.abulk_update(
+                instances,
+                model_anonymizable.get_anonymizable_fields(),
+            )
 
     if is_delete_user:
         await user.adelete()
@@ -58,9 +60,8 @@ async def anonymize_user_data(
 class AnonymizerRegistry:
     models: list[type[AnonimazableTimeStampedModel]] = []
 
-    # the generic limiter breaks pycharm stubs
-    # def register[M: AnonimazableTimeStampedModel]
-    def register[M](self, cls: type[M]) -> type[M]:
+    # generic limiter prb breaks pycharm stubs, but adds mypy more useful checks
+    def register[M: AnonimazableTimeStampedModel](self, cls: type[M]) -> type[M]:
         assert issubclass(cls, AnonimazableTimeStampedModel)
         self.models.append(cls)
         return cls
@@ -84,7 +85,7 @@ class AnonimazableTimeStampedModel(TimeStampedModel):
     created_at = anonymizable(models.DateTimeField(auto_now_add=True))
     updated_at = anonymizable(models.DateTimeField(auto_now=True))
 
-    author: User
+    author: User | None
     history: HistoricalRecords | None = None
 
     class Meta:

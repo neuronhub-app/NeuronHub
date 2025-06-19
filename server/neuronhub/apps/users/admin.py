@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
@@ -12,7 +12,7 @@ class UserConnectionGroupInline(admin.TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(UserAdmin):
+class UserAdmin(DjangoUserAdmin):
     list_display = [
         "username",
         "email",
