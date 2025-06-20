@@ -112,9 +112,9 @@ export type MutationUpdate_User_ListArgs = {
 
 export type PostCommentType = PostTypeI & {
   __typename?: "PostCommentType";
-  TYPE?: Maybe<PostTypeEnum>;
+  TYPE: PostTypeEnum;
   author: UserType;
-  children: Array<PostCommentType>;
+  children: Array<PostTypeI>;
   comments: Array<PostCommentType>;
   company?: Maybe<DjangoModelType>;
   content: Scalars["String"]["output"];
@@ -141,10 +141,6 @@ export type PostCommentType = PostTypeI & {
   votes: Array<PostVoteType>;
 };
 
-export type PostCommentTypeChildrenArgs = {
-  filters?: InputMaybe<PostFilter>;
-};
-
 export type PostCommentTypeCommentsArgs = {
   filters?: InputMaybe<PostFilter>;
 };
@@ -164,7 +160,7 @@ export type PostFilter = {
 
 export type PostReviewType = PostTypeI & {
   __typename?: "PostReviewType";
-  TYPE?: Maybe<PostTypeEnum>;
+  TYPE: PostTypeEnum;
   author: UserType;
   children: Array<PostTypeI>;
   comments: Array<PostCommentType>;
@@ -255,7 +251,7 @@ export type PostTagVoteType = {
 
 export type PostToolType = PostTypeI & {
   __typename?: "PostToolType";
-  TYPE?: Maybe<PostTypeEnum>;
+  TYPE: PostTypeEnum;
   alternatives: Array<PostToolType>;
   author: UserType;
   children: Array<PostTypeI>;
@@ -300,7 +296,7 @@ export type PostToolTypeTagsArgs = {
 
 export type PostType = PostTypeI & {
   __typename?: "PostType";
-  TYPE?: Maybe<PostTypeEnum>;
+  TYPE: PostTypeEnum;
   author: UserType;
   children: Array<PostTypeI>;
   comments: Array<PostCommentType>;
@@ -372,7 +368,7 @@ export type PostTypeEnumFilterLookup = {
 };
 
 export type PostTypeI = {
-  TYPE?: Maybe<PostTypeEnum>;
+  TYPE: PostTypeEnum;
   author: UserType;
   children: Array<PostTypeI>;
   comments: Array<PostCommentType>;
@@ -428,7 +424,7 @@ export type PostTypeInput = {
   reviewed_at?: InputMaybe<Scalars["DateTime"]["input"]>;
   seen_by_users?: InputMaybe<ManyToManyInput>;
   source?: InputMaybe<Scalars["String"]["input"]>;
-  tags?: InputMaybe<Array<PostTagTypeInput>>;
+  tags: Array<PostTagTypeInput>;
   title?: InputMaybe<Scalars["String"]["input"]>;
   tool_type?: InputMaybe<ToolType>;
   url?: InputMaybe<Scalars["String"]["input"]>;

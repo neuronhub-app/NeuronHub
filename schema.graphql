@@ -65,19 +65,18 @@ type Mutation {
 }
 
 type PostCommentType implements PostTypeI {
-  TYPE: PostTypeEnum
+  TYPE: PostTypeEnum!
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
   parent: PostCommentType
-  children(filters: PostFilter): [PostCommentType!]!
+  children: [PostTypeI!]!
   comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
   title: String!
   content: String!
   content_private: String!
   source: String!
-  updated_at: DateTime!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -92,6 +91,7 @@ type PostCommentType implements PostTypeI {
   crunchbase_url: String!
   github_url: String!
   created_at: DateTime!
+  updated_at: DateTime!
 }
 
 input PostFilter {
@@ -104,7 +104,7 @@ input PostFilter {
 }
 
 type PostReviewType implements PostTypeI {
-  TYPE: PostTypeEnum
+  TYPE: PostTypeEnum!
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
@@ -116,7 +116,6 @@ type PostReviewType implements PostTypeI {
   content: String!
   content_private: String!
   source: String!
-  updated_at: DateTime!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -131,6 +130,7 @@ type PostReviewType implements PostTypeI {
   crunchbase_url: String!
   github_url: String!
   created_at: DateTime!
+  updated_at: DateTime!
   review_usage_status: UsageStatus
   review_rating: Decimal
   review_importance: Decimal
@@ -161,8 +161,8 @@ type PostTagType {
 }
 
 input PostTagTypeInput {
-  id: ID
   name: String!
+  id: ID
   comment: String
   is_vote_positive: Boolean
   is_important: Boolean
@@ -176,7 +176,7 @@ type PostTagVoteType {
 }
 
 type PostToolType implements PostTypeI {
-  TYPE: PostTypeEnum
+  TYPE: PostTypeEnum!
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
@@ -188,7 +188,6 @@ type PostToolType implements PostTypeI {
   content: String!
   content_private: String!
   source: String!
-  updated_at: DateTime!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -203,12 +202,13 @@ type PostToolType implements PostTypeI {
   crunchbase_url: String!
   github_url: String!
   created_at: DateTime!
+  updated_at: DateTime!
   tool_type: ToolType
   alternatives(filters: PostFilter): [PostToolType!]!
 }
 
 type PostType implements PostTypeI {
-  TYPE: PostTypeEnum
+  TYPE: PostTypeEnum!
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
@@ -220,7 +220,6 @@ type PostType implements PostTypeI {
   content: String!
   content_private: String!
   source: String!
-  updated_at: DateTime!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -235,6 +234,7 @@ type PostType implements PostTypeI {
   crunchbase_url: String!
   github_url: String!
   created_at: DateTime!
+  updated_at: DateTime!
 }
 
 enum PostTypeEnum {
@@ -293,7 +293,7 @@ input PostTypeEnumFilterLookup {
 }
 
 interface PostTypeI {
-  TYPE: PostTypeEnum
+  TYPE: PostTypeEnum!
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
@@ -305,7 +305,6 @@ interface PostTypeI {
   content: String!
   content_private: String!
   source: String!
-  updated_at: DateTime!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -320,6 +319,7 @@ interface PostTypeI {
   crunchbase_url: String!
   github_url: String!
   created_at: DateTime!
+  updated_at: DateTime!
 }
 
 input PostTypeInput {
@@ -334,7 +334,7 @@ input PostTypeInput {
   visible_to_groups: ManyToManyInput
   recommended_to_users: ManyToManyInput
   recommended_to_groups: ManyToManyInput
-  tags: [PostTagTypeInput!]
+  tags: [PostTagTypeInput!]!
   source: String
   seen_by_users: ManyToManyInput
   review_usage_status: UsageStatus

@@ -7,6 +7,7 @@ import strawberry_django
 from asgiref.sync import async_to_sync
 from django.db.models import QuerySet
 from strawberry import Info
+from strawberry import UNSET
 from strawberry import auto
 from strawberry_django.auth.utils import get_current_user
 
@@ -164,8 +165,6 @@ class PostTypeInput:
     url: auto
 
 
-
-
 # ---------------------
 # PostTag
 # ---------------------
@@ -201,10 +200,10 @@ class PostTagVoteType:
     is_changed_my_mind: auto
 
 
-@strawberry.input
+@strawberry_django.input(PostTag, partial=True)
 class PostTagTypeInput:
-    id: strawberry.ID | None
     name: str
-    comment: str | None
-    is_vote_positive: bool | None
-    is_important: bool | None
+    id: strawberry.ID | None = UNSET
+    comment: str | None = UNSET
+    is_vote_positive: bool | None = UNSET
+    is_important: bool | None = UNSET
