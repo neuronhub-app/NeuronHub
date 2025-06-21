@@ -31,6 +31,7 @@ The commit can be ended in `(AI)` to indicate that most of the code was LLM writ
 ### Scopes
 
 - `API` - backend & strawberry types, mutations, etc. Usually without `clients/` changes.
+- `upgrade` - devops `^` upgrading. Done often and usually has no changes outside lock-files.
 - `auth` - apps.users or frontend logic for it, hijacking, permissions, etc
 - `tags` - related to FE or BE tags implementation
 - `AI` - tools as Claude, Aider, etc
@@ -45,6 +46,7 @@ Not used atm:
 Scopes for the docs (`?`) type:
 - `refac`
 - `glossary`
+- `arch` - for [architecture.md](/docs/architecture.md) file
 - `readme` - either backend or frontend or root
 - `{file name without "md"}`
 
