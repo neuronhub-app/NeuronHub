@@ -53,19 +53,18 @@ dependencies = [
 
 
 [tool.uv]
-
-dev-dependencies = [
-    "ruff == 0.12.*",
-    "faker == 37.*",
-    "objprint == 0.*",
-    "pip == 25.*",
-    "wat == 0.6.*",
-    "pytest == 8.*",
-        "pytest-django == 4.*",
-        "pytest-mock == 3.*",
-        "pytest-pspec ~= 0.0.4",
-        "pytest-rich == 0.*",
-]
+    dev-dependencies = [
+        "ruff == 0.12.*",
+        "faker == 37.*",
+        "objprint == 0.*",
+        "pip == 25.*",
+        "wat == 0.6.*",
+        "pytest == 8.*",
+            "pytest-django == 4.*",
+            "pytest-mock == 3.*",
+            "pytest-pspec ~= 0.0.4",
+            "pytest-rich == 0.*",
+    ]
 
 
 [tool.mypy]
@@ -108,40 +107,37 @@ dev-dependencies = [
 
 
 [tool.ruff.lint.isort]
-
-force-single-line = true
-lines-after-imports = 2
-known-first-party = ["neuronhub"]
+    force-single-line = true
+    lines-after-imports = 2
+    known-first-party = ["neuronhub"]
 
 
 [tool.ruff.lint]
-
-extend-select = [
-    "UP",  # pyupgrade: enforce modern python syntax
-]
-ignore = [
-    # "drop unused vars", don't want as they're used as links/docs
-    "F841",
-    # 2 rules for multi-line string indent - sounds useless,
-    # use textwrap.dedent() - it's your responsibility. and flake8's fault for not detecting dedent()
-    "W291",
-    "W293",
-]
+    extend-select = [
+        "UP",  # pyupgrade: enforce modern python syntax
+    ]
+    ignore = [
+        # "drop unused vars", don't want as they're used as links/docs
+        "F841",
+        # 2 rules for multi-line string indent - sounds useless,
+        # use textwrap.dedent() - it's your responsibility. and flake8's fault for not detecting dedent()
+        "W291",
+        "W293",
+    ]
 
 
 [tool.pytest.ini_options]
-
-DJANGO_SETTINGS_MODULE = "neuronhub.settings"
-python_files = ["*__test.py"]
-addopts = [
-    "--no-migrations",
-    "--capture=no", # show print() stdout
-    "--color=yes",
-    "--code-highlight=yes",
-    "--no-header",
-    "--pspec", # allows to use docstrings instead of test function names
-]
-filterwarnings = [
-    "ignore::DeprecationWarning:environ.compat",
-    "ignore::DeprecationWarning:functools",
-]
+    DJANGO_SETTINGS_MODULE = "neuronhub.settings"
+    python_files = ["*__test.py"]
+    addopts = [
+        "--no-migrations",
+        "--capture=no", # show print() stdout
+        "--color=yes",
+        "--code-highlight=yes",
+        "--no-header",
+        "--pspec", # allows to use docstrings instead of test function names
+    ]
+    filterwarnings = [
+        "ignore::DeprecationWarning:environ.compat",
+        "ignore::DeprecationWarning:functools",
+    ]
