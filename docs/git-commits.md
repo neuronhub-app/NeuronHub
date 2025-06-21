@@ -24,20 +24,23 @@ Examples:
 - `?` - docs (answering potential questions)
 - `#` - code style and formatting (python comments symbol, that's often used for `# type - ignore`)
 
-Adding `!` as a second char indicates the importance of the changes. Eg squashed PRs can contain dozens KLOC, vs adding a new text input.
+A second char `!` can be added to indicate the importance of the changes. Eg squashed PRs can contain dozens KLOC, vs adding a new text input.
+
+The commit can be ended in `(AI)` to indicate that most of the code was LLM written, and didn't receive an overly scrupulous code-review, ie can contain perfectly hidden bugs.
 
 ### Scopes
 
-- `monitor` - sentry, datadog, etc
-- `track` - PostHog or other changes re analytics and activity tracking
+- `API` - backend & strawberry types, mutations, etc. Usually without `clients/` changes.
 - `auth` - apps.users or frontend logic for it, hijacking, permissions, etc
+- `tags` - related to FE or BE tags implementation
+- `AI` - tools as Claude, Aider, etc
 - `admin` - django admin related
 - `types` - TypeScript or Python typings
-- `API` - related to strawberry structure and/or graphql types
-- `tags` - related to FE or BE tags implementation
+- `monitor` - sentry, datadog, etc
+
+Not used atm:
 - `brows` - browser extension
-- `settings` - django settings.py
-- `LLM` - tools as Claude, Aider, etc
+- `track` - PostHog or other changes re analytics and activity tracking
 
 Scopes for the docs (`?`) type:
 - `refac`
