@@ -1,12 +1,12 @@
 # Project Intro
 
-@docs/architecture.md
+@./docs/architecture.md
 
 ### Server and Client README files
 
-@server/README.md
+@./server/README.md
 
-@client/README.md
+@./client/README.md
 
 # Special Instructions
 

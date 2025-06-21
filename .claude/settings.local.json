@@ -1,5 +1,4 @@
 {
-  "defaultMode": "allowEdits",
   "permissions": {
     "allow": [
       "Bash(git:*)",
@@ -7,14 +6,11 @@
       "Bash(cat:*)",
       "Bash(grep:*)",
       "Bash(find:*)",
-
       "Bash(rg:*)",
       "Bash(eza:*)",
       "Bash(bat:*)",
       "Bash(fd:*)",
-
       "Bash(pl)",
-
       "Bash(uv add:*)",
       "Bash(uv remove:*)",
       "Bash(uv sync:*)",
@@ -29,16 +25,14 @@
       "Bash(./.run/format.sh)",
       "Bash(./.run/mypy.sh)",
       "Bash(./.run/gen-types-and-format.sh)",
-
-
       "WebFetch(domain:readthedocs.io)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:github.io)",
       "WebFetch(domain:gitlab.com)",
       "WebFetch(domain:developer.mozilla.org)",
       "WebFetch(domain:python.org)",
+      "WebFetch(domain:docs.anthropic.com)",
       "WebFetch(domain:typescriptlang.org)",
-
       "WebFetch(domain:react.dev)",
       "WebFetch(domain:reactrouter.com)",
       "WebFetch(domain:postgresql.org)",
@@ -50,16 +44,13 @@
       "WebFetch(domain:zod.dev)",
       "WebFetch(domain:formidable.com)",
       "WebFetch(domain:gql-tada.0no.co)",
-
       "WebFetch(domain:*.wikipedia.org)",
       "WebFetch(domain:news.ycombinator.com)",
-
       "WebFetch(domain:danluu.com)",
       "WebFetch(domain:jvns.ca)",
       "WebFetch(domain:simonwillison.net)",
       "WebFetch(domain:fasterthanli.me)",
       "WebFetch(domain:rachelbythebay.com)",
-
       "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": [
@@ -70,5 +61,6 @@
     "puppeteer",
     "memory",
     "sequential-thinking"
-  ]
+  ],
+  "defaultMode": "allowEdits"
 }
