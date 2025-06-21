@@ -1,28 +1,28 @@
 {
+  "defaultMode": "allowEdits",
   "permissions": {
     "allow": [
-      // Commands / Bash
       "Bash(git:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(grep:*)",
       "Bash(find:*)",
-      // Commands / Bash / User
+
       "Bash(rg:*)",
       "Bash(eza:*)",
       "Bash(bat:*)",
       "Bash(fd:*)",
-      // Commands / User
+
       "Bash(pl)",
-      // Commands / Project
+
       "Bash(uv add:*)",
       "Bash(uv remove:*)",
       "Bash(uv sync:*)",
       "Bash(uv run:*)",
       "Bash(uv pip:*)",
       "Bash(uv run pytest:*)",
-      "Bash(uv run manage.py db_stubs_repopulate)",
-      "Bash(bun run tsc)",
+      "Bash(uv run manage.py:*)",
+      "Bash(bun run tsc:*)",
       "Bash(bun run update)",
       "Bash(bun run install)",
       "Bash(bun run dev)",
@@ -30,7 +30,7 @@
       "Bash(./.run/mypy.sh)",
       "Bash(./.run/gen-types-and-format.sh)",
 
-      // docs
+
       "WebFetch(domain:readthedocs.io)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:github.io)",
@@ -38,7 +38,7 @@
       "WebFetch(domain:developer.mozilla.org)",
       "WebFetch(domain:python.org)",
       "WebFetch(domain:typescriptlang.org)",
-      // docs / packages
+
       "WebFetch(domain:react.dev)",
       "WebFetch(domain:reactrouter.com)",
       "WebFetch(domain:postgresql.org)",
@@ -48,24 +48,27 @@
       "WebFetch(domain:biomejs.dev)",
       "WebFetch(domain:valtio.dev)",
       "WebFetch(domain:zod.dev)",
-      "WebFetch(domain:formidable.com)", // urql
+      "WebFetch(domain:formidable.com)",
       "WebFetch(domain:gql-tada.0no.co)",
-      // social docs
+
       "WebFetch(domain:*.wikipedia.org)",
       "WebFetch(domain:news.ycombinator.com)",
-      // blogs offered by LLM
+
       "WebFetch(domain:danluu.com)",
       "WebFetch(domain:jvns.ca)",
       "WebFetch(domain:simonwillison.net)",
       "WebFetch(domain:fasterthanli.me)",
       "WebFetch(domain:rachelbythebay.com)",
 
-      // MCP
-      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": [
-      "Bash(curl:*)",
-      "WebFetch(domain:stackoverflow.com)", // gives 403 anyway
+      "WebFetch(domain:stackoverflow.com)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "puppeteer",
+    "memory",
+    "sequential-thinking"
+  ]
 }

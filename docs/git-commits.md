@@ -37,6 +37,7 @@ Adding `!` as a second char indicates the importance of the changes. Eg squashed
 - `tags` - related to FE or BE tags implementation
 - `brows` - browser extension
 - `settings` - django settings.py
+- `LLM` - tools as Claude, Aider, etc
 
 Scopes for the docs (`?`) type:
 - `refac`
