@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass
 from random import Random
 
@@ -58,10 +57,11 @@ class UsersGen:
     faker: UniqueProxy
 
     user_default: User | None = None
-    user_default_task: asyncio.Task | None = None
-    user_email_local_addr = "test.bot"
-    user_email_domain = "neuronhub.io"
-    user_email = f"{user_email_local_addr}@{user_email_domain}"
+
+    _user_username = "admin"
+    _user_email_domain = "neuronhub.io"
+    _user_email = f"{_user_username}@{_user_email_domain}"
+    _user_password = "admin"
 
     @classmethod
     async def create(cls, faker: UniqueProxy):
@@ -72,6 +72,8 @@ class UsersGen:
     async def user(
         self,
         email: str = None,
+        username: str = None,
+        password: str = None,
         is_superuser: bool = False,
         first_name: str = None,
         last_name: str = None,
@@ -80,16 +82,16 @@ class UsersGen:
     ) -> User:
         from neuronhub.apps.users.models import User
 
-        first_name = first_name or self.faker.first_name()
+        username_new = username or email or self.faker.user_name()
         if is_get_or_create:
             user, _ = await User.objects.aget_or_create(
-                username=email or self.faker.user_name(),
-                email=email or self.faker.email(domain=self.user_email_domain),
+                username=username_new,
+                email=email or self.faker.email(domain=self._user_email_domain),
             )
         else:
             user = await User.objects.acreate(
-                username=email or self.faker.user_name(),
-                email=email or self.faker.email(domain=self.user_email_domain),
+                username=username_new,
+                email=email or self.faker.email(domain=self._user_email_domain),
             )
         user.first_name = first_name or self.faker.first_name()
         user.last_name = last_name or self.faker.last_name()
@@ -98,11 +100,8 @@ class UsersGen:
             user.is_staff = True
             user.is_superuser = True
 
+        user.set_password(password or self._user_password)
         await user.asave()
-
-        if is_attach_org:
-            pass
-
         return user
 
     async def get_user_default(self, is_attach_org: bool = True) -> User:
@@ -111,14 +110,18 @@ class UsersGen:
         if self.user_default:
             return self.user_default
         else:
-            if user_default := await User.objects.filter(email=self.user_email).afirst():
+            if user_default := await User.objects.filter(email=self._user_email).afirst():
                 return user_default
             else:
-                return await self.user(
-                    email=self.user_email,
+                user = await self.user(
+                    email=self._user_email,
+                    username=self._user_username,
+                    password=self._user_password,
                     is_get_or_create=True,
-                    is_attach_org=is_attach_org,
                 )
+                user.set_password(self._user_password)
+                await user.asave()
+                return user
 
 
 @dataclass
