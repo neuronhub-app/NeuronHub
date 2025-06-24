@@ -6,3 +6,5 @@ uv run ruff format .
 cd ..
 cd client || exit
 bun run format
+
+cd ..

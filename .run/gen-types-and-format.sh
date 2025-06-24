@@ -10,3 +10,5 @@ bun run graphql:codegen
 bun run gql-tada generate output # it "auto runs" by gql.tada - ie not trustworthy
 bun run typegen
 bun run format
+
+cd ..
