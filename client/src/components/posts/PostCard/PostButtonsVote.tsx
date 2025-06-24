@@ -73,6 +73,7 @@ function VoteButton(props: { id: ID; isVotePositive: boolean }) {
       variant="subtle-ghost"
       borderRadius="lg"
       size="sm"
+      className={props.isVotePositive ? "btn-upvote" : "btn-downvote"}
     >
       {props.isVotePositive ? <FaChevronUp /> : <FaChevronDown />}
     </IconButton>

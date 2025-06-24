@@ -64,6 +64,11 @@ dependencies = [
             "pytest-mock == 3.*",
             "pytest-pspec ~= 0.0.4",
             "pytest-rich == 0.*",
+
+        "playwright == 1.*",
+            "pytest-playwright-asyncio == 0.*",
+            "pytest-asyncio >= 0.26.0",
+            "greenlet >= 3.1.0",
     ]
 
 
@@ -128,7 +133,7 @@ dependencies = [
 
 [tool.pytest.ini_options]
     DJANGO_SETTINGS_MODULE = "neuronhub.settings"
-    python_files = ["*__test.py"]
+    python_files = ["*__test.py", "neuronhub/apps/tests/playwright/**"]
     addopts = [
         "--no-migrations",
         "--capture=no", # show print() stdout
@@ -137,6 +142,7 @@ dependencies = [
         "--no-header",
         "--pspec", # allows to use docstrings instead of test function names
     ]
+    asyncio_default_test_loop_scope = "session"
     filterwarnings = [
         "ignore::DeprecationWarning:environ.compat",
         "ignore::DeprecationWarning:functools",

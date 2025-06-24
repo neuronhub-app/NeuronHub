@@ -1,6 +1,7 @@
 import { For, IconButton, Stack } from "@chakra-ui/react";
 import { ErrorBoundary } from "@sentry/react";
 import { type ComponentProps, type ReactNode, useEffect } from "react";
+import toast from "react-hot-toast";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { LuLibrary } from "react-icons/lu";
 import { useSnapshot } from "valtio/react";
@@ -78,7 +79,10 @@ function ReviewButton(props: {
       <IconButton
         loading={state.snap.isLoading}
         onClick={async () => {
-          if (state.snap.isLoading || !user.state.current) {
+          if (!user.state.current) {
+            toast.error("Login first");
+          }
+          if (state.snap.isLoading) {
             return;
           }
           state.mutable.isLoading = true;
@@ -110,6 +114,9 @@ function ReviewButton(props: {
         variant="subtle-ghost"
         size="sm"
         aria-label={label}
+        className={
+          props.fieldName === UserListName.ReadLater ? "btn-reading-list" : "btn-library"
+        }
       >
         {state.snap.isAdded ? props.iconPresent : props.iconNotPresent}
       </IconButton>

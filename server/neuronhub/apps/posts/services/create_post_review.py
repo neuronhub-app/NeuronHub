@@ -4,6 +4,7 @@ import typing
 from asgiref.sync import sync_to_async
 from django.core.exceptions import ValidationError
 from strawberry import UNSET
+from typing import Any
 
 from neuronhub.apps.posts.models import PostTag, PostTagVote, Post, PostRelated
 from neuronhub.apps.users.models import User
@@ -119,12 +120,11 @@ async def _create_tag(tag_name: str, author: User) -> PostTag:
 
 async def _tag_vote_update(tag: PostTag, tool: Post, author: User, tag_input: PostTagTypeInput):
     """Update or create tag vote, preserving existing values when not specified."""
-    # Build update dict only with explicitly provided values
-    defaults = {}
+    defaults: dict[str, Any] = {}
     if tag_input.is_vote_positive is not UNSET:
         defaults["is_vote_positive"] = tag_input.is_vote_positive
     if tag_input.comment is not UNSET:
-        defaults["comment"] = tag_input.comment or ""  # type: ignore dumb mypy
+        defaults["comment"] = tag_input.comment if tag_input.comment is not None else ""
 
     if defaults:
         await PostTagVote.objects.aupdate_or_create(

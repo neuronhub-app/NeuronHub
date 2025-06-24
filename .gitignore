@@ -5,11 +5,11 @@
 docs/private/
 
 server/.env.local
-**/**.pyc
-
-# aider
-.aider*
-!.aider/.aiderignore
-!.aider.conf.yml
 
 .claude/prompts/local/**
+
+# caches
+__pycache__
+server/.*_cache/
+server/.venv/
+.*_cache/
