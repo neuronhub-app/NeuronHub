@@ -4,6 +4,14 @@ READMEs:
 
 Also see project's [architecture](/docs/architecture.md).
 
+### Docker
+
+```bash
+make up
+make test
+make down
+```
+
 ### Claude
 
 Summary of [the best practices](https://www.anthropic.com/engineering/claude-code-best-practices)
@@ -23,10 +31,8 @@ Keywords
 
 UI
 - `⌘ V` screenshots of UI designs
-- Puppeteer MCP
 
 Ideas
-- `claude --dangerously-skip-permissions` in containers
 - fix GitHub CI
   - `gh` for GitHub tasks
 - Git history search

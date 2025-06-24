@@ -2,72 +2,30 @@
 reviewed_at: 2025.06.17
 ---
 
-Setup
---------------------------------
-
-### Setup
+## Setup
 
 ```bash
 bun install
 bun run dev
 ```
 
-### Upgrade
+**Upgrade**: `bun run update`  
+**Formatting**: Biome JetBrains plugin on save
 
-```bash
-bun run update
-```
+## GraphQL Pattern
 
-### Code formatting
+**`mutateAndRefetch`** - each mutation triggers [`refetchAllQueries`](./src/urql/refetchQueriesExchange.ts) to avoid stale cache. Currently ~1 second delay, may need optimization as app scales.
 
-Run Biome JetBrains plugin on save.
+## Development Notes
 
-Unusual techniques
---------------------------------
+**react-router v7**: HMR hard-reloads on Route component changes - keep only route params in `index.tsx`
 
-To avoid GraphQL stale cache, each mutation is triggered using [`async mutateAndRefetch`](./src/urql/mutateAndRefetch.ts),
-which calls [`refetchAllQueries`](./src/urql/refetchQueriesExchange.ts) - refetching all mounted (eg by `urlq.useQuery()`)
-Queries. The `mutateAndRefetch` doesn't return to the caller until all queries are refetched.
+**urql**: `reexecuteQuery` needs `{ requestPolicy: "network-only" }` (urql#1395)
 
-This will likely grow overly expensive on the server, and too annoying to the end-user, but atm it takes just a ~second.
+**react-hook-form**: `onChange` breaks if you pass `ref` to `<input>` - see [docs](https://www.react-hook-form.com/faqs/#Howtosharerefusage)
 
-Known Issues
---------------------------------
+**Chakra v3**: React 19 conflicts with `useMemo()`/`JSON.stringify()` causing recursion (`stateNode`, `FiberNode` errors)
 
-### react-router
+**Zod**: Affected by `tsconfig.json` strict mode, `z.date()` unstable, v4 upgrade planned
 
-v7 HMR triggers a hard reload on every change to a file with the Route's `export default` component, so keep only the route params code in the `index.tsx`. 
-
-Don't know what's up with `import("../index.js")` bugs, but it's just JS. (Related to react-router#12453)
-
-### urql
-
-In `const [result, reexecuteQuery] = useQuery(...)` the `reexecuteQuery` doesn't work w/o `reexecuteQuery({ requestPolicy: "network-only" })`. See urql-graphql/urql/issues#1395.
-
-### gql-tada
-
-Immature, unstable, but ~better than codegen.
-
-### react-hook-form
-
-`onChange` stops working if you pass `ref` to `<input>`. See [their docs](https://www.react-hook-form.com/faqs/#Howtosharerefusage) on how to access it.
-
-The package's architecture is inconsistent. The [Chakra adapters](/client/src/components/forms) in this project are minimal and copy-pasted from chakra-ui documentation. I plan to migrate to a Chakra UI package as soon as it appears.
-
-### chakra v3
-
-Immature, eg with React 19:
-- React's `useMemo()` can conflict with Chakra components trying to use `JSON.stringify()`, causing recursion errors when components have cyclic references (exception keywords: `stateNode`, `FiberNode`)
-- Some components, eg `SegmentControl`, have wrong css that don't work without `ColorModeProvider`'s global styles.
-
-### zod.js
-
-- Runtime is affected by tsconfig.json, eg required fields become optional wo a warning if `compilerOptions::strict=false`
-- Integration with react-hook-form can be hard, re default values and `z.default()`
-- `z.date()` isn't stable
-
-Zod v4 fixes some, to be upgraded.
-
-### react-select
-
-Drops custom `Option` props that aren't named `value` or `label`, eg `Option.comment` is removed by react-select `onChange` handlers.
+**react-select**: Drops custom `Option` props (only keeps `value`/`label`)
