@@ -1,0 +1,6 @@
+node_modules/
+.env*
+
+# avoid confusing LLMs
+Dockerfile
+.dockerignore

@@ -39,6 +39,7 @@ The commit can be ended in `(AI)` to indicate that most of the code was LLM writ
 - `types` - TypeScript or Python typings
 - `test_gen` - `apps/tests/test_gen::Gen` changes
 - `monitor` - sentry, datadog, etc
+- `docker`
 
 Not used atm:
 - `brows` - browser extension

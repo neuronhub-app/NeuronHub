@@ -1,0 +1,64 @@
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: neuronhub
+      POSTGRES_USER: neuronhub
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --username neuronhub"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  server:
+    build: ./server
+    environment:
+      DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
+      ALLOWED_HOSTS: server,localhost
+    volumes:
+      - ./server:/server
+      - lib_server:/server/.venv
+    ports:
+      - "8000:8000"
+    working_dir: /server
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  client:
+    build: ./client
+    environment:
+      VITE_API_URL: http://server:8000
+    volumes:
+      - ./client:/client
+      - lib_frontend:/client/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+
+  test:
+    build: ./server
+    environment:
+      DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
+      ALLOWED_HOSTS: server,localhost
+      SERVER_URL: http://server:8000
+      CLIENT_URL: http://client:3000
+      DJANGO_SETTINGS_MODULE: neuronhub.settings
+    volumes:
+      - ./server:/server
+      - lib_server:/server/.venv
+    working_dir: /server
+    depends_on:
+      - server
+      - client
+    command: ["uv", "run", "pytest"]
+
+volumes:
+  postgres_data:
+  lib_server:
+  lib_frontend:

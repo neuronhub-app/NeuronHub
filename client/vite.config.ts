@@ -7,6 +7,7 @@ export default defineConfig({
   root: __dirname,
   server: {
     port: 3000,
+    allowedHosts: ["localhost", "client"],
   },
   plugins: [reactRouter(), tsconfigPaths(), devtoolsJson()],
 });
