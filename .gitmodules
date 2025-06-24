@@ -1,4 +1,4 @@
-[submodule "path/to/your/submodule"]
+[submodule "docs/private"]
 	path = docs/private
 	url = http://nas.strix:3000/vik/neuronhub-docs.git
 	branch = master
