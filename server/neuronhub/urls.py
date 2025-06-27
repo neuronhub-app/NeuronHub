@@ -1,9 +1,5 @@
 from django.conf import settings
 from django.contrib import admin
-from django.db import DEFAULT_DB_ALIAS
-from django.db import connections
-from django.db.migrations.executor import MigrationExecutor
-from django.http import HttpResponse
 from django.urls import include
 from django.urls import path
 from django.urls import re_path
@@ -13,15 +9,6 @@ from strawberry.django.views import AsyncGraphQLView
 
 from neuronhub.graphql import schema
 from neuronhub.settings import DjangoEnv
-
-
-def healthcheck_view(request):
-    executor = MigrationExecutor(connections[DEFAULT_DB_ALIAS])
-    plan = executor.migration_plan(executor.loader.graph.leaf_nodes())
-    if plan:
-        return HttpResponse("error: pending migrations", status=503)
-    else:
-        return HttpResponse("ok")
 
 
 graphql_view = AsyncGraphQLView.as_view(
@@ -41,7 +28,7 @@ urlpatterns = [
             ]
         ),
     ),
-    path("healthcheck/", healthcheck_view),
+    path("healthcheck/", include("health_check.urls")),
     re_path(
         r"^media/(?P<path>.*)$",
         serve,
