@@ -12,34 +12,43 @@ services:
       test: ["CMD-SHELL", "pg_isready --username neuronhub"]
       interval: 5s
       timeout: 5s
-      retries: 5
 
   server:
     build: ./server
     environment:
       DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
       ALLOWED_HOSTS: server,localhost
+      SERVER_URL: http://server:8000
+      CLIENT_URL: http://client:3000
     volumes:
-      - ./server:/server
-      - lib_server:/server/.venv
+      - .:/app
+      - server_lib:/app/server/.venv
     ports:
       - "8000:8000"
-    working_dir: /server
+    working_dir: /app/server
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/healthcheck/"]
+      interval: 3s
+      timeout: 7s
 
   client:
     build: ./client
     environment:
       VITE_API_URL: http://server:8000
     volumes:
-      - ./client:/client
-      - lib_frontend:/client/node_modules
+      - .:/app
+      - server_lib:/app/server/.venv
+      - client_lib:/app/client/node_modules
+      - ~/.claude:/root/.claude
     ports:
       - "3000:3000"
+    working_dir: /app/client
     depends_on:
-      - server
+      server:
+        condition: service_healthy
 
   test:
     build: ./server
@@ -48,17 +57,20 @@ services:
       ALLOWED_HOSTS: server,localhost
       SERVER_URL: http://server:8000
       CLIENT_URL: http://client:3000
-      DJANGO_SETTINGS_MODULE: neuronhub.settings
     volumes:
-      - ./server:/server
-      - lib_server:/server/.venv
-    working_dir: /server
+      - .:/app
+      - server_lib:/app/server/.venv
+      - client_lib:/app/client/node_modules
     depends_on:
-      - server
-      - client
-    command: ["uv", "run", "pytest"]
+      postgres:
+        condition: service_healthy
+      server:
+        condition: service_healthy
+      client:
+        condition: service_started
+    command: ["bash", "-c", "cd /app/server && uv run pytest"]
 
 volumes:
   postgres_data:
-  lib_server:
-  lib_frontend:
+  server_lib:
+  client_lib:

@@ -12,6 +12,13 @@ make test
 make down
 ```
 
+#### Running Claude in Docker
+
+It'll ask to auth each time.
+```bash
+docker-compose run --rm client bash -c "/app/client/node_modules/.bin/claude --dangerously-skip-permissions"
+```
+
 ### Claude
 
 Summary of [the best practices](https://www.anthropic.com/engineering/claude-code-best-practices)

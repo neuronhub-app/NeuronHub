@@ -1,9 +1,9 @@
-# todo ? Dockerfiles for server for < image size
+# todo ? Dockerfiles for prod /server/ for < image size
 FROM mcr.microsoft.com/playwright/python:v1.52.0-noble
 
 RUN pip install uv --quiet --disable-pip-version-check
 
-WORKDIR /server
+WORKDIR /app/server
 
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-cache
