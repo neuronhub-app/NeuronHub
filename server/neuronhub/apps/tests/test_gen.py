@@ -26,6 +26,7 @@ class Gen:
         cls,
         is_random_values_deterministic: bool = True,
         random_seed: int = 42,
+        is_user_default_superuser: bool = False,
     ):
         self = cls()
 
@@ -43,7 +44,10 @@ class Gen:
         self.faker_non_unique = faker
         self.random_seeded = faker.random
 
-        self.users = await UsersGen.create(faker=self.faker)
+        self.users = await UsersGen.create(
+            faker=self.faker,
+            is_user_default_superuser=is_user_default_superuser,
+        )
         if self.users.user_default is None:
             raise ValueError("Gen.create() failed")
 
@@ -64,9 +68,9 @@ class UsersGen:
     _user_password = "admin"
 
     @classmethod
-    async def create(cls, faker: UniqueProxy):
+    async def create(cls, faker: UniqueProxy, is_user_default_superuser: bool = False):
         self = cls(faker=faker)
-        self.user_default = await self.get_user_default()
+        self.user_default = await self.get_user_default(is_superuser=is_user_default_superuser)
         return self
 
     async def user(
@@ -104,7 +108,11 @@ class UsersGen:
         await user.asave()
         return user
 
-    async def get_user_default(self, is_attach_org: bool = True) -> User:
+    async def get_user_default(
+        self,
+        is_superuser: bool = False,
+        is_attach_org: bool = True,
+    ) -> User:
         from neuronhub.apps.users.models import User
 
         if self.user_default:
@@ -119,6 +127,9 @@ class UsersGen:
                     password=self._user_password,
                     is_get_or_create=True,
                 )
+                if is_superuser:
+                    user.is_staff = True
+                    user.is_superuser = True
                 user.set_password(self._user_password)
                 await user.asave()
                 return user

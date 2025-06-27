@@ -49,8 +49,8 @@ async def db_stubs_repopulate(
     if is_delete_users:
         await User.objects.all().adelete()
 
-    gen = await Gen.create()
-    user = await gen.users.get_user_default()
+    gen = await Gen.create(is_user_default_superuser=True)
+    user = gen.users.user_default
 
     await _create_review_pycharm(user, gen=gen)
     tool_iterm = await _create_review_iterm(user, gen=gen)

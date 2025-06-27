@@ -37,7 +37,7 @@ The commit can be ended in `(AI)` to indicate that most of the code was LLM writ
 - `AI` - tools as Claude, Aider, etc
 - `admin` - django admin related
 - `types` - TypeScript or Python typings
-- `test_gen` - `apps/tests/test_gen::Gen` changes
+- `test_gen` - `apps/tests/test_gen::Gen` changes and `db_stubs_repopulate` stuff
 - `monitor` - sentry, datadog, etc
 - `docker`
 
