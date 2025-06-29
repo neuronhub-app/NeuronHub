@@ -25,7 +25,7 @@ class PlaywrightHelper:
         self.page = page
 
     async def db_stubs_repopulate(self):
-        await db_stubs_repopulate(is_delete_tools=True)
+        await db_stubs_repopulate(is_delete_posts=True)
 
     async def login_using_django_admin(self):
         await self.page.goto(f"{settings.SERVER_URL}/admin/login/")

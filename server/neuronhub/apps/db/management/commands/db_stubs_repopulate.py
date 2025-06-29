@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class Options(TypedDict):
-    is_delete_tools: bool
+    is_delete_posts: bool
     is_delete_orgs: bool
     is_delete_users: bool
 
@@ -20,7 +20,7 @@ class Options(TypedDict):
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
-            "--is_delete_tools",
+            "--is_delete_posts",
             action="store_true",
             default=True,
         )
@@ -39,7 +39,7 @@ class Command(BaseCommand):
         try:
             asyncio.run(
                 db_stubs_repopulate(
-                    is_delete_tools=options["is_delete_tools"],
+                    is_delete_posts=options["is_delete_posts"],
                     is_delete_users=options["is_delete_users"],
                     is_delete_orgs=options["is_delete_orgs"],
                 )

@@ -27,11 +27,11 @@ logger = logging.getLogger(__name__)
 
 
 async def db_stubs_repopulate(
-    is_delete_tools: bool = False,
+    is_delete_posts: bool = False,
     is_delete_users: bool = False,
     is_delete_orgs: bool = False,
 ) -> None:
-    if is_delete_tools:
+    if is_delete_posts:
         for model in [
             # posts:
             PostTagVote,
