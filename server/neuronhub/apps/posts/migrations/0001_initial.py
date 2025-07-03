@@ -7,8 +7,8 @@ import django_countries.fields
 import django_extensions.db.fields
 import neuronhub.apps.anonymizer.fields
 import neuronhub.apps.db.fields
+import neuronhub.apps.posts.graphql.types_lazy
 import neuronhub.apps.posts.models.posts
-import neuronhub.apps.posts.models.reviews
 import neuronhub.apps.posts.models.types
 import simple_history.models
 from django.db import migrations, models
@@ -369,7 +369,7 @@ class Migration(migrations.Migration):
                             ("changed_my_mind", "Changed my mind"),
                             ("read_fully", "Read fully"),
                         ],
-                        choices_enum=neuronhub.apps.posts.models.reviews.ReviewTagName,
+                        choices_enum=neuronhub.apps.posts.graphql.types_lazy.ReviewTagName,
                         max_length=15,
                     ),
                 ),

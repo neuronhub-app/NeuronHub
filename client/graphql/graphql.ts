@@ -27,6 +27,15 @@ export type Scalars = {
   Upload: { input: any; output: any };
 };
 
+export type BoolBaseFilterLookup = {
+  /** Exact match. Filter will be skipped on `null` value */
+  exact?: InputMaybe<Scalars["Boolean"]["input"]>;
+  /** Exact match of items in a given list. Filter will be skipped on `null` value */
+  in_list?: InputMaybe<Array<Scalars["Boolean"]["input"]>>;
+  /** Assignment test. Filter will be skipped on `null` value */
+  is_null?: InputMaybe<Scalars["Boolean"]["input"]>;
+};
+
 export type DjangoFileType = {
   __typename?: "DjangoFileType";
   name: Scalars["String"]["output"];
@@ -209,6 +218,7 @@ export type PostTagFilter = {
   OR?: InputMaybe<PostTagFilter>;
   description?: InputMaybe<StrFilterLookup>;
   id?: InputMaybe<IdBaseFilterLookup>;
+  is_review_tag?: InputMaybe<BoolBaseFilterLookup>;
   name?: InputMaybe<StrFilterLookup>;
 };
 
@@ -218,6 +228,7 @@ export type PostTagType = {
   description: Scalars["String"]["output"];
   id: Scalars["ID"]["output"];
   is_important?: Maybe<Scalars["Boolean"]["output"]>;
+  is_review_tag: Scalars["Boolean"]["output"];
   name: Scalars["String"]["output"];
   posts: Array<PostType>;
   tag_children: Array<PostTagType>;

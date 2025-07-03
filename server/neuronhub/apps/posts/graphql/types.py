@@ -175,6 +175,7 @@ class PostTagFilter:
     id: auto
     name: auto
     description: auto
+    is_review_tag: auto
 
 
 @strawberry_django.type(PostTag, filters=PostTagFilter)
@@ -189,6 +190,7 @@ class PostTagType:
     name: auto
     description: auto
     is_important: auto
+    is_review_tag: auto
 
 
 @strawberry_django.type(PostTagVote)

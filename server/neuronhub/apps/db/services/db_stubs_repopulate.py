@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import asyncio
 import dataclasses
 import datetime
@@ -9,6 +11,7 @@ from django.utils import timezone
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.orgs.models import Org
+from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models import PostRelated
 from neuronhub.apps.posts.models import UsageStatus
 from neuronhub.apps.posts.models.posts import Post  # Import Post model
@@ -18,7 +21,6 @@ from neuronhub.apps.posts.models.posts import PostVote
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
-from neuronhub.apps.posts.models.reviews import ReviewTagName
 from neuronhub.apps.posts.services.create_tag import create_tag
 from neuronhub.apps.users.models import User
 
@@ -327,7 +329,7 @@ async def _create_posts(user: User, gen: Gen, post_unifi: Post, post_aider: Post
     )
 
 
-async def create_company_ownership(name: str) -> "ToolCompanyOwnership":
+async def create_company_ownership(name: str) -> ToolCompanyOwnership:
     ownership, _ = await ToolCompanyOwnership.objects.aget_or_create(name=name)
     return ownership
 

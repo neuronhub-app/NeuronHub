@@ -10,6 +10,19 @@ When the condition fails, the following can be returned (following this priority
 """
 directive @IsAuthenticated repeatable on FIELD_DEFINITION
 
+input BoolBaseFilterLookup {
+  """Exact match. Filter will be skipped on `null` value"""
+  exact: Boolean
+
+  """Assignment test. Filter will be skipped on `null` value"""
+  is_null: Boolean
+
+  """
+  Exact match of items in a given list. Filter will be skipped on `null` value
+  """
+  in_list: [Boolean!]
+}
+
 """Date with time (isoformat)"""
 scalar DateTime
 
@@ -142,6 +155,7 @@ input PostTagFilter {
   id: IDBaseFilterLookup
   name: StrFilterLookup
   description: StrFilterLookup
+  is_review_tag: BoolBaseFilterLookup
   AND: PostTagFilter
   OR: PostTagFilter
   NOT: PostTagFilter
@@ -158,6 +172,7 @@ type PostTagType {
   name: String!
   description: String!
   is_important: Boolean
+  is_review_tag: Boolean!
 }
 
 input PostTagTypeInput {
