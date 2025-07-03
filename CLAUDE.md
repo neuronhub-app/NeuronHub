@@ -1,41 +1,52 @@
 ## NeuronHub - Privacy-First Tech Expertise Sharing
 
-- Architecture: Clean Django + React SPA, GraphQL boundary  
-- Constraints: Avoid Facebook patterns (complex state, microservices), prefer simple maintainable solutions  
-- Testing: Outside-in TDD, London school, `test_gen.py` factories  
-- Keywords: Fat models thin views, composition over inheritance, fail fast, explicit over implicit
+- Architecture: Clean Django, React SPA, GraphQL boundary
+- Testing: Outside-in TDD, London school, `test_gen.py` factories
+- Approach: composition over inheritance, fail fast, explicit over implicit, avoid Facebook patterns (complex state, microservices), prefer simple maintainable solutions
 
 @./docs/architecture.md
 
-## Workflow Overview
+### Workflow
 
-### Development Workflow
+You MUST work using your given `docs/private/project-management/**/*.md` Task MD file.
 
-You MUST follow this workflow for any task.
+Read the template:
+```markdown
+@./docs/private/project-management/task-template.md
+```
 
-1. Read & Understand - understand domain, grep codebase 
-2. Architect Solution - identify affected models, services, UI components  
-3. Plan Implementation - TodoWrite tool, break into testable units
-4. Write Failing Tests - eg use `test_gen.py`, or write units/playwright 
-5. Red-Green-Refactor - `uv run pytest` until green, then refactor
-6. Integration Verification - run pytest again, type check, format
-   - `./.run/mypy.sh`
-   - `./.run/gen-types-and-format.sh`
+You MUST create a checklist based on the structure below to make sure the Task MD file is fully ready for execution.
+- [ ] Use a subagent to think ultra hard about the architecture and add/update [#Architecture]
+  - understand domain, grep codebase, identify affected models, services, UI components
+- [ ] Use a subagent to think ultra hard re how to fully complete it and add/update [#Execution Plan]
+Preparation
+- [ ] Run test, document failures (if any)
+- [ ] Write few TDD tests, confirm they fail.
+- [ ] Use a subagent to review your tests and update the Task MD file.
+- [ ] Use Todo tool to document the implementation in testable units.
+Implementation - start adding code to make your tests pass. Keep your Todo tool in sync with the Task MD file.
+- [ ] 25% progress: Use a subagent to review and update the Task MD file.
+- [ ] 50% progress: Use a subagent to review and update the Task MD file.
+- [ ] 75% progress: Use a subagent to review and update the Task MD file.
+- [ ] 75% progress: Use a subagent to review and update the Task MD file.
+- [ ] 100% progress: Use a subagent to review and update the Task MD file. Test everything with `uv run pytest`.
+- [ ] Use a subagent to review your changes and:
+  - Think ultra hard whether it meats the requirements.
+  - Review and update the Task MD file.
+  - Fix the found problems.
+- [ ] Use a subagent to review your changes.
+- [ ] Think hard about the tradeoffs you made and update the Task MD file.
 
-You MUST test everything by `uv run pytest` and `mypy` before finishing any task.
+### CLI commands
 
-### Commands
-
-- Models changes: migrate → gen graphql types → test
-- `./.run/gen-types-and-format.sh` - includes: Ruff, root `/schema.graphql` gen, graphql-codegen, gql-tada, and Biome
-- `uv run manage.py migrate`
-- `uv run manage.py db_stubs_repopulate --is_delete_tools` - idempotent, a full db state reset with test data. But keeps the default User and his cookie session.
 - `uv run pytest`
-- `uv lock --upgrade`
+- `uv run manage.py migrate`
+- `uv run manage.py db_stubs_repopulate` - idempotent, a full db state reset to the stub data. Keeps the default `admin` User and his cookie session.
+- `./.run/gen-types-and-format.sh` - executes: Ruff, root `/schema.graphql` generation, graphql-codegen, gql-tada, Biome.
 
 Remember to run `uv` scripts from `server/` dir, and `./.run/` files from the root dir.
 
-### Patterns
+### Structure
 
 - Django: Apps store domain in `models.py`, business logic in `services.py`, API in `graphql/`. Avoid god objects.
 - React: Compound components, lift state up (ideally one Valtio per page), single responsibility  
@@ -45,13 +56,12 @@ Remember to run `uv` scripts from `server/` dir, and `./.run/` files from the ro
 ### Avoid
 
 - React: useState hell, prop drilling, premature optimization, god components
-- Django: fat views, ORM in templates, circular imports
 - GraphQL: resolver soup, client caching complexity
-- Testing: non-maintainable code, mocking everything, flaky tests, testing implementation details
-- CORS issues: BE + FE 100% have no CORS issues 
-- Playwright: excessive `wait_for_timeout()` - use proper locators and state checks instead
+- Tests: non-maintainable code, mocking everything, flaky tests, testing implementation details
+- CORS: BE and FE 100% have no CORS issues 
+- Playwright: no `wait_for_timeout()` - use locators and state checks instead
 
-@./client/README.md
+@./docs/client-caveats.md
 
 @./docs/testing-setup.md
 
