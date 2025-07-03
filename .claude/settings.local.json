@@ -13,44 +13,28 @@
       "Bash(mv:*)",
       "Bash(pkill:*)",
       "Bash(sed:*)",
-
       "Bash(rg:*)",
       "Bash(eza:*)",
       "Bash(bat:*)",
       "Bash(fd:*)",
-
       "Bash(chflags:*)",
       "Bash(chmod:*)",
       "Bash(xattr:*)",
       "Bash(python:*)",
-
-      "Bash(uv add:*)",
-      "Bash(uv remove:*)",
-      "Bash(uv sync:*)",
-      "Bash(uv run:*)",
-      "Bash(uv pip:*)",
-      "Bash(uv run pytest:*)",
-      "Bash(uv run manage.py:*)",
-      "Bash(bun run tsc:*)",
-      "Bash(bun run update)",
-      "Bash(bun run install)",
-      "Bash(bun run dev)",
+      "Bash(uv:*)",
+      "Bash(bun:*)",
       "Bash(./.run/format.sh)",
       "Bash(./.run/mypy.sh)",
       "Bash(./.run/gen-types-and-format.sh)",
-
       "Bash(docker:*)",
       "Bash(make:*)",
-
       "WebFetch(domain:github.com)",
       "WebFetch(domain:github.io)",
       "WebFetch(domain:gitlab.com)",
-
       "WebFetch(domain:developer.mozilla.org)",
       "WebFetch(domain:*.wikipedia.org)",
       "WebFetch(domain:news.ycombinator.com)",
       "WebFetch(domain:docs.anthropic.com)",
-
       "WebFetch(domain:python.org)",
       "WebFetch(domain:pip.pypa.io)",
       "WebFetch(domain:docs.astral.sh)",
@@ -60,7 +44,6 @@
       "WebFetch(domain:pytest.org)",
       "WebFetch(domain:strawberry.rocks)",
       "WebFetch(domain:playwright.dev)",
-
       "WebFetch(domain:typescriptlang.org)",
       "WebFetch(domain:react.dev)",
       "WebFetch(domain:reactrouter.com)",
@@ -69,13 +52,11 @@
       "WebFetch(domain:zod.dev)",
       "WebFetch(domain:formidable.com)",
       "WebFetch(domain:gql-tada.0no.co)",
-
       "WebFetch(domain:danluu.com)",
       "WebFetch(domain:jvns.ca)",
       "WebFetch(domain:simonwillison.net)",
       "WebFetch(domain:fasterthanli.me)",
       "WebFetch(domain:rachelbythebay.com)",
-
       "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": [
@@ -87,5 +68,6 @@
     "memory",
     "sequential-thinking"
   ],
-  "defaultMode": "allowEdits"
+  "defaultMode": "allowEdits",
+  "enableAllProjectMcpServers": true
 }
