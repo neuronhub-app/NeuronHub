@@ -32,10 +32,7 @@ dependencies = [
     # django admin
     "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] worked with him
     "django-select2 == 8.*", # [i=low, rep=high, GH=high, @codingjoe, 0.8k] public CV
-        "django-select2-admin-filters == 0.1.4", # [i=none, rep=low, GH=low, @the-bit-by-bit] died in 2021, Polish dev agency, keep fronen
-        "django-admin-autocomplete-filter == 0.7.1", # [i=none, rep=lowest, GH=lowest, @farhan0581, 0.3k] died 2021, Indian dev, no links - keep frozen. Not used. Can help with MultipleModelSelect2Filter.
-    "django-adminutils ~= 0.0.28", # [i=low, rep=high, GH=norm, @GaretJax] linkedin.com/in/garetjax, Divio CTO
-    "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe] public CV
+    "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe, 1.6k] public CV
     "django-object-actions == 5.*", # [i=low, rep=high, GH=low, @crccheck] but crccheck.com/blog is ok
     "django-debug-toolbar == 5.*", # [i=low, rep=high, GH=high, @matthiask] 406.ch
     "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no links, member of LiberTEM - keep frozen
