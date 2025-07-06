@@ -26,15 +26,15 @@ dependencies = [
     "dj-database-url == 3.*", # [i=low, rep=norm, GH=norm, @mattseymour]
 
     # django fields
-    "django-timezone-field == 7.*", # [i=low, rep=high, GH=high, @mfogel]
+    "django-timezone-field == 7.*", # [i=low, rep=high, GH=high, @mfogel] rich presence on SO (#103909), AirBnB, Yelp, etc
     "django-choices-field == 2.*", # [i=norm, rep=high, @bellini666] Strawberry maintainer
 
     # django admin
     "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] worked with him
     "django-select2 == 8.*", # [i=low, rep=high, GH=high, @codingjoe, 0.8k] public CV
     "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe, 1.6k] public CV
-    "django-object-actions == 5.*", # [i=low, rep=high, GH=low, @crccheck] but crccheck.com/blog is ok
     "django-debug-toolbar == 5.*", # [i=low, rep=high, GH=high, @matthiask] 406.ch
+    "django-object-actions == 5.*", # [i=none, rep=norm, GH=low, @crccheck, 0.7k] crccheck.com/blog since 2008, 100 posts
     "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no links, member of LiberTEM - keep frozen
 
     # server
