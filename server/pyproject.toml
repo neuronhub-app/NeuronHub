@@ -73,6 +73,10 @@ dependencies = [
     ]
 
 
+[tool.django-stubs]
+    django_settings_module = "neuronhub.settings"
+
+
 [tool.mypy]
     python_version = "3.13"
     plugins = ["mypy_django_plugin.main"]
@@ -81,55 +85,40 @@ dependencies = [
     implicit_optional = true
     show_error_codes = true
 
-[[tool.mypy.overrides]]
-    module = "*.migrations.*"
-    ignore_errors = true
+    [[tool.mypy.overrides]]
+        module = [
+            "allauth.*",
+            "faker.*",
+            "wat.*", # non-lintable magic
 
-[[tool.mypy.overrides]]
-    module = "*.settings"
-    ignore_errors = true
-
-[[tool.mypy.overrides]]
-    module = [
-        "allauth.*",
-        "wat.*",
-        "faker.*",
-    ]
-    ignore_missing_imports = true
-    ignore_errors = true
-
-[[tool.mypy.overrides]]
-    # wat package is unlintable
-    module = "neuronhub.apps.tests.utils"
-    ignore_errors = true
-
-
-[tool.django-stubs]
-    django_settings_module = "neuronhub.settings"
+            # project
+            "*.migrations.*",
+            "*.settings",
+            "neuronhub.apps.tests.utils", # because it uses `wat`
+        ]
+        ignore_errors = true
 
 
 [tool.ruff]
     line-length = 97
 
+    [tool.ruff.lint.isort]
+        force-single-line = true
+        lines-after-imports = 2
+        known-first-party = ["neuronhub"]
 
-[tool.ruff.lint.isort]
-    force-single-line = true
-    lines-after-imports = 2
-    known-first-party = ["neuronhub"]
-
-
-[tool.ruff.lint]
-    extend-select = [
-        "UP",  # pyupgrade: enforce modern python syntax
-    ]
-    ignore = [
-        # "drop unused vars", don't want as they're used as links/docs
-        "F841",
-        # 2 rules for multi-line string indent - sounds useless,
-        # use textwrap.dedent() - it's your responsibility. and flake8's fault for not detecting dedent()
-        "W291",
-        "W293",
-    ]
+    [tool.ruff.lint]
+        extend-select = [
+            "UP",  # pyupgrade: enforce modern python syntax
+        ]
+        ignore = [
+            # "drop unused vars", don't want as they're used as links/docs
+            "F841",
+            # 2 rules for multi-line string indent - sounds useless,
+            # use textwrap.dedent() - it's your responsibility. and flake8's fault for not detecting dedent()
+            "W291",
+            "W293",
+        ]
 
 
 [tool.pytest.ini_options]
