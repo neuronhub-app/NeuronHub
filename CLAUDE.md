@@ -6,37 +6,6 @@
 
 @./docs/architecture.md
 
-### Workflow
-
-You MUST work using your given `docs/private/project-management/**/*.md` Task MD file.
-
-Read the template:
-```markdown
-@./docs/private/project-management/task-template.md
-```
-
-You MUST create a checklist based on the structure below to make sure the Task MD file is fully ready for execution.
-- [ ] Use a subagent to think ultra hard about the architecture and add/update [#Architecture]
-  - understand domain, grep codebase, identify affected models, services, UI components
-- [ ] Use a subagent to think ultra hard re how to fully complete it and add/update [#Execution Plan]
-Preparation
-- [ ] Run test, document failures (if any)
-- [ ] Write few TDD tests, confirm they fail.
-- [ ] Use a subagent to review your tests and update the Task MD file.
-- [ ] Use Todo tool to document the implementation in testable units.
-Implementation - start adding code to make your tests pass. Keep your Todo tool in sync with the Task MD file.
-- [ ] 25% progress: Use a subagent to review and update the Task MD file.
-- [ ] 50% progress: Use a subagent to review and update the Task MD file.
-- [ ] 75% progress: Use a subagent to review and update the Task MD file.
-- [ ] 75% progress: Use a subagent to review and update the Task MD file.
-- [ ] 100% progress: Use a subagent to review and update the Task MD file. Test everything with `uv run pytest`.
-- [ ] Use a subagent to review your changes and:
-  - Think ultra hard whether it meats the requirements.
-  - Review and update the Task MD file.
-  - Fix the found problems.
-- [ ] Use a subagent to review your changes.
-- [ ] Think hard about the tradeoffs you made and update the Task MD file.
-
 ### CLI commands
 
 - `uv run pytest`
