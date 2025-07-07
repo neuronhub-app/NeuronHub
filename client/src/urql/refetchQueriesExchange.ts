@@ -68,7 +68,7 @@ export function refetchQueriesExchange(input: ExchangeInput): ExchangeIO {
       ),
       input.forward,
       tap(opResult => {
-        // todo ~ not working - on react-router nav to a cached page it breaks, eg:
+        // todo ! not working - on react-router nav to a cached page it breaks, eg:
         // 1. open /posts/
         // 2. open /reviews/
         // 3. go back to /posts/ (here we load the old PostList from react-router cache)

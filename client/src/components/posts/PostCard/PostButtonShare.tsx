@@ -8,8 +8,8 @@ import type { ID } from "@/gql-tada";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import type { UserListName } from "~/graphql/graphql";
 
-// todo + (UI) 1. clipboard action on click
-// todo + (UI) 2. mutate Post.recommended_to_users/groups
+// todo feat(UI): clipboard action on click
+// todo feat(UI): mutate Post.recommended_to_users/groups
 export function PostButtonShare(props: { id: ID; fieldName: UserListName }) {
   const userSnap = useSnapshot(user.state);
 

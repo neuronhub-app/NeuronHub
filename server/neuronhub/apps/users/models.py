@@ -47,7 +47,7 @@ class User(AbstractUser):
 class UserConnectionGroup(models.Model):
     name = models.CharField(max_length=255, blank=True)
 
-    # todo ~ rename to author
+    # todo refac: rename to author
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

@@ -19,7 +19,7 @@ const tokens = defineTokens({
     },
   },
   // seems to be broken either on MacOS or Chakra. I don't believe this need specification. But it barer works, and only if i use _hover.
-  // todo ? remove
+  // todo maybe: remove
   cursor: {
     button: { value: "pointer" },
   },
@@ -56,7 +56,7 @@ export const system = createSystem(
               sm: { value: gap.sm },
               md: { value: gap.md },
               lg: { value: gap.lg },
-              xl: { value: gap.xl }, // todo ? set to Sidebar's Content padding
+              xl: { value: gap.xl }, // todo maybe: set to Sidebar's Content padding
             },
           },
         },

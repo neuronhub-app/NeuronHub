@@ -1,4 +1,4 @@
-# todo ? Dockerfiles for prod /server/ for < image size
+# todo maybe: Dockerfiles for prod /server/ for lesser image size
 FROM mcr.microsoft.com/playwright/python:v1.52.0-noble
 
 RUN pip install uv --quiet --disable-pip-version-check

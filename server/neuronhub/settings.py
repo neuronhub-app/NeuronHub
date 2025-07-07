@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "django_object_actions",
     "django_countries",
-    "adminutils",
+    "django_rich",
     "corsheaders",
     "anymail",
     "simple_history",
@@ -169,9 +169,9 @@ CORS_URLS_REGEX = r"^/api/.*$"
 CORS_EXPOSE_HEADERS = ["X-CSRFToken"]
 
 SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN", None)
-# SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", False)
+# SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", False) # todo !! [auth] enable
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 3600 * 24 * 30  # 1 months
+SESSION_COOKIE_AGE = 3600 * 24 * 30  # 1 month
 
 CORS_ALLOW_HEADERS = (
     *default_headers,
@@ -206,7 +206,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LOGIN_REDIRECT_URL = CLIENT_URL
 
 # django-allauth
-# todo ! sec: enable 2FA
+# todo ! [auth] enable 2FA
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["username*", "password1*", "email"]  #: asterisk means required
 ACCOUNT_EMAIL_VERIFICATION = "optional"
@@ -214,11 +214,11 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = None
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = (
     ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL
 )
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7  # todo ! sec: set 2d
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7  # todo ! [auth] set 2d
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # todo ! sec: check
-ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # todo ! sec: disable
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # todo ! sec: disable
+ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # todo ! [auth] check sec
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # todo ! [auth] disable (≈ok, but we do secˆ)
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # todo ! [auth] disable
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 ACCOUNT_SESSION_REMEMBER = True
 if DJANGO_ENV == DjangoEnv.LOCAL:
@@ -238,6 +238,8 @@ if IS_SENTRY_ENABLED:
         ],
     )
 
+TEST_RUNNER = "django_rich.test.RichRunner"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -254,13 +256,14 @@ LOGGING = {
 
 _line_width = 120
 rich.traceback.install(
-    width=None,  # max-width=100vw, so who cares
+    width=_line_width,  # max-width=100vw, so who cares
     code_width=_line_width,
     show_locals=True,
     locals_max_length=1,  # crop vars to 1 newline, eg cls
     locals_max_string=_line_width,
-    suppress=[django],
+    suppress=[django],  # hide Dango's locals - it's too verbose
 )
+
 
 DEFAULT_DJANGO_SETTINGS = StrawberryDjangoSettings(
     FIELD_DESCRIPTION_FROM_HELP_TEXT=True,
@@ -272,4 +275,5 @@ DEFAULT_DJANGO_SETTINGS = StrawberryDjangoSettings(
     DEFAULT_PK_FIELD_NAME="id",  # default is "pk" - nice intention, but dumb - "id" is soft-required in django, alas
     USE_DEPRECATED_FILTERS=False,
     PAGINATION_DEFAULT_LIMIT=300,
+    ALLOW_MUTATIONS_WITHOUT_FILTERS=False,
 )

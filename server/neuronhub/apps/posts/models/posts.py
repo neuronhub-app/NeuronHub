@@ -87,7 +87,7 @@ class Post(AnonimazableTimeStampedModel):
     alternatives = models.ManyToManyField(
         "self",
         through="posts.PostRelated",
-        symmetrical=False,  # todo ~ clarify why
+        symmetrical=False,  # todo refac: clarify why
         related_name="alternatives_to",
     )
 
@@ -286,7 +286,7 @@ class PostTagVote(AnonimazableTimeStampedModel):
         return f"{self.tag} [{self.is_vote_positive}]"
 
 
-# todo ? rename to PostRelatedVote (to indicate it's a Vote first of all)
+# todo maybe: rename to PostRelatedVote (to indicate it's a Vote first of all)
 @anonymizer.register
 class PostRelated(AnonimazableTimeStampedModel):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)

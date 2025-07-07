@@ -14,7 +14,7 @@ import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { UserListName } from "~/graphql/graphql";
 
-// todo ~ put into PostCard [[./index.tsx]], and leave only `export ReviewButton`
+// todo refac: put into PostCard [[./index.tsx]], and leave only `export ReviewButton`
 // this is overly complex & abstract for a child component
 export function PostButtons(props: { post: PostListItemType }) {
   const buttons: Array<ComponentProps<typeof ReviewButton>> = [

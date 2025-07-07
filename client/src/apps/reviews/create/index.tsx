@@ -55,7 +55,7 @@ export default function ReviewCreateRoute() {
   return <ReviewCreateForm.Comp />;
 }
 
-// todo ~ discard and use eg two Fragments for input/output
+// todo refac: discard and use eg two Fragments for input/output
 // why is it an interface? gql.tada is shit - prob that's why. Technically i should use an extract of the gql Input
 export interface ReviewSelectOption {
   id: ID;
@@ -158,7 +158,7 @@ export namespace ReviewCreateForm {
     isRated: true,
   });
 
-  // todo ~ move out to fix HRM of react-router - otherwise reloads on every save
+  // todo refac: move out to fix HRM of react-router - otherwise reloads on every save
   export function Comp() {
     const form = useForm<FormSchema>({
       resolver: zodResolver(schema),
@@ -260,7 +260,7 @@ export namespace ReviewCreateForm {
                   label={`${getToolTypeName()} name`}
                 />
 
-                {/* todo ? responsiveness */}
+                {/* todo maybe: responsiveness */}
                 <HStack w="full" gap="gap.md">
                   <FormChakraInput
                     label="Domain"

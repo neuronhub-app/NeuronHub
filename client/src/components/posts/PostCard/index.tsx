@@ -8,7 +8,7 @@ import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { Prose } from "@/components/ui/prose";
 import { isPostReviewType } from "@/graphql/fragments/reviews";
 
-// todo ~ if it has too many isPostReviewType -> it must be a comp
+// todo refac: if it has too many isPostReviewType -> it must be a comp
 export function PostCard(props: { post: PostListItemType }) {
   const post = props.post;
 
