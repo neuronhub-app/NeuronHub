@@ -1,5 +1,5 @@
 ---
-reviewed_at: 2025.06.22
+reviewed_at: 2025.07.06
 ---
 
 ## Setup
@@ -12,8 +12,8 @@ uv sync
 
 PostgreSQL:
 ```bash
-brew install postgres@16
-brew services start postgres@16
+brew install postgres@17
+brew services start postgres@17
 createuser neuronhub
 createdb neuronhub --owner=neuronhub
 ```
@@ -21,12 +21,12 @@ createdb neuronhub --owner=neuronhub
 Django:
 ```bash
 uv run manage.py migrate
-uv run manage.py db_stubs_repopulate  # populate with test data, incl test user admin/admin
+uv run manage.py db_stubs_repopulate  # populate with test data, incl the test user admin/admin
 uv run manage.py runserver
 uv run pytest
 ```
 
-Run `uv` from `server/` directory.
+Run `uv` from `server/` dir.
 
 ## Additional Commands
 
