@@ -1,23 +1,20 @@
-import { cleanEnv, str } from "envalid";
+import { cleanEnv, str, url } from "envalid";
 
 /**
- * oddly doesn't load vite envs, eg NODE_ENV
- *
- * *a shortened copy from README.md from v8 https://github.com/af/envalid*
+ * a summary of README.md github.com/af/envalid
  *
  * - str() - empty value is valid
  * - bool()
  * - num()
  * - email()
  * - host() - domain or ip
- * - port() - TCP port (1-65535)
- * - url() - a URL with a protocol and hostname
+ * - url() - with a protocol and hostname
  * - json() - parses with JSON.parse
  *
  * options:
  * - choices
- * - default - serialized default
- * - devDefault - if NODE_ENV !== "production". Good when required in prod, but optional in dev.
+ * - default
+ * - devDefault - if NODE_ENV !== "production", eg if required only in prod.
  * - desc
  * - example - example value
  * - docs - A URL to docs
@@ -25,8 +22,10 @@ import { cleanEnv, str } from "envalid";
  */
 export const env = cleanEnv(import.meta.env, {
   NODE_ENV: str({
-    choices: ["development", "test", "production", "staging"],
-    devDefault: "development",
-    default: undefined,
+    choices: ["development", "staging", "production"],
+    default: "development",
+  }),
+  VITE_SERVER_URL: url({
+    default: "http://localhost:8000",
   }),
 });

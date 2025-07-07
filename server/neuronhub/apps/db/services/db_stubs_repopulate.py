@@ -32,7 +32,7 @@ async def db_stubs_repopulate(
     is_delete_posts: bool = False,
     is_delete_users: bool = False,
     is_delete_orgs: bool = False,
-) -> None:
+) -> Gen:
     if is_delete_posts:
         for model in [
             # posts:
@@ -62,6 +62,8 @@ async def db_stubs_repopulate(
 
     # Create Posts
     await _create_posts(user, gen=gen, post_unifi=tool_unifi, post_aider=tool_aider)
+
+    return gen
 
 
 async def _create_review_pycharm(user: User, gen: Gen):

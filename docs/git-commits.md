@@ -36,6 +36,7 @@ Examples:
 - `gen` - changes to `apps/tests/test_gen::Gen` and `db_stubs_repopulate`
 - `monitor` - Sentry, Datadog, etc
 - `types` - TypeScript or Python typings
+- `E2E` - just Playwright, more precisely - integration tests
 - `Docker`
 
 Unused:

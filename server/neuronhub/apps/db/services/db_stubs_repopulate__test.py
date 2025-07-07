@@ -6,4 +6,4 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 class DbStubsRepopulateTest(NeuronTestCase):
     async def test_repopulate(self):
         await db_stubs_repopulate()
-        print(await Post.reviews.all().afirst())
+        assert await Post.reviews.all().afirst()
