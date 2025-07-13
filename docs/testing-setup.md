@@ -19,13 +19,13 @@ class NeuronTestCase(TestCase):
         ...
 ```
 
-- Store cases nearby their target with `__test` postfix, eg [](/server/neuronhub/apps/posts/services/filter_posts_by_user.py) is covered by [](/server/neuronhub/apps/posts/services/filter_posts_by_user__test.py).
+- Store tests nearby their target with `__test` postfix, eg [](/server/neuronhub/apps/posts/services/filter_posts_by_user.py) is covered by [](/server/neuronhub/apps/posts/services/filter_posts_by_user__test.py).
 - always use `async`/`await`
 
 #### [Gen](/server/neuronhub/apps/tests/test_gen.py)
 
 All fields of `Gen` are designed as optional with fallbacks.
-- we can easily call many `review = await self.gen.posts.create(self.gen.posts.Params(type=Post.Type.Review))`
+- we can easily create many `review = await self.gen.posts.create(self.gen.posts.Params(type=Post.Type.Review))`
 - `author` by default is always `self.gen.users.user_default`
 - most of fields are populated by `faker.gen`
 
@@ -50,26 +50,11 @@ review_2 = await self.gen.posts.create(self.gen.posts.Params(type=Post.Type.Revi
 
 ### Playwright
 
-- The biggest issue is E2E tests maintenance cost. We minimalistic cover only critical flows.
-- Playwright runs on the dev db for simplicity. Reset it with `manage.py db_stubs_repopulate` whenever.
-- Store E2E tests in [](/server/neuronhub/apps/tests/playwright/).
-- `PlaywrightHelper` contains functions that always end with `wait_for_load_state("networkidle")`.
-- If you need `wait_for_timeout` - your code's shit.
+- The biggest issue in E2E is maintenance cost - keep them lean.
+- We store E2E tests in [](/server/neuronhub/apps/tests/playwright/). For a simple example see [](/server/neuronhub/apps/tests/playwright/test_vote_and_reading_list.py).
+- The [conftest](/server/neuronhub/apps/tests/playwright/conftest.py) starts the Vite server and links it to Django's test LiveServer on port `8001` - ie you have no need to run any bg processes for Django/Vite - just run pytest as intended.
+
+Notes
 - Frontend is using Django cookie auth from `/admin/login/` - CORS 100% works.
-
-Setup
-```bash
-cd server/
-uv run manage.py runserver &
-cd ../client/
-bun run dev &
-```
-
-The HMR works.
-
-Run
-```bash
-cd server/
-uv run pytest neuronhub/apps/tests/playwright
-```
-
+- `PlaywrightHelper` contains few functions that always end with `wait_for_load_state("networkidle")`.
+- If you need `wait_for_timeout` - your code's shit.

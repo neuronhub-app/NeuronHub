@@ -11,9 +11,10 @@
 - `uv run pytest`
 - `uv run manage.py migrate`
 - `uv run manage.py db_stubs_repopulate` - idempotent, a full db state reset to the stub data. Keeps the default `admin` User and his cookie session.
-- `./.run/gen-types-and-format.sh` - executes: Ruff, root `/schema.graphql` generation, graphql-codegen, gql-tada, Biome.
+- `mise graphql-gen` - executes: Ruff, root `/schema.graphql` generation, graphql-codegen, gql-tada, Biome.
+- Shell utils: rg, fd, bat
 
-Remember to run `uv` scripts from `server/` dir, and `./.run/` files from the root dir.
+Remember to run `uv` scripts from `server/` dir
 
 ### Structure
 
@@ -26,9 +27,7 @@ Remember to run `uv` scripts from `server/` dir, and `./.run/` files from the ro
 
 - React: useState hell, prop drilling, premature optimization, god components
 - GraphQL: resolver soup, client caching complexity
-- Tests: non-maintainable code, mocking everything, flaky tests, testing implementation details
-- CORS: BE and FE 100% have no CORS issues 
-- Playwright: no `wait_for_timeout()` - use locators and state checks instead
+- Tests: non-maintainable code, mocking everything, flaky tests, testing implementation details, magic strings
 
 @./docs/client-caveats.md
 

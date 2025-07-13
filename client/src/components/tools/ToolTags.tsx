@@ -54,6 +54,7 @@ function ToolTagElem(props: { tag: PostTagFragmentType }) {
       size="lg"
       {...getOutlineContrastStyle({ variant: "subtle" })}
       opacity={tagColor === "gray" ? 0.8 : 1}
+      data-testid="tool-tag"
     >
       {iconInfo && (
         <Tag.StartElement {...iconInfo.props}>

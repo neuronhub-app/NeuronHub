@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from django.conf import settings
 from playwright.async_api import Locator
 from playwright.async_api import Page
+from playwright.async_api import expect
 from pytest_django.live_server_helper import LiveServer
 
 from neuronhub.apps.db.services.db_stubs_repopulate import db_stubs_repopulate
@@ -54,5 +55,40 @@ class PlaywrightHelper:
     def get(self, selector: str) -> Locator:
         return self.page.locator(selector).first
 
+    async def expect_to_be_visible(self, selector: str):
+        review_tags_container = self.get(selector)
+        await expect(review_tags_container).to_be_visible()
+
+    async def get_all(self, selector: str) -> list[Locator]:
+        return await self.page.locator(selector).all()
+
+    async def get_attr_value(self, selector: str, attr: str) -> str | None:
+        button = self.get(selector)
+        return await button.get_attribute(attr)
+
+    async def click_and_wait(self, selector: str):
+        await self.page.click(selector)
+        await self.wait_for_network_idle()
+
+    async def count_elems(self, selector: str) -> int:
+        return await self.page.locator(selector).count()
+
+    async def get_by_content(self, selector: str, content: str) -> Locator | None:
+        elements = await self.get_all(selector)
+        for element in elements:
+            elem_content = await element.text_content()
+            if elem_content and content in elem_content:
+                return element
+        return None
+
     async def wait_for_network_idle(self):
         await self.page.wait_for_load_state("networkidle")
+
+    async def login_as(self, username: str, password: str = None):
+        if password is None:
+            password = username
+        await self.page.goto(f"{self.live_server}/admin/login/")
+        await self.page.fill('input[name="username"]', username)
+        await self.page.fill('input[name="password"]', password)
+        await self.page.click('input[type="submit"]')
+        await self.wait_for_network_idle()
