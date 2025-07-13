@@ -173,6 +173,7 @@ type PostTagType {
   description: String!
   is_important: Boolean
   is_review_tag: Boolean!
+  label: String!
 }
 
 input PostTagTypeInput {

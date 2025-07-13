@@ -8,13 +8,16 @@ import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { Prose } from "@/components/ui/prose";
 import { isPostReviewType } from "@/graphql/fragments/reviews";
 
-// todo refac: if it has too many isPostReviewType -> it must be a comp
+// todo refac: has too many isPostReviewType() → must
 export function PostCard(props: { post: PostListItemType }) {
   const post = props.post;
 
   return (
-    <Stack gap="gap.sm">
+    <Stack gap="gap.sm" data-testid="post-card">
       <PostDatetime datetimeStr={isPostReviewType(post) ? post.reviewed_at : post.updated_at} />
+      <Text data-testid="post-type" display="none">
+        {isPostReviewType(post) ? "Review" : "Post"}
+      </Text>
 
       {isPostReviewType(post) && post.parent && (
         <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">

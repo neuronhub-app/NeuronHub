@@ -14,7 +14,7 @@ from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models import PostRelated
 from neuronhub.apps.posts.models import UsageStatus
-from neuronhub.apps.posts.models.posts import Post  # Import Post model
+from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
@@ -365,19 +365,19 @@ class ReviewTagParams:
 
 
 async def create_review_tags(post: Post, params: list[ReviewTagParams]):
-    tag, _ = await PostTag.objects.aget_or_create(
-        name=ReviewTagName.expectations.value,
-        defaults={
-            "is_review_tag": True,
-        },
-    )
-    await asyncio.gather(
-        *[
-            PostTagVote.objects.acreate(
-                post=post,
-                tag=tag,
-                is_vote_positive=param.is_vote_pos,
-            )
-            for param in params
-        ]
-    )
+    await asyncio.gather(*[_create_single_review_tag(post, param) for param in params])
+
+
+async def _create_single_review_tag(post: Post, param: ReviewTagParams):
+    if param.is_vote_pos is not None:
+        tag, _ = await PostTag.objects.aget_or_create(
+            name=param.name.value,
+            defaults=dict(is_review_tag=True, author=post.author),
+        )
+        await sync_to_async(post.tags.add)(tag)
+        await PostTagVote.objects.acreate(
+            post=post,
+            tag=tag,
+            author=post.author,
+            is_vote_positive=param.is_vote_pos,
+        )

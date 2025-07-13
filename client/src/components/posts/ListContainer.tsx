@@ -21,10 +21,12 @@ import { PostCard } from "@/components/posts/PostCard";
 import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
 import { PostButtons } from "@/components/posts/PostCard/PostButtons";
 import { PostButtonsVote } from "@/components/posts/PostCard/PostButtonsVote";
+import { ReviewTags } from "@/components/reviews/ReviewTags";
 import { ToolTags } from "@/components/tools/ToolTags";
 import { Button } from "@/components/ui/button";
 import type { PostFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewFragmentType } from "@/graphql/fragments/reviews";
+import { isPostReviewType } from "@/graphql/fragments/reviews";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 export type PostListItemType = PostFragmentType | PostReviewFragmentType;
@@ -76,6 +78,9 @@ export function ListContainer(props: {
                   <PostCard post={post} />
 
                   {post.parent && <ToolTags tags={post.parent.tags} />}
+                  {isPostReviewType(post) && (
+                    <ReviewTags tags={post.tags} reviewAuthorId={post.author.id} />
+                  )}
 
                   <HStack justify="space-between">
                     <PostAuthor author={post.author} />

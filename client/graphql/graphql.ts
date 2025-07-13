@@ -229,6 +229,7 @@ export type PostTagType = {
   id: Scalars["ID"]["output"];
   is_important?: Maybe<Scalars["Boolean"]["output"]>;
   is_review_tag: Scalars["Boolean"]["output"];
+  label: Scalars["String"]["output"];
   name: Scalars["String"]["output"];
   posts: Array<PostType>;
   tag_children: Array<PostTagType>;
@@ -1129,8 +1130,10 @@ export type PostTagFragmentFragment = {
   __typename?: "PostTagType";
   id: string;
   name: string;
+  label: string;
   description: string;
   is_important?: boolean | null;
+  is_review_tag: boolean;
   votes: Array<{
     __typename?: "PostTagVoteType";
     id: string;
@@ -1175,8 +1178,10 @@ export const PostTagFragmentFragmentDoc = {
             },
           },
           { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "label" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
           { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_tag" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "tag_parent" },
@@ -1349,8 +1354,10 @@ export const PostFragmentFragmentDoc = {
             },
           },
           { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "label" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
           { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_tag" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "tag_parent" },
@@ -1482,8 +1489,10 @@ export const PostDetailFragmentFragmentDoc = {
             },
           },
           { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "label" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
           { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_tag" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "tag_parent" },
@@ -1725,8 +1734,10 @@ export const PostReviewFragmentFragmentDoc = {
             },
           },
           { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "label" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
           { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_tag" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "tag_parent" },
@@ -1911,8 +1922,10 @@ export const PostReviewDetailFragmentFragmentDoc = {
             },
           },
           { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "label" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
           { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_tag" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "tag_parent" },
@@ -2191,8 +2204,10 @@ export const PostDetailDocument = {
             },
           },
           { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "label" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
           { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_tag" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "tag_parent" },
@@ -2475,8 +2490,10 @@ export const PostListDocument = {
             },
           },
           { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "label" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
           { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_tag" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "tag_parent" },
@@ -2873,8 +2890,10 @@ export const PostReviewDetailDocument = {
             },
           },
           { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "label" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
           { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_tag" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "tag_parent" },
@@ -3148,8 +3167,10 @@ export const ReviewListDocument = {
             },
           },
           { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "label" } },
           { kind: "Field", name: { kind: "Name", value: "description" } },
           { kind: "Field", name: { kind: "Name", value: "is_important" } },
+          { kind: "Field", name: { kind: "Name", value: "is_review_tag" } },
           {
             kind: "Field",
             name: { kind: "Name", value: "tag_parent" },
