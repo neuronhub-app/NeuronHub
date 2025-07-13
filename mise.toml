@@ -1,0 +1,85 @@
+[tools]
+    bun = "latest"
+    uv = "latest"
+
+
+[tasks.run]
+    depends = ["run-server", "run-client"]
+
+    [tasks.run-server]
+        dir = "server"
+        run = "uv run manage.py runserver"
+
+    [tasks.run-client]
+        dir = "client"
+        run = "bun run dev"
+
+
+[tasks.graphql-gen]
+    depends = ["graphql-gen-server", "graphql-gen-client"]
+
+    [tasks.graphql-gen-server]
+        dir = "server"
+        run = "uv run manage.py export_schema neuronhub.graphql --path=../schema.graphql"
+
+    [tasks.graphql-gen-client]
+        dir = "client"
+        run = [
+            "bun run graphql-codegen --config src/codegen.ts",
+            "bun run gql-tada generate output",
+            "bunx @chakra-ui/cli typegen src/theme/theme.ts",
+            "mise run format-client"
+        ]
+
+
+[tasks.format]
+    depends = ["format-server", "format-client"]
+
+    [tasks.format-server]
+        dir = "server"
+        run = "uv run ruff format ."
+
+    [tasks.format-client]
+        dir = "client"
+        run = "bun run biome check --write"
+
+
+
+[tasks.migrate]
+    dir = "server"
+    run = "uv run manage.py migrate"
+
+[tasks.makemigrations]
+    dir = "server"
+    run = "uv run manage.py makemigrations"
+
+[tasks.test]
+    dir = "server"
+    run = "uv run pytest"
+
+
+[tasks.lint]
+    depends = ["lint-server", "lint-client"]
+
+    [tasks.lint-server]
+        dir = "server"
+        run = "uv run mypy neuronhub"
+
+    [tasks.lint-client]
+        dir = "client"
+        run = "bun run tsc --noEmit"
+
+
+[tasks.upgrade]
+    depends = ["upgrade-server", "upgrade-client"]
+
+    [tasks.upgrade-server]
+        dir = "server"
+        run = "uv lock --upgrade"
+
+    [tasks.upgrade-client]
+        dir = "client"
+        run = [
+            "bun run ncu --upgrade --packageManager",
+            "bun install"
+        ]

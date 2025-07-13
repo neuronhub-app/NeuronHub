@@ -1,11 +1,13 @@
 {
   "permissions": {
     "allow": [
+      "Bash(bash:*)",
       "Bash(git:*)",
       "Bash(ls:*)",
       "Bash(cat:*)",
       "Bash(grep:*)",
       "Bash(find:*)",
+      "Bash(echo:*)",
       "Bash(mkdir:*)",
       "Bash(curl:*)",
       "Bash(rm:*)",
@@ -13,21 +15,18 @@
       "Bash(mv:*)",
       "Bash(pkill:*)",
       "Bash(sed:*)",
-      "Bash(rg:*)",
-      "Bash(eza:*)",
-      "Bash(bat:*)",
-      "Bash(fd:*)",
       "Bash(chflags:*)",
       "Bash(chmod:*)",
       "Bash(xattr:*)",
       "Bash(python:*)",
       "Bash(uv:*)",
       "Bash(bun:*)",
-      "Bash(./.run/format.sh)",
-      "Bash(./.run/mypy.sh)",
-      "Bash(./.run/gen-types-and-format.sh)",
+      "Bash(mise:*)",
+      "Bash(rg:*)",
+      "Bash(eza:*)",
+      "Bash(bat:*)",
+      "Bash(fd:*)",
       "Bash(docker:*)",
-      "Bash(make:*)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:github.io)",
       "WebFetch(domain:gitlab.com)",
@@ -57,17 +56,19 @@
       "WebFetch(domain:simonwillison.net)",
       "WebFetch(domain:fasterthanli.me)",
       "WebFetch(domain:rachelbythebay.com)",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "mcp__puppeteer__puppeteer_navigate",
+      "mcp__puppeteer__puppeteer_screenshot"
     ],
     "deny": [
       "WebFetch(domain:stackoverflow.com)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "puppeteer",
     "memory",
     "sequential-thinking"
   ],
-  "defaultMode": "allowEdits",
-  "enableAllProjectMcpServers": true
+  "defaultMode": "allowEdits"
 }

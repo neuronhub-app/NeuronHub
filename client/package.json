@@ -7,11 +7,7 @@
     "build": "tsc && vite build",
     "tsc": "tsc --noEmit",
     "serve": "vite preview",
-    "format": "bun run biome check --write",
-    "update-check": "bun run ncu --packageManager=bun",
-    "update": "bun run ncu --upgrade --packageManager=bun && bun install",
-    "typegen": "bunx @chakra-ui/cli typegen src/theme/theme.ts",
-    "graphql:codegen": "graphql-codegen --config src/codegen.ts"
+    "format": "biome check --write"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.21.1",

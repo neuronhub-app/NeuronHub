@@ -30,7 +30,6 @@ Run `uv` from `server/` dir.
 
 ## Additional Commands
 
-- Format: `uv run ruff format .`
-- Schema Export: `uv run manage.py export_schema neuronhub.graphql --path=../schema.graphql` 
-- Types hard reset: `./.run/gen-types-and-format.sh`
-- Upgrade: `uv lock --upgrade`
+- Format: `mise format-server`
+- GraphQL types hard reset: `mise graphql-gen`
+- Upgrade: `mise upgrade-server`
