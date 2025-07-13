@@ -1,7 +1,6 @@
-
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:17-alpine
     environment:
       POSTGRES_DB: neuronhub
       POSTGRES_USER: neuronhub
@@ -17,7 +16,7 @@ services:
     build: ./server
     environment:
       DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
-      ALLOWED_HOSTS: server,localhost
+      ALLOWED_HOSTS: "*"
       SERVER_URL: http://server:8000
       CLIENT_URL: http://client:3000
     volumes:
@@ -42,7 +41,6 @@ services:
       - .:/app
       - server_lib:/app/server/.venv
       - client_lib:/app/client/node_modules
-      - ~/.claude:/root/.claude
     ports:
       - "3000:3000"
     working_dir: /app/client
@@ -50,21 +48,19 @@ services:
       server:
         condition: service_healthy
 
-  test:
+  claude:
     build: ./server
     environment:
       DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
-      ALLOWED_HOSTS: server,localhost
-      SERVER_URL: http://server:8000
+      ALLOWED_HOSTS: "*"
       CLIENT_URL: http://client:3000
     volumes:
       - .:/app
       - server_lib:/app/server/.venv
       - client_lib:/app/client/node_modules
+      - ~/.claude:/root/.claude
     depends_on:
       postgres:
-        condition: service_healthy
-      server:
         condition: service_healthy
       client:
         condition: service_started
