@@ -7,6 +7,7 @@ docs/private/
 server/.env.local
 
 .claude/prompts/local/**
+.claude/commands/**
 
 # caches
 __pycache__

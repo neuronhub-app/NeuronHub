@@ -69,6 +69,5 @@
     "puppeteer",
     "memory",
     "sequential-thinking"
-  ],
-  "defaultMode": "allowEdits"
+  ]
 }

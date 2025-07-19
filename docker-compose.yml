@@ -1,3 +1,5 @@
+name: neuronhub
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -13,7 +15,10 @@ services:
       timeout: 5s
 
   server:
-    build: ./server
+    build: ./server/
+    working_dir: /app/server
+    command: ["echo", "server/ built"]
+
     environment:
       DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
       ALLOWED_HOSTS: "*"
@@ -22,49 +27,52 @@ services:
     volumes:
       - .:/app
       - server_lib:/app/server/.venv
-    ports:
-      - "8000:8000"
-    working_dir: /app/server
     depends_on:
       postgres:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8000/healthcheck/"]
-      interval: 3s
-      timeout: 7s
+    # ports:
+    #   - "8000:8000"
+    # healthcheck:
+    #   test: ["CMD", "curl", "--fail", "http://localhost:8000/healthcheck/"]
+    #   interval: 3s
+    #   timeout: 7s
 
   client:
-    build: ./client
+    build: ./client/
+    working_dir: /app/client
+    command: ["echo", "client/ built"]
+
     environment:
       VITE_API_URL: http://server:8000
     volumes:
       - .:/app
       - server_lib:/app/server/.venv
       - client_lib:/app/client/node_modules
-    ports:
-      - "3000:3000"
-    working_dir: /app/client
     depends_on:
       server:
-        condition: service_healthy
+        condition: service_completed_successfully
+    # ports:
+    #   - "3000:3000"
 
   claude:
-    build: ./server
-    environment:
-      DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
-      ALLOWED_HOSTS: "*"
-      CLIENT_URL: http://client:3000
+    build: ./.claude/
+    working_dir: /app/
+    command: ["bash", "-c", "claude --dangerously-skip-permissions"]
+    user: "1000:1000"
+
     volumes:
-      - .:/app
       - server_lib:/app/server/.venv
       - client_lib:/app/client/node_modules
+      - .:/app
       - ~/.claude:/root/.claude
     depends_on:
       postgres:
         condition: service_healthy
-      client:
-        condition: service_started
-    command: ["bash", "-c", "cd /app/server && uv run pytest"]
+    environment:
+      DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
+      ALLOWED_HOSTS: "*"
+      CLIENT_URL: http://client:3000
+      VITE_API_URL: http://server:8000
 
 volumes:
   postgres_data:

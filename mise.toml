@@ -15,6 +15,10 @@
         run = "bun run dev"
 
 
+[tasks.run-claude]
+    run = "sudo docker compose run --rm claude" # `bash` to workaround NVM $PATH meddling
+
+
 [tasks.graphql-gen]
     depends = ["graphql-gen-server", "graphql-gen-client"]
 
@@ -83,3 +87,14 @@
             "bun run ncu --upgrade --packageManager",
             "bun install"
         ]
+
+[tasks.install]
+    depends = ["install-server", "install-client"]
+
+    [tasks.install-server]
+        dir = "server"
+        run = "uv sync"
+
+    [tasks.install-client]
+        dir = "client"
+        run = "bun install"
