@@ -15,7 +15,7 @@ services:
       timeout: 5s
 
   server:
-    build: ./server/
+    build: ../server/
     working_dir: /app/server
     command: ["echo", "server/ built"]
 
@@ -30,15 +30,15 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    # ports:
-    #   - "8000:8000"
-    # healthcheck:
-    #   test: ["CMD", "curl", "--fail", "http://localhost:8000/healthcheck/"]
-    #   interval: 3s
-    #   timeout: 7s
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/healthcheck/"]
+      interval: 3s
+      timeout: 7s
 
   client:
-    build: ./client/
+    build: ../client/
     working_dir: /app/client
     command: ["echo", "client/ built"]
 
@@ -51,28 +51,8 @@ services:
     depends_on:
       server:
         condition: service_completed_successfully
-    # ports:
-    #   - "3000:3000"
-
-  claude:
-    build: ./.claude/
-    working_dir: /app/
-    command: ["bash", "-c", "claude --dangerously-skip-permissions"]
-    user: "1000:1000"
-
-    volumes:
-      - server_lib:/app/server/.venv
-      - client_lib:/app/client/node_modules
-      - .:/app
-      - ~/.claude:/root/.claude
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
-      ALLOWED_HOSTS: "*"
-      CLIENT_URL: http://client:3000
-      VITE_API_URL: http://server:8000
+    ports:
+      - "3000:3000"
 
 volumes:
   postgres_data:

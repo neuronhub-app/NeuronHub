@@ -1,6 +1,0 @@
-# avoid confusing LLMs
-Makefile
-docker-compose.yml
-.dockerignore
-
-/.run/*.xml
