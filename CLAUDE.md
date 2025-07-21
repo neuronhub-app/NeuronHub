@@ -14,8 +14,6 @@
 - `mise graphql-gen` - executes: Ruff, root `/schema.graphql` generation, graphql-codegen, gql-tada, Biome.
 - Shell utils: rg, fd, bat
 
-Remember to run `uv` scripts from `server/` dir
-
 ### Structure
 
 - Django: Apps store domain in `models.py`, business logic in `services.py`, API in `graphql/`. Avoid god objects.

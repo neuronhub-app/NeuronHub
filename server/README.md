@@ -6,7 +6,7 @@ reviewed_at: 2025.07.20
 
 ```bash
 mise install
-mise install-server
+mise run install
 mise migrate
 mise db_stubs_repopulate  # populate with test data, incl the test user admin/admin
 mise run-server
@@ -24,5 +24,5 @@ createdb neuronhub --owner=neuronhub
 ## Additional Commands
 
 - Format: `mise format-server`
-- GraphQL types hard reset: `mise graphql-gen`
+- GraphQL + TS full rebuild: `mise graphql-gen`
 - Upgrade: `mise upgrade-server`

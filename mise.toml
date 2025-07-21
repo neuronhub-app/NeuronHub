@@ -2,11 +2,28 @@
     bun = "latest"
     uv = "latest"
 
+[settings]
+    python.uv_venv_auto = true # use `uv` venv instead of Mise
 
+
+[tasks.install]
+    depends = ["install-server", "install-client"]
+
+    [tasks.install-server]
+        dir = "server"
+        run = "uv sync"
+
+    [tasks.install-client]
+        dir = "client"
+        run = "bun install"
+
+
+# todo maybe: rename to run-dev
 [tasks.run]
-    depends = ["run-server", "run-client"]
+    depends = ["run-db", "run-server", "run-client"]
 
     [tasks.run-server]
+        depends = "run-db"
         dir = "server"
         run = "uv run manage.py runserver"
 
@@ -14,10 +31,35 @@
         dir = "client"
         run = "bun run dev"
 
+    [tasks.run-db]
+        description = "start docker db, idempotently"
+        run = "sudo docker compose --file ./devops/docker-compose.dev-db.yml up --detach"
 
-[tasks.run-claude]
-    run = "sudo docker compose run --rm claude" # `bash` to workaround NVM $PATH meddling
+# manage.py commands
 
+[tasks.migrate]
+    depends = "run-db"
+    dir = "server"
+    run = "uv run manage.py migrate"
+
+[tasks.makemigrations]
+    depends = "run-db"
+    dir = "server"
+    run = "uv run manage.py makemigrations"
+
+[tasks.test]
+    depends = "run-db"
+    dir = "server"
+    run = "uv run pytest"
+
+[tasks.db_stubs_repopulate]
+    depends = "run-db"
+    dir = "server"
+    run = "uv run manage.py db_stubs_repopulate"
+
+
+# GraphQL
+# ------------------------------------------------
 
 [tasks.graphql-gen]
     depends = ["graphql-gen-server", "graphql-gen-client"]
@@ -36,6 +78,9 @@
         ]
 
 
+# format, lint
+# ------------------------------------------------
+
 [tasks.format]
     depends = ["format-server", "format-client"]
 
@@ -46,25 +91,6 @@
     [tasks.format-client]
         dir = "client"
         run = "bun run biome check --write"
-
-
-
-[tasks.migrate]
-    dir = "server"
-    run = "uv run manage.py migrate"
-
-[tasks.makemigrations]
-    dir = "server"
-    run = "uv run manage.py makemigrations"
-
-[tasks.test]
-    dir = "server"
-    run = "uv run pytest"
-
-[tasks.db_stubs_repopulate]
-    dir = "server"
-    run = "uv run manage.py db_stubs_repopulate"
-
 
 [tasks.lint]
     depends = ["lint-server", "lint-client"]
@@ -77,6 +103,9 @@
         dir = "client"
         run = "bun run tsc --noEmit"
 
+
+# upgrade
+# ------------------------------------------------
 
 [tasks.upgrade]
     depends = ["upgrade-server", "upgrade-client"]
@@ -91,14 +120,3 @@
             "bun run ncu --upgrade --packageManager",
             "bun install"
         ]
-
-[tasks.install]
-    depends = ["install-server", "install-client"]
-
-    [tasks.install-server]
-        dir = "server"
-        run = "uv sync"
-
-    [tasks.install-client]
-        dir = "client"
-        run = "bun install"
