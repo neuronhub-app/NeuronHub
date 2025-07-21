@@ -1,5 +1,6 @@
 # Coder Workspace base image
 # ==========================================
+LABEL version="0.1.4.0"
 
 FROM codercom/example-base:ubuntu
 
@@ -47,9 +48,12 @@ RUN brew install --force-bottle chezmoi fd bat micro eza delta btop
 ENV EDITOR=micro
 
 # Mise
-RUN brew install --force-bottle mise
+RUN brew install --force-bottle mise usage
 RUN echo 'eval "$(mise activate bash)"' >> $HOME/.bashrc
-RUN echo "mise activate fish | source" >> $HOME/.config/fish/config.fish
+RUN echo "mise activate fish | source" >> $XDG_CONFIG_HOME/fish/config.fish
+RUN mkdir -p $XDG_CONFIG_HOME/fish/completions
+RUN usage --completions fish > $XDG_CONFIG_HOME/fish/completions/usage.fish
+RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 
 # Bun
-RUN mise install bun
+RUN mise install bun uv
