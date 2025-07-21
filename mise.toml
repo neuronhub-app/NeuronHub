@@ -61,6 +61,10 @@
     dir = "server"
     run = "uv run pytest"
 
+[tasks.db_stubs_repopulate]
+    dir = "server"
+    run = "uv run manage.py db_stubs_repopulate"
+
 
 [tasks.lint]
     depends = ["lint-server", "lint-client"]

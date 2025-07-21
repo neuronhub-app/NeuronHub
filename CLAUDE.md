@@ -8,9 +8,9 @@
 
 ### CLI commands
 
-- `uv run pytest`
-- `uv run manage.py migrate`
-- `uv run manage.py db_stubs_repopulate` - idempotent, a full db state reset to the stub data. Keeps the default `admin` User and his cookie session.
+- `mise test`
+- `mise migrate`
+- `mise db_stubs_repopulate` - idempotent, a full db state reset to the stub data. Keeps the default `admin` User and his cookie session.
 - `mise graphql-gen` - executes: Ruff, root `/schema.graphql` generation, graphql-codegen, gql-tada, Biome.
 - Shell utils: rg, fd, bat
 
