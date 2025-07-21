@@ -1,4 +1,4 @@
-# version 0.2.0.2
+# version 0.2.0.3
 
 terraform {
   required_providers {
@@ -12,6 +12,10 @@ terraform {
   }
 }
 
+variable "git_token" {
+  sensitive = true
+  type = string
+}
 data "coder_parameter" "docker_image_id" {
   name    = "docker_image_id"
   type    = "string"
@@ -61,18 +65,10 @@ data "coder_parameter" "git_user" {
   type    = "string"
   mutable = true
 }
-data "coder_parameter" "git_token" {
-  name      = "git_token"
-  default   = ""
-  type      = "string"
-  styling = jsonencode({
-    mask_input = true
-  })
-}
 
 locals {
   username        = data.coder_workspace_owner.me.name
-  git_url         = "${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${data.coder_parameter.git_token.value}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_repo.value}.git"
+  git_url         = "${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${var.git_token}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_repo.value}.git"
   git_url_preview = "${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_repo.value}.git"
 }
 
