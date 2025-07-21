@@ -3,63 +3,58 @@
     uv = "latest"
 
 [settings]
-    python.uv_venv_auto = true # use `uv` venv instead of Mise
+    python.uv_venv_auto = true # use uv /server/.venv/, not Mise path
 
 
-[tasks.install]
-    depends = ["install-server", "install-client"]
+[tasks.install-deps]
+    depends = ["install-deps-server", "install-deps-client"]
 
-    [tasks.install-server]
+    [tasks.install-deps-server]
         dir = "server"
         run = "uv sync"
 
-    [tasks.install-client]
+    [tasks.install-deps-client]
         dir = "client"
         run = "bun install"
 
 
-# todo maybe: rename to run-dev
-[tasks.run]
-    depends = ["run-db", "run-server", "run-client"]
+[tasks.dev-start]
+    depends = ["dev-db", "dev-server", "dev-client"]
 
-    [tasks.run-server]
-        depends = "run-db"
+    [tasks.dev-server]
+        depends = "dev-db"
         dir = "server"
         run = "uv run manage.py runserver"
 
-    [tasks.run-client]
+    [tasks.dev-client]
+        depends = ["dev-db", "dev-server"]
         dir = "client"
         run = "bun run dev"
 
-    [tasks.run-db]
+    [tasks.dev-db]
         description = "start docker db, idempotently"
         run = "sudo docker compose --file ./devops/docker-compose.dev-db.yml up --detach"
 
-# manage.py commands
+    [tasks.dev-db-stop]
+        run = "sudo docker compose --file ./devops/docker-compose.dev-db.yml down"
 
-[tasks.migrate]
-    depends = "run-db"
-    dir = "server"
-    run = "uv run manage.py migrate"
 
-[tasks.makemigrations]
-    depends = "run-db"
-    dir = "server"
-    run = "uv run manage.py makemigrations"
-
-[tasks.test]
-    depends = "run-db"
+[tasks.pytest]
+    depends = "dev-db"
     dir = "server"
     run = "uv run pytest"
 
-[tasks.db_stubs_repopulate]
-    depends = "run-db"
+
+[tasks.db-migrate]
+    dir = "server"
+    run = "uv run manage.py migrate"
+[tasks.db-makemigrations]
+    dir = "server"
+    run = "uv run manage.py makemigrations"
+[tasks.db-stubs-repopulate]
     dir = "server"
     run = "uv run manage.py db_stubs_repopulate"
 
-
-# GraphQL
-# ------------------------------------------------
 
 [tasks.graphql-gen]
     depends = ["graphql-gen-server", "graphql-gen-client"]
@@ -78,9 +73,6 @@
         ]
 
 
-# format, lint
-# ------------------------------------------------
-
 [tasks.format]
     depends = ["format-server", "format-client"]
 
@@ -91,6 +83,7 @@
     [tasks.format-client]
         dir = "client"
         run = "bun run biome check --write"
+
 
 [tasks.lint]
     depends = ["lint-server", "lint-client"]
@@ -104,17 +97,14 @@
         run = "bun run tsc --noEmit"
 
 
-# upgrade
-# ------------------------------------------------
+[tasks.upgrade-deps]
+    depends = ["upgrade-deps-server", "upgrade-deps-client"]
 
-[tasks.upgrade]
-    depends = ["upgrade-server", "upgrade-client"]
-
-    [tasks.upgrade-server]
+    [tasks.upgrade-deps-server]
         dir = "server"
         run = "uv lock --upgrade"
 
-    [tasks.upgrade-client]
+    [tasks.upgrade-deps-client]
         dir = "client"
         run = [
             "bun run ncu --upgrade --packageManager",

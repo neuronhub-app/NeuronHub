@@ -1,8 +1,8 @@
 # Coder Workspace base image
 # ==========================================
-LABEL version="0.1.4.0"
-
 FROM codercom/example-base:ubuntu
+
+LABEL version="0.1.5.0"
 
 USER coder
 
@@ -44,6 +44,7 @@ RUN echo "eval (brew shellenv)" >> $XDG_CONFIG_HOME/fish/config.fish
 
 # CLI tools
 # -----------------------------------
+RUN brew install --cask claude-code
 RUN brew install --force-bottle chezmoi fd bat micro eza delta btop
 ENV EDITOR=micro
 
@@ -55,5 +56,4 @@ RUN mkdir -p $XDG_CONFIG_HOME/fish/completions
 RUN usage --completions fish > $XDG_CONFIG_HOME/fish/completions/usage.fish
 RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 
-# Bun
 RUN mise install bun uv

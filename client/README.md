@@ -1,12 +1,12 @@
 ---
-reviewed_at: 2025.06.22
+reviewed_at: 2025.07.21
 ---
 
-## Client Setup
+## Setup
 
 ```bash
-bun install
-bun run dev
+mise install-deps-client
+mise dev-client
 ```
 
 ### Caveats

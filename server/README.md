@@ -1,17 +1,20 @@
 ---
-reviewed_at: 2025.07.20
+reviewed_at: 2025.07.21
 ---
 
 ## Setup
 
 ```bash
 mise install
-mise run install
-mise migrate
-mise db_stubs_repopulate  # populate with test data, incl the test user admin/admin
-mise run-server
-mise test
+mise install-deps
+mise db-migrate
+mise db-stubs-repopulate  # populate with test data, incl the test user admin/admin
+mise dev-server
+mise pytest
 ```
+
+GraphQL + TS full rebuild: `mise gen-graphql`
+
 
 ### PostgreSQL native
 ```fish
@@ -20,9 +23,3 @@ brew services start postgres@17
 createuser neuronhub
 createdb neuronhub --owner=neuronhub
 ```
-
-## Additional Commands
-
-- Format: `mise format-server`
-- GraphQL + TS full rebuild: `mise graphql-gen`
-- Upgrade: `mise upgrade-server`

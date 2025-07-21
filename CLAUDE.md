@@ -8,10 +8,10 @@
 
 ### CLI commands
 
-- `mise test`
-- `mise migrate`
-- `mise db_stubs_repopulate` - idempotent, a full db state reset to the stub data. Keeps the default `admin` User and his cookie session.
-- `mise graphql-gen` - executes: Ruff, root `/schema.graphql` generation, graphql-codegen, gql-tada, Biome.
+- `mise pytest`
+- `mise db-migrate`
+- `mise db-stubs-repopulate` - idempotent, a full db state reset to the stub data. Keeps the default `admin` User and his cookie session.
+- `mise gen-graphql` - executes: Ruff, root `/schema.graphql` generation, graphql-codegen, gql-tada, Biome.
 - Shell utils: rg, fd, bat
 
 ### Structure
