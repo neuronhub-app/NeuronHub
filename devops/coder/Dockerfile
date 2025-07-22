@@ -1,8 +1,8 @@
-# Coder Workspace base image
+# Coder Workspace image
 # ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.7.0"
+LABEL version="0.1.8.0"
 
 USER coder
 
@@ -30,6 +30,7 @@ RUN mkdir -p $XDG_BIN_HOME
 ENV HOMEBRE_NO_ANALYTICS=1
 ENV NONINTERACTIVE=1
 
+# Linux keeps failing in dirs besides linuxbrew. But on MacOS it's fine.
 ENV BREW_DIR=linuxbrew
 RUN sudo mkdir -p /home/$BREW_DIR/.$BREW_DIR
 RUN sudo chown -R $USER:$USER /home/$BREW_DIR/.$BREW_DIR
@@ -44,11 +45,12 @@ RUN echo "eval (brew shellenv)" >> $XDG_CONFIG_HOME/fish/config.fish
 
 # CLI tools
 # -----------------------------------
-RUN brew install --force-bottle chezmoi fd bat micro eza delta btop zoxide atuin node@24
-RUN npm install --global @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking @anthropic-ai/claude-code
+RUN brew install --force-bottle chezmoi fd bat micro eza delta btop zoxide atuin
 ENV EDITOR=micro
 
+
 # Mise
+# -----------------------------------
 RUN brew install --force-bottle mise usage
 RUN echo 'eval "$(mise activate bash)"' >> $HOME/.bashrc
 RUN echo "mise activate fish | source" >> $XDG_CONFIG_HOME/fish/config.fish
@@ -56,4 +58,14 @@ RUN mkdir -p $XDG_CONFIG_HOME/fish/completions
 RUN usage --completions fish > $XDG_CONFIG_HOME/fish/completions/usage.fish
 RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 
-RUN mise install bun uv
+
+# Mise exec
+# -----------------------------------
+RUN mise install uv bun
+
+# Warning: `exec` isn't for Docker shell, the docs will mislead you
+
+RUN mise exec bun --command "bun install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"
+
+RUN mise exec uv --command "uv tool install playwright"
+RUN mise exec uv --command "uv tool run playwright install chromium"
