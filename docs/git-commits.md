@@ -38,6 +38,7 @@ Examples:
 - `types` - TypeScript or Python typings
 - `E2E` - just Playwright, more precisely - integration tests
 - `Docker`
+- `Coder`
 
 Unused:
 - `brows` - browser extension

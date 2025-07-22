@@ -2,7 +2,7 @@
 # ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.5.0"
+LABEL version="0.1.6.0"
 
 USER coder
 
@@ -45,7 +45,7 @@ RUN echo "eval (brew shellenv)" >> $XDG_CONFIG_HOME/fish/config.fish
 # CLI tools
 # -----------------------------------
 RUN brew install --cask claude-code
-RUN brew install --force-bottle chezmoi fd bat micro eza delta btop
+RUN brew install --force-bottle chezmoi fd bat micro eza delta btop zoxide atuin
 ENV EDITOR=micro
 
 # Mise
