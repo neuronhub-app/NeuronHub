@@ -85,7 +85,9 @@ MIDDLEWARE = [
 IS_DEBUG_TOOLBAR_ENABLED = env.bool("IS_DEBUG_TOOLBAR_ENABLED", DEBUG)
 if IS_DEBUG_TOOLBAR_ENABLED:
     INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.insert(0, "strawberry_django.middlewares.debug_toolbar.DebugToolbarMiddleware")
+    MIDDLEWARE.insert(
+        0, "strawberry_django.middlewares.debug_toolbar.DebugToolbarMiddleware"
+    )
     DEBUG_TOOLBAR_PANELS = [
         "debug_toolbar.panels.history.HistoryPanel",
         "debug_toolbar.panels.versions.VersionsPanel",
@@ -134,7 +136,10 @@ else:
     DATABASES = {
         "default": dj_database_url.config(
             conn_max_age=600,
-            default=env.str("DATABASE_URL", "postgres://neuronhub@host.docker.internal:5432/neuronhub"),
+            default=env.str(
+                "DATABASE_URL",
+                "postgres://neuronhub@host.docker.internal:5432/neuronhub",
+            ),
         )
     }
 
@@ -184,8 +189,6 @@ ALLOWED_HOSTS = env.list(
     "ALLOWED_HOSTS",
     default=[
         ".localhost",
-        "127.0.0.1",
-        "[::1]",
         SERVER_URL.replace("http://", "").replace("https://", ""),
     ],
 )

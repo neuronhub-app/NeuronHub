@@ -27,9 +27,9 @@
         run = "uv run manage.py runserver"
 
     [tasks.dev-client]
-        depends = ["dev-db", "dev-server"]
+        depends = "dev-db"
         dir = "client"
-        run = "bun run dev"
+        run = "bun run dev --host"
 
     [tasks.dev-db]
         description = "start docker db, idempotently"
