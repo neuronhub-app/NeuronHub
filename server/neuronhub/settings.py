@@ -134,7 +134,7 @@ else:
     DATABASES = {
         "default": dj_database_url.config(
             conn_max_age=600,
-            default=env.str("DATABASE_URL", "postgres://neuronhub@localhost:5432/neuronhub"),
+            default=env.str("DATABASE_URL", "postgres://neuronhub@host.docker.internal:5432/neuronhub"),
         )
     }
 
