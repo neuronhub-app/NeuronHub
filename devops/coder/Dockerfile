@@ -2,7 +2,7 @@
 # ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.6.0"
+LABEL version="0.1.7.0"
 
 USER coder
 

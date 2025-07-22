@@ -1,4 +1,4 @@
-# version 0.3.0.5
+# version 0.3.0.6
 
 terraform {
   required_providers {
