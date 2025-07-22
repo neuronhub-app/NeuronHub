@@ -44,6 +44,9 @@
     dir = "server"
     run = "uv run pytest"
 
+[tasks.claude]
+    run = "claude --dangerously-skip-permissions"
+
 
 [tasks.db-migrate]
     dir = "server"
