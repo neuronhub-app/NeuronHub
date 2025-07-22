@@ -44,8 +44,8 @@ RUN echo "eval (brew shellenv)" >> $XDG_CONFIG_HOME/fish/config.fish
 
 # CLI tools
 # -----------------------------------
-RUN brew install --cask claude-code
-RUN brew install --force-bottle chezmoi fd bat micro eza delta btop zoxide atuin
+RUN brew install --force-bottle chezmoi fd bat micro eza delta btop zoxide atuin node@24
+RUN npm install --global @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking @anthropic-ai/claude-code
 ENV EDITOR=micro
 
 # Mise
