@@ -440,6 +440,7 @@ enum ToolType {
   Material
   SaaS
   App
+  Product
   Other
 }
 

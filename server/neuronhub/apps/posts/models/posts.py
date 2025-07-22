@@ -11,7 +11,9 @@ from simple_history.models import HistoricalRecords
 
 from django.db.models import ManyToManyField
 
-from neuronhub.apps.admin.utils.convert_md_to_html_for_admin import convert_md_to_html_for_admin
+from neuronhub.apps.admin.utils.convert_md_to_html_for_admin import (
+    convert_md_to_html_for_admin,
+)
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable
@@ -146,6 +148,7 @@ class Post(AnonimazableTimeStampedModel):
         Material = "material"
         SaaS = "saas"
         App = "app"
+        Product = "product"
         Other = "other"
 
     company = models.ForeignKey(ToolCompany, on_delete=models.SET_NULL, null=True, blank=True)

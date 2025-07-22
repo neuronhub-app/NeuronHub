@@ -36,7 +36,7 @@ class PlaywrightHelper:
         return self
 
     async def login_using_django_admin(self):
-        await self.page.goto(f"{self.live_server}/admin/login/")
+        await self.page.goto(f"{self.live_server.url}/admin/login/")
         await self.page.fill('input[name="username"]', "admin")
         await self.page.fill('input[name="password"]', "admin")
         await self.page.click('input[type="submit"]')
@@ -87,8 +87,11 @@ class PlaywrightHelper:
     async def login_as(self, username: str, password: str = None):
         if password is None:
             password = username
-        await self.page.goto(f"{self.live_server}/admin/login/")
+        await self.page.goto(f"{self.live_server.url}/admin/login/")
         await self.page.fill('input[name="username"]', username)
         await self.page.fill('input[name="password"]', password)
         await self.page.click('input[type="submit"]')
         await self.wait_for_network_idle()
+
+    async def login_admin(self):
+        await self.login_as("admin", "admin")

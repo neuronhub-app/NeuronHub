@@ -34,6 +34,9 @@ export const PostFragment = graphql(
           id
           username
         }
+        parent {
+          id
+        }
         created_at
         updated_at
       }
@@ -76,6 +79,26 @@ export const PostCommentsFragment = graphql(
         visibility
         created_at
         updated_at
+
+        comments {
+          id
+          type
+          __typename
+          author {
+            id
+            username
+            avatar {
+              url
+            }
+          }
+          parent {
+            id
+          }
+          content
+          visibility
+          created_at
+          updated_at
+        }
       }
     }
   `,

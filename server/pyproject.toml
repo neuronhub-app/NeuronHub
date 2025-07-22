@@ -66,7 +66,7 @@ dependencies = [
             "pytest-pspec ~= 0.0.4",
             "pytest-rich == 0.*",
 
-        "playwright == 1.*",
+        "playwright == 1.53.*",
             "pytest-playwright-asyncio == 0.*",
             "pytest-asyncio >= 0.26.0",
             "greenlet >= 3.1.0",

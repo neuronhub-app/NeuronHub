@@ -1,12 +1,14 @@
 import { Field as ChakraField, Checkbox } from "@chakra-ui/react";
 import type { ReactNode } from "react";
-import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
+import type { FieldPath, UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
 import type { ReviewCreateForm } from "@/apps/reviews/create";
 
-export function FormChakraCheckboxField(
+export function FormChakraCheckboxField<
+  TFieldName extends FieldPath<ReviewCreateForm.FormSchema>,
+>(
   props: {
     form: UseFormReturn<ReviewCreateForm.FormSchema>;
-    formRegister: UseFormRegisterReturn<"rating">;
+    formRegister: UseFormRegisterReturn<TFieldName>;
     label?: ReactNode;
     helperText?: ReactNode;
     errorText?: ReactNode;
@@ -35,9 +37,9 @@ export function FormChakraCheckboxField(
       </Checkbox.Root>
 
       {props.helperText && <ChakraField.HelperText>{props.helperText}</ChakraField.HelperText>}
-      {state.errors?.[formRegister.name]?.message && (
+      {(state.errors as any)?.[formRegister.name]?.message && (
         <ChakraField.ErrorText>
-          {state.errors?.[formRegister.name]?.message}
+          {(state.errors as any)?.[formRegister.name]?.message}
         </ChakraField.ErrorText>
       )}
     </ChakraField.Root>

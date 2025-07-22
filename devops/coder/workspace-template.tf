@@ -1,4 +1,4 @@
-# version 0.2.0.3
+# version 0.3.0.3
 
 terraform {
   required_providers {
@@ -14,7 +14,7 @@ terraform {
 
 variable "git_token" {
   sensitive = true
-  type = string
+  type      = string
 }
 data "coder_parameter" "docker_image_id" {
   name    = "docker_image_id"
@@ -31,10 +31,10 @@ data "coder_parameter" "git_host" {
   default     = ""
 }
 data "coder_parameter" "git_protocol" {
-  name        = "git_protocol"
-  type        = "string"
-  mutable     = true
-  default     = "https"
+  name    = "git_protocol"
+  type    = "string"
+  mutable = true
+  default = "https"
   option {
     name  = "HTTPS"
     value = "https"
@@ -53,6 +53,15 @@ data "coder_parameter" "git_repo" {
   mutable      = true
   icon         = "/icon/git.svg"
 }
+data "coder_parameter" "git_dotfiles_repo" {
+  name         = "git_dotfiles_repo"
+  default      = ""
+  display_name = "Dotfiles repository"
+  description  = "namespace/repo"
+  type         = "string"
+  mutable      = true
+  icon         = "/icon/dotfiles.svg"
+}
 data "coder_parameter" "project_name" {
   name    = "project_name"
   default = "neuronhub"
@@ -67,9 +76,8 @@ data "coder_parameter" "git_user" {
 }
 
 locals {
-  username        = data.coder_workspace_owner.me.name
-  git_url         = "${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${var.git_token}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_repo.value}.git"
-  git_url_preview = "${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_repo.value}.git"
+  username = data.coder_workspace_owner.me.name
+  git_url  = "${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${var.git_token}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_repo.value}.git"
 }
 
 data "coder_provisioner" "me" {}
@@ -84,15 +92,20 @@ resource "coder_agent" "main" {
   startup_script = <<-EOT
     #!/usr/bin/env fish
 
-    # [coder] prep /home/coder/ with defaults on first start
     if not test -f ~/.init_done
+      # Coder setup
       cp -rT /etc/skel ~
+
+      chezmoi init --apply ${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${var.git_token}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_dotfiles_repo.value}.git
+
       touch ~/.init_done
+    else
+        chezmoi git pull
+        chezmoi apply
     end
 
+    # Git
     mkdir -p ~/projects/; cd ~/projects/
-    echo "${local.git_url_preview}"
-
     if test -d ${data.coder_parameter.project_name.value}
         cd ${data.coder_parameter.project_name.value}
         git pull
@@ -101,6 +114,7 @@ resource "coder_agent" "main" {
         cd ${data.coder_parameter.project_name.value}
     end
 
+    # Project setup
     mise trust
     mise install
     mise install-deps
@@ -240,12 +254,6 @@ resource "docker_container" "workspace" {
   }
 }
 
-module "dotfiles" {
-  count    = data.coder_workspace.me.start_count
-  source   = "registry.coder.com/coder/dotfiles/coder"
-  version  = "~> 1.0"
-  agent_id = coder_agent.main.id
-}
 # See https://registry.coder.com/modules/coder/code-server
 module "code-server" {
   count    = data.coder_workspace.me.start_count

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from asgiref.sync import async_to_sync
+from django.contrib.auth.models import AnonymousUser
 from django.http import HttpRequest
 from django.test import RequestFactory
 from django.test import TestCase
@@ -31,7 +32,7 @@ class NeuronTestCase(TestCase):
         self,
         query: str,
         variables: dict = None,
-        user_authed: User | None = None,
+        user_authed: User | AnonymousUser | None = None,
     ) -> ExecutionResult:
         request = RequestFactory().get("/graphql")
         request.user = user_authed or self.user

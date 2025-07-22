@@ -531,6 +531,7 @@ export enum ToolType {
   App = "App",
   Material = "Material",
   Other = "Other",
+  Product = "Product",
   Program = "Program",
   SaaS = "SaaS",
 }
@@ -616,6 +617,23 @@ export type PostListQuery = {
       " $fragmentRefs"?: { PostFragment_PostType_Fragment: PostFragment_PostType_Fragment };
     }
   >;
+};
+
+export type CreatePostCommentMutationVariables = Exact<{
+  data: PostTypeInput;
+}>;
+
+export type CreatePostCommentMutation = {
+  __typename?: "Mutation";
+  create_post_comment: {
+    __typename?: "PostCommentType";
+    id: string;
+    type: PostTypeEnum;
+    content: string;
+    created_at: any;
+    author: { __typename?: "UserType"; id: string; username: string };
+    parent?: { __typename?: "PostCommentType"; id: string } | null;
+  };
 };
 
 export type ToolTagsQueryQueryVariables = Exact<{
@@ -763,6 +781,7 @@ type PostFragment_PostCommentType_Fragment = {
     created_at: any;
     updated_at: any;
     author: { __typename?: "UserType"; id: string; username: string };
+    parent?: { __typename?: "PostCommentType"; id: string } | null;
   }>;
   parent?: {
     __typename: "PostCommentType";
@@ -808,6 +827,7 @@ type PostFragment_PostReviewType_Fragment = {
     created_at: any;
     updated_at: any;
     author: { __typename?: "UserType"; id: string; username: string };
+    parent?: { __typename?: "PostCommentType"; id: string } | null;
   }>;
   parent?: {
     __typename: "PostToolType";
@@ -853,6 +873,7 @@ type PostFragment_PostToolType_Fragment = {
     created_at: any;
     updated_at: any;
     author: { __typename?: "UserType"; id: string; username: string };
+    parent?: { __typename?: "PostCommentType"; id: string } | null;
   }>;
   parent?:
     | {
@@ -930,6 +951,7 @@ type PostFragment_PostType_Fragment = {
     created_at: any;
     updated_at: any;
     author: { __typename?: "UserType"; id: string; username: string };
+    parent?: { __typename?: "PostCommentType"; id: string } | null;
   }>;
   parent?:
     | {
@@ -1003,6 +1025,22 @@ type PostCommentsFragment_PostCommentType_Fragment = {
       avatar?: { __typename?: "DjangoFileType"; url: string } | null;
     };
     parent?: { __typename?: "PostCommentType"; id: string } | null;
+    comments: Array<{
+      __typename: "PostCommentType";
+      id: string;
+      type: PostTypeEnum;
+      content: string;
+      visibility: Visibility;
+      created_at: any;
+      updated_at: any;
+      author: {
+        __typename?: "UserType";
+        id: string;
+        username: string;
+        avatar?: { __typename?: "DjangoFileType"; url: string } | null;
+      };
+      parent?: { __typename?: "PostCommentType"; id: string } | null;
+    }>;
   }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostCommentType_Fragment" };
 
@@ -1023,6 +1061,22 @@ type PostCommentsFragment_PostReviewType_Fragment = {
       avatar?: { __typename?: "DjangoFileType"; url: string } | null;
     };
     parent?: { __typename?: "PostCommentType"; id: string } | null;
+    comments: Array<{
+      __typename: "PostCommentType";
+      id: string;
+      type: PostTypeEnum;
+      content: string;
+      visibility: Visibility;
+      created_at: any;
+      updated_at: any;
+      author: {
+        __typename?: "UserType";
+        id: string;
+        username: string;
+        avatar?: { __typename?: "DjangoFileType"; url: string } | null;
+      };
+      parent?: { __typename?: "PostCommentType"; id: string } | null;
+    }>;
   }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostReviewType_Fragment" };
 
@@ -1043,6 +1097,22 @@ type PostCommentsFragment_PostToolType_Fragment = {
       avatar?: { __typename?: "DjangoFileType"; url: string } | null;
     };
     parent?: { __typename?: "PostCommentType"; id: string } | null;
+    comments: Array<{
+      __typename: "PostCommentType";
+      id: string;
+      type: PostTypeEnum;
+      content: string;
+      visibility: Visibility;
+      created_at: any;
+      updated_at: any;
+      author: {
+        __typename?: "UserType";
+        id: string;
+        username: string;
+        avatar?: { __typename?: "DjangoFileType"; url: string } | null;
+      };
+      parent?: { __typename?: "PostCommentType"; id: string } | null;
+    }>;
   }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostToolType_Fragment" };
 
@@ -1063,6 +1133,22 @@ type PostCommentsFragment_PostType_Fragment = {
       avatar?: { __typename?: "DjangoFileType"; url: string } | null;
     };
     parent?: { __typename?: "PostCommentType"; id: string } | null;
+    comments: Array<{
+      __typename: "PostCommentType";
+      id: string;
+      type: PostTypeEnum;
+      content: string;
+      visibility: Visibility;
+      created_at: any;
+      updated_at: any;
+      author: {
+        __typename?: "UserType";
+        id: string;
+        username: string;
+        avatar?: { __typename?: "DjangoFileType"; url: string } | null;
+      };
+      parent?: { __typename?: "PostCommentType"; id: string } | null;
+    }>;
   }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostType_Fragment" };
 
@@ -1279,6 +1365,14 @@ export const PostFragmentFragmentDoc = {
                     ],
                   },
                 },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
               ],
@@ -1435,6 +1529,51 @@ export const PostCommentsFragmentFragmentDoc = {
                 { kind: "Field", name: { kind: "Name", value: "visibility" } },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "comments" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      { kind: "Field", name: { kind: "Name", value: "__typename" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "username" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "url" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "parent" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "content" } },
+                      { kind: "Field", name: { kind: "Name", value: "visibility" } },
+                      { kind: "Field", name: { kind: "Name", value: "created_at" } },
+                      { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -1585,6 +1724,14 @@ export const PostDetailFragmentFragmentDoc = {
                     ],
                   },
                 },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
               ],
@@ -1676,6 +1823,51 @@ export const PostDetailFragmentFragmentDoc = {
                 { kind: "Field", name: { kind: "Name", value: "visibility" } },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "comments" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      { kind: "Field", name: { kind: "Name", value: "__typename" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "username" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "url" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "parent" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "content" } },
+                      { kind: "Field", name: { kind: "Name", value: "visibility" } },
+                      { kind: "Field", name: { kind: "Name", value: "created_at" } },
+                      { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -1828,6 +2020,14 @@ export const PostReviewFragmentFragmentDoc = {
                       { kind: "Field", name: { kind: "Name", value: "id" } },
                       { kind: "Field", name: { kind: "Name", value: "username" } },
                     ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
                   },
                 },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
@@ -2018,6 +2218,14 @@ export const PostReviewDetailFragmentFragmentDoc = {
                     ],
                   },
                 },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
               ],
@@ -2125,6 +2333,51 @@ export const PostReviewDetailFragmentFragmentDoc = {
                 { kind: "Field", name: { kind: "Name", value: "visibility" } },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "comments" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      { kind: "Field", name: { kind: "Name", value: "__typename" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "username" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "url" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "parent" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "content" } },
+                      { kind: "Field", name: { kind: "Name", value: "visibility" } },
+                      { kind: "Field", name: { kind: "Name", value: "created_at" } },
+                      { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -2300,6 +2553,14 @@ export const PostDetailDocument = {
                     ],
                   },
                 },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
               ],
@@ -2391,6 +2652,51 @@ export const PostDetailDocument = {
                 { kind: "Field", name: { kind: "Name", value: "visibility" } },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "comments" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      { kind: "Field", name: { kind: "Name", value: "__typename" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "username" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "url" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "parent" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "content" } },
+                      { kind: "Field", name: { kind: "Name", value: "visibility" } },
+                      { kind: "Field", name: { kind: "Name", value: "created_at" } },
+                      { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -2586,6 +2892,14 @@ export const PostListDocument = {
                     ],
                   },
                 },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
               ],
@@ -2632,6 +2946,70 @@ export const PostListDocument = {
     },
   ],
 } as unknown as DocumentNode<PostListQuery, PostListQueryVariables>;
+export const CreatePostCommentDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CreatePostComment" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "data" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "PostTypeInput" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "create_post_comment" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "data" },
+                value: { kind: "Variable", name: { kind: "Name", value: "data" } },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "type" } },
+                { kind: "Field", name: { kind: "Name", value: "content" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "username" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "created_at" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreatePostCommentMutation, CreatePostCommentMutationVariables>;
 export const ToolTagsQueryDocument = {
   kind: "Document",
   definitions: [
@@ -2986,6 +3364,14 @@ export const PostReviewDetailDocument = {
                     ],
                   },
                 },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
               ],
@@ -3093,6 +3479,51 @@ export const PostReviewDetailDocument = {
                 { kind: "Field", name: { kind: "Name", value: "visibility" } },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "comments" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      { kind: "Field", name: { kind: "Name", value: "__typename" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "username" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "url" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "parent" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "content" } },
+                      { kind: "Field", name: { kind: "Name", value: "visibility" } },
+                      { kind: "Field", name: { kind: "Name", value: "created_at" } },
+                      { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -3261,6 +3692,14 @@ export const ReviewListDocument = {
                       { kind: "Field", name: { kind: "Name", value: "id" } },
                       { kind: "Field", name: { kind: "Name", value: "username" } },
                     ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "parent" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
                   },
                 },
                 { kind: "Field", name: { kind: "Name", value: "created_at" } },

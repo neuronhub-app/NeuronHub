@@ -1,10 +1,15 @@
 import { useQuery } from "urql";
+import { createPostComment } from "@/apps/posts/services/createPostComment";
+import { useUserCurrent } from "@/apps/users/useUserCurrent";
 import { PostDetail } from "@/components/posts/PostDetail";
+import { toaster } from "@/components/ui/toaster";
 import { graphql } from "@/gql-tada";
 import { PostDetailFragment } from "@/graphql/fragments/posts";
 import type { Route } from "~/react-router/posts/detail/+types/index";
 
 export default function PostDetailRoute(props: Route.ComponentProps) {
+  const { user } = useUserCurrent();
+
   const query = graphql(
     `
       query PostDetail($pk: ID!) {
@@ -16,14 +21,33 @@ export default function PostDetailRoute(props: Route.ComponentProps) {
     [PostDetailFragment],
   );
 
-  const [{ data, error, fetching }] = useQuery({
+  const [{ data, error, fetching }, reexecuteQuery] = useQuery({
     query,
     variables: { pk: props.params.id as string },
   });
-  if (error) {
-  }
+
+  const handleCommentSubmit = async (postId: string, content: string) => {
+    try {
+      await createPostComment({ parentId: postId, content });
+      toaster.success({ title: "Comment posted" });
+      reexecuteQuery({ requestPolicy: "network-only" });
+    } catch (error) {
+      toaster.error({
+        title: "Failed to post comment",
+        description: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  };
 
   return (
-    <PostDetail title="Post" post={data?.post ?? undefined} isLoading={fetching} error={error} />
+    <PostDetail
+      title="Post"
+      post={data?.post ?? undefined}
+      isLoading={fetching}
+      error={error}
+      isAuthenticated={!!user}
+      onCommentSubmit={handleCommentSubmit}
+      onCommentCreated={() => reexecuteQuery({ requestPolicy: "network-only" })}
+    />
   );
 }

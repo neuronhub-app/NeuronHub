@@ -46,13 +46,16 @@ class PostsMutation:
             raise ValueError("Parent is required for creating a comment")
 
         comment = await Post.objects.acreate(
+            type=Post.Type.Comment,
             author=cast(User, user),
-            parent=data.parent.id,
+            parent_id=data.parent.id,
             content=data.content,
             visibility=data.visibility,
         )
-        await sync_to_async(comment.visible_to_users.set)(data.visible_to_users)
-        await sync_to_async(comment.visible_to_groups.set)(data.visible_to_groups)
+        if data.visible_to_users is not strawberry.UNSET:
+            await sync_to_async(comment.visible_to_users.set)(data.visible_to_users)
+        if data.visible_to_groups is not strawberry.UNSET:
+            await sync_to_async(comment.visible_to_groups.set)(data.visible_to_groups)
 
         return cast(PostCommentType, comment)
 

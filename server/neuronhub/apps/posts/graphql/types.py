@@ -115,7 +115,7 @@ class PostCommentType(PostTypeI):
     TYPE = Post.Type.Comment
 
     parent: PostCommentType | None
-    comments: list[PostCommentType]
+    comments: list[PostCommentType] = strawberry_django.field(field_name="children")
 
 
 @strawberry_django.type(PostVote)
@@ -144,7 +144,7 @@ class PostTypeInput:
     recommended_to_users: auto
     recommended_to_groups: auto
 
-    tags: list[PostTagTypeInput]
+    tags: list[PostTagTypeInput] | None
 
     source: auto
 

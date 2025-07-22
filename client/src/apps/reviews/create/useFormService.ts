@@ -11,7 +11,7 @@ export function useFormService() {
       recommend_to,
       visible_to,
       tags,
-      tool: { alternatives, ...toolRest },
+      parent: { alternatives, ...parentRest },
       ...valuesRest
     } = values;
 
@@ -26,14 +26,14 @@ export function useFormService() {
         `),
         {
           input: {
-            tool: {
-              alternatives: alternatives?.map(alternative => ({
-                tool_alternative: { set: alternative.id },
-                is_vote_positive: alternative.is_vote_positive,
-                comment: alternative.comment,
-              })),
-              ...toolRest,
-            },
+            ...valuesRest,
+            ...parentRest,
+
+            alternatives: alternatives
+              ? {
+                  set: alternatives.map(alt => alt.id),
+                }
+              : undefined,
 
             visible_to_users: {
               set: visible_to?.filter(option => option.user).map(user => user.id),
@@ -49,8 +49,13 @@ export function useFormService() {
               set: values.recommend_to?.filter(option => option.group).map(group => group.id),
             },
 
-            ...valuesRest,
-            tags,
+            tags:
+              tags?.map(tag => ({
+                is_vote_positive: tag.is_vote_positive,
+                comment: tag.comment,
+                id: tag.id,
+                name: tag.name,
+              })) || [],
           },
         },
       )

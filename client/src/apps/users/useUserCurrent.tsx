@@ -24,9 +24,7 @@ export function useUserCurrent() {
       const connectionsUniqueMap = new Map(
         connectionsRaw.map(conn => [`${conn.id}-${conn.username}`, conn]),
       );
-      const connectionsUnique = Array.from(connectionsUniqueMap.values());
-
-      user.state.connections = connectionsUnique;
+      user.state.connections = Array.from(connectionsUniqueMap.values());
       user.state.current = data.user_current;
     }
   }, [data]);

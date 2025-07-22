@@ -117,8 +117,8 @@ export namespace ReviewCreateForm {
         z.literal("Program"),
         z.literal("Material"),
         z.literal("Product"),
+        z.literal("SaaS"),
         z.literal("App"),
-        z.literal("Service"),
         z.literal("Other"),
       ]),
       content: z.string().optional(),
@@ -216,7 +216,7 @@ export namespace ReviewCreateForm {
                   size="lg"
                   items={[
                     getToolType("Program", <FaCode />),
-                    getToolType("Service", <FaServer />),
+                    getToolType("SaaS", <FaServer />),
                     getToolType("Material", <FaBook />),
                     getToolType("App", <FaAppStoreIos />),
                     getToolType("Product", <FaShoppingCart />),
@@ -229,7 +229,7 @@ export namespace ReviewCreateForm {
                     A Git repository, with statistics that can be pulled from it
                   </Text>
                 </Show>
-                <Show when={formState.parent.tool_type === "Service"}>
+                <Show when={formState.parent.tool_type === "SaaS"}>
                   <Text color="fg.muted" fontSize="xs">
                     An online service, eg Notion, Claude, Claude API, AWS, GCP, etc
                   </Text>

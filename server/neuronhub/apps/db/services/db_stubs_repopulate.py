@@ -137,7 +137,18 @@ async def _create_review_pycharm(user: User, gen: Gen):
             ReviewTagParams(ReviewTagName.ease_of_use, is_vote_pos=False),
         ],
     )
-    await gen.posts.create(gen.posts.Params(Post.Type.Comment, parent=review, author=user))
+    comment = await gen.posts.create(
+        gen.posts.Params(Post.Type.Comment, parent=review, author=user)
+    )
+    # Add nested comment (reply)
+    await gen.posts.create(
+        gen.posts.Params(
+            Post.Type.Comment,
+            parent=comment,
+            author=user,
+            content="VS Code has better extensions ecosystem, but PyCharm has superior debugging and refactoring capabilities for Python projects.",
+        )
+    )
 
 
 async def _create_review_iterm(user: User, gen: Gen):
@@ -187,6 +198,16 @@ async def _create_review_iterm(user: User, gen: Gen):
         review_experience_hours=7_000,
         visibility=Visibility.PUBLIC,
     )
+    # Add comment to iTerm2 review
+    await gen.posts.create(
+        gen.posts.Params(
+            Post.Type.Comment,
+            parent=review,
+            author=user,
+            content="Have you tried the GPU rendering option? It makes scrolling buttery smooth.",
+        )
+    )
+
     await create_review_tags(
         post=review,
         params=[
