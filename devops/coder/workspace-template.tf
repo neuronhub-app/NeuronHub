@@ -1,4 +1,4 @@
-# version 0.3.0.3
+# version 0.3.0.4
 
 terraform {
   required_providers {
@@ -28,7 +28,6 @@ data "coder_parameter" "git_host" {
   type        = "string"
   description = "domain:port"
   mutable     = true
-  default     = ""
 }
 data "coder_parameter" "git_protocol" {
   name    = "git_protocol"
@@ -95,6 +94,8 @@ resource "coder_agent" "main" {
     if not test -f ~/.init_done
       # Coder setup
       cp -rT /etc/skel ~
+
+      sudo usermod --shell (which fish) (whoami)
 
       chezmoi init --apply ${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${var.git_token}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_dotfiles_repo.value}.git
 
