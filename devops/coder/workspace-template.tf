@@ -1,4 +1,4 @@
-# version 0.3.0.4
+# version 0.3.0.5
 
 terraform {
   required_providers {
@@ -141,7 +141,7 @@ resource "coder_agent" "main" {
   metadata {
     display_name = "Home Disk"
     key          = "3_home_disk"
-    script       = "coder stat disk --path $${HOME}"
+    script       = "coder stat disk --path $HOME"
     interval     = 60
     timeout      = 1
   }
@@ -162,7 +162,6 @@ resource "coder_agent" "main" {
   metadata {
     display_name = "Load Average (Host)"
     key          = "6_load_host"
-    # get load avg scaled by number of cores
     # language=bash
     script       = <<EOT
       echo "`cat /proc/loadavg | awk '{ print $1 }'` `nproc`" | awk '{ printf "%0.2f", $1/$2 }'
@@ -175,7 +174,7 @@ resource "coder_agent" "main" {
     key = "7_swap_host"
     # language=bash
     script       = <<EOT
-      free -b | awk '/^Swap/ { printf("%.1f/%.1f", $3/1024.0/1024.0/1024.0, $2/1024.0/1024.0/1024.0) }'
+      free --bytes | awk '/^Swap/ { printf("%.1f/%.1f\n", $3/1024.0/1024.0/1024.0, $2/1024.0/1024.0/1024.0) }'
     EOT
     interval     = 10
     timeout      = 1
