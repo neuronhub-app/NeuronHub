@@ -2,7 +2,7 @@
 # ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.8.0"
+LABEL version="0.1.8.1"
 
 USER coder
 
@@ -59,13 +59,14 @@ RUN usage --completions fish > $XDG_CONFIG_HOME/fish/completions/usage.fish
 RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 
 
-# Mise exec
+# Mise tools
 # -----------------------------------
+# todo maybe: git clone project's mise.toml
 RUN mise install uv bun
 
-# Warning: `exec` isn't for Docker shell, the docs will mislead you
-
+# Claude
 RUN mise exec bun --command "bun install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"
 
+# Playwright + Chromium
 RUN mise exec uv --command "uv tool install playwright"
-RUN mise exec uv --command "uv tool run playwright install chromium"
+RUN mise exec uv --command "uv tool run playwright install chromium --with-deps"
