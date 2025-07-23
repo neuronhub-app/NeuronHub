@@ -2,7 +2,7 @@
 # ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.8.1"
+LABEL version="0.1.8.2"
 
 USER coder
 
@@ -62,10 +62,12 @@ RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 # Mise tools
 # -----------------------------------
 # todo maybe: git clone project's mise.toml
-RUN mise install uv bun
+RUN sudo apt install --yes gpg-agent # for node
+RUN mise install uv bun node
 
 # Claude
-RUN mise exec bun --command "bun install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"
+RUN mise exec node --command "npm install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"
+RUN mise exec uv --command "uv tool install claude-monitor"
 
 # Playwright + Chromium
 RUN mise exec uv --command "uv tool install playwright"

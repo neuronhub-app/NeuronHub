@@ -14,3 +14,5 @@ __pycache__
 server/.*_cache/
 server/.venv/
 .*_cache/
+
+mise.local.toml

@@ -1,7 +1,13 @@
 ## Dockerfile build
 
-- `sudo docker build --tag {repo}/neuronhub/coder:{version} .`
-- `sudo docker push {repo}/neuronhub/coder:{version} .`
+- `mise run docker-build`
+- `mise run docker-push`
+
+For custom registry create a `mise.local.toml`:
+```toml
+[env]
+    DOCKER_REGISTRY_URL = "ghcr.io"
+```
 
 ## Terraform Template
 
