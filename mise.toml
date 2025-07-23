@@ -7,7 +7,14 @@
 
 
 [tasks.install-deps]
-    depends = ["install-deps-server", "install-deps-client"]
+    depends = [
+        "install-deps-server",
+        "install-deps-client",
+        "install-deps-pytest",
+        "install-deps-pytest-chromium",
+        "install-deps-claude-code",
+    ]
+    alias = "install"
 
     [tasks.install-deps-server]
         dir = "server"
@@ -17,9 +24,19 @@
         dir = "client"
         run = "bun install"
 
+    [tasks.install-deps-pytest]
+        run = "uv tool install playwright"
+
+    [tasks.install-deps-pytest-chromium]
+        run = "uv tool run playwright install chromium --with-deps"
+
+    [tasks.install-deps-claude-code]
+        run = "bun install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"
+
 
 [tasks.dev-start]
     depends = ["dev-db", "dev-server", "dev-client"]
+    alias = ["dev", "start"]
 
     [tasks.dev-server]
         depends = "dev-db"
@@ -40,9 +57,16 @@
 
 
 [tasks.pytest]
+    run = "uv run pytest"
     depends = "dev-db"
     dir = "server"
-    run = "uv run pytest"
+    alias = "test"
+
+[tasks.pytest-playwright]
+    depends = "dev-db"
+    dir = "server"
+    run = "uv run pytest neuronhub/apps/tests/playwright"
+    alias = ["playwright", "e2e"]
 
 [tasks.claude]
     run = "claude --dangerously-skip-permissions"
@@ -51,16 +75,20 @@
 [tasks.db-migrate]
     dir = "server"
     run = "uv run manage.py migrate"
+    alias = "migrate"
 [tasks.db-makemigrations]
     dir = "server"
     run = "uv run manage.py makemigrations"
+    alias = "makemigrations"
 [tasks.db-stubs-repopulate]
     dir = "server"
     run = "uv run manage.py db_stubs_repopulate"
+    alias = ["db_stubs_repopulate", "db-stubs"]
 
 
 [tasks.graphql-gen]
     depends = ["graphql-gen-server", "graphql-gen-client"]
+    alias = ["codegen", "typegen"]
 
     [tasks.graphql-gen-server]
         dir = "server"
@@ -94,14 +122,22 @@
     [tasks.lint-server]
         dir = "server"
         run = "uv run mypy neuronhub"
+        alias = "mypy"
 
     [tasks.lint-client]
         dir = "client"
         run = "bun run tsc --noEmit"
+        alias = "tsc"
 
 
 [tasks.upgrade-deps]
-    depends = ["upgrade-deps-server", "upgrade-deps-client"]
+    depends = [
+        "upgrade-deps-server",
+        "upgrade-deps-client",
+        "upgrade-deps-pytest",
+        "install-deps-pytest-chromium",
+    ]
+    alias = "upgrade"
 
     [tasks.upgrade-deps-server]
         dir = "server"
@@ -113,3 +149,9 @@
             "bun run ncu --upgrade --packageManager",
             "bun install"
         ]
+
+    [tasks.upgrade-deps-pytest]
+        run = "uv tool upgrade playwright"
+
+    [tasks.upgrade-deps-claude-code]
+        run = "bun update --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"

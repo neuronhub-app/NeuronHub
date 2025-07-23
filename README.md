@@ -1,21 +1,23 @@
-READMEs:
-- [server/](/server/README.md)
-- [client/](/client/README.md)
+### Setup
 
-Also see project's [architecture](/docs/architecture.md).
+For complete dev env see [Coder's Dockerfile](/devops/coder/Dockerfile).
 
-### Claude usage
+```shell
+mise install
+mise install-deps
+mise db-migrate
+mise db-stubs-repopulate
+mise dev-start
+```
 
-Keywords
-- `think` 4k tokens
-- `think hard` 10k tokens
-  - also: more, deeply
-- `think harder` 32k tokens
-  - also: longer, intensely
+URLs
+- http://localhost:8000/admin
+- http://localhost:3000
 
-TUI
-- `⌘ V` screenshots of UI designs
+Read [mise.toml](/mise.toml) for more.
 
-Uses
-- fix GitHub CI with `gh`
-- Git history search
+### Docs
+
+- [architecture](/docs/architecture.md)
+- [client/ caveats](/docs/client-caveats.md)
+- [testing setup](/docs/testing-setup.md)

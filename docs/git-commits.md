@@ -1,6 +1,8 @@
 ---
-reviewed_at: 2025.07.21
+reviewed_at: 2025.07.22
 ---
+
+For a good commit: target the case of somebody breaking the code to be able to quickly find the cause by scanning the Git log.
 
 The project is using an iteration over the [conventionalcommits.org](https://www.conventionalcommits.org).
 
@@ -36,9 +38,10 @@ Examples:
 - `gen` - changes to `apps/tests/test_gen::Gen` and `db_stubs_repopulate`
 - `monitor` - Sentry, Datadog, etc
 - `types` - TypeScript or Python typings
-- `E2E` - just Playwright, more precisely - integration tests
+- `E2E` - Playwright, ie integration tests
 - `Docker`
 - `Coder`
+- `Mise` re mise.toml
 
 Unused:
 - `brows` - browser extension
