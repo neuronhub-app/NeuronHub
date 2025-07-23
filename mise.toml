@@ -19,7 +19,6 @@
         "install-deps-pytest-chromium",
         "install-deps-claude-code",
     ]
-    alias = "install"
 
     [tasks.install-deps-server]
         dir = "server"
@@ -41,7 +40,6 @@
 
 [tasks.dev-start]
     depends = ["dev-db", "dev-server", "dev-client"]
-    alias = ["dev", "start"]
 
     [tasks.dev-server]
         depends = "dev-db"
@@ -71,7 +69,6 @@
     depends = "dev-db"
     dir = "server"
     run = "uv run pytest neuronhub/apps/tests/playwright"
-    alias = ["playwright", "e2e"]
 
 
 [tasks.claude]
@@ -84,15 +81,13 @@
 [tasks.db-migrate]
     dir = "server"
     run = "uv run manage.py migrate"
-    alias = "migrate"
 [tasks.db-makemigrations]
     dir = "server"
     run = "uv run manage.py makemigrations"
-    alias = "makemigrations"
 [tasks.db-stubs-repopulate]
     dir = "server"
     run = "uv run manage.py db_stubs_repopulate"
-    alias = ["db_stubs_repopulate", "db-stubs"]
+    alias = ["db_stubs_repopulate"]
 
 
 [tasks.graphql-gen]
@@ -131,12 +126,10 @@
     [tasks.lint-server]
         dir = "server"
         run = "uv run mypy neuronhub"
-        alias = "mypy"
 
     [tasks.lint-client]
         dir = "client"
         run = "bun run tsc --noEmit"
-        alias = "tsc"
 
 
 [tasks.upgrade-deps]
@@ -146,7 +139,6 @@
         "upgrade-deps-pytest",
         "install-deps-pytest-chromium",
     ]
-    alias = "upgrade"
 
     [tasks.upgrade-deps-server]
         dir = "server"
