@@ -73,11 +73,12 @@
     run = "uv run pytest neuronhub/apps/tests/playwright"
     alias = ["playwright", "e2e"]
 
+
 [tasks.claude]
     run = "npx @anthropic-ai/claude-code --dangerously-skip-permissions"
 
 [tasks.ccusage]
-    run = "uv tool run claude-monitor --plan max20 --refresh-rate 2 --time-format 24h --timezone America/Los_Angeles"
+    run = "uv tool run claude-monitor --plan max20 --refresh-rate 1 --time-format 24h --timezone America/Los_Angeles"
 
 
 [tasks.db-migrate]
@@ -96,7 +97,7 @@
 
 [tasks.graphql-gen]
     depends = ["graphql-gen-server", "graphql-gen-client"]
-    alias = ["codegen", "typegen"]
+    alias = ["codegen", "typegen", "gen-graphql"]
 
     [tasks.graphql-gen-server]
         dir = "server"

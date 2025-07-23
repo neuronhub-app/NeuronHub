@@ -8,11 +8,16 @@
 
 ### CLI commands
 
-- `mise pytest`
+- `mise lint` - mypy, tsc, etc
+- `mise format`- ruff, biome
+- `mise pytest` - all tests, accepts paths to tests as args
+- `mise pytest-playwright` - E2E with Chromium, ie runs `uv run pytest neuronhub/apps/tests/playwright`
 - `mise db-migrate`
 - `mise db-stubs-repopulate` - idempotent, a full db state reset to the stub data. Keeps the default `admin` User and his cookie session.
-- `mise gen-graphql` - executes: Ruff, root `/schema.graphql` generation, graphql-codegen, gql-tada, Biome.
+- `mise graphql-gen` - root `/schema.graphql` generation, graphql-codegen, gql-tada
 - Shell utils: rg, fd, bat
+
+Aim to always use Mise: it has all commands, dirs, args, etc.
 
 ### Structure
 
