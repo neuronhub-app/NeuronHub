@@ -5,18 +5,15 @@
 
 ## Terraform Template
 
-On start:
-- Clones or pulls git repo by token
+On start it:
+- Clones/pulls Git repo
 - Runs `mise install-deps` and `mise db-migrate`
 
 Notes:
-- Uses `/var/run/docker.sock`
+- (!) Uses `/var/run/docker.sock`
 - Only `/home/coder/` is persisted
 
-## Prerequisites
-
-(from Coder docs)
-
+Prerequisites (from Coder docs):
 ```sh
 sudo adduser coder docker
 sudo systemctl restart coder
