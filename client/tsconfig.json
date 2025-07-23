@@ -45,5 +45,6 @@
     // include those to let TS fix its type errors
     "react-router.config.ts",
     "vite.config.ts"
-  ]
+  ],
+  "references": [{ "path": "./.react-router" }]
 }
