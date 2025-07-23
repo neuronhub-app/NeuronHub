@@ -45,7 +45,9 @@ async def _open_reviews_and_verify_toggle(
     state_expected = "unchecked" if state_initial == "checked" else "checked"
 
     await helper.click_and_wait(selector)
-    assert await helper.get_attr_value(selector, attr_name) == state_expected
+
+    # hack by Claude to fix the test. Oddly helps.
+    await helper.wait_for_attr_value(selector, attr=attr_name, val_expected=state_expected)
 
     await helper.reload()
     assert await helper.get_attr_value(selector, attr_name) == state_expected

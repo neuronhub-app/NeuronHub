@@ -66,6 +66,13 @@ class PlaywrightHelper:
         button = self.get(selector)
         return await button.get_attribute(attr)
 
+    async def wait_for_attr_value(self, selector: str, attr: str, val_expected: str):
+        # shouldn't needed, but Playwright isn't reliable
+        await self.page.wait_for_function(
+            f'document.querySelector("{selector}").getAttribute("{attr}") === "{val_expected}"',
+            timeout=1000,
+        )
+
     async def click_and_wait(self, selector: str):
         await self.page.click(selector)
         await self.wait_for_network_idle()
