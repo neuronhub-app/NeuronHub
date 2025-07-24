@@ -127,7 +127,7 @@
 
 
 [tasks.lint]
-    depends = ["lint-server", "lint-client"]
+    depends = ["lint-server", "lint-client", "lint-claude"]
 
     [tasks.lint-server]
         dir = "server"
@@ -135,6 +135,10 @@
 
     [tasks.lint-client]
         dir = "client"
+        run = "bun run tsc --noEmit"
+
+    [tasks.lint-claude]
+        dir = ".claude"
         run = "bun run tsc --noEmit"
 
 

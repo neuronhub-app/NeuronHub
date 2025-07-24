@@ -1,11 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ESNext", // ES2020 from Vite, replaced with ESNext for Chakra
-    "module": "ESNext", // ES6 replaced with ESNext for Chakra
+    "target": "ESNext",
+    "moduleResolution": "nodenext",
+    "module": "ESNext",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "skipLibCheck": true,
     "strict": true,
     "baseUrl": ".",
+    "paths": {
+      "@/commands/*": ["commands/*"],
+    },
   },
-  "include": ["build.ts"],
+  "include": ["build.ts", "commands/**/*.ts"],
 }
