@@ -2,7 +2,7 @@
 # ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.8.2"
+LABEL version="0.1.9.0"
 
 USER coder
 
@@ -45,7 +45,7 @@ RUN echo "eval (brew shellenv)" >> $XDG_CONFIG_HOME/fish/config.fish
 
 # CLI tools
 # -----------------------------------
-RUN brew install --force-bottle chezmoi fd bat micro eza delta btop zoxide atuin
+RUN brew install --force-bottle chezmoi fd bat micro eza delta btop zoxide atuin fzf jq
 ENV EDITOR=micro
 
 
@@ -65,9 +65,15 @@ RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 RUN sudo apt install --yes gpg-agent # for node
 RUN mise install uv bun node
 
-# Claude
-RUN mise exec node --command "npm install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"
+# Claude + MCPs: Memory, Thinking, Postgres
+RUN mise exec node --command "npm install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking @modelcontextprotocol/server-postgres"
 RUN mise exec uv --command "uv tool install claude-monitor"
+
+# MCP Context7
+ENV CONTEXT7_CACHE_DIR=$XDG_DATA_HOME/context7/cache
+ENV CONTEXT7_DOCS_DIR=$XDG_DATA_HOME/context7/docs
+RUN mkdir -p $XDG_DATA_HOME/context7/{cache,docs}
+RUN mise exec bun --command "bun install --global @upstash/context7-mcp@latest"
 
 # Playwright + Chromium
 RUN mise exec uv --command "uv tool install playwright"

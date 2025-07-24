@@ -59,10 +59,6 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
 
-    "@anthropic-ai/claude-code": "^1.0.43",
-    "@modelcontextprotocol/server-memory": "^2025.4.25",
-    "@modelcontextprotocol/server-filesystem": "^2025.7.1",
-
     "npm-check-updates": "^18.0.1",
 
     "@redux-devtools/extension": "^3.3.0",

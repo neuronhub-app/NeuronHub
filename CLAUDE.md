@@ -15,9 +15,9 @@
 - `mise db-migrate`
 - `mise db-stubs-repopulate` - idempotent, a full db state reset to the stub data. Keeps the default `admin` User and his cookie session.
 - `mise graphql-gen` - root `/schema.graphql` generation, graphql-codegen, gql-tada
-- Shell utils: rg, fd, bat
-
-Aim to always use Mise: it has all commands, dirs, args, etc.
+- Shell utils you should use when helps: rg, fd, bat, jq, delta, exa
+- The main shell is Fish. You can use Bash too.
+- You MUST always use mise.toml tasks - they have all commands, configs, args, etc.
 
 ### Structure
 
