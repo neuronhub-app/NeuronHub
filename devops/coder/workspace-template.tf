@@ -1,4 +1,4 @@
-# version 0.3.0.6
+# version 0.3.1.0
 
 terraform {
   required_providers {
@@ -15,6 +15,10 @@ terraform {
 variable "git_token" {
   sensitive = true
   type      = string
+}
+variable "timezone" {
+  type        = string
+  default     = "UTC"
 }
 data "coder_parameter" "docker_image_id" {
   name    = "docker_image_id"
@@ -86,6 +90,7 @@ data "coder_workspace_owner" "me" {}
 resource "coder_agent" "main" {
   arch = data.coder_provisioner.me.arch
   os = "linux"
+  env = { TZ = var.timezone }
 
   # language=fish
   startup_script = <<-EOT
@@ -218,7 +223,7 @@ resource "docker_container" "workspace" {
   entrypoint = [
     "sh", "-c", replace(coder_agent.main.init_script, "/localhost|127\\.0\\.0\\.1/", "host.docker.internal")
   ]
-  env = ["CODER_AGENT_TOKEN=${coder_agent.main.token}"]
+  env = ["CODER_AGENT_TOKEN=${coder_agent.main.token}", "TZ=${var.timezone}"]
   host {
     host = "host.docker.internal"
     ip   = "host-gateway"
