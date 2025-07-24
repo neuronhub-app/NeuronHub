@@ -85,9 +85,7 @@ MIDDLEWARE = [
 IS_DEBUG_TOOLBAR_ENABLED = env.bool("IS_DEBUG_TOOLBAR_ENABLED", DEBUG)
 if IS_DEBUG_TOOLBAR_ENABLED:
     INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.insert(
-        0, "strawberry_django.middlewares.debug_toolbar.DebugToolbarMiddleware"
-    )
+    MIDDLEWARE.insert(0, "strawberry_django.middlewares.debug_toolbar.DebugToolbarMiddleware")
     DEBUG_TOOLBAR_PANELS = [
         "debug_toolbar.panels.history.HistoryPanel",
         "debug_toolbar.panels.versions.VersionsPanel",

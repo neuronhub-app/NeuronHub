@@ -25,6 +25,9 @@ export const PostFragment = graphql(
       votes {
         id
         is_vote_positive
+        author {
+          id
+        }
       }
       comments {
         id
@@ -79,6 +82,13 @@ export const PostCommentsFragment = graphql(
         visibility
         created_at
         updated_at
+        votes {
+          id
+          is_vote_positive
+          author {
+            id
+          }
+        }
 
         comments {
           id
@@ -98,6 +108,13 @@ export const PostCommentsFragment = graphql(
           visibility
           created_at
           updated_at
+          votes {
+            id
+            is_vote_positive
+            author {
+              id
+            }
+          }
         }
       }
     }

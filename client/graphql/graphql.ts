@@ -744,16 +744,6 @@ export type Update_User_ListMutationVariables = Exact<{
 
 export type Update_User_ListMutation = { __typename?: "Mutation"; update_user_list: boolean };
 
-export type CreateOrUpdatePostVoteMutationVariables = Exact<{
-  id: Scalars["ID"]["input"];
-  isVotePositive?: InputMaybe<Scalars["Boolean"]["input"]>;
-}>;
-
-export type CreateOrUpdatePostVoteMutation = {
-  __typename?: "Mutation";
-  create_or_update_post_vote: boolean;
-};
-
 type PostFragment_PostCommentType_Fragment = {
   __typename: "PostCommentType";
   id: string;
@@ -772,7 +762,12 @@ type PostFragment_PostCommentType_Fragment = {
     username: string;
     avatar?: { __typename?: "DjangoFileType"; url: string } | null;
   };
-  votes: Array<{ __typename?: "PostVoteType"; id: string; is_vote_positive?: boolean | null }>;
+  votes: Array<{
+    __typename?: "PostVoteType";
+    id: string;
+    is_vote_positive?: boolean | null;
+    author: { __typename?: "UserType"; id: string };
+  }>;
   comments: Array<{
     __typename?: "PostCommentType";
     id: string;
@@ -818,7 +813,12 @@ type PostFragment_PostReviewType_Fragment = {
     username: string;
     avatar?: { __typename?: "DjangoFileType"; url: string } | null;
   };
-  votes: Array<{ __typename?: "PostVoteType"; id: string; is_vote_positive?: boolean | null }>;
+  votes: Array<{
+    __typename?: "PostVoteType";
+    id: string;
+    is_vote_positive?: boolean | null;
+    author: { __typename?: "UserType"; id: string };
+  }>;
   comments: Array<{
     __typename?: "PostCommentType";
     id: string;
@@ -864,7 +864,12 @@ type PostFragment_PostToolType_Fragment = {
     username: string;
     avatar?: { __typename?: "DjangoFileType"; url: string } | null;
   };
-  votes: Array<{ __typename?: "PostVoteType"; id: string; is_vote_positive?: boolean | null }>;
+  votes: Array<{
+    __typename?: "PostVoteType";
+    id: string;
+    is_vote_positive?: boolean | null;
+    author: { __typename?: "UserType"; id: string };
+  }>;
   comments: Array<{
     __typename?: "PostCommentType";
     id: string;
@@ -942,7 +947,12 @@ type PostFragment_PostType_Fragment = {
     username: string;
     avatar?: { __typename?: "DjangoFileType"; url: string } | null;
   };
-  votes: Array<{ __typename?: "PostVoteType"; id: string; is_vote_positive?: boolean | null }>;
+  votes: Array<{
+    __typename?: "PostVoteType";
+    id: string;
+    is_vote_positive?: boolean | null;
+    author: { __typename?: "UserType"; id: string };
+  }>;
   comments: Array<{
     __typename?: "PostCommentType";
     id: string;
@@ -1025,6 +1035,12 @@ type PostCommentsFragment_PostCommentType_Fragment = {
       avatar?: { __typename?: "DjangoFileType"; url: string } | null;
     };
     parent?: { __typename?: "PostCommentType"; id: string } | null;
+    votes: Array<{
+      __typename?: "PostVoteType";
+      id: string;
+      is_vote_positive?: boolean | null;
+      author: { __typename?: "UserType"; id: string };
+    }>;
     comments: Array<{
       __typename: "PostCommentType";
       id: string;
@@ -1040,6 +1056,12 @@ type PostCommentsFragment_PostCommentType_Fragment = {
         avatar?: { __typename?: "DjangoFileType"; url: string } | null;
       };
       parent?: { __typename?: "PostCommentType"; id: string } | null;
+      votes: Array<{
+        __typename?: "PostVoteType";
+        id: string;
+        is_vote_positive?: boolean | null;
+        author: { __typename?: "UserType"; id: string };
+      }>;
     }>;
   }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostCommentType_Fragment" };
@@ -1061,6 +1083,12 @@ type PostCommentsFragment_PostReviewType_Fragment = {
       avatar?: { __typename?: "DjangoFileType"; url: string } | null;
     };
     parent?: { __typename?: "PostCommentType"; id: string } | null;
+    votes: Array<{
+      __typename?: "PostVoteType";
+      id: string;
+      is_vote_positive?: boolean | null;
+      author: { __typename?: "UserType"; id: string };
+    }>;
     comments: Array<{
       __typename: "PostCommentType";
       id: string;
@@ -1076,6 +1104,12 @@ type PostCommentsFragment_PostReviewType_Fragment = {
         avatar?: { __typename?: "DjangoFileType"; url: string } | null;
       };
       parent?: { __typename?: "PostCommentType"; id: string } | null;
+      votes: Array<{
+        __typename?: "PostVoteType";
+        id: string;
+        is_vote_positive?: boolean | null;
+        author: { __typename?: "UserType"; id: string };
+      }>;
     }>;
   }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostReviewType_Fragment" };
@@ -1097,6 +1131,12 @@ type PostCommentsFragment_PostToolType_Fragment = {
       avatar?: { __typename?: "DjangoFileType"; url: string } | null;
     };
     parent?: { __typename?: "PostCommentType"; id: string } | null;
+    votes: Array<{
+      __typename?: "PostVoteType";
+      id: string;
+      is_vote_positive?: boolean | null;
+      author: { __typename?: "UserType"; id: string };
+    }>;
     comments: Array<{
       __typename: "PostCommentType";
       id: string;
@@ -1112,6 +1152,12 @@ type PostCommentsFragment_PostToolType_Fragment = {
         avatar?: { __typename?: "DjangoFileType"; url: string } | null;
       };
       parent?: { __typename?: "PostCommentType"; id: string } | null;
+      votes: Array<{
+        __typename?: "PostVoteType";
+        id: string;
+        is_vote_positive?: boolean | null;
+        author: { __typename?: "UserType"; id: string };
+      }>;
     }>;
   }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostToolType_Fragment" };
@@ -1133,6 +1179,12 @@ type PostCommentsFragment_PostType_Fragment = {
       avatar?: { __typename?: "DjangoFileType"; url: string } | null;
     };
     parent?: { __typename?: "PostCommentType"; id: string } | null;
+    votes: Array<{
+      __typename?: "PostVoteType";
+      id: string;
+      is_vote_positive?: boolean | null;
+      author: { __typename?: "UserType"; id: string };
+    }>;
     comments: Array<{
       __typename: "PostCommentType";
       id: string;
@@ -1148,6 +1200,12 @@ type PostCommentsFragment_PostType_Fragment = {
         avatar?: { __typename?: "DjangoFileType"; url: string } | null;
       };
       parent?: { __typename?: "PostCommentType"; id: string } | null;
+      votes: Array<{
+        __typename?: "PostVoteType";
+        id: string;
+        is_vote_positive?: boolean | null;
+        author: { __typename?: "UserType"; id: string };
+      }>;
     }>;
   }>;
 } & { " $fragmentName"?: "PostCommentsFragment_PostType_Fragment" };
@@ -1229,6 +1287,16 @@ export type PostTagFragmentFragment = {
   tag_parent?: { __typename?: "PostTagType"; id: string; name: string } | null;
   author: { __typename?: "UserType"; id: string; username: string };
 } & { " $fragmentName"?: "PostTagFragmentFragment" };
+
+export type CreateOrUpdatePostVoteMutationVariables = Exact<{
+  id: Scalars["ID"]["input"];
+  isVotePositive?: InputMaybe<Scalars["Boolean"]["input"]>;
+}>;
+
+export type CreateOrUpdatePostVoteMutation = {
+  __typename?: "Mutation";
+  create_or_update_post_vote: boolean;
+};
 
 export const PostTagFragmentFragmentDoc = {
   kind: "Document",
@@ -1342,6 +1410,14 @@ export const PostFragmentFragmentDoc = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
               ],
             },
           },
@@ -1531,6 +1607,25 @@ export const PostCommentsFragmentFragmentDoc = {
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
                 {
                   kind: "Field",
+                  name: { kind: "Name", value: "votes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
                   name: { kind: "Name", value: "comments" },
                   selectionSet: {
                     kind: "SelectionSet",
@@ -1571,6 +1666,27 @@ export const PostCommentsFragmentFragmentDoc = {
                       { kind: "Field", name: { kind: "Name", value: "visibility" } },
                       { kind: "Field", name: { kind: "Name", value: "created_at" } },
                       { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "votes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "author" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -1701,6 +1817,14 @@ export const PostDetailFragmentFragmentDoc = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
               ],
             },
           },
@@ -1825,6 +1949,25 @@ export const PostDetailFragmentFragmentDoc = {
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
                 {
                   kind: "Field",
+                  name: { kind: "Name", value: "votes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
                   name: { kind: "Name", value: "comments" },
                   selectionSet: {
                     kind: "SelectionSet",
@@ -1865,6 +2008,27 @@ export const PostDetailFragmentFragmentDoc = {
                       { kind: "Field", name: { kind: "Name", value: "visibility" } },
                       { kind: "Field", name: { kind: "Name", value: "created_at" } },
                       { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "votes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "author" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -1999,6 +2163,14 @@ export const PostReviewFragmentFragmentDoc = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
               ],
             },
           },
@@ -2195,6 +2367,14 @@ export const PostReviewDetailFragmentFragmentDoc = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
               ],
             },
           },
@@ -2335,6 +2515,25 @@ export const PostReviewDetailFragmentFragmentDoc = {
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
                 {
                   kind: "Field",
+                  name: { kind: "Name", value: "votes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
                   name: { kind: "Name", value: "comments" },
                   selectionSet: {
                     kind: "SelectionSet",
@@ -2375,6 +2574,27 @@ export const PostReviewDetailFragmentFragmentDoc = {
                       { kind: "Field", name: { kind: "Name", value: "visibility" } },
                       { kind: "Field", name: { kind: "Name", value: "created_at" } },
                       { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "votes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "author" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -2530,6 +2750,14 @@ export const PostDetailDocument = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
               ],
             },
           },
@@ -2654,6 +2882,25 @@ export const PostDetailDocument = {
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
                 {
                   kind: "Field",
+                  name: { kind: "Name", value: "votes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
                   name: { kind: "Name", value: "comments" },
                   selectionSet: {
                     kind: "SelectionSet",
@@ -2694,6 +2941,27 @@ export const PostDetailDocument = {
                       { kind: "Field", name: { kind: "Name", value: "visibility" } },
                       { kind: "Field", name: { kind: "Name", value: "created_at" } },
                       { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "votes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "author" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -2869,6 +3137,14 @@ export const PostListDocument = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
               ],
             },
           },
@@ -3341,6 +3617,14 @@ export const PostReviewDetailDocument = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
               ],
             },
           },
@@ -3481,6 +3765,25 @@ export const PostReviewDetailDocument = {
                 { kind: "Field", name: { kind: "Name", value: "updated_at" } },
                 {
                   kind: "Field",
+                  name: { kind: "Name", value: "votes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "author" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
                   name: { kind: "Name", value: "comments" },
                   selectionSet: {
                     kind: "SelectionSet",
@@ -3521,6 +3824,27 @@ export const PostReviewDetailDocument = {
                       { kind: "Field", name: { kind: "Name", value: "visibility" } },
                       { kind: "Field", name: { kind: "Name", value: "created_at" } },
                       { kind: "Field", name: { kind: "Name", value: "updated_at" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "votes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "author" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  { kind: "Field", name: { kind: "Name", value: "id" } },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -3671,6 +3995,14 @@ export const ReviewListDocument = {
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "id" } },
                 { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "author" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                  },
+                },
               ],
             },
           },
