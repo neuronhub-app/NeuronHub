@@ -1,0 +1,21 @@
+[upgrade-deps]
+    depends = [
+        "upgrade-deps-server",
+        "upgrade-deps-client",
+        "upgrade-deps-pytest",
+        "install-deps-pytest-chromium",
+    ]
+
+[upgrade-deps-server]
+    dir = "server"
+    run = "uv lock --upgrade"
+
+[upgrade-deps-client]
+    dir = "client"
+    run = [
+        "bun run ncu --upgrade --packageManager",
+        "bun install"
+    ]
+
+[upgrade-deps-pytest]
+    run = "uv tool upgrade playwright"

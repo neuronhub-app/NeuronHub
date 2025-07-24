@@ -1,0 +1,5 @@
+[claude]
+    run = "npx @anthropic-ai/claude-code --dangerously-skip-permissions"
+
+[claude-monitor]
+    run = "uv tool run claude-monitor --plan max20 --refresh-rate 1 --time-format 24h --timezone America/Los_Angeles"

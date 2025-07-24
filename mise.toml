@@ -6,36 +6,13 @@
 [settings]
     python.uv_venv_auto = true # use uv /server/.venv/, not Mise path
 
-[env]
-    DOCKER_REGISTRY_URL = "ghcr.io"
-    DOCKER_IMAGE_ID = "neuronhub/coder"
-
-
-[tasks.install-deps]
-    depends = [
-        "install-deps-server",
-        "install-deps-client",
-        "install-deps-pytest",
-        "install-deps-pytest-chromium",
-        "install-deps-claude-code",
+[task_config]
+    includes = [
+        "devops/install-deps.mise.toml",
+        "devops/upgrade-deps.mise.toml",
+        "devops/claude.mise.toml",
+        "devops/coder/docker.mise.toml",
     ]
-
-    [tasks.install-deps-server]
-        dir = "server"
-        run = "uv sync"
-
-    [tasks.install-deps-client]
-        dir = "client"
-        run = "bun install"
-
-    [tasks.install-deps-pytest]
-        run = "uv tool install playwright"
-
-    [tasks.install-deps-pytest-chromium]
-        run = "uv tool run playwright install chromium --with-deps"
-
-    [tasks.install-deps-claude-code]
-        run = "npm install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"
 
 
 [tasks.dev-start]
@@ -60,10 +37,9 @@
 
 
 [tasks.pytest]
-    run = "uv run pytest"
-    depends = "dev-db"
     dir = "server"
-    alias = "test"
+    depends = "dev-db"
+    run = "uv run pytest"
 
 [tasks.pytest-playwright]
     depends = "dev-db"
@@ -71,25 +47,17 @@
     run = "uv run pytest neuronhub/apps/tests/playwright"
 
 
-[tasks.claude]
-    run = "npx @anthropic-ai/claude-code --dangerously-skip-permissions"
-[tasks.claude-monitor]
-    run = "uv tool run claude-monitor --plan max20 --refresh-rate 1 --time-format 24h --timezone America/Los_Angeles"
-[tasks.claude-build]
-    dir = ".claude"
-    run = "bun run build.ts"
-
-
 [tasks.db-migrate]
     dir = "server"
     run = "uv run manage.py migrate"
+
 [tasks.db-makemigrations]
     dir = "server"
     run = "uv run manage.py makemigrations"
+
 [tasks.db-stubs-repopulate]
     dir = "server"
     run = "uv run manage.py db_stubs_repopulate"
-    alias = ["db_stubs_repopulate"]
 
 
 [tasks.graphql-gen]
@@ -132,35 +100,3 @@
     [tasks.lint-client]
         dir = "client"
         run = "bun run tsc --noEmit"
-
-
-[tasks.upgrade-deps]
-    depends = [
-        "upgrade-deps-server",
-        "upgrade-deps-client",
-        "upgrade-deps-pytest",
-        "install-deps-pytest-chromium",
-    ]
-
-    [tasks.upgrade-deps-server]
-        dir = "server"
-        run = "uv lock --upgrade"
-
-    [tasks.upgrade-deps-client]
-        dir = "client"
-        run = [
-            "bun run ncu --upgrade --packageManager",
-            "bun install"
-        ]
-
-    [tasks.upgrade-deps-pytest]
-        run = "uv tool upgrade playwright"
-
-
-[tasks.docker-build]
-    dir = "devops/coder"
-    run = "sudo docker build --tag $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_ID:{{option(name='version', default='latest')}} ."
-
-[tasks.docker-push]
-    dir = "devops/coder"
-    run = "sudo docker push $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_ID:{{option(name='version', default='latest')}}"
