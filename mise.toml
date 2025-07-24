@@ -73,9 +73,11 @@
 
 [tasks.claude]
     run = "npx @anthropic-ai/claude-code --dangerously-skip-permissions"
-
-[tasks.ccusage]
+[tasks.claude-monitor]
     run = "uv tool run claude-monitor --plan max20 --refresh-rate 1 --time-format 24h --timezone America/Los_Angeles"
+[tasks.claude-build]
+    dir = ".claude"
+    run = "bun run build.ts"
 
 
 [tasks.db-migrate]
@@ -109,7 +111,7 @@
 
 
 [tasks.format]
-    depends = ["format-server", "format-client"]
+    depends = ["format-server", "format-client", "format-claude"]
 
     [tasks.format-server]
         dir = "server"
@@ -118,6 +120,10 @@
     [tasks.format-client]
         dir = "client"
         run = "bun run biome check --write"
+
+    [tasks.format-claude]
+        dir = ".claude"
+        run = "bun run biome check --write --unsafe"
 
 
 [tasks.lint]

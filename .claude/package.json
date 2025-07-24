@@ -1,0 +1,11 @@
+{
+  "name": "claude-builder",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@biomejs/biome": "^2.1.2",
+    "typescript": "^5.8.3",
+    "@types/bun": "^1.2.19",
+    "npm-check-updates": "^18.0.2"
+  }
+}
