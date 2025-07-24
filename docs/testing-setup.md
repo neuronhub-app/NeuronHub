@@ -2,7 +2,7 @@
 
 ### Pytest
 
-Use a subclass `NeuronTestCase`, importing from [test_cases](/server/neuronhub/apps/tests/test_cases.py):
+Use a subclass `NeuronTestCase`, importing from [test_cases](/server/neuronhub/apps/tests/test_cases.py), its code looks as:
 
 ```python
 class NeuronTestCase(TestCase):
@@ -22,12 +22,18 @@ class NeuronTestCase(TestCase):
 - Store tests nearby their target with `__test` postfix, eg [](/server/neuronhub/apps/posts/services/filter_posts_by_user.py) is covered by [](/server/neuronhub/apps/posts/services/filter_posts_by_user__test.py).
 - always use `async`/`await`
 
+#### Read Pytest Rich Output
+
+Rich is set for stacktraces, incl local vars, source, coloring.
+
 #### [Gen](/server/neuronhub/apps/tests/test_gen.py)
 
 All fields of `Gen` are designed as optional with fallbacks.
 - we can easily create many `review = await self.gen.posts.create(self.gen.posts.Params(type=Post.Type.Review))`
 - `author` by default is always `self.gen.users.user_default`
 - most of fields are populated by `faker.gen`
+
+Add more generators when needed for more than one test function. Esp if for several files.
 
 ##### Source code and usage
 ```python
@@ -50,11 +56,11 @@ review_2 = await self.gen.posts.create(self.gen.posts.Params(type=Post.Type.Revi
 
 ### Playwright
 
-- The biggest issue in E2E is maintenance cost - keep them lean.
+- The biggest issue in E2E is the maintenance cost, and the critical feedback slowdown caused by redundant double-testing. 
 - We store E2E tests in [](/server/neuronhub/apps/tests/playwright/). For a simple example see [](/server/neuronhub/apps/tests/playwright/test_vote_and_reading_list.py).
-- The [conftest](/server/neuronhub/apps/tests/playwright/conftest.py) starts the Vite server and links it to Django's test LiveServer on port `8001` - ie you have no need to run any bg processes for Django/Vite - just run pytest as intended.
+- The [conftest](/server/neuronhub/apps/tests/playwright/conftest.py) starts the Vite server and links it to Django's test LiveServer on port `8001` - ie you have no need to run any bg processes for Django/Vite - just run `mise pytest-playwright` as intended.
 
 Notes
 - Frontend is using Django cookie auth from `/admin/login/` - CORS 100% works.
-- `PlaywrightHelper` contains few functions that always end with `wait_for_load_state("networkidle")`.
-- If you need `wait_for_timeout` - your code's shit.
+- `PlaywrightHelper` contains few functions that always end with `wait_for_load_state("networkidle")` - no need to repeat it.
+- If you need `wait_for_timeout` - the code is shit and needs fixes.
