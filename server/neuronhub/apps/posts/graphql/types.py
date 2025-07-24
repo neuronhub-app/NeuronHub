@@ -58,9 +58,15 @@ class PostTypeI:
     recommended_to_users: list[UserType]
     recommended_to_groups: list[UserConnectionGroupType]
 
-    tags: list[PostTagType]
-    votes: list[PostVoteType]
-    tag_votes: list[PostTagVoteType]
+    tags: list[PostTagType] = strawberry_django.field(
+        prefetch_related=["author", "votes"]
+    )
+    votes: list[PostVoteType] = strawberry_django.field(
+        prefetch_related=["author"]
+    )
+    tag_votes: list[PostTagVoteType] = strawberry_django.field(
+        prefetch_related=["tag_votes__tag", "tag_votes__author"]
+    )
 
     company: auto
     domain: auto
@@ -184,7 +190,9 @@ class PostTagType:
     id: auto
     posts: list[PostType]
     tag_parent: PostTagType | None
-    votes: list[PostTagVoteType]
+    votes: list[PostTagVoteType] = strawberry_django.field(
+        prefetch_related=["author"]
+    )
     tag_children: list[PostTagType]
     author: UserType
 
@@ -206,6 +214,7 @@ class PostTagType:
 @strawberry_django.type(PostTagVote)
 class PostTagVoteType:
     id: auto
+    tag: PostTagType
     author: UserType
 
     is_vote_positive: auto
