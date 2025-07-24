@@ -1,8 +1,0 @@
-{
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "context7",
-    "memory",
-    "sequential-thinking"
-  ]
-}

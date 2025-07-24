@@ -111,7 +111,7 @@
 
 
 [tasks.format]
-    depends = ["format-server", "format-client", "format-claude"]
+    depends = ["format-server", "format-client"]
 
     [tasks.format-server]
         dir = "server"
@@ -121,13 +121,9 @@
         dir = "client"
         run = "bun run biome check --write"
 
-    [tasks.format-claude]
-        dir = ".claude"
-        run = "bun run biome check --write --unsafe"
-
 
 [tasks.lint]
-    depends = ["lint-server", "lint-client", "lint-claude"]
+    depends = ["lint-server", "lint-client"]
 
     [tasks.lint-server]
         dir = "server"
@@ -135,10 +131,6 @@
 
     [tasks.lint-client]
         dir = "client"
-        run = "bun run tsc --noEmit"
-
-    [tasks.lint-claude]
-        dir = ".claude"
         run = "bun run tsc --noEmit"
 
 
@@ -163,9 +155,6 @@
 
     [tasks.upgrade-deps-pytest]
         run = "uv tool upgrade playwright"
-
-    [tasks.upgrade-deps-claude-code]
-        run = "npm update --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"
 
 
 [tasks.docker-build]
