@@ -11,7 +11,7 @@ export function useFormService() {
       recommend_to,
       visible_to,
       tags,
-      parent: { alternatives, ...parentRest },
+      parent: { alternatives, name, ...parentRest },
       ...valuesRest
     } = values;
 
@@ -19,7 +19,7 @@ export function useFormService() {
       .mutation(
         graphql(`
           mutation CreatePostReview($input: PostTypeInput!) {
-            create_post(data: $input) {
+            create_post_review(data: $input) {
               id
             }
           }
@@ -27,7 +27,10 @@ export function useFormService() {
         {
           input: {
             ...valuesRest,
-            ...parentRest,
+            parent: {
+              ...parentRest,
+              title: name, // Map 'name' to 'title' for the parent tool
+            },
 
             alternatives: alternatives
               ? {
@@ -64,7 +67,10 @@ export function useFormService() {
       captureException(res.error);
       return { success: false, error: res.error.message } as const;
     }
-    return { success: true } as const;
+    if (!res.data?.create_post_review?.id) {
+      return { success: false, error: "Review creation failed - no ID returned" } as const;
+    }
+    return { success: true, reviewId: res.data.create_post_review.id } as const;
   }
   return {
     send: sendSubmitMutation,

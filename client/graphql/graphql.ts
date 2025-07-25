@@ -73,9 +73,9 @@ export type ManyToOneInput = {
 export type Mutation = {
   __typename?: "Mutation";
   create_or_update_post_vote: Scalars["Boolean"]["output"];
-  create_post: UserType;
+  create_post: PostType;
   create_post_comment: PostCommentType;
-  create_post_review: UserType;
+  create_post_review: PostType;
   logout: Scalars["Boolean"]["output"];
   update_post: PostType;
   update_post_seen_status: Scalars["Boolean"]["output"];
@@ -436,7 +436,7 @@ export type PostTypeInput = {
   reviewed_at?: InputMaybe<Scalars["DateTime"]["input"]>;
   seen_by_users?: InputMaybe<ManyToManyInput>;
   source?: InputMaybe<Scalars["String"]["input"]>;
-  tags: Array<PostTagTypeInput>;
+  tags?: InputMaybe<Array<PostTagTypeInput>>;
   title?: InputMaybe<Scalars["String"]["input"]>;
   tool_type?: InputMaybe<ToolType>;
   url?: InputMaybe<Scalars["String"]["input"]>;
@@ -665,7 +665,7 @@ export type CreatePostReviewMutationVariables = Exact<{
 
 export type CreatePostReviewMutation = {
   __typename?: "Mutation";
-  create_post: { __typename?: "UserType"; id: string };
+  create_post_review: { __typename?: "PostType"; id: string };
 };
 
 export type PostReviewDetailQueryVariables = Exact<{
@@ -3176,7 +3176,7 @@ export const CreatePostReviewDocument = {
         selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "create_post" },
+            name: { kind: "Name", value: "create_post_review" },
             arguments: [
               {
                 kind: "Argument",

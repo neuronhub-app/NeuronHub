@@ -23,20 +23,20 @@ class PostsMutation:
         self,
         data: PostTypeInput,
         info: Info,
-    ) -> UserType:
+    ) -> PostType:
         author: User = info.context.request.user
         review = await create_post_review(author, data)
-        return cast(UserType, author)
+        return cast(PostType, review)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def create_post_review(
         self,
         data: PostTypeInput,
         info: Info,
-    ) -> UserType:
+    ) -> PostType:
         author: User = info.context.request.user
         review = await create_post_review(author, data)
-        return cast(UserType, author)
+        return cast(PostType, review)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def create_post_comment(self, data: PostTypeInput, info: Info) -> PostCommentType:

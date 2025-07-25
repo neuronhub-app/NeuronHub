@@ -69,8 +69,8 @@ type Mutation {
   logout: Boolean!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   update_user_list(id: ID!, list_field_name: UserListName!, is_added: Boolean!): Boolean! @IsAuthenticated
-  create_post(data: PostTypeInput!): UserType! @IsAuthenticated
-  create_post_review(data: PostTypeInput!): UserType! @IsAuthenticated
+  create_post(data: PostTypeInput!): PostType! @IsAuthenticated
+  create_post_review(data: PostTypeInput!): PostType! @IsAuthenticated
   create_post_comment(data: PostTypeInput!): PostCommentType! @IsAuthenticated
   update_post(data: PostTypeInput!): PostType! @IsAuthenticated
   create_or_update_post_vote(id: ID!, is_vote_positive: Boolean, is_changed_my_mind: Boolean = null): Boolean! @IsAuthenticated
@@ -350,7 +350,7 @@ input PostTypeInput {
   visible_to_groups: ManyToManyInput
   recommended_to_users: ManyToManyInput
   recommended_to_groups: ManyToManyInput
-  tags: [PostTagTypeInput!]!
+  tags: [PostTagTypeInput!]
   source: String
   seen_by_users: ManyToManyInput
   review_usage_status: UsageStatus

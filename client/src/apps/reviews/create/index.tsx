@@ -32,6 +32,7 @@ import {
 import { HiLockClosed, HiOutlineClock } from "react-icons/hi2";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
+import { useNavigate } from "react-router";
 import { useClient } from "urql";
 import { proxy } from "valtio";
 import { useProxy } from "valtio/utils";
@@ -181,6 +182,7 @@ export namespace ReviewCreateForm {
 
     const client = useClient();
     const formService = useFormService();
+    const navigate = useNavigate();
     const $state = useProxy(state);
     const formState = form.watch();
 
@@ -188,6 +190,7 @@ export namespace ReviewCreateForm {
       const res = await formService.send(values);
       if (res.success) {
         toast.success("Review added");
+        navigate(`/reviews/${res.reviewId}`);
       } else {
         toast.error(res.error);
       }
