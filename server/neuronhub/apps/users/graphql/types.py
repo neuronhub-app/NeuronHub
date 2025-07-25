@@ -26,8 +26,12 @@ class UserType:
     connection_groups: list[UserConnectionGroupType]
     avatar: auto
 
-    post_votes: list[PostVoteTypeLazy]
-    post_tag_votes: list[PostTagVoteTypeLazy]
+    post_votes: list[PostVoteTypeLazy] = strawberry_django.field(
+        prefetch_related=["post", "author"]
+    )
+    post_tag_votes: list[PostTagVoteTypeLazy] = strawberry_django.field(
+        prefetch_related=["post", "tag", "author"]
+    )
 
     read_later: auto
     library: auto

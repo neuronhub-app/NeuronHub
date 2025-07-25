@@ -1,4 +1,4 @@
-import { For, Heading, HStack, Stack, Text } from "@chakra-ui/react";
+import { For, Heading, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import type { CombinedError } from "urql";
 import { CommentCreateForm } from "@/components/posts/CommentCreateForm";

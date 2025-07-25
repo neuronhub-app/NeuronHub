@@ -259,6 +259,8 @@ export type PostTagVoteType = {
   id: Scalars["ID"]["output"];
   is_changed_my_mind: Scalars["Boolean"]["output"];
   is_vote_positive?: Maybe<Scalars["Boolean"]["output"]>;
+  post: PostTypeI;
+  tag: PostTagType;
 };
 
 export type PostToolType = PostTypeI & {

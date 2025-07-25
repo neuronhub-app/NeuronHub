@@ -14,7 +14,8 @@ class DbStubsRepopulateTest(NeuronTestCase):
         assert await Post.reviews.all().afirst()
 
     async def test_create_review_tags_bug(self):
-        """Test that demonstrates the bug in create_review_tags function.
+        """
+        Test that demonstrates the bug in create_review_tags function.
 
         This test should FAIL initially, showing that all review tags
         are created as 'expectations' instead of their intended names.

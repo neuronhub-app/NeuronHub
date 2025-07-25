@@ -214,6 +214,7 @@ class PostTagType:
 @strawberry_django.type(PostTagVote)
 class PostTagVoteType:
     id: auto
+    post: PostTypeI
     tag: PostTagType
     author: UserType
 

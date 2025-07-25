@@ -186,6 +186,8 @@ input PostTagTypeInput {
 
 type PostTagVoteType {
   id: ID!
+  post: PostTypeI!
+  tag: PostTagType!
   author: UserType!
   is_vote_positive: Boolean
   is_changed_my_mind: Boolean!
