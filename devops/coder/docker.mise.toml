@@ -1,13 +1,13 @@
 # $schema: https://mise.jdx.dev/schema/mise-task.json
 
 [docker-build]
-dir = "devops/coder"
-env.DOCKER_REGISTRY_URL = "ghcr.io"
-env.DOCKER_IMAGE_ID = "neuronhub/coder"
-run = "sudo docker build --tag $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_ID:{{option(name='version', default='latest')}} ."
+    dir = "devops/coder"
+    env.DOCKER_REGISTRY_URL = "ghcr.io"
+    env.DOCKER_IMAGE_ID = "neuronhub/coder"
+    run = "sudo docker build --tag $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_ID:{{option(name='version', default='latest')}} ."
 
 [docker-push]
-dir = "devops/coder"
-env.DOCKER_REGISTRY_URL = "ghcr.io"
-env.DOCKER_IMAGE_ID = "neuronhub/coder"
-run = "sudo docker push $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_ID:{{option(name='version', default='latest')}}"
+    dir = "devops/coder"
+    env.DOCKER_REGISTRY_URL = "ghcr.io"
+    env.DOCKER_IMAGE_ID = "neuronhub/coder"
+    run = "sudo docker push $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_ID:{{option(name='version', default='latest')}}"

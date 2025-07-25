@@ -67,6 +67,8 @@ RUN mise install uv bun node
 
 # Claude + MCPs: Memory, Thinking, Postgres
 RUN mise exec node --command "npm install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking @modelcontextprotocol/server-postgres"
+RUN mise exec node --command "claude config set --global verbose true"
+RUN mise exec node --command "claude config set --global preferredNotifChannel terminal_bell"
 RUN mise exec uv --command "uv tool install claude-monitor"
 
 # MCP Context7

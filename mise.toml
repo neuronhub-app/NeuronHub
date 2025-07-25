@@ -89,6 +89,10 @@
         dir = "client"
         run = "bun run biome check --write"
 
+    [tasks.format-client-unsafe]
+        dir = "client"
+        run = "bun run biome check --write --unsafe"
+
 
 [tasks.lint]
     depends = ["lint-server", "lint-client"]
