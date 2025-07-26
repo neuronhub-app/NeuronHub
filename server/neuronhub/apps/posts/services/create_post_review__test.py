@@ -89,7 +89,6 @@ class CreatePostReviewServiceTest(NeuronTestCase):
         assert tag_parent == infra_tag
         assert infra_tag.tag_parent is None
         
-        # Also test multi-level tag name parsing
         data2 = PostTypeInput(
             parent=PostTypeInput(title="Docker", tool_type=Post.ToolType.Program),
             title="Great for containers",
@@ -100,7 +99,6 @@ class CreatePostReviewServiceTest(NeuronTestCase):
         
         review2 = await create_post_review(self.user, data2)
         
-        # For multi-level, it should create parent=DevOps, child=Orchestration
         orchestration_tag = await PostTag.objects.aget(name="Orchestration")
         devops_tag = await PostTag.objects.aget(name="DevOps")
         
@@ -136,7 +134,7 @@ class CreatePostReviewServiceTest(NeuronTestCase):
         
         vote = await PostTagVote.objects.aget(post=tool, tag=python_tag, author=self.user)
         assert vote.comment == "Updated comment"
-        assert vote.is_vote_positive is True  # Preserved
+        assert vote.is_vote_positive is True
 
     async def test_requires_parent_tool(self):
         from django.core.exceptions import ValidationError
