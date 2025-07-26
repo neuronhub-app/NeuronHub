@@ -61,6 +61,13 @@ export const UserQueryDoc = graphql(`
         id
         is_vote_positive
         is_changed_my_mind
+        post {
+          id
+        }
+        tag {
+          id
+          name
+        }
       }
 
       connection_groups {

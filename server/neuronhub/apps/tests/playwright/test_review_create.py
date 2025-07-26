@@ -45,6 +45,9 @@ async def test_review_create_happy_path(
     # Submit form
     await helper.click_and_wait('button[type="submit"]')
     
+    # Wait for navigation to complete (form submission + redirect)
+    await page.wait_for_timeout(1000)
+    
     # Verify redirect to review detail page
     current_url = page.url
     assert "/reviews/" in current_url and "create" not in current_url, f"Expected redirect to review detail page, but on {current_url}"

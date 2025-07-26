@@ -723,6 +723,12 @@ export type UserCurrentQuery = {
       id: string;
       is_vote_positive?: boolean | null;
       is_changed_my_mind: boolean;
+      post:
+        | { __typename?: "PostCommentType"; id: string }
+        | { __typename?: "PostReviewType"; id: string }
+        | { __typename?: "PostToolType"; id: string }
+        | { __typename?: "PostType"; id: string };
+      tag: { __typename?: "PostTagType"; id: string; name: string };
     }>;
     connection_groups: Array<{
       __typename?: "UserConnectionGroupType";
@@ -4169,6 +4175,25 @@ export const UserCurrentDocument = {
                       { kind: "Field", name: { kind: "Name", value: "id" } },
                       { kind: "Field", name: { kind: "Name", value: "is_vote_positive" } },
                       { kind: "Field", name: { kind: "Name", value: "is_changed_my_mind" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "post" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [{ kind: "Field", name: { kind: "Name", value: "id" } }],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "tag" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            { kind: "Field", name: { kind: "Name", value: "id" } },
+                            { kind: "Field", name: { kind: "Name", value: "name" } },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
