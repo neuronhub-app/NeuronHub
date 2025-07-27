@@ -58,12 +58,8 @@ class PostTypeI:
     recommended_to_users: list[UserType]
     recommended_to_groups: list[UserConnectionGroupType]
 
-    tags: list[PostTagType] = strawberry_django.field(
-        prefetch_related=["author", "votes"]
-    )
-    votes: list[PostVoteType] = strawberry_django.field(
-        prefetch_related=["author"]
-    )
+    tags: list[PostTagType] = strawberry_django.field(prefetch_related=["author", "votes"])
+    votes: list[PostVoteType] = strawberry_django.field(prefetch_related=["author"])
     tag_votes: list[PostTagVoteType] = strawberry_django.field(
         prefetch_related=["tag_votes__tag", "tag_votes__author"]
     )
@@ -190,9 +186,7 @@ class PostTagType:
     id: auto
     posts: list[PostType]
     tag_parent: PostTagType | None
-    votes: list[PostTagVoteType] = strawberry_django.field(
-        prefetch_related=["author"]
-    )
+    votes: list[PostTagVoteType] = strawberry_django.field(prefetch_related=["author"])
     tag_children: list[PostTagType]
     author: UserType
 
@@ -201,10 +195,11 @@ class PostTagType:
     is_important: auto
     is_review_tag: auto
 
-    @strawberry.field
+    @strawberry.field()
     def label(self) -> str:
         if self.is_review_tag:
             try:
+                # noinspection PyTypeChecker
                 return ReviewTagName(self.name).label
             except ValueError:
                 return self.name

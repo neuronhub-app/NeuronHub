@@ -70,7 +70,7 @@ export function useFormService() {
     if (!res.data?.create_post_review?.id) {
       return { success: false, error: "Review creation failed - no ID returned" } as const;
     }
-    
+
     return { success: true, reviewId: res.data.create_post_review.id } as const;
   }
   return {
