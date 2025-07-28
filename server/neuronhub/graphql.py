@@ -22,6 +22,7 @@ field_type_map.update(
 # import types relying on field_type_map
 from neuronhub.apps.posts.graphql.mutations import PostsMutation
 from neuronhub.apps.posts.graphql.resolvers import PostsQuery
+from neuronhub.apps.tests.graphql.mutations import TestsMutation
 from neuronhub.apps.users.graphql.mutations import UserMutation
 from neuronhub.apps.users.graphql.resolvers import UsersQuery
 
@@ -57,7 +58,7 @@ Query = merge_types(
 
 
 @strawberry.type
-class Mutation(UserMutation, PostsMutation):
+class Mutation(UserMutation, PostsMutation, TestsMutation):
     pass
 
 

@@ -8,7 +8,8 @@ class TestPostTagVoteGraphQL(NeuronTestCase):
             self.gen.posts.Params(type=Post.Type.Tool, title="Test Tool")
         )
 
-        tag = await PostTag.objects.acreate(name="TestTag", author=self.user)
+        tag = await self.gen.posts.tag(name="TestTag")
+        await post.tags.aadd(tag)
 
         await PostTagVote.objects.acreate(
             post=post, tag=tag, author=self.user, is_vote_positive=True
@@ -56,13 +57,13 @@ class TestPostTagVoteGraphQL(NeuronTestCase):
             self.gen.posts.Params(type=Post.Type.Tool, title="Test Tool with Tags")
         )
 
-        tag1 = await PostTag.objects.acreate(name="Tag1", author=self.user)
-        tag2 = await PostTag.objects.acreate(name="Tag2", author=self.user)
+        tag1 = await self.gen.posts.tag(name="Tag1")
+        tag2 = await self.gen.posts.tag(name="Tag2")
+        await post.tags.aadd(tag1, tag2)
 
         await PostTagVote.objects.acreate(
             post=post, tag=tag1, author=self.user, is_vote_positive=True
         )
-
         await PostTagVote.objects.acreate(
             post=post, tag=tag2, author=self.user, is_vote_positive=False
         )

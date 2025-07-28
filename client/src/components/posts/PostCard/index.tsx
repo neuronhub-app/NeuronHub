@@ -6,6 +6,7 @@ import { UsageStatusBlock } from "@/apps/reviews/PostReviewCard/UsageStatus";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { Prose } from "@/components/ui/prose";
+import { ids } from "@/e2e/ids";
 import { isPostReviewType } from "@/graphql/fragments/reviews";
 
 // todo refac: has too many isPostReviewType() → must
@@ -13,9 +14,9 @@ export function PostCard(props: { post: PostListItemType }) {
   const post = props.post;
 
   return (
-    <Stack gap="gap.sm" data-testid="post-card">
+    <Stack gap="gap.sm" {...ids.set(ids.post.card.container)}>
       <PostDatetime datetimeStr={isPostReviewType(post) ? post.reviewed_at : post.updated_at} />
-      <Text data-testid="post-type" display="none">
+      <Text {...ids.set(ids.post.card.type)} display="none">
         {isPostReviewType(post) ? "Review" : "Post"}
       </Text>
 
@@ -25,7 +26,10 @@ export function PostCard(props: { post: PostListItemType }) {
         </Heading>
       )}
 
-      <NavLink to={isPostReviewType(post) ? `/reviews/${post.id}` : `/posts/${post.id}`}>
+      <NavLink
+        to={isPostReviewType(post) ? `/reviews/${post.id}` : `/posts/${post.id}`}
+        {...ids.set(ids.post.card.link)}
+      >
         <Text fontWeight="bold" color="fg.muted">
           {post.title}
         </Text>

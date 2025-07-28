@@ -13,6 +13,7 @@ export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
   optionalText?: ReactNode;
   isShowIconMarkdown?: boolean;
   fieldProps?: Omit<ChakraField.RootProps, "label">;
+  "data-testid"?: string;
 }) {
   const { field, fieldState } = useController(props.field);
 
@@ -31,6 +32,7 @@ export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
           autoresize
           placeholder={props.placeholder}
           aria-invalid={!!fieldState.error}
+          data-testid={props["data-testid"]}
           _hover={{
             borderColor: "gray.300",
             _dark: { borderColor: "gray.700" },

@@ -1,5 +1,6 @@
 import { HStack, IconButton, Text } from "@chakra-ui/react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import { usePostVote } from "@/hooks/usePostVote";
 
@@ -29,7 +30,7 @@ export function CommentVoteBar({ comment }: CommentVoteBarProps) {
         loading={isLoadingUpvote}
         onClick={() => toggleVote(true)}
         data-state={isVotePositive === true ? "checked" : "unchecked"}
-        className="comment-upvote"
+        {...ids.set(ids.comment.vote.up)}
         aria-label="Upvote comment"
       >
         <FaChevronUp />
@@ -43,7 +44,7 @@ export function CommentVoteBar({ comment }: CommentVoteBarProps) {
         loading={isLoadingDownvote}
         onClick={() => toggleVote(false)}
         data-state={isVotePositive === false ? "checked" : "unchecked"}
-        className="comment-downvote"
+        {...ids.set(ids.comment.vote.down)}
         aria-label="Downvote comment"
       >
         <FaChevronDown />

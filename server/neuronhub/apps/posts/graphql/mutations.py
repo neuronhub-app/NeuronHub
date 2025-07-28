@@ -12,6 +12,7 @@ from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models.posts import PostVote
 from neuronhub.apps.posts.services.create_post_review import create_post_review
+from neuronhub.apps.posts.services.create_post_comment import create_post_comment
 from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.models import User
 
@@ -45,17 +46,23 @@ class PostsMutation:
         if not data.parent:
             raise ValueError("Parent is required for creating a comment")
 
-        comment = await Post.objects.acreate(
-            type=Post.Type.Comment,
+        parent = await Post.objects.aget(id=data.parent.id)
+
+        visible_to_users = (
+            None if data.visible_to_users is strawberry.UNSET else data.visible_to_users
+        )
+        visible_to_groups = (
+            None if data.visible_to_groups is strawberry.UNSET else data.visible_to_groups
+        )
+
+        comment = await create_post_comment(
             author=cast(User, user),
-            parent_id=data.parent.id,
+            parent=parent,
             content=data.content,
             visibility=data.visibility,
+            visible_to_users=visible_to_users,
+            visible_to_groups=visible_to_groups,
         )
-        if data.visible_to_users is not strawberry.UNSET:
-            await sync_to_async(comment.visible_to_users.set)(data.visible_to_users)
-        if data.visible_to_groups is not strawberry.UNSET:
-            await sync_to_async(comment.visible_to_groups.set)(data.visible_to_groups)
 
         return cast(PostCommentType, comment)
 

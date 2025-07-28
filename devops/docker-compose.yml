@@ -3,7 +3,7 @@
 name: neuronhub
 
 services:
-  postgres:
+  db:
     image: postgres:17-alpine
     environment:
       POSTGRES_DB: neuronhub

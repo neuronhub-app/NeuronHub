@@ -1,10 +1,11 @@
 [tools]
     bun = "latest"
     uv = "latest"
-    node = "latest"
+    claude = "latest"
+        node = "latest"
 
 [settings]
-    python.uv_venv_auto = true # use uv /server/.venv/, not Mise path
+    python.uv_venv_auto = true # use uv /server/.venv/ instead of Mise
 
 [task_config]
     includes = [
@@ -12,6 +13,7 @@
         "devops/upgrade-deps.mise.toml",
         "devops/claude.mise.toml",
         "devops/coder/docker.mise.toml",
+        "client/e2e/e2e.mise.toml",
     ]
 
 
@@ -29,11 +31,13 @@
         run = "bun run dev --host"
 
     [tasks.dev-db]
-        description = "start docker db, idempotently"
-        run = "sudo docker compose --file ./devops/docker-compose.dev-db.yml up --detach"
+        dir = "devops"
+        run = "sudo docker compose up db --detach"
+        silent = true
 
     [tasks.dev-db-stop]
-        run = "sudo docker compose --file ./devops/docker-compose.dev-db.yml down"
+        dir = "devops"
+        run = "sudo docker compose down db"
 
 
 [tasks.pytest]
@@ -41,11 +45,11 @@
     depends = "dev-db"
     run = "uv run pytest"
 
-[tasks.pytest-playwright]
-    depends = "dev-db"
-    dir = "server"
-    run = "uv run pytest neuronhub/apps/tests/playwright"
-
+[tasks.e2e]
+    depends = ["dev-db", "dev-db-setup-e2e"]
+    dir = "client"
+    run = "bun run playwright test --config=e2e/playwright.config.ts"
+    env.VITE_SERVER_URL = "http://localhost:{{get_env(name='E2E_SERVER_PORT', default='8001')}}"
 
 [tasks.db-migrate]
     dir = "server"
@@ -62,7 +66,6 @@
 
 [tasks.graphql-gen]
     depends = ["graphql-gen-server", "graphql-gen-client"]
-    alias = ["codegen", "typegen", "gen-graphql"]
 
     [tasks.graphql-gen-server]
         dir = "server"
@@ -73,8 +76,7 @@
         run = [
             "bun run graphql-codegen --config src/codegen.ts",
             "bun run gql-tada generate output",
-            "bunx @chakra-ui/cli typegen src/theme/theme.ts",
-            "mise run format-client"
+            "mise format-client",
         ]
 
 
@@ -95,7 +97,8 @@
 
 
 [tasks.lint]
-    depends = ["lint-server", "lint-client"]
+    depends = "typegen-client"
+    run = ["mise lint-server", "mise lint-client"]
 
     [tasks.lint-server]
         dir = "server"
@@ -104,3 +107,10 @@
     [tasks.lint-client]
         dir = "client"
         run = "bun run tsc --noEmit"
+
+    [tasks.typegen-client]
+        dir = "client"
+        run = [
+            "bun run react-router typegen",
+            "bunx @chakra-ui/cli typegen src/theme/theme.ts",
+        ]

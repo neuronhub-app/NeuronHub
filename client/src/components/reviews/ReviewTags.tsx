@@ -1,5 +1,6 @@
 import { Tag, Wrap } from "@chakra-ui/react";
 import { HiMinus, HiPlus } from "react-icons/hi2";
+import { ids } from "@/e2e/ids";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
@@ -30,7 +31,7 @@ export function ReviewTags(props: { tags: PostTagFragmentType[]; reviewAuthorId?
   }
 
   return (
-    <Wrap data-testid="review-tags">
+    <Wrap {...ids.set(ids.review.tag.container)}>
       {reviewTags.map(tag => (
         <ReviewTagElem key={tag.id} tag={tag} reviewAuthorId={props.reviewAuthorId} />
       ))}
@@ -57,13 +58,17 @@ function ReviewTagElem(props: { tag: PostTagFragmentType; reviewAuthorId?: strin
       {...getOutlineContrastStyle({ variant: "subtle" })}
       opacity={0.8}
       fontWeight={props.tag.is_important ? "bold" : "normal"}
-      data-testid="review-tag"
+      {...ids.set(ids.review.tag.item)}
       data-is-important={props.tag.is_important}
     >
       <Tag.Label>{props.tag.label || props.tag.name}</Tag.Label>
       {authorVote && (
         <Tag.EndElement
-          data-testid={authorVote.is_vote_positive ? "author-vote-plus" : "author-vote-minus"}
+          {...ids.set(
+            authorVote.is_vote_positive
+              ? ids.review.tag.authorVotePlus
+              : ids.review.tag.authorVoteMinus,
+          )}
         >
           {authorVote.is_vote_positive ? <HiPlus /> : <HiMinus />}
         </Tag.EndElement>

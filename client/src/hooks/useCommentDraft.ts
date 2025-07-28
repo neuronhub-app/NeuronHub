@@ -3,10 +3,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const STORAGE_KEY_PREFIX = "comment-draft-";
 const DEBOUNCE_MS = 500;
 
+// AI shit
 export function useCommentDraft(parentId: string) {
   const storageKey = `${STORAGE_KEY_PREFIX}${parentId}`;
 
-  const [draft, setDraft] = useState(() => {
+  const [content, setContent] = useState(() => {
     try {
       return localStorage.getItem(storageKey) || "";
     } catch {
@@ -37,16 +38,16 @@ export function useCommentDraft(parentId: string) {
     [storageKey],
   );
 
-  const updateDraft = useCallback(
+  const update = useCallback(
     (content: string) => {
-      setDraft(content);
+      setContent(content);
       saveDraft(content);
     },
     [saveDraft],
   );
 
-  const clearDraft = useCallback(() => {
-    setDraft("");
+  const clear = useCallback(() => {
+    setContent("");
     try {
       localStorage.removeItem(storageKey);
     } catch {
@@ -62,5 +63,5 @@ export function useCommentDraft(parentId: string) {
     };
   }, []);
 
-  return { draft, updateDraft, clearDraft };
+  return { content, update, clear };
 }

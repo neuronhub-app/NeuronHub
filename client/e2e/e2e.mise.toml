@@ -1,0 +1,9 @@
+[dev-db-setup-e2e]
+    run = """
+        #!/usr/bin/env fish
+        sudo docker compose --file ./devops/docker-compose.yml exec db bash -c "psql --user=neuronhub --command='CREATE DATABASE $E2E_DB_NAME;'"
+
+        cd server/
+        set --export DATABASE_NAME $E2E_DB_NAME # `mise db-migrate` atm ignores envs in shebangs
+        uv run manage.py migrate
+    """

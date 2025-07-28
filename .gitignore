@@ -5,10 +5,10 @@
 
 docs/private/
 
-server/.env.local
+client/e2e/config.schema.json
+client/e2e/config.json
 
-.claude/prompts/local/**
-.claude/commands/**
+server/.env.local
 
 # caches
 __pycache__

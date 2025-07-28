@@ -2,6 +2,7 @@
 .vite/
 .react-router/
 node_modules/
+test-results/
 
 /logs
 *.log

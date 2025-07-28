@@ -21,14 +21,14 @@
     "noFallthroughCasesInSwitch": true,
 
     "baseUrl": ".",
+    "rootDirs": [".", "./.react-router/types"], // from react-router docs
 
     "paths": {
+      "@/e2e/*": ["./e2e/*"],
       "@/*": ["./src/*"],
-
       // generated
-      // todo refac: move to a subdir
       "~/graphql/*": ["./graphql/*"],
-      "~/react-router/*": ["./.react-router/types/src/apps/*"]
+      "~/react-router/*": ["./.react-router/types/src/apps/*"],
     },
 
     "plugins": [
@@ -36,15 +36,14 @@
         "name": "gql.tada/ts-plugin",
         "schema": "./../schema.graphql",
         "tadaOutputLocation": "./graphql/graphql-env.d.ts",
-        "shouldCheckForColocatedFragments": false // see [[docs/client-caveats.md]]
-      }
-    ]
+        "shouldCheckForColocatedFragments": false, // see [[docs/client-caveats.md]]
+      },
+    ],
   },
   "include": [
     "src",
-    // include those to let TS fix its type errors
-    "react-router.config.ts",
-    "vite.config.ts"
+    "e2e",
+    "vite.config.ts",
+    ".react-router/types/**/*", // from react-router docs
   ],
-  "references": [{ "path": "./.react-router" }]
 }

@@ -5,6 +5,7 @@ import { DiOpensource } from "react-icons/di";
 import { FaApple, FaCode, FaLinux, FaPython, FaTerminal } from "react-icons/fa6";
 import { GoLaw } from "react-icons/go";
 import { SiKotlin } from "react-icons/si";
+import { ids } from "@/e2e/ids";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
@@ -54,7 +55,7 @@ function ToolTagElem(props: { tag: PostTagFragmentType }) {
       size="lg"
       {...getOutlineContrastStyle({ variant: "subtle" })}
       opacity={tagColor === "gray" ? 0.8 : 1}
-      data-testid="tool-tag"
+      {...ids.set(ids.tool.tag.item)}
     >
       {iconInfo && (
         <Tag.StartElement {...iconInfo.props}>

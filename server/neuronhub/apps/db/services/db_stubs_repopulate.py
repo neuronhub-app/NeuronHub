@@ -42,6 +42,7 @@ async def db_stubs_repopulate(
             Post,
             PostRelated,
             ToolCompany,
+            ToolCompanyOwnership,
         ]:
             await model._default_manager.all().adelete()
 

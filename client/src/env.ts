@@ -20,7 +20,7 @@ import { cleanEnv, str, url } from "envalid";
  * - docs - A URL to docs
  * - requiredWhen
  */
-export const env = cleanEnv(import.meta.env, {
+export const env = cleanEnv(import.meta.env ?? {}, {
   NODE_ENV: str({
     choices: ["development", "staging", "production"],
     default: "development",

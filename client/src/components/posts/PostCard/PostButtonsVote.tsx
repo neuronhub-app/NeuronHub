@@ -1,6 +1,7 @@
 import { Flex, IconButton, Stack } from "@chakra-ui/react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import type { PostListItemType } from "@/components/posts/ListContainer";
+import { ids } from "@/e2e/ids";
 import { usePostVote } from "@/hooks/usePostVote";
 
 export function PostButtonsVote(props: { post: PostListItemType }) {
@@ -20,7 +21,7 @@ export function PostButtonsVote(props: { post: PostListItemType }) {
         variant="subtle-ghost"
         borderRadius="lg"
         size="sm"
-        className="btn-upvote"
+        {...ids.set(ids.post.vote.up)}
       >
         <FaChevronUp />
       </IconButton>
@@ -33,7 +34,7 @@ export function PostButtonsVote(props: { post: PostListItemType }) {
         variant="subtle-ghost"
         borderRadius="lg"
         size="sm"
-        className="btn-downvote"
+        {...ids.set(ids.post.vote.down)}
       >
         <FaChevronDown />
       </IconButton>

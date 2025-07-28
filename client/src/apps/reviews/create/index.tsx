@@ -49,6 +49,7 @@ import { zStringEmpty } from "@/components/forms/zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tag } from "@/components/ui/tag";
+import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { UsageStatus, Visibility } from "~/graphql/graphql";
 
@@ -133,7 +134,7 @@ export namespace ReviewCreateForm {
       alternatives: toolMultiSelect,
     }),
     id: z.string().nullable(),
-    title: z.string().min(1),
+    title: z.string().optional(),
     source: z.string().optional(),
     content: z.string().optional(),
     content_private: z.string().optional(),
@@ -154,6 +155,10 @@ export namespace ReviewCreateForm {
 
   export type FormSchema = z.infer<typeof schema>;
   export type FormType = UseFormReturn<FormSchema>;
+
+  export const strs = {
+    reviewCreated: "Review added",
+  } as const;
 
   const state = proxy({
     isRated: true,
@@ -189,7 +194,7 @@ export namespace ReviewCreateForm {
     async function handleSubmit(values: z.infer<typeof schema>) {
       const res = await formService.send(values);
       if (res.success) {
-        toast.success("Review added");
+        toast.success(strs.reviewCreated);
         navigate(`/reviews/${res.reviewId}`);
       } else {
         toast.error(res.error);
@@ -261,6 +266,7 @@ export namespace ReviewCreateForm {
                 <FormChakraInput
                   field={{ control, name: "parent.name" }}
                   label={`${getToolTypeName()} name`}
+                  {...ids.set(ids.review.form.parentNameInput)}
                 />
 
                 {/* todo maybe: responsiveness */}
@@ -363,11 +369,16 @@ export namespace ReviewCreateForm {
 
               <Fieldset.Content display="flex" gap="gap.lg">
                 <VStack gap="gap.lg" alignItems="flex-start" w="100%">
-                  <FormChakraInput field={{ control, name: "title" }} label="Title" />
+                  <FormChakraInput
+                    field={{ control, name: "title" }}
+                    label="Title"
+                    {...ids.set(ids.review.form.titleInput)}
+                  />
                   <FormChakraTextarea
                     field={{ control, name: "content" }}
                     label="Content"
                     isShowIconMarkdown
+                    {...ids.set(ids.review.form.contentTextarea)}
                   />
                   <FormChakraInput
                     field={{ control, name: "source" }}
@@ -432,6 +443,7 @@ export namespace ReviewCreateForm {
                     <FormChakraSegmentControl
                       field={{ control, name: "review_usage_status" }}
                       label="Usage status"
+                      {...ids.set(ids.review.form.usageStatusSelector)}
                       items={[
                         getToolType(UsageStatus.Using, <FaHeartPulse />),
                         getToolType(UsageStatus.WantToUse, <FaBookmark />, "Want to use"),
@@ -518,7 +530,11 @@ export namespace ReviewCreateForm {
                 </Flex>
               </CheckboxGroup>
 
-              <Button loading={form.formState.isSubmitting} type="submit">
+              <Button
+                loading={form.formState.isSubmitting}
+                type="submit"
+                {...ids.set(ids.post.btn.submit)}
+              >
                 Save
               </Button>
 

@@ -2,9 +2,8 @@
     depends = [
         "install-deps-server",
         "install-deps-client",
-        "install-deps-pytest",
-        "install-deps-pytest-chromium",
-        "install-deps-claude-code",
+        "install-deps-claude",
+        "install-deps-playwright",
     ]
 
 [install-deps-server]
@@ -15,11 +14,8 @@
     dir = "client"
     run = "bun install"
 
-[install-deps-pytest]
-    run = "uv tool install playwright"
+[install-deps-playwright]
+    run = "bun run playwright install chromium --with-deps"
 
-[install-deps-pytest-chromium]
-    run = "uv tool run playwright install chromium --with-deps"
-
-[install-deps-claude-code]
-    run = "npm install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"
+[install-deps-claude]
+    run = "bun install --global @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"

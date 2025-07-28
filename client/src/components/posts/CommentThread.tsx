@@ -1,4 +1,6 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
+import toast from "react-hot-toast";
+import { strs } from "@/apps/posts/detail/PostDetail";
 import { createPostComment } from "@/apps/posts/services/createPostComment";
 import { useUserCurrent } from "@/apps/users/useUserCurrent";
 import { CommentCreateForm } from "@/components/posts/CommentCreateForm";
@@ -21,7 +23,7 @@ export function CommentThread({ comment, onCommentCreated }: CommentThreadProps)
   const handleCommentSubmit = async (data: { content: string }) => {
     try {
       await createPostComment({ parentId: comment.id, content: data.content });
-      toaster.success({ title: "Reply posted" });
+      toast.success(strs.createdComment);
       onCommentCreated?.();
     } catch (error) {
       toaster.error({

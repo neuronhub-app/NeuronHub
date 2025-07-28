@@ -1,5 +1,16 @@
 ## Testing Setup
 
+We use `pytest` for unit tests, and `playwright` in `client/e2e`.
+
+The biggest issues in tests are:
+1. The fucking MAINTENANCE COST
+2. Instability
+3. The dev workflow feedback slowdown caused by idiotic and redundant specs
+
+Unit tests have great potential to speed up the development. But only when they're written within the high-quality framework, and focus on testing project's business logic.
+
+We do not fucking test third-party libraries, as Strawberry, GraphQL, etc.  
+
 ### Pytest
 
 Use a subclass `NeuronTestCase`, importing from [test_cases](/server/neuronhub/apps/tests/test_cases.py), its code looks as:
@@ -19,19 +30,17 @@ class NeuronTestCase(TestCase):
         ...
 ```
 
-- Store tests nearby their target with `__test` postfix, eg [](/server/neuronhub/apps/posts/services/filter_posts_by_user.py) is covered by [](/server/neuronhub/apps/posts/services/filter_posts_by_user__test.py).
-- always use `async`/`await`
-
-#### Read Pytest Rich Output
-
-Rich is set for stacktraces, incl local vars, source, coloring.
+- Store tests nearby their target with `__test` postfix, eg `/server/neuronhub/apps/posts/services/filter_posts_by_user.py` is covered by `filter_posts_by_user__test.py`.
+- Never test with GraphQL what can be tested with direct Python code invocation.
+- Always use `async`/`await`
+- read Pytest Rich output: it's set for stacktraces, local vars, source code, etc
 
 #### [Gen](/server/neuronhub/apps/tests/test_gen.py)
 
 All fields of `Gen` are designed as optional with fallbacks.
 - we can easily create many `review = await self.gen.posts.create(self.gen.posts.Params(type=Post.Type.Review))`
 - `author` by default is always `self.gen.users.user_default`
-- most of fields are populated by `faker.gen`
+- most fields are populated by `faker.gen`
 
 Add more generators when needed for more than one test function. Esp if for several files.
 
@@ -42,25 +51,24 @@ Add more generators when needed for more than one test function. Esp if for seve
 # usage:
 user = await self.gen.users.user()
 post = await self.gen.posts.create()
-review = await self.gen.posts.create(self.gen.posts.Params(
+review_1 = await self.gen.posts.create(self.gen.posts.Params(
     type=Post.Type.Review,
     parent=post,
-    title="My review",
-    content="Content",
     visibility=Visibility.INTERNAL,
     tool_type=Post.ToolType.Program,
-    github_url="https://github.com/org/repo",
 ))
 review_2 = await self.gen.posts.create(self.gen.posts.Params(type=Post.Type.Review, parent=post, author=user))
 ```
 
 ### Playwright
 
-- The biggest issue in E2E is the maintenance cost, and the critical feedback slowdown caused by redundant double-testing. 
-- We store E2E tests in [](/server/neuronhub/apps/tests/playwright/). For a simple example see [](/server/neuronhub/apps/tests/playwright/test_vote_and_reading_list.py).
-- The [conftest](/server/neuronhub/apps/tests/playwright/conftest.py) starts the Vite server and links it to Django's test LiveServer on port `8001` - ie you have no need to run any bg processes for Django/Vite - just run `mise pytest-playwright` as intended.
+In E2E we test only the critical user journeys. Or the cases with the lowest possible maintenance cost. Everything else is stupid time waste.
 
-Notes
-- Frontend is using Django cookie auth from `/admin/login/` - CORS 100% works.
-- `PlaywrightHelper` contains few functions that always end with `wait_for_load_state("networkidle")` - no need to repeat it.
-- If you need `wait_for_timeout` - the code is shit and needs fixes.
+- Run by `mise e2e` - Django and Vite are run by Playwright
+- Specs are all in `client/e2e/tests`
+
+Notes:
+- If code needs `waitForTimeout` or similar - it is shit and must be rewritten.
+- `client/e2e/PlayWrightHelper.ts` is wrapper for bad Playwright API.
+- Use `data-testid` for locators, in JSX set as `{...ids.set(ids.post.btn.submit)}`, see `client/e2e/ids.ts`
+- Auth is by Django `/admin/login/` and cookie - CORS 100% works.

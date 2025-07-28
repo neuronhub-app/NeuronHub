@@ -12,6 +12,7 @@ export function FormChakraSegmentControl<TFieldValues extends FieldValues>(props
     label: ReactNode;
   }>;
   size?: "sm" | "md" | "lg";
+  "data-testid"?: string;
 }) {
   const { field, fieldState } = useController(props.field);
 
@@ -28,6 +29,7 @@ export function FormChakraSegmentControl<TFieldValues extends FieldValues>(props
         items={props.items}
         onValueChange={change => field.onChange(change.value)}
         size={props.size}
+        data-testid={props["data-testid"]}
       />
     </Field>
   );

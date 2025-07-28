@@ -77,6 +77,7 @@ export type Mutation = {
   create_post_comment: PostCommentType;
   create_post_review: PostType;
   logout: Scalars["Boolean"]["output"];
+  test_db_stubs_repopulate: Scalars["Boolean"]["output"];
   update_post: PostType;
   update_post_seen_status: Scalars["Boolean"]["output"];
   update_user: UserType;

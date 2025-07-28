@@ -2,8 +2,8 @@
     depends = [
         "upgrade-deps-server",
         "upgrade-deps-client",
-        "upgrade-deps-pytest",
-        "install-deps-pytest-chromium",
+        "upgrade-deps-playwright",
+        "install-deps-playwright",
     ]
 
 [upgrade-deps-server]
@@ -13,9 +13,10 @@
 [upgrade-deps-client]
     dir = "client"
     run = [
-        "bun run ncu --upgrade --packageManager",
+        "bun run ncu --upgrade --packageManager bun",
         "bun install"
     ]
 
-[upgrade-deps-pytest]
-    run = "uv tool upgrade playwright"
+[upgrade-deps-playwright]
+    dir = "client"
+    run = "bun update playwright"

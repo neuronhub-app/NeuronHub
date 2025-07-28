@@ -5,7 +5,7 @@ from random import Random
 
 from asgiref.sync import sync_to_async
 from faker import Faker
-from faker.proxy import UniqueProxy  # type: ignore[attr-defined]
+from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
 
 from neuronhub.apps.anonymizer.fields import Visibility
 
@@ -19,38 +19,26 @@ class Gen:
     posts: PostsGen
     faker: UniqueProxy
     faker_non_unique: Faker
-    random_seeded: Random
+    random_gen_seeded: Random
 
     @classmethod
     async def create(
         cls,
-        is_random_values_deterministic: bool = True,
-        random_seed: int = 42,
-        is_user_default_superuser: bool = False,
+        is_user_default_superuser: bool = True,
     ):
         self = cls()
 
         faker = Faker()
+        self.faker = faker.unique  # faker.unique to avoid non-unique usernames, etc
 
-        if is_random_values_deterministic:
-            # seeding won't make every self.faker.name() return the same value
-            # it'll only make the same #5 call to self.faker.name() return the same value
-            faker.seed_instance(random_seed)
-
-        # use faker.unique proxy to avoid non-unique donor emails, etc
-        # beware - it might go into an infinite loop trying to return unique data if it runs out of available and
-        # keeps trying to get a new unique value
-        self.faker = faker.unique
+        faker.seed_instance(42)  # Deterministic: #5 faker.name() -> same #5 name() string
+        self.random_gen_seeded = faker.random
         self.faker_non_unique = faker
-        self.random_seeded = faker.random
 
         self.users = await UsersGen.create(
             faker=self.faker,
             is_user_default_superuser=is_user_default_superuser,
         )
-        if self.users.user_default is None:
-            raise ValueError("Gen.create() failed")
-
         self.posts = PostsGen(faker=self.faker, user=self.users.user_default)
 
         return self
@@ -60,7 +48,7 @@ class Gen:
 class UsersGen:
     faker: UniqueProxy
 
-    user_default: User | None = None
+    user_default: User
 
     _user_username = "admin"
     _user_email_domain = "neuronhub.io"
@@ -68,9 +56,14 @@ class UsersGen:
     _user_password = "admin"
 
     @classmethod
-    async def create(cls, faker: UniqueProxy, is_user_default_superuser: bool = False):
-        self = cls(faker=faker)
-        self.user_default = await self.get_user_default(is_superuser=is_user_default_superuser)
+    async def create(cls, faker: UniqueProxy, is_user_default_superuser: bool = True):
+        self = cls(
+            faker=faker,
+            user_default=await cls.get_or_create_user_default(
+                is_superuser=is_user_default_superuser
+            ),
+        )
+        assert self.user_default, "UsersGen.create() failed"
         return self
 
     async def user(
@@ -113,26 +106,29 @@ class UsersGen:
         is_superuser: bool = False,
         is_attach_org: bool = True,
     ) -> User:
-        from neuronhub.apps.users.models import User
-
         if self.user_default:
             return self.user_default
         else:
-            if user_default := await User.objects.filter(email=self._user_email).afirst():
-                return user_default
-            else:
-                user = await self.user(
-                    email=self._user_email,
-                    username=self._user_username,
-                    password=self._user_password,
-                    is_get_or_create=True,
-                )
-                if is_superuser:
-                    user.is_staff = True
-                    user.is_superuser = True
-                user.set_password(self._user_password)
-                await user.asave()
-                return user
+            return await self.get_or_create_user_default(is_superuser=is_superuser)
+
+    @classmethod
+    async def get_or_create_user_default(cls, is_superuser: bool = True) -> User:
+        if user_default := await User.objects.filter(
+            email=cls._user_email, is_superuser=is_superuser
+        ).afirst():
+            return user_default
+        else:
+            user = await User.objects.acreate(
+                email=cls._user_email,
+                username=cls._user_username,
+                password=cls._user_password,
+            )
+            if is_superuser:
+                user.is_staff = True
+                user.is_superuser = True
+            user.set_password(cls._user_password)
+            await user.asave()
+            return user
 
 
 @dataclass
@@ -179,6 +175,32 @@ class PostsGen:
             )
         )
 
+    async def vote(
+        self,
+        post: Post,
+        author: User = None,
+        is_vote_positive: bool = True,
+    ):
+        from neuronhub.apps.posts.models import PostVote
+
+        return await PostVote.objects.acreate(
+            post=post,
+            author=author or self.user,
+            is_vote_positive=is_vote_positive,
+        )
+
+    async def tag(
+        self,
+        name: str,
+        author: User = None,
+    ):
+        from neuronhub.apps.posts.models import PostTag
+
+        tag, _ = await PostTag.objects.aget_or_create(
+            name=name, defaults=dict(author=author or self.user)
+        )
+        return tag
+
     async def create(self, params: Params = Params(type=Post.Type.Post)) -> Post:
         from neuronhub.apps.posts.models import Post
         from neuronhub.apps.posts.models import ToolCompany
@@ -187,12 +209,14 @@ class PostsGen:
         company = None
         if params.company_name:
             ownership = await create_company_ownership(params.company_ownership_name)
-            company = await ToolCompany.objects.acreate(
+            company, _ = await ToolCompany.objects.aget_or_create(
                 name=params.company_name,
-                domain=params.company_domain or self.faker.domain_name(),
-                country=params.company_country or self.faker.country_code(),
-                ownership=ownership,
-                is_single_product=params.is_single_product,
+                defaults=dict(
+                    domain=params.company_domain or self.faker.domain_name(),
+                    country=params.company_country or self.faker.country_code(),
+                    ownership=ownership,
+                    is_single_product=params.is_single_product,
+                ),
             )
 
         is_tool = params.type == Post.Type.Tool

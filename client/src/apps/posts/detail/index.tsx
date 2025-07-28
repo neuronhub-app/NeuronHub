@@ -1,4 +1,6 @@
+import toast from "react-hot-toast";
 import { useQuery } from "urql";
+import { strs } from "@/apps/posts/detail/PostDetail";
 import { createPostComment } from "@/apps/posts/services/createPostComment";
 import { useUserCurrent } from "@/apps/users/useUserCurrent";
 import { PostDetail } from "@/components/posts/PostDetail";
@@ -23,13 +25,13 @@ export default function PostDetailRoute(props: Route.ComponentProps) {
 
   const [{ data, error, fetching }, reexecuteQuery] = useQuery({
     query,
-    variables: { pk: props.params.id as string },
+    variables: { pk: props.params.id },
   });
 
   const handleCommentSubmit = async (postId: string, content: string) => {
     try {
       await createPostComment({ parentId: postId, content });
-      toaster.success({ title: "Comment posted" });
+      toast.success(strs.createdComment);
       reexecuteQuery({ requestPolicy: "network-only" });
     } catch (error) {
       toaster.error({

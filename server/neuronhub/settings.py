@@ -131,12 +131,15 @@ if DJANGO_ENV == DjangoEnv.BUILD:
         },
     }
 else:
+    db_host = env.str("DATABASE_HOST", "host.docker.internal")
+    db_user = env.str("DATABASE_USER", "neuronhub")
+    db_name = env.str("DATABASE_NAME", "neuronhub")
     DATABASES = {
         "default": dj_database_url.config(
             conn_max_age=600,
             default=env.str(
                 "DATABASE_URL",
-                "postgres://neuronhub@host.docker.internal:5432/neuronhub",
+                f"postgres://{db_user}@{db_host}:5432/{db_name}",
             ),
         )
     }
@@ -254,6 +257,22 @@ LOGGING = {
         "level": "INFO",
     },
 }
+# in E2E Mise `--quite` doesn't work on runserver, and `--silent` drops stderr
+if env.bool("IS_DJANGO_RUNSERVER_STDERR_ONLY", False):
+    LOGGING["handlers"]["null"] = {"class": "logging.NullHandler"}
+    LOGGING["loggers"] = {
+        "django.server": {
+            "handlers": ["null"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        # keep stderr
+        "django": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": True,
+        },
+    }
 
 _line_width = 120
 rich.traceback.install(

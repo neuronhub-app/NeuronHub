@@ -24,6 +24,7 @@ export function FormChakraInput<TFieldValues extends FieldValues>(props: {
   startElement?: ReactNode;
 
   maxW?: string;
+  "data-testid"?: string;
 }) {
   const { field, fieldState } = useController(props.field);
 
@@ -62,6 +63,7 @@ export function FormChakraInput<TFieldValues extends FieldValues>(props: {
               props.onKeyEnter();
             }
           }}
+          data-testid={props["data-testid"]}
         />
       </InputGroup>
     </Field>

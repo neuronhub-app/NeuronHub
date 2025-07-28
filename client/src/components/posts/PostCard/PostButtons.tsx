@@ -9,6 +9,7 @@ import { user } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostButtonShare } from "@/components/posts/PostCard/PostButtonShare";
 import { Tooltip } from "@/components/ui/tooltip";
+import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
@@ -114,9 +115,11 @@ function ReviewButton(props: {
         variant="subtle-ghost"
         size="sm"
         aria-label={label}
-        className={
-          props.fieldName === UserListName.ReadLater ? "btn-reading-list" : "btn-library"
-        }
+        {...ids.set(
+          props.fieldName === UserListName.ReadLater
+            ? ids.post.btn.readingList
+            : ids.post.btn.library,
+        )}
       >
         {state.snap.isAdded ? props.iconPresent : props.iconNotPresent}
       </IconButton>
