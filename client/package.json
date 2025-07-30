@@ -10,63 +10,64 @@
     "format": "biome check --write"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.21.1",
+    "@chakra-ui/react": "^3.23.0",
       "@emotion/react": "^11.14.0",
       "next-themes": "^0.4.6",
 
-    "react": "^19.1.0",
-      "react-dom": "^19.1.0",
-    "react-router": "^7.6.3",
-      "@react-router/dev": "^7.6.3",
-      "@react-router/node": "^7.6.3",
-      "isbot": "^5.1.28",
+    "react": "^19.1.1",
+      "react-dom": "^19.1.1",
+    "react-router": "^7.7.1",
+      "@react-router/dev": "^7.7.1",
+      "@react-router/node": "^7.7.1",
+      "isbot": "^5.1.29",
 
     "react-hot-toast": "^2.5.2",
-    "react-select": "^5.10.1",
+    "react-select": "^5.10.2",
     "chakra-react-select": "^6.1.0",
-    "react-hook-form": "^7.60.0",
+    "react-hook-form": "^7.61.1",
       "react-hook-form-chakra": "^1.0.2",
-      "@hookform/resolvers": "^5.1.1",
+      "@hookform/resolvers": "^5.2.1",
       "@hookform/devtools": "^4.4.0",
 
-    "lucide-react": "^0.525.0",
+    "lucide-react": "^0.534.0",
     "react-icons": "^5.5.0",
 
     "valtio": "^2.1.5",
-    "zod": "^3.25.74",
-    "marked": "^16.0.0",
+    "zod": "^4.0.13",
+    "marked": "^16.1.1",
     "date-fns": "^4.1.0",
     "@date-fns/tz": "^1.2.0",
-    "@sentry/react": "^9.35.0",
-    "envalid": "^8.0.0",
+    "@sentry/react": "^9.43.0",
+    "envalid": "^8.1.0",
 
     "urql": "^4.2.2",
-    "gql.tada": "^1.8.11",
-    "@0no-co/graphqlsp": "^1.13.0",
+    "gql.tada": "^1.8.12",
+    "@0no-co/graphqlsp": "^1.14.0",
     "graphql": "^16.11.0"
   },
   "devDependencies": {
-    "@chakra-ui/cli": "^3.21.1",
+    "@chakra-ui/cli": "^3.23.0",
       "globby": "^14.1.0",
 
-    "@biomejs/biome": "^2.0.6",
+    "@biomejs/biome": "^2.1.3",
 
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/client-preset": "^4.8.3",
 
     "typescript": "^5.8.3",
-    "@types/bun": "^1.2.18",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
+    "@types/bun": "^1.2.19",
+    "@playwright/test": "^1.54.1",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
 
-    "npm-check-updates": "^18.0.1",
+    "npm-check-updates": "^18.0.2",
 
     "@redux-devtools/extension": "^3.3.0",
 
-    "vite": "^7.0.2",
-      "@vitejs/plugin-react": "^4.6.0",
+    "vite": "^7.0.6",
+      "@vitejs/plugin-react": "^4.7.0",
       "@rollup/plugin-replace": "^6.0.2",
       "vite-tsconfig-paths": "^6.0.0-beta.3",
-      "vite-plugin-devtools-json": "^0.2.1"
+      "vite-plugin-devtools-json": "^0.4.1"
   }
 }

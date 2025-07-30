@@ -79,6 +79,13 @@
             "mise format-client",
         ]
 
+[tasks.client-typegen]
+    dir = "client"
+    run = [
+        "bun run react-router typegen",
+        "bunx @chakra-ui/cli typegen src/theme/theme.ts",
+    ]
+
 
 [tasks.format]
     depends = ["format-server", "format-client"]
