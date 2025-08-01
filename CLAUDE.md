@@ -1,39 +1,7 @@
 ## NeuronHub - Privacy-First Tech Expertise Sharing
 
 - Architecture: Clean Django, React SPA, GraphQL boundary
-- Testing: Outside-in TDD, London school, `test_gen.py` factories
-- Approach: composition over inheritance, fail fast, explicit over implicit, avoid Facebook patterns (complex state, microservices), prefer simple maintainable solutions
+- Testing: Outside-in TDD, London school
+- Approach: composition over inheritance, fail fast, explicit over implicit, avoid Facebook patterns (complex state, microservices), simple maintainable solutions
 
 @./docs/architecture.md
-
-### CLI commands
-
-- `mise lint` - mypy, tsc, etc
-- `mise format`- ruff, biome
-- `mise pytest` - all tests, accepts paths to tests as args
-- `mise pytest-playwright` - E2E with Chromium, ie runs `uv run pytest neuronhub/apps/tests/playwright`
-- `mise db-migrate`
-- `mise db-stubs-repopulate` - idempotent, a full db state reset to the stub data. Keeps the default `admin` User and his cookie session.
-- `mise graphql-gen` - root `/schema.graphql` generation, graphql-codegen, gql-tada
-- Shell utils you should use when helps: rg, fd, bat, jq, delta, exa
-- The main shell is Fish. You can use Bash too.
-- You MUST always use mise.toml tasks - they have all commands, configs, args, etc.
-
-### Structure
-
-- Django: Apps store domain in `models.py`, business logic in `services.py`, API in `graphql/`. Avoid god objects.
-- React: Compound components, lift state up (ideally one Valtio per page), single responsibility  
-- Testing: Arrange-Act-Assert, Given-When-Then, test behavior not implementation
-- Database: Normalize then denormalize, foreign keys over joins
-
-### Avoid
-
-- React: useState hell, prop drilling, premature optimization, god components
-- GraphQL: resolver soup, client caching complexity
-- Tests: non-maintainable code, mocking everything, flaky tests, testing implementation details, magic strings
-
-@./docs/client-caveats.md
-
-@./docs/testing-setup.md
-
-@./docs/code-style.md
