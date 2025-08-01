@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import logging
-import typing
 
 from django.core.validators import DomainNameValidator
 from django.db import models
@@ -11,11 +10,6 @@ from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.db.fields import MarkdownField
 from neuronhub.apps.db.models_abstract import TimeStampedModel
-
-
-if typing.TYPE_CHECKING:
-    from neuronhub.apps.posts.models import Post
-
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +47,7 @@ class ToolCompany(TimeStampedModel):
     crunchbase_url = models.URLField(blank=True)
     github_url = models.URLField(blank=True)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=["slug"])
 
     def __str__(self):
         return self.name
