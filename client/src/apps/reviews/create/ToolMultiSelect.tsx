@@ -1,12 +1,11 @@
 import type { IconProps } from "@chakra-ui/react";
 import { DialogBackdrop, Flex, HStack, Icon, IconButton } from "@chakra-ui/react";
-import { AsyncCreatableSelect } from "chakra-react-select";
+import { AsyncCreatableSelect, components } from "chakra-react-select";
 import type { MessageSquarePlus } from "lucide-react";
 import type { ReactNode } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { FaMessage, FaRegMessage } from "react-icons/fa6";
 import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
-import { components } from "react-select";
 
 import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create/index";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";

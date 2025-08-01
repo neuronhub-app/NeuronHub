@@ -140,13 +140,9 @@ export namespace ReviewCreateForm {
     content_private: z.string().optional(),
     review_rating: z.number().min(0).max(100).nullable(),
     review_importance: z.number().optional(),
-    review_usage_status: z.enum(
-      Object.values(UsageStatus) as [UsageStatus, ...UsageStatus[]], // @ts-bad-inference
-    ),
+    review_usage_status: z.enum(Object.values(UsageStatus)),
     reviewed_at: z.iso.date().optional(),
-    visibility: z.enum(
-      Object.values(Visibility) as [Visibility, ...Visibility[]], // @ts-bad-inference
-    ),
+    visibility: z.enum(Object.values(Visibility)),
     tags: toolMultiSelect,
     recommend_to: useMultiSelect,
     visible_to: useMultiSelect,
