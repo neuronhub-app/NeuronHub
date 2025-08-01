@@ -5,9 +5,6 @@ Keywords
 - `think harder` 32k tokens
   - also: longer, intensely
 
-TUI
-- `⌘ V` screenshots of UI designs
-
 Uses
-- fix GitHub CI with `gh`
-- Git history search
+- Git operations
+- `⌘ V` screenshots of UI designs

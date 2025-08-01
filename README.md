@@ -2,6 +2,7 @@
 
 For complete dev env see [Coder's Dockerfile](/devops/coder/Dockerfile).
 
+Install `Mise`, then:
 ```shell
 mise install
 mise install-deps
@@ -16,8 +17,7 @@ URLs
 
 Read [mise.toml](/mise.toml) for more.
 
-### Docs
+### Main docs
 
 - [architecture](/docs/architecture.md)
-- [client/ caveats](/docs/client-caveats.md)
 - [testing setup](/docs/testing-setup.md)
