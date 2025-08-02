@@ -36,15 +36,15 @@ class MaskErrorsIncludingValidation(MaskErrors):
     """
 
     def on_validate(self) -> Iterator[None]:
-        if self.execution_context.errors:
+        if self.execution_context.pre_execution_errors:
             processed_errors: list[GraphQLError] = []
-            for error in self.execution_context.errors:
+            for error in self.execution_context.pre_execution_errors:
                 if self.should_mask_error(error):
                     processed_errors.append(self.anonymise_error(error))
                 else:
                     processed_errors.append(error)
 
-            self.execution_context.errors = processed_errors
+            self.execution_context.pre_execution_errors = processed_errors
         yield
 
 

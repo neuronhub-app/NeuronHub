@@ -16,8 +16,8 @@ dependencies = [
     "django-rich == 2.*", # [i=norm, rep=highest, @adamchainz] Django Sec Team
     "django-extensions == 4.*",
         "ipython == 9.*",
-    "strawberry-graphql ~= 0.274.0",
-        "strawberry-graphql-django ~= 0.62.0",
+    "strawberry-graphql ~= 0.278.0",
+        "strawberry-graphql-django ~= 0.65.0",
     "django-stubs[compatible-mypy] == 5.*",
     "django-health-check == 3.*", # [i=low, rep=norm, GH=norm, @revsys, 1.3k] US dev agency
     "django-simple-history == 3.*", # [i=high, rep=norm, GH=norm, @django-commons, 2.4k]
@@ -33,7 +33,7 @@ dependencies = [
     "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] worked with him
     "django-select2 == 8.*", # [i=low, rep=high, GH=high, @codingjoe, 0.8k] public CV
     "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe, 1.6k] public CV
-    "django-debug-toolbar == 5.*", # [i=low, rep=high, GH=high, @matthiask] 406.ch
+    "django-debug-toolbar == 6.*", # [i=low, rep=high, GH=high, @matthiask] 406.ch
     "django-object-actions == 5.*", # [i=none, rep=norm, GH=low, @crccheck, 0.7k] crccheck.com/blog since 2008, 100 posts
     "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no links, member of LiberTEM - keep frozen
 
@@ -65,14 +65,6 @@ dependencies = [
             "pytest-mock == 3.*",
             "pytest-pspec ~= 0.0.4",
             "pytest-rich == 0.*",
-
-        "playwright == 1.53.*",
-            "pytest-playwright-asyncio == 0.*",
-            "pytest-asyncio >= 0.26.0",
-            "greenlet >= 3.1.0",
-
-        "requests == 2.*", # used only in [[./neuronhub/apps/tests/playwright/conftest.py]]
-            "types-requests == 2.*",
     ]
 
 
@@ -117,10 +109,11 @@ dependencies = [
             "UP",  # pyupgrade: enforce modern python syntax
         ]
         ignore = [
-            # "drop unused vars", don't want as they're used as links/docs
+            # drops unused vars - ignore as they're used as links/docs
             "F841",
-            # 2 rules for multi-line string indent - sounds useless,
-            # use textwrap.dedent() - it's your responsibility. and flake8's fault for not detecting dedent()
+
+            # 2 rules below for multi-line string indent - sounds useless.
+            # Use textwrap.dedent(). It's flake8's fault for not detecting dedent().
             "W291",
             "W293",
         ]
@@ -137,7 +130,6 @@ dependencies = [
         "--no-header",
         "--pspec", # allows to use docstrings instead of test function names
     ]
-    asyncio_default_test_loop_scope = "session"
     filterwarnings = [
         "ignore::DeprecationWarning:environ.compat",
         "ignore::DeprecationWarning:functools",
