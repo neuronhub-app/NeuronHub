@@ -37,9 +37,7 @@ export async function refetchAllQueries() {
       } else {
         pendingTotal += pendingStep;
         if (pendingTotal > pendingMax) {
-          console.warn(
-            "Refetch timed out. Happens if react-router v7 navigates back & forth. It prob kills urql operations/subscriptions, while this Exchange doesn't listen to unmount events.",
-          );
+          console.warn("Refetch timed out #react-router-urql-bug?");
           resolve();
         } else {
           setTimeout(resolveIfCompleted, pendingStep);
@@ -68,11 +66,14 @@ export function refetchQueriesExchange(input: ExchangeInput): ExchangeIO {
       ),
       input.forward,
       tap(opResult => {
-        // todo ! not working - on react-router nav to a cached page it breaks, eg:
+        // todo ! bug - on react-router nav backward w browser "Back" btn breaks this refetch
+        // Using normal NavLink works fine.
+        //
+        // Reproduce:
         // 1. open /posts/
         // 2. open /reviews/
-        // 3. go back to /posts/ (here we load the old PostList from react-router cache)
-        // 4. try to vote on a Post → [[refetchQueriesExchange.ts#refetchAllQueries]] won't reload query=PostList, because it was... never mounted?
+        // 3. go back to /posts/ with Back btn (here we load the old PostList from react-router cache)
+        // 4. try to vote on a Post → [[refetchQueriesExchange.ts#refetchAllQueries]] won't reload query=PostList, because it was... never mounted? not sure #react-router-urql-bug
         state.opsRefetching.delete(opResult.operation.key);
       }),
     );
