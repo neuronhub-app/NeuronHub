@@ -73,7 +73,11 @@
 
 [tasks."typegen"]
     wait_for = "typegen:server"
-    run = ["mise typegen:client:graphql", "mise typegen:client:react"]
+    run = [
+        "mise typegen:client:graphql",
+        "mise typegen:client:react",
+        "mise run --output=silent typegen:client:chakra", # stdout trash - nothing else works
+    ]
     description = "Strawberry GraphQL + TypeSript"
 
     [tasks."typegen:server"]
@@ -83,17 +87,18 @@
     [tasks."typegen:client:graphql"]
         dir = "client"
         run = [
-            "bun run graphql-codegen --config src/codegen.ts",
+            "bun run graphql-codegen --errors-only --silent --config src/codegen.ts",
             "bun run gql-tada generate output",
         ]
         depends_post = "format:client"
 
     [tasks."typegen:client:react"]
         dir = "client"
-        run = [
-            "bun run react-router typegen",
-            "bunx @chakra-ui/cli typegen src/theme/theme.ts",
-        ]
+        run = "bun run react-router typegen"
+
+    [tasks."typegen:client:chakra"]
+        dir = "client"
+        run = "bunx @chakra-ui/cli typegen src/theme/theme.ts"
 
 
 [tasks."format"]
