@@ -5,8 +5,8 @@ version = "0.0.0.0"
 description = ""
 requires-python = "~=3.13.0"
 
-# For auditing, packages specify reputation and ordered respecevely. The format:
-# [i={importance for project}, rep={overall rating}, GH={github history}, @{GH username}, {number of stars}]
+# For audit, packages doc reputation. Format:
+# [i={importance for project}, rep={reputation online}, GH={github history quality}, @{GH username}, {number of stars}k]
 dependencies = [
     # django
     "django == 5.2.*",
@@ -35,7 +35,7 @@ dependencies = [
     "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe, 1.6k] public CV
     "django-debug-toolbar == 6.*", # [i=low, rep=high, GH=high, @matthiask] 406.ch
     "django-object-actions == 5.*", # [i=none, rep=norm, GH=low, @crccheck, 0.7k] crccheck.com/blog since 2008, 100 posts
-    "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no links, member of LiberTEM - keep frozen
+    "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no urls, member of LiberTEM (?) - keep it frozen
 
     # server
     "daphne == 4.*",
@@ -48,8 +48,8 @@ dependencies = [
     "sentry-sdk == 2.*",
     "humanize == 4.*", # [i=low, rep=norm, GH=norm, @jmoiron]
     "markdownify == 1.*", # [i=norm, rep=norm, GH=norm, @matthewwithanm, 1.7k] another project 2.3k stars. Other MD packages suck.
-    "python-dotenv == 1.*", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few articles on saurabh-kumar.com/blog/
-    "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - sloria's marshmallow is used by Microsoft, AWS, etc
+    "python-dotenv == 1.*", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few posts on saurabh-kumar.com/blog/
+    "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - his `marshmallow` used by Microsoft, AWS, etc
 ]
 
 # Python 3.14 support, waiting on GraphQL 3.3.*
@@ -124,7 +124,7 @@ dependencies = [
 
 [tool.pytest.ini_options]
     DJANGO_SETTINGS_MODULE = "neuronhub.settings"
-    python_files = ["*__test.py", "neuronhub/apps/tests/playwright/**"]
+    python_files = ["*__test.py"]
     addopts = [
         "--no-migrations",
         "--capture=no", # show print() stdout
@@ -134,6 +134,5 @@ dependencies = [
         "--pspec", # allows to use docstrings instead of test function names
     ]
     filterwarnings = [
-        "ignore::DeprecationWarning:environ.compat",
         "ignore::DeprecationWarning:functools",
     ]
