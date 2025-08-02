@@ -1,22 +1,22 @@
 import { For, Heading, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import type { CombinedError } from "urql";
+import { useUserCurrent } from "@/apps/users/useUserCurrent";
 import { CommentCreateForm } from "@/components/posts/comments/CommentCreateForm";
 import { CommentThread } from "@/components/posts/comments/CommentThread";
 import { PostCard } from "@/components/posts/PostCard";
-import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
+import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 
 export function PostDetail(props: {
   title: string;
-  post: PostDetailFragmentType | PostReviewDetailFragmentType | undefined;
+  post?: PostDetailFragmentType | PostReviewDetailFragmentType;
   isLoading: boolean;
   error?: CombinedError;
   children?: ReactNode;
-  isAuthenticated?: boolean;
-  onCommentSubmit?: (postId: string, content: string) => Promise<void>;
-  onCommentCreated?: () => void;
 }) {
+  const userQuery = useUserCurrent();
+
   return (
     <Stack>
       <Heading size="2xl">{props.title}</Heading>
@@ -30,22 +30,14 @@ export function PostDetail(props: {
           <Stack gap="gap.lg">
             <Heading size="lg">Comments</Heading>
 
-            <For each={props.post.comments.filter(comment => !comment.parent)}>
+            <For each={props.post?.comments.filter(comment => !comment.parent)}>
               {comment => (
-                <CommentThread
-                  key={comment.id}
-                  comment={comment as any}
-                  onCommentCreated={props.onCommentCreated}
-                />
+                // @ts-bad-inference
+                <CommentThread key={comment.id} comment={comment as PostCommentType} />
               )}
             </For>
 
-            {props.isAuthenticated && props.onCommentSubmit && props.post.type !== "Comment" && (
-              <CommentCreateForm
-                parentId={props.post.id}
-                onSubmit={async data => props.onCommentSubmit!(props.post!.id, data.content)}
-              />
-            )}
+            {userQuery.isAuthed && <CommentCreateForm parentId={props.post.id} />}
           </Stack>
         </Stack>
       )}

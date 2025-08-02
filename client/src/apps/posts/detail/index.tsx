@@ -1,15 +1,11 @@
+import toast from "react-hot-toast";
 import { useQuery } from "urql";
-
-import { useUserCurrent } from "@/apps/users/useUserCurrent";
-import { handleCommentSubmit } from "@/components/posts/comments/handleCommentSubmit";
 import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
 import { PostDetailFragment } from "@/graphql/fragments/posts";
 import type { Route } from "~/react-router/posts/detail/+types/index";
 
 export default function PostDetailRoute(props: Route.ComponentProps) {
-  const userCurrent = useUserCurrent();
-
   const query = graphql(
     `
       query PostDetail($pk: ID!) {
@@ -21,20 +17,15 @@ export default function PostDetailRoute(props: Route.ComponentProps) {
     [PostDetailFragment],
   );
 
-  const queryResult = useQuery({
+  const [{ data, error, fetching }] = useQuery({
     query,
     variables: { pk: props.params.id },
   });
+  if (error) {
+    toast.error("Post load failed");
+  }
 
   return (
-    <PostDetail
-      title="Post"
-      post={queryResult[0].data?.post ?? undefined}
-      isLoading={queryResult[0].fetching}
-      error={queryResult[0].error}
-      isAuthenticated={!!userCurrent.user}
-      onCommentSubmit={handleCommentSubmit}
-      onCommentCreated={() => {}}
-    />
+    <PostDetail title="Post" post={data?.post ?? undefined} isLoading={fetching} error={error} />
   );
 }

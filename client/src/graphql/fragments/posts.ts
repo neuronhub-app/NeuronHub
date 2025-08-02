@@ -120,6 +120,7 @@ export const PostCommentsFragment = graphql(
     }
   `,
 );
+export type PostCommentType = FragmentOf<typeof PostCommentsFragment>["comments"][number];
 
 export const PostDetailFragment = graphql(
   `

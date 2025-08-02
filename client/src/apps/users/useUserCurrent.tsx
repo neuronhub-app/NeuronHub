@@ -31,6 +31,7 @@ export function useUserCurrent() {
 
   return {
     user: snap.current,
+    isAuthed: !!snap.current,
     connections: snap.connections,
     error: error,
     fetching,

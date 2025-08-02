@@ -1,26 +1,12 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
 import { useUserCurrent } from "@/apps/users/useUserCurrent";
-import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { CommentCreateForm } from "@/components/posts/comments/CommentCreateForm";
 import { CommentVoteBar } from "@/components/posts/comments/CommentVoteBar";
-import { handleCommentSubmit } from "@/components/posts/comments/handleCommentSubmit";
-import type { FragmentOf } from "@/gql-tada";
-import type { PostCommentsFragment } from "@/graphql/fragments/posts";
+import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
+import type { PostCommentType } from "@/graphql/fragments/posts";
 
-type CommentType = FragmentOf<typeof PostCommentsFragment>["comments"][0];
-
-interface CommentThreadProps {
-  comment: CommentType;
-  onCommentCreated?: () => void;
-}
-
-export function CommentThread(props: CommentThreadProps) {
-  const userCurrent = useUserCurrent();
-
-  async function onSubmit(data: { content: string }) {
-    await handleCommentSubmit(props.comment.id, data.content);
-    props.onCommentCreated?.();
-  }
+export function CommentThread(props: { comment: PostCommentType }) {
+  const userQuery = useUserCurrent();
 
   return (
     <Box>
@@ -41,9 +27,9 @@ export function CommentThread(props: CommentThreadProps) {
           <Text whiteSpace="pre-wrap">{props.comment.content}</Text>
         </Box>
 
-        {userCurrent.user && (
+        {userQuery.isAuthed && (
           <Box ml={8}>
-            <CommentCreateForm parentId={props.comment.id} onSubmit={onSubmit} />
+            <CommentCreateForm parentId={props.comment.id} />
           </Box>
         )}
 

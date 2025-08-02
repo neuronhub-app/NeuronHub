@@ -5,22 +5,18 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
+import { handleCommentSubmit } from "@/components/posts/comments/handleCommentSubmit";
 import { ids } from "@/e2e/ids";
 import { useCommentDraft } from "@/hooks/useCommentDraft";
 
 const schema = z.object({
   content: z.string().min(1).max(5000),
 });
-type CommentFormData = z.infer<typeof schema>;
 
-export function CommentCreateForm(props: {
-  parentId: string;
-  onSubmit: (data: CommentFormData) => Promise<void>;
-  isLoading?: boolean;
-}) {
+export function CommentCreateForm(props: { parentId: string }) {
   const draft = useCommentDraft(props.parentId);
 
-  const form = useForm<CommentFormData>({
+  const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: { content: draft.content },
   });
@@ -32,8 +28,8 @@ export function CommentCreateForm(props: {
 
   return (
     <form
-      onSubmit={form.handleSubmit(async (data: CommentFormData) => {
-        await props.onSubmit(data);
+      onSubmit={form.handleSubmit(async data => {
+        await handleCommentSubmit(props.parentId, data.content);
         form.reset();
         draft.clear();
       })}
@@ -49,7 +45,6 @@ export function CommentCreateForm(props: {
           type="submit"
           variant="subtle"
           size="sm"
-          loading={props.isLoading}
           alignSelf="flex-start"
           {...ids.set(ids.comment.form.submitBtn)}
         >
