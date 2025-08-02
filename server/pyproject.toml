@@ -49,8 +49,12 @@ dependencies = [
     "humanize == 4.*", # [i=low, rep=norm, GH=norm, @jmoiron]
     "markdownify == 1.*", # [i=norm, rep=norm, GH=norm, @matthewwithanm, 1.7k] another project 2.3k stars. Other MD packages suck.
     "python-dotenv == 1.*", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few articles on saurabh-kumar.com/blog/
-    "python-environ == 0.4.*", # [i=none] drop - this is a 5y dead fork of django-environ
+    "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - sloria's marshmallow is used by Microsoft, AWS, etc
 ]
+
+# Python 3.14 support, waiting on GraphQL 3.3.*
+#[tool.uv.sources]
+#    strawberry-graphql = { git = "https://github.com/strawberry-graphql/strawberry.git", branch = "feature/314" }
 
 
 [tool.uv]
