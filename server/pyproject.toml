@@ -66,8 +66,7 @@ dependencies = [
         "wat == 0.6.*",
         "pytest == 8.*",
             "pytest-django == 4.*",
-            "pytest-mock == 3.*",
-            "pytest-pspec ~= 0.0.4",
+            "pytest-pspec ~= 0.0.4", # ~dead, mostly useless
             "pytest-rich == 0.*",
     ]
 
