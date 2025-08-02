@@ -40,8 +40,8 @@ Examples:
 - `types` - TypeScript or Python typings
 - `E2E` - Playwright, ie integration tests
 - `Docker`
-- `Coder`
-- `Mise` re mise.toml
+- `Coder` - coder.com
+- `Mise` - eg mise.toml
 
 Unused:
 - `brows` - browser extension
