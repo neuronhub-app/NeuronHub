@@ -1,12 +1,9 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
-import toast from "react-hot-toast";
-import { strs } from "@/apps/posts/detail/PostDetail";
-import { createPostComment } from "@/apps/posts/services/createPostComment";
 import { useUserCurrent } from "@/apps/users/useUserCurrent";
-import { CommentCreateForm } from "@/components/posts/CommentCreateForm";
-import { CommentVoteBar } from "@/components/posts/CommentVoteBar";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
-import { toaster } from "@/components/ui/toaster";
+import { CommentCreateForm } from "@/components/posts/comments/CommentCreateForm";
+import { CommentVoteBar } from "@/components/posts/comments/CommentVoteBar";
+import { handleCommentSubmit } from "@/components/posts/comments/handleCommentSubmit";
 import type { FragmentOf } from "@/gql-tada";
 import type { PostCommentsFragment } from "@/graphql/fragments/posts";
 
@@ -17,21 +14,13 @@ interface CommentThreadProps {
   onCommentCreated?: () => void;
 }
 
-export function CommentThread({ comment, onCommentCreated }: CommentThreadProps) {
-  const { user: authenticatedUser } = useUserCurrent();
+export function CommentThread(props: CommentThreadProps) {
+  const userCurrent = useUserCurrent();
 
-  const handleCommentSubmit = async (data: { content: string }) => {
-    try {
-      await createPostComment({ parentId: comment.id, content: data.content });
-      toast.success(strs.createdComment);
-      onCommentCreated?.();
-    } catch (error) {
-      toaster.error({
-        title: "Failed to post reply",
-        description: error instanceof Error ? error.message : "Unknown error",
-      });
-    }
-  };
+  async function onSubmit(data: { content: string }) {
+    await handleCommentSubmit(props.comment.id, data.content);
+    props.onCommentCreated?.();
+  }
 
   return (
     <Box>
@@ -40,28 +29,28 @@ export function CommentThread({ comment, onCommentCreated }: CommentThreadProps)
           <HStack mb={2} justify="space-between">
             <Box>
               <Text fontWeight="semibold" display="inline">
-                {comment.author?.username}
+                {props.comment.author?.username}
               </Text>
               <PostDatetime
-                datetimeStr={comment.created_at}
+                datetimeStr={props.comment.created_at}
                 style={{ display: "inline", ml: 2 }}
               />
             </Box>
-            <CommentVoteBar comment={comment} />
+            <CommentVoteBar comment={props.comment} />
           </HStack>
-          <Text whiteSpace="pre-wrap">{comment.content}</Text>
+          <Text whiteSpace="pre-wrap">{props.comment.content}</Text>
         </Box>
 
-        {authenticatedUser && (
+        {userCurrent.user && (
           <Box ml={8}>
-            <CommentCreateForm parentId={comment.id} onSubmit={handleCommentSubmit} />
+            <CommentCreateForm parentId={props.comment.id} onSubmit={onSubmit} />
           </Box>
         )}
 
-        {comment.comments?.length > 0 && (
+        {props.comment.comments?.length > 0 && (
           <Box ml={8}>
             <VStack align="stretch" gap={4}>
-              {comment.comments.map(reply => (
+              {props.comment.comments.map(reply => (
                 <Box key={reply.id} p={4} borderWidth={1} borderRadius="md">
                   <HStack mb={2} justify="space-between">
                     <Box>

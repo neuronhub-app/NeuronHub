@@ -1,7 +1,6 @@
-"use client";
-
 import { IconButton, Span } from "@chakra-ui/react";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { LuMessageCircleMore, LuRefreshCcw, LuX } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,14 +14,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from "@/components/ui/menu";
-import { toaster } from "@/components/ui/toaster";
 
 export const MemberActions = (props: { item: string }) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleResendInvite = () => {
     // do something
-    toaster.success({ title: `The invite has been sent to ${props.item}` });
+    toast.success(`The invite has been sent to ${props.item}`);
   };
 
   const handleBeforeRevoke = () => {
@@ -32,7 +30,7 @@ export const MemberActions = (props: { item: string }) => {
   const handleRevoke = () => {
     // do something
     setShowConfirmDialog(false);
-    toaster.success({ title: "Member revoked" });
+    toast.success("Member revoked");
   };
 
   return (
