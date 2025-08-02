@@ -1,6 +1,7 @@
 [tools]
     bun = "latest"
     uv = "latest"
+    biome = "latest"
     claude = "latest"
         node = "latest"
 
@@ -17,107 +18,104 @@
     ]
 
 
-[tasks.dev-start]
-    depends = ["dev-db", "dev-server", "dev-client"]
+[tasks."dev"]
+    depends = ["dev:db", "dev:server", "dev:client"]
 
-    [tasks.dev-server]
-        depends = "dev-db"
+    [tasks."dev:server"]
+        depends = "dev:db"
         dir = "server"
         run = "uv run manage.py runserver"
 
-    [tasks.dev-client]
-        depends = "dev-db"
+    [tasks."dev:client"]
+        depends = "dev:db"
         dir = "client"
         run = "bun run dev --host"
 
-    [tasks.dev-db]
+    [tasks."dev:db"]
         dir = "devops"
         run = "sudo docker compose up db --detach"
         silent = true
 
-    [tasks.dev-db-stop]
+    [tasks."dev:db-stop"]
         dir = "devops"
         run = "sudo docker compose down db"
 
 
-[tasks.pytest]
+[tasks."test"]
     dir = "server"
-    depends = "dev-db"
-    run = "uv run pytest"
+    depends = "dev:db"
+    run = "mise run test:*"
 
-[tasks.e2e]
-    depends = ["dev-db", "dev-db-setup-e2e"]
-    dir = "client"
-    run = "bun run playwright test --config=e2e/playwright.config.ts"
-    env.VITE_SERVER_URL = "http://localhost:{{get_env(name='E2E_SERVER_PORT', default='8001')}}"
+    [tasks."test:pytest"]
+        dir = "server"
+        depends = "dev:db"
+        run = "uv run pytest"
 
-[tasks.db-migrate]
+    [tasks."test:e2e"]
+        depends = ["dev:db", "dev:db:setup-e2e"]
+        dir = "client"
+        run = "bun run playwright test --config=e2e/playwright.config.ts"
+        env.VITE_SERVER_URL = "http://localhost:{{get_env(name='E2E_SERVER_PORT', default='8001')}}"
+
+
+[tasks."django:migrate"]
     dir = "server"
     run = "uv run manage.py migrate"
 
-[tasks.db-makemigrations]
+[tasks."django:makemigrations"]
     dir = "server"
     run = "uv run manage.py makemigrations"
 
-[tasks.db-stubs-repopulate]
+[tasks."django:stubs-repopulate"]
     dir = "server"
     run = "uv run manage.py db_stubs_repopulate"
 
 
-[tasks.graphql-gen]
-    depends = ["graphql-gen-server", "graphql-gen-client"]
+[tasks."typegen"]
+    wait_for = "typegen:server"
+    run = ["mise typegen:client:graphql", "mise typegen:client:react"]
+    description = "Strawberry GraphQL + TypeSript"
 
-    [tasks.graphql-gen-server]
+    [tasks."typegen:server"]
         dir = "server"
         run = "uv run manage.py export_schema neuronhub.graphql --path=../schema.graphql"
 
-    [tasks.graphql-gen-client]
+    [tasks."typegen:client:graphql"]
         dir = "client"
         run = [
             "bun run graphql-codegen --config src/codegen.ts",
             "bun run gql-tada generate output",
-            "mise format-client",
         ]
+        depends_post = "format:client"
 
-[tasks.client-typegen]
-    dir = "client"
-    run = [
-        "bun run react-router typegen",
-        "bunx @chakra-ui/cli typegen src/theme/theme.ts",
-    ]
-
-
-[tasks.format]
-    depends = ["format-server", "format-client"]
-
-    [tasks.format-server]
-        dir = "server"
-        run = "uv run ruff format ."
-
-    [tasks.format-client]
-        dir = "client"
-        run = "bun run biome check --write"
-
-    [tasks.format-client-unsafe]
-        dir = "client"
-        run = "bun run biome check --write --unsafe"
-
-
-[tasks.lint]
-    depends = "typegen-client"
-    run = ["mise lint-server", "mise lint-client"]
-
-    [tasks.lint-server]
-        dir = "server"
-        run = "uv run mypy neuronhub"
-
-    [tasks.lint-client]
-        dir = "client"
-        run = "bun run tsc --noEmit"
-
-    [tasks.typegen-client]
+    [tasks."typegen:client:react"]
         dir = "client"
         run = [
             "bun run react-router typegen",
             "bunx @chakra-ui/cli typegen src/theme/theme.ts",
         ]
+
+
+[tasks."format"]
+    run = "mise run format:*"
+
+    [tasks."format:server"]
+        dir = "server"
+        run = "uv run ruff format"
+
+    [tasks."format:client"]
+        dir = "client"
+        run = "bun run biome format --write"
+
+
+[tasks."lint"]
+    depends = "typegen"
+    run = "mise run lint:*"
+
+    [tasks."lint:server"]
+        dir = "server"
+        run = "uv run mypy neuronhub"
+
+    [tasks."lint:client"]
+        dir = "client"
+        run = "bun run tsc --noEmit"

@@ -13,7 +13,9 @@ We do not fucking test third-party libraries, as Strawberry, GraphQL, etc.
 
 ### Pytest
 
-Use a subclass `NeuronTestCase`, importing from [test_cases](/server/neuronhub/apps/tests/test_cases.py), its code looks as:
+Run by `mise test:pytest`
+
+In tests use a subclass `NeuronTestCase`, from [test_cases](/server/neuronhub/apps/tests/test_cases.py). It's code is like:
 
 ```python
 class NeuronTestCase(TestCase):
@@ -64,11 +66,11 @@ review_2 = await self.gen.posts.create(self.gen.posts.Params(type=Post.Type.Revi
 
 In E2E we test only the critical user journeys. Or the cases with the lowest possible maintenance cost. Everything else is stupid time waste.
 
-- Run by `mise e2e` - Django and Vite are run by Playwright
-- Specs are all in `client/e2e/tests`
+- Run by `mise test:e2e` - Django and Vite are run by Playwright
+- Specs are in `client/e2e/tests`
 
 Notes:
-- If code needs `waitForTimeout` or similar - it is shit and must be rewritten.
+- If code needs timeouts as `waitForTimeout` - it is shit and must be rewritten.
 - `client/e2e/PlayWrightHelper.ts` is wrapper for bad Playwright API.
 - Use `data-testid` for locators, in JSX set as `{...ids.set(ids.post.btn.submit)}`, see `client/e2e/ids.ts`
 - Auth is by Django `/admin/login/` and cookie - CORS 100% works.

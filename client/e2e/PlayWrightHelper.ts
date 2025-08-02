@@ -50,7 +50,7 @@ export class PlayWrightHelper {
       .mutation(
         gql`mutation db_stubs_repopulate { test_db_stubs_repopulate }`,
         {},
-        { url: config.server.apiUrl }, // because Vite env gets fucked by Mise and Playwright Node process
+        { url: config.server.apiUrl }, // as Vite env is fucked by Playwright's Node process
       )
       .toPromise();
   }

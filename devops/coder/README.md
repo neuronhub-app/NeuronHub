@@ -1,7 +1,7 @@
 ## Dockerfile build
 
-- `mise run docker-build`
-- `mise run docker-push`
+- `mise run docker:build`
+- `mise run docker:push`
 
 For custom registry create a `mise.local.toml`:
 ```toml
@@ -13,7 +13,7 @@ For custom registry create a `mise.local.toml`:
 
 On start it:
 - Clones/pulls Git repo
-- Runs `mise install-deps` and `mise db-migrate`
+- Runs `mise install-deps` and `mise django:migrate`
 
 Notes:
 - (!) Uses `/var/run/docker.sock`

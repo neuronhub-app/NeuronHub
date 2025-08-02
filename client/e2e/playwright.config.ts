@@ -11,7 +11,7 @@ export default defineConfig({
   webServer: [
     {
       // --quiet keeps stderr wo/ stdout
-      command: `mise run --quiet dev-server ${config.server.port} --nothreading`,
+      command: `mise run --quiet dev:server ${config.server.port} --nothreading`,
       name: "Server",
       url: `${config.server.url}/admin/login/`,
       env: {
@@ -22,7 +22,7 @@ export default defineConfig({
       },
     },
     {
-      command: `mise run dev-client --port ${config.client.port}`,
+      command: `mise run dev:client --port ${config.client.port}`,
       name: "Client",
       url: config.client.url,
       env: {

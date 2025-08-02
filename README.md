@@ -6,9 +6,9 @@ Install `Mise`, then:
 ```shell
 mise install
 mise install-deps
-mise db-migrate
-mise db-stubs-repopulate
-mise dev-start
+mise django:migrate
+mise django:stubs-repopulate
+mise dev
 ```
 
 URLs
