@@ -7,7 +7,10 @@ import type { UseFormReturn } from "react-hook-form";
 import { FaMessage, FaRegMessage } from "react-icons/fa6";
 import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
 
-import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create/index";
+import type {
+  ReviewCreateForm,
+  ReviewSelectOption,
+} from "@/apps/reviews/create/ReviewCreateForm";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogBody,

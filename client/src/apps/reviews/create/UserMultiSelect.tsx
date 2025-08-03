@@ -2,7 +2,10 @@ import { DialogBackdrop, Flex, HStack } from "@chakra-ui/react";
 import { AsyncCreatableSelect, components } from "chakra-react-select";
 import { useEffect, useRef } from "react";
 import { subscribe } from "valtio/vanilla";
-import type { ReviewCreateForm, ReviewSelectOption } from "@/apps/reviews/create/index";
+import type {
+  ReviewCreateForm,
+  ReviewSelectOption,
+} from "@/apps/reviews/create/ReviewCreateForm";
 import { user } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {

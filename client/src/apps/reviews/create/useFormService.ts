@@ -1,6 +1,6 @@
 import { captureException } from "@sentry/react";
 import { useClient } from "urql";
-import type { ReviewCreateForm } from "@/apps/reviews/create";
+import type { ReviewCreateForm } from "@/apps/reviews/create/ReviewCreateForm";
 import { graphql } from "@/gql-tada";
 
 export function useFormService() {

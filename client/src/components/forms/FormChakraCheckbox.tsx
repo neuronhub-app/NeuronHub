@@ -1,7 +1,7 @@
 import { Field as ChakraField, Checkbox } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import type { FieldPath, UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
-import type { ReviewCreateForm } from "@/apps/reviews/create";
+import type { ReviewCreateForm } from "@/apps/reviews/create/ReviewCreateForm";
 
 export function FormChakraCheckboxField<
   TFieldName extends FieldPath<ReviewCreateForm.FormSchema>,

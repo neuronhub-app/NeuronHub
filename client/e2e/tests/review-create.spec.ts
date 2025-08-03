@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { ReviewCreateForm } from "@/apps/reviews/create";
+import { ReviewCreateForm } from "@/apps/reviews/create/ReviewCreateForm";
 import { config } from "@/e2e/config";
 import { ids } from "@/e2e/ids";
 import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
