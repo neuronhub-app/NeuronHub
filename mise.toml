@@ -72,7 +72,7 @@
 
 
 [tasks."typegen"]
-    wait_for = "typegen:server"
+    depends = "typegen:server"
     run = [
         "mise typegen:client:graphql",
         "mise typegen:client:react",
