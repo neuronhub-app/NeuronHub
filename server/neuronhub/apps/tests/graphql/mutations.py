@@ -11,5 +11,9 @@ class TestsMutation:
     async def test_db_stubs_repopulate(self, info: Info) -> str:
         assert settings.DEBUG
 
-        gen = await db_stubs_repopulate(is_delete_posts=True, is_delete_users=True)
+        gen = await db_stubs_repopulate(
+            is_delete_posts=True,
+            is_delete_user_default=True,
+            is_delete_users_extra=True,
+        )
         return gen.users.user_default.username

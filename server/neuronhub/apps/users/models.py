@@ -60,3 +60,5 @@ class UserConnectionGroup(models.Model):
         related_name="connection_groups_reverse",
         related_query_name="connection_group_reverse",
     )
+
+    NAME_DEFAULT = "Connections"

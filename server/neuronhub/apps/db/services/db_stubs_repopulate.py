@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import asyncio
-import dataclasses
 import datetime
 import logging
 import textwrap
+from dataclasses import dataclass
 
 from asgiref.sync import sync_to_async
 from django.utils import timezone
@@ -22,20 +22,18 @@ from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
 from neuronhub.apps.posts.services.create_tag import create_tag
-from neuronhub.apps.users.models import User
-
+from neuronhub.apps.users.models import User, UserConnectionGroup
 
 logger = logging.getLogger(__name__)
 
 
 async def db_stubs_repopulate(
     is_delete_posts: bool = False,
-    is_delete_users: bool = False,
-    is_delete_orgs: bool = False,
+    is_delete_user_default: bool = False,
+    is_delete_users_extra: bool = True,
 ) -> Gen:
     if is_delete_posts:
         for model in [
-            # posts:
             PostTagVote,
             PostTag,
             PostVote,
@@ -46,25 +44,59 @@ async def db_stubs_repopulate(
         ]:
             await model._default_manager.all().adelete()
 
-    if is_delete_orgs:
+    if is_delete_user_default:
+        await User.objects.all().adelete()
         await Org.objects.all().adelete()
 
-    if is_delete_users:
-        await User.objects.all().adelete()
+    if is_delete_users_extra:
+        await UserConnectionGroup.objects.all().adelete()
+        await User.objects.filter(username__in=users.__dict__.values()).adelete()
 
     gen = await Gen.create(is_user_default_superuser=True)
     user = gen.users.user_default
 
+    await _create_users(gen)
+
     await _create_review_pycharm(user, gen=gen)
     tool_iterm = await _create_review_iterm(user, gen=gen)
     await _create_review_ghostly(user, alternatives=[tool_iterm], gen=gen)
-    tool_unifi = await _create_tool_unifi_network(user, gen=gen)
-    tool_aider = await _create_tool_aider(user, gen=gen)
-
-    # Create Posts
-    await _create_posts(user, gen=gen, post_unifi=tool_unifi, post_aider=tool_aider)
-
+    await _create_tool_and_post_unifi_network(user, gen=gen)
+    await _create_tool_and_post_aider(user, gen=gen)
     return gen
+
+
+async def _create_users(gen: Gen):
+    user = gen.users.user_default
+    group_default, _ = await user.connection_groups.aget_or_create(
+        name=UserConnectionGroup.NAME_DEFAULT,
+        user=user,
+    )
+    user_connected_1 = await gen.users.user(username=users.connected_1, is_get_or_create=True)
+    user_connected_2 = await gen.users.user(username=users.connected_2, is_get_or_create=True)
+    await group_default.connections.aadd(user_connected_1, user_connected_2)
+
+    group_engineers, _ = await user.connection_groups.aget_or_create(
+        name="Engineers",
+        user=user,
+    )
+    user_engineer_1 = await gen.users.user(username=users.engineer_1, is_get_or_create=True)
+    user_engineer_2 = await gen.users.user(username=users.engineer_2, is_get_or_create=True)
+    user_engineer_3 = await gen.users.user(username=users.engineer_3, is_get_or_create=True)
+    await group_engineers.connections.aadd(user_engineer_1, user_engineer_2, user_engineer_3)
+
+    await gen.users.user(username=users.random_1, is_get_or_create=True)
+    await gen.users.user(username=users.random_2, is_get_or_create=True)
+
+
+@dataclass
+class users:
+    connected_1 = "u_connected_1"
+    connected_2 = "u_connected_2"
+    engineer_1 = "u_engineer_1"
+    engineer_2 = "u_engineer_2"
+    engineer_3 = "u_engineer_3"
+    random_1 = "u_random_1"
+    random_2 = "u_random_2"
 
 
 async def _create_review_pycharm(user: User, gen: Gen):
@@ -269,7 +301,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
     )
 
 
-async def _create_tool_unifi_network(user: User, gen: Gen) -> Post:
+async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
     tool = await gen.posts.create(
         gen.posts.Params(
             title="UniFi Network)",
@@ -294,10 +326,25 @@ async def _create_tool_unifi_network(user: User, gen: Gen) -> Post:
             TagParams("Dev / License / Proprietary"),
         ],
     )
+    await gen.posts.create(
+        gen.posts.Params(
+            title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this)",
+            content=textwrap.dedent(
+                """
+                From LLM:
+                > 1. No UI solution - requires custom scripts that survive firmware updates and enforce routing rules, 
+                eg see the dead github.com/peacey/split-vpn
+                > 2. Can create a separate VLAN for VPN traffic with custom policy routing through config.gateway.json
+                """
+            ),
+            parent=tool,
+            author=user,
+        )
+    )
     return tool
 
 
-async def _create_tool_aider(user: User, gen: Gen) -> Post:
+async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
     tool = await gen.posts.create(
         gen.posts.Params(
             title="Aider",
@@ -323,34 +370,15 @@ async def _create_tool_aider(user: User, gen: Gen) -> Post:
             TagParams("Dev / License / Apache 2.0", is_important=True),
         ],
     )
-    return tool
-
-
-async def _create_posts(user: User, gen: Gen, post_unifi: Post, post_aider: Post):
-    await gen.posts.create(
-        gen.posts.Params(
-            title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this)",
-            content=textwrap.dedent(
-                """
-                From LLM:
-                > 1. No UI solution - requires custom scripts that survive firmware updates and enforce routing rules, 
-                eg see the dead github.com/peacey/split-vpn
-                > 2. Can create a separate VLAN for VPN traffic with custom policy routing through config.gateway.json
-                """
-            ),
-            parent=post_unifi,
-            author=user,
-        )
-    )
-
     await gen.posts.create(
         gen.posts.Params(
             title="Aider leaderboards are becoming popular on HN for new models assessment)",
             content="https://aider.chat/docs/leaderboards",
-            parent=post_aider,
+            parent=tool,
             author=user,
         )
     )
+    return tool
 
 
 async def create_company_ownership(name: str) -> ToolCompanyOwnership:
@@ -358,7 +386,7 @@ async def create_company_ownership(name: str) -> ToolCompanyOwnership:
     return ownership
 
 
-@dataclasses.dataclass
+@dataclass
 class TagParams:
     name: str
     is_vote_pos: bool | None = None
@@ -380,7 +408,7 @@ async def create_tags(tool: Post, author: User, params: list[TagParams]):
     )
 
 
-@dataclasses.dataclass
+@dataclass
 class ReviewTagParams:
     name: ReviewTagName
     is_vote_pos: bool | None = None

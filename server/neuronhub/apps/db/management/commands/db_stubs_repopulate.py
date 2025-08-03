@@ -13,8 +13,7 @@ logger = logging.getLogger(__name__)
 
 class Options(TypedDict):
     is_delete_posts: bool
-    is_delete_orgs: bool
-    is_delete_users: bool
+    is_delete_user_default: bool
 
 
 class Command(BaseCommand):
@@ -25,12 +24,7 @@ class Command(BaseCommand):
             default=True,
         )
         parser.add_argument(
-            "--is_delete_orgs",
-            action="store_true",
-            default=False,
-        )
-        parser.add_argument(
-            "--is_delete_users",
+            "--is_delete_user_default",
             action="store_true",
             default=False,
         )
@@ -40,8 +34,7 @@ class Command(BaseCommand):
             asyncio.run(
                 db_stubs_repopulate(
                     is_delete_posts=options["is_delete_posts"],
-                    is_delete_users=options["is_delete_users"],
-                    is_delete_orgs=options["is_delete_orgs"],
+                    is_delete_user_default=options["is_delete_user_default"],
                 )
             )
             logger.info("Database stubs repopulated successfully")

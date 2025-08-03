@@ -83,7 +83,7 @@ class UsersGen:
         if is_get_or_create:
             user, _ = await User.objects.aget_or_create(
                 username=username_new,
-                email=email or self.faker.email(domain=self._user_email_domain),
+                email=f"{username_new}@{self._user_email_domain}",
             )
         else:
             user = await User.objects.acreate(
