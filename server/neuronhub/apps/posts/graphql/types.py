@@ -77,7 +77,7 @@ class PostTypeI:
     def get_queryset(cls, queryset: QuerySet[Post], info: Info) -> QuerySet[Post]:
         user = get_current_user(info)
         if hasattr(cls, "TYPE"):
-            queryset = queryset.filter(type=cls.TYPE)
+            queryset = queryset.filter(type=cls.TYPE).distinct("id")
         return async_to_sync(filter_posts_by_user)(user, posts=queryset)
 
 
@@ -86,7 +86,6 @@ class PostType(PostTypeI):
     TYPE = Post.Type.Post
 
 
-# noinspection PyDataclass
 @strawberry_django.type(Post, filters=PostFilter)
 class PostToolType(PostTypeI):
     TYPE = Post.Type.Tool
