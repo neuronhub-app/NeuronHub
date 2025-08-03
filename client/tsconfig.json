@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ESNext", // ES2020 from Vite, replaced with ESNext for Chakra
-    "module": "ESNext", // ES6 replaced with ESNext for Chakra
+    "target": "ESNext", // from Chakra
+    "module": "ESNext", // from Chakra
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "moduleResolution": "Bundler", // by Vite and Chakra
+    "moduleResolution": "Bundler", // from Vite and Chakra
 
     "useDefineForClassFields": true,
     "skipLibCheck": true,
@@ -13,9 +13,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    // zod.js requires strict=true (and probably strictNullChecks=true) to mark fields as "required" by default.
-    //
-    // gql.tada doesn't work without it.
+    // - zod.js requires strict=true (and probably strictNullChecks=true) to mark fields as "required" by default.
+    // - gql.tada doesn't work without it.
     "strict": true,
 
     "noFallthroughCasesInSwitch": true,
@@ -26,7 +25,8 @@
     "paths": {
       "@/e2e/*": ["./e2e/*"],
       "@/*": ["./src/*"],
-      // generated
+
+      // generations prefixed with `~`
       "~/graphql/*": ["./graphql/*"],
       "~/react-router/*": ["./.react-router/types/src/apps/*"],
     },
@@ -36,7 +36,7 @@
         "name": "gql.tada/ts-plugin",
         "schema": "./../schema.graphql",
         "tadaOutputLocation": "./graphql/graphql-env.d.ts",
-        "shouldCheckForColocatedFragments": false, // see [[docs/client-caveats.md]]
+        "shouldCheckForColocatedFragments": false, // see [[docs/caveats/client-caveats.md]]
       },
     ],
   },

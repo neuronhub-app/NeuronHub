@@ -216,7 +216,7 @@ export function OptionButton(props: {
   );
 }
 
-// @llm-code been fine
+// #AI works fine
 function toggleOptionVoteValue(
   option: ReviewSelectOption,
   isPositive: boolean,

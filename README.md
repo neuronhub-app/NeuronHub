@@ -1,6 +1,10 @@
+---
+reviewed_at: 2025.08.02
+---
+
 ### Setup
 
-For complete dev env see [Coder's Dockerfile](/devops/coder/Dockerfile).
+For complete env setup see [Coder.com Dockerfile](/devops/coder/Dockerfile).
 
 Install `Mise`, then:
 ```shell
@@ -17,7 +21,8 @@ URLs
 
 Read [mise.toml](/mise.toml) for more.
 
-### Main docs
+### Docs
 
 - [architecture](/docs/architecture.md)
 - [testing setup](/docs/testing-setup.md)
+- [code style](/docs/code-style.md)

@@ -1,8 +1,8 @@
-# Coder Workspace image
+# Coder.com Workspace image
 # ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.9.0"
+LABEL version="0.1.10.0"
 
 USER coder
 
@@ -61,22 +61,17 @@ RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 
 # Mise tools
 # -----------------------------------
-# todo maybe: git clone project's mise.toml
+# todo refac: git clone neuronhub's mise.toml and run `mise install`
 RUN sudo apt install --yes gpg-agent # for node
 RUN mise install uv bun node
 
+RUN mise exec uv --command "uv tool install claude-monitor"
+
 # Claude + MCPs: Memory, Thinking, Postgres
 RUN mise exec node --command "npm install --global @anthropic-ai/claude-code @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking @modelcontextprotocol/server-postgres"
-RUN mise exec node --command "claude config set --global verbose true"
-RUN mise exec node --command "claude config set --global preferredNotifChannel terminal_bell"
-RUN mise exec uv --command "uv tool install claude-monitor"
 
 # MCP Context7
 ENV CONTEXT7_CACHE_DIR=$XDG_DATA_HOME/context7/cache
 ENV CONTEXT7_DOCS_DIR=$XDG_DATA_HOME/context7/docs
 RUN mkdir -p $XDG_DATA_HOME/context7/{cache,docs}
 RUN mise exec bun --command "bun install --global @upstash/context7-mcp@latest"
-
-# Playwright + Chromium
-RUN mise exec uv --command "uv tool install playwright"
-RUN mise exec uv --command "uv tool run playwright install chromium --with-deps"
