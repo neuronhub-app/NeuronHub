@@ -19,6 +19,7 @@ export default defineConfig({
         CLIENT_URL: config.client.url,
         DATABASE_NAME: config.server.databaseName,
         IS_DJANGO_RUNSERVER_STDERR_ONLY: "true",
+        E2E_TEST: "true",
       },
     },
     {

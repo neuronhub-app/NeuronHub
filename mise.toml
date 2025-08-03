@@ -24,7 +24,7 @@
     [tasks."dev:server"]
         depends = "dev:db"
         dir = "server"
-        run = "uv run manage.py runserver $SERVER_PORT"
+        run = "uv run manage.py runserver {% if not env['E2E_TEST']  %}$SERVER_PORT{% endif %}"
 
     [tasks."dev:client"]
         depends = "dev:db"

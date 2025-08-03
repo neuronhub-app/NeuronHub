@@ -25,7 +25,5 @@ export const env = cleanEnv(import.meta.env ?? {}, {
     choices: ["development", "staging", "production"],
     default: "development",
   }),
-  VITE_SERVER_URL: url({
-    default: "http://localhost:8000",
-  }),
+  VITE_SERVER_URL: url({ default: "http://localhost:8000" }),
 });
