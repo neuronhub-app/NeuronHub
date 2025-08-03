@@ -160,7 +160,8 @@ SITE_ID = 1
 STATIC_URL = "static/"
 ROOT_URLCONF = "neuronhub.urls"
 
-SERVER_URL = env.str("SERVER_URL", "http://localhost:8000")
+SERVER_PORT = env.int("SERVER_PORT", 8000)
+SERVER_URL = env.str("SERVER_URL", f"http://localhost:{SERVER_PORT}")
 CLIENT_URL = env.str("CLIENT_URL", "http://localhost:3000")
 DOMAIN = env.str("DOMAIN", CLIENT_URL.replace("https://", "").replace("http://", ""))
 DOMAIN_PROD = "neuronhub.io"

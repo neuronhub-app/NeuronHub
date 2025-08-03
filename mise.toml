@@ -24,7 +24,7 @@
     [tasks."dev:server"]
         depends = "dev:db"
         dir = "server"
-        run = "uv run manage.py runserver"
+        run = "uv run manage.py runserver $SERVER_PORT"
 
     [tasks."dev:client"]
         depends = "dev:db"
@@ -55,7 +55,7 @@
         depends = ["dev:db", "dev:db:setup-e2e"]
         dir = "client"
         run = "bun run playwright test --config=e2e/playwright.config.ts"
-        env.VITE_SERVER_URL = "http://localhost:{{get_env(name='E2E_SERVER_PORT', default='8001')}}"
+        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='E2E_SERVER_PORT', default='8001') }}"
 
 
 [tasks."django:migrate"]
