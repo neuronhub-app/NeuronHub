@@ -18,7 +18,7 @@ export namespace ids {
 
   export const review = {
     form: {
-      parentNameInput: "review.form.parent-name-input",
+      parentTitleInput: "review.form.parent-title-input",
       titleInput: "review.form.title-input",
       contentTextarea: "review.form.content-textarea",
       usageStatusSelector: "review.form.usage-status-selector",

@@ -12,6 +12,7 @@ test.describe("Comments", () => {
     await pwh.dbResetAndLogin();
   });
 
+  // todo !(test) flaky on last state check
   test("post and vote", async ({ page }) => {
     await pwh.navigate(urls.reviews.$);
     await pwh.get(ids.post.card.link).click();

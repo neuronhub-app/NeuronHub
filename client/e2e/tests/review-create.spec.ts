@@ -14,9 +14,9 @@ test.describe("Review create", () => {
 
   test("Create with 2 fields", async ({ page }) => {
     await page.goto(`${config.client.url}/reviews/create`);
-    await expect(page.getByTestId(ids.review.form.parentNameInput)).toBeVisible();
+    await expect(page.getByTestId(ids.review.form.parentTitleInput)).toBeVisible();
 
-    await page.getByTestId(ids.review.form.parentNameInput).fill("Django");
+    await page.getByTestId(ids.review.form.parentTitleInput).fill("Django");
     await page.getByTestId(ids.review.form.contentTextarea).fill("Easy to build with");
     await helper.click(ids.post.btn.submit);
 

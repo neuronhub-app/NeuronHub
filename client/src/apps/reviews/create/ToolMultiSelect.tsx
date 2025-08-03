@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-type ReviewSelectName = "tags" | "parent.alternatives";
+type ReviewSelectName = "tags" | "alternatives";
 
 export function ToolMultiSelect(props: {
   form: UseFormReturn<ReviewCreateForm.FormSchema>;

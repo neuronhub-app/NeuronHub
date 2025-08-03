@@ -37,9 +37,9 @@ import { useClient } from "urql";
 import { proxy } from "valtio";
 import { useProxy } from "valtio/utils";
 import { z } from "zod/v4";
+import { sendReviewCreateMutation } from "@/apps/reviews/create/sendReviewCreateMutation";
 import { ToolMultiSelect } from "@/apps/reviews/create/ToolMultiSelect";
 import { UserMultiSelect } from "@/apps/reviews/create/UserMultiSelect";
-import { useFormService } from "@/apps/reviews/create/useFormService";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -53,8 +53,8 @@ import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { UsageStatus, Visibility } from "~/graphql/enums";
 
-// todo refac: discard and use eg two Fragments for input/output
-// why is it an interface? gql.tada is shit - prob that's why. i should use an extract of the gql Input
+// todo refac: use eg two Fragments for input/output
+// prob an `interface` because of gql.tada bugs. Try an extract of the gql Input later
 export interface ReviewSelectOption {
   id: ID;
   name: string;
@@ -82,7 +82,7 @@ export namespace ReviewCreateForm {
       }),
     )
     .optional();
-  const useMultiSelect = z
+  const userMultiSelect = z
     .array(
       z.object({
         id: z.string(),
@@ -110,7 +110,7 @@ export namespace ReviewCreateForm {
   export const schema = z.object({
     parent: z.object({
       id: z.string().nullable(),
-      name: z.string().min(1),
+      title: z.string().min(1),
       tool_type: z.union([
         z.literal("Program"),
         z.literal("Material"),
@@ -127,30 +127,32 @@ export namespace ReviewCreateForm {
       crunchbase_url: z
         .union([z.string().includes("crunchbase.com").includes("/"), zStringEmpty()])
         .optional(),
-      alternatives: toolMultiSelect,
     }),
+
     id: z.string().nullable(),
     title: z.string().optional(),
     source: z.string().optional(),
     content: z.string().optional(),
     content_private: z.string().optional(),
+    alternatives: toolMultiSelect,
+    tags: toolMultiSelect,
+
+    // review fields
     review_rating: z.number().min(0).max(100).nullable(),
-    review_importance: z.number().optional(),
+    review_importance: z.number().min(0).max(100).optional().nullable(),
     review_usage_status: z.enum(Object.values(UsageStatus)),
     reviewed_at: z.iso.date().optional(),
+
     visibility: z.enum(Object.values(Visibility)),
-    tags: toolMultiSelect,
-    recommend_to: useMultiSelect,
-    visible_to: useMultiSelect,
+    recommend_to: userMultiSelect,
+    visible_to: userMultiSelect,
     is_review_later: z.boolean().optional(),
   });
 
   export type FormSchema = z.infer<typeof schema>;
   export type FormType = UseFormReturn<FormSchema>;
 
-  export const strs = {
-    reviewCreated: "Review added",
-  } as const;
+  export const strs = { reviewCreated: "Review added" } as const;
 
   const state = proxy({
     isRated: true,
@@ -172,19 +174,18 @@ export namespace ReviewCreateForm {
         review_usage_status: UsageStatus.Using,
         visibility: Visibility.Private,
         is_review_later: false,
-        // importance: Importance.Medium,
+        review_importance: null,
       },
     });
     const control = form.control;
 
     const client = useClient();
-    const formService = useFormService();
     const navigate = useNavigate();
     const $state = useProxy(state);
     const formState = form.watch();
 
     async function handleSubmit(values: z.infer<typeof schema>) {
-      const res = await formService.send(values);
+      const res = await sendReviewCreateMutation(client, values);
       if (res.success) {
         toast.success(strs.reviewCreated);
         navigate(`/reviews/${res.reviewId}`);
@@ -256,9 +257,9 @@ export namespace ReviewCreateForm {
                 </Show>
 
                 <FormChakraInput
-                  field={{ control, name: "parent.name" }}
+                  field={{ control, name: "parent.title" }}
                   label={`${getToolTypeName()} name`}
-                  {...ids.set(ids.review.form.parentNameInput)}
+                  {...ids.set(ids.review.form.parentTitleInput)}
                 />
 
                 {/* todo maybe: responsiveness */}
@@ -325,29 +326,30 @@ export namespace ReviewCreateForm {
                   </Text>
                   <ToolMultiSelect
                     form={form}
-                    fieldName="parent.alternatives"
+                    fieldName="alternatives"
                     loadOptions={async (inputValue: string) => {
                       const res = await client
                         .query(
+                          // todo refac: rename "name" -> "title"?
                           graphql(`
-                            query PostToolAlternativesQuery($name: String) {
-                              post_tools( filters: {title: { contains: $name} } ) {
+                            query PostToolAlternativesQuery($title: String) {
+                              post_tools( filters: {title: { contains: $title } } ) {
                                 id
                                 title
                               }
                             }
                           `),
-                          { name: inputValue },
+                          { title: inputValue },
                         )
                         .toPromise();
                       if (!res.data) {
                         toast.error("Failed to load alternatives");
                         return [];
                       }
-                      return res.data.post_tools.map(p => ({
-                        id: p.id,
-                        name: p.title,
-                      }));
+                      const toolsRaw = res.data.post_tools;
+                      // dedupe by ID (JS sucks)
+                      const tools = [...new Map(toolsRaw.map(tool => [tool.id, tool])).values()];
+                      return tools.map(tool => ({ id: tool.id, name: tool.title }));
                     }}
                   />
                 </VStack>
@@ -480,13 +482,13 @@ export namespace ReviewCreateForm {
                     ]}
                     size="sm"
                   />
-                  {formState.visibility in
-                    [
-                      Visibility.UsersSelected,
-                      Visibility.Connections,
-                      Visibility.SubscribersPaid,
-                      Visibility.Subscribers,
-                    ] && (
+                  {new Set([
+                    Visibility.UsersSelected,
+                    Visibility.Connections,
+                    Visibility.ConnectionGroupsSelected,
+                    Visibility.SubscribersPaid,
+                    Visibility.Subscribers,
+                  ]).has(formState.visibility) && (
                     <UserMultiSelect
                       form={form}
                       fieldName="visible_to"

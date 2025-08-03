@@ -161,17 +161,13 @@ class Post(AnonimazableTimeStampedModel):
     # review fields
     # ---------------------
 
-    review_rating = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+    review_rating = models.PositiveIntegerField(
         blank=True,
         null=True,
         help_text="Split on 5 categories: very dissatisfied, dissatisfied, neutral, satisfied, very satisfied",
     )
     review_experience_hours = models.PositiveIntegerField(blank=True, null=True)
-    review_importance = models.DecimalField(
-        max_digits=5, decimal_places=2, blank=True, null=True
-    )
+    review_importance = models.PositiveIntegerField(blank=True, null=True)
     review_usage_status = TextChoicesField(
         UsageStatus,
         default=None,

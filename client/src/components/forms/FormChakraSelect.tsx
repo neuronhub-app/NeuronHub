@@ -11,7 +11,7 @@ export function FormChakraSelect(props: {
   fieldName: "review_importance";
   options: Array<{
     label: string;
-    value: ReviewCreateForm.FormSchema["review_importance"];
+    value: string;
   }>;
 }) {
   return (
