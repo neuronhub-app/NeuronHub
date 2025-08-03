@@ -5,18 +5,14 @@ import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-interface Vote {
-  id: ID;
-  is_vote_positive: boolean | null;
-  author: { id: ID };
-}
-
-interface UsePostVoteParams {
+export function usePostVoting(props: {
   postId: ID;
-  votes: Vote[];
-}
-
-export function usePostVote({ postId, votes }: UsePostVoteParams) {
+  votes: Array<{
+    id: ID;
+    is_vote_positive: boolean | null;
+    author: { id: ID };
+  }>;
+}) {
   const userSnap = useSnapshot(user.state);
 
   const state = useValtioProxyRef({
@@ -26,22 +22,16 @@ export function usePostVote({ postId, votes }: UsePostVoteParams) {
   });
 
   useEffect(() => {
-    const userVote = userSnap.current?.post_votes.find(vote => vote.post.id === postId);
+    const userVote = userSnap.current?.post_votes.find(vote => vote.post.id === props.postId);
     state.mutable.isVotePositive = userVote?.is_vote_positive ?? null;
-  }, [userSnap.current?.post_votes, postId]);
+  }, [userSnap.current?.post_votes, props.postId]);
 
-  const votesSum = votes.reduce((sum, vote) => {
-    if (vote.is_vote_positive === true) return sum + 1;
-    if (vote.is_vote_positive === false) return sum - 1;
-    return sum;
-  }, 0);
-
-  const toggleVote = async (isVotePositive: boolean) => {
+  async function vote(args: { isPositive: boolean }) {
     if (state.snap.isLoadingUpvote || state.snap.isLoadingDownvote) {
       return;
     }
 
-    if (isVotePositive) {
+    if (args.isPositive) {
       state.mutable.isLoadingUpvote = true;
     } else {
       state.mutable.isLoadingDownvote = true;
@@ -49,11 +39,11 @@ export function usePostVote({ postId, votes }: UsePostVoteParams) {
 
     let newVoteValue: boolean | null = null;
     if (state.snap.isVotePositive === null) {
-      newVoteValue = isVotePositive;
-    } else if (state.snap.isVotePositive === isVotePositive) {
+      newVoteValue = args.isPositive;
+    } else if (state.snap.isVotePositive === args.isPositive) {
       newVoteValue = null;
     } else {
-      newVoteValue = isVotePositive;
+      newVoteValue = args.isPositive;
     }
 
     await mutateAndRefetch(
@@ -62,18 +52,26 @@ export function usePostVote({ postId, votes }: UsePostVoteParams) {
           create_or_update_post_vote(id: $id, is_vote_positive: $isVotePositive)
         }
       `),
-      { id: postId, isVotePositive: newVoteValue },
+      { id: props.postId, isVotePositive: newVoteValue },
     );
 
     state.mutable.isLoadingUpvote = false;
     state.mutable.isLoadingDownvote = false;
-  };
+  }
 
   return {
     isVotePositive: state.snap.isVotePositive,
     isLoadingUpvote: state.snap.isLoadingUpvote,
     isLoadingDownvote: state.snap.isLoadingDownvote,
-    toggleVote,
-    votesSum,
+    vote,
+    sum: props.votes.reduce((sum, vote) => {
+      if (vote.is_vote_positive === true) {
+        return sum + 1;
+      }
+      if (vote.is_vote_positive === false) {
+        return sum - 1;
+      }
+      return sum;
+    }, 0),
   };
 }

@@ -1,11 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const STORAGE_KEY_PREFIX = "comment-draft-";
-const DEBOUNCE_MS = 500;
-
-// AI shit
-export function useCommentDraft(parentId: string) {
-  const storageKey = `${STORAGE_KEY_PREFIX}${parentId}`;
+// @AI-slop todo refac: drop all. try to an existing package
+export function usePostCommentDraft(parentId: string) {
+  const storageKey = `comment-draft-${parentId}`;
 
   const [content, setContent] = useState(() => {
     try {
@@ -33,7 +30,7 @@ export function useCommentDraft(parentId: string) {
         } catch {
           // Silently fail if localStorage is not available
         }
-      }, DEBOUNCE_MS);
+      }, 500);
     },
     [storageKey],
   );

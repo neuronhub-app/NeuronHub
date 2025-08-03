@@ -2,19 +2,22 @@ import { Button, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { z } from "zod";
+import { strs } from "@/apps/posts/detail/PostDetail";
 
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
-import { handleCommentSubmit } from "@/components/posts/comments/handleCommentSubmit";
 import { ids } from "@/e2e/ids";
-import { useCommentDraft } from "@/hooks/useCommentDraft";
+import { graphql } from "@/gql-tada";
+import { usePostCommentDraft } from "@/hooks/usePostCommentDraft";
+import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 
 const schema = z.object({
   content: z.string().min(1).max(5000),
 });
 
 export function CommentCreateForm(props: { parentId: string }) {
-  const draft = useCommentDraft(props.parentId);
+  const draft = usePostCommentDraft(props.parentId);
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -29,9 +32,16 @@ export function CommentCreateForm(props: { parentId: string }) {
   return (
     <form
       onSubmit={form.handleSubmit(async data => {
-        await handleCommentSubmit(props.parentId, data.content);
-        form.reset();
-        draft.clear();
+        try {
+          await createComment({ parentId: props.parentId, content: data.content });
+          toast.success(strs.createdComment);
+          form.reset();
+          draft.clear();
+        } catch (error) {
+          const errorMessage = error instanceof Error ? error.message : "Unknown error";
+          toast.error(`Failed to post comment: ${errorMessage}`);
+          return;
+        }
       })}
     >
       <Stack gap={4}>
@@ -52,5 +62,35 @@ export function CommentCreateForm(props: { parentId: string }) {
         </Button>
       </Stack>
     </form>
+  );
+}
+
+async function createComment(input: { parentId: string; content: string }) {
+  return mutateAndRefetch(
+    graphql(`
+      mutation CreatePostComment($data: PostTypeInput!) {
+        create_post_comment(data: $data) {
+          id
+          type
+          content
+          author {
+            id
+            username
+          }
+          parent {
+            id
+          }
+          created_at
+        }
+      }
+    `),
+    {
+      data: {
+        parent: { id: input.parentId, tags: [] },
+        content: input.content,
+        tags: [],
+        visibility: "PUBLIC",
+      },
+    },
   );
 }

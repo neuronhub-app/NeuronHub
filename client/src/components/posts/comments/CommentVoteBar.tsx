@@ -2,48 +2,34 @@ import { HStack, IconButton, Text } from "@chakra-ui/react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
-import { usePostVote } from "@/hooks/usePostVote";
+import type { PostCommentType } from "@/graphql/fragments/posts";
+import { usePostVoting } from "@/hooks/usePostVoting";
 
-interface CommentVoteBarProps {
-  comment: {
-    id: ID;
-    votes: {
-      id: ID;
-      is_vote_positive: boolean | null;
-      author: { id: ID };
-    }[];
-  };
-}
-
-export function CommentVoteBar({ comment }: CommentVoteBarProps) {
-  const { isVotePositive, isLoadingUpvote, isLoadingDownvote, toggleVote, votesSum } =
-    usePostVote({
-      postId: comment.id,
-      votes: comment.votes,
-    });
+export function CommentVoteBar(props: { comment: { id: ID; votes: PostCommentType["votes"] } }) {
+  const voting = usePostVoting({ postId: props.comment.id, votes: props.comment.votes });
 
   return (
     <HStack color="slate.muted" gap={1}>
       <IconButton
+        loading={voting.isLoadingUpvote}
+        onClick={() => voting.vote({ isPositive: true })}
+        data-state={voting.isVotePositive === true ? "checked" : "unchecked"}
         size="xs"
         variant="ghost"
-        loading={isLoadingUpvote}
-        onClick={() => toggleVote(true)}
-        data-state={isVotePositive === true ? "checked" : "unchecked"}
         {...ids.set(ids.comment.vote.up)}
         aria-label="Upvote comment"
       >
         <FaChevronUp />
       </IconButton>
       <Text fontSize="sm" minW={4} textAlign="center">
-        {votesSum}
+        {voting.sum}
       </Text>
       <IconButton
+        loading={voting.isLoadingDownvote}
+        onClick={() => voting.vote({ isPositive: false })}
+        data-state={voting.isVotePositive === false ? "checked" : "unchecked"}
         size="xs"
         variant="ghost"
-        loading={isLoadingDownvote}
-        onClick={() => toggleVote(false)}
-        data-state={isVotePositive === false ? "checked" : "unchecked"}
         {...ids.set(ids.comment.vote.down)}
         aria-label="Downvote comment"
       >
