@@ -5,17 +5,21 @@ import { initGraphQLTada } from "gql.tada";
  *
  * This is a copy-paste of the default from the docs, with disableMasking=true.
  */
-import type { Scalars } from "~/graphql/graphql";
-import type { introspection } from "~/graphql/graphql-env.d.ts";
+import type { introspection } from "~/graphql/gql-tada/graphql-env.d.ts";
 
 export const graphql = initGraphQLTada<{
-  // Re fragment unmasking: overengineered.
-  // It's bad when paragraphs are written saying "this abstraction is actually good for you"
+  // `disableMasking: false` is overengineered.
+  // You know it's bad when docs have pages explaining "this abstraction is actually good for you"
   disableMasking: true;
   introspection: introspection;
+  scalars: {
+    DateTime: string;
+    Decimal: string;
+    Upload: File;
+  };
 }>();
 
 export type { FragmentOf, ResultOf, VariablesOf } from "gql.tada";
 export { readFragment } from "gql.tada";
 
-export type ID = Scalars["ID"]["input"];
+export type ID = ReturnType<typeof graphql.scalar<"ID">>;

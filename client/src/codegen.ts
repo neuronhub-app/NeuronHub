@@ -1,34 +1,22 @@
-import * as fs from "node:fs";
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 /**
- * The project uses gql.tada instead of codegen.
- * But some types are require codegen, eg Enums.
- *
- * And can help with hardcoding allowed queries/mutations in the future.
+ * While we use gql.tada instead of codegen, gql.data lacks Enum generation, hence we use codegen.
  */
 export default {
   schema: "../schema.graphql",
-  documents: ["./src/**/*"],
-  ignoreNoDocuments: true, // for better experience with the watcher
-
+  documents: [],
+  ignoreNoDocuments: true,
   generates: {
-    "./graphql/": {
-      preset: "client",
+    "./graphql/enums.ts": {
+      plugins: [
+        {
+          typescript: {
+            enumsAsTypes: false,
+            onlyEnums: true,
+          },
+        },
+      ],
     },
   },
-  hooks: {
-    afterAllFileWrite: ["bun run format"],
-    afterOneFileWrite: (file: string) => {
-      const isRedundantFile =
-        file.endsWith("fragment-masking.ts") ||
-        file.endsWith("index.ts") ||
-        file.endsWith("gql.ts");
-
-      if (isRedundantFile) {
-        // delete, we use gql.tada for it
-        fs.unlinkSync(file);
-      }
-    },
-  },
-} as CodegenConfig;
+} satisfies CodegenConfig;

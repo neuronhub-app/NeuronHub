@@ -6,7 +6,7 @@ import { user } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { ID } from "@/gql-tada";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
-import type { UserListName } from "~/graphql/graphql";
+import type { UserListName } from "~/graphql/enums";
 
 // todo feat(UI): clipboard action on click
 // todo feat(UI): mutate Post.recommended_to_users/groups

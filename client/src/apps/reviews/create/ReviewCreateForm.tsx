@@ -51,7 +51,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tag } from "@/components/ui/tag";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
-import { UsageStatus, Visibility } from "~/graphql/graphql";
+import { UsageStatus, Visibility } from "~/graphql/enums";
 
 // todo refac: discard and use eg two Fragments for input/output
 // why is it an interface? gql.tada is shit - prob that's why. i should use an extract of the gql Input

@@ -1,0 +1,2758 @@
+/* eslint-disable */
+/* prettier-ignore */
+
+export type introspection_types = {
+  BoolBaseFilterLookup: {
+    kind: "INPUT_OBJECT";
+    name: "BoolBaseFilterLookup";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "exact";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "is_null";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "in_list";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+    ];
+  };
+  Boolean: unknown;
+  DateTime: unknown;
+  DjangoFileType: {
+    kind: "OBJECT";
+    name: "DjangoFileType";
+    fields: {
+      name: {
+        name: "name";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      path: {
+        name: "path";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      size: {
+        name: "size";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Int"; ofType: null };
+        };
+      };
+      url: {
+        name: "url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+    };
+  };
+  DjangoModelType: {
+    kind: "OBJECT";
+    name: "DjangoModelType";
+    fields: {
+      pk: {
+        name: "pk";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+    };
+  };
+  ID: unknown;
+  IDBaseFilterLookup: {
+    kind: "INPUT_OBJECT";
+    name: "IDBaseFilterLookup";
+    isOneOf: false;
+    inputFields: [
+      { name: "exact"; type: { kind: "SCALAR"; name: "ID"; ofType: null }; defaultValue: null },
+      {
+        name: "is_null";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "in_list";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+    ];
+  };
+  Int: unknown;
+  ManyToManyInput: {
+    kind: "INPUT_OBJECT";
+    name: "ManyToManyInput";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "add";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "remove";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "set";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+    ];
+  };
+  ManyToOneInput: {
+    kind: "INPUT_OBJECT";
+    name: "ManyToOneInput";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "add";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "remove";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "set";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+    ];
+  };
+  Mutation: {
+    kind: "OBJECT";
+    name: "Mutation";
+    fields: {
+      create_or_update_post_vote: {
+        name: "create_or_update_post_vote";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
+      create_post: {
+        name: "create_post";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "PostType"; ofType: null };
+        };
+      };
+      create_post_comment: {
+        name: "create_post_comment";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "PostCommentType"; ofType: null };
+        };
+      };
+      create_post_review: {
+        name: "create_post_review";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "PostType"; ofType: null };
+        };
+      };
+      logout: {
+        name: "logout";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
+      test_db_stubs_repopulate: {
+        name: "test_db_stubs_repopulate";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      update_post: {
+        name: "update_post";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "PostType"; ofType: null };
+        };
+      };
+      update_post_seen_status: {
+        name: "update_post_seen_status";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
+      update_user: {
+        name: "update_user";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      update_user_list: {
+        name: "update_user_list";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
+    };
+  };
+  PostCommentType: {
+    kind: "OBJECT";
+    name: "PostCommentType";
+    fields: {
+      TYPE: {
+        name: "TYPE";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      children: {
+        name: "children";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null };
+            };
+          };
+        };
+      };
+      comments: {
+        name: "comments";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostCommentType"; ofType: null };
+            };
+          };
+        };
+      };
+      company: {
+        name: "company";
+        type: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+      };
+      content: {
+        name: "content";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      content_private: {
+        name: "content_private";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      created_at: {
+        name: "created_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      crunchbase_url: {
+        name: "crunchbase_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      domain: {
+        name: "domain";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      github_url: {
+        name: "github_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      parent: {
+        name: "parent";
+        type: { kind: "OBJECT"; name: "PostCommentType"; ofType: null };
+      };
+      recommended_to_groups: {
+        name: "recommended_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      recommended_to_users: {
+        name: "recommended_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      seen_by_users: {
+        name: "seen_by_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      source: {
+        name: "source";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      tag_votes: {
+        name: "tag_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+      tags: {
+        name: "tags";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagType"; ofType: null };
+            };
+          };
+        };
+      };
+      title: {
+        name: "title";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      type: {
+        name: "type";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      updated_at: {
+        name: "updated_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      url: {
+        name: "url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      visibility: {
+        name: "visibility";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "Visibility"; ofType: null };
+        };
+      };
+      visible_to_groups: {
+        name: "visible_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      visible_to_users: {
+        name: "visible_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      votes: {
+        name: "votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+    };
+  };
+  PostFilter: {
+    kind: "INPUT_OBJECT";
+    name: "PostFilter";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "type";
+        type: { kind: "INPUT_OBJECT"; name: "PostTypeEnumFilterLookup"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "title";
+        type: { kind: "INPUT_OBJECT"; name: "StrFilterLookup"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "AND";
+        type: { kind: "INPUT_OBJECT"; name: "PostFilter"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "OR";
+        type: { kind: "INPUT_OBJECT"; name: "PostFilter"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "NOT";
+        type: { kind: "INPUT_OBJECT"; name: "PostFilter"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "DISTINCT";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+    ];
+  };
+  PostReviewType: {
+    kind: "OBJECT";
+    name: "PostReviewType";
+    fields: {
+      TYPE: {
+        name: "TYPE";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      children: {
+        name: "children";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null };
+            };
+          };
+        };
+      };
+      comments: {
+        name: "comments";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostCommentType"; ofType: null };
+            };
+          };
+        };
+      };
+      company: {
+        name: "company";
+        type: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+      };
+      content: {
+        name: "content";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      content_private: {
+        name: "content_private";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      created_at: {
+        name: "created_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      crunchbase_url: {
+        name: "crunchbase_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      domain: {
+        name: "domain";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      github_url: {
+        name: "github_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      parent: { name: "parent"; type: { kind: "OBJECT"; name: "PostToolType"; ofType: null } };
+      recommended_to_groups: {
+        name: "recommended_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      recommended_to_users: {
+        name: "recommended_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      review_experience_hours: {
+        name: "review_experience_hours";
+        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+      };
+      review_importance: {
+        name: "review_importance";
+        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+      };
+      review_rating: {
+        name: "review_rating";
+        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+      };
+      review_usage_status: {
+        name: "review_usage_status";
+        type: { kind: "ENUM"; name: "UsageStatus"; ofType: null };
+      };
+      reviewed_at: {
+        name: "reviewed_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      seen_by_users: {
+        name: "seen_by_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      source: {
+        name: "source";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      tag_votes: {
+        name: "tag_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+      tags: {
+        name: "tags";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagType"; ofType: null };
+            };
+          };
+        };
+      };
+      title: {
+        name: "title";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      type: {
+        name: "type";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      updated_at: {
+        name: "updated_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      url: {
+        name: "url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      visibility: {
+        name: "visibility";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "Visibility"; ofType: null };
+        };
+      };
+      visible_to_groups: {
+        name: "visible_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      visible_to_users: {
+        name: "visible_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      votes: {
+        name: "votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+    };
+  };
+  PostTagFilter: {
+    kind: "INPUT_OBJECT";
+    name: "PostTagFilter";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "id";
+        type: { kind: "INPUT_OBJECT"; name: "IDBaseFilterLookup"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "name";
+        type: { kind: "INPUT_OBJECT"; name: "StrFilterLookup"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "description";
+        type: { kind: "INPUT_OBJECT"; name: "StrFilterLookup"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "is_review_tag";
+        type: { kind: "INPUT_OBJECT"; name: "BoolBaseFilterLookup"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "AND";
+        type: { kind: "INPUT_OBJECT"; name: "PostTagFilter"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "OR";
+        type: { kind: "INPUT_OBJECT"; name: "PostTagFilter"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "NOT";
+        type: { kind: "INPUT_OBJECT"; name: "PostTagFilter"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "DISTINCT";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+    ];
+  };
+  PostTagType: {
+    kind: "OBJECT";
+    name: "PostTagType";
+    fields: {
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      description: {
+        name: "description";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      is_important: {
+        name: "is_important";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+      };
+      is_review_tag: {
+        name: "is_review_tag";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
+      label: {
+        name: "label";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      name: {
+        name: "name";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      posts: {
+        name: "posts";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostType"; ofType: null };
+            };
+          };
+        };
+      };
+      tag_children: {
+        name: "tag_children";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagType"; ofType: null };
+            };
+          };
+        };
+      };
+      tag_parent: {
+        name: "tag_parent";
+        type: { kind: "OBJECT"; name: "PostTagType"; ofType: null };
+      };
+      votes: {
+        name: "votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+    };
+  };
+  PostTagTypeInput: {
+    kind: "INPUT_OBJECT";
+    name: "PostTagTypeInput";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "name";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+        defaultValue: null;
+      },
+      { name: "id"; type: { kind: "SCALAR"; name: "ID"; ofType: null }; defaultValue: null },
+      {
+        name: "comment";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "is_vote_positive";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "is_important";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+    ];
+  };
+  PostTagVoteType: {
+    kind: "OBJECT";
+    name: "PostTagVoteType";
+    fields: {
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      is_changed_my_mind: {
+        name: "is_changed_my_mind";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        };
+      };
+      is_vote_positive: {
+        name: "is_vote_positive";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+      };
+      post: {
+        name: "post";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null };
+        };
+      };
+      tag: {
+        name: "tag";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "PostTagType"; ofType: null };
+        };
+      };
+    };
+  };
+  PostToolType: {
+    kind: "OBJECT";
+    name: "PostToolType";
+    fields: {
+      TYPE: {
+        name: "TYPE";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      alternatives: {
+        name: "alternatives";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostToolType"; ofType: null };
+            };
+          };
+        };
+      };
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      children: {
+        name: "children";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null };
+            };
+          };
+        };
+      };
+      comments: {
+        name: "comments";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostCommentType"; ofType: null };
+            };
+          };
+        };
+      };
+      company: {
+        name: "company";
+        type: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+      };
+      content: {
+        name: "content";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      content_private: {
+        name: "content_private";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      created_at: {
+        name: "created_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      crunchbase_url: {
+        name: "crunchbase_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      domain: {
+        name: "domain";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      github_url: {
+        name: "github_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      parent: { name: "parent"; type: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null } };
+      recommended_to_groups: {
+        name: "recommended_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      recommended_to_users: {
+        name: "recommended_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      seen_by_users: {
+        name: "seen_by_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      source: {
+        name: "source";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      tag_votes: {
+        name: "tag_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+      tags: {
+        name: "tags";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagType"; ofType: null };
+            };
+          };
+        };
+      };
+      title: {
+        name: "title";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      tool_type: { name: "tool_type"; type: { kind: "ENUM"; name: "ToolType"; ofType: null } };
+      type: {
+        name: "type";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      updated_at: {
+        name: "updated_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      url: {
+        name: "url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      visibility: {
+        name: "visibility";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "Visibility"; ofType: null };
+        };
+      };
+      visible_to_groups: {
+        name: "visible_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      visible_to_users: {
+        name: "visible_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      votes: {
+        name: "votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+    };
+  };
+  PostType: {
+    kind: "OBJECT";
+    name: "PostType";
+    fields: {
+      TYPE: {
+        name: "TYPE";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      children: {
+        name: "children";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null };
+            };
+          };
+        };
+      };
+      comments: {
+        name: "comments";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostCommentType"; ofType: null };
+            };
+          };
+        };
+      };
+      company: {
+        name: "company";
+        type: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+      };
+      content: {
+        name: "content";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      content_private: {
+        name: "content_private";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      created_at: {
+        name: "created_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      crunchbase_url: {
+        name: "crunchbase_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      domain: {
+        name: "domain";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      github_url: {
+        name: "github_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      parent: { name: "parent"; type: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null } };
+      recommended_to_groups: {
+        name: "recommended_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      recommended_to_users: {
+        name: "recommended_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      seen_by_users: {
+        name: "seen_by_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      source: {
+        name: "source";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      tag_votes: {
+        name: "tag_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+      tags: {
+        name: "tags";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagType"; ofType: null };
+            };
+          };
+        };
+      };
+      title: {
+        name: "title";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      type: {
+        name: "type";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      updated_at: {
+        name: "updated_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      url: {
+        name: "url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      visibility: {
+        name: "visibility";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "Visibility"; ofType: null };
+        };
+      };
+      visible_to_groups: {
+        name: "visible_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      visible_to_users: {
+        name: "visible_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      votes: {
+        name: "votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+    };
+  };
+  PostTypeEnum: { name: "PostTypeEnum"; enumValues: "Post" | "Tool" | "Review" | "Comment" };
+  PostTypeEnumFilterLookup: {
+    kind: "INPUT_OBJECT";
+    name: "PostTypeEnumFilterLookup";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "exact";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "is_null";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "in_list";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "i_exact";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "contains";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "i_contains";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "starts_with";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "i_starts_with";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "ends_with";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "i_ends_with";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "regex";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "i_regex";
+        type: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        defaultValue: null;
+      },
+    ];
+  };
+  PostTypeI: {
+    kind: "INTERFACE";
+    name: "PostTypeI";
+    fields: {
+      TYPE: {
+        name: "TYPE";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      children: {
+        name: "children";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null };
+            };
+          };
+        };
+      };
+      comments: {
+        name: "comments";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostCommentType"; ofType: null };
+            };
+          };
+        };
+      };
+      company: {
+        name: "company";
+        type: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+      };
+      content: {
+        name: "content";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      content_private: {
+        name: "content_private";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      created_at: {
+        name: "created_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      crunchbase_url: {
+        name: "crunchbase_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      domain: {
+        name: "domain";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      github_url: {
+        name: "github_url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      parent: { name: "parent"; type: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null } };
+      recommended_to_groups: {
+        name: "recommended_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      recommended_to_users: {
+        name: "recommended_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      seen_by_users: {
+        name: "seen_by_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      source: {
+        name: "source";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      tag_votes: {
+        name: "tag_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+      tags: {
+        name: "tags";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagType"; ofType: null };
+            };
+          };
+        };
+      };
+      title: {
+        name: "title";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      type: {
+        name: "type";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "PostTypeEnum"; ofType: null };
+        };
+      };
+      updated_at: {
+        name: "updated_at";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        };
+      };
+      url: {
+        name: "url";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      visibility: {
+        name: "visibility";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "ENUM"; name: "Visibility"; ofType: null };
+        };
+      };
+      visible_to_groups: {
+        name: "visible_to_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      visible_to_users: {
+        name: "visible_to_users";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      votes: {
+        name: "votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+    };
+    possibleTypes: "PostCommentType" | "PostReviewType" | "PostToolType" | "PostType";
+  };
+  PostTypeInput: {
+    kind: "INPUT_OBJECT";
+    name: "PostTypeInput";
+    isOneOf: false;
+    inputFields: [
+      { name: "id"; type: { kind: "SCALAR"; name: "ID"; ofType: null }; defaultValue: null },
+      {
+        name: "parent";
+        type: { kind: "INPUT_OBJECT"; name: "PostTypeInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "alternatives";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "title";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "content";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "content_private";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "visibility";
+        type: { kind: "ENUM"; name: "Visibility"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "visible_to_users";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "visible_to_groups";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "recommended_to_users";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "recommended_to_groups";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "tags";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "INPUT_OBJECT"; name: "PostTagTypeInput"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "source";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "seen_by_users";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "review_usage_status";
+        type: { kind: "ENUM"; name: "UsageStatus"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "review_rating";
+        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "review_experience_hours";
+        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "review_importance";
+        type: { kind: "SCALAR"; name: "Int"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "is_review_later";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "reviewed_at";
+        type: { kind: "SCALAR"; name: "DateTime"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "tool_type";
+        type: { kind: "ENUM"; name: "ToolType"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "domain";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "github_url";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "crunchbase_url";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "url";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+    ];
+  };
+  PostVoteType: {
+    kind: "OBJECT";
+    name: "PostVoteType";
+    fields: {
+      author: {
+        name: "author";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      is_changed_my_mind: {
+        name: "is_changed_my_mind";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+      };
+      is_vote_positive: {
+        name: "is_vote_positive";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+      };
+      post: {
+        name: "post";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "INTERFACE"; name: "PostTypeI"; ofType: null };
+        };
+      };
+    };
+  };
+  Query: {
+    kind: "OBJECT";
+    name: "Query";
+    fields: {
+      post: { name: "post"; type: { kind: "OBJECT"; name: "PostType"; ofType: null } };
+      post_comment: {
+        name: "post_comment";
+        type: { kind: "OBJECT"; name: "PostCommentType"; ofType: null };
+      };
+      post_comments: {
+        name: "post_comments";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostCommentType"; ofType: null };
+            };
+          };
+        };
+      };
+      post_review: {
+        name: "post_review";
+        type: { kind: "OBJECT"; name: "PostReviewType"; ofType: null };
+      };
+      post_reviews: {
+        name: "post_reviews";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostReviewType"; ofType: null };
+            };
+          };
+        };
+      };
+      post_tool: {
+        name: "post_tool";
+        type: { kind: "OBJECT"; name: "PostToolType"; ofType: null };
+      };
+      post_tools: {
+        name: "post_tools";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostToolType"; ofType: null };
+            };
+          };
+        };
+      };
+      posts: {
+        name: "posts";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostType"; ofType: null };
+            };
+          };
+        };
+      };
+      tags: {
+        name: "tags";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagType"; ofType: null };
+            };
+          };
+        };
+      };
+      user_current: {
+        name: "user_current";
+        type: { kind: "OBJECT"; name: "UserType"; ofType: null };
+      };
+    };
+  };
+  StrFilterLookup: {
+    kind: "INPUT_OBJECT";
+    name: "StrFilterLookup";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "exact";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "is_null";
+        type: { kind: "SCALAR"; name: "Boolean"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "in_list";
+        type: {
+          kind: "LIST";
+          name: never;
+          ofType: {
+            kind: "NON_NULL";
+            name: never;
+            ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+          };
+        };
+        defaultValue: null;
+      },
+      {
+        name: "i_exact";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "contains";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "i_contains";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "starts_with";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "i_starts_with";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "ends_with";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "i_ends_with";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "regex";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "i_regex";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+    ];
+  };
+  String: unknown;
+  ToolType: {
+    name: "ToolType";
+    enumValues: "Program" | "Material" | "SaaS" | "App" | "Product" | "Other";
+  };
+  Upload: unknown;
+  UsageStatus: {
+    name: "UsageStatus";
+    enumValues: "USING" | "USED" | "WANT_TO_USE" | "INTERESTED" | "NOT_INTERESTED";
+  };
+  UserConnectionGroupType: {
+    kind: "OBJECT";
+    name: "UserConnectionGroupType";
+    fields: {
+      connections: {
+        name: "connections";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserType"; ofType: null };
+            };
+          };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "ID"; ofType: null };
+        };
+      };
+      name: {
+        name: "name";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+    };
+  };
+  UserListName: { name: "UserListName"; enumValues: "read_later" | "library" };
+  UserType: {
+    kind: "OBJECT";
+    name: "UserType";
+    fields: {
+      avatar: { name: "avatar"; type: { kind: "OBJECT"; name: "DjangoFileType"; ofType: null } };
+      connection_groups: {
+        name: "connection_groups";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "UserConnectionGroupType"; ofType: null };
+            };
+          };
+        };
+      };
+      email: {
+        name: "email";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      first_name: {
+        name: "first_name";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      id: {
+        name: "id";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      last_name: {
+        name: "last_name";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+      library: {
+        name: "library";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      post_tag_votes: {
+        name: "post_tag_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostTagVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+      post_votes: {
+        name: "post_votes";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "PostVoteType"; ofType: null };
+            };
+          };
+        };
+      };
+      read_later: {
+        name: "read_later";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: {
+            kind: "LIST";
+            name: never;
+            ofType: {
+              kind: "NON_NULL";
+              name: never;
+              ofType: { kind: "OBJECT"; name: "DjangoModelType"; ofType: null };
+            };
+          };
+        };
+      };
+      username: {
+        name: "username";
+        type: {
+          kind: "NON_NULL";
+          name: never;
+          ofType: { kind: "SCALAR"; name: "String"; ofType: null };
+        };
+      };
+    };
+  };
+  UserTypeInput: {
+    kind: "INPUT_OBJECT";
+    name: "UserTypeInput";
+    isOneOf: false;
+    inputFields: [
+      {
+        name: "username";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "first_name";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "last_name";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "email";
+        type: { kind: "SCALAR"; name: "String"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "connection_groups";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToOneInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "avatar";
+        type: { kind: "SCALAR"; name: "Upload"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "read_later";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+      {
+        name: "library";
+        type: { kind: "INPUT_OBJECT"; name: "ManyToManyInput"; ofType: null };
+        defaultValue: null;
+      },
+    ];
+  };
+  Visibility: {
+    name: "Visibility";
+    enumValues:
+      | "PRIVATE"
+      | "USERS_SELECTED"
+      | "CONNECTION_GROUPS_SELECTED"
+      | "CONNECTIONS"
+      | "SUBSCRIBERS_PAID"
+      | "SUBSCRIBERS"
+      | "INTERNAL"
+      | "PUBLIC";
+  };
+};
+
+/** An IntrospectionQuery representation of your schema.
+ *
+ * @remarks
+ * This is an introspection of your schema saved as a file by GraphQLSP.
+ * It will automatically be used by `gql.tada` to infer the types of your GraphQL documents.
+ * If you need to reuse this data or update your `scalars`, update `tadaOutputLocation` to
+ * instead save to a .ts instead of a .d.ts file.
+ */
+export type introspection = {
+  name: never;
+  query: "Query";
+  mutation: "Mutation";
+  subscription: never;
+  types: introspection_types;
+};
+
+import * as gqlTada from "gql.tada";
+
+declare module "gql.tada" {
+  interface setupSchema {
+    introspection: introspection;
+  }
+}

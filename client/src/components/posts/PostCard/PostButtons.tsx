@@ -13,7 +13,7 @@ import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
-import { UserListName } from "~/graphql/graphql";
+import { UserListName } from "~/graphql/enums";
 
 // todo refac: put into PostCard [[./index.tsx]], and leave only `export ReviewButton`
 // this is overly complex & abstract for a child component

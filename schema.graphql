@@ -26,9 +26,6 @@ input BoolBaseFilterLookup {
 """Date with time (isoformat)"""
 scalar DateTime
 
-"""Decimal (fixed-point)"""
-scalar Decimal
-
 type DjangoFileType {
   name: String!
   path: String!
@@ -146,8 +143,8 @@ type PostReviewType implements PostTypeI {
   created_at: DateTime!
   updated_at: DateTime!
   review_usage_status: UsageStatus
-  review_rating: Decimal
-  review_importance: Decimal
+  review_rating: Int
+  review_importance: Int
   review_experience_hours: Int
   reviewed_at: DateTime!
 }
@@ -357,9 +354,9 @@ input PostTypeInput {
   source: String
   seen_by_users: ManyToManyInput
   review_usage_status: UsageStatus
-  review_rating: Decimal
+  review_rating: Int
   review_experience_hours: Int
-  review_importance: Decimal
+  review_importance: Int
   is_review_later: Boolean
   reviewed_at: DateTime
   tool_type: ToolType
