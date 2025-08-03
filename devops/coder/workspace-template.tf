@@ -1,4 +1,4 @@
-# version 0.3.1.0
+# version 0.3.2.0
 
 terraform {
   required_providers {
@@ -114,18 +114,15 @@ resource "coder_agent" "main" {
     mkdir -p ~/projects/; cd ~/projects/
     if test -d ${data.coder_parameter.project_name.value}
         cd ${data.coder_parameter.project_name.value}
-        git pull
     else
         git clone "${local.git_url}" ${data.coder_parameter.project_name.value}
         cd ${data.coder_parameter.project_name.value}
     end
 
-    # Project setup
-    mise trust
+    # Mise
+    mise trust --quiet
     mise install
-    mise install-deps
-    mise dev-db
-    mise db-migrate
+    mise run dev-db
   EOT
 
   # (Optional) only for GUI
