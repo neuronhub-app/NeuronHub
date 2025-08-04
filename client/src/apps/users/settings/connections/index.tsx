@@ -4,6 +4,7 @@ import {
   Container,
   HStack,
   Input,
+  InputGroup,
   Show,
   Stack,
   Table,
@@ -12,7 +13,6 @@ import {
 import { LuSearch, LuUserPlus } from "react-icons/lu";
 import { MemberActions } from "@/apps/users/settings/connections/ConnectionActions";
 import { Avatar } from "@/components/ui/avatar";
-import { InputGroup } from "@/components/ui/input-group";
 
 export default function Connections() {
   return (

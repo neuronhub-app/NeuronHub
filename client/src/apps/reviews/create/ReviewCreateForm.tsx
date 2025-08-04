@@ -45,7 +45,6 @@ import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
 import { FormChakraSlider } from "@/components/forms/FormChakraSlider";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
-import { zStringEmpty } from "@/components/forms/zod";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tag } from "@/components/ui/tag";
@@ -122,10 +121,13 @@ export namespace ReviewCreateForm {
       content: z.string().optional(),
       domain: z.string().optional(),
       github_url: z
-        .union([z.string().includes("github.com").includes("/"), zStringEmpty()])
+        .union([z.string().includes("github.com").includes("/"), z.string().trim().length(0)])
         .optional(),
       crunchbase_url: z
-        .union([z.string().includes("crunchbase.com").includes("/"), zStringEmpty()])
+        .union([
+          z.string().includes("crunchbase.com").includes("/"),
+          z.string().trim().length(0),
+        ])
         .optional(),
     }),
 
@@ -257,30 +259,31 @@ export namespace ReviewCreateForm {
                 </Show>
 
                 <FormChakraInput
-                  field={{ control, name: "parent.title" }}
+                  name="parent.title"
+                  control={control}
                   label={`${getToolTypeName()} name`}
-                  {...ids.set(ids.review.form.parentTitleInput)}
+                  {...ids.setInputId(ids.review.form.parentTitle)}
                 />
 
                 {/* todo maybe: responsiveness */}
                 <HStack w="full" gap="gap.md">
                   <FormChakraInput
+                    name="parent.domain"
+                    control={control}
+                    inputProps={{ placeholder: "name.com" }}
                     label="Domain"
-                    placeholder="name.com"
-                    field={{ control, name: "parent.domain" }}
                   />
                   <FormChakraInput
-                    label="GitHub"
-                    field={{
-                      control,
-                      name: "parent.github_url",
-                    }}
+                    name="parent.github_url"
+                    control={control}
                     startElement={<LuGithub />}
+                    label="GitHub"
                   />
                   <FormChakraInput
-                    label="Crunchbase"
-                    field={{ control, name: "parent.crunchbase_url" }}
+                    name="parent.crunchbase_url"
+                    control={control}
                     startElement={<SiCrunchbase />}
+                    label="Crunchbase"
                   />
                 </HStack>
 
@@ -364,7 +367,8 @@ export namespace ReviewCreateForm {
               <Fieldset.Content display="flex" gap="gap.lg">
                 <VStack gap="gap.lg" alignItems="flex-start" w="100%">
                   <FormChakraInput
-                    field={{ control, name: "title" }}
+                    name="title"
+                    control={control}
                     label="Title"
                     {...ids.set(ids.review.form.titleInput)}
                   />
@@ -375,11 +379,12 @@ export namespace ReviewCreateForm {
                     {...ids.set(ids.review.form.contentTextarea)}
                   />
                   <FormChakraInput
-                    field={{ control, name: "source" }}
+                    name="source"
+                    control={control}
                     label="Source"
-                    placeholder="Link or reference"
+                    inputProps={{ placeholder: "Link or reference" }}
+                    {...ids.set(ids.review.form.titleInput)}
                   />
-
                   <FormChakraTextarea
                     field={{ control, name: "content_private" }}
                     label="Private note"
@@ -404,7 +409,7 @@ export namespace ReviewCreateForm {
 
                   <VStack align="flex-start" w="full" gap="gap.sm">
                     <Checkbox
-                      defaultChecked={true}
+                      defaultChecked
                       inputProps={{
                         onChange: event => {
                           $state.isRated = event.target.checked;
@@ -419,7 +424,7 @@ export namespace ReviewCreateForm {
                         },
                       }}
                     >
-                      Rating{" "}
+                      Rating
                       {formState.review_rating && (
                         <Tag size="md" ml={2}>
                           {formState.review_rating}
@@ -453,10 +458,9 @@ export namespace ReviewCreateForm {
                     />
 
                     <FormChakraInput
-                      field={{ control, name: "reviewed_at" }}
-                      inputProps={{
-                        type: "date",
-                      }}
+                      name="reviewed_at"
+                      control={control}
+                      inputProps={{ type: "date" }}
                       label="Reviewed at"
                       maxW={style.maxW}
                     />

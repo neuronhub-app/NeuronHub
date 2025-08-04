@@ -1,71 +1,52 @@
-import { Input } from "@chakra-ui/react";
-import { type ReactNode, useEffect, useRef } from "react";
-import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
-import { Field } from "@/components/ui/field";
-import { InputGroup } from "@/components/ui/input-group";
+import { Field, Input, InputGroup } from "@chakra-ui/react";
+import type { ComponentProps, ReactElement } from "react";
+import {
+  type FieldPath,
+  type FieldValues,
+  type UseControllerProps,
+  useController,
+} from "react-hook-form";
 
-export function FormChakraInput<TFieldValues extends FieldValues>(props: {
-  field: UseControllerProps<TFieldValues>;
-
-  placeholder?: string;
-  label?: ReactNode;
-  helperText?: ReactNode;
-  errorText?: ReactNode;
-  optionalText?: ReactNode;
-  autoFocus?: boolean;
-
-  onKeyEnter?: () => void;
-
-  inputProps?: {
-    type?: "date";
-    size?: "xs" | "sm" | "md" | "lg";
-  };
-
-  startElement?: ReactNode;
-
-  maxW?: string;
-  "data-testid"?: string;
-}) {
-  const { field, fieldState } = useController(props.field);
-
-  const inputRef = useRef(null as HTMLInputElement | null);
-
-  useEffect(() => {
-    setTimeout(() => {
-      if (props.autoFocus) {
-        inputRef.current?.focus();
-      }
-    }, 0);
-  }, []);
+// #AI
+export function FormChakraInput<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  control,
+  name,
+  label,
+  onKeyEnter,
+  inputProps,
+  startElement,
+  ...fieldRootProps
+}: UseControllerProps<TFieldValues, TName> &
+  Omit<ComponentProps<typeof Field.Root>, "children"> & {
+    label?: string;
+    onKeyEnter?: () => void;
+    inputProps?: ComponentProps<typeof Input> & { "data-testid"?: string };
+    startElement?: ReactElement;
+  }) {
+  const { field, fieldState } = useController<TFieldValues, TName>({
+    control,
+    name,
+  });
 
   return (
-    <Field
-      label={props.label}
-      invalid={!!fieldState.error}
-      errorText={fieldState.error?.message}
-      maxW={props.maxW}
-    >
-      <InputGroup w="full" startElement={props.startElement}>
+    <Field.Root invalid={!!fieldState.error} {...fieldRootProps}>
+      {label && <Field.Label>{label}</Field.Label>}
+      <InputGroup w="full" startElement={startElement}>
         <Input
           {...field}
-          ref={e => {
-            field.ref(e);
-            inputRef.current = e; // you can still assign to ref
-          }}
-          _hover={{
-            borderColor: "gray.300",
-            _dark: { borderColor: "gray.700" },
-          }}
-          type={props.inputProps?.type}
-          size={props.inputProps?.size}
+          {...inputProps}
+          value={field.value ?? ""}
           onKeyDown={event => {
-            if (event.key === "Enter" && props.onKeyEnter) {
-              props.onKeyEnter();
+            if (event.key === "Enter") {
+              onKeyEnter?.();
             }
           }}
-          data-testid={props["data-testid"]}
         />
       </InputGroup>
-    </Field>
+      <Field.ErrorText>{fieldState.error?.message}</Field.ErrorText>
+    </Field.Root>
   );
 }

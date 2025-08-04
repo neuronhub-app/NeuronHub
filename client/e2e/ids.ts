@@ -18,7 +18,7 @@ export namespace ids {
 
   export const review = {
     form: {
-      parentTitleInput: "review.form.parent-title-input",
+      parentTitle: "review.form.parent-title-input",
       titleInput: "review.form.title-input",
       contentTextarea: "review.form.content-textarea",
       usageStatusSelector: "review.form.usage-status-selector",
@@ -54,5 +54,9 @@ export namespace ids {
 
   export function set<S extends string>(id: S): { "data-testid": S } {
     return { "data-testid": id };
+  }
+
+  export function setInputId<Id extends string>(id: Id): { inputProps: { "data-testid": Id } } {
+    return { inputProps: { "data-testid": id } };
   }
 }

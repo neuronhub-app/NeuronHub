@@ -2,7 +2,7 @@ import type { IconProps } from "@chakra-ui/react";
 import { DialogBackdrop, Flex, HStack, Icon, IconButton } from "@chakra-ui/react";
 import { AsyncCreatableSelect, components } from "chakra-react-select";
 import type { MessageSquarePlus } from "lucide-react";
-import type { ReactNode } from "react";
+import { type ReactNode, useRef } from "react";
 import type { UseFormReturn } from "react-hook-form";
 import { FaMessage, FaRegMessage } from "react-icons/fa6";
 import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
@@ -32,6 +32,8 @@ export function ToolMultiSelect(props: {
   isAllowCreate?: boolean;
 }) {
   const options = props.form.watch(props.fieldName)!;
+
+  const commentInputRef = useRef<HTMLInputElement>(null);
 
   const state = useValtioProxyRef({
     isDialogOpen: false,
@@ -117,10 +119,9 @@ export function ToolMultiSelect(props: {
         trapFocus={true}
         lazyMount={false}
         unmountOnExit={false}
+        initialFocusEl={() => commentInputRef.current}
         open={state.snap.isDialogOpen}
-        onOpenChange={event => {
-          state.mutable.isDialogOpen = event.open;
-        }}
+        onOpenChange={event => (state.mutable.isDialogOpen = event.open)}
       >
         <DialogBackdrop />
         <DialogContent>
@@ -131,17 +132,12 @@ export function ToolMultiSelect(props: {
           <DialogBody>
             {state.snap.isDialogOpen && state.snap.optionSelected && (
               <FormChakraInput
-                autoFocus={true}
+                name={`${props.fieldName}.${getOptionIndex(state.snap.optionSelected)}.comment`}
+                control={props.form.control}
                 key={state.snap.optionSelected.name}
-                field={{
-                  control: props.form.control,
-                  name: `${props.fieldName}.${getOptionIndex(state.snap.optionSelected)}.comment`,
-                }}
-                onKeyEnter={() => {
-                  state.mutable.isDialogOpen = false;
-                }}
+                onKeyEnter={() => (state.mutable.isDialogOpen = false)}
+                inputProps={{ placeholder: "How it relates to the tool", ref: commentInputRef }}
                 label="Comment"
-                placeholder="How it relates to the tool"
               />
             )}
           </DialogBody>

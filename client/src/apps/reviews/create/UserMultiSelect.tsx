@@ -106,12 +106,13 @@ export function UserMultiSelect(props: {
             {state.snap.isOptionDialogOpen && state.snap.userSelected && (
               <FormChakraInput
                 key={state.snap.userSelected.id}
-                field={{
-                  control: props.form.control,
-                  name: `${props.fieldName}.${getOptionNumber(state.snap.userSelected.id)}.message`,
-                }}
+                name={`${props.fieldName}.${getOptionNumber(state.snap.userSelected.id)}.message`}
+                control={props.form.control}
                 label="Message"
-                placeholder="A message for the give user to see"
+                inputProps={{
+                  placeholder: "A message for the give user to see",
+                  ref: dialogInputRef,
+                }}
               />
             )}
           </DialogBody>

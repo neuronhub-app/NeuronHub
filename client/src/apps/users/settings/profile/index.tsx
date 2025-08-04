@@ -1,8 +1,16 @@
-import { Button, Container, HStack, Input, Stack, Text, Textarea } from "@chakra-ui/react";
+import {
+  Button,
+  Container,
+  HStack,
+  Input,
+  InputGroup,
+  Stack,
+  Text,
+  Textarea,
+} from "@chakra-ui/react";
 import { LuLinkedin, LuTriangleAlert, LuTwitter } from "react-icons/lu";
 import { AvatarUpload } from "@/apps/users/settings/profile/AvatarUpload";
 import { Field } from "@/components/ui/field";
-import { InputGroup } from "@/components/ui/input-group";
 
 export default function Profile() {
   return (
