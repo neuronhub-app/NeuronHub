@@ -24,13 +24,14 @@ from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
 from neuronhub.apps.posts.services.create_tag import create_tag
 from neuronhub.apps.users.models import User, UserConnectionGroup
 
+
 logger = logging.getLogger(__name__)
 
 
 async def db_stubs_repopulate(
-    is_delete_posts: bool = False,
-    is_delete_user_default: bool = False,
+    is_delete_posts: bool = True,
     is_delete_users_extra: bool = True,
+    is_delete_user_default: bool = False,
 ) -> Gen:
     if is_delete_posts:
         for model in [
