@@ -25,7 +25,7 @@ Examples:
 - `build` - CI, dependencies, compiler configs, etc
 - `UI` - visual-only changes, eg in `client/`, where most often no code review needed
 - `docs`
-- `style` - code style or formating
+- `format` - code style or formating
 
 ### Scopes
 

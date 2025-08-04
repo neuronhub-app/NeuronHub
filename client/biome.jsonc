@@ -58,7 +58,7 @@
       "src/**",
       "e2e/**",
       "graphql/**",
-      "!graphql/graphql-env.d.ts", // gql isn't meant to be lintable
+      "!graphql/gql-tada/graphql-env.d.ts", // gql isn't meant to be lintable
 
       "biome.jsonc",
       "tsconfig.json",
