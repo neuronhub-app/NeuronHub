@@ -8,7 +8,7 @@ import {
 } from "react-hook-form";
 
 /**
- * Base for any Chakra + react-hook-form field.
+ * A base for any Chakra + react-hook-form field. Currently unused.
  * #AI
  */
 export function ChakraFormField<

@@ -1,4 +1,4 @@
-import { Field as ChakraField, Flex, Float, Icon, Textarea } from "@chakra-ui/react";
+import { Field, Flex, Float, Icon, Textarea } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
 import { FaMarkdown } from "react-icons/fa";
@@ -12,18 +12,18 @@ export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
   errorText?: ReactNode;
   optionalText?: ReactNode;
   isShowIconMarkdown?: boolean;
-  fieldProps?: Omit<ChakraField.RootProps, "label">;
+  fieldProps?: Omit<Field.RootProps, "label">;
   "data-testid"?: string;
 }) {
   const { field, fieldState } = useController(props.field);
 
   return (
-    <ChakraField.Root {...props.fieldProps}>
+    <Field.Root {...props.fieldProps}>
       {props.label && (
-        <ChakraField.Label>
+        <Field.Label>
           {props.label}
-          <ChakraField.RequiredIndicator fallback={props.optionalText} />
-        </ChakraField.Label>
+          <Field.RequiredIndicator fallback={props.optionalText} />
+        </Field.Label>
       )}
 
       <Flex w="full">
@@ -59,10 +59,10 @@ export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
         )}
       </Flex>
 
-      {props.helperText && <ChakraField.HelperText>{props.helperText}</ChakraField.HelperText>}
+      {props.helperText && <Field.HelperText>{props.helperText}</Field.HelperText>}
       {fieldState.error?.message && (
-        <ChakraField.ErrorText>{fieldState.error?.message}</ChakraField.ErrorText>
+        <Field.ErrorText>{fieldState.error?.message}</Field.ErrorText>
       )}
-    </ChakraField.Root>
+    </Field.Root>
   );
 }

@@ -22,5 +22,3 @@ export const Avatar = React.forwardRef<HTMLDivElement, AvatarProps>(function Ava
     </ChakraAvatar.Root>
   );
 });
-
-export const AvatarGroup = ChakraAvatarGroup;

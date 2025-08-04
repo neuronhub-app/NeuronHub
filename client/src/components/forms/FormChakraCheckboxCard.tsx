@@ -1,31 +1,60 @@
-import { CheckboxCardIndicator, Float, Icon } from "@chakra-ui/react";
-import type { ReactElement, ReactNode } from "react";
-import type { UseFormRegisterReturn, UseFormReturn } from "react-hook-form";
-import type { ReviewCreateForm } from "@/apps/reviews/create/ReviewCreateForm";
-import { CheckboxCard } from "@/components/ui/checkbox-card";
+import { CheckboxCard, CheckboxCardIndicator, Float, Icon } from "@chakra-ui/react";
+import type { ComponentProps, ReactElement } from "react";
+import {
+  type FieldPath,
+  type FieldValues,
+  type UseControllerProps,
+  useController,
+} from "react-hook-form";
 
-export function FormChakraCheckboxCard(props: {
-  form: UseFormReturn<ReviewCreateForm.FormSchema>;
-  formRegister: UseFormRegisterReturn;
-  label?: ReactNode;
-  helperText?: ReactNode;
-
+export function FormChakraCheckboxCard<
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
+  control,
+  name,
+  label,
+  description,
+  icon,
+  indicator,
+  checkboxCardProps,
+}: UseControllerProps<TFieldValues, TName> & {
+  label: string;
   icon: ReactElement;
-  minW?: string;
+  description?: string;
+  indicator?: ReactElement;
+  checkboxCardProps?: Omit<ComponentProps<typeof CheckboxCard.Root>, "children">;
 }) {
+  const { field } = useController<TFieldValues, TName>({ control, name });
+
   return (
-    <CheckboxCard
-      inputProps={props.formRegister}
-      align="start"
-      icon={<Icon fontSize="2xl">{props.icon}</Icon>}
-      label={props.label}
-      description={props.helperText}
-      minW={props.minW}
-      indicator={
+    <CheckboxCard.Root
+      {...checkboxCardProps}
+      _hover={{ bg: "bg.light", _dark: { bg: "bg.light" }, cursor: "pointer" }}
+    >
+      <CheckboxCard.HiddenInput
+        {...field}
+        checked={field.value}
+        onChange={e => field.onChange(e.currentTarget.checked)}
+      />
+      <CheckboxCard.Control>
+        <CheckboxCard.Content gap={3}>
+          <Icon fontSize="2xl">{icon}</Icon>
+          <CheckboxCard.Label>{label}</CheckboxCard.Label>
+          {description && (
+            <CheckboxCard.Description fontSize="xs" mt="-1.5">
+              {description}
+            </CheckboxCard.Description>
+          )}
+        </CheckboxCard.Content>
         <Float placement="top-end" offset="6">
-          <CheckboxCardIndicator />
+          {indicator || (
+            <Float placement="top-end" offset="6">
+              <CheckboxCardIndicator />
+            </Float>
+          )}
         </Float>
-      }
-    />
+      </CheckboxCard.Control>
+    </CheckboxCard.Root>
   );
 }

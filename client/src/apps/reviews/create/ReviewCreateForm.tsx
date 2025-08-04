@@ -214,9 +214,10 @@ export namespace ReviewCreateForm {
             <Fieldset.Root>
               <Fieldset.Content display="flex" gap="gap.md">
                 <FormChakraSegmentControl
-                  field={{ control, name: "parent.tool_type" }}
+                  control={control}
+                  name="parent.tool_type"
                   label="Type"
-                  size="lg"
+                  // size="lg"
                   items={[
                     getToolType("Program", <FaCode />),
                     getToolType("SaaS", <FaServer />),
@@ -434,13 +435,21 @@ export namespace ReviewCreateForm {
 
                     <FormChakraSlider
                       hidden={!$state.isRated}
-                      field={{ control, name: "review_rating" }}
+                      name="review_rating"
+                      control={control}
+                      marks={[
+                        { value: 20, label: "Very Bad" },
+                        { value: 40, label: "Bad" },
+                        { value: 60, label: "Good" },
+                        { value: 80, label: "Very good" },
+                      ]}
                     />
                   </VStack>
 
                   <HStack justify="space-between" w="full" gap="gap.md">
                     <FormChakraSegmentControl
-                      field={{ control, name: "review_usage_status" }}
+                      control={control}
+                      name="review_usage_status"
                       label="Usage status"
                       {...ids.set(ids.review.form.usageStatusSelector)}
                       items={[
@@ -454,7 +463,7 @@ export namespace ReviewCreateForm {
                           "Not interested",
                         ),
                       ]}
-                      size="sm"
+                      // size="sm"
                     />
 
                     <FormChakraInput
@@ -469,7 +478,8 @@ export namespace ReviewCreateForm {
 
                 <VStack align="flex-start">
                   <FormChakraSegmentControl
-                    field={{ control, name: "visibility" }}
+                    control={control}
+                    name="visibility"
                     label="Visibility"
                     items={[
                       getToolType(Visibility.Private, <HiLockClosed />),
@@ -484,7 +494,7 @@ export namespace ReviewCreateForm {
                       ),
                       getToolType(Visibility.Public, <FaGlobe />),
                     ]}
-                    size="sm"
+                    // size="sm"
                   />
                   {new Set([
                     Visibility.UsersSelected,
@@ -515,18 +525,16 @@ export namespace ReviewCreateForm {
             </Fieldset.Root>
 
             <VStack align="flex-start" w="full" gap="gap.md">
-              <CheckboxGroup>
-                <Flex gap="gap.md">
-                  <FormChakraCheckboxCard
-                    form={form}
-                    formRegister={form.register("is_review_later")}
-                    label="Review later"
-                    helperText="Add to pending list"
-                    icon={<HiOutlineClock size={23} />}
-                    minW="200px"
-                  />
-                </Flex>
-              </CheckboxGroup>
+              <Flex gap="gap.md">
+                <FormChakraCheckboxCard
+                  control={control}
+                  name="is_review_later"
+                  label="Review later"
+                  description="Add to pending list"
+                  icon={<HiOutlineClock size={23} />}
+                  checkboxCardProps={{ minW: "200px" }}
+                />
+              </Flex>
 
               <Button
                 loading={form.formState.isSubmitting}
