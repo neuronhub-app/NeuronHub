@@ -37,7 +37,7 @@ RUN sudo chown -R $USER:$USER /home/$BREW_DIR/.$BREW_DIR
 
 RUN curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh | bash
 
-ENV PATH="/home/$BREW_DIR/.$BREW_DIR/bin:/home/$BREW_DIR/.$BREW_DIR/sbin:$PATH"
+ENV PATH="/home/$BREW_DIR/.$BREW_DIR/bin:/home/$BREW_DIR/.$BREW_DIR/sbin:$XDG_BIN_HOME:$PATH"
 
 RUN mkdir -p $XDG_CONFIG_HOME/fish
 RUN echo "eval (brew shellenv)" >> $XDG_CONFIG_HOME/fish/config.fish
@@ -51,9 +51,11 @@ ENV EDITOR=micro
 
 # Mise
 # -----------------------------------
-RUN brew install --force-bottle mise usage
+RUN curl https://mise.run | sh
+RUN brew install --force-bottle usage
 RUN echo 'eval "$(mise activate bash)"' >> $HOME/.bashrc
 RUN echo "mise activate fish | source" >> $XDG_CONFIG_HOME/fish/config.fish
+RUN echo '$XDG_CONFIG_HOME/mise activate fish | source' >> $XDG_CONFIG_HOME/fish/config.fish
 RUN mkdir -p $XDG_CONFIG_HOME/fish/completions
 RUN usage --completions fish > $XDG_CONFIG_HOME/fish/completions/usage.fish
 RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish

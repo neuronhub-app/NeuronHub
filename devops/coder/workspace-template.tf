@@ -1,4 +1,4 @@
-# version 0.3.2.0
+# version 0.3.2.1
 
 terraform {
   required_providers {
@@ -122,7 +122,7 @@ resource "coder_agent" "main" {
     # Mise
     mise trust --quiet
     mise install
-    mise run dev-db
+    mise run dev:db
   EOT
 
   # (Optional) only for GUI
