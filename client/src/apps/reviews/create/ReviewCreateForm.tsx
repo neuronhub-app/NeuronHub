@@ -1,6 +1,5 @@
 import {
   Box,
-  CheckboxGroup,
   Fieldset,
   Flex,
   Heading,
@@ -46,8 +45,6 @@ import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentCo
 import { FormChakraSlider } from "@/components/forms/FormChakraSlider";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Tag } from "@/components/ui/tag";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { UsageStatus, Visibility } from "~/graphql/enums";
@@ -156,11 +153,6 @@ export namespace ReviewCreateForm {
 
   export const strs = { reviewCreated: "Review added" } as const;
 
-  const state = proxy({
-    isRated: true,
-  });
-
-  // todo refac: move out to fix HRM of react-router - otherwise reloads on every save
   export function Comp() {
     const form = useForm<FormSchema>({
       resolver: zodResolver(schema),
@@ -183,7 +175,6 @@ export namespace ReviewCreateForm {
 
     const client = useClient();
     const navigate = useNavigate();
-    const $state = useProxy(state);
     const formState = form.watch();
 
     async function handleSubmit(values: z.infer<typeof schema>) {
@@ -217,7 +208,7 @@ export namespace ReviewCreateForm {
                   control={control}
                   name="parent.tool_type"
                   label="Type"
-                  // size="lg"
+                  segmentGroupProps={{ size: "lg" }}
                   items={[
                     getToolType("Program", <FaCode />),
                     getToolType("SaaS", <FaServer />),
@@ -351,7 +342,7 @@ export namespace ReviewCreateForm {
                         return [];
                       }
                       const toolsRaw = res.data.post_tools;
-                      // dedupe by ID (JS sucks)
+                      // dedupe by ID
                       const tools = [...new Map(toolsRaw.map(tool => [tool.id, tool])).values()];
                       return tools.map(tool => ({ id: tool.id, name: tool.title }));
                     }}
@@ -379,6 +370,29 @@ export namespace ReviewCreateForm {
                     isShowIconMarkdown
                     {...ids.set(ids.review.form.contentTextarea)}
                   />
+
+                  <VStack w="50%" gap="gap.lg">
+                    <FormChakraSlider
+                      name="review_rating"
+                      control={control}
+                      label="Rating"
+                      stages={["bad", "slightly bad", "neutral", "slightly good", "good"]}
+                    />
+
+                    <FormChakraSlider
+                      name="review_importance"
+                      control={control}
+                      label="Importance"
+                      stages={[
+                        "not important",
+                        "slightly not important",
+                        "neutral",
+                        "slightly important",
+                        "important",
+                      ]}
+                    />
+                  </VStack>
+
                   <FormChakraInput
                     name="source"
                     control={control}
@@ -408,44 +422,6 @@ export namespace ReviewCreateForm {
                   {/*  ]}*/}
                   {/*/>*/}
 
-                  <VStack align="flex-start" w="full" gap="gap.sm">
-                    <Checkbox
-                      defaultChecked
-                      inputProps={{
-                        onChange: event => {
-                          $state.isRated = event.target.checked;
-                          if ($state.isRated) {
-                            form.setValue(
-                              "review_rating",
-                              form.formState.defaultValues?.review_rating ?? null,
-                            );
-                          } else {
-                            form.setValue("review_rating", null);
-                          }
-                        },
-                      }}
-                    >
-                      Rating
-                      {formState.review_rating && (
-                        <Tag size="md" ml={2}>
-                          {formState.review_rating}
-                        </Tag>
-                      )}
-                    </Checkbox>
-
-                    <FormChakraSlider
-                      hidden={!$state.isRated}
-                      name="review_rating"
-                      control={control}
-                      marks={[
-                        { value: 20, label: "Very Bad" },
-                        { value: 40, label: "Bad" },
-                        { value: 60, label: "Good" },
-                        { value: 80, label: "Very good" },
-                      ]}
-                    />
-                  </VStack>
-
                   <HStack justify="space-between" w="full" gap="gap.md">
                     <FormChakraSegmentControl
                       control={control}
@@ -463,7 +439,7 @@ export namespace ReviewCreateForm {
                           "Not interested",
                         ),
                       ]}
-                      // size="sm"
+                      segmentGroupProps={{ size: "sm" }}
                     />
 
                     <FormChakraInput
@@ -494,7 +470,7 @@ export namespace ReviewCreateForm {
                       ),
                       getToolType(Visibility.Public, <FaGlobe />),
                     ]}
-                    // size="sm"
+                    segmentGroupProps={{ size: "sm" }}
                   />
                   {new Set([
                     Visibility.UsersSelected,

@@ -28,6 +28,7 @@ const tokens = defineTokens({
 export const gap = {
   label: "{spacing.1.5}",
 
+  xs: "{spacing.0.5}",
   sm: "{spacing.1.5}",
   md: "{spacing.4}",
   lg: "{spacing.7}",
@@ -53,6 +54,7 @@ export const system = createSystem(
           spacing: {
             gap: {
               label: { value: gap.label },
+              xs: { value: gap.xs },
               sm: { value: gap.sm },
               md: { value: gap.md },
               lg: { value: gap.lg },

@@ -35,6 +35,7 @@ Examples:
 - `tags` - related to FE or BE tags implementation
 - `AI` - tools as Claude, Aider, etc
 - `admin` - Django Admin related
+- `form` - `reviews/create` form
 - `gen` - changes to `apps/tests/test_gen::Gen` and `db_stubs_repopulate`
 - `monitor` - Sentry, Datadog, etc
 - `types` - TypeScript or Python typings
