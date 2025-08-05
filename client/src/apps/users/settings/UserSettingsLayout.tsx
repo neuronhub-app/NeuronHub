@@ -41,7 +41,7 @@ export default function UserSettingsLayout() {
 
       <For each={tabs}>
         {tab => (
-          <Tabs.Content value={tab.value} p={0}>
+          <Tabs.Content value={tab.value} key={tab.value} p={0}>
             {<Outlet />}
           </Tabs.Content>
         )}

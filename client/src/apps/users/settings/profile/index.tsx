@@ -1,6 +1,7 @@
 import {
   Button,
   Container,
+  Field,
   HStack,
   Input,
   InputGroup,
@@ -10,42 +11,55 @@ import {
 } from "@chakra-ui/react";
 import { LuLinkedin, LuTriangleAlert, LuTwitter } from "react-icons/lu";
 import { AvatarUpload } from "@/apps/users/settings/profile/AvatarUpload";
-import { Field } from "@/components/ui/field";
+import { ThemeSelector } from "@/apps/users/settings/profile/ThemeSelector";
 
 export default function Profile() {
   return (
     <Container maxW="xl" py={10} m={0} px={1}>
       <Stack gap="20">
         <form>
-          <Stack gap="8" css={{ "--field-label-width": "sizes.24" }}>
-            <Field orientation="horizontal" label="Avatar" mb="4">
+          <Stack gap="5">
+            <Field.Root orientation="horizontal" mb="4">
+              <Field.Label>Photo</Field.Label>
               <AvatarUpload />
-            </Field>
-            <Field orientation="horizontal" label="Name">
+            </Field.Root>
+            <Field.Root orientation="horizontal">
+              <Field.Label>Name</Field.Label>
               <Input name="name" />
-            </Field>
-            <Field orientation="horizontal" label="Location">
+            </Field.Root>
+            <Field.Root orientation="horizontal">
+              <Field.Label>Location</Field.Label>
               <Input name="location" />
-            </Field>
-            <Field orientation="horizontal" label="Bio">
+            </Field.Root>
+            <Field.Root orientation="horizontal">
+              <Field.Label>Bio</Field.Label>
               <Textarea rows={4} name="bio" resize="none" />
-            </Field>
-            <Field orientation="horizontal" label="LinkedIn">
+            </Field.Root>
+            <Field.Root orientation="horizontal">
+              <Field.Label>LinkedIn</Field.Label>
               <InputGroup w="full" startElement={<LuLinkedin />}>
                 <Input name="linkedIn" />
               </InputGroup>
-            </Field>
-            <Field orientation="horizontal" label="Twitter">
+            </Field.Root>
+            <Field.Root orientation="horizontal">
+              <Field.Label>Twitter</Field.Label>
               <InputGroup w="full" startElement={<LuTwitter />}>
                 <Input name="twitter" />
               </InputGroup>
-            </Field>
-            <Field orientation="horizontal" label="Website">
+            </Field.Root>
+            <Field.Root orientation="horizontal">
+              <Field.Label>Website</Field.Label>
               <InputGroup w="full" startElement="https://">
                 <Input name="website" ps="7ch" />
               </InputGroup>
-            </Field>
-            <Button>Save</Button>
+            </Field.Root>
+
+            <Field.Root>
+              <Field.Label>Theme</Field.Label>
+              <ThemeSelector />
+            </Field.Root>
+
+            <Button alignSelf="flex-start">Save</Button>
           </Stack>
         </form>
 
