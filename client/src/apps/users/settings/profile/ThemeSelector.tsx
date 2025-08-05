@@ -1,9 +1,12 @@
 /** biome-ignore-all lint/nursery/useUniqueElementIds: a dumb rule for those SVG nodes */
 import { Flex, RadioCard, Text } from "@chakra-ui/react";
+import { useTheme } from "next-themes";
 
 export function ThemeSelector() {
+  const { resolvedTheme, setTheme } = useTheme();
+
   return (
-    <RadioCard.Root size="sm" defaultValue="system" width="full">
+    <RadioCard.Root size="sm" defaultValue={resolvedTheme} width="full">
       <Flex gap="4">
         {[
           {
@@ -29,7 +32,11 @@ export function ThemeSelector() {
             flex="1"
             maxW="120px"
           >
-            <RadioCard.ItemHiddenInput />
+            <RadioCard.ItemHiddenInput
+              onChange={event => {
+                setTheme(event.currentTarget.value);
+              }}
+            />
             {item.icon}
             <RadioCard.ItemControl p="2.5" alignItems="center">
               <RadioCard.ItemIndicator />
