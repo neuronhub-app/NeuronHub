@@ -33,8 +33,6 @@ import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
 import { useNavigate } from "react-router";
 import { useClient } from "urql";
-import { proxy } from "valtio";
-import { useProxy } from "valtio/utils";
 import { z } from "zod/v4";
 import { sendReviewCreateMutation } from "@/apps/reviews/create/sendReviewCreateMutation";
 import { ToolMultiSelect } from "@/apps/reviews/create/ToolMultiSelect";

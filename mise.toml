@@ -110,7 +110,10 @@
 
     [tasks."format:client"]
         dir = "client"
-        run = "bun run biome format --write"
+        run = [
+            "bun run biome format --write",
+            "bun run biome lint --write --unsafe",
+        ]
 
 
 [tasks."lint"]

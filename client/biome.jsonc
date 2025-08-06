@@ -46,6 +46,7 @@
         "noTsIgnore": "error", // read the docs - i agree with enforcement
       },
     },
+    "includes": ["e2e/**", "src/**", "!src/components/ui/**"],
   },
   "formatter": {
     "enabled": true,
@@ -63,7 +64,6 @@
       "biome.jsonc",
       "tsconfig.json",
       "vite.config.ts",
-      "panda.config.ts",
     ],
   },
 }
