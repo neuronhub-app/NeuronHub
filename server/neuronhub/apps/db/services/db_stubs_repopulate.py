@@ -107,9 +107,10 @@ async def _create_review_pycharm(user: User, gen: Gen):
             title="PyCharm",
             tool_type=Post.ToolType.Program,
             crunchbase_url="crunchbase.com/organization/jetbrains",
-            content="PyCharm is an integrated development environment (IDE) used in computer programming, "
-            "specifically "
-            "for the Python language. It is developed by the Czech company JetBrains.",
+            content="""
+                PyCharm is an integrated development environment (IDE) used in computer programming, 
+                specifically for the Python language. It is developed by the Czech company JetBrains.
+            """,
             url="jetbrains.com/pycharm",
             company_name="JetBrains",
             company_domain="jetbrains.com",
@@ -120,15 +121,15 @@ async def _create_review_pycharm(user: User, gen: Gen):
     )
 
     await create_tags(
-        tool=pycharm,
+        post=pycharm,
         author=user,
         params=[
             TagParams("Software / IDE", is_vote_pos=True, is_important=True),
-            TagParams("Dev / Python", is_vote_pos=True, is_important=True),
+            TagParams("Dev / Python", is_vote_pos=True),
             TagParams("Dev / Kotlin"),
             TagParams("Dev / TypeScript"),
             TagParams("Dev / Database"),
-            TagParams("Dev / Django", is_important=True, is_vote_pos=True),
+            TagParams("Dev / Django", is_vote_pos=True),
             TagParams("Dev / Web Development", is_vote_pos=True),
             TagParams("Dev / JavaScript"),
             TagParams("Dev / JetBrains", is_important=True),
@@ -204,7 +205,7 @@ async def _create_review_iterm(user: User, gen: Gen):
     )
 
     await create_tags(
-        tool=tool,
+        post=tool,
         author=user,
         params=[
             TagParams("Software / Terminal emulator", is_vote_pos=True, is_important=True),
@@ -272,13 +273,12 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
         await sync_to_async(tool.alternatives.add)(*alternatives)
 
     await create_tags(
-        tool=tool,
+        post=tool,
         author=user,
         params=[
-            TagParams("Software / Terminal emulator", is_vote_pos=True, is_important=True),
+            TagParams("Software / Terminal emulator", is_vote_pos=True),
             TagParams("OS / Linux", is_vote_pos=True),
-            TagParams("OS / macOS"),
-            TagParams("OS / macOS / Native"),
+            TagParams("OS / macOS", is_vote_pos=True),
             TagParams("Dev / Zig"),
             TagParams("Dev / Swift"),
             TagParams("Dev / License / MIT", is_important=True),
@@ -305,7 +305,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
 async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
     tool = await gen.posts.create(
         gen.posts.Params(
-            title="UniFi Network)",
+            title="UniFi Network",
             type=Post.Type.Tool,
             tool_type=Post.ToolType.Program,
             content="Ubiquiti UniFi Network Application for managing UniFi networking devices.",
@@ -317,14 +317,12 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
         )
     )
     await create_tags(
-        tool=tool,
+        post=tool,
         author=user,
         params=[
-            TagParams("Software / Network Management", is_vote_pos=True, is_important=True),
-            TagParams("Hardware / Networking", is_vote_pos=True),
-            TagParams("Business / License-free", is_vote_pos=True),
-            TagParams("Dev / Self-hosted", is_important=True, is_vote_pos=True),
-            TagParams("Dev / License / Proprietary"),
+            TagParams("Software / Network", is_vote_pos=True),
+            TagParams("Dev / Self-host", is_important=True, is_vote_pos=True),
+            TagParams("Dev / License / Closed-source"),
         ],
     )
     await gen.posts.create(
@@ -361,14 +359,13 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
         )
     )
     await create_tags(
-        tool=tool,
+        post=tool,
         author=user,
         params=[
-            TagParams("Software / Dev Tool", is_vote_pos=True, is_important=True),
+            TagParams("Software / Dev Tool", is_vote_pos=True),
             TagParams("Dev / AI", is_vote_pos=True),
             TagParams("Dev / CLI", is_vote_pos=True),
-            TagParams("Dev / Python"),
-            TagParams("Dev / License / Apache 2.0", is_important=True),
+            TagParams("Dev / License / Apache 2", is_important=True),
         ],
     )
     await gen.posts.create(
@@ -391,15 +388,15 @@ async def create_company_ownership(name: str) -> ToolCompanyOwnership:
 class TagParams:
     name: str
     is_vote_pos: bool | None = None
-    is_important: bool = False
+    is_important: bool | None = None
 
 
-async def create_tags(tool: Post, author: User, params: list[TagParams]):
+async def create_tags(post: Post, author: User, params: list[TagParams]):
     await asyncio.gather(
         *[
             create_tag(
                 name_raw=param.name,
-                post=tool,
+                post=post,
                 author=author,
                 is_vote_positive=param.is_vote_pos,
                 is_important=param.is_important,

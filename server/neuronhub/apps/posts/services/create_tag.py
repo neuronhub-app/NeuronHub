@@ -1,7 +1,5 @@
 import logging
 
-from asgiref.sync import sync_to_async
-
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models import PostTagVote
@@ -16,7 +14,7 @@ async def create_tag(
     post: Post,
     author: User = None,
     is_vote_positive: bool = None,
-    is_important: bool = False,
+    is_important: bool = None,
 ) -> PostTag | None:
     post_tag_defaults = dict(author=author, is_important=is_important)
 
@@ -36,15 +34,15 @@ async def create_tag(
                     tag_parent=tag_parent,
                     defaults=post_tag_defaults,
                 )
-                await sync_to_async(post.tags.add)(tag)
+                await post.tags.aadd(tag)
     else:
         tag, _ = await PostTag.objects.aget_or_create(
             name=name_raw.strip(),
             defaults=post_tag_defaults,
         )
-        await sync_to_async(post.tags.add)(tag)
+        await post.tags.aadd(tag)
 
-    if (is_vote_positive is not None) or (is_important is not None):
+    if is_vote_positive is not None:
         if not post:
             raise ValueError("Tool must be provided if is_vote_positive is set")
 
@@ -54,9 +52,12 @@ async def create_tag(
             author=author,
             defaults={"is_vote_positive": is_vote_positive},
         )
-
     if not tag:
         raise ValueError("Bug in tag creation")
 
-    await sync_to_async(post.tags.add)(tag)
+    if is_important is not None:
+        tag.is_important = is_important
+        await tag.asave()
+
+    await post.tags.aadd(tag)
     return tag
