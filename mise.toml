@@ -24,7 +24,7 @@
     [tasks."dev:server"]
         depends = "dev:db"
         dir = "server"
-        run = "uv run manage.py runserver {% if not env['E2E_TEST']  %}$SERVER_PORT{% endif %}"
+        run = "uv run manage.py runserver {% if not env['E2E_TEST'] %}$SERVER_PORT{% endif %}"
 
     [tasks."dev:client"]
         depends = "dev:db"
@@ -76,7 +76,7 @@
     run = [
         "mise typegen:client:graphql",
         "mise typegen:client:react",
-        "mise run --output=silent typegen:client:chakra", # stdout trash - nothing else works
+        "mise run --output=silent typegen:client:chakra", # it pollutes stdout - nothing else works
     ]
     description = "Strawberry GraphQL + TypeSript"
 
@@ -117,7 +117,7 @@
 
 
 [tasks."lint"]
-    depends = "typegen"
+    depends = ["typegen", "format"]
     run = "mise run lint:*"
 
     [tasks."lint:server"]
