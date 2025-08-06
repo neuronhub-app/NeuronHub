@@ -185,8 +185,8 @@ class PostTagType:
     id: auto
     posts: list[PostType]
     tag_parent: PostTagType | None
-    votes: list[PostTagVoteType] = strawberry_django.field(prefetch_related=["author"])
     tag_children: list[PostTagType]
+    votes: list[PostTagVoteType] = strawberry_django.field(prefetch_related=["author"])
     author: UserType
 
     name: auto

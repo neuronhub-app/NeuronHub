@@ -77,7 +77,7 @@ export function ListContainer(props: {
                 >
                   <PostCard post={post} />
 
-                  {post.parent && <ToolTags tags={post.parent.tags} />}
+                  {post.parent && <ToolTags tags={post.parent.tags} postId={post.parent.id} />}
                   {isPostReviewType(post) && (
                     <ReviewTags tags={post.tags} reviewAuthorId={post.author.id} />
                   )}

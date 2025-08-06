@@ -5,12 +5,15 @@ export const PostTagFragment = graphql(`
     id
     votes {
       id
-      is_vote_positive
+			post {
+				id
+			}
       author {
         id
         # todo ! is this a sec leak? can we use hashes?
         username
       }
+      is_vote_positive
     }
 
     name
@@ -27,6 +30,9 @@ export const PostTagFragment = graphql(`
       id
       username
     }
+		tag_children {
+			id
+		}
   }
 `);
 

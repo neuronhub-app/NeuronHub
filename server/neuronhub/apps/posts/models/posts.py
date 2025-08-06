@@ -215,6 +215,7 @@ class PostTag(AnonimazableTimeStampedModel):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+        related_name="tag_children",
     )
     author = models.ForeignKey(
         User,
