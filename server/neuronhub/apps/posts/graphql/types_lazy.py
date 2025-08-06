@@ -23,7 +23,6 @@ class ReviewTagName(models.TextChoices):
     # general
     value = "value", "Value"
     ease_of_use = "ease_of_use", "Ease of use"
-    a_must_have = "a_must_have", "A must have"
 
     # software
     expectations = "expectations", "Expectations"

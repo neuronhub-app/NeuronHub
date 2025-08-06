@@ -6,7 +6,6 @@ import logging
 import textwrap
 from dataclasses import dataclass
 
-from asgiref.sync import sync_to_async
 from django.utils import timezone
 
 from neuronhub.apps.anonymizer.fields import Visibility
@@ -165,10 +164,8 @@ async def _create_review_pycharm(user: User, gen: Gen):
     await create_review_tags(
         post=review,
         params=[
-            ReviewTagParams(ReviewTagName.expectations, is_vote_pos=True),
             ReviewTagParams(ReviewTagName.stability, is_vote_pos=False),
             ReviewTagParams(ReviewTagName.value, is_vote_pos=True),
-            ReviewTagParams(ReviewTagName.a_must_have, is_vote_pos=True),
             ReviewTagParams(ReviewTagName.ease_of_use, is_vote_pos=False),
         ],
     )
@@ -248,7 +245,6 @@ async def _create_review_iterm(user: User, gen: Gen):
         params=[
             ReviewTagParams(ReviewTagName.open_source, is_vote_pos=True),
             ReviewTagParams(ReviewTagName.stability, is_vote_pos=True),
-            ReviewTagParams(ReviewTagName.expectations, is_vote_pos=False),
         ],
     )
 
@@ -270,7 +266,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
     )
 
     if alternatives:
-        await sync_to_async(tool.alternatives.add)(*alternatives)
+        await tool.alternatives.aadd(*alternatives)
 
     await create_tags(
         post=tool,
@@ -327,7 +323,7 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
     )
     await gen.posts.create(
         gen.posts.Params(
-            title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this)",
+            title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this",
             content=textwrap.dedent(
                 """
                 From LLM:
@@ -370,7 +366,7 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
     )
     await gen.posts.create(
         gen.posts.Params(
-            title="Aider leaderboards are becoming popular on HN for new models assessment)",
+            title="Aider leaderboards are becoming popular on HN for new models assessment",
             content="https://aider.chat/docs/leaderboards",
             parent=tool,
             author=user,
@@ -422,7 +418,7 @@ async def _create_single_review_tag(post: Post, param: ReviewTagParams):
             name=param.name.value,
             defaults=dict(is_review_tag=True, author=post.author),
         )
-        await sync_to_async(post.tags.add)(tag)
+        await post.tags.aadd(tag)
         await PostTagVote.objects.acreate(
             post=post,
             tag=tag,
