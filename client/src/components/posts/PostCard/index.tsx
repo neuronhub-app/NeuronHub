@@ -36,7 +36,7 @@ export function PostCard(props: { post: PostListItemType }) {
       </NavLink>
 
       {isPostReviewType(post) && (
-        <HStack gap="gap.lg">
+        <HStack gap="gap.lg" px={0.5}>
           <UsageStatusBlock status={post.review_usage_status} color="fg.secondary" />
           <RatingBars rating={post.review_rating} type="rating" color="fg.secondary" />
           <RatingBars rating={post.review_importance} type="importance" color="fg.secondary" />
@@ -44,7 +44,7 @@ export function PostCard(props: { post: PostListItemType }) {
             rating={post.review_experience_hours}
             type="experience"
             color="fg.secondary"
-            boxSize={6}
+            boxSize="22px"
           />
         </HStack>
       )}

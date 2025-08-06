@@ -1,5 +1,5 @@
 import { Flex, Icon, type JsxStyleProps, Text } from "@chakra-ui/react";
-import { BiPulse } from "react-icons/bi";
+import { FaHeartPulse } from "react-icons/fa6";
 import type { PostReviewFragmentType } from "@/graphql/fragments/reviews";
 
 export function UsageStatusBlock(props: {
@@ -11,11 +11,11 @@ export function UsageStatusBlock(props: {
   }
   const statusLabel = statuses[props.status];
   return (
-    <Flex align="center" gap={1}>
-      <Icon boxSize={6} color={props.color}>
-        <BiPulse />
+    <Flex align="center" gap="gap.sm">
+      <Icon boxSize={5} color={props.color}>
+        <FaHeartPulse />
       </Icon>
-      <Text fontSize="sm" color="fg.muted" mb="1px">
+      <Text color="fg.muted" mb="1px">
         {statusLabel}
       </Text>
     </Flex>

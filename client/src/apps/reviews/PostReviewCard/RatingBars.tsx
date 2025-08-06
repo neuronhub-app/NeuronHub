@@ -1,7 +1,6 @@
 import { Box, Flex, For, HStack, Icon, type JsxStyleProps, Stack, Text } from "@chakra-ui/react";
-import { FaRegStar } from "react-icons/fa6";
-import { HiMiniChartBar } from "react-icons/hi2";
-import { MdOutlineSpeed } from "react-icons/md";
+import { FaStar, FaUserClock } from "react-icons/fa6";
+import { GoAlertFill } from "react-icons/go";
 import { Tooltip } from "@/components/ui/tooltip";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
@@ -41,12 +40,12 @@ export function RatingBars(props: {
     return fillPercent0to1 * 100;
   }
 
-  let icon = <FaRegStar />;
+  let icon = <FaStar />;
   if (props.type === "importance") {
-    icon = <HiMiniChartBar />;
+    icon = <GoAlertFill />;
   }
   if (props.type === "experience") {
-    icon = <MdOutlineSpeed />;
+    icon = <FaUserClock />;
   }
 
   return (
@@ -122,7 +121,7 @@ function getExperienceRating0to5(hours: number): number {
   // 6. 3'000h (4h over 2+ years)
   // 7. 7'000h+ (4h over 5+ years)
   // 8. 14'000h+ (4h over 10+ years)
-  // 9. 28'000h+ (8h over 10+ years)
+  // 9. 28'000h+ (4h over 20+ years)
   if (hours <= 40) {
     return 0.5;
   }
