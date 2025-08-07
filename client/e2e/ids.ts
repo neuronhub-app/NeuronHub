@@ -3,6 +3,7 @@ export namespace ids {
     vote: {
       up: "post.vote.up",
       down: "post.vote.down",
+      count: "post.vote.count",
     },
     btn: {
       readingList: "post.btn.reading-list",

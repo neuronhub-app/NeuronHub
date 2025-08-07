@@ -164,8 +164,8 @@ type PostTagType {
   id: ID!
   posts(filters: PostFilter): [PostType!]!
   tag_parent: PostTagType
-  votes: [PostTagVoteType!]!
   tag_children(filters: PostTagFilter): [PostTagType!]!
+  votes: [PostTagVoteType!]!
   author: UserType!
   name: String!
   description: String!

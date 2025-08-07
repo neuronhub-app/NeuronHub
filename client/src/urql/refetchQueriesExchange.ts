@@ -1,5 +1,5 @@
 import type { ExchangeInput, ExchangeIO, Operation } from "urql";
-import { proxy } from "valtio/index";
+import { proxy } from "valtio";
 import { pipe, tap } from "wonka";
 import { urqlClient } from "@/urql/urqlClient";
 
@@ -66,14 +66,6 @@ export function refetchQueriesExchange(input: ExchangeInput): ExchangeIO {
       ),
       input.forward,
       tap(opResult => {
-        // todo ! bug - on react-router nav backward w browser "Back" btn breaks this refetch
-        // Using normal NavLink works fine.
-        //
-        // Reproduce:
-        // 1. open /posts/
-        // 2. open /reviews/
-        // 3. go back to /posts/ with Back btn (here we load the old PostList from react-router cache)
-        // 4. try to vote on a Post → [[refetchQueriesExchange.ts#refetchAllQueries]] won't reload query=PostList, because it was... never mounted? not sure #react-router-urql-bug
         state.opsRefetching.delete(opResult.operation.key);
       }),
     );

@@ -21,7 +21,7 @@ export function PostButtonsVote(props: { post: PostListItemType }) {
       >
         <FaChevronUp />
       </IconButton>
-      <Flex>{voting.sum}</Flex>
+      <Flex {...ids.set(ids.post.vote.count)}>{voting.sum}</Flex>
       <IconButton
         loading={voting.isLoadingDownvote}
         onClick={() => voting.vote({ isPositive: false })}
