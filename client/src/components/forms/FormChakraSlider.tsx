@@ -142,6 +142,7 @@ export function FormChakraSlider<
                 fontSize="xs"
                 transitionDuration="moderate"
                 transitionProperty="background, color"
+                color="white"
               >
                 {stages[stageIndex]}
               </Slider.DraggingIndicator>
