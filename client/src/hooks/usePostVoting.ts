@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useSnapshot } from "valtio/react";
 import { user } from "@/apps/users/useUserCurrent";
 import { graphql, type ID } from "@/gql-tada";
-import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
+import { mutateAndRefetch } from "@/urql/mutateAndRefetchNew";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 export function usePostVoting(props: {

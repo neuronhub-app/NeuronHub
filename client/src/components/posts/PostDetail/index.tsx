@@ -1,6 +1,5 @@
 import { For, Heading, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
-import type { CombinedError } from "urql";
 import { useUserCurrent } from "@/apps/users/useUserCurrent";
 import { CommentCreateForm } from "@/components/posts/comments/CommentCreateForm";
 import { CommentThread } from "@/components/posts/comments/CommentThread";
@@ -12,7 +11,7 @@ export function PostDetail(props: {
   title: string;
   post?: PostDetailFragmentType | PostReviewDetailFragmentType;
   isLoading: boolean;
-  error?: CombinedError;
+  error?: Error | null;
   children?: ReactNode;
 }) {
   const userQuery = useUserCurrent();

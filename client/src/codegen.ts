@@ -1,7 +1,7 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 /**
- * While we use gql.tada instead of codegen, gql.data lacks Enum generation, hence we use codegen.
+ * We only use gql.tada, not codegen - but gql.data lacks Enum gen
  */
 export default {
   schema: "../schema.graphql",

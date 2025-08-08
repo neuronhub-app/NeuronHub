@@ -36,7 +36,7 @@ export function ListContainer(props: {
   items: Array<PostListItemType>;
   urlNamespace: "reviews" | "posts";
   isLoading: boolean;
-  error?: CombinedError;
+  error?: CombinedError | Error | null;
   children?: ReactNode;
 }) {
   return (

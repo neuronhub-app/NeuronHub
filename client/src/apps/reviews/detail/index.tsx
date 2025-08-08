@@ -1,8 +1,8 @@
 import toast from "react-hot-toast";
-import { useQuery } from "urql";
 import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
 import { PostReviewDetailFragment } from "@/graphql/fragments/reviews";
+import { useGraphQL } from "@/urql/useGraphQL";
 import type { Route } from "~/react-router/reviews/detail/+types/index";
 
 export default function PostReviewDetailRoute(props: Route.ComponentProps) {
@@ -16,10 +16,7 @@ export default function PostReviewDetailRoute(props: Route.ComponentProps) {
     `,
     [PostReviewDetailFragment],
   );
-  const [{ data, error, fetching }] = useQuery({
-    query,
-    variables: { pk: props.params.id },
-  });
+  const { data, error, isLoading } = useGraphQL(query, { pk: props.params.id });
   if (error) {
     toast.error("Review load failed");
   }
@@ -28,7 +25,7 @@ export default function PostReviewDetailRoute(props: Route.ComponentProps) {
     <PostDetail
       title="Review"
       post={data?.post_review ?? undefined}
-      isLoading={fetching}
+      isLoading={isLoading}
       error={error}
     />
   );
