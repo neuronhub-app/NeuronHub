@@ -1,8 +1,7 @@
 import { expect, type Page } from "@playwright/test";
-import { gql } from "urql";
 import { config } from "@/e2e/config";
 import type { urls } from "@/routes";
-import { urqlClient } from "@/urql/urqlClient";
+import { GraphQLClient } from "graphql-request";
 
 export class PlayWrightHelper {
   constructor(private page: Page) {
@@ -46,12 +45,11 @@ export class PlayWrightHelper {
   }
 
   async dbStubsRepopulate() {
-    return urqlClient
-      .mutation(
-        gql`mutation db_stubs_repopulate { test_db_stubs_repopulate }`,
-        {},
-        { url: config.server.apiUrl }, // as Vite env is fucked by Playwright's Node process
-      )
-      .toPromise();
+    const client = new GraphQLClient(config.server.apiUrl, {
+      credentials: "include",
+      mode: "cors",
+    });
+
+    return client.request(`mutation db_stubs_repopulate { test_db_stubs_repopulate }`, {});
   }
 }

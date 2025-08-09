@@ -4,12 +4,20 @@ import toast from "react-hot-toast";
 import { graphqlClient } from "./graphqlClient";
 import { queryClient } from "./queryClient";
 
-export async function mutateAndRefetch<Data = any, Variables = Record<string, any>>(
+export async function mutateAndRefetch<Data, Variables extends object>(
   query: TadaDocumentNode<Data, Variables>,
   variables: Variables,
 ): Promise<{ success: boolean; data?: Data }> {
   try {
-    const data = (await graphqlClient.request(query as any, variables as any)) as Data;
+    // graphql-request v7 requires explicit typing due to overload issues
+    const client = graphqlClient as {
+      request<T, V extends object = object>(
+        document: TadaDocumentNode<T, V>,
+        variables: V,
+      ): Promise<T>;
+    };
+
+    const data = await client.request(query, variables);
 
     queryClient.invalidateQueries();
 
