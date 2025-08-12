@@ -61,7 +61,7 @@ export function ListContainer(props: {
         <Stack gap="gap.xl">
           <For each={props.items} fallback={<Heading>No reviews yet</Heading>}>
             {post => (
-              <HStack key={post.id} gap="gap.md" align="flex-start">
+              <HStack key={post?.id} gap="gap.md" align="flex-start">
                 <Stack>
                   <PostButtonsVote post={post} />
                   <PostButtons post={post} />
@@ -79,7 +79,7 @@ export function ListContainer(props: {
 
                   {post.parent && <ToolTags tags={post.parent.tags} postId={post.parent.id} />}
                   {isPostReviewType(post) && (
-                    <ReviewTags tags={post.tags} reviewAuthorId={post.author.id} />
+                    <ReviewTags tags={post.tags} reviewAuthorId={post.author?.id} />
                   )}
 
                   <HStack justify="space-between">
@@ -126,7 +126,8 @@ export function ListContainer(props: {
                       color="gray.300"
                       _hover={{ color: "slate.400" }}
                     >
-                      <BsChatLeftTextFill /> <Text color="gray.400">{post.comments.length}</Text>
+                      <BsChatLeftTextFill />{" "}
+                      <Text color="gray.400">{post.comments?.length}</Text>
                     </IconButton>
                   </NavLink>
                 </Stack>

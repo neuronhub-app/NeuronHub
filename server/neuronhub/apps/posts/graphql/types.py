@@ -6,6 +6,7 @@ import strawberry
 import strawberry_django
 from asgiref.sync import async_to_sync
 from django.db.models import QuerySet
+from sentry_sdk import capture_message
 from strawberry import Info
 from strawberry import UNSET
 from strawberry import auto
@@ -78,6 +79,8 @@ class PostTypeI:
         user = get_current_user(info)
         if hasattr(cls, "TYPE"):
             queryset = queryset.filter(type=cls.TYPE).distinct("id")
+        else:
+            capture_message(f"PostTypeI wo TYPE: {cls.__name__}", level="error")
         return async_to_sync(filter_posts_by_user)(user, posts=queryset)
 
 

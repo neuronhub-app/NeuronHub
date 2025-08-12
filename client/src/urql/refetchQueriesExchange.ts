@@ -1,3 +1,4 @@
+import { logger } from "@sentry/react";
 import type { ExchangeInput, ExchangeIO, Operation } from "urql";
 import { proxy } from "valtio";
 import { pipe, tap } from "wonka";
@@ -37,7 +38,7 @@ export async function refetchAllQueries() {
       } else {
         pendingTotal += pendingStep;
         if (pendingTotal > pendingMax) {
-          console.warn("Refetch timed out #react-router-urql-bug?");
+          logger.warn("Refetch timed out #react-router-urql-bug?");
           resolve();
         } else {
           setTimeout(resolveIfCompleted, pendingStep);

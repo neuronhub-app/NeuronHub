@@ -29,7 +29,7 @@
     [tasks."dev:client"]
         depends = "dev:db"
         dir = "client"
-        run = "bun run dev --host"
+        run = "bun run react-router dev --host"
 
     [tasks."dev:db"]
         dir = "devops"

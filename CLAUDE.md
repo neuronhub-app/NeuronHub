@@ -5,5 +5,6 @@
 - Approach: composition over inheritance, fail fast, explicit over implicit, avoid Facebook patterns (complex state, microservices), simple maintainable solutions
 
 For any CLI commands you must use `mise.toml`, expect if the command isn't there.
+You must never run dev servers, only `mise e2e` if you need it.
 
 @./docs/architecture.md

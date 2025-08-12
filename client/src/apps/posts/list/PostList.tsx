@@ -7,12 +7,12 @@ export function PostList() {
   const [{ data, error, fetching }] = useQuery({
     query: graphql(
       `
-          query PostList {
-            posts(filters: { type: { exact: Post } }) {
-              ...PostFragment
-            }
-          }
-        `,
+				query PostList {
+					posts(filters: { type: { exact: Post } }) {
+						...PostFragment
+					}
+				}
+			`,
       [PostFragment],
     ),
   });

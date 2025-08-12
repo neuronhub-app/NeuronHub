@@ -2,15 +2,8 @@
   "name": "neuronhub",
   "private": true,
   "type": "module",
-  "scripts": {
-    "dev": "react-router dev",
-    "build": "tsc && vite build",
-    "tsc": "tsc --noEmit",
-    "serve": "vite preview",
-    "format": "biome check --write"
-  },
   "dependencies": {
-    "@chakra-ui/react": "^3.24.0",
+    "@chakra-ui/react": "^3.24.2",
       "@emotion/react": "^11.14.0",
       "next-themes": "^0.4.6",
 
@@ -28,7 +21,7 @@
       "@hookform/resolvers": "^5.2.1",
       "@hookform/devtools": "^4.4.0",
 
-    "lucide-react": "^0.536.0",
+    "lucide-react": "^0.539.0",
     "react-icons": "^5.5.0",
 
     "valtio": "^2.1.5",
@@ -36,13 +29,12 @@
     "marked": "^16.1.1",
     "date-fns": "^4.1.0",
     "@date-fns/tz": "^1.3.1",
-    "@sentry/react": "^10.0.0",
+    "@sentry/react": "^10.4.0",
     "envalid": "^8.1.0",
 
-    "urql": "^4.2.2",
-    "@tanstack/react-query": "^5.84.1ª",
-    "graffle": "^8.0.0-next.168",
-    "gql.tada": "^1.8.12",
+    "urql": "^5.0.0",
+    "@apollo/client": "^4.0.0-rc.9",
+    "gql.tada": "^1.8.13",
     "@0no-co/graphqlsp": "^1.15.0",
     "graphql": "^16.11.0"
   },
@@ -66,7 +58,7 @@
     "@redux-devtools/extension": "^3.3.0",
 
     "vite": "^7.0.6",
-      "@vitejs/plugin-react": "^4.7.0",
+      "@vitejs/plugin-react": "^5.0.0",
       "@rollup/plugin-replace": "^6.0.2",
       "vite-tsconfig-paths": "^6.0.0-beta.3",
       "vite-plugin-devtools-json": "^0.4.1"

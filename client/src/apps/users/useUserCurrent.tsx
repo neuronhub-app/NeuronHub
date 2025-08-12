@@ -2,7 +2,7 @@ import { graphql, type ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { proxy } from "valtio";
 import { useSnapshot } from "valtio/react";
-import { useGraphQL } from "@/urql/useGraphQL";
+import { useApolloQuery } from "@/urql/useApolloQuery";
 
 export namespace user {
   export const state = proxy({
@@ -12,7 +12,7 @@ export namespace user {
 }
 
 export function useUserCurrent() {
-  const { data, error, isLoading } = useGraphQL(UserQueryDoc);
+  const { data, error, loading } = useApolloQuery(UserQueryDoc);
 
   const snap = useSnapshot(user.state);
 
@@ -34,7 +34,7 @@ export function useUserCurrent() {
     isAuthed: !!snap.current,
     connections: snap.connections,
     error: error,
-    fetching: isLoading,
+    fetching: loading,
   };
 }
 

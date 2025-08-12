@@ -1,10 +1,13 @@
-import { initGraphQLTada } from "gql.tada";
 /**
  * According to the docs, this is supposed to be optional.
  * But types don't work without this file.
  *
- * This is a copy-paste of the default from the docs, with disableMasking=true.
+ * This is a copy-paste of the default from the docs, with:
+ * - disableMasking: true
+ * - scalars: ...
+ * - ID
  */
+import { initGraphQLTada } from "gql.tada";
 import type { introspection } from "~/graphql/gql-tada/graphql-env.d.ts";
 
 export const graphql = initGraphQLTada<{
