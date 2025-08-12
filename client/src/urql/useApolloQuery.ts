@@ -1,4 +1,4 @@
-import type { OperationVariables, WatchQueryFetchPolicy } from "@apollo/client";
+import type { OperationVariables } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import type { TadaDocumentNode } from "gql.tada";
 import { useRef } from "react";
@@ -6,18 +6,17 @@ import { useRef } from "react";
 export function useApolloQuery<Data, Variables extends OperationVariables = OperationVariables>(
   query: TadaDocumentNode<Data, Variables>,
   variables?: Variables,
-  options?: { fetchPolicy?: WatchQueryFetchPolicy },
 ) {
-  // for Apollo bug: non-saved `query` triggers infinite React re-render
+  // Apollo bug: non-saved `query` loops React re-render
   const queryRef = useRef<TadaDocumentNode<Data, Variables>>(query);
 
-  return useQuery(
+  const queryResult = useQuery(
     queryRef.current,
-    // @ts-expect-error Apollo types are bad
-    { 
-      variables,
-      fetchPolicy: options?.fetchPolicy ?? "cache-and-network",
-      notifyOnNetworkStatusChange: true,
-    },
+    // @ts-expect-error bad Apollo types
+    { variables },
   );
+  return {
+    ...queryResult,
+    isLoadingInit: !queryResult.data && queryResult.loading,
+  };
 }

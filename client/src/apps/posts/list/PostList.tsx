@@ -1,11 +1,11 @@
-import { useQuery } from "urql";
-import { ListContainer } from "@/components/posts/ListContainer";
+import { ListContainer, type PostListItemType } from "@/components/posts/ListContainer";
 import { graphql } from "@/gql-tada";
 import { PostFragment } from "@/graphql/fragments/posts";
+import { useApolloQuery } from "@/urql/useApolloQuery";
 
 export function PostList() {
-  const [{ data, error, fetching }] = useQuery({
-    query: graphql(
+  const { data, error, isLoadingInit } = useApolloQuery(
+    graphql(
       `
 				query PostList {
 					posts(filters: { type: { exact: Post } }) {
@@ -15,14 +15,16 @@ export function PostList() {
 			`,
       [PostFragment],
     ),
-  });
+  );
 
+  // @ts-expect-error bad infer
+  const posts: PostListItemType[] = data?.posts ?? [];
   return (
     <ListContainer
       title="Posts"
-      items={data?.posts ?? []}
+      items={posts}
       urlNamespace="posts"
-      isLoading={fetching}
+      isLoadingInit={isLoadingInit}
       error={error}
     />
   );

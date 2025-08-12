@@ -14,9 +14,7 @@ export async function mutateAndRefetch<TData, TVariables extends OperationVariab
   try {
     const result = await apolloClient.mutate({ mutation, variables });
 
-    // Reset store clears cache AND refetches all active queries
-    // This ensures queries work correctly after browser navigation
-    await apolloClient.resetStore();
+    await apolloClient.refetchQueries({ include: "active" });
 
     return { success: true, data: result.data ?? undefined };
   } catch (error) {

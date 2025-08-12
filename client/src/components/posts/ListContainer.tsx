@@ -35,7 +35,7 @@ export function ListContainer(props: {
   title: string;
   items: Array<PostListItemType>;
   urlNamespace: "reviews" | "posts";
-  isLoading: boolean;
+  isLoadingInit: boolean;
   error?: CombinedError | Error | null;
   children?: ReactNode;
 }) {
@@ -54,7 +54,7 @@ export function ListContainer(props: {
         </NavLink>
       </HStack>
 
-      {props.isLoading && <p>Loading...</p>}
+      {props.isLoadingInit && <p>Loading...</p>}
       {props.error && <p>Error: {props.error.message}</p>}
 
       <Flex flex="1" pos="relative" gap="gap.xl">

@@ -1,11 +1,11 @@
 import { Button, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { captureException } from "@sentry/react";
 import React from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { strs } from "@/apps/posts/detail/PostDetail";
-
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
@@ -38,9 +38,9 @@ export function CommentCreateForm(props: { parentId: string }) {
           form.reset();
           draft.clear();
         } catch (error) {
+          captureException(error);
           const errorMessage = error instanceof Error ? error.message : "Unknown error";
           toast.error(`Failed to post comment: ${errorMessage}`);
-          return;
         }
       })}
     >
@@ -56,6 +56,7 @@ export function CommentCreateForm(props: { parentId: string }) {
           variant="subtle"
           size="sm"
           alignSelf="flex-start"
+          loading={form.formState.isSubmitting}
           {...ids.set(ids.comment.form.submitBtn)}
         >
           Post
