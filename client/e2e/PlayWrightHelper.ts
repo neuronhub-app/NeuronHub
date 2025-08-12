@@ -1,7 +1,7 @@
 import { expect, type Page } from "@playwright/test";
+import { GraphQLClient } from "graphql-request";
 import { config } from "@/e2e/config";
 import type { urls } from "@/routes";
-import { GraphQLClient } from "graphql-request";
 
 export class PlayWrightHelper {
   constructor(private page: Page) {
@@ -27,6 +27,10 @@ export class PlayWrightHelper {
 
   get(id: string) {
     return this.page.getByTestId(id).first();
+  }
+
+  getAll(id: string) {
+    return this.page.getByTestId(id);
   }
 
   async click(id: string) {

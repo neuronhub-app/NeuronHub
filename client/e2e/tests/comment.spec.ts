@@ -15,7 +15,7 @@ test.describe("Comments", () => {
   // todo !(test) flaky on last state check
   test("post and vote", async ({ page }) => {
     await pwh.navigate(urls.reviews.$);
-    await pwh.get(ids.post.card.link).click();
+    await pwh.click(ids.post.card.link);
     await pwh.waitForText("Comments");
 
     const testComment = "Test comment";

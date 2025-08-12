@@ -1,5 +1,4 @@
 import { expect, type Page, test } from "@playwright/test";
-import { config } from "@/e2e/config";
 import { ids } from "@/e2e/ids";
 import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 import { urls } from "@/routes";
@@ -28,8 +27,10 @@ test.describe("Post button actions", () => {
     await pwh.waitForState(btnId, "unchecked");
 
     // mutate
-    const waitForUpdate = page.waitForResponse(`${config.server.apiUrl}?query=UserCurrent`);
-    await pwh.get(btnId).click();
+    const waitForUpdate = page.waitForResponse(response =>
+      response.url().includes("UserCurrent"),
+    );
+    await pwh.click(btnId);
     await waitForUpdate;
     await pwh.waitForState(btnId, "checked");
 

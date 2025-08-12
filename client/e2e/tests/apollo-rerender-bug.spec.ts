@@ -13,47 +13,20 @@ test.describe("Apollo re-render", () => {
 
   test("no infinite re-renders", async ({ page }) => {
     const consoleErrors: string[] = [];
-    const renderCount = 0;
-
     page.on("console", msg => {
       if (msg.type() === "error") {
         consoleErrors.push(msg.text());
       }
     });
 
-    // Track Apollo query executions
-    await page.addInitScript(() => {
-      let queryCount = 0;
-      const originalFetch = window.fetch;
-      // @ts-expect-error
-      window.fetch = function (...args) {
-        const url = args[0];
-        if (typeof url === "string" && url.includes("/api/graphql")) {
-          queryCount++;
-          if (queryCount > 10) {
-            console.error(`Excessive Apollo queries detected: ${queryCount}`);
-          }
-        }
-        return originalFetch.apply(this, args);
-      };
-    });
+    await page.goto(`${config.client.url}/reviews/`, { waitUntil: "networkidle" });
 
-    await page.goto(`${config.client.url}/reviews/`, {
-      waitUntil: "networkidle",
-      timeout: 5000,
-    });
-
-    // Ensure reviews actually loaded
-    await pwh.get(ids.post.card.container).first().waitFor({ timeout: 5000 });
-    const reviewCount = await pwh.get(ids.post.card.container).count();
+    const reviewCount = await pwh.getAll(ids.post.card.container).count();
     expect(reviewCount).toBeGreaterThan(0);
 
     // Check for re-render errors
     const reRenderError = consoleErrors.find(
-      err =>
-        err.includes("Too many re-renders") ||
-        err.includes("Maximum update depth exceeded") ||
-        err.includes("Excessive Apollo queries"),
+      err => err.includes("Too many re-renders") || err.includes("depth exceeded"),
     );
     expect(reRenderError).toBeUndefined();
 

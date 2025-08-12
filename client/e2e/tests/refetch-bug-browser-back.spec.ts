@@ -16,13 +16,11 @@ test.describe("Apollo refetch after browser navigation", () => {
     await pwh.navigate(urls.reviews.$);
     await pwh.waitForText("Reviews");
 
-    const firstVoteCount = pwh.get(ids.post.vote.count).first();
+    const firstVoteCount = pwh.get(ids.post.vote.count);
     await expect(firstVoteCount).toBeVisible();
     const initialCount = Number.parseInt((await firstVoteCount.textContent()) ?? "0");
 
-    const firstReviewLink = pwh.get(ids.post.card.link);
-    await expect(firstReviewLink).toBeVisible();
-    await firstReviewLink.click();
+    await pwh.click(ids.post.card.link);
 
     await page.waitForURL(/\/reviews\/\d+/);
     await page.waitForLoadState("networkidle");
@@ -31,7 +29,7 @@ test.describe("Apollo refetch after browser navigation", () => {
     await page.waitForURL(`**/${urls.reviews.$}`);
     await pwh.waitForText("Reviews");
 
-    const voteBtn = pwh.get(ids.post.vote.up).first();
+    const voteBtn = pwh.get(ids.post.vote.up);
     await expect(voteBtn).toBeVisible();
     await voteBtn.click();
 
@@ -42,7 +40,7 @@ test.describe("Apollo refetch after browser navigation", () => {
 
     await page.waitForTimeout(1000);
 
-    const updatedVoteCountElement = pwh.get(ids.post.vote.count).first();
+    const updatedVoteCountElement = pwh.get(ids.post.vote.count);
     const updatedCount = Number.parseInt((await updatedVoteCountElement.textContent()) ?? "0");
 
     expect(updatedCount).toBe(initialCount + 1);
