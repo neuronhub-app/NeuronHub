@@ -1,8 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { config } from "@/e2e/config";
+import { ids } from "@/e2e/ids";
 import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 
-test.describe("Apollo infinite re-render bug", () => {
+test.describe("Apollo re-render", () => {
   let pwh: PlayWrightHelper;
 
   test.beforeEach(async ({ page }) => {
@@ -10,57 +11,56 @@ test.describe("Apollo infinite re-render bug", () => {
     await pwh.dbResetAndLogin();
   });
 
-  test("should not cause infinite re-renders", async ({ page }) => {
-    // Listen for all console messages
-    const consoleMessages: string[] = [];
+  test("no infinite re-renders", async ({ page }) => {
     const consoleErrors: string[] = [];
+    const renderCount = 0;
+
     page.on("console", msg => {
-      const text = msg.text();
-      consoleMessages.push(`[${msg.type()}] ${text}`);
       if (msg.type() === "error") {
-        consoleErrors.push(text);
+        consoleErrors.push(msg.text());
       }
     });
 
-    // Listen for page errors
-    const pageErrors: Error[] = [];
-    page.on("pageerror", error => {
-      pageErrors.push(error);
+    // Track Apollo query executions
+    await page.addInitScript(() => {
+      let queryCount = 0;
+      const originalFetch = window.fetch;
+      // @ts-expect-error
+      window.fetch = function (...args) {
+        const url = args[0];
+        if (typeof url === "string" && url.includes("/api/graphql")) {
+          queryCount++;
+          if (queryCount > 10) {
+            console.error(`Excessive Apollo queries detected: ${queryCount}`);
+          }
+        }
+        return originalFetch.apply(this, args);
+      };
     });
 
-    // Navigate to reviews page which uses Apollo
     await page.goto(`${config.client.url}/reviews/`, {
-      waitUntil: "domcontentloaded",
+      waitUntil: "networkidle",
       timeout: 5000,
     });
 
-    // Wait a bit to see if any errors occur
-    await page.waitForTimeout(2000);
+    // Ensure reviews actually loaded
+    await pwh.get(ids.post.card.container).first().waitFor({ timeout: 5000 });
+    const reviewCount = await pwh.get(ids.post.card.container).count();
+    expect(reviewCount).toBeGreaterThan(0);
 
-    // Check for the specific React re-render error
+    // Check for re-render errors
     const reRenderError = consoleErrors.find(
       err =>
-        err.includes("Too many re-renders") || err.includes("Maximum update depth exceeded"),
+        err.includes("Too many re-renders") ||
+        err.includes("Maximum update depth exceeded") ||
+        err.includes("Excessive Apollo queries"),
     );
+    expect(reRenderError).toBeUndefined();
 
-    // Assert no infinite re-render error
-    expect(reRenderError, `Found infinite re-render error: ${reRenderError}`).toBeUndefined();
-
-    // Log all messages for debugging
-    console.log("All console messages:", consoleMessages.slice(0, 20));
-    if (consoleErrors.length > 0) {
-      console.log("Console errors:", consoleErrors);
-    }
-    if (pageErrors.length > 0) {
-      console.log(
-        "Page errors:",
-        pageErrors.map(e => e.message),
-      );
-    }
-
-    // Check that the page actually rendered something
+    // Verify page rendered correctly
     const bodyText = await page.textContent("body");
-    expect(bodyText).not.toBe("");
+    expect(bodyText).toContain("Reviews");
     expect(bodyText).not.toContain("Loading...");
+    expect(bodyText).not.toContain("Error");
   });
 });

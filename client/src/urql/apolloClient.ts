@@ -14,7 +14,13 @@ function createClientV2() {
   }
 
   const client = new ApolloClient({
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      // Fix for nested fragment spreading when gql.tada disableMasking is true
+      // Apollo needs explicit possibleTypes for interfaces to properly handle fragments
+      possibleTypes: {
+        PostTypeI: ["PostType", "PostToolType", "PostReviewType", "PostCommentType"],
+      },
+    }),
     devtools: {
       enabled: import.meta.env.NODE_ENV === "development",
     },

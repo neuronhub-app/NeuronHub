@@ -14,7 +14,13 @@ export async function mutateAndRefetch<TData, TVariables extends OperationVariab
   try {
     const result = await apolloClient.mutate({ mutation, variables });
 
-    await apolloClient.refetchQueries({ include: "active" }); // all mounted refetch
+    // Force refetch all active queries to ensure UI updates
+    await apolloClient.refetchQueries({ 
+      include: "active",
+      onQueryUpdated: (observableQuery) => {
+        return observableQuery.refetch();
+      }
+    });
 
     return { success: true, data: result.data ?? undefined };
   } catch (error) {

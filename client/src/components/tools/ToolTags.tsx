@@ -16,7 +16,7 @@ import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 // todo !! after finding what tag is_important, make sure they're still sorted by votes
 // todo !! add count for is_vote_positive=false
 export function ToolTags(props: { tags: PostTagFragmentType[]; postId: ID }) {
-  props.tags.sort((a, b) => {
+  const sortedTags = [...props.tags].sort((a, b) => {
     // Secondly sort by votes
     const votesA = a.votes.filter(tag => tag.post.id === props.postId);
     const votesB = b.votes.filter(tag => tag.post.id === props.postId);
@@ -40,7 +40,7 @@ export function ToolTags(props: { tags: PostTagFragmentType[]; postId: ID }) {
     return a.name.localeCompare(b.name);
   });
 
-  const tagsChildrenOnly = props.tags.filter(tag => tag.tag_children?.length === 0);
+  const tagsChildrenOnly = sortedTags.filter(tag => tag.tag_children?.length === 0);
   return (
     <Wrap>
       {tagsChildrenOnly.map(tag => (

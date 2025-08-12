@@ -5,21 +5,21 @@ import { ids } from "@/e2e/ids";
 import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 
 test.describe("Review create", () => {
-  let helper: PlayWrightHelper;
+  let pwh: PlayWrightHelper;
 
   test.beforeEach(async ({ page }) => {
-    helper = new PlayWrightHelper(page);
-    await helper.dbResetAndLogin();
+    pwh = new PlayWrightHelper(page);
+    await pwh.dbResetAndLogin();
   });
 
   test("Create with 2 fields", async ({ page }) => {
     await page.goto(`${config.client.url}/reviews/create`);
-    await expect(page.getByTestId(ids.review.form.parentTitle)).toBeVisible();
+    await expect(pwh.get(ids.review.form.parentTitle)).toBeVisible();
 
-    await page.getByTestId(ids.review.form.parentTitle).fill("Django");
-    await page.getByTestId(ids.review.form.contentTextarea).fill("Easy to build with");
-    await helper.click(ids.post.btn.submit);
+    await pwh.get(ids.review.form.parentTitle).fill("Django");
+    await pwh.get(ids.review.form.contentTextarea).fill("Easy to build with");
+    await pwh.click(ids.post.btn.submit);
 
-    await helper.waitForText(ReviewCreateForm.strs.reviewCreated);
+    await pwh.waitForText(ReviewCreateForm.strs.reviewCreated);
   });
 });
