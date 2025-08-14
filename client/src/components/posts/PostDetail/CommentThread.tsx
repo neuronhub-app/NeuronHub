@@ -1,8 +1,8 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
 import { useUser } from "@/apps/users/useUserCurrent";
-import { CommentCreateForm } from "@/components/posts/comments/CommentCreateForm";
-import { CommentVoteBar } from "@/components/posts/comments/CommentVoteBar";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
+import { CommentCreateForm } from "@/components/posts/PostDetail/CommentCreateForm";
+import { CommentVoteBar } from "@/components/posts/PostDetail/CommentVoteBar";
 import type { PostCommentType } from "@/graphql/fragments/posts";
 
 export function CommentThread(props: { comment: PostCommentType }) {

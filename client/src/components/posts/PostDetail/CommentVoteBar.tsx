@@ -1,9 +1,9 @@
 import { HStack, IconButton, Text } from "@chakra-ui/react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { usePostVoting } from "@/components/posts/usePostVoting";
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import type { PostCommentType } from "@/graphql/fragments/posts";
-import { usePostVoting } from "@/hooks/usePostVoting";
 
 // todo refac: dedup with [[PostButtonsVote.tsx]]
 export function CommentVoteBar(props: { comment: { id: ID; votes: PostCommentType["votes"] } }) {

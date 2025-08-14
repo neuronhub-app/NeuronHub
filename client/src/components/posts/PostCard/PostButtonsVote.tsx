@@ -1,8 +1,8 @@
 import { Flex, IconButton, Stack } from "@chakra-ui/react";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import type { PostListItemType } from "@/components/posts/ListContainer";
+import { usePostVoting } from "@/components/posts/usePostVoting";
 import { ids } from "@/e2e/ids";
-import { usePostVoting } from "@/hooks/usePostVoting";
 
 export function PostButtonsVote(props: { post: PostListItemType }) {
   const voting = usePostVoting({ postId: props.post.id, votes: props.post.votes });

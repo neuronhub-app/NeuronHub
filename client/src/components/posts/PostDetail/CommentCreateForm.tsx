@@ -5,12 +5,15 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import { strs } from "@/apps/posts/detail/PostDetail";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
+import { usePostCommentDraft } from "@/components/posts/PostDetail/usePostCommentDraft";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
-import { usePostCommentDraft } from "@/hooks/usePostCommentDraft";
+
+export const strs = {
+  createdComment: "Comment posted",
+} as const;
 
 const schema = z.object({
   content: z.string().min(1).max(5000),

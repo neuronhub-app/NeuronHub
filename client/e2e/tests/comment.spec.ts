@@ -1,5 +1,5 @@
 import { test } from "@playwright/test";
-import { strs } from "@/apps/posts/detail/PostDetail";
+import { strs } from "@/components/posts/PostDetail/CommentCreateForm";
 import { ids } from "@/e2e/ids";
 import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 import { urls } from "@/routes";

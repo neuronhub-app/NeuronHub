@@ -1,10 +1,10 @@
 import { Heading, HStack, Show, Stack, Text } from "@chakra-ui/react";
 import { marked } from "marked";
 import { NavLink } from "react-router";
-import { RatingBars } from "@/apps/reviews/PostReviewCard/RatingBars";
-import { UsageStatusBlock } from "@/apps/reviews/PostReviewCard/UsageStatus";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
+import { RatingBars } from "@/components/posts/PostReviewCard/RatingBars";
+import { UsageStatusBlock } from "@/components/posts/PostReviewCard/UsageStatus";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import { isPostReviewType } from "@/graphql/fragments/reviews";

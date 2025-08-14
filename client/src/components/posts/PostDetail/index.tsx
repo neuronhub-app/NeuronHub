@@ -1,8 +1,8 @@
 import { For, Heading, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { useUser } from "@/apps/users/useUserCurrent";
-import { CommentCreateForm } from "@/components/posts/comments/CommentCreateForm";
-import { CommentThread } from "@/components/posts/comments/CommentThread";
+import { CommentCreateForm } from "@/components/posts/PostDetail/CommentCreateForm";
+import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
 import { PostCard } from "@/components/posts/PostCard";
 import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
