@@ -1,5 +1,7 @@
 import { defineConfig } from "@playwright/test";
-import { config } from "@/e2e/config";
+import { env } from "@/env";
+
+const clientUrl = `http://localhost:${env.E2E_CLIENT_PORT}`;
 
 export default defineConfig({
   testDir: "./tests",
@@ -11,23 +13,24 @@ export default defineConfig({
   webServer: [
     {
       // --quiet keeps stderr wo/ stdout
-      command: `mise run --quiet dev:server ${config.server.port} --nothreading`,
+      command: `mise run --quiet dev:server ${env.E2E_SERVER_PORT} --nothreading`,
       name: "Server",
-      url: `${config.server.url}/admin/login/`,
+      url: `${env.VITE_SERVER_URL}/admin/login/`,
       env: {
-        SERVER_URL: config.server.url,
-        CLIENT_URL: config.client.url,
-        DATABASE_NAME: config.server.databaseName,
-        IS_DJANGO_RUNSERVER_STDERR_ONLY: "true",
         E2E_TEST: "true",
+        IS_DJANGO_RUNSERVER_STDERR_ONLY: "true",
+        SERVER_URL: env.VITE_SERVER_URL,
+        CLIENT_URL: clientUrl,
+        DATABASE_NAME: env.E2E_DB_NAME,
       },
     },
     {
-      command: `mise run dev:client --port ${config.client.port}`,
+      command: `mise run dev:client --port ${env.E2E_CLIENT_PORT}`,
       name: "Client",
-      url: config.client.url,
+      url: clientUrl,
       env: {
-        VITE_SERVER_URL: config.server.url,
+        E2E_TEST: "true",
+        VITE_SERVER_URL: env.VITE_SERVER_URL,
       },
     },
   ],
@@ -35,6 +38,6 @@ export default defineConfig({
   use: {
     trace: "off",
     browserName: "chromium",
-    baseURL: config.client.url,
+    baseURL: clientUrl,
   },
 });

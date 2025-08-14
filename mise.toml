@@ -6,7 +6,7 @@
         node = "latest"
 
 [settings]
-    python.uv_venv_auto = true # use uv /server/.venv/ instead of Mise
+    python.uv_venv_auto = true
 
 [task_config]
     includes = [
@@ -53,9 +53,11 @@
 
     [tasks."test:e2e"]
         depends = ["dev:db", "dev:db:setup-e2e"]
+        alias = "e2e"
         dir = "client"
-        run = "bun run playwright test --config=e2e/playwright.config.ts"
+        env.E2E_TEST = "true"
         env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='E2E_SERVER_PORT', default='8001') }}"
+        run = "bun run playwright test --config=e2e/playwright.config.ts"
 
 
 [tasks."django:migrate"]
