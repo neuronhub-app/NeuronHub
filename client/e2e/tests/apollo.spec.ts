@@ -1,7 +1,6 @@
 import { type ConsoleMessage, expect, test } from "@playwright/test";
 import { ids } from "@/e2e/ids";
 import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
-import { env } from "@/env";
 import { urls } from "@/routes";
 
 // skipped as usually not needed
@@ -22,8 +21,6 @@ test.describe("Apollo", () => {
   test.skip(`${urls.reviews.list} loads with PostFragment fields & no infinite re-renders`, async ({
     page,
   }) => {
-    console.log(env.VITE_SERVER_URL_API);
-
     const consoleLogs: ConsoleMessage[] = [];
     page.on("console", msg => consoleLogs.push(msg));
 

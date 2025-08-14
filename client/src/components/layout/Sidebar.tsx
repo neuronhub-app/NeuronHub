@@ -13,13 +13,16 @@ import {
 import { MessageSquareText } from "lucide-react";
 import { FaRegBookmark } from "react-icons/fa6";
 import { GoCommentDiscussion } from "react-icons/go";
-import { LuLayoutDashboard, LuLibrary, LuSettings } from "react-icons/lu";
+import { LuLayoutDashboard, LuLibrary, LuLogIn, LuLogOut, LuSettings } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
-import { type LinkProps, NavLink } from "react-router";
+import { type LinkProps, NavLink, useNavigate } from "react-router";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColorModeButton } from "@/components/ui/color-mode";
+import { ids } from "@/e2e/ids";
+import { graphql } from "@/gql-tada";
+import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
 import { urls } from "@/routes";
 
 const groups = [
@@ -128,24 +131,55 @@ function SidebarLink(props: { to?: LinkProps["to"] } & ButtonProps) {
   );
 }
 
-function UserProfile() {
+export function UserProfile() {
   const user = useUser();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await mutateAndRefetch(graphql(`mutation Logout { logout }`), {});
+    navigate(urls.login);
+  }
+
+  if (!user) {
+    return (
+      <HStack gap="3" justify="space-between">
+        <NavLink to={urls.login}>
+          <Button variant="outline" width="full">
+            <LuLogIn />
+            Login
+          </Button>
+        </NavLink>
+        <ColorModeButton />
+      </HStack>
+    );
+  }
 
   return (
-    <HStack gap="3" justify="space-between">
-      <HStack gap="3">
-        {/*<Avatar src="https://i.pravatar.cc/300" />*/}
-        <Avatar name={user?.name} />
-        <Box>
-          <Text textStyle="sm" fontWeight="medium">
-            {user?.name}
-          </Text>
-          <Text textStyle="sm" color="fg.muted">
-            {user?.email}
-          </Text>
-        </Box>
+    <Stack gap="3">
+      <HStack gap="3" justify="space-between">
+        <HStack gap="3">
+          <Avatar name={user.username} />
+          <Box>
+            <Text textStyle="sm" fontWeight="medium">
+              {user.username}
+            </Text>
+            <Text textStyle="sm" color="fg.muted">
+              {user.email}
+            </Text>
+          </Box>
+        </HStack>
+        <ColorModeButton />
       </HStack>
-      <ColorModeButton />
-    </HStack>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleLogout}
+        colorPalette="gray"
+        {...ids.set(ids.auth.logout.btn)}
+      >
+        <LuLogOut />
+        Logout
+      </Button>
+    </Stack>
   );
 }

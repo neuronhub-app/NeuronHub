@@ -2,6 +2,7 @@ from typing import cast
 
 import strawberry
 from asgiref.sync import sync_to_async
+from django.contrib.auth import aauthenticate, alogin
 from strawberry import Info
 from strawberry_django import auth
 from strawberry_django.permissions import IsAuthenticated
@@ -12,9 +13,39 @@ from neuronhub.apps.users.graphql.types import UserTypeInput
 from neuronhub.apps.users.models import User
 
 
+@strawberry.input
+class LoginInput:
+    username_or_email: str
+    password: str
+
+
+@strawberry.type
+class LoginResponse:
+    success: bool
+    user: UserType | None = None
+    error: str | None = None
+
+
 @strawberry.type
 class UserMutation:
     logout: bool = auth.logout()
+
+    @strawberry.mutation()
+    async def login(self, data: LoginInput, info: Info) -> LoginResponse:
+        username = data.username_or_email
+        if "@" in username:
+            if user := await User.objects.filter(email=data.username_or_email).afirst():
+                username = user.username
+
+        if user := await aauthenticate(
+            request=info.context.request,
+            username=username,
+            password=data.password,
+        ):
+            await alogin(info.context.request, user)
+            return LoginResponse(success=True, user=cast(UserType, user))
+
+        return LoginResponse(success=False, error="Invalid credentials")
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def update_user(

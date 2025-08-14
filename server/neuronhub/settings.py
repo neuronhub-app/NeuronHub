@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
+    "allauth.headless",
     "django_object_actions",
     "django_countries",
     "django_rich",
@@ -212,6 +213,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 LOGIN_REDIRECT_URL = CLIENT_URL
 
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+
 # django-allauth
 # todo ! [auth] enable 2FA
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
@@ -239,9 +245,7 @@ if IS_SENTRY_ENABLED:
         dsn="https://examplePublicKey@o0.ingest.sentry.io/0",
         send_default_pii=DJANGO_ENV is not DjangoEnv.PROD,
         integrations=[
-            StrawberryIntegration(
-                async_execution=True,
-            ),
+            StrawberryIntegration(async_execution=True),
         ],
     )
 

@@ -50,6 +50,17 @@ input IDBaseFilterLookup {
   in_list: [ID!]
 }
 
+input LoginInput {
+  username_or_email: String!
+  password: String!
+}
+
+type LoginResponse {
+  success: Boolean!
+  user: UserType
+  error: String
+}
+
 input ManyToManyInput {
   add: [ID!]
   remove: [ID!]
@@ -64,6 +75,7 @@ input ManyToOneInput {
 
 type Mutation {
   logout: Boolean!
+  login(data: LoginInput!): LoginResponse!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   update_user_list(id: ID!, list_field_name: UserListName!, is_added: Boolean!): Boolean! @IsAuthenticated
   create_post(data: PostTypeInput!): PostType! @IsAuthenticated

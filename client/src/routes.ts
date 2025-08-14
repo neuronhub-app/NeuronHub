@@ -2,6 +2,7 @@ import { layout, prefix, type RouteConfig, route } from "@react-router/dev/route
 import type { ID } from "@/gql-tada";
 
 export default [
+  route("/login", "./apps/auth/login/index.tsx"),
   layout("./components/layout/index.tsx", [
     ...prefix("/reviews", [
       route("/", "./apps/reviews/list/index.tsx"),
@@ -24,6 +25,7 @@ export default [
 
 export const urls = {
   home: "/",
+  login: "/login",
   get reviews() {
     return {
       get list() {

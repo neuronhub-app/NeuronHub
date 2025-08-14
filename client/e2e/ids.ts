@@ -49,6 +49,18 @@ export namespace ids {
     },
   } as const;
 
+  export const auth = {
+    login: {
+      username: "auth.login.username",
+      password: "auth.login.password",
+      submit: "auth.login.submit",
+      error: "auth.login.error",
+    },
+    logout: {
+      btn: "auth.logout.btn",
+    },
+  } as const;
+
   export function selector<S extends string>(id: S): `[data-testid="${S}"]` {
     return `[data-testid="${id}"]`;
   }

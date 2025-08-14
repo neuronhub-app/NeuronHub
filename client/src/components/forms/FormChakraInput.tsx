@@ -16,12 +16,14 @@ export function FormChakraInput<
   name,
   label,
   onKeyEnter,
+  placeholder,
   inputProps,
   startElement,
   ...fieldRootProps
 }: UseControllerProps<TFieldValues, TName> &
   Omit<ComponentProps<typeof Field.Root>, "children"> & {
     label?: string;
+    placeholder?: string;
     onKeyEnter?: () => void;
     inputProps?: ComponentProps<typeof Input> & { "data-testid"?: string };
     startElement?: ReactElement;
