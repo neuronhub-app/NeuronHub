@@ -1,4 +1,4 @@
-# version 0.3.2.1
+# version 0.3.2.2
 
 terraform {
   required_providers {
@@ -105,9 +105,6 @@ resource "coder_agent" "main" {
       chezmoi init --apply ${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${var.git_token}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_dotfiles_repo.value}.git
 
       touch ~/.init_done
-    else
-        chezmoi git pull
-        chezmoi apply
     end
 
     # Git
