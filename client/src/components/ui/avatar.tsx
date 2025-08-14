@@ -1,4 +1,4 @@
-import { Avatar as ChakraAvatar, AvatarGroup as ChakraAvatarGroup } from "@chakra-ui/react";
+import { Avatar as ChakraAvatar } from "@chakra-ui/react";
 import * as React from "react";
 
 type ImageProps = React.ImgHTMLAttributes<HTMLImageElement>;

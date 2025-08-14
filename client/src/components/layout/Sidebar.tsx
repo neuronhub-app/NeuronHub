@@ -11,7 +11,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { MessageSquareText } from "lucide-react";
-import type { SVGProps } from "react";
 import { FaRegBookmark } from "react-icons/fa6";
 import { GoCommentDiscussion } from "react-icons/go";
 import { LuLayoutDashboard, LuLibrary, LuSettings } from "react-icons/lu";
@@ -28,8 +27,8 @@ const groups = [
     title: "",
     links: [
       { to: "/tools", icon: LuLayoutDashboard, label: "Tools" },
-      { to: "/posts", icon: GoCommentDiscussion, label: "Posts" },
-      { to: "/reviews", icon: MessageSquareText, label: "Reviews" },
+      { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts" },
+      { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },
       { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
       { to: "/library", icon: LuLibrary, label: "Library" },
     ],
@@ -136,41 +135,17 @@ function UserProfile() {
     <HStack gap="3" justify="space-between">
       <HStack gap="3">
         {/*<Avatar src="https://i.pravatar.cc/300" />*/}
-        <Avatar name={userQuery?.user?.name} />
+        <Avatar name={user?.name} />
         <Box>
           <Text textStyle="sm" fontWeight="medium">
-            {userQuery?.user?.name}
+            {user?.name}
           </Text>
           <Text textStyle="sm" color="fg.muted">
-            {userQuery?.user?.email}
+            {user?.email}
           </Text>
         </Box>
       </HStack>
       <ColorModeButton />
     </HStack>
   );
-};
-
-export const Logo = (props: SVGProps<SVGSVGElement>) => (
-  <svg
-    height="28"
-    viewBox="0 0 143 50"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    <title>NeuronHub</title>
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M20.127 0C15.466 0 11.2287 1.69492 7.83887 4.23729L30.9321 31.9915L49.788 17.7966C48.9406 7.83898 40.466 0 30.0846 0"
-      fill="var(--chakra-colors-color-palette-solid)"
-    />
-    <path
-      fillRule="evenodd"
-      clipRule="evenodd"
-      d="M30.0847 50C41.1017 50 50 41.1017 50 30.0847V29.0254L32.839 41.7373C30.9322 43.2203 28.178 42.7966 26.6949 41.1017L2.11864 11.4407C0.847458 13.983 0 16.9491 0 19.9152V29.8729C0 40.8898 8.89831 49.7881 19.9153 49.7881"
-      fill="var(--chakra-colors-color-palette-emphasized)"
-    />
-  </svg>
-);
+}
