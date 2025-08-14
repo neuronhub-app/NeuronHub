@@ -11,7 +11,7 @@ import { PostButtonShare } from "@/components/posts/PostCard/PostButtonShare";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
-import { mutateAndRefetch } from "@/urql/mutateAndRefetchNew";
+import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { UserListName } from "~/graphql/enums";
 

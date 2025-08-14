@@ -9,17 +9,17 @@ export default function UserSettingsLayout() {
   const tabs = [
     {
       label: "Profile",
-      value: urls.user.settings.profile.path,
+      value: urls.user.settings.profile,
       icon: <FaUser />,
     },
     {
       label: "Connections",
-      value: urls.user.settings.connections.path,
+      value: urls.user.settings.connections,
       icon: <FaUsers />,
     },
     {
       label: "Notifications",
-      value: urls.user.settings.notifications.path,
+      value: urls.user.settings.notifications,
       icon: <FaBell />,
     },
   ];

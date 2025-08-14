@@ -1,8 +1,10 @@
-import { graphql, type ResultOf } from "gql.tada";
+import { captureException } from "@sentry/react";
+import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { proxy } from "valtio";
 import { useSnapshot } from "valtio/react";
-import { useApolloQuery } from "@/urql/useApolloQuery";
+import { graphql } from "@/gql-tada";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 export namespace user {
   export const state = proxy({
@@ -11,31 +13,36 @@ export namespace user {
   });
 }
 
-export function useUserCurrent() {
-  const { data, error, loading } = useApolloQuery(UserQueryDoc);
+export function useUser() {
+  const { data, error } = useApolloQuery(UserQueryDoc);
 
   const snap = useSnapshot(user.state);
 
   useEffect(() => {
     if (data?.user_current) {
-      const connectionsRaw = data.user_current.connection_groups.flatMap(
-        group => group.connections,
-      );
+      // @ts-expect-error ts-bad-inference, broke with Apollo
+      const userCurrent: User = data.user_current;
+      user.state.current = userCurrent;
+    }
+
+    if (data?.user_current?.connection_groups) {
+      const connectionsUntyped = data.user_current.connection_groups
+        .flatMap(group => group?.connections)
+        .filter(Boolean);
+      // @ts-expect-error ts-bad-inference, broke with Apollo
+      const connections: UserConnection[] = connectionsUntyped;
       const connectionsUniqueMap = new Map(
-        connectionsRaw.map(conn => [`${conn.id}-${conn.username}`, conn]),
+        connections.map(conn => [`${conn.id}-${conn.username}`, conn]),
       );
       user.state.connections = Array.from(connectionsUniqueMap.values());
-      user.state.current = data.user_current;
+    }
+
+    if (error) {
+      captureException(error);
     }
   }, [data]);
 
-  return {
-    user: snap.current,
-    isAuthed: !!snap.current,
-    connections: snap.connections,
-    error: error,
-    fetching: loading,
-  };
+  return snap.current;
 }
 
 export const UserQueryDoc = graphql(`
@@ -88,7 +95,4 @@ export const UserQueryDoc = graphql(`
 type UserQuery = ResultOf<typeof UserQueryDoc>;
 export type User = NonNullable<UserQuery["user_current"]>;
 export type UserConnectionGroup = User["connection_groups"][number];
-// @bad-inference otherwise `name: unknown`
-export type UserConnection = UserConnectionGroup["connections"][number] & {
-  username: string;
-};
+export type UserConnection = UserConnectionGroup["connections"][number];

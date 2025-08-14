@@ -17,7 +17,7 @@ import { GoCommentDiscussion } from "react-icons/go";
 import { LuLayoutDashboard, LuLibrary, LuSettings } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink } from "react-router";
-import { useUserCurrent } from "@/apps/users/useUserCurrent";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ColorModeButton } from "@/components/ui/color-mode";
@@ -86,7 +86,7 @@ export function Sidebar(props: StackProps) {
       <Stack gap="4">
         <Stack gap="1" px={0}>
           <Bleed inline={styles.inline}>
-            <SidebarLink to={urls.user.settings.profile.path}>
+            <SidebarLink to={urls.user.settings.profile}>
               <LuSettings />
               Settings
             </SidebarLink>
@@ -129,8 +129,8 @@ function SidebarLink(props: { to?: LinkProps["to"] } & ButtonProps) {
   );
 }
 
-export const UserProfile = () => {
-  const userQuery = useUserCurrent();
+function UserProfile() {
+  const user = useUser();
 
   return (
     <HStack gap="3" justify="space-between">

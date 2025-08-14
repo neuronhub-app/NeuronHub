@@ -1,4 +1,5 @@
 import { layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
+import type { ID } from "@/gql-tada";
 
 export default [
   layout("./components/layout/index.tsx", [
@@ -23,55 +24,50 @@ export default [
 
 export const urls = {
   home: "/",
-  reviews: {
-    $: "reviews",
-    create: {
-      $: "create",
-      get path() {
-        return `/${urls.reviews.$}/${urls.reviews.create.$}` as const;
+  get reviews() {
+    return {
+      get list() {
+        return "/reviews" as const;
       },
-    },
+      get create() {
+        return `${urls.reviews.list}/create` as const;
+      },
+      detail(id: ID) {
+        return `${urls.reviews.list}/${id}` as const;
+      },
+    };
   },
-  posts: {
-    $: "posts",
-    create: {
-      $: "create",
-      get path() {
-        return `/${urls.posts.$}/${urls.posts.create.$}` as const;
+  get posts() {
+    return {
+      get list() {
+        return "/posts" as const;
       },
-    },
+      get create() {
+        return `${urls.posts.list}/create` as const;
+      },
+      detail(id: ID) {
+        return `${urls.posts.list}/${id}` as const;
+      },
+    };
   },
-  user: {
-    $: "user",
-    settings: {
-      $: "settings",
-      get path() {
-        return `/${urls.user.$}/${urls.user.settings.$}` as const;
+  get user() {
+    return {
+      get settings() {
+        return {
+          get detail() {
+            return `/user/settings` as const;
+          },
+          get profile() {
+            return `${this.detail}/profile` as const;
+          },
+          get connections() {
+            return `${this.detail}/connections` as const;
+          },
+          get notifications() {
+            return `${this.detail}/notifications` as const;
+          },
+        };
       },
-
-      profile: {
-        $: "profile",
-        get path() {
-          const user = urls.user;
-          return `/${user.$}/${user.settings.$}/${user.settings.profile.$}` as const;
-        },
-      },
-
-      connections: {
-        $: "connections",
-        get path() {
-          const user = urls.user;
-          return `/${user.$}/${user.settings.$}/${user.settings.connections.$}` as const;
-        },
-      },
-
-      notifications: {
-        $: "notifications",
-        get path() {
-          const user = urls.user;
-          return `/${user.$}/${user.settings.$}/${user.settings.notifications.$}` as const;
-        },
-      },
-    },
+    };
   },
 } as const;

@@ -1,19 +1,19 @@
 import { expect, test } from "@playwright/test";
 import { ReviewCreateForm } from "@/apps/reviews/create/ReviewCreateForm";
-import { config } from "@/e2e/config";
 import { ids } from "@/e2e/ids";
 import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
+import { urls } from "@/routes";
 
-test.describe("Review create", () => {
+test.describe("Review create form", () => {
   let pwh: PlayWrightHelper;
 
   test.beforeEach(async ({ page }) => {
     pwh = new PlayWrightHelper(page);
-    await pwh.dbResetAndLogin();
+    await pwh.dbStubsRepopulateAndLogin();
   });
 
   test("Create with 2 fields", async ({ page }) => {
-    await page.goto(`${config.client.url}/reviews/create`);
+    await page.goto(urls.reviews.create);
     await expect(pwh.get(ids.review.form.parentTitle)).toBeVisible();
 
     await pwh.get(ids.review.form.parentTitle).fill("Django");

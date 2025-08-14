@@ -1,31 +1,33 @@
+import { captureException } from "@sentry/react";
 import toast from "react-hot-toast";
-import { useQuery } from "urql";
 import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
-import { PostDetailFragment } from "@/graphql/fragments/posts";
+import { PostDetailFragment, type PostDetailFragmentType } from "@/graphql/fragments/posts";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/posts/detail/+types/index";
 
 export default function PostDetailRoute(props: Route.ComponentProps) {
-  const query = graphql(
-    `
+  const { data, error, isLoadingInit } = useApolloQuery(
+    graphql(
+      `
       query PostDetail($pk: ID!) {
         post(pk: $pk) {
           ...PostDetailFragment
         }
       }
     `,
-    [PostDetailFragment],
+      [PostDetailFragment],
+    ),
+    { pk: props.params.id },
   );
 
-  const [{ data, error, fetching }] = useQuery({
-    query,
-    variables: { pk: props.params.id },
-  });
   if (error) {
     toast.error("Post load failed");
+    captureException(error);
   }
 
-  return (
-    <PostDetail title="Post" post={data?.post ?? undefined} isLoading={fetching} error={error} />
-  );
+  // @ts-expect-error ts-bad-inference - caused by Apollo
+  const post: PostDetailFragmentType = data?.post ?? undefined;
+
+  return <PostDetail title="Post" post={post} isLoading={isLoadingInit} error={error} />;
 }

@@ -3,11 +3,9 @@ import { ChakraProvider } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
-import { Provider } from "urql";
 import { ColorModeProvider } from "@/components/ui/color-mode";
+import { client } from "@/graphql/client";
 import { system } from "@/theme/theme";
-import { apolloClient } from "@/urql/apolloClient";
-import { urqlClient } from "@/urql/urqlClient";
 
 export function Layout(props: { children: ReactNode }) {
   return (
@@ -30,15 +28,13 @@ export function Layout(props: { children: ReactNode }) {
 
 export default function Root() {
   return (
-    <ApolloProvider client={apolloClient}>
-      <Provider value={urqlClient}>
-        <ChakraProvider value={system}>
-          <ColorModeProvider enableSystem={true}>
-            <Outlet />
-            <Toaster position="bottom-center" gutter={8} />
-          </ColorModeProvider>
-        </ChakraProvider>
-      </Provider>
+    <ApolloProvider client={client}>
+      <ChakraProvider value={system}>
+        <ColorModeProvider enableSystem={true}>
+          <Outlet />
+          <Toaster position="bottom-center" gutter={8} />
+        </ColorModeProvider>
+      </ChakraProvider>
     </ApolloProvider>
   );
 }

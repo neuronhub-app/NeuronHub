@@ -1,8 +1,12 @@
+import { captureException } from "@sentry/react";
 import toast from "react-hot-toast";
 import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
-import { PostReviewDetailFragment } from "@/graphql/fragments/reviews";
-import { useApolloQuery } from "@/urql/useApolloQuery";
+import {
+  PostReviewDetailFragment,
+  type PostReviewDetailFragmentType,
+} from "@/graphql/fragments/reviews";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/reviews/detail/+types/index";
 
 export default function PostReviewDetailRoute(props: Route.ComponentProps) {
@@ -21,14 +25,11 @@ export default function PostReviewDetailRoute(props: Route.ComponentProps) {
   );
   if (error) {
     toast.error("Review load failed");
+    captureException(error);
   }
 
-  return (
-    <PostDetail
-      title="Review"
-      post={data?.post_review ?? undefined}
-      isLoading={loading}
-      error={error}
-    />
-  );
+  // @ts-expect-error ts-bad-inference - caused by Apollo
+  const review: PostReviewDetailFragmentType = data?.post_review ?? undefined;
+
+  return <PostDetail title="Review" post={review} isLoading={loading} error={error} />;
 }

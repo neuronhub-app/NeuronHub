@@ -2,31 +2,30 @@ import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/clien
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { env } from "@/env";
 
-export const apolloClient = createClientV2();
+export const client = createApolloClient();
 
-function createClientV2() {
-  const backendUrl = `${env.VITE_SERVER_URL}/api/graphql`;
+function createApolloClient() {
+  // real error reports, not the useless: `An error occurred [...] full error text at https://go.apollo.dev/c/err#{hash}`
+  loadErrorMessages();
 
-  // show local warnings
-  if (import.meta.env.NODE_ENV === "development") {
+  if (env.isDev) {
     loadDevMessages();
-    loadErrorMessages();
   }
 
   const client = new ApolloClient({
     cache: new InMemoryCache({
       // Fix for nested fragment spreading when gql.tada disableMasking is true
-      // Apollo needs explicit possibleTypes for interfaces to properly handle fragments
+      // Apollo needs explicit possibleTypes for interfaces to properly handle fragments (see #40)
       possibleTypes: {
         PostTypeI: ["PostType", "PostToolType", "PostReviewType", "PostCommentType"],
       },
     }),
     devtools: {
-      enabled: import.meta.env.NODE_ENV === "development",
+      enabled: env.isDev,
     },
     link: ApolloLink.from([
       new HttpLink({
-        uri: backendUrl,
+        uri: env.VITE_SERVER_URL_API,
         credentials: "include",
         // @ts-expect-error
         fetch: fetchUsingReadableUrl,
@@ -36,16 +35,14 @@ function createClientV2() {
   return client;
 }
 
-/**
- * Change `/api/graphql/` -> `/api/graphql/QueryName?variables=...`
- */
+// Change `/api/graphql/` -> `/api/graphql/QueryName?variables=...`
 function fetchUsingReadableUrl(uri: RequestInfo | Request | URL, options?: RequestInit) {
   const bodyString = typeof options?.body === "string" ? options.body : "";
   const body = JSON.parse(bodyString);
 
-  let urlReadable = uri;
+  let urlModified = uri;
   if (body.operationName) {
-    urlReadable += `/${body.operationName}`;
+    urlModified += `/${body.operationName}`;
 
     if (Object.keys(body.variables ?? {}).length) {
       const variablesSerialized = structuredClone(body.variables);
@@ -57,8 +54,8 @@ function fetchUsingReadableUrl(uri: RequestInfo | Request | URL, options?: Reque
         }
       }
       const searchParams = new URLSearchParams(variablesSerialized);
-      urlReadable += `?${searchParams.toString()}`;
+      urlModified += `?${searchParams.toString()}`;
     }
   }
-  return fetch(urlReadable, options);
+  return fetch(urlModified, options);
 }

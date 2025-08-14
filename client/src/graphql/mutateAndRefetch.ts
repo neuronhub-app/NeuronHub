@@ -2,7 +2,7 @@ import type { OperationVariables } from "@apollo/client";
 import { captureException } from "@sentry/react";
 import type { TadaDocumentNode } from "gql.tada";
 import toast from "react-hot-toast";
-import { apolloClient } from "@/urql/apolloClient";
+import { client } from "@/graphql/client";
 
 export async function mutateAndRefetch<TData, TVariables extends OperationVariables = object>(
   mutation: TadaDocumentNode<TData, TVariables>,
@@ -12,9 +12,9 @@ export async function mutateAndRefetch<TData, TVariables extends OperationVariab
   success: boolean;
 }> {
   try {
-    const result = await apolloClient.mutate({ mutation, variables });
+    const result = await client.mutate({ mutation, variables });
 
-    await apolloClient.refetchQueries({ include: "active" });
+    await client.refetchQueries({ include: "active" });
 
     return { success: true, data: result.data ?? undefined };
   } catch (error) {

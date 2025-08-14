@@ -32,7 +32,6 @@ import { HiLockClosed, HiOutlineClock } from "react-icons/hi2";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
 import { useNavigate } from "react-router";
-import { useClient } from "urql";
 import { z } from "zod/v4";
 import { sendReviewCreateMutation } from "@/apps/reviews/create/sendReviewCreateMutation";
 import { ToolMultiSelect } from "@/apps/reviews/create/ToolMultiSelect";
@@ -45,6 +44,7 @@ import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
+import { client } from "@/graphql/client";
 import { UsageStatus, Visibility } from "~/graphql/enums";
 
 // todo refac: use eg two Fragments for input/output
@@ -171,12 +171,11 @@ export namespace ReviewCreateForm {
     });
     const control = form.control;
 
-    const client = useClient();
     const navigate = useNavigate();
     const formState = form.watch();
 
     async function handleSubmit(values: z.infer<typeof schema>) {
-      const res = await sendReviewCreateMutation(client, values);
+      const res = await sendReviewCreateMutation(values);
       if (res.success) {
         toast.success(strs.reviewCreated);
         navigate(`/reviews/${res.reviewId}`);
@@ -307,7 +306,7 @@ export namespace ReviewCreateForm {
                           }
                         }
                       `);
-                      const res = await client.query(query, { name: inputValue }).toPromise();
+                      const res = await client.query({ query, variables: { name: inputValue } });
                       return res.data!.tags.filter(tag => tag.tag_parent === null);
                     }}
                   />
@@ -321,10 +320,9 @@ export namespace ReviewCreateForm {
                     form={form}
                     fieldName="alternatives"
                     loadOptions={async (inputValue: string) => {
-                      const res = await client
-                        .query(
-                          // todo refac: rename "name" -> "title"?
-                          graphql(`
+                      const res = await client.query({
+                        // todo refac: rename "name" -> "title"?
+                        query: graphql(`
                             query PostToolAlternativesQuery($title: String) {
                               post_tools( filters: {title: { contains: $title } } ) {
                                 id
@@ -332,9 +330,8 @@ export namespace ReviewCreateForm {
                               }
                             }
                           `),
-                          { title: inputValue },
-                        )
-                        .toPromise();
+                        variables: { title: inputValue },
+                      });
                       if (!res.data) {
                         toast.error("Failed to load alternatives");
                         return [];

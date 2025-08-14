@@ -15,7 +15,6 @@ import { BsChatLeftTextFill } from "react-icons/bs";
 import { FaGithub, FaPlus } from "react-icons/fa6";
 import { SiCrunchbase } from "react-icons/si";
 import { NavLink } from "react-router";
-import type { CombinedError } from "urql";
 import { ReviewListSidebar } from "@/apps/reviews/list/ReviewListSidebar";
 import { PostCard } from "@/components/posts/PostCard";
 import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
@@ -36,7 +35,7 @@ export function ListContainer(props: {
   items: Array<PostListItemType>;
   urlNamespace: "reviews" | "posts";
   isLoadingInit: boolean;
-  error?: CombinedError | Error | null;
+  error?: Error | null;
   children?: ReactNode;
 }) {
   return (

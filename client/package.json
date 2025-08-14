@@ -32,7 +32,6 @@
     "@sentry/react": "^10.4.0",
     "envalid": "^8.1.0",
 
-    "urql": "^5.0.0",
     "@apollo/client": "^4.0.0-rc.9",
     "gql.tada": "^1.8.13",
     "@0no-co/graphqlsp": "^1.15.0",

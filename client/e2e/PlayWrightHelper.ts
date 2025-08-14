@@ -1,6 +1,8 @@
 import { expect, type Page } from "@playwright/test";
-import { GraphQLClient } from "graphql-request";
 import { config } from "@/e2e/config";
+import { env } from "@/env";
+import { graphql } from "@/gql-tada";
+import { client } from "@/graphql/client";
 import type { urls } from "@/routes";
 
 export class PlayWrightHelper {
@@ -8,25 +10,29 @@ export class PlayWrightHelper {
     this.page.setDefaultTimeout(2000);
   }
 
-  async dbResetAndLogin() {
+  async dbStubsRepopulateAndLogin() {
     await this.dbStubsRepopulate();
     await this.login();
   }
 
   async login() {
-    await this.page.goto(`${config.server.url}/admin/login/`);
+    await this.page.goto(`${env.VITE_SERVER_URL}/admin/login/`);
     await this.page.fill('input[name="username"]', config.user.username);
     await this.page.fill('input[name="password"]', config.user.password);
     await this.page.click('input[type="submit"]');
     await this.waitForText("Site administration");
   }
 
-  async navigate(path: typeof urls.reviews.$) {
+  async navigate(path: typeof urls.reviews.list) {
     await this.page.goto(path);
   }
 
   get(id: string) {
     return this.page.getByTestId(id).first();
+  }
+
+  async getInt(id: string) {
+    return Number.parseInt((await this.get(id).textContent()) ?? "");
   }
 
   getAll(id: string) {
@@ -49,11 +55,12 @@ export class PlayWrightHelper {
   }
 
   async dbStubsRepopulate() {
-    const client = new GraphQLClient(config.server.apiUrl, {
-      credentials: "include",
-      mode: "cors",
+    return client.mutate({
+      mutation: graphql(`mutation db_stubs_repopulate { test_db_stubs_repopulate }`),
     });
+  }
 
-    return client.request(`mutation db_stubs_repopulate { test_db_stubs_repopulate }`, {});
+  waitForNetworkIdle() {
+    return this.page.waitForLoadState("networkidle");
   }
 }

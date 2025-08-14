@@ -9,17 +9,17 @@ test.describe("Comments", () => {
 
   test.beforeEach(async ({ page }) => {
     pwh = new PlayWrightHelper(page);
-    await pwh.dbResetAndLogin();
+    await pwh.dbStubsRepopulateAndLogin();
   });
 
   // todo !(test) flaky on last state check
   test("post and vote", async ({ page }) => {
-    await pwh.navigate(urls.reviews.$);
+    await pwh.navigate(urls.reviews.list);
     await pwh.click(ids.post.card.link);
     await pwh.waitForText("Comments");
 
     const testComment = "Test comment";
-    await pwh.get(ids.comment.form.contentTextarea).fill(testComment);
+    await pwh.get(ids.comment.form.textarea).fill(testComment);
     await pwh.click(ids.comment.form.submitBtn);
 
     await pwh.waitForText(strs.createdComment);

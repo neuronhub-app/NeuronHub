@@ -8,7 +8,7 @@ test.describe("Post button actions", () => {
 
   test.beforeEach(async ({ page }) => {
     pwh = new PlayWrightHelper(page);
-    await pwh.dbResetAndLogin();
+    await pwh.dbStubsRepopulateAndLogin();
   });
 
   test("Upvote", async ({ page }) => {
@@ -20,7 +20,7 @@ test.describe("Post button actions", () => {
   });
 
   async function openReviewsAndVerifyToggle(page: Page, btnId: string) {
-    await pwh.navigate(urls.reviews.$);
+    await pwh.navigate(urls.reviews.list);
 
     await expect(pwh.get(btnId)).toBeVisible();
 

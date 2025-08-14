@@ -1,6 +1,6 @@
 import { For, Heading, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
-import { useUserCurrent } from "@/apps/users/useUserCurrent";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { CommentCreateForm } from "@/components/posts/comments/CommentCreateForm";
 import { CommentThread } from "@/components/posts/comments/CommentThread";
 import { PostCard } from "@/components/posts/PostCard";
@@ -14,7 +14,7 @@ export function PostDetail(props: {
   error?: Error | null;
   children?: ReactNode;
 }) {
-  const userQuery = useUserCurrent();
+  const user = useUser();
 
   return (
     <Stack>
@@ -36,7 +36,7 @@ export function PostDetail(props: {
               )}
             </For>
 
-            {userQuery.isAuthed && <CommentCreateForm parentId={props.post.id} />}
+            {user && <CommentCreateForm parentId={props.post.id} />}
           </Stack>
         </Stack>
       )}

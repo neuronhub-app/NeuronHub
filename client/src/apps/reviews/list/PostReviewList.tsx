@@ -1,7 +1,7 @@
 import { ListContainer, type PostListItemType } from "@/components/posts/ListContainer";
 import { graphql } from "@/gql-tada";
 import { PostReviewFragment } from "@/graphql/fragments/reviews";
-import { useApolloQuery } from "@/urql/useApolloQuery";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 export function PostReviewList() {
   const { data, error, isLoadingInit } = useApolloQuery(

@@ -9,8 +9,8 @@ import { strs } from "@/apps/posts/detail/PostDetail";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
+import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
 import { usePostCommentDraft } from "@/hooks/usePostCommentDraft";
-import { mutateAndRefetch } from "@/urql/mutateAndRefetch";
 
 const schema = z.object({
   content: z.string().min(1).max(5000),
@@ -49,7 +49,7 @@ export function CommentCreateForm(props: { parentId: string }) {
           field={{ name: "content", control: form.control }}
           placeholder="Write a comment..."
           errorText={form.formState.errors.content?.message}
-          {...ids.set(ids.comment.form.contentTextarea)}
+          {...ids.set(ids.comment.form.textarea)}
         />
         <Button
           type="submit"

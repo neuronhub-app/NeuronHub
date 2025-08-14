@@ -1,12 +1,12 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
-import { useUserCurrent } from "@/apps/users/useUserCurrent";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { CommentCreateForm } from "@/components/posts/comments/CommentCreateForm";
 import { CommentVoteBar } from "@/components/posts/comments/CommentVoteBar";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import type { PostCommentType } from "@/graphql/fragments/posts";
 
 export function CommentThread(props: { comment: PostCommentType }) {
-  const userQuery = useUserCurrent();
+  const user = useUser();
 
   return (
     <Box>
@@ -27,7 +27,7 @@ export function CommentThread(props: { comment: PostCommentType }) {
           <Text whiteSpace="pre-wrap">{props.comment.content}</Text>
         </Box>
 
-        {userQuery.isAuthed && (
+        {user && (
           <Box ml={8}>
             <CommentCreateForm parentId={props.comment.id} />
           </Box>
