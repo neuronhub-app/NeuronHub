@@ -1,6 +1,7 @@
 import { useUser } from "@/apps/users/useUserCurrent";
 import { graphql, type ID } from "@/gql-tada";
-import { mutateAndRefetch } from "@/urql/mutateAndRefetchNew";
+import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
+import { useInit } from "@/utils/useInit";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 export function usePostVoting(props: {
@@ -19,13 +20,19 @@ export function usePostVoting(props: {
     isVotePositive: null as boolean | null,
   });
 
-  useEffect(() => {
-    const userVote = userSnap.current?.post_votes.find(vote => vote.post.id === props.postId);
-    state.mutable.isVotePositive = userVote?.is_vote_positive ?? null;
-  }, [userSnap.current?.post_votes, props.postId]);
+  const isLoading = state.snap.isLoadingUpvote || state.snap.isLoadingDownvote;
+
+  useInit({
+    init: () => {
+      const userVote = user?.post_votes.find(vote => props.postId === vote.post.id);
+      state.mutable.isVotePositive = userVote?.is_vote_positive ?? null;
+    },
+    isBlocked: isLoading,
+    deps: [props.postId, user?.post_votes],
+  });
 
   async function vote(args: { isPositive: boolean }) {
-    if (state.snap.isLoadingUpvote || state.snap.isLoadingDownvote) {
+    if (isLoading) {
       return;
     }
 
@@ -35,7 +42,7 @@ export function usePostVoting(props: {
       state.mutable.isLoadingDownvote = true;
     }
 
-    let newVoteValue: boolean | null = null;
+    let newVoteValue: boolean | null;
     if (state.snap.isVotePositive === null) {
       newVoteValue = args.isPositive;
     } else if (state.snap.isVotePositive === args.isPositive) {
