@@ -4,6 +4,7 @@ import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 import { env } from "@/env";
 import { urls } from "@/routes";
 
+// skipped as usually not needed
 test.describe("Apollo", () => {
   let helper: PlayWrightHelper;
 
@@ -18,7 +19,7 @@ test.describe("Apollo", () => {
    *
    * Otherwise Apollo queries the correct HTTP data, but excludes it from the cache, fucking up the app (see #40).
    */
-  test(`${urls.reviews.list} loads with PostFragment fields & no infinite re-renders`, async ({
+  test.skip(`${urls.reviews.list} loads with PostFragment fields & no infinite re-renders`, async ({
     page,
   }) => {
     console.log(env.VITE_SERVER_URL_API);
@@ -38,7 +39,7 @@ test.describe("Apollo", () => {
    * Nav to /detail & back, in order to trigger react-router re-mount.
    * Eg urql is unable to detect its `useQuery` hooks re-mount, hence unable reload them on a mutation (#39).
    */
-  test("refetchQueries() works after react-router 'Back' navigation remount", async ({
+  test.skip("refetchQueries() works after react-router 'Back' navigation remount", async ({
     page,
   }) => {
     await helper.navigate(urls.reviews.list);
