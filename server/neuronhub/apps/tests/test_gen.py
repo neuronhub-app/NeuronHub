@@ -101,15 +101,19 @@ class UsersGen:
         await user.asave()
         return user
 
-    async def get_user_default(
-        self,
-        is_superuser: bool = False,
-        is_attach_org: bool = True,
-    ) -> User:
+    async def get_user_default(self, is_superuser: bool = False) -> User:
         if self.user_default:
             return self.user_default
         else:
             return await self.get_or_create_user_default(is_superuser=is_superuser)
+
+    async def alias(self, user: User | None = None) -> User:
+        user = user or self.user_default
+        return await user.aliases.acreate(
+            owner=user,
+            email=f"{user.username}-{self.faker.user_name}@{self._user_email_domain}",
+            username=f"{user.username}-{self.faker.user_name}",
+        )
 
     @classmethod
     async def get_or_create_user_default(cls, is_superuser: bool = True) -> User:

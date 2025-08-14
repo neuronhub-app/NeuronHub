@@ -72,9 +72,6 @@ class DbStubsRepopulateTest(NeuronTestCase):
             ReviewTagParams(name=ReviewTagName.ease_of_use, is_vote_pos=True),
             ReviewTagParams(name=ReviewTagName.stability, is_vote_pos=False),
             ReviewTagParams(name=ReviewTagName.value, is_vote_pos=None),  # Should NOT create tag
-            ReviewTagParams(
-                name=ReviewTagName.a_must_have, is_vote_pos=None
-            ),  # Should NOT create tag
         ]
 
         # Create review tags

@@ -18,6 +18,8 @@ class User(AbstractUser):
         null=True,
         blank=True,
         help_text="Owner of this User (Alias), if any",
+        related_name="aliases",
+        related_query_name="alias",
     )
     org = models.ForeignKey(
         Org,

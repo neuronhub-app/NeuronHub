@@ -67,6 +67,14 @@ async def db_stubs_repopulate(
 
 async def _create_users(gen: Gen):
     user = gen.users.user_default
+
+    # Aliases
+
+    await gen.users.alias(user)
+    await gen.users.alias(user)
+
+    # Connections
+
     group_default, _ = await user.connection_groups.aget_or_create(
         name=UserConnectionGroup.NAME_DEFAULT,
         user=user,

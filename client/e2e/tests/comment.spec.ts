@@ -13,6 +13,7 @@ test.describe("Comments", () => {
   });
 
   // todo !(test) flaky on last state check
+  // todo !(test) flaky on `pwh.click(ids.post.card.link)`
   test("post and vote", async ({ page }) => {
     await pwh.navigate(urls.reviews.list);
     await pwh.click(ids.post.card.link);
