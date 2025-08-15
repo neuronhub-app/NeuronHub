@@ -1,9 +1,9 @@
 ["dev:db:setup-e2e"]
     run = """
         #!/usr/bin/env fish
-        sudo docker compose --file ./devops/docker-compose.yml exec db bash -c "psql --user=neuronhub --command='CREATE DATABASE $E2E_DB_NAME;'" 2>/dev/null || true
+        sudo docker compose --file ./devops/docker-compose.yml exec db bash -c "psql --user=neuronhub --command='CREATE DATABASE $VITE_E2E_DB_NAME;'" 2>/dev/null || true
 
         cd server/
-        set --export DATABASE_NAME $E2E_DB_NAME # `mise django:migrate` atm ignores envs in shebangs
+        set --export DATABASE_NAME $VITE_E2E_DB_NAME # `mise django:migrate` atm ignores envs in shebangs
         uv run manage.py migrate
     """

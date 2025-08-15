@@ -17,6 +17,10 @@
         "client/e2e/e2e.mise.toml",
     ]
 
+[env]
+    VITE_E2E_TEST = false
+    VITE_SERVER_PORT = 8000
+    VITE_CLIENT_PORT = 3000
 
 [tasks."dev"]
     depends = ["dev:db", "dev:server", "dev:client"]
@@ -24,12 +28,12 @@
     [tasks."dev:server"]
         depends = "dev:db"
         dir = "server"
-        run = "uv run manage.py runserver {% if not env['E2E_TEST'] %}$SERVER_PORT{% endif %}"
+        run = "uv run manage.py runserver {% if not env['VITE_E2E_TEST'] %}$VITE_SERVER_PORT{% endif %}"
 
     [tasks."dev:client"]
         depends = "dev:db"
         dir = "client"
-        run = "bun run react-router dev --host"
+        run = "bun run react-router dev --host {% if not env['VITE_E2E_TEST'] %}--port=$VITE_CLIENT_PORT{% endif %}"
 
     [tasks."dev:db"]
         dir = "devops"
@@ -55,8 +59,7 @@
         depends = ["dev:db", "dev:db:setup-e2e"]
         alias = "e2e"
         dir = "client"
-        env.E2E_TEST = "true"
-        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='E2E_SERVER_PORT', default='8001') }}"
+        env.VITE_E2E_TEST = "true"
         run = "bun run playwright test --config=e2e/playwright.config.ts"
 
 
