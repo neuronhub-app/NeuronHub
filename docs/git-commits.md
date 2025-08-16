@@ -1,54 +1,57 @@
 ---
-reviewed_at: 2025.07.22
+reviewed_at: 2025.08.15
 ---
 
-For a good commit: target the case of somebody breaking the code to be able to quickly find the cause by scanning the Git log.
+A good Git commit allows to eye-scan log to fix prod at 3am.
 
-The project is using an iteration over the [conventionalcommits.org](https://www.conventionalcommits.org).
-
-The main difference is no need for breaking changes indication. And the `!` is used to show changes importance. Eg squashed commits may contain dozens KLOCs, vs a `feat` with a new UI input or something.
+We use an iteration over [conventionalcommits.org](https://www.conventionalcommits.org).
+The main differences:
+- no breaking changes focus
+- `!` is used to show changes importance. Eg squashed commits may contain dozens KLOCs, vs a `feat` with a new UI input or something.
 
 Examples:
-- `feat: add 7 required fields to ReviewCreateForm`
-- `refac(tags): pagination #126`
-- `build(monitor): add Sentry`
+- `feat(post-form): add 7 required fields`
 - `refac(API): prefetch tags and Review QuerySets #122`
-- `docs(git-commits): scopes`
-- `! feat(tags): sort by user per Review #126`
+- `build(monitor): add Sentry`
+- `docs(git-commits): add scopes`
+- `! feat(tags): sorting per PostReview #126`
 
 ### Type
 
-- `feat` - features or additions
-- `fix` - bug fixes or removals
-- `refac` - refactor, cleanups, perf, etc
-- `test` - stability improvements, that should be unable to damage runtime code
-- `build` - CI, dependencies, compiler configs, etc
-- `UI` - visual-only changes, eg in `client/`, where most often no code review needed
-- `docs`
+- `fix`
+- `feat`
+- `refac` - refactor, cleanups, performance, etc
+- `test` - stability; should have no runtime impact
+- `build` - CI, dependencies, compilation, etc
+- `UI` - visual-only changes, eg when no code review needed
 - `format` - code style or formating
+- `docs`
 
 ### Scopes
 
-- `API` - backend & strawberry types, mutations, etc. Usually without `clients/` changes.
-- `upgrade` - Done often and usually has no changes outside the lock-files.
-- `auth` - apps.users or frontend logic for it, hijacking, permissions, etc
-- `tags` - related to FE or BE tags implementation
-- `AI` - tools as Claude, Aider, etc
-- `admin` - Django Admin related
-- `form` - `reviews/create` form
-- `gen` - changes to `apps/tests/test_gen::Gen` and `db_stubs_repopulate`
-- `monitor` - Sentry, Datadog, etc
-- `types` - TypeScript or Python typings
-- `E2E` - Playwright, ie integration tests
+- `API` - GraphQL, Strawberry, mutations, etc
+- `upgrade` - usually lock-files
+- `auth` - apps.users, permissions, etc
+- `tags` - `PostTag`, etc
+- `AI` - Claude, Aider, etc
+- `gen` - `tests/test_gen::Gen` and `db_stubs_repopulate`
+- `monitor` - eg Sentry
+- `Coder` - devops/ for coder.com
+- `Mise` - eg `mise.toml`
 - `Docker`
-- `Coder` - coder.com
-- `Mise` - eg mise.toml
 
-Unused:
+Frontend:
+- `E2E` - Playwright
+- `post-form` - our complex React Form: `posts/create` or `reviews/create`
+- `comment` - create, edit, vote, etc
+
+#### Unused
+- `admin` - Django Admin
+- `types` - TypeScript or Python typings
 - `brows` - browser extension
-- `track` - PostHog or other changes re analytics and activity tracking
+- `track` - analytics tracking, eg Posthog
 
-Extra Scopes for the `docs` Type:
+#### Scopes for the `docs` Type:
 - `refac`
 - `glossary`
 - `arch` - for [architecture.md](/docs/architecture.md) file
@@ -57,15 +60,17 @@ Extra Scopes for the `docs` Type:
 
 ### Text style
 
-As long as human brain can read it - the shorter the better, regardless of the grammar. Especially with rudimentary/inconsistent English conventions, that don't exist in other languages, eg as prefixes "the/a/an".
+First noun, then verb.
 
-Shortening into non-cognitively familiar words is bad, eg:
-- "brwsr" - "browser" - unknown, bad
-- "smth" - "something" - known, ~ok
-- "mgmt" - "management" - in a small team ok, but not readable for this project
+If brain can read it - the shorter the better. Fuck the grammar and English, eg prefixes "the / a / an".
 
-Write first noun, then its verb.
+#### Bad shortening
 
-Shortening is bad when a sentence the brain usually perceives as a set of "tokens" is turned into a rare mix of abbreviations, eg:
+Bad to replace familiar words with less familiar:
+- `brwsr` for `browser`: bad
+- `smth` for `something`: ok, known
+- `mgmt` for `management`: bad here, ok in a small team
+
+Bad if brain is familiar with a sentence (set of "tokens"), but it's written as abbreviations, eg:
 - bad: `refac: imprv auth w/ opt JWT tkn & upd usr mgmt admn`
 - ok: `refac(auth): JWT token optimize; user admin cleanup`
