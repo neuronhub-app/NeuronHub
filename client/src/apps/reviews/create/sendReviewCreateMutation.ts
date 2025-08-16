@@ -1,11 +1,11 @@
 import type { ReviewCreateForm } from "@/apps/reviews/create/ReviewCreateForm";
 import { graphql } from "@/gql-tada";
-import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
+import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 
 export async function sendReviewCreateMutation(values: ReviewCreateForm.FormSchema) {
   const { recommend_to, visible_to, alternatives, ...valuesRest } = values;
 
-  const response = await mutateAndRefetch(
+  const response = await mutateAndRefetchMountedQueries(
     graphql(`
 			mutation CreatePostReview($input: PostTypeInput!) {
 				create_post_review(data: $input) { id }

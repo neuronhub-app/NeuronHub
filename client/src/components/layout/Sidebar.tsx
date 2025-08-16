@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
-import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
+import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
 
 const groups = [
@@ -136,7 +136,7 @@ export function UserProfile() {
   const navigate = useNavigate();
 
   async function handleLogout() {
-    await mutateAndRefetch(graphql(`mutation Logout { logout }`), {});
+    await mutateAndRefetchMountedQueries(graphql(`mutation Logout { logout }`), {});
     navigate(urls.login);
   }
 

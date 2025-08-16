@@ -9,7 +9,7 @@ import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { usePostCommentDraft } from "@/components/posts/PostDetail/usePostCommentDraft";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
-import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
+import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 
 export const strs = {
   createdComment: "Comment posted",
@@ -70,7 +70,7 @@ export function CommentCreateForm(props: { parentId: string }) {
 }
 
 async function createComment(input: { parentId: string; content: string }) {
-  return mutateAndRefetch(
+  return mutateAndRefetchMountedQueries(
     graphql(`
       mutation CreatePostComment($data: PostTypeInput!) {
         create_post_comment(data: $data) {

@@ -1,6 +1,6 @@
 import { useUser } from "@/apps/users/useUserCurrent";
 import { graphql, type ID } from "@/gql-tada";
-import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
+import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useInit } from "@/utils/useInit";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
@@ -51,7 +51,7 @@ export function usePostVoting(props: {
       newVoteValue = args.isPositive;
     }
 
-    await mutateAndRefetch(
+    await mutateAndRefetchMountedQueries(
       graphql(`
         mutation CreateOrUpdatePostVote($id: ID!, $isVotePositive: Boolean) {
           create_or_update_post_vote(id: $id, is_vote_positive: $isVotePositive)

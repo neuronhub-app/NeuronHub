@@ -11,7 +11,7 @@ import { PostButtonShare } from "@/components/posts/PostCard/PostButtonShare";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
-import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
+import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { UserListName } from "~/graphql/enums";
 
@@ -87,7 +87,7 @@ function ReviewButton(props: {
             return;
           }
           state.mutable.isLoading = true;
-          await mutateAndRefetch(
+          await mutateAndRefetchMountedQueries(
             graphql(
               `
                 mutation update_user_list(

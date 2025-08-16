@@ -4,7 +4,10 @@ import type { TadaDocumentNode } from "gql.tada";
 import toast from "react-hot-toast";
 import { client } from "@/graphql/client";
 
-export async function mutateAndRefetch<TData, TVariables extends OperationVariables = object>(
+export async function mutateAndRefetchMountedQueries<
+  TData,
+  TVariables extends OperationVariables = object,
+>(
   mutation: TadaDocumentNode<TData, TVariables>,
   variables: TVariables,
 ): Promise<{
