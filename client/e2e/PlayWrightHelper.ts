@@ -34,7 +34,7 @@ export class PlayWrightHelper {
   }
 
   async getInt(id: string) {
-    return Number.parseInt((await this.get(id).textContent()) ?? "");
+    return Number.parseInt((await this.get(id).textContent()) ?? "", 10);
   }
 
   getAll(id: string) {

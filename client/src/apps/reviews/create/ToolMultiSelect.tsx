@@ -121,7 +121,9 @@ export function ToolMultiSelect(props: {
         unmountOnExit={false}
         initialFocusEl={() => commentInputRef.current}
         open={state.snap.isDialogOpen}
-        onOpenChange={event => (state.mutable.isDialogOpen = event.open)}
+        onOpenChange={event => {
+          state.mutable.isDialogOpen = event.open;
+        }}
       >
         <DialogBackdrop />
         <DialogContent>
@@ -135,7 +137,9 @@ export function ToolMultiSelect(props: {
                 name={`${props.fieldName}.${getOptionIndex(state.snap.optionSelected)}.comment`}
                 control={props.form.control}
                 key={state.snap.optionSelected.name}
-                onKeyEnter={() => (state.mutable.isDialogOpen = false)}
+                onKeyEnter={() => {
+                  state.mutable.isDialogOpen = false;
+                }}
                 inputProps={{ placeholder: "How it relates to the tool", ref: commentInputRef }}
                 label="Comment"
               />

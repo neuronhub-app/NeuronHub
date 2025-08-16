@@ -20,20 +20,18 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noAssignInExpressions": "off",
         "noExplicitAny": "off",
+        "noTsIgnore": "error",
       },
       "correctness": {
         "noUnusedVariables": "off",
-        "noUnusedImports": "info", // unqualified to define "unused"
-        "useExhaustiveDependencies": "off", // unqualified to define "exhaustive dependencies"
+        "useExhaustiveDependencies": "off", // can't define "exhaustive"
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noUnusedTemplateLiteral": "off", // JetBrains GraphQL highlight doesn't work with quotes instead of a literal
-        "noUselessElse": "off", // ok, but `else {}` helps readability, often enough
+        "noUnusedTemplateLiteral": "off", // JetBrains gql highlight can't work with quotes instead of a literal
 
-        // rules below added by the v2 migration script, but they're fine defaults
+        // below by v2 migration script. Checked: ok defaults
         "noParameterAssign": "error",
         "useAsConstAssertion": "error",
         "useEnumInitializers": "error",
@@ -41,12 +39,14 @@
         "useSingleVarDeclarator": "error",
         "useNumberNamespace": "error",
       },
-      "nursery": {
-        "noDestructuredProps": "error", // destruction mostly makes code less readable
-        "noTsIgnore": "error", // read the docs - i agree with enforcement
-      },
     },
-    "includes": ["e2e/**", "src/**", "!src/components/ui/**"],
+    "includes": [
+      "e2e/**",
+      "src/**",
+      // exclude
+      "!src/components/ui/**",
+      "!src/apps/users/settings/profile/ThemeSelector.tsx",
+    ],
   },
   "formatter": {
     "enabled": true,
@@ -59,7 +59,7 @@
       "src/**",
       "e2e/**",
       "graphql/**",
-      "!graphql/gql-tada/graphql-env.d.ts", // gql isn't meant to be lintable
+      "!graphql/gql-tada/graphql-env.d.ts", // isn't lintable
 
       "biome.jsonc",
       "tsconfig.json",
