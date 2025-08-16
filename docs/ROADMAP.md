@@ -4,6 +4,8 @@
 
 ### v0.1.0.0
 
+Deploy to 4 SWE friends.
+
 - [x] [post-form] Rating
 - [x] [post-form] Importance
 - [x] [post-form] Visibility
