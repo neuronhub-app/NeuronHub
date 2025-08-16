@@ -2,7 +2,7 @@ import strawberry
 from strawberry import Info
 from django.conf import settings
 
-from neuronhub.apps.db.services.db_stubs_repopulate import db_stubs_repopulate
+from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
 
 
 @strawberry.type

@@ -1,4 +1,4 @@
-from neuronhub.apps.db.services.db_stubs_repopulate import (
+from neuronhub.apps.tests.services.db_stubs_repopulate import (
     db_stubs_repopulate,
     create_review_tags,
     ReviewTagParams,

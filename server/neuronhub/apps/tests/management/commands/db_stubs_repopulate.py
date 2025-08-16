@@ -5,7 +5,7 @@ from typing import Unpack
 
 from django.core.management import BaseCommand
 
-from neuronhub.apps.db.services.db_stubs_repopulate import db_stubs_repopulate
+from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
 
 
 logger = logging.getLogger(__name__)
