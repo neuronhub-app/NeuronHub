@@ -27,7 +27,7 @@ dependencies = [
 
     # django fields
     "django-timezone-field == 7.*", # [i=low, rep=high, GH=high, @mfogel] rich presence on SO (#103909), AirBnB, Yelp, etc
-    "django-choices-field == 2.*", # [i=norm, rep=high, @bellini666] Strawberry maintainer
+    "django-choices-field == 3.*", # [i=norm, rep=high, @bellini666] Strawberry maintainer
 
     # django admin
     "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] worked with him
