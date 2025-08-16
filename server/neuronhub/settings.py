@@ -85,7 +85,7 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
 ]
 
-IS_DEBUG_TOOLBAR_ENABLED = env.bool("IS_DEBUG_TOOLBAR_ENABLED", DEBUG)
+IS_DEBUG_TOOLBAR_ENABLED = env.bool("IS_DEBUG_TOOLBAR_ENABLED", False)
 if IS_DEBUG_TOOLBAR_ENABLED:
     INSTALLED_APPS.append("debug_toolbar")
     MIDDLEWARE.insert(0, "strawberry_django.middlewares.debug_toolbar.DebugToolbarMiddleware")
@@ -111,7 +111,6 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
-                "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
@@ -119,9 +118,6 @@ TEMPLATES = [
         },
     },
 ]
-if DJANGO_ENV is DjangoEnv.LOCAL:
-    context_processors: list[str] = TEMPLATES[0]["OPTIONS"]["context_processors"]
-    context_processors.insert(0, "django.template.context_processors.debug")
 
 WSGI_APPLICATION = "neuronhub.wsgi.application"
 ASGI_APPLICATION = "neuronhub.asgi.application"
