@@ -3,53 +3,63 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@0no-co/graphqlsp": "^1.15.0",
-    "@apollo/client": "^4.0.0-rc.9",
     "@chakra-ui/react": "^3.24.2",
-    "@date-fns/tz": "^1.4.1",
-    "@emotion/react": "^11.14.0",
-    "@hookform/devtools": "^4.4.0",
-    "@hookform/resolvers": "^5.2.1",
-    "@react-router/dev": "^7.8.1",
-    "@react-router/node": "^7.8.1",
-    "@sentry/react": "^10.5.0",
-    "chakra-react-select": "^6.1.0",
-    "date-fns": "^4.1.0",
-    "envalid": "^8.1.0",
-    "gql.tada": "^1.8.13",
-    "graphql": "^16.11.0",
-    "isbot": "^5.1.29",
-    "lucide-react": "^0.539.0",
-    "marked": "^16.1.2",
-    "next-themes": "^0.4.6",
-    "playwright": "^1.54.2",
+      "@emotion/react": "^11.14.0",
+      "next-themes": "^0.4.6",
+
     "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "react-hook-form": "^7.62.0",
-    "react-hot-toast": "^2.6.0",
-    "react-icons": "^5.5.0",
+      "react-dom": "^19.1.1",
     "react-router": "^7.8.1",
+      "@react-router/dev": "^7.8.1",
+      "@react-router/node": "^7.8.1",
+      "isbot": "^5.1.29",
+
+    "react-hot-toast": "^2.6.0",
     "react-select": "^5.10.2",
+    "chakra-react-select": "^6.1.0",
+    "react-hook-form": "^7.62.0",
+      "@hookform/resolvers": "^5.2.1",
+      "@hookform/devtools": "^4.4.0",
+
+    "lucide-react": "^0.539.0",
+    "react-icons": "^5.5.0",
+
     "valtio": "^2.1.5",
-    "zod": "^4.0.17"
+    "zod": "^4.0.17",
+    "marked": "^16.1.2",
+    "date-fns": "^4.1.0",
+    "@date-fns/tz": "^1.4.1",
+    "@sentry/react": "^10.5.0",
+    "envalid": "^8.1.0",
+
+    "@apollo/client": "^4.0.0-rc.9",
+    "gql.tada": "^1.8.13",
+    "@0no-co/graphqlsp": "^1.15.0",
+    "graphql": "^16.11.0"
   },
   "devDependencies": {
     "@chakra-ui/cli": "^3.24.2",
-    "globby": "^14.1.0",
+      "globby": "^14.1.0",
+
     "@biomejs/biome": "^2.2.0",
+
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/client-preset": "^4.8.3",
+
     "typescript": "^5.9.2",
     "@types/bun": "^1.2.20",
     "@playwright/test": "^1.54.2",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
+
     "npm-check-updates": "^18.0.2",
+
     "@redux-devtools/extension": "^3.3.0",
+
     "vite": "^7.1.2",
-    "@vitejs/plugin-react": "^5.0.0",
-    "@rollup/plugin-replace": "^6.0.2",
-    "vite-tsconfig-paths": "^6.0.0-beta.3",
-    "vite-plugin-devtools-json": "^1.0.0"
+      "@vitejs/plugin-react": "^5.0.0",
+      "@rollup/plugin-replace": "^6.0.2",
+      "vite-tsconfig-paths": "^6.0.0-beta.3",
+      "vite-plugin-devtools-json": "^1.0.0"
   }
 }
