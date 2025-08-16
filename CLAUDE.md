@@ -7,4 +7,6 @@
 For any CLI commands you must use `mise.toml`, expect if the command isn't there.
 You must never run dev servers, only `mise test:e2e` if you need it.
 
+@./docs/ROADMAP.md
+
 @./docs/architecture.md
