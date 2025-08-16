@@ -1,18 +1,17 @@
-import { captureException } from "@sentry/react";
 import type { ReviewCreateForm } from "@/apps/reviews/create/ReviewCreateForm";
 import { graphql } from "@/gql-tada";
-import { client } from "@/graphql/client";
+import { mutateAndRefetch } from "@/graphql/mutateAndRefetch";
 
 export async function sendReviewCreateMutation(values: ReviewCreateForm.FormSchema) {
   const { recommend_to, visible_to, alternatives, ...valuesRest } = values;
 
-  const res = await client.mutate({
-    mutation: graphql(`
+  const response = await mutateAndRefetch(
+    graphql(`
 			mutation CreatePostReview($input: PostTypeInput!) {
 				create_post_review(data: $input) { id }
 			}
 		`),
-    variables: {
+    {
       input: {
         ...valuesRest,
 
@@ -40,14 +39,8 @@ export async function sendReviewCreateMutation(values: ReviewCreateForm.FormSche
         },
       },
     },
-  });
-  if (res.error) {
-    captureException(res.error);
-    return { success: false, error: res.error.message } as const;
+  );
+  if (response.success) {
+    return { success: true, reviewId: response.data!.create_post_review.id } as const;
   }
-  if (!res.data?.create_post_review?.id) {
-    return { success: false, error: "Review creation failed - no ID returned" } as const;
-  }
-
-  return { success: true, reviewId: res.data.create_post_review.id } as const;
 }

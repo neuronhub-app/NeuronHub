@@ -176,11 +176,9 @@ export namespace ReviewCreateForm {
 
     async function handleSubmit(values: z.infer<typeof schema>) {
       const res = await sendReviewCreateMutation(values);
-      if (res.success) {
+      if (res?.success) {
         toast.success(strs.reviewCreated);
         navigate(`/reviews/${res.reviewId}`);
-      } else {
-        toast.error(res.error);
       }
     }
 
