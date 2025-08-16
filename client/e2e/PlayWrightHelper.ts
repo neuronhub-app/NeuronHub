@@ -6,8 +6,10 @@ import { client } from "@/graphql/client";
 import type { urls } from "@/routes";
 
 export class PlayWrightHelper {
+  timeout = 2000;
+
   constructor(private page: Page) {
-    this.page.setDefaultTimeout(2000);
+    this.page.setDefaultTimeout(this.timeout);
   }
 
   async dbStubsRepopulateAndLogin() {
@@ -41,6 +43,10 @@ export class PlayWrightHelper {
 
   async click(id: string) {
     return this.get(id).click();
+  }
+
+  async wait(id: string) {
+    return this.get(id).waitFor();
   }
 
   async waitForText(text: string) {

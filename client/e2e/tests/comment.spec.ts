@@ -12,39 +12,41 @@ test.describe("Comments", () => {
     await pwh.dbStubsRepopulateAndLogin();
   });
 
-  // todo !(test) flaky on last state check
-  // todo !(test) flaky on `pwh.click(ids.post.card.link)`
-  test("post and vote", async ({ page }) => {
+  test("create and voting", async ({ page }) => {
+    // test creation
     await pwh.navigate(urls.reviews.list);
+    await pwh.waitForNetworkIdle();
     await pwh.click(ids.post.card.link);
-    await pwh.waitForText("Comments");
-
-    const testComment = "Test comment";
-    await pwh.get(ids.comment.form.textarea).fill(testComment);
+    await pwh.wait(ids.comment.form.textarea);
+    const commentContent = "Test comment";
+    await pwh.get(ids.comment.form.textarea).fill(commentContent);
     await pwh.click(ids.comment.form.submitBtn);
 
     await pwh.waitForText(strs.createdComment);
 
-    await pwh.waitForAttrValue(ids.comment.vote.up, "data-state", "unchecked");
-    await pwh.waitForAttrValue(ids.comment.vote.down, "data-state", "unchecked");
+    // test voting
+    await pwh.waitForState(ids.comment.vote.up, "unchecked");
+    await pwh.waitForState(ids.comment.vote.down, "unchecked");
 
     await pwh.click(ids.comment.vote.up);
-    await pwh.waitForAttrValue(ids.comment.vote.up, "data-state", "checked");
-    await pwh.waitForAttrValue(ids.comment.vote.down, "data-state", "unchecked");
+    await pwh.waitForState(ids.comment.vote.up, "checked");
+    await pwh.waitForState(ids.comment.vote.down, "unchecked");
 
     await pwh.click(ids.comment.vote.down);
-    await pwh.waitForAttrValue(ids.comment.vote.down, "data-state", "checked");
-    await pwh.waitForAttrValue(ids.comment.vote.up, "data-state", "unchecked");
+    await pwh.waitForState(ids.comment.vote.down, "checked");
+    await pwh.waitForState(ids.comment.vote.up, "unchecked");
 
     await pwh.click(ids.comment.vote.down);
-    await pwh.waitForAttrValue(ids.comment.vote.down, "data-state", "unchecked");
-    await pwh.waitForAttrValue(ids.comment.vote.up, "data-state", "unchecked");
+    await pwh.waitForState(ids.comment.vote.down, "unchecked");
+    await pwh.waitForState(ids.comment.vote.up, "unchecked");
 
     await pwh.click(ids.comment.vote.up);
-    await pwh.waitForAttrValue(ids.comment.vote.up, "data-state", "checked");
+    await pwh.waitForState(ids.comment.vote.up, "checked");
 
+    // test reload
     await page.reload();
-    await pwh.waitForAttrValue(ids.comment.vote.up, "data-state", "checked");
-    await pwh.waitForText(testComment);
+    await pwh.waitForNetworkIdle();
+    await pwh.waitForState(ids.comment.vote.up, "checked");
+    await pwh.waitForText(commentContent);
   });
 });
