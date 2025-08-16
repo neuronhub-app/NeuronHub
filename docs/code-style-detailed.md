@@ -41,6 +41,10 @@ Examples:
 - Named exports only
 - No inline conditionals: `if (x) action()`
 
+### Error handling
+
+Never pollute console logs. Use Sentry's `captureException` or `logger.{level}()` 
+
 ### Nullish coalescing
 
 `??` for null/undefined, never `||` (preserves falsy).
@@ -67,6 +71,8 @@ const postReviewCreate = (user: User) => { }
 
 ### GraphQL
 
+Always inline queries if used only in one place, ie never create `UPPER_CASE` var.
+
 Always use `gql-tada.FragmentOf` instead of hand-writing types, or fragment sub types as `PostCommentType["votes"]`. See current fragments in `client/src/graphql/fragments/`.
 
 
@@ -74,7 +80,23 @@ Always use `gql-tada.FragmentOf` instead of hand-writing types, or fragment sub 
 
 We must keep `props` types inlined, not in an `interface`. If you need the type use `ComponentProps<typeof Comp>`.
 
-### Chakra
+### Chakra v3
+
+#### Semantic Tokens
+
+Always use semantic tokens when available. Create new tokens if helps.
+
+Without tokens the styles become an unmanageable clusterfuck.
+
+For spaces always `gap.{token}` - our spacing is symmetrical. Add new ones if helps, or create aliases for the existing skeleton.
+
+For colors always use the adaptable tokens (eg `bg="bg.subtle"`, not `black`), because we support light and dark mode natively.
+
+To get the raw values use the `system` from `theme.ts`, eg `system.token("colors.danager")`. Or the new syntax for strings `"{colors.red}"`.
+
+`mise lint` will re-generate Chakra theme types and tokens to lint them.
+
+#### Code Style
 
 Prefer
 - `<For>` over `.map()`

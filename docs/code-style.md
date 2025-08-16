@@ -27,7 +27,7 @@ You're working on a pre-MVP pre-PMF codebase:
 
 #### Best practices
 
-- Define variables at point of use
+- Define variables as close as possible to the point of use
 - Functions > 20 lines → decompose. Think of later debugging prod at 3am.
 - When objects are used only in one place - keep them together, esp if file is below 200 LOC
 - Single-use vars → inline as named args
