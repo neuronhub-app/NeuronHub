@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/react";
 import toast from "react-hot-toast";
+
 import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
 import {
