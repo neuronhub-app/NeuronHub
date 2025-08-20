@@ -133,6 +133,8 @@ else:
     db_host = env.str("DATABASE_HOST", "host.docker.internal")
     db_user = env.str("DATABASE_USER", "neuronhub")
     db_name = env.str("DATABASE_NAME", "neuronhub")
+    if env.bool("E2E_TEST", False):
+        db_name = env.str("E2E_DB_NAME")
     DATABASES = {
         "default": dj_database_url.config(
             conn_max_age=600,

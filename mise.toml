@@ -18,9 +18,11 @@
     ]
 
 [env]
-    VITE_E2E_TEST = false
-    VITE_SERVER_PORT = 8000
-    VITE_CLIENT_PORT = 3000
+    SERVER_PORT = 8000
+    SERVER_PORT_E2E = 8001
+
+    CLIENT_PORT = 3000
+    CLIENT_PORT_E2E = 3001
 
 [tasks."dev"]
     depends = ["dev:db", "dev:server", "dev:client"]
@@ -28,12 +30,13 @@
     [tasks."dev:server"]
         depends = "dev:db"
         dir = "server"
-        run = "uv run manage.py runserver {% if not env['VITE_E2E_TEST'] %}$VITE_SERVER_PORT{% endif %}"
+        run = "uv run manage.py runserver $SERVER_PORT"
 
     [tasks."dev:client"]
         depends = "dev:db"
         dir = "client"
-        run = "bun run react-router dev --host {% if not env['VITE_E2E_TEST'] %}--port=$VITE_CLIENT_PORT{% endif %}"
+        run = "bun run react-router dev --host --port=$CLIENT_PORT"
+        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT') }}"
 
     [tasks."dev:db"]
         dir = "devops"
@@ -43,6 +46,22 @@
     [tasks."dev:db-stop"]
         dir = "devops"
         run = "sudo docker compose down db"
+
+    [tasks."dev:server:e2e"]
+        depends = ["dev:db", "dev:db:setup-e2e"]
+        dir = "server"
+        run = "uv run manage.py runserver $SERVER_PORT_E2E --nothreading --noreload"
+        env.SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
+        env.E2E_TEST = true
+        env.E2E_DB_NAME = "{{ get_env(name='E2E_DB_NAME') }}" # mise ignores `mise.local.toml` - needs env passthrough
+
+    [tasks."dev:client:e2e"]
+        dir = "client"
+        run = "bun run react-router dev --host --port=$CLIENT_PORT_E2E"
+        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
+
+    [tasks."dev:e2e"]
+        depends = ["dev:server:e2e", "dev:client:e2e"]
 
 
 [tasks."test"]
@@ -56,11 +75,11 @@
         run = "uv run pytest"
 
     [tasks."test:e2e"]
-        depends = ["dev:db", "dev:db:setup-e2e"]
-        alias = "e2e"
         dir = "client"
-        env.VITE_E2E_TEST = "true"
         run = "bun run playwright test --config=e2e/playwright.config.ts"
+        alias = "e2e"
+        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}" # #[[mise-env-]]
+        env.E2E_TEST = true
 
 
 [tasks."django:migrate"]
