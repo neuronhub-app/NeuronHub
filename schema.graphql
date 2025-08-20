@@ -78,10 +78,10 @@ type Mutation {
   login(data: LoginInput!): LoginResponse!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   update_user_list(id: ID!, list_field_name: UserListName!, is_added: Boolean!): Boolean! @IsAuthenticated
+  update_post(data: PostTypeInput!): PostType! @IsAuthenticated
   create_post(data: PostTypeInput!): PostType! @IsAuthenticated
   create_post_review(data: PostTypeInput!): PostType! @IsAuthenticated
   create_post_comment(data: PostTypeInput!): PostCommentType! @IsAuthenticated
-  update_post(data: PostTypeInput!): PostType! @IsAuthenticated
   create_or_update_post_vote(id: ID!, is_vote_positive: Boolean, is_changed_my_mind: Boolean = null): Boolean! @IsAuthenticated
   update_post_seen_status(id: ID!): Boolean! @IsAuthenticated
   test_db_stubs_repopulate: String!
@@ -131,7 +131,7 @@ type PostReviewType implements PostTypeI {
   id: ID!
   author: UserType!
   seen_by_users: [DjangoModelType!]!
-  parent: PostToolType
+  parent: PostToolType!
   children: [PostTypeI!]!
   comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
@@ -159,6 +159,7 @@ type PostReviewType implements PostTypeI {
   review_importance: Int
   review_experience_hours: Int
   reviewed_at: DateTime!
+  is_review_later: Boolean!
 }
 
 input PostTagFilter {
@@ -478,7 +479,7 @@ enum UserListName {
 }
 
 type UserType {
-  id: String!
+  id: ID!
   username: String!
   first_name: String!
   last_name: String!

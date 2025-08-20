@@ -7,6 +7,8 @@ import {
   useController,
 } from "react-hook-form";
 
+import { ids } from "@/e2e/ids";
+
 // #AI
 export function FormChakraInput<
   TFieldValues extends FieldValues = FieldValues,
@@ -48,7 +50,11 @@ export function FormChakraInput<
           }}
         />
       </InputGroup>
-      <Field.ErrorText>{fieldState.error?.message}</Field.ErrorText>
+      {fieldState.error && (
+        <Field.ErrorText {...ids.set(ids.form.input.error)}>
+          {fieldState.error?.message}
+        </Field.ErrorText>
+      )}
     </Field.Root>
   );
 }

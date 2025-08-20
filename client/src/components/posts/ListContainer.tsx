@@ -23,9 +23,10 @@ import { PostButtonsVote } from "@/components/posts/PostCard/PostButtonsVote";
 import { ReviewTags } from "@/components/posts/PostReviewCard/ReviewTags";
 import { ToolTags } from "@/components/posts/ToolTags";
 import { Button } from "@/components/ui/button";
+import { ids } from "@/e2e/ids";
 import type { PostFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewFragmentType } from "@/graphql/fragments/reviews";
-import { isPostReviewType } from "@/graphql/fragments/reviews";
+import { isReview } from "@/graphql/fragments/reviews";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 export type PostListItemType = PostFragmentType | PostReviewFragmentType;
@@ -58,7 +59,11 @@ export function ListContainer(props: {
 
       <Flex flex="1" pos="relative" gap="gap.xl">
         <Stack gap="gap.xl">
-          <For each={props.items} fallback={<Heading>No reviews yet</Heading>}>
+          <For
+            each={props.items}
+            fallback={<Heading>No reviews yet</Heading>}
+            {...ids.set(ids.post.list)}
+          >
             {post => (
               <HStack key={post?.id} gap="gap.md" align="flex-start">
                 <Stack>
@@ -77,7 +82,8 @@ export function ListContainer(props: {
                   <PostCard post={post} />
 
                   {post.parent && <ToolTags tags={post.parent.tags} postId={post.parent.id} />}
-                  {isPostReviewType(post) && (
+
+                  {isReview(post) && (
                     <ReviewTags tags={post.tags} reviewAuthorId={post.author?.id} />
                   )}
 

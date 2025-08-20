@@ -6,9 +6,11 @@ import { client } from "@/graphql/client";
 import type { urls } from "@/routes";
 
 export class PlayWrightHelper {
-  timeout = 2000;
-
-  constructor(private page: Page) {
+  constructor(
+    private page: Page,
+    private timeout = 2400,
+    private timeoutDeviation = 1000,
+  ) {
     this.page.setDefaultTimeout(this.timeout);
   }
 
@@ -17,47 +19,45 @@ export class PlayWrightHelper {
     await this.login();
   }
 
-  async login() {
-    await this.page.goto(`${env.VITE_SERVER_URL}/admin/login/`);
-    await this.page.fill('input[name="username"]', config.user.username);
-    await this.page.fill('input[name="password"]', config.user.password);
-    await this.page.click('input[type="submit"]');
-    await this.waitForText("Site administration");
-  }
-
-  async navigate(path: typeof urls.reviews.list) {
-    await this.page.goto(path);
-  }
-
-  get(id: string) {
-    return this.page.getByTestId(id).first();
-  }
-
-  async getInt(id: string) {
-    return Number.parseInt((await this.get(id).textContent()) ?? "", 10);
+  async navigate(path: typeof urls.reviews.list | typeof urls.posts.list) {
+    return this.page.goto(path);
   }
 
   getAll(id: string) {
     return this.page.getByTestId(id);
   }
 
-  async click(id: string) {
+  get(id: string) {
+    return this.getAll(id).first();
+  }
+
+  async fill(id: string, content: string) {
+    const input = this.get(id);
+    await input.waitFor();
+    await input.fill(content);
+  }
+
+  async click(id: string, options: { wait: boolean } = { wait: true }) {
+    if (options.wait) {
+      await this.get(id).waitFor();
+    }
     return this.get(id).click();
   }
 
   async wait(id: string) {
-    return this.get(id).waitFor();
+    return this.get(id).waitFor({ timeout: this.timeout + this.timeoutDeviation });
   }
 
-  async waitForText(text: string) {
+  async expectText(text: string) {
     await this.page.waitForSelector(`text="${text}"`);
   }
 
   async waitForState(testId: string, state: "checked" | "unchecked") {
-    await this.waitForAttrValue(testId, "data-state", state);
+    await expect(this.get(testId)).toHaveAttribute("data-state", state);
   }
-  async waitForAttrValue(testId: string, attr: string, expectedValue: string) {
-    await expect(this.get(testId)).toHaveAttribute(attr, expectedValue);
+
+  waitForNetworkIdle() {
+    return this.page.waitForLoadState("networkidle");
   }
 
   async dbStubsRepopulate() {
@@ -66,7 +66,11 @@ export class PlayWrightHelper {
     });
   }
 
-  waitForNetworkIdle() {
-    return this.page.waitForLoadState("networkidle");
+  private async login() {
+    await this.page.goto(`${env.VITE_SERVER_URL}/admin/login/`);
+    await this.page.fill('input[name="username"]', config.user.username);
+    await this.page.fill('input[name="password"]', config.user.password);
+    await this.page.click('input[type="submit"]');
+    await this.expectText("Site administration");
   }
 }

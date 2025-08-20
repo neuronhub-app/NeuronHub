@@ -47,6 +47,13 @@ export const PostFragment = graphql(
         id
         __typename
         title
+        ... on PostToolType {
+          tool_type
+          content
+          domain
+          github_url
+          crunchbase_url
+        }
         tags {
           ...PostTagFragment
         }

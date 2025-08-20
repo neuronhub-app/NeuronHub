@@ -3,9 +3,9 @@ import { AsyncCreatableSelect, components } from "chakra-react-select";
 import { useEffect, useRef } from "react";
 import { subscribe } from "valtio/vanilla";
 
-import type {
+import {
   ReviewCreateForm,
-  ReviewSelectOption,
+  type ReviewSelectOption,
 } from "@/apps/reviews/create/ReviewCreateForm";
 import { user } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
@@ -32,18 +32,19 @@ export function UserMultiSelect(props: {
   const state = useValtioProxyRef({
     isOptionDialogOpen: false,
     userSelected: null as ReviewSelectOption | null,
-    optionsDefault: [] as UserSelectOption[],
+    options: [] as UserSelectOption[],
   });
+  const dialogInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    state.mutable.optionsDefault = getOptionsFiltered();
+    if (user.state?.current?.connection_groups) {
+      state.mutable.options = getOptionsAndFilter();
+    }
 
     subscribe(user.state, () => {
-      state.mutable.optionsDefault = getOptionsFiltered();
+      state.mutable.options = getOptionsAndFilter();
     });
   }, []);
-
-  const dialogInputRef = useRef<HTMLInputElement | null>(null);
 
   function getOptionNumber(optionId: string): number {
     return options!.findIndex(option => option.id === optionId);
@@ -56,26 +57,27 @@ export function UserMultiSelect(props: {
   return (
     <Flex minW="50%">
       <AsyncCreatableSelect
-        defaultOptions={state.snap.optionsDefault}
+        defaultOptions={state.snap.options}
+        value={options ?? []}
         isMulti
         placeholder={props.placeholder}
-        isValidNewOption={() => false} // disable creation
+        isValidNewOption={() => false} // disable creation, to preserve UserSelectOption attrs
         closeMenuOnSelect={false}
-        onChange={(multiValue, _actionMeta) => {
+        onChange={(multiValue, _) => {
           props.form.setValue(
             props.fieldName,
             multiValue.map(value => {
-              // prevent react-select from recreating Option and resetting custom props
+              // disable creation, to preserve UserSelectOption attrs
               const option = options?.find(option => option.id === value.id);
               return option ?? value;
             }),
           );
         }}
-        loadOptions={async (inputValue: string) => getOptionsFiltered(inputValue)}
-        getOptionLabel={option => (option as any)?.label}
-        getOptionValue={(option: UserSelectOption) => {
-          const prefix = option.group ? "group" : "user";
-          return `${prefix}-${option.id}`;
+        loadOptions={async (inputValue: string) => getOptionsAndFilter(inputValue)}
+        getOptionLabel={option => option.label ?? option.id}
+        getOptionValue={option => {
+          // `getOptionValue` is a bad name, it's only used for comparison
+          return `${option.type}-${option.id}`;
         }}
         components={{
           MultiValueLabel: propsMultiVal => (
@@ -124,37 +126,34 @@ export function UserMultiSelect(props: {
   );
 }
 
-function getOptionsFiltered(filterInputValue?: string): UserSelectOption[] {
-  function filter(optionName: string) {
-    const isNoFilter = !filterInputValue || filterInputValue === "";
-    return isNoFilter || optionName.toLowerCase().includes(filterInputValue.toLowerCase());
+function getOptionsAndFilter(filterInputValue?: string): UserSelectOption[] {
+  function isFilterMatched(optionName: string) {
+    const isNothingTyped = !filterInputValue || filterInputValue === "";
+    return isNothingTyped || optionName.toLowerCase().includes(filterInputValue.toLowerCase());
   }
 
-  const connectionOptions = user.state.connections
-    .filter(connection => filter(connection.username))
-    .map(connection => ({
-      id: connection.id,
-      label: connection.username,
-      user: connection,
-      group: null,
+  const optionsUsers = user.state.connections
+    .filter(user => isFilterMatched(user.username))
+    .map(user => ({
+      id: user.id,
+      type: ReviewCreateForm.UserType.enum.User,
+      label: user.username,
+      user: user,
       message: null,
     }));
 
-  const groupOptions = user.state.current?.connection_groups
-    .filter(group => filter(group.name))
-    .map(group => ({
-      id: group.id,
-      label: group.connections.length
-        ? `${group.name || "Default"} (${group.connections.length})`
-        : group.name,
-      group: group,
-      user: null,
-      message: null,
-    }))
-    .filter(option => option.group.name !== "");
+  const optionsGroups =
+    user.state
+      .current!.connection_groups.filter(group => isFilterMatched(group.name))
+      .map(group => ({
+        id: group.id,
+        type: ReviewCreateForm.UserType.enum.Group,
+        label: group.connections.length
+          ? `${group.name || "Default"} (${group.connections.length})`
+          : group.name,
+        group: group,
+        message: null,
+      })) ?? [];
 
-  if (groupOptions) {
-    return [...groupOptions, ...connectionOptions];
-  }
-  return connectionOptions;
+  return [...optionsGroups, ...optionsUsers];
 }

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import typing
-from asgiref.sync import sync_to_async
 from django.core.exceptions import ValidationError
 from strawberry import UNSET
 from typing import Any
@@ -48,7 +47,7 @@ async def create_post_review(author: User, data: PostTypeInput) -> Post:
 
     if data.tags:
         tags = await _process_tags(data.tags, post_tool, author=author)
-        await sync_to_async(review.tags.set)([tag.id for tag in tags])
+        await review.tags.aset([tag.id for tag in tags])
 
     return review
 

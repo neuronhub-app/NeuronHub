@@ -16,8 +16,8 @@ class UserConnectionGroupType:
 
 @strawberry_django.type(User)
 class UserType:
-    # for privacy only username is exposed
-    id: auto = strawberry_django.field(field_name="username")
+    # todo feat: for privacy publish UUID / username (requires strawberry-django's M2M { set: ID } override)
+    id: auto
     username: auto
 
     first_name: auto

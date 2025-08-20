@@ -16,13 +16,13 @@ test.describe("Comments", () => {
     // test creation
     await pwh.navigate(urls.reviews.list);
     await pwh.waitForNetworkIdle();
-    await pwh.click(ids.post.card.link);
+    await pwh.click(ids.post.card.link.detail);
     await pwh.wait(ids.comment.form.textarea);
     const commentContent = "Test comment";
     await pwh.get(ids.comment.form.textarea).fill(commentContent);
     await pwh.click(ids.comment.form.submitBtn);
 
-    await pwh.waitForText(strs.createdComment);
+    await pwh.expectText(strs.createdComment);
 
     // test voting
     await pwh.waitForState(ids.comment.vote.up, "unchecked");
@@ -47,6 +47,6 @@ test.describe("Comments", () => {
     await page.reload();
     await pwh.waitForNetworkIdle();
     await pwh.waitForState(ids.comment.vote.up, "checked");
-    await pwh.waitForText(commentContent);
+    await pwh.expectText(commentContent);
   });
 });

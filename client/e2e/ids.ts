@@ -1,5 +1,7 @@
+// todo refac: gen values from keys
 export namespace ids {
   export const post = {
+    list: "post.list",
     vote: {
       up: "post.vote.up",
       down: "post.vote.down",
@@ -9,20 +11,33 @@ export namespace ids {
       readingList: "post.btn.reading-list",
       library: "post.btn.library",
       submit: "post.btn.submit",
+      edit: "post.btn.edit",
     },
     card: {
       container: "post.card.container",
-      type: "post.card.type",
-      link: "post.card.link",
+      id: "post.card.id",
+      link: {
+        detail: "post.card.link.detail",
+        edit: "post.card.link.edit",
+      },
+    },
+  } as const;
+
+  export const form = {
+    input: {
+      error: "form.input.error",
     },
   } as const;
 
   export const review = {
+    // todo rename to `post.form`, ie the main Post form
     form: {
-      parentTitle: "review.form.parent-title-input",
-      titleInput: "review.form.title-input",
-      contentTextarea: "review.form.content-textarea",
-      usageStatusSelector: "review.form.usage-status-selector",
+      parentTitle: "review.form.parentTitle",
+      title: "review.form.title",
+      source: "review.form.source",
+      content: "review.form.content",
+      usageStatus: "review.form.usageStatus",
+      rating: "review.form.rating",
     },
     tag: {
       container: "review.tag.container",
@@ -69,7 +84,7 @@ export namespace ids {
     return { "data-testid": id };
   }
 
-  export function setInputId<Id extends string>(id: Id): { inputProps: { "data-testid": Id } } {
+  export function setInput<Id extends string>(id: Id): { inputProps: { "data-testid": Id } } {
     return { inputProps: { "data-testid": id } };
   }
 }

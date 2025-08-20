@@ -20,6 +20,8 @@ export const PostReviewFragment = graphql(
   [PostFragment],
 );
 
+// Review detail
+
 export const PostReviewDetailFragment = graphql(
   `
     fragment PostReviewDetailFragment on PostReviewType {
@@ -32,8 +34,42 @@ export const PostReviewDetailFragment = graphql(
 export type PostReviewDetailFragmentType = FragmentOf<typeof PostReviewDetailFragment>;
 export type PostReviewFragmentType = FragmentOf<typeof PostReviewFragment>;
 
-export function isPostReviewType(
+export function isReview(
   post: PostFragmentType | PostReviewFragmentType,
 ): post is PostReviewFragmentType {
   return post.__typename === "PostReviewType";
 }
+
+// Review edit
+
+export const PostReviewEditFragment = graphql(
+  `
+    fragment PostReviewEditFragment on PostReviewType {
+      ...PostReviewFragment
+      ...PostCommentsFragment
+
+			content_private
+			is_review_later
+
+      visibility
+      recommended_to_users {
+        id
+        username
+      }
+      recommended_to_groups {
+        id
+        name
+      }
+      visible_to_users {
+        id
+        username
+      }
+      visible_to_groups {
+        id
+        name
+      }
+    }
+  `,
+  [PostReviewFragment, PostCommentsFragment],
+);
+export type PostReviewEditFragmentType = FragmentOf<typeof PostReviewEditFragment>;

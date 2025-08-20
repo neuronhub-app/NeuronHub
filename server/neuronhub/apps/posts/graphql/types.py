@@ -104,13 +104,14 @@ class PostToolType(PostTypeI):
 class PostReviewType(PostTypeI):
     TYPE = Post.Type.Review
 
-    parent: PostToolType | None
+    parent: PostToolType
 
     review_usage_status: auto
     review_rating: auto
     review_importance: auto
     review_experience_hours: auto
     reviewed_at: auto
+    is_review_later: auto
 
 
 # noinspection PyDataclass
