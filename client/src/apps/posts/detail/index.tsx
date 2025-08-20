@@ -26,7 +26,7 @@ export default function PostDetailRoute(props: Route.ComponentProps) {
     captureException(error);
   }
 
-  // @ts-expect-error ts-bad-inference - caused by Apollo
+  // @ts-expect-error #bad-infer, by Apollo
   const post: PostDetailFragmentType = data?.post ?? undefined;
 
   return <PostDetail title="Post" post={post} isLoading={isLoadingInit} error={error} />;

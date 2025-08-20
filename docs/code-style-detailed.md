@@ -52,7 +52,7 @@ Never pollute console logs. Use Sentry's `captureException` or `logger.{level}()
 ### Types
 
 No `as any` or `any` where knowable; if used - must leave an explanation.
-- If TS inference is broken - comment with `// @ts-expect-error ts-bad-inference {reason}`. The `{reason}` should explain when it's worth trying to remove the exception.
+- If TS inference is broken - comment with `// @ts-expect-error #bad-infer {reason}`. The `{reason}` should explain when it's worth trying to remove the exception.
 
 ### No destructing
 

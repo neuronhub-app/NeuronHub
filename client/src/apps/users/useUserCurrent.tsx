@@ -20,7 +20,7 @@ export function useUser() {
 
   useEffect(() => {
     if (data?.user_current) {
-      // @ts-expect-error ts-bad-inference, broke with Apollo
+      // @ts-expect-error #bad-infer, by Apollo
       const userCurrent: User = data.user_current;
       user.state.current = userCurrent;
     }
@@ -29,7 +29,7 @@ export function useUser() {
       const connectionsUntyped = data.user_current.connection_groups
         .flatMap(group => group?.connections)
         .filter(Boolean);
-      // @ts-expect-error ts-bad-inference, broke with Apollo
+      // @ts-expect-error #bad-infer, by Apollo
       const connections: UserConnection[] = connectionsUntyped;
       const connectionsUniqueMap = new Map(
         connections.map(conn => [`${conn.id}-${conn.username}`, conn]),

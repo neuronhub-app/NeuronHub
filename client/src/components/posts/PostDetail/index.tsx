@@ -29,11 +29,12 @@ export function PostDetail(props: {
           <Stack gap="gap.lg">
             <Heading size="lg">Comments</Heading>
 
-            <For each={props.post?.comments.filter(comment => !comment.parent)}>
-              {comment => (
-                // @ts-bad-inference
-                <CommentThread key={comment.id} comment={comment as PostCommentType} />
-              )}
+            <For each={props.post.comments.filter(comment => !comment.parent)}>
+              {comment => {
+                // @ts-expect-error #bad-infer
+                const commentTyped: PostCommentType = comment;
+                return <CommentThread key={comment.id} comment={commentTyped} />;
+              }}
             </For>
 
             {user && <CommentCreateForm parentId={props.post.id} />}
