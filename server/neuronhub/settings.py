@@ -122,6 +122,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "neuronhub.wsgi.application"
 ASGI_APPLICATION = "neuronhub.asgi.application"
 
+E2E_TEST = env.bool("E2E_TEST", False)
 if DJANGO_ENV == DjangoEnv.BUILD:
     DATABASES = {
         "default": {
@@ -133,7 +134,7 @@ else:
     db_host = env.str("DATABASE_HOST", "host.docker.internal")
     db_user = env.str("DATABASE_USER", "neuronhub")
     db_name = env.str("DATABASE_NAME", "neuronhub")
-    if env.bool("E2E_TEST", False):
+    if E2E_TEST:
         db_name = env.str("E2E_DB_NAME")
     DATABASES = {
         "default": dj_database_url.config(
@@ -262,8 +263,8 @@ LOGGING = {
         "level": "INFO",
     },
 }
-# in E2E Mise `--quite` doesn't work on runserver, and `--silent` drops stderr
-if env.bool("IS_DJANGO_RUNSERVER_STDERR_ONLY", False):
+# in E2E Mise `--quite` doesn't work on runserver, and `--silent` drops stderr; so we drop logs except errors #AI
+if E2E_TEST:
     LOGGING["handlers"]["null"] = {"class": "logging.NullHandler"}
     LOGGING["loggers"] = {
         "django.server": {

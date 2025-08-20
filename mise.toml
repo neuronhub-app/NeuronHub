@@ -24,6 +24,8 @@
     CLIENT_PORT = 3000
     CLIENT_PORT_E2E = 3001
 
+    E2E_DB_NAME = "test_neuronhub_e2e"
+
 [tasks."dev"]
     depends = ["dev:db", "dev:server", "dev:client"]
 
@@ -52,8 +54,8 @@
         dir = "server"
         run = "uv run manage.py runserver $SERVER_PORT_E2E --nothreading --noreload"
         env.SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
-        env.E2E_TEST = true
-        env.E2E_DB_NAME = "{{ get_env(name='E2E_DB_NAME') }}" # mise ignores `mise.local.toml` - needs env passthrough
+        env.E2E_TEST = "true"
+        env.E2E_DB_NAME = "{{ get_env(name='E2E_DB_NAME') }}"
 
     [tasks."dev:client:e2e"]
         dir = "client"
@@ -78,8 +80,7 @@
         dir = "client"
         run = "bun run playwright test --config=e2e/playwright.config.ts"
         alias = "e2e"
-        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}" # #[[mise-env-]]
-        env.E2E_TEST = true
+        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
 
 
 [tasks."django:migrate"]
