@@ -3,7 +3,7 @@ import { ids } from "@/e2e/ids";
 import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 import { urls } from "@/routes";
 
-// skipped as usually not needed
+// Those tests are skipped, as usually not needed
 test.describe("Apollo", () => {
   let helper: PlayWrightHelper;
 
@@ -40,15 +40,19 @@ test.describe("Apollo", () => {
     page,
   }) => {
     await helper.navigate(urls.reviews.list);
-    const votes = await helper.getInt(ids.post.vote.count);
+    const votes = await getVoteCount();
 
-    await helper.click(ids.post.card.link);
+    await helper.click(ids.post.card.link.detail);
     await helper.get(ids.comment.form.textarea).waitFor();
     await page.goBack();
 
     // confirm refetchQueries() reloads votes count
     await helper.click(ids.post.vote.up);
     await helper.waitForState(ids.post.vote.up, "checked");
-    expect(await helper.getInt(ids.post.vote.count)).toBe(votes + 1);
+    expect(await getVoteCount()).toBe(votes + 1);
+
+    async function getVoteCount() {
+      return Number.parseInt((await helper.get(ids.post.vote.count).textContent()) ?? "", 10);
+    }
   });
 });
