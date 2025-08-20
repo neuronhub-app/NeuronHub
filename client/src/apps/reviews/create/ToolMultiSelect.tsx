@@ -23,11 +23,11 @@ import {
 } from "@/components/ui/dialog";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-type ReviewSelectName = "tags" | "alternatives";
+type FieldName = "tags" | "alternatives";
 
 export function ToolMultiSelect(props: {
   form: UseFormReturn<ReviewCreateForm.FormSchema>;
-  fieldName: ReviewSelectName;
+  fieldName: FieldName;
   loadOptions: (inputValue: string) => Promise<ReviewSelectOption[]>;
   isAllowCreate?: boolean;
 }) {
@@ -57,7 +57,7 @@ export function ToolMultiSelect(props: {
         isMulti
         isClearable={false}
         closeMenuOnSelect={false}
-        onChange={(multiValue, _actionMeta) => {
+        onChange={(multiValue, _) => {
           props.form.setValue(
             props.fieldName,
             multiValue.map(value => {
@@ -67,16 +67,13 @@ export function ToolMultiSelect(props: {
             }),
           );
         }}
-        getNewOptionData={inputValue => ({
-          id: inputValue,
-          name: inputValue,
-        })}
+        getNewOptionData={inputValue => ({ id: inputValue, name: inputValue })}
         loadOptions={async (inputValue: string) => {
-          // todo throttle
+          // todo UX: throttle
           return props.loadOptions(inputValue);
         }}
-        getOptionLabel={(option: ReviewSelectOption) => option.name}
-        getOptionValue={(option: ReviewSelectOption) => option.name}
+        getOptionLabel={option => option.name}
+        getOptionValue={option => option.name}
         components={{
           MultiValueLabel: propsMultiVal => (
             <components.MultiValueLabel {...propsMultiVal}>
@@ -88,15 +85,15 @@ export function ToolMultiSelect(props: {
                     isPositive={true}
                     option={propsMultiVal.data}
                     options={options}
-                    form={props.form}
                     fieldName={props.fieldName}
+                    setValue={props.form.setValue}
                   />
                   <VoteButton
                     isPositive={false}
                     option={propsMultiVal.data}
                     options={options}
-                    form={props.form}
                     fieldName={props.fieldName}
+                    setValue={props.form.setValue}
                   />
                   <OptionButton
                     onClick={() => {
@@ -155,18 +152,17 @@ export function ToolMultiSelect(props: {
 function VoteButton(props: {
   option: ReviewSelectOption;
   options: ReviewSelectOption[];
-  form: ReviewCreateForm.FormType;
-  fieldName: ReviewSelectName;
+  setValue: ReviewCreateForm.FormType["setValue"];
+  fieldName: FieldName;
   isPositive: boolean;
 }): ReactNode {
   function onVoteButtonClick(): void {
-    const option = props.options.find(option => option.name === props.option.name)!;
-    const optionUpdated = toggleOptionVoteValue(option, props.isPositive);
-
-    props.form.setValue(
-      props.fieldName,
-      props.options.map(option => (option.name === props.option.name ? optionUpdated : option)),
+    const optionOld = props.options.find(opt => opt.name === props.option.name)!;
+    const optionNew = toggleVoteValue(optionOld, props.isPositive);
+    const optionsNew = props.options.map(opt =>
+      opt.name === props.option.name ? optionNew : opt,
     );
+    props.setValue(props.fieldName, optionsNew);
   }
 
   const isButtonActive = props.options.some(
@@ -219,11 +215,7 @@ export function OptionButton(props: {
   );
 }
 
-// #AI works fine
-function toggleOptionVoteValue(
-  option: ReviewSelectOption,
-  isPositive: boolean,
-): ReviewSelectOption {
+function toggleVoteValue(option: ReviewSelectOption, isPositive: boolean): ReviewSelectOption {
   if (
     (isPositive && option.is_vote_positive === true) ||
     (!isPositive && option.is_vote_positive === false)
