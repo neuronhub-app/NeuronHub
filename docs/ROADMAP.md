@@ -20,7 +20,7 @@
 #### Deploy
 - [ ] Sentry errors and logs
 
-### v0.1.1.0
+### v0.2.0.0
 
 - [ ] [comment] fix vote `checked` UI
 - [ ] [post-form] `alternative` votes and comments
@@ -28,8 +28,12 @@
 - [ ] [auth] double-check visibility
 - [ ] paginate
 
-### v0.1.2.0
+### v0.2.1.0
 
 - [ ] [auth] signup
 - [ ] [post-form] pros/cons list indicator with icons
 - [ ] [comment] vote `changed my mind`
+
+### v0.3.0.0
+
+- [ ] [auth] Apple/Google
