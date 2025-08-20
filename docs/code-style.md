@@ -39,22 +39,45 @@ You're working on a pre-MVP pre-PMF codebase:
 
 ### Components
 
+Hypothetical example of a typical inner hierarchy and imports:
 ```tsx
-export function UserCard(props: { user: User; className?: string }) {
+import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { client } from "@/graphql/client"; // configured Apollo Client
+import { useUser } from "@/apps/users/useUserCurrent";
+import { ID, graphql } from "@/gql-tada";
+import { useInit } from "@/utils/useInit";
+
+export function Card(props: { id: ID; className?: string }) {
   // 1. Defaults
   const className = props.className ?? "default";
   
   // 2. Hooks
-  const userSnap = useSnapshot(user.state);
+
+  const user = useUser();
+
+  const { data, error, isLoadingFirstTime } = useApolloQuery(
+    graphql(`query Post($id: ID!) { post(id: $id) { ... } }`),
+    { id: props.id },
+  );
 
   // 3. State
+
   const state = useValtioProxyRef({ isDialogOpen: false });
 
-  // 3. Handlers
-  function handleClick() { }
+  // 3. Functions and handlers
 
-  // 4. Render values - closest to usage in JSX
-  const name = props.user.name ?? "Anonymous";
+  useInit({
+    isBlocked: isLoadingFirstTime,
+    init: () => { ... },
+    deps: [],
+  });
+
+  async function handleClick() {
+    await client.mutate({ ... });
+  }
+
+  // 4. Variables JSX render
+  const name = user.name ?? "Anonymous";
 
   return (
     <DialogRoot
