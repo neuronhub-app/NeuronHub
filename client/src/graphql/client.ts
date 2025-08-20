@@ -42,6 +42,10 @@ function fetchUsingReadableUrl(uri: RequestInfo | Request | URL, options?: Reque
 
   let urlModified = uri;
   if (body.operationName) {
+    const isMutation = body.query.startsWith("mutation");
+    if (isMutation) {
+      urlModified += `/mutate`;
+    }
     urlModified += `/${body.operationName}`;
 
     if (Object.keys(body.variables ?? {}).length) {

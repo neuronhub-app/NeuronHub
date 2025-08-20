@@ -25,7 +25,9 @@ urlpatterns = [
         include(
             [
                 path("graphql", csrf_exempt(graphql_view)),
+                # extra for [[client.ts#fetchUsingReadableUrl]]
                 path("graphql/<operation>", csrf_exempt(graphql_view)),
+                path("graphql/mutate/<operation>", csrf_exempt(graphql_view)),
             ]
         ),
     ),
