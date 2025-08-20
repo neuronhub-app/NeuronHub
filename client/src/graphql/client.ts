@@ -35,7 +35,9 @@ function createApolloClient() {
   return client;
 }
 
-// Change `/api/graphql/` -> `/api/graphql/QueryName?variables=...`
+// Change:
+// - `/api/graphql/` -> `/api/graphql/Name`
+// - `/api/graphql/` -> `/api/graphql/mutate/Name`
 function fetchUsingReadableUrl(uri: RequestInfo | Request | URL, options?: RequestInit) {
   const bodyString = typeof options?.body === "string" ? options.body : "";
   const body = JSON.parse(bodyString);

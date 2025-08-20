@@ -7,17 +7,10 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/posts/detail/+types/index";
 
 export default function PostDetailRoute(props: Route.ComponentProps) {
-  const { data, error, isLoadingInit } = useApolloQuery(
-    graphql(
-      `
-      query PostDetail($pk: ID!) {
-        post(pk: $pk) {
-          ...PostDetailFragment
-        }
-      }
-    `,
-      [PostDetailFragment],
-    ),
+  const { data, error, isLoadingFirstTime } = useApolloQuery(
+    graphql(`query PostDetail($pk: ID!) { post(pk: $pk) { ...PostDetailFragment } }`, [
+      PostDetailFragment,
+    ]),
     { pk: props.params.id },
   );
 
@@ -29,5 +22,5 @@ export default function PostDetailRoute(props: Route.ComponentProps) {
   // @ts-expect-error #bad-infer, by Apollo
   const post: PostDetailFragmentType = data?.post ?? undefined;
 
-  return <PostDetail title="Post" post={post} isLoading={isLoadingInit} error={error} />;
+  return <PostDetail title="Post" post={post} isLoading={isLoadingFirstTime} error={error} />;
 }

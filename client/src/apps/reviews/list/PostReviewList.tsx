@@ -4,7 +4,7 @@ import { PostReviewFragment } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 export function PostReviewList() {
-  const { data, error, isLoadingInit } = useApolloQuery(
+  const { data, error, isLoadingFirstTime } = useApolloQuery(
     graphql(
       `
         query ReviewList {
@@ -24,7 +24,7 @@ export function PostReviewList() {
       title="Reviews"
       items={posts}
       urlNamespace="reviews"
-      isLoadingInit={isLoadingInit}
+      isLoadingFirstTime={isLoadingFirstTime}
       error={error}
     />
   );

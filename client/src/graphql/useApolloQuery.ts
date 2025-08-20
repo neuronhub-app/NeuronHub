@@ -17,6 +17,6 @@ export function useApolloQuery<Data, Variables extends OperationVariables = Oper
   );
   return {
     ...queryResult,
-    isLoadingInit: !queryResult.data && queryResult.loading,
+    isLoadingFirstTime: !queryResult.data && queryResult.loading,
   };
 }
