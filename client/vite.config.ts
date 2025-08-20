@@ -10,4 +10,6 @@ export default defineConfig({
     allowedHosts: ["localhost", "client"],
   },
   plugins: [reactRouter(), tsconfigPaths(), devtoolsJson()],
+  build: { sourcemap: true },
+  dev: { sourcemap: true },
 });
