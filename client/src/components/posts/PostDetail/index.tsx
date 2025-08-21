@@ -1,8 +1,8 @@
-import { For, Heading, Stack } from "@chakra-ui/react";
+import { For, Heading, Show, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard";
-import { CommentCreateForm } from "@/components/posts/PostDetail/CommentCreateForm";
+import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
 import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
@@ -37,7 +37,9 @@ export function PostDetail(props: {
               }}
             </For>
 
-            {user && <CommentCreateForm parentId={props.post.id} />}
+            <Show when={user}>
+              <CommentForm mode="create" parentId={props.post.id} />
+            </Show>
           </Stack>
         </Stack>
       )}

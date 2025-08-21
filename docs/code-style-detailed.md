@@ -40,6 +40,7 @@ Examples:
 - Always `ESNext`
 - Named exports only
 - No inline conditionals: `if (x) action()`
+- instead of `useState` use `useValtioProxyRef`. Unless there's a tangible maintenance benefit to `useState`
 
 ### Error handling
 

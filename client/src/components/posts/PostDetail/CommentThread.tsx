@@ -1,12 +1,23 @@
-import { Box, HStack, Text, VStack } from "@chakra-ui/react";
+import { Box, Button, For, HStack, Show, Text, VStack } from "@chakra-ui/react";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
-import { CommentCreateForm } from "@/components/posts/PostDetail/CommentCreateForm";
+import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentVoteBar } from "@/components/posts/PostDetail/CommentVoteBar";
+import { ids } from "@/e2e/ids";
+import type { ID } from "@/gql-tada";
 import type { PostCommentType } from "@/graphql/fragments/posts";
+import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 export function CommentThread(props: { comment: PostCommentType }) {
   const user = useUser();
+
+  const state = useValtioProxyRef({
+    editingCommentId: null as null | ID,
+    editingReplyId: null as null | ID,
+  });
+
+  const isAuthor = user?.id === props.comment.author?.id;
+  const isEditing = state.snap.editingCommentId === props.comment.id;
 
   return (
     <Box>
@@ -22,40 +33,104 @@ export function CommentThread(props: { comment: PostCommentType }) {
                 style={{ display: "inline", ml: 2 }}
               />
             </Box>
-            <CommentVoteBar comment={props.comment} />
+            <HStack>
+              <Show when={isAuthor && !isEditing}>
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => {
+                    state.mutable.editingCommentId = props.comment.id;
+                  }}
+                  {...ids.set(ids.comment.edit.btn)}
+                >
+                  Edit
+                </Button>
+              </Show>
+              <CommentVoteBar comment={props.comment} />
+            </HStack>
           </HStack>
-          <Text whiteSpace="pre-wrap">{props.comment.content}</Text>
+
+          <Show
+            when={isEditing}
+            fallback={<Text whiteSpace="pre-wrap">{props.comment.content}</Text>}
+          >
+            <CommentForm
+              mode="edit"
+              comment={props.comment}
+              onCancel={() => {
+                state.mutable.editingCommentId = null;
+              }}
+              onSave={() => {
+                state.mutable.editingCommentId = null;
+              }}
+            />
+          </Show>
         </Box>
 
-        {user && (
+        <Show when={user}>
           <Box ml={8}>
-            <CommentCreateForm parentId={props.comment.id} />
+            <CommentForm mode="create" parentId={props.comment.id} />
           </Box>
-        )}
+        </Show>
 
-        {props.comment.comments?.length > 0 && (
+        <Show when={props.comment.comments && props.comment.comments.length > 0}>
           <Box ml={8}>
             <VStack align="stretch" gap={4}>
-              {props.comment.comments.map(reply => (
-                <Box key={reply.id} p={4} borderWidth={1} borderRadius="md">
-                  <HStack mb={2} justify="space-between">
-                    <Box>
-                      <Text fontWeight="semibold" display="inline">
-                        {reply.author?.username}
-                      </Text>
-                      <PostDatetime
-                        datetimeStr={reply.created_at}
-                        style={{ display: "inline", ml: 2 }}
-                      />
+              <For each={props.comment.comments ?? []}>
+                {reply => {
+                  const isReplyAuthor = user?.id === reply.author?.id;
+                  const isEditingReply = state.snap.editingReplyId === reply.id;
+
+                  return (
+                    <Box key={reply.id} p={4} borderWidth={1} borderRadius="md">
+                      <HStack mb={2} justify="space-between">
+                        <Box>
+                          <Text fontWeight="semibold" display="inline">
+                            {reply.author?.username}
+                          </Text>
+                          <PostDatetime
+                            datetimeStr={reply.created_at}
+                            style={{ display: "inline", ml: 2 }}
+                          />
+                        </Box>
+                        <HStack>
+                          <Show when={isReplyAuthor && !isEditingReply}>
+                            <Button
+                              size="xs"
+                              variant="ghost"
+                              onClick={() => {
+                                state.mutable.editingReplyId = reply.id;
+                              }}
+                              {...ids.set(ids.comment.edit.btn)}
+                            >
+                              Edit
+                            </Button>
+                          </Show>
+                          <CommentVoteBar comment={reply} />
+                        </HStack>
+                      </HStack>
+                      <Show
+                        when={isEditingReply}
+                        fallback={<Text whiteSpace="pre-wrap">{reply.content}</Text>}
+                      >
+                        <CommentForm
+                          mode="edit"
+                          comment={reply}
+                          onCancel={() => {
+                            state.mutable.editingReplyId = null;
+                          }}
+                          onSave={() => {
+                            state.mutable.editingReplyId = null;
+                          }}
+                        />
+                      </Show>
                     </Box>
-                    <CommentVoteBar comment={reply} />
-                  </HStack>
-                  <Text whiteSpace="pre-wrap">{reply.content}</Text>
-                </Box>
-              ))}
+                  );
+                }}
+              </For>
             </VStack>
           </Box>
-        )}
+        </Show>
       </VStack>
     </Box>
   );

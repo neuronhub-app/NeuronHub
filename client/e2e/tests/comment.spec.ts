@@ -1,5 +1,5 @@
 import { test } from "@playwright/test";
-import { strs } from "@/components/posts/PostDetail/CommentCreateForm";
+import { strs } from "@/components/posts/PostDetail/CommentForm";
 import { ids } from "@/e2e/ids";
 import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 import { urls } from "@/routes";
@@ -12,7 +12,7 @@ test.describe("Comments", () => {
     await pwh.dbStubsRepopulateAndLogin();
   });
 
-  test("create and voting", async ({ page }) => {
+  test("create comment and vote", async ({ page }) => {
     // test creation
     await pwh.navigate(urls.reviews.list);
     await pwh.waitForNetworkIdle();
@@ -43,10 +43,33 @@ test.describe("Comments", () => {
     await pwh.click(ids.comment.vote.up);
     await pwh.waitForState(ids.comment.vote.up, "checked");
 
-    // test reload
+    // Reload to verify persistence
     await page.reload();
     await pwh.waitForNetworkIdle();
     await pwh.waitForState(ids.comment.vote.up, "checked");
     await pwh.expectText(commentContent);
+  });
+
+  test("edit comment", async ({ page }) => {
+    // Open a Review
+    await pwh.navigate(urls.reviews.list);
+    await pwh.waitForNetworkIdle();
+    await pwh.click(ids.post.card.link.detail);
+
+    // Edit
+    await pwh.click(ids.comment.edit.btn);
+    await pwh.wait(ids.comment.form.textarea);
+    const contentUpdated = "Updated comment content";
+    await pwh.get(ids.comment.form.textarea).clear();
+    await pwh.get(ids.comment.form.textarea).fill(contentUpdated);
+    // save
+    await pwh.click(ids.comment.form.saveBtn);
+    await pwh.expectText(strs.updatedComment);
+    await pwh.expectText(contentUpdated);
+
+    // Reload to verify persistence
+    await page.reload();
+    await pwh.waitForNetworkIdle();
+    await pwh.expectText(contentUpdated);
   });
 });

@@ -53,8 +53,13 @@ export namespace ids {
       down: "comment.vote.down",
     },
     form: {
-      textarea: "comment.form.content-textarea",
+      textarea: "comment.form.textarea",
       submitBtn: "comment.form.submit-btn",
+      saveBtn: "comment.form.save-btn",
+      cancelBtn: "comment.form.cancel-btn",
+    },
+    edit: {
+      btn: "comment.edit.btn",
     },
   } as const;
 
