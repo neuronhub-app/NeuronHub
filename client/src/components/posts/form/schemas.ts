@@ -142,7 +142,7 @@ export namespace schemas {
   export const Review = Abstract.safeExtend(sharable.Schema.shape).safeExtend({
     review_rating: z.number().min(0).max(100).nullable(),
     review_importance: z.number().min(0).max(100).nullable(),
-    review_usage_status: z.enum(enumConvert(UsageStatus)),
+    review_usage_status: z.enum(enumConvert(UsageStatus)).nullable(),
     reviewed_at: z.iso.date().optional(),
     is_review_later: z.boolean().optional(),
   });

@@ -70,7 +70,7 @@ export namespace PostReviewForm {
               id: null,
               visibility: Visibility.Private,
               reviewed_at: formatISO(new Date(), { representation: "date" }),
-              review_usage_status: UsageStatus.Interested,
+              review_usage_status: null,
               review_rating: null,
               review_importance: null,
               tags: [],
