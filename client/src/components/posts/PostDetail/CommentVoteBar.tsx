@@ -16,7 +16,7 @@ export function CommentVoteBar(props: { comment: { id: ID; votes: PostCommentTyp
         onClick={() => voting.vote({ isPositive: true })}
         data-state={voting.isVotePositive === true ? "checked" : "unchecked"}
         size="xs"
-        variant="ghost"
+        variant="subtle-ghost"
         {...ids.set(ids.comment.vote.up)}
         aria-label="Upvote comment"
       >
@@ -30,7 +30,7 @@ export function CommentVoteBar(props: { comment: { id: ID; votes: PostCommentTyp
         onClick={() => voting.vote({ isPositive: false })}
         data-state={voting.isVotePositive === false ? "checked" : "unchecked"}
         size="xs"
-        variant="ghost"
+        variant="subtle-ghost"
         {...ids.set(ids.comment.vote.down)}
         aria-label="Downvote comment"
       >

@@ -74,7 +74,6 @@ export const UserQueryDoc = graphql(`
         }
         tag {
           id
-          name
         }
       }
 
