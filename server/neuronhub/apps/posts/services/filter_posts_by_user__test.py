@@ -31,10 +31,10 @@ class VisibilityTest(NeuronTestCase):
 
         user2 = await self.gen.users.user()
 
-        comment = await self.gen.posts.comment(author=self.user, post=post)
+        comment = await self.gen.posts.comment(author=self.user, parent=post)
         comment2 = await self.gen.posts.comment(
             author=user2,
-            post=post,
+            parent=post,
             visibility=Visibility.USERS_SELECTED,
             visible_to_users=[self.user],
         )
@@ -55,12 +55,12 @@ class VisibilityTest(NeuronTestCase):
 
         user2 = await self.gen.users.user()
 
-        await self.gen.posts.comment(author=self.user, post=post)
+        await self.gen.posts.comment(author=self.user, parent=post)
         comments = await filter_posts_by_user(self.user, post.children.all())
         assert await comments.acount() == 1
 
         comment2 = await self.gen.posts.comment(
-            post=post,
+            parent=post,
             author=user2,
             visibility=Visibility.PRIVATE,
         )

@@ -169,14 +169,14 @@ class PostsGen:
 
     async def comment(
         self,
-        post: Post = None,
+        parent: Post = None,
         author: User = None,
         visibility: Visibility = Visibility.PUBLIC,
         visible_to_users: list[User] = None,
     ) -> Post:
         return await self.create(
             self.Params(
-                parent=post,
+                parent=parent,
                 type=Post.Type.Comment,
                 author=author or self.user,
                 visibility=visibility,

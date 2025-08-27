@@ -72,6 +72,4 @@ test.describe("Comments", () => {
     await pwh.waitForNetworkIdle();
     await pwh.expectText(contentUpdated);
   });
-
-  // todo ! reply editing "deletes" it, prob looses `parent`
 });

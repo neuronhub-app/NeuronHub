@@ -297,7 +297,8 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
         reviewed_at=timezone.now() - datetime.timedelta(days=35),
         visibility=Visibility.PUBLIC,
     )
-    await gen.posts.comment(post=review, author=user)
+    comment = await gen.posts.comment(parent=review, author=user)
+    await gen.posts.comment(parent=comment, author=user)
     await create_review_tags(
         post=review,
         params=[

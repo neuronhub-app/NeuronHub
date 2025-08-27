@@ -10,6 +10,7 @@ import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import type { PostCommentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { Visibility } from "~/graphql/enums";
 
 export function CommentForm(
   props:
@@ -44,7 +45,6 @@ export function CommentForm(
       const response = await commentUpdate({
         id: props.comment.id,
         content: data.content,
-        parentId: props.comment.parent?.id,
       });
       if (response.success) {
         toast.success(strs.updatedComment);
@@ -136,26 +136,24 @@ async function commentCreate(input: { parentId: ID; content: string }) {
     ),
     {
       data: {
-        parent: { id: input.parentId, tags: [] },
+        parent: { id: input.parentId },
         content: input.content,
         tags: [],
-        visibility: "PUBLIC",
+        visibility: Visibility.Public,
       },
     },
   );
 }
 
-async function commentUpdate(input: { id: ID; content: string; parentId?: ID }) {
+async function commentUpdate(input: { id: ID; content: string }) {
   return mutateAndRefetchMountedQueries(
     graphql(`mutation CommentUpdate($data: PostTypeInput!) { update_post(data: $data) { id } }`),
     {
       data: {
         id: input.id,
-        // todo refac: prob redundant, either here or in Django
-        parent: input.parentId ? { id: input.parentId, tags: [] } : undefined,
         content: input.content,
         tags: [],
-        visibility: "PUBLIC",
+        visibility: Visibility.Public,
       },
     },
   );
