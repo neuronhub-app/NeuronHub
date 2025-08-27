@@ -2,7 +2,7 @@
 # ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.10.0"
+LABEL version="0.1.12.1"
 
 USER coder
 
@@ -10,6 +10,7 @@ USER coder
 # Fish
 # -----------------------------------
 RUN sudo apt update
+RUN sudo apt upgrade --yes
 RUN sudo apt install --yes --no-install-recommends fish
 SHELL ["fish", "--command"]
 
@@ -45,29 +46,28 @@ RUN echo "eval (brew shellenv)" >> $XDG_CONFIG_HOME/fish/config.fish
 
 # CLI tools
 # -----------------------------------
-RUN brew install --force-bottle chezmoi fd bat micro eza delta btop zoxide atuin fzf jq
+RUN brew install --force-bottle chezmoi fd bat micro eza delta btop zoxide atuin fzf jq ripgrep
 ENV EDITOR=micro
 
 
 # Mise
 # -----------------------------------
-RUN curl https://mise.run | sh
-RUN brew install --force-bottle usage
-RUN echo 'eval "$(mise activate bash)"' >> $HOME/.bashrc
-RUN echo "mise activate fish | source" >> $XDG_CONFIG_HOME/fish/config.fish
-RUN echo '$XDG_CONFIG_HOME/mise activate fish | source' >> $XDG_CONFIG_HOME/fish/config.fish
+RUN curl https://mise.run/bash | sh
+RUN echo 'mise activate fish | source' >> $XDG_CONFIG_HOME/fish/config.fish
+# completions
+RUN mise use --global usage # completion
 RUN mkdir -p $XDG_CONFIG_HOME/fish/completions
-RUN usage --completions fish > $XDG_CONFIG_HOME/fish/completions/usage.fish
 RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 
 
 # Mise tools
 # -----------------------------------
-# todo refac: git clone neuronhub's mise.toml and run `mise install`?
 RUN sudo apt install --yes gpg-agent # for node
 RUN mise install uv bun biome node claude
 
 RUN mise exec uv --command "uv tool install claude-monitor"
+RUN mise exec node --command "npx playwright install-deps"
+RUN mise exec node --command "npx playwright install chromium --with-deps"
 
 # MCP Context7
 ENV CONTEXT7_CACHE_DIR=$XDG_DATA_HOME/context7/cache

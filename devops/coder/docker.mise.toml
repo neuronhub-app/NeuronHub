@@ -4,10 +4,10 @@
     dir = "devops/coder"
     env.DOCKER_REGISTRY_URL = "{{ get_env(name='DOCKER_REGISTRY_URL', default='ghcr.io') }}"
     env.DOCKER_IMAGE_ID = "neuronhub/coder"
-    run = "sudo docker build --tag $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_ID:{{option(name='version', default='latest')}} ."
+    run = "sudo docker build --tag {{ get_env(name='DOCKER_REGISTRY_URL') }}/neuronhub/coder:{{option(name='version', default='latest')}} ."
 
 ["docker:push"]
     dir = "devops/coder"
     env.DOCKER_REGISTRY_URL = "{{ get_env(name='DOCKER_REGISTRY_URL', default='ghcr.io') }}"
     env.DOCKER_IMAGE_ID = "neuronhub/coder"
-    run = "sudo docker push $DOCKER_REGISTRY_URL/$DOCKER_IMAGE_ID:{{option(name='version', default='latest')}}"
+    run = "sudo docker push {{ get_env(name='DOCKER_REGISTRY_URL') }}/neuronhub/coder:{{option(name='version', default='latest')}}"
