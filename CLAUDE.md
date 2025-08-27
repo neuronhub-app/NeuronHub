@@ -6,5 +6,6 @@
 
 ### Workflow
 
-For all CLI you must use `mise.toml`, expect if the command isn't there.
-You must never run dev servers, only `mise test:e2e` when needed.
+For all CLI you MUST always only use `mise.toml`, expect if the command isn't there.
+
+You MUST only use `mise test:e2e` for E2E, never run `mise dev` or `bun` / `uv`.
