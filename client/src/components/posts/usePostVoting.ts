@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
@@ -51,7 +52,7 @@ export function usePostVoting(props: {
       newVoteValue = args.isPositive;
     }
 
-    await mutateAndRefetchMountedQueries(
+    const res = await mutateAndRefetchMountedQueries(
       graphql(`
         mutation CreateOrUpdatePostVote($id: ID!, $isVotePositive: Boolean) {
           create_or_update_post_vote(id: $id, is_vote_positive: $isVotePositive)
@@ -59,6 +60,9 @@ export function usePostVoting(props: {
       `),
       { id: props.postId, isVotePositive: newVoteValue },
     );
+    if (!res.success) {
+      toast.error(res.error);
+    }
 
     state.mutable.isLoadingUpvote = false;
     state.mutable.isLoadingDownvote = false;

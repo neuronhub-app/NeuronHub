@@ -87,14 +87,10 @@ function ReviewButton(props: {
             return;
           }
           state.mutable.isLoading = true;
-          await mutateAndRefetchMountedQueries(
+          const res = await mutateAndRefetchMountedQueries(
             graphql(
               `
-                mutation update_user_list(
-                  $id: ID!
-                  $list_field_name: UserListName!
-                  $is_added: Boolean!
-                ) {
+                mutation update_user_list($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
                   update_user_list(
                     id: $id
                     list_field_name: $list_field_name
@@ -109,6 +105,10 @@ function ReviewButton(props: {
               is_added: !state.snap.isAdded,
             },
           );
+          if (!res.success) {
+            toast.error(`Failed to update your ${props.fieldName}: ${res.error}`);
+          }
+
           state.mutable.isLoading = false;
         }}
         data-state={state.snap.isAdded ? "checked" : "unchecked"}

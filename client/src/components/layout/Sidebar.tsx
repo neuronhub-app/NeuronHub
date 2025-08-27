@@ -11,6 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { MessageSquareText } from "lucide-react";
+import toast from "react-hot-toast";
 import { FaRegBookmark } from "react-icons/fa6";
 import { GoCommentDiscussion } from "react-icons/go";
 import { LuLayoutDashboard, LuLibrary, LuLogIn, LuLogOut, LuSettings } from "react-icons/lu";
@@ -148,8 +149,12 @@ export function UserProfile() {
   const navigate = useNavigate();
 
   async function handleLogout() {
-    await mutateAndRefetchMountedQueries(graphql(`mutation Logout { logout }`), {});
-    navigate(urls.login);
+    const res = await mutateAndRefetchMountedQueries(graphql(`mutation Logout { logout }`), {});
+    if (res.success) {
+      navigate(urls.login);
+    } else {
+      toast.error(`Failed to log out: ${res.error}`);
+    }
   }
 
   if (!user) {
