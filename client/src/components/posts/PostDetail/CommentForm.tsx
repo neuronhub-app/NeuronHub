@@ -1,6 +1,6 @@
 import { Button, HStack, Show, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { type JSX, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -40,25 +40,32 @@ export function CommentForm(
   }, [content, draft.update]);
 
   async function handleSubmit(data: z.infer<typeof schema>) {
-    try {
-      if (isEditMode) {
-        await commentUpdate({
-          id: props.comment.id,
-          content: data.content,
-          parentId: props.comment.parent?.id,
-        });
+    if (isEditMode) {
+      const response = await commentUpdate({
+        id: props.comment.id,
+        content: data.content,
+        parentId: props.comment.parent?.id,
+      });
+      if (response.success) {
         toast.success(strs.updatedComment);
         draft.clear();
         props.onSave();
       } else {
-        await commentCreate({ parentId: props.parentId, content: data.content });
+        showError(response.error);
+      }
+    } else {
+      const response = await commentCreate({ parentId: props.parentId, content: data.content });
+      if (response.success) {
         toast.success(strs.createdComment);
         form.reset();
         draft.clear();
+      } else {
+        showError(response.error);
       }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-      toast.error(`Failed comment ${isEditMode ? "update" : "creation"}: ${errorMessage}`);
+    }
+
+    function showError(error: string | JSX.Element) {
+      toast.error(`Failed comment ${isEditMode ? "update" : "creation"}: ${error}`);
     }
   }
 
