@@ -1,75 +1,80 @@
 ---
-reviewed_at: 2025.08.15
+reviewed_at: 2025.08.27
 ---
 
-A good Git commit allows to eye-scan log to fix prod at 3am.
+A good Git commit allows to eye-scan the log to fix prod at 3am.
 
-We use an iteration over [conventionalcommits.org](https://www.conventionalcommits.org).
-The main differences:
-- no breaking changes focus
-- `!` is used to show changes importance. Eg squashed commits may contain dozens KLOCs, vs a `feat` with a new UI input or something.
+We use an iteration over [conventionalcommits.org](https://www.conventionalcommits.org). The main differences:
+- `!` is used to show changes impact & importance. Eg a squashed branch commit can change dozens KLOCs, vs a `feat` with a new UI checkbox.
+- "BREAKING CHANGE"s are added to the description, and only targets self-hosting users.
+- `Refs:` aren't required in the footer, but required in the first line (to convert to `<a href> in GitHub).
+
+Conventions:
+- capitalize Django models, React components, product names, etc - to visually distinct them
+- model sub-types as `Post(type=Review)` are shortened to `Review`
 
 Examples:
 - `feat(post-form): add 7 required fields`
+- `! feat(tags): tags sorting per User Review #126`
 - `refac(API): prefetch tags and Review QuerySets #122`
-- `build(monitor): add Sentry`
 - `docs(git-commits): add scopes`
-- `! feat(tags): sorting per PostReview #126`
+- `build(monitor): add Sentry`
 
 ### Type
 
 - `fix`
 - `feat`
 - `refac` - refactor, cleanups, performance, etc
-- `test` - stability; should have no runtime impact
-- `build` - CI, dependencies, compilation, etc
-- `UI` - visual-only changes, eg when no code review needed
+- `test` - e2e or pytest, ie no runtime impact
+- `build` - CI, dependencies, dev containers, dev tools, etc
+- `UI` - UI-only changes, eg if no code review is needed
 - `format` - code style or formating
 - `docs`
 
 ### Scopes
 
-- `API` - GraphQL, Strawberry, mutations, etc
-- `upgrade` - usually lock-files
-- `auth` - apps.users, permissions, etc
-- `tags` - `PostTag`, etc
-- `AI` - Claude, Aider, etc
-- `gen` - `tests/test_gen::Gen` and `db_stubs_repopulate`
-- `monitor` - eg Sentry
-- `Coder` - devops/ for coder.com
-- `Mise` - eg `mise.toml`
-- `Docker`
+If you're unsure which `Scope` to use, use the highest in the list below - they're sorted by importance.
 
-Frontend:
-- `E2E` - Playwright
-- `post-form` - our complex React Form: `posts/create` or `reviews/create`
-- `comment` - create, edit, vote, etc
+Some `Scope`s are bound to a single `Type`, eg `build(AI)`.
+
+- `post-form` - the most complex `react-hook-form`s for `Post` creation/editing
+- `tags` - `PostTag` logic
+- `auth` - `apps.users`, permissions, etc
+- `comment` - re create, edit, vote, etc
+- `API` - API layers: Apollo GraphQL, Strawberry resolvers, etc
+- `upgrade` - eg lock-files and related changes
+- `test(E2E)` - Playwright
+- `gen` - `tests/test_gen::Gen` and `db_stubs_repopulate`
+- `build(AI)` - Claude, Aider, etc
+- `build(Mise)` - eg `mise.toml`
+- `build(Docker)`
+- `build(Coder)` - mostly `devops/` dir changes for Coder.com
+- `monitor` - eg Sentry
+- `types` - TypeScript or Python typings
+- `admin` - Django Admin, ie no impact on the user-facing logic
 
 #### Unused
-- `admin` - Django Admin
-- `types` - TypeScript or Python typings
-- `brows` - browser extension
-- `track` - analytics tracking, eg Posthog
+- `browsr` - browser extension
+- `track` - analytics tracking, eg PostHog
 
-#### Scopes for the `docs` Type:
+#### Special `Scope`s for the `docs` `Type`:
 - `refac`
-- `glossary`
-- `arch` - for [architecture.md](/docs/architecture.md) file
-- `README` - either `server/` or `client/` or root `/`
-- `{file name wo ".md"}`
+- `arch` - abbreviation of `docs(architecture)`
+- `README` - either `server/` or `client/` or root `/` README files
+- `{file name without the ".md" extension}`
 
 ### Text style
 
 First noun, then verb.
 
-If brain can read it - the shorter the better. Fuck the grammar and English, eg prefixes "the / a / an".
+If the brain can read it - the shorter the better. Target visual scanning, not legalese. Fuck English grammar, eg prefixes "the / a / an".
 
 #### Bad shortening
 
 Bad to replace familiar words with less familiar:
-- `brwsr` for `browser`: bad
-- `smth` for `something`: ok, known
-- `mgmt` for `management`: bad here, ok in a small team
+- `brwsr` for `browser` - bad
+- `smth` for `something` - ~ok, known
+- `mgmt` for `management` - bad here, might be ok in a non-public small dev team
 
 Bad if brain is familiar with a sentence (set of "tokens"), but it's written as abbreviations, eg:
 - bad: `refac: imprv auth w/ opt JWT tkn & upd usr mgmt admn`
