@@ -50,11 +50,9 @@ export function FormChakraInput<
           }}
         />
       </InputGroup>
-      {fieldState.error && (
-        <Field.ErrorText {...ids.set(ids.form.input.error)}>
-          {fieldState.error?.message}
-        </Field.ErrorText>
-      )}
+      <Field.ErrorText {...ids.set(ids.form.input.error)}>
+        {fieldState.error?.message}
+      </Field.ErrorText>
     </Field.Root>
   );
 }

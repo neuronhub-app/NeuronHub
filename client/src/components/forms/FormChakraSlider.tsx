@@ -86,8 +86,8 @@ export function FormChakraSlider<
         {...sliderProps}
         name={field.name}
         value={valueForSlider}
-        onValueChange={({ value }) => {
-          const valueForForm = value[0];
+        onValueChange={event => {
+          const valueForForm = event.value[0];
           field.onChange(valueForForm);
         }}
         onFocusChange={details => {

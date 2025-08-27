@@ -28,12 +28,13 @@ export function FormChakraSegmentControl<
   return (
     <Field.Root invalid={!!fieldState.error} {...fieldRootProps}>
       {label && <Field.Label>{label}</Field.Label>}
+
       <SegmentGroup.Root
         {...segmentGroupProps}
         onBlur={field.onBlur}
         name={field.name}
         value={field.value}
-        onValueChange={({ value }) => field.onChange(value)}
+        onValueChange={event => field.onChange(event.value)}
       >
         <SegmentGroup.Indicator />
         <SegmentGroup.Items items={items} />

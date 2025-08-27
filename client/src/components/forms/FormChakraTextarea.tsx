@@ -18,7 +18,7 @@ export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
   const { field, fieldState } = useController(props.field);
 
   return (
-    <Field.Root {...props.fieldProps}>
+    <Field.Root {...props.fieldProps} invalid={!!fieldState.error}>
       {props.label && (
         <Field.Label>
           {props.label}
@@ -60,9 +60,8 @@ export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
       </Flex>
 
       {props.helperText && <Field.HelperText>{props.helperText}</Field.HelperText>}
-      {fieldState.error?.message && (
-        <Field.ErrorText>{fieldState.error?.message}</Field.ErrorText>
-      )}
+
+      <Field.ErrorText>{fieldState.error?.message}</Field.ErrorText>
     </Field.Root>
   );
 }
