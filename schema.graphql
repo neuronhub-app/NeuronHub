@@ -365,7 +365,6 @@ input PostTypeInput {
   recommended_to_groups: ManyToManyInput
   tags: [PostTagTypeInput!]
   source: String
-  seen_by_users: ManyToManyInput
   review_usage_status: UsageStatus
   review_rating: Int
   review_experience_hours: Int
