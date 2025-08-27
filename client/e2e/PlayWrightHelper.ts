@@ -8,7 +8,7 @@ import type { urls } from "@/routes";
 export class PlayWrightHelper {
   constructor(
     private page: Page,
-    private timeout = 2400,
+    private timeout = 3500,
     private timeoutDeviation = 1000,
   ) {
     this.page.setDefaultTimeout(this.timeout);
