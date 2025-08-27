@@ -64,7 +64,13 @@ export function Sidebar(props: StackProps) {
         </Flex>
         <Stack gap="6">
           {groups.map((group, index) => (
-            <Stack key={index as any} gap="2">
+            <Stack
+              key={
+                // biome-ignore lint/suspicious/noArrayIndexKey: wrong
+                index
+              }
+              gap="2"
+            >
               {group.title && (
                 <Text fontWeight="medium" textStyle="sm">
                   {group.title}
@@ -72,7 +78,13 @@ export function Sidebar(props: StackProps) {
               )}
               <Stack gap="1">
                 {group.links.map((link, index) => (
-                  <Bleed key={index as any} inline={styles.inline}>
+                  <Bleed
+                    key={
+                      // biome-ignore lint/suspicious/noArrayIndexKey: wrong
+                      index
+                    }
+                    inline={styles.inline}
+                  >
                     <SidebarLink to={link.to}>
                       <link.icon />
                       {link.label}

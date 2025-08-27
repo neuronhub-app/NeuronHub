@@ -20,7 +20,7 @@
     "rules": {
       "recommended": true,
       "suspicious": {
-        "noExplicitAny": "off",
+        "noExplicitAny": "error",
         "noTsIgnore": "error",
       },
       "correctness": {
@@ -29,12 +29,13 @@
       },
       "style": {
         "noNonNullAssertion": "off",
-        "noUnusedTemplateLiteral": "off", // JetBrains gql highlight can't work with quotes instead of a literal
+        "noUnusedTemplateLiteral": "off", // IDEA gql() highlight breaks without a literal, eg quotes
+        "noShoutyConstants": "error",
+        "noEnum": "error",
 
         // below by v2 migration script. Checked: ok defaults
         "noParameterAssign": "error",
         "useAsConstAssertion": "error",
-        "useEnumInitializers": "error",
         "useSelfClosingElements": "error",
         "useSingleVarDeclarator": "error",
         "useNumberNamespace": "error",
