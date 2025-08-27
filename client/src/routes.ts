@@ -28,6 +28,18 @@ export const urls = {
       return `${this.list}/${id}/${op.edit}` as const;
     },
   },
+  tools: {
+    list: "/tools",
+    get create() {
+      return `${this.list}/${op.create}` as const;
+    },
+    detail(id: ID) {
+      return `${this.list}/${id}` as const;
+    },
+    edit(id: ID) {
+      return `${this.list}/${id}/${op.edit}` as const;
+    },
+  },
   user: {
     settings: {
       detail: "/user/settings",
@@ -57,10 +69,10 @@ export default [
     ]),
     ...prefix(urls.posts.list, [
       route("/", "./apps/posts/list/index.tsx"),
-      route(`/${op.create}`, "./apps/posts/create/index.tsx"),
       route("/:id", "./apps/posts/detail/index.tsx"),
       route(`/:id/${op.edit}`, "./apps/posts/edit/index.tsx"),
     ]),
+    ...prefix(urls.tools.list, [route(`/${op.create}`, "./apps/tools/create/index.tsx")]),
     ...prefix(urls.user.settings.detail, [
       layout("./apps/users/settings/UserSettingsLayout.tsx", [
         route("/profile", "./apps/users/settings/profile/index.tsx"),

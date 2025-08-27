@@ -1,14 +1,11 @@
-import { DialogBackdrop, Flex, HStack } from "@chakra-ui/react";
+import { DialogBackdrop, Field, HStack } from "@chakra-ui/react";
 import { AsyncCreatableSelect, components } from "chakra-react-select";
 import { useEffect, useRef } from "react";
 import { subscribe } from "valtio/vanilla";
-
-import {
-  ReviewCreateForm,
-  type ReviewSelectOption,
-} from "@/apps/reviews/create/ReviewCreateForm";
 import { user } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
+import type { SelectVotableOption } from "@/components/posts/form/SelectVotable";
+import { type schemas, UserType } from "@/components/posts/form/schemas";
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -20,18 +17,23 @@ import {
 } from "@/components/ui/dialog";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-export type UserSelectOption = NonNullable<ReviewCreateForm.FormSchema["recommend_to"]>[number];
+export type UserSelectOption =
+  | NonNullable<schemas.sharable.Schema["recommend_to"]>[number]
+  | NonNullable<schemas.sharable.Schema["visible_to"]>[number];
 
+// todo refac: rename to PostSharableSelect
 export function UserMultiSelect(props: {
-  form: ReviewCreateForm.FormType;
+  form: schemas.sharable.Form;
   fieldName: "recommend_to" | "visible_to";
   placeholder?: string;
 }) {
   const options = props.form.watch(props.fieldName)!;
 
+  const fieldError = props.form.formState.errors[props.fieldName];
+
   const state = useValtioProxyRef({
     isOptionDialogOpen: false,
-    userSelected: null as ReviewSelectOption | null,
+    userSelected: null as SelectVotableOption | null,
     options: [] as UserSelectOption[],
   });
   const dialogInputRef = useRef<HTMLInputElement | null>(null);
@@ -55,7 +57,7 @@ export function UserMultiSelect(props: {
   }
 
   return (
-    <Flex minW="50%">
+    <Field.Root invalid={!!fieldError} minW="50%">
       <AsyncCreatableSelect
         defaultOptions={state.snap.options}
         value={options ?? []}
@@ -89,6 +91,7 @@ export function UserMultiSelect(props: {
           ),
         }}
       />
+      <Field.ErrorText>{fieldError?.message ?? "Invalid value"}</Field.ErrorText>
 
       <DialogRoot
         modal={true}
@@ -122,7 +125,7 @@ export function UserMultiSelect(props: {
           <DialogFooter />
         </DialogContent>
       </DialogRoot>
-    </Flex>
+    </Field.Root>
   );
 }
 
@@ -136,7 +139,7 @@ function getOptionsAndFilter(filterInputValue?: string): UserSelectOption[] {
     .filter(user => isFilterMatched(user.username))
     .map(user => ({
       id: user.id,
-      type: ReviewCreateForm.UserType.enum.User,
+      type: UserType.enum.User,
       label: user.username,
       user: user,
       message: null,
@@ -147,7 +150,7 @@ function getOptionsAndFilter(filterInputValue?: string): UserSelectOption[] {
       .current!.connection_groups.filter(group => isFilterMatched(group.name))
       .map(group => ({
         id: group.id,
-        type: ReviewCreateForm.UserType.enum.Group,
+        type: UserType.enum.Group,
         label: group.connections.length
           ? `${group.name || "Default"} (${group.connections.length})`
           : group.name,

@@ -18,7 +18,6 @@ from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
 from neuronhub.apps.posts.services.filter_posts_by_user import filter_posts_by_user
-from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.users.graphql.types import UserConnectionGroupType
 from neuronhub.apps.users.graphql.types import UserType
 
@@ -153,8 +152,6 @@ class PostTypeInput:
 
     source: auto
 
-    seen_by_users: auto
-
     # review fields
     review_usage_status: auto
     review_rating: auto
@@ -197,16 +194,7 @@ class PostTagType:
     description: auto
     is_important: auto
     is_review_tag: auto
-
-    @strawberry.field()
-    def label(self) -> str:
-        if self.is_review_tag:
-            try:
-                # noinspection PyTypeChecker
-                return ReviewTagName(self.name).label
-            except ValueError:
-                return self.name
-        return self.name
+    label: auto
 
 
 @strawberry_django.type(PostTagVote)

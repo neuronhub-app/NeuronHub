@@ -69,6 +69,15 @@ export namespace ids {
     },
   } as const;
 
+  export const postTool = {
+    form: {
+      title: "postTool.form.title",
+    },
+    btn: {
+      submit: "postTool.btn.submit",
+    },
+  } as const;
+
   export const auth = {
     login: {
       username: "auth.login.username",

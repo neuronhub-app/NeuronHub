@@ -1,5 +1,5 @@
-import { ReviewCreateForm } from "@/apps/reviews/create/ReviewCreateForm";
+import { PostReviewForm } from "@/apps/reviews/create/PostReviewForm";
 
 export default function PostReviewCreateRoute() {
-  return <ReviewCreateForm.Comp />;
+  return <PostReviewForm.Comp />;
 }

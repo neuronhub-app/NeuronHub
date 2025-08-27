@@ -1,6 +1,6 @@
 import { captureException } from "@sentry/react";
 import toast from "react-hot-toast";
-import { ReviewCreateForm } from "@/apps/reviews/create/ReviewCreateForm";
+import { PostReviewForm } from "@/apps/reviews/create/PostReviewForm";
 import { graphql } from "@/gql-tada";
 import { PostReviewEditFragment } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
@@ -35,5 +35,5 @@ export default function PostReviewEditRoute(props: Route.ComponentProps) {
   }
   // @ts-expect-error bad-infer by Apollo
   const review: PostReviewEditFragmentType = data?.post_review ?? undefined;
-  return <ReviewCreateForm.Comp review={review} />;
+  return <PostReviewForm.Comp review={review} />;
 }

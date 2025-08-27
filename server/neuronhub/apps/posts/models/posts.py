@@ -10,6 +10,7 @@ from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
 
 from django.db.models import ManyToManyField
+from strawberry_django.descriptors import model_cached_property
 
 from neuronhub.apps.admin.utils.convert_md_to_html_for_admin import (
     convert_md_to_html_for_admin,
@@ -19,6 +20,7 @@ from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable
 from neuronhub.apps.anonymizer.registry import anonymizer
 from neuronhub.apps.db.fields import MarkdownField
+from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.types import PostTypeEnum
 from neuronhub.apps.users.graphql.types_lazy import UserListName
@@ -257,6 +259,33 @@ class PostTag(AnonimazableTimeStampedModel):
 
     class Meta:
         unique_together = ["tag_parent", "name"]
+
+    @model_cached_property(only=["name", "tag_parent"], prefetch_related=["tag_parent"])
+    def label(self) -> str:
+        """
+        # todo UX: @computed field + db_index=True
+
+            from computedfields.models import ComputedFieldsModel, computed
+
+            @computed(
+                models.CharField(max_length=255),
+                depends=[
+                    ("self", ["name", "is_review_tag"]),
+                    ("tag_parent", ["name"]),
+                ],
+            )
+            def label(self):
+                ...
+
+        PS `GeneratedField` can't use `tag_parent`
+        """
+        if self.is_review_tag:
+            try:
+                # noinspection PyTypeChecker
+                return ReviewTagName(self.name).label
+            except ValueError:
+                pass
+        return self.__str__()
 
     def __str__(self):
         if self.tag_parent:

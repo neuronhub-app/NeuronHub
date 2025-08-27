@@ -5,6 +5,7 @@ from asgiref.sync import sync_to_async
 from strawberry import Info
 from strawberry_django import mutations
 from strawberry_django.auth.utils import aget_current_user
+from strawberry_django.mutations import resolvers
 from strawberry_django.permissions import IsAuthenticated
 
 from neuronhub.apps.posts.graphql.types import PostCommentType
@@ -28,8 +29,16 @@ class PostsMutation:
         info: Info,
     ) -> PostType:
         author: User = info.context.request.user
-        review = await create_post_review(author, data)
-        return cast(PostType, review)
+        res = await sync_to_async(resolvers.create)(
+            info,
+            model=Post,
+            data={
+                **vars(data),
+                "type": Post.Type.Tool,
+                "author": author,
+            },
+        )
+        return cast(PostType, res)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def create_post_review(
