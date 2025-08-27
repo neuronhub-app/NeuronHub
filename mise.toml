@@ -98,16 +98,14 @@
 
 [tasks."typegen"]
     depends = "typegen:server"
-    run = [
-        "mise typegen:client:graphql",
-        "mise typegen:client:react",
-        "mise run --output=silent typegen:client:chakra", # it pollutes stdout - nothing else works
-    ]
-    description = "Strawberry GraphQL + TypeSript"
+    run = "mise run typegen:client:*"
+    description = "Strawberry -> schema.graphql -> TypeSript enums"
 
     [tasks."typegen:server"]
         dir = "server"
         run = "uv run manage.py export_schema neuronhub.graphql --path=../schema.graphql"
+        sources = ["neuronhub/**/*.py"]
+        outputs = ["../schema.graphql"]
 
     [tasks."typegen:client:graphql"]
         dir = "client"
@@ -115,40 +113,52 @@
             "bun run graphql-codegen --errors-only --silent --config src/codegen.ts",
             "bun run gql-tada generate output",
         ]
-        depends_post = "format:client"
+        sources = ["../schema.graphql"]
+        outputs = ["graphql/**/*"]
 
     [tasks."typegen:client:react"]
         dir = "client"
         run = "bun run react-router typegen"
+        sources = ["src/apps/**/index.tsx", "src/routes.ts"]
+        outputs = [".react-router/**/*"]
 
     [tasks."typegen:client:chakra"]
         dir = "client"
         run = "bunx @chakra-ui/cli typegen src/theme/theme.ts"
+        sources = ["src/theme/**/*.ts"]
+        outputs = ["node_modules/@chakra-ui/react/dist/types/styled-system/generated/**/*"]
 
 
 [tasks."format"]
-    run = "mise run format:*"
+    depends = ["format:server", "format:client"]
 
     [tasks."format:server"]
         dir = "server"
         run = "uv run ruff format"
+        sources = ["neuronhub/**/*.py"]
+        outputs = { auto = true }
 
     [tasks."format:client"]
         dir = "client"
-        run = [
-            "bun run biome format --write",
-            "bun run biome lint --write --unsafe",
-        ]
-
+        run = "bun run biome format --write"
+        sources = ["src/**/*", "e2e/**/*"]
+        outputs = { auto = true }
 
 [tasks."lint"]
-    depends = ["typegen", "format"]
+    depends = ["typegen --output=silent", "format"]
     run = "mise run lint:*"
 
     [tasks."lint:server"]
         dir = "server"
         run = "uv run mypy neuronhub"
+        sources = ["neuronhub/**/*.py"]
+        outputs = { auto = true }
 
     [tasks."lint:client"]
         dir = "client"
-        run = "bun run tsc --noEmit"
+        run = [
+            "bun run tsc --noEmit",
+            "bun run biome lint --write --unsafe",
+        ]
+        sources = ["src/**/*", "e2e/**/*"]
+        outputs = { auto = true }
