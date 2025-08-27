@@ -77,7 +77,7 @@ dependencies = [
 
 [tool.mypy]
     python_version = "3.13"
-    plugins = ["mypy_django_plugin.main"]
+    plugins = ["mypy_django_plugin.main", "strawberry.ext.mypy_plugin"]
     explicit_package_bases = true
     ignore_missing_imports = true
     implicit_optional = true
