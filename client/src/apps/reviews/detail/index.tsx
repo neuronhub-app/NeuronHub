@@ -11,7 +11,7 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/reviews/detail/+types/index";
 
 export default function PostReviewDetailRoute(props: Route.ComponentProps) {
-  const { data, error, loading } = useApolloQuery(
+  const { data, error, isLoadingFirstTime } = useApolloQuery(
     graphql(
       `
       query PostReviewDetail($pk: ID!) {
@@ -32,5 +32,7 @@ export default function PostReviewDetailRoute(props: Route.ComponentProps) {
   // @ts-expect-error #bad-infer, by Apollo
   const review: PostReviewDetailFragmentType = data?.post_review ?? undefined;
 
-  return <PostDetail title="Review" post={review} isLoading={loading} error={error} />;
+  return (
+    <PostDetail title="Review" post={review} isLoading={isLoadingFirstTime} error={error} />
+  );
 }

@@ -7,7 +7,7 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/reviews/edit/+types/index";
 
 export default function PostReviewEditRoute(props: Route.ComponentProps) {
-  const { data, error, loading } = useApolloQuery(
+  const { data, error, isLoadingFirstTime } = useApolloQuery(
     graphql(
       `
       query PostReviewEdit($pk: ID!) {
@@ -26,7 +26,7 @@ export default function PostReviewEditRoute(props: Route.ComponentProps) {
     captureException(error);
   }
 
-  if (loading) {
+  if (isLoadingFirstTime) {
     return <div>Loading...</div>;
   }
 
