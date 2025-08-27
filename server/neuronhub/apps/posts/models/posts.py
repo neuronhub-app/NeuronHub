@@ -180,6 +180,9 @@ class Post(AnonimazableTimeStampedModel):
     )
     reviewed_at = anonymizable(models.DateTimeField(default=timezone.now))
 
+    class Meta:
+        ordering = ["-created_at"]
+
     def __str__(self):
         match self.type:
             case Post.Type.Post | Post.Type.Tool:
