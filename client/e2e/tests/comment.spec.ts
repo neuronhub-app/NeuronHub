@@ -43,7 +43,7 @@ test.describe("Comments", () => {
     await pwh.click(ids.comment.vote.up);
     await pwh.waitForState(ids.comment.vote.up, "checked");
 
-    // Reload to verify persistence
+    // reload to verify persistence
     await page.reload();
     await pwh.waitForNetworkIdle();
     await pwh.waitForState(ids.comment.vote.up, "checked");
@@ -51,12 +51,12 @@ test.describe("Comments", () => {
   });
 
   test("edit comment", async ({ page }) => {
-    // Open a Review
+    // open a Review
     await pwh.navigate(urls.reviews.list);
     await pwh.waitForNetworkIdle();
     await pwh.click(ids.post.card.link.detail);
 
-    // Edit
+    // edit
     await pwh.click(ids.comment.edit.btn);
     await pwh.wait(ids.comment.form.textarea);
     const contentUpdated = "Updated comment content";
@@ -67,9 +67,11 @@ test.describe("Comments", () => {
     await pwh.expectText(strs.updatedComment);
     await pwh.expectText(contentUpdated);
 
-    // Reload to verify persistence
+    // reload to verify persistence
     await page.reload();
     await pwh.waitForNetworkIdle();
     await pwh.expectText(contentUpdated);
   });
+
+  // todo ! reply editing "deletes" it, prob looses `parent`
 });
