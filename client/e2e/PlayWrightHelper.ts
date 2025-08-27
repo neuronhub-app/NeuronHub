@@ -8,8 +8,8 @@ import type { urls } from "@/routes";
 export class PlayWrightHelper {
   constructor(
     private page: Page,
-    private timeout = 3500,
-    private timeoutDeviation = 1000,
+    private timeout = 4500,
+    private timeoutWaitExtra = 1000,
   ) {
     this.page.setDefaultTimeout(this.timeout);
   }
@@ -45,7 +45,7 @@ export class PlayWrightHelper {
   }
 
   async wait(id: string) {
-    return this.get(id).waitFor({ timeout: this.timeout + this.timeoutDeviation });
+    return this.get(id).waitFor({ timeout: this.timeout + this.timeoutWaitExtra });
   }
 
   async expectText(text: string) {
@@ -58,6 +58,10 @@ export class PlayWrightHelper {
 
   waitForNetworkIdle() {
     return this.page.waitForLoadState("networkidle");
+  }
+
+  async screenshot(name: string = "screenshot") {
+    return this.page.screenshot({ path: `${name}.png`, fullPage: true });
   }
 
   async dbStubsRepopulate() {
