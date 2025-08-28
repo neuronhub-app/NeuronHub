@@ -36,8 +36,4 @@
 - [ ] pros/cons list indicator with icons
 - [ ] vote `is_changed_my_mind`
 
-### v0.3.0.0
-
-*Beta - Show HN*
-
-- [ ] OAuth Apple/Google
+For more see [alpha-public](/docs/roadmap/alpha-public.md).
