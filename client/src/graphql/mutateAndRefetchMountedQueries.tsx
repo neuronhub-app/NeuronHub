@@ -12,10 +12,10 @@ export function mutateAndRefetchMountedQueries<
   return mutateAndRefetch(mutation, variables, { isRefetchAll: false });
 }
 
-export function mutateDeleteAndRefetchQueries<
-  TData,
-  TVariables extends OperationVariables = object,
->(mutation: TadaDocumentNode<TData, TVariables>, variables: TVariables) {
+export function mutateDeleteAndResetStore<TData, TVariables extends OperationVariables = object>(
+  mutation: TadaDocumentNode<TData, TVariables>,
+  variables: TVariables,
+) {
   return mutateAndRefetch(mutation, variables, { isRefetchAll: true });
 }
 

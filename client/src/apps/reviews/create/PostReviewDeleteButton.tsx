@@ -4,7 +4,7 @@ import { FiTrash2 } from "react-icons/fi";
 import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { graphql, type ID } from "@/gql-tada";
-import { mutateDeleteAndRefetchQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { mutateDeleteAndResetStore } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
@@ -15,7 +15,7 @@ export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
 
   async function deleteReview() {
     state.mutable.isLoading = true;
-    const response = await mutateDeleteAndRefetchQueries(
+    const response = await mutateDeleteAndResetStore(
       graphql(`mutation ReviewDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
       { id: props.id },
     );

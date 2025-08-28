@@ -12,7 +12,7 @@
   - [x] feat: Tool creation
   - [x] feat: Review deletion
   - [ ] feat: add `Post.review_tags` and `Post.tags` for Review
-  - [ ] feat: Tool & Post list
+  - [ ] feat: Tool list
   - [ ] feat: Post create/edit
 
 #### Deploy

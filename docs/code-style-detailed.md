@@ -108,6 +108,7 @@ Always inline queries if used only in one place, ie never create `UPPER_CASE` va
 
 Always use `gql-tada.FragmentOf` instead of hand-writing types, or fragment sub types as `PostCommentType["votes"]`. See current fragments in `client/src/graphql/fragments/`.
 
+You MUST always use [[mutateAndRefetchMountedQueries.tsx]] function instead of `client.mutate` to mitigate Apollo's dysfunctional caching. It also has `mutateDeleteAndResetStore()`, as `client.refetchQueries({ include: "all" })` does not refetch all queries.
 
 ## React
 
