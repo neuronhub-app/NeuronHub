@@ -21,6 +21,7 @@ class Gen:
     faker_non_unique: Faker
     random_gen_seeded: Random
 
+    # todo refac: rename to `new`? `create` sounds as we'll call User.objects.create(), not get_or_create()
     @classmethod
     async def create(
         cls,

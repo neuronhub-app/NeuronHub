@@ -17,7 +17,7 @@ from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
-from neuronhub.apps.tests.test_gen import Gen
+from neuronhub.apps.tests.test_gen import Gen, UsersGen
 from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
 from neuronhub.apps.posts.services.create_tag import create_tag
@@ -50,12 +50,13 @@ async def db_stubs_repopulate(
 
     if is_delete_users_extra:
         await UserConnectionGroup.objects.all().adelete()
-        await User.objects.filter(username__in=users.__dict__.values()).adelete()
+        await User.objects.exclude(username=UsersGen._user_username).adelete()
 
     gen = await Gen.create(is_user_default_superuser=True)
     user = gen.users.user_default
 
-    await _create_users(gen)
+    if is_delete_users_extra:
+        await _create_users(gen)
 
     await _create_review_pycharm(user, gen=gen)
     tool_iterm = await _create_review_iterm(user, gen=gen)
@@ -70,8 +71,8 @@ async def _create_users(gen: Gen):
 
     # Aliases
 
-    await gen.users.alias(user)
-    await gen.users.alias(user)
+    await gen.users.alias(user, is_get_or_create=True)
+    await gen.users.alias(user, is_get_or_create=True)
 
     # Connections
 
