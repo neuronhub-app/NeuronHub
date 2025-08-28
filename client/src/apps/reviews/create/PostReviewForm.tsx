@@ -29,6 +29,7 @@ import { urls } from "@/routes";
 import { UsageStatus, Visibility } from "~/graphql/enums";
 
 export namespace PostReviewForm {
+  import review = ids.review;
   export const strs = {
     reviewCreated: "Review added",
     reviewUpdated: "Review updated",
@@ -276,12 +277,6 @@ export namespace PostReviewForm {
                 </Flex>
 
                 <HStack>
-                  {props.review && (
-                    <PostReviewDeleteButton
-                      id={props.review.id}
-                      title={props.review.parent!.title}
-                    />
-                  )}
                   <Button
                     type="submit"
                     loading={forms.review.formState.isSubmitting}
@@ -297,6 +292,12 @@ export namespace PostReviewForm {
                       "Create Review"
                     )}
                   </Button>
+                  {props.review && (
+                    <PostReviewDeleteButton
+                      id={props.review.id}
+                      toolTitle={props.review.parent!.title}
+                    />
+                  )}
                 </HStack>
               </VStack>
             </FormProvider>

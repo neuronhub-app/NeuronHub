@@ -8,7 +8,7 @@ import { mutateDeleteAndRefetchQueries } from "@/graphql/mutateAndRefetchMounted
 import { urls } from "@/routes";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-export function PostReviewDeleteButton(props: { id: ID; title: string }) {
+export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
   const navigate = useNavigate();
 
   const state = useValtioProxyRef({ isLoading: false });
@@ -21,7 +21,7 @@ export function PostReviewDeleteButton(props: { id: ID; title: string }) {
     );
     state.mutable.isLoading = false;
     if (response.success) {
-      toast.success(`Review for "${props.title}" deleted`);
+      toast.success(`Review for "${props.toolTitle}" deleted`);
       await navigate(urls.reviews.list);
     } else {
       toast.error(`Error from server: ${response.error}`);
@@ -39,7 +39,7 @@ export function PostReviewDeleteButton(props: { id: ID; title: string }) {
           spinnerPlacement="start"
           loading={state.snap.isLoading}
         >
-          <Icon size="sm">
+          <Icon opacity={0.75}>
             <FiTrash2 />
           </Icon>
           Delete
