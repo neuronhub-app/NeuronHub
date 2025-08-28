@@ -1,4 +1,0 @@
-- [post-form] move out Post.parent schema + JSX
-- [types] set Biome `noExplicitAny = error` (LLMs keep going mad)
-- rename `server` -> `backend`, `client` -> `frontend`
-- consider swapping tsconfig.json path: sources `~/`, for generated code `@/`
