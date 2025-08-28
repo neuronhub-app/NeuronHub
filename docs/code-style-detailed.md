@@ -109,6 +109,8 @@ Always use `gql-tada.FragmentOf` instead of hand-writing types, or fragment sub 
 
 You MUST always use [[mutateAndRefetchMountedQueries.tsx]] function instead of `client.mutate` to mitigate Apollo's dysfunctional caching. It also has `mutateDeleteAndResetStore()`, as `client.refetchQueries({ include: "all" })` does not refetch all queries.
 
+For query loading - you MUST use `useApolloQuery`, and instead of its `loading` var use `isLoadingFirstTime` - which doesn't trigger the loading when we call `mutateAndRefetchMountedQueries()` - ie when we refetch rather than load first time.
+
 ## React
 
 We must keep `props` types inlined, not in an `interface`. If you need the type use `ComponentProps<typeof Comp>`.
