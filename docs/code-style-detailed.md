@@ -31,6 +31,7 @@ Hence a comment is not only the future tech debt - it is also the highest-level 
 // Bad
 const toolData = forms.tool.getValues();
 const reviewData = forms.review.getValues();
+
 // Good
 const data = {
   tool: forms.tool.getValues(),
@@ -42,17 +43,15 @@ In Python use a lowercase-named dataclass / class.
 
 ### Use function named parameters over redundant vars
 
-Bad:
 ```ts
+// Bad:
 const input = {
   ...data.review,
   parent: { id: response.data.create_post.id },
 };
 await mutateReview(input);
-```
 
-Good:
-```ts
+// Good:
 await mutateReview({
   input: {
     ...data.review,
