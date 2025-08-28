@@ -100,7 +100,7 @@
 [tasks."typegen"]
     depends = "typegen:server"
     run = "mise run typegen:client:*"
-    description = "Strawberry -> schema.graphql -> TypeSript enums"
+    description = "Strawberry Django -> schema.graphql -> TypeScript enums"
 
     [tasks."typegen:server"]
         dir = "server"

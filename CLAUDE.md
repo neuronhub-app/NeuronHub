@@ -15,18 +15,10 @@
 
 ### Workflow
 
-Mise commands:
-- `mise lint` - is cached to be used all the time. It runs:
-  - `mise format` - Ruff, Biome
-  - `mise typegen` - Strawberry Django -> schema.graphql -> TypeScript enums
-  - `mise lint:server` - mypy
-  - `mise lint:client` - Biome and `tsc`
-- `mise pytest` - server/ only
-- `mise e2e` - runs Playwright, and manages its own Django and Vite servers
-  
-Mise Django commands:
-- `mise django:migrate`
-- `mise django:makemigrations`
-- `mise django:db-stubs-repopulate`
+<mise-tasks>
+
+@./docs/mise-tasks.md
 
 You're never going to be able to run Django or Vite dev servers. Only Mise config is capable of it.
+
+</mise-tasks>
