@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "anymail",
     "simple_history",
+    "guardian",
     "codemirror2",
     "strawberry_django",
     "health_check",
@@ -216,6 +217,7 @@ LOGIN_REDIRECT_URL = CLIENT_URL
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
+    # "guardian.backends.ObjectPermissionBackend", todo feat: django-guardian breaks aauthenticate(), as they don't support async
 ]
 
 # django-allauth

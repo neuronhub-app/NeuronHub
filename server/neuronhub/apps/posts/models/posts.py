@@ -185,6 +185,9 @@ class Post(AnonimazableTimeStampedModel):
     class Meta:
         ordering = ["-created_at"]
 
+    class Perms:
+        owner = "post_owner"
+
     def __str__(self):
         match self.type:
             case Post.Type.Post | Post.Type.Tool:

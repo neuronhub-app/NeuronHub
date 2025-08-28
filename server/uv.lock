@@ -347,6 +347,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-guardian"
+version = "3.0.6"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f9/95/6c7452213fee13bdc0ed9757fc4f996c3981d542d3c754d0dbdc048e6831/django_guardian-3.0.6.tar.gz", hash = "sha256:2117b231b95bfb8edc2908900f650975a252511b2e4db9af00c45ff9bd079fcd", size = 85093, upload-time = "2025-08-27T11:26:05.872Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a9/47/f1d677362e350d8709974151263506d66047ae6a95ebecdb9f6030e3f75b/django_guardian-3.0.6-py3-none-any.whl", hash = "sha256:77e177cb5d2c774343911071095d09045d78fe10180509405b44a1e7cc26ceb9", size = 117638, upload-time = "2025-08-27T11:26:04.263Z" },
+]
+
+[[package]]
 name = "django-health-check"
 version = "3.20.0"
 source = { registry = "https://pypi.org/simple" }
@@ -715,6 +727,7 @@ dependencies = [
     { name = "django-debug-toolbar" },
     { name = "django-extensions" },
     { name = "django-fieldsignals" },
+    { name = "django-guardian" },
     { name = "django-health-check" },
     { name = "django-hijack" },
     { name = "django-object-actions" },
@@ -765,6 +778,7 @@ requires-dist = [
     { name = "django-debug-toolbar", specifier = "==6.*" },
     { name = "django-extensions", specifier = "==4.*" },
     { name = "django-fieldsignals", specifier = "==0.*" },
+    { name = "django-guardian", specifier = "==3.0.*" },
     { name = "django-health-check", specifier = "==3.*" },
     { name = "django-hijack", specifier = "==3.*" },
     { name = "django-object-actions", specifier = "==5.*" },

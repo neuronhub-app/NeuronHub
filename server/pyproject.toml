@@ -30,12 +30,13 @@ dependencies = [
     "django-choices-field == 3.*", # [i=norm, rep=high, @bellini666] Strawberry maintainer
 
     # django admin
-    "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] worked with him
+    "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] i personally worked with the author
     "django-select2 == 8.*", # [i=low, rep=high, GH=high, @codingjoe, 0.8k] public CV
     "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe, 1.6k] public CV
     "django-debug-toolbar == 6.*", # [i=low, rep=high, GH=high, @matthiask] 406.ch
     "django-object-actions == 5.*", # [i=none, rep=norm, GH=low, @crccheck, 0.7k] crccheck.com/blog since 2008, 100 posts
-    "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no urls, member of LiberTEM (?) - keep it frozen
+    "django-guardian == 3.0.*", # [i=high, rep=norm, GH=high, @thclark, 3.8k] upgrade carefully; integrated by Strawberry; changed owners few times, atm @thclark UK founder
+    "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no urls, member of LiberTEM (wat?) - keep frozen
 
     # server
     "daphne == 4.*",
