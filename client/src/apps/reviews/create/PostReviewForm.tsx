@@ -37,9 +37,11 @@ export namespace PostReviewForm {
   export function Comp(props: { review?: PostReviewEditFragmentType }) {
     const navigate = useNavigate();
 
+    // todo UX: fix broken `reValidateMode: "onChange"` - after refactor to 2 forms validates only on <button type="submit"> click
     const forms = {
       tool: useForm<schemas.Tool>({
         resolver: zodResolver(schemas.Tool),
+        reValidateMode: "onChange",
         defaultValues: {
           id: null,
           title: "",
@@ -69,6 +71,7 @@ export namespace PostReviewForm {
             }
           : {
               id: null,
+              title: "",
               visibility: Visibility.Private,
               reviewed_at: formatISO(new Date(), { representation: "date" }),
               review_usage_status: null,
