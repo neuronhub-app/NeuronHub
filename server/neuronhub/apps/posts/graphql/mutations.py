@@ -18,9 +18,15 @@ from neuronhub.apps.posts.services.create_post_comment import create_post_commen
 from neuronhub.apps.users.models import User
 
 
+@strawberry.input
+class DjangoModelInput:
+    id: strawberry.ID
+
+
 @strawberry.type
 class PostsMutation:
     update_post: PostType = mutations.update(PostTypeInput, extensions=[IsAuthenticated()])
+    post_delete: PostType = mutations.delete(DjangoModelInput, extensions=[IsAuthenticated()])
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def create_post(

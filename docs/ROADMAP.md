@@ -4,19 +4,13 @@
 
 ### v0.1.0.0
 
-- [x] (post-form) 
-  - [x] Rating
-  - [x] Importance
-  - [x] Visibility
-- [x] (API) switch to Apollo to refetch after every mutation
-- [x] UI(comment) fix vote `checked` UI
-- [x] feat(comment) edit
-- [x] fix(API): sort Posts by date
-- [x] fix(comment): reply edit must preserve `.parent`
-- [x] (post-form)
-  - [x] refac: Review split out sub forms
-  - [x] refac: Review UserMultiSelect
-  - [x] feat: Tool create
+- [x] feat(post-form): add `review_rating` `review_importance`
+- [x] (API): switch to Apollo to refetch after every mutation
+- [x] feat(comment): editing
+- [x] (post-form):
+  - [x] refac: split Review's on sub field sets, add Zod `schemas.ts`
+  - [x] feat: Tool creation
+  - [x] feat: Review deletion
   - [ ] feat: add `Post.review_tags` and `Post.tags` for Review
   - [ ] feat: Tool & Post list
   - [ ] feat: Post create/edit

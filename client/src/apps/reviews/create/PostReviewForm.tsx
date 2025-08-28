@@ -6,10 +6,11 @@ import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FaStar } from "react-icons/fa";
 import { FaBookmark, FaCircleXmark, FaClockRotateLeft, FaHeartPulse } from "react-icons/fa6";
+import { FiSave } from "react-icons/fi";
 import { HiOutlineClock } from "react-icons/hi2";
 import { useNavigate } from "react-router";
-
 import { mutateReview } from "@/apps/reviews/create/mutateReview";
+import { PostReviewDeleteButton } from "@/apps/reviews/create/PostReviewDeleteButton";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -139,7 +140,7 @@ export namespace PostReviewForm {
     }
 
     return (
-      <VStack alignItems="flex-start" w="100%" maxW="900px" gap="gap.lg">
+      <VStack alignItems="flex-start" w="100%" gap="gap.lg">
         <Heading fontSize="2xl">{isEditMode ? "Edit review" : "Add review"}</Heading>
 
         <VStack asChild w="100%" alignItems="flex-start" gap="gap.xl">
@@ -169,7 +170,7 @@ export namespace PostReviewForm {
                 </Fieldset.Legend>
 
                 <Fieldset.Content display="flex" gap="gap.lg">
-                  <VStack gap="gap.lg" alignItems="flex-start" w="100%">
+                  <VStack gap="gap.lg" align="flex-start" maxW="full">
                     <FormChakraInput
                       name="title"
                       control={forms.review.control}
@@ -204,14 +205,6 @@ export namespace PostReviewForm {
                         ]}
                       />
                     </VStack>
-
-                    <FormChakraInput
-                      name="source"
-                      control={forms.review.control}
-                      label="Source"
-                      placeholder="Link or reference"
-                      {...ids.setInput(ids.review.form.source)}
-                    />
 
                     <SelectVotable fieldName="tags" />
 
@@ -267,7 +260,7 @@ export namespace PostReviewForm {
                 </Fieldset.Content>
               </Fieldset.Root>
 
-              <VStack align="flex-start" w="full" gap="gap.md">
+              <VStack w="full" gap="gap.xl" align="flex-start">
                 <Flex gap="gap.md">
                   <FormChakraCheckboxCard
                     control={forms.review.control}
@@ -279,13 +272,29 @@ export namespace PostReviewForm {
                   />
                 </Flex>
 
-                <Button
-                  type="submit"
-                  loading={forms.review.formState.isSubmitting}
-                  {...ids.set(ids.post.btn.submit)}
-                >
-                  Save
-                </Button>
+                <HStack>
+                  {props.review && (
+                    <PostReviewDeleteButton
+                      id={props.review.id}
+                      title={props.review.parent!.title}
+                    />
+                  )}
+                  <Button
+                    type="submit"
+                    loading={forms.review.formState.isSubmitting}
+                    {...ids.set(ids.post.btn.submit)}
+                    size="lg"
+                  >
+                    {isEditMode ? (
+                      <>
+                        <FiSave />
+                        Save Review
+                      </>
+                    ) : (
+                      "Create Review"
+                    )}
+                  </Button>
+                </HStack>
               </VStack>
             </FormProvider>
           </form>

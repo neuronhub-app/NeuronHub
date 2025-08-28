@@ -5,12 +5,24 @@ import type { TadaDocumentNode } from "gql.tada";
 import type { JSX } from "react";
 import { client } from "@/graphql/client";
 
-export async function mutateAndRefetchMountedQueries<
+export function mutateAndRefetchMountedQueries<
   TData,
   TVariables extends OperationVariables = object,
->(
+>(mutation: TadaDocumentNode<TData, TVariables>, variables: TVariables) {
+  return mutateAndRefetch(mutation, variables, { isRefetchAll: false });
+}
+
+export function mutateDeleteAndRefetchQueries<
+  TData,
+  TVariables extends OperationVariables = object,
+>(mutation: TadaDocumentNode<TData, TVariables>, variables: TVariables) {
+  return mutateAndRefetch(mutation, variables, { isRefetchAll: true });
+}
+
+async function mutateAndRefetch<TData, TVariables extends OperationVariables = object>(
   mutation: TadaDocumentNode<TData, TVariables>,
   variables: TVariables,
+  options?: { isRefetchAll: boolean },
 ): Promise<
   | {
       success: true;
@@ -29,7 +41,11 @@ export async function mutateAndRefetchMountedQueries<
       return returnError(result.error);
     }
 
-    await client.refetchQueries({ include: "active" });
+    if (options?.isRefetchAll) {
+      await client.resetStore();
+    } else {
+      await client.refetchQueries({ include: "active" });
+    }
 
     if (result.data === undefined) {
       return returnError(

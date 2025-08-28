@@ -33,6 +33,10 @@ type DjangoFileType {
   url: String!
 }
 
+input DjangoModelInput {
+  id: ID!
+}
+
 type DjangoModelType {
   pk: ID!
 }
@@ -79,6 +83,7 @@ type Mutation {
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   update_user_list(id: ID!, list_field_name: UserListName!, is_added: Boolean!): Boolean! @IsAuthenticated
   update_post(data: PostTypeInput!): PostType! @IsAuthenticated
+  post_delete(data: DjangoModelInput!): PostType! @IsAuthenticated
   create_post(data: PostTypeInput!): PostType! @IsAuthenticated
   create_post_review(data: PostTypeInput!): PostType! @IsAuthenticated
   create_post_comment(data: PostTypeInput!): PostCommentType! @IsAuthenticated

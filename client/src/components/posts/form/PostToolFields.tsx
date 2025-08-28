@@ -97,6 +97,14 @@ export function PostToolFields(props: { form: UseFormReturn<schemas.Tool> }) {
         isShowIconMarkdown
       />
 
+      <FormChakraInput
+        name="source"
+        control={props.form.control}
+        label="Source"
+        placeholder="Link or reference"
+        {...ids.setInput(ids.review.form.source)}
+      />
+
       <SelectVotable fieldName="tags" />
 
       {/* TODO: Fix alternatives field type issues
