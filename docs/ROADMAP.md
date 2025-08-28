@@ -1,42 +1,43 @@
-## Project status and next steps
-
-*In parentheses are the [Scopes](/docs/git-commits.md#scopes)*
+## Status and next steps
 
 ### v0.1.0.0
 
-- [x] feat(post-form): add `review_rating` `review_importance`
-- [x] (API): switch to Apollo to refetch after every mutation
-- [x] feat(comment): editing
-- [x] (post-form):
-  - [x] refac: split Review's on sub field sets, add Zod `schemas.ts`
-  - [x] feat: Tool creation
-  - [x] feat: Review deletion
-  - [ ] feat: add `Post.review_tags` and `Post.tags` for Review
-  - [ ] feat: Tool list
-  - [ ] feat: Post create/edit
+*Alpha - Personal*
 
-#### Deploy
+- [ ] [post-form]
+  - [x] split PostReviewForm on sub field sets, add Zod `schemas.ts`
+  - [x] Tool creation
+  - [x] Review deletion
+  - [ ] add `review.tags` logic
+  - [ ] add `review.review_tags`
+  - [ ] PostTool list
+  - [ ] Post create/edit
 - [ ] Git repo
-- [ ] Dokploy
 
 ### v0.2.0.0
 
-- [ ] build(monitor): Sentry
-- [ ] feat(post-form): logo upload
-- [ ] feat(post-form): `alternative` votes and comments
-- [ ] feat(post-form): Review `tool` AsyncSelect
-- [ ] feat(post-form): Experience
-- [ ] feat(auth): avatar upload
-- [ ] feat(auth): /review `visibility`
-- [ ] feat(API): paginate
+*Alpha - Invite-only*
+
+- [ ] Dokploy
+- [ ] Sentry
+- [ ] [post-form]
+  - [ ] PostTool logo upload
+  - [ ] `alternative` votes and comments
+  - [ ] In PostReview allow to select a PostTool using the `tool.title` input
+  - [ ] `review_experience` field
+- [ ] avatar upload
+- [ ] /review `visibility`
+- [ ] API paginate
 
 ### v0.2.1.0
 
-- [ ] feat(auth): signup
-- [ ] feat(auth): aliases select
-- [ ] feat(post-form): pros/cons list indicator with icons
-- [ ] feat(comment): vote `changed my mind`
+- [ ] signup
+- [ ] aliases select
+- [ ] pros/cons list indicator with icons
+- [ ] vote `is_changed_my_mind`
 
 ### v0.3.0.0
 
-- [ ] (auth) Apple/Google
+*Beta - Show HN*
+
+- [ ] OAuth Apple/Google
