@@ -2,7 +2,7 @@
 
 ## Core Principles
 
-### You must write dumb, self-documented code
+### You must write simple, self-documented code
 
 - Devs overestimate self intelligence - KISS
 - Extract explanatory variables and functions

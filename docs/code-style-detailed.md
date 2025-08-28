@@ -3,17 +3,19 @@ description: For LLM-driven code cleanup. LLM needs it in a separate prompt to n
 ---
 
 
-# Code Style Detailed
+Code Style Detailed
+----------------------------------------
 
-
-## Every line of code is tech debt
+Every line of code is tech debt
+========================================
 
 All code is tech debt. Either current or future, no fucking difference.
 
 Every redundant line MUST be removed. Every redundant word must be removed.
 
 
-## Best practices
+Best practices
+========================================
 
 - 2+ uses of strings → define them in a local var
 - Use absolute path imports only, see `tsconfig.json`'s `path`
@@ -24,6 +26,10 @@ Every redundant line MUST be removed. Every redundant word must be removed.
 If there's a comment - human brain skips class/function naming (and whatever) to read the comments first.
 
 Hence a comment is not only the future tech debt - it is also the highest-level information noise, the damages code comprehension by its mere existence.
+
+### TODO comments
+
+See [todos.md](/docs/todos.md).
 
 ### Group related variables by domain in an object
 
@@ -67,7 +73,8 @@ As `{category}? {noun} {verb}`: `{category}` creates logical modules at a glance
 Examples:
 - `post_review_create`, not `create_post_review`
 
-## TypeScript
+TypeScript
+========================================
 
 - Always `ESNext`
 - Named exports only
@@ -111,9 +118,10 @@ You MUST always use [[mutateAndRefetchMountedQueries.tsx]] function instead of `
 
 For query loading - you MUST use `useApolloQuery`, and instead of its `loading` var use `isLoadingFirstTime` - which doesn't trigger the loading when we call `mutateAndRefetchMountedQueries()` - ie when we refetch rather than load first time.
 
-## React
+React
+========================================
 
-We must keep `props` types inlined, not in an `interface`. If you need the type use `ComponentProps<typeof Comp>`.
+We must keep `props` types inlined, esp not in an `interface`. If you need the type use `ComponentProps<typeof Comp>`.
 
 ### Chakra v3
 
