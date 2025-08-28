@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "neuronhub.apps.users",
     "neuronhub.apps.orgs",
     "neuronhub.apps.posts",
+    "neuronhub.apps.tests",
 ]
 
 MIDDLEWARE = [
