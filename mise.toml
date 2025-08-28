@@ -75,6 +75,7 @@
         dir = "server"
         depends = "dev:db"
         run = "uv run pytest"
+        alias = "pytest"
 
     [tasks."test:e2e"]
         dir = "client"
