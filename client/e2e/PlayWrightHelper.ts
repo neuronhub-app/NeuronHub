@@ -39,7 +39,7 @@ export class PlayWrightHelper {
 
   async click(id: string, options: { wait: boolean } = { wait: true }) {
     if (options.wait) {
-      await this.get(id).waitFor();
+      await this.get(id).waitFor({ state: "attached" });
     }
     return this.get(id).click();
   }

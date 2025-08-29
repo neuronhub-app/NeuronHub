@@ -105,7 +105,7 @@ export function PostToolFields(props: { form: UseFormReturn<schemas.Tool> }) {
         {...ids.setInput(ids.review.form.source)}
       />
 
-      <SelectVotable fieldName="tags" />
+      <SelectVotable fieldName="tags" {...ids.set(ids.post.form.tags.container)} />
 
       {/* TODO: Fix alternatives field type issues
       <VStack align="flex-start" w="full" gap="gap.sm">

@@ -13,6 +13,7 @@ import { type ReactNode, useRef } from "react";
 import { useFormContext } from "react-hook-form";
 import { FaMessage, FaRegMessage } from "react-icons/fa6";
 import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { schemas } from "@/components/posts/form/schemas";
 import {
@@ -24,8 +25,10 @@ import {
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
+import { useInit } from "@/utils/useInit";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 // for: .tags & .alternatives
@@ -47,16 +50,40 @@ export function SelectVotable(props: {
   fieldName: SelectVotableField;
   label?: string;
   isReviewTags?: boolean; // see docs [[PostTag#is_review_tag]]
+  postId?: ID;
+  "data-testid"?: string;
 }) {
   const form = schemas.useFormContextAbstract([props.fieldName]);
   const options = form.watch(props.fieldName);
   const fieldError = form.formState.errors[props.fieldName];
+  const user = useUser();
 
   const commentInputRef = useRef<HTMLInputElement>(null);
 
   const state = useValtioProxyRef({
     isDialogOpen: false,
     optionSelected: null as SelectVotableOption | null,
+  });
+
+  useInit({
+    isBlocked: !props.postId || !user?.post_tag_votes || !options,
+    init: () => {
+      const optionsWithVotes = options.map(option => {
+        const userVote = user!.post_tag_votes.find(
+          vote => vote.post.id === props.postId && vote.tag.id === option.id,
+        );
+        if (userVote) {
+          return { ...option, is_vote_positive: userVote.is_vote_positive };
+        }
+        return option;
+      });
+
+      // #AI looks idiotic
+      if (JSON.stringify(options) !== JSON.stringify(optionsWithVotes)) {
+        form.setValue(props.fieldName, optionsWithVotes);
+      }
+    },
+    deps: [props.postId, user?.post_tag_votes, options?.length],
   });
 
   function getOptionIndex(option: SelectVotableOption): number {
@@ -69,7 +96,7 @@ export function SelectVotable(props: {
   }
 
   return (
-    <Field.Root invalid={!!fieldError} minW="50%">
+    <Field.Root invalid={!!fieldError} minW="50%" data-testid={props["data-testid"]}>
       <VStack align="flex-start" w="full" gap="gap.sm">
         <Field.Label fontSize="sm" fontWeight="semibold" textTransform="capitalize">
           {props.label ?? props.fieldName}
@@ -81,6 +108,7 @@ export function SelectVotable(props: {
           isMulti
           isClearable={false}
           closeMenuOnSelect={false}
+          value={options}
           onChange={(optionsNew: MultiValue<SelectVotableOption>, _) => {
             form.setValue(
               props.fieldName,
@@ -121,7 +149,7 @@ export function SelectVotable(props: {
             });
             return response.data!.tags;
           }}
-          getOptionLabel={option => option.label}
+          getOptionLabel={option => option.label ?? option.name}
           getOptionValue={option => option.name}
           components={{
             MultiValueLabel: propsMultiVal => (
@@ -129,18 +157,20 @@ export function SelectVotable(props: {
                 <HStack gap="2" px={0.5} py={0.5}>
                   {propsMultiVal.children}
 
-                  <HStack gap="px">
+                  <HStack gap="px" data-name={propsMultiVal.data.name}>
                     <VoteButton
                       isPositive={true}
                       option={propsMultiVal.data}
                       options={options}
                       fieldName={props.fieldName}
+                      data-testid={ids.post.form.tags.tag.vote.up}
                     />
                     <VoteButton
                       isPositive={false}
                       option={propsMultiVal.data}
                       options={options}
                       fieldName={props.fieldName}
+                      data-testid={ids.post.form.tags.tag.vote.down}
                     />
                     <OptionButton
                       onClick={() => {
@@ -152,12 +182,14 @@ export function SelectVotable(props: {
                         getOptionComment(propsMultiVal.data) ? "fg.info" : "fg.muted-button"
                       }
                       iconSize=".75rem"
+                      data-testid={ids.post.form.tags.tag.comment}
                     />
                   </HStack>
                 </HStack>
               </components.MultiValueLabel>
             ),
           }}
+          data-testid={props["data-testid"]}
         />
         <Field.ErrorText>{fieldError?.message ?? "Invalid value"}</Field.ErrorText>
 
@@ -208,6 +240,7 @@ function VoteButton(props: {
   options: SelectVotableOption[];
   fieldName: SelectVotableField;
   isPositive: boolean;
+  "data-testid": string;
 }): ReactNode {
   const form = useFormContext<schemas.Tool | schemas.PostAbstract | schemas.Review>();
 
@@ -240,15 +273,19 @@ function VoteButton(props: {
       color={isButtonActive ? (props.isPositive ? "green.fg" : "red.fg") : "gray.500"}
       onClick={onVoteButtonClick}
       icon={icon}
+      data-testid={props["data-testid"]}
+      data-is-vote-positive={isButtonActive && props.isPositive}
     />
   );
 }
 
 export function OptionButton(props: {
   icon: typeof MessageSquarePlus | typeof FaMessage;
+  onClick: () => void;
   iconSize?: IconProps["fontSize"];
-  onClick?: () => void;
   color?: IconProps["color"];
+  "data-testid": string;
+  "data-is-vote-positive"?: boolean;
 }) {
   return (
     <IconButton
@@ -258,10 +295,10 @@ export function OptionButton(props: {
       h={6}
       size="2xs"
       variant="ghost"
-      _hover={{
-        bg: "gray.subtle",
-      }}
+      _hover={{ bg: "gray.subtle" }}
       colorPalette="gray"
+      data-testid={props["data-testid"]}
+      data-is-vote-positive={props["data-is-vote-positive"]}
     >
       <Icon fontSize={props.iconSize}>
         <props.icon />

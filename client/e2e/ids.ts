@@ -21,6 +21,18 @@ export namespace ids {
         edit: "post.card.link.edit",
       },
     },
+    form: {
+      tags: {
+        container: "post.form.tags.container",
+        tag: {
+          vote: {
+            up: "post.form.tags.tag.vote.up",
+            down: "post.form.tags.tag.vote.down",
+          },
+          comment: "post.form.tags.tag.comment",
+        },
+      },
+    },
   } as const;
 
   export const form = {
@@ -38,6 +50,7 @@ export namespace ids {
       content: "review.form.content",
       usageStatus: "review.form.usageStatus",
       rating: "review.form.rating",
+      tags: "review.form.tags",
     },
     tag: {
       container: "review.tag.container",
@@ -72,6 +85,7 @@ export namespace ids {
   export const postTool = {
     form: {
       title: "postTool.form.title",
+      tags: "postTool.form.tags",
     },
     btn: {
       submit: "postTool.btn.submit",

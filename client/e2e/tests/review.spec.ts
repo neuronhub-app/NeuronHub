@@ -53,4 +53,46 @@ test.describe("Review", () => {
     await page.waitForURL(urls.reviews.detail(reviewId!));
     await helper.expectText(contentUpdated2);
   });
+
+  test("Tags editing and voting", async ({ page }) => {
+    await page.goto(urls.reviews.list);
+    await helper.click(ids.post.card.link.edit);
+    await helper.wait(ids.review.form.title);
+
+    const tagsContainer = helper.get(ids.review.form.tags);
+    const tagName = {
+      existing: "Terminal emulator",
+      added: "New tag",
+    };
+    await expect(tagsContainer).toContainText(tagName.existing);
+
+    // upvote `tagName.existing` #AI
+    await tagsContainer
+      .locator(`[data-name="${tagName.existing}"]`)
+      .getByTestId(ids.post.form.tags.tag.vote.up)
+      .click();
+
+    // Add new tag
+    const input = tagsContainer.locator("input").first();
+    await input.click();
+    await input.pressSequentially(tagName.added, { delay: 100 });
+    await page.keyboard.press("Enter");
+    await expect(tagsContainer).toContainText(tagName.added);
+    await helper.click(ids.post.btn.submit);
+    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await helper.waitForNetworkIdle();
+
+    // Re-edit to verify persistence
+    await helper.click(ids.post.card.link.edit);
+    await helper.wait(ids.review.form.title);
+    const tagsUpdated = helper.get(ids.review.form.tags);
+    await expect(tagsUpdated).toContainText(tagName.existing);
+    await expect(tagsUpdated).toContainText(tagName.added);
+
+    const voteButton = tagsUpdated
+      .locator(`[data-name="${tagName.existing}"]`)
+      .getByTestId(ids.post.form.tags.tag.vote.up);
+
+    await expect(voteButton).toHaveAttribute("data-is-vote-positive", "true");
+  });
 });

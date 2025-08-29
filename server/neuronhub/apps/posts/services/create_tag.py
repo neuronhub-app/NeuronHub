@@ -15,8 +15,10 @@ async def create_tag(
     author: User = None,
     is_vote_positive: bool = None,
     is_important: bool = None,
+    comment: str = "",
 ) -> PostTag | None:
     post_tag_defaults = dict(author=author, is_important=is_important)
+    is_can_edit_importance = False
 
     if "/" in name_raw:
         tag: PostTag | None = None
@@ -29,33 +31,33 @@ async def create_tag(
                     name=tag_parent_name_raw.strip(),
                     defaults=post_tag_defaults,
                 )
-                tag, _ = await PostTag.objects.aget_or_create(
+                tag, is_created = await PostTag.objects.aget_or_create(
                     name=tag_name,
                     tag_parent=tag_parent,
                     defaults=post_tag_defaults,
                 )
+                is_can_edit_importance = is_created
                 await post.tags.aadd(tag)
     else:
-        tag, _ = await PostTag.objects.aget_or_create(
+        tag, is_created = await PostTag.objects.aget_or_create(
             name=name_raw.strip(),
             defaults=post_tag_defaults,
         )
+        is_can_edit_importance = is_created
         await post.tags.aadd(tag)
 
     if is_vote_positive is not None:
-        if not post:
-            raise ValueError("Tool must be provided if is_vote_positive is set")
-
-        await PostTagVote.objects.aget_or_create(
+        assert post, "Voting needs a Post(type=Tool)"
+        await PostTagVote.objects.aupdate_or_create(
             post=post,
             tag=tag,
             author=author,
-            defaults={"is_vote_positive": is_vote_positive},
+            defaults={"is_vote_positive": is_vote_positive, "comment": comment},
         )
-    if not tag:
-        raise ValueError("Bug in tag creation")
 
-    if is_important is not None:
+    assert tag, "If not - the for..in failed"
+
+    if is_can_edit_importance and is_important is not None:
         tag.is_important = is_important
         await tag.asave()
 

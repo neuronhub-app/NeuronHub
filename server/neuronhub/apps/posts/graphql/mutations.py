@@ -13,7 +13,9 @@ from neuronhub.apps.posts.graphql.types import PostType
 from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models.posts import PostVote
-from neuronhub.apps.posts.services.create_post_review import create_post_review
+from neuronhub.apps.posts.services.post_review_create_or_update import (
+    post_review_create_or_update,
+)
 from neuronhub.apps.posts.services.create_post_comment import create_post_comment
 from neuronhub.apps.users.models import User
 
@@ -46,14 +48,15 @@ class PostsMutation:
         )
         return cast(PostType, res)
 
+    # todo ! (auth) check author on update
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def create_post_review(
+    async def post_review_create_or_update(
         self,
         data: PostTypeInput,
         info: Info,
     ) -> PostType:
         author: User = info.context.request.user
-        review = await create_post_review(author, data)
+        review = await post_review_create_or_update(author, data)
         return cast(PostType, review)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])

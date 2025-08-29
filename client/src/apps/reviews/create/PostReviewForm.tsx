@@ -11,6 +11,7 @@ import { HiOutlineClock } from "react-icons/hi2";
 import { useNavigate } from "react-router";
 import { mutateReview } from "@/apps/reviews/create/mutateReview";
 import { PostReviewDeleteButton } from "@/apps/reviews/create/PostReviewDeleteButton";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -29,7 +30,6 @@ import { urls } from "@/routes";
 import { UsageStatus, Visibility } from "~/graphql/enums";
 
 export namespace PostReviewForm {
-  import review = ids.review;
   export const strs = {
     reviewCreated: "Review added",
     reviewUpdated: "Review updated",
@@ -37,6 +37,7 @@ export namespace PostReviewForm {
 
   export function Comp(props: { review?: PostReviewEditFragmentType }) {
     const navigate = useNavigate();
+    const user = useUser();
 
     // todo UX: fix broken `reValidateMode: "onChange"` - after refactor to 2 forms validates only on <button type="submit"> click
     const forms = {
@@ -67,7 +68,18 @@ export namespace PostReviewForm {
               reviewed_at: formatISO(new Date(props.review.reviewed_at), {
                 representation: "date",
               }),
-              tags: [],
+              tags:
+                props.review.parent?.tags?.map(tag => {
+                  const tool = props.review?.parent;
+                  const userVote = user!.post_tag_votes.find(
+                    vote => vote.post.id === tool?.id && vote.tag.id === tag.id,
+                  );
+                  return {
+                    id: tag.id,
+                    name: tag.name,
+                    is_vote_positive: userVote?.is_vote_positive ?? null,
+                  };
+                }) ?? [],
               ...schemas.sharable.deserialize(props.review),
             }
           : {
@@ -95,7 +107,7 @@ export namespace PostReviewForm {
           const response = await mutateReview(reviewData);
           if (response.success) {
             toast.success(strs.reviewUpdated);
-            navigate(urls.reviews.detail(response.id));
+            navigate(urls.reviews.detail(response.data.id));
           } else {
             toast.error(`Update failed: ${response.error}`);
           }
@@ -136,9 +148,9 @@ export namespace PostReviewForm {
         });
         if (response.success) {
           toast.success(strs.reviewCreated);
-          navigate(urls.reviews.detail(response.id));
+          navigate(urls.reviews.detail(response.data.id));
         } else {
-          toast.error(`Review creation failed: ${response.error}`);
+          toast.error(`Creation failed: ${response.error}`);
         }
       }
     }
@@ -210,7 +222,13 @@ export namespace PostReviewForm {
                       />
                     </VStack>
 
-                    <SelectVotable fieldName="tags" />
+                    {isEditMode && (
+                      <SelectVotable
+                        fieldName="tags"
+                        postId={props.review?.parent?.id}
+                        {...ids.set(ids.review.form.tags)}
+                      />
+                    )}
 
                     {/* todo ! add field Post.review_tags */}
                     {/*<SelectVotable fieldName="review_tags" label="Review tags" />*/}

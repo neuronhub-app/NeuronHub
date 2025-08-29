@@ -5,21 +5,21 @@ import type { TadaDocumentNode } from "gql.tada";
 import type { JSX } from "react";
 import { client } from "@/graphql/client";
 
-export function mutateAndRefetchMountedQueries<
-  TData,
-  TVariables extends OperationVariables = object,
->(mutation: TadaDocumentNode<TData, TVariables>, variables: TVariables) {
+export function mutateAndRefetchMountedQueries<TData, TVariables extends OperationVariables>(
+  mutation: TadaDocumentNode<TData, TVariables>,
+  variables: TVariables,
+) {
   return mutateAndRefetch(mutation, variables, { isRefetchAll: false });
 }
 
-export function mutateDeleteAndResetStore<TData, TVariables extends OperationVariables = object>(
+export function mutateDeleteAndResetStore<TData, TVariables extends OperationVariables>(
   mutation: TadaDocumentNode<TData, TVariables>,
   variables: TVariables,
 ) {
   return mutateAndRefetch(mutation, variables, { isRefetchAll: true });
 }
 
-async function mutateAndRefetch<TData, TVariables extends OperationVariables = object>(
+async function mutateAndRefetch<TData, TVariables extends OperationVariables>(
   mutation: TadaDocumentNode<TData, TVariables>,
   variables: TVariables,
   options?: { isRefetchAll: boolean },
