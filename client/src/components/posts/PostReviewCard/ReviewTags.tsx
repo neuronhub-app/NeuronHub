@@ -1,19 +1,12 @@
 import { Tag, Wrap } from "@chakra-ui/react";
 import { HiMinus, HiPlus } from "react-icons/hi2";
 import { ids } from "@/e2e/ids";
+import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
-export function ReviewTags(props: { tags: PostTagFragmentType[]; reviewAuthorId?: string }) {
-  const reviewTags = props.tags.filter(tag => {
-    if (!tag.is_review_tag) return false;
-
-    if (props.reviewAuthorId) {
-      return tag.votes.some(vote => vote.author.id === props.reviewAuthorId);
-    }
-
-    return true;
-  });
+export function ReviewTags(props: { tags: PostTagFragmentType[]; authorId: ID }) {
+  const reviewTags = props.tags.filter(tag => tag.is_review_tag);
 
   reviewTags.sort((a, b) => {
     if (a.is_important !== b.is_important) {
@@ -33,33 +26,25 @@ export function ReviewTags(props: { tags: PostTagFragmentType[]; reviewAuthorId?
   return (
     <Wrap {...ids.set(ids.review.tag.container)}>
       {reviewTags.map(tag => (
-        <ReviewTagElem key={tag.id} tag={tag} reviewAuthorId={props.reviewAuthorId} />
+        <ReviewTagElem key={tag.id} tag={tag} authorId={props.authorId} />
       ))}
     </Wrap>
   );
 }
 
-function ReviewTagElem(props: { tag: PostTagFragmentType; reviewAuthorId?: string }) {
-  let authorVote = null;
-
-  if (props.reviewAuthorId) {
-    authorVote = props.tag.votes.find(vote => vote.author.id === props.reviewAuthorId);
-  }
-
-  const colorPalette = authorVote?.is_vote_positive ? "green" : authorVote ? "red" : "gray";
-
+function ReviewTagElem(props: { tag: PostTagFragmentType; authorId: ID }) {
+  const authorVote = props.tag.votes.find(vote => vote.author.id === props.authorId);
   return (
     <Tag.Root
       key={props.tag.id}
       aria-label={props.tag.description}
-      colorPalette={colorPalette}
+      colorPalette={authorVote?.is_vote_positive ? "green" : authorVote ? "red" : "gray"}
       variant="subtle"
       size="lg"
-      {...getOutlineContrastStyle({ variant: "subtle" })}
       opacity={0.8}
       fontWeight={props.tag.is_important ? "bold" : "normal"}
+      {...getOutlineContrastStyle({ variant: "subtle" })}
       {...ids.set(ids.review.tag.item)}
-      data-is-important={props.tag.is_important}
     >
       <Tag.Label>{props.tag.label || props.tag.name}</Tag.Label>
       {authorVote && (

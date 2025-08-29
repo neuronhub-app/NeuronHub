@@ -83,9 +83,7 @@ export function ListContainer(props: {
 
                   {post.parent && <ToolTags tags={post.parent.tags} postId={post.parent.id} />}
 
-                  {isReview(post) && (
-                    <ReviewTags tags={post.tags} reviewAuthorId={post.author?.id} />
-                  )}
+                  {isReview(post) && <ReviewTags tags={post.tags} authorId={post.author.id} />}
 
                   <HStack justify="space-between">
                     <PostAuthor author={post.author} />
