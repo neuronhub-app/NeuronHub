@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "anymail",
     "simple_history",
-    "guardian",
     "codemirror2",
     "strawberry_django",
     "health_check",
