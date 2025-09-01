@@ -77,9 +77,7 @@ class PostTypeI:
     def get_queryset(cls, queryset: QuerySet[Post], info: Info) -> QuerySet[Post]:
         user = get_current_user(info)
         if hasattr(cls, "TYPE"):
-            queryset = queryset.filter(type=cls.TYPE).distinct("id", "created_at")
-        else:
-            capture_message(f"PostTypeI wo TYPE: {cls.__name__}", level="error")
+            queryset = queryset.filter(type=cls.TYPE)
         return async_to_sync(filter_posts_by_user)(user, posts=queryset)
 
 
