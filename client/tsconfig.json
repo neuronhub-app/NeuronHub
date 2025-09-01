@@ -20,8 +20,8 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true, // for LLMs mistakes
 
-    "baseUrl": ".",
     "rootDirs": [".", "./.react-router/types"], // from react-router docs
+    "noErrorTruncation": true,
 
     "paths": {
       "@/e2e/*": ["./e2e/*"],

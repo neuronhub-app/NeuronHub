@@ -46,7 +46,7 @@
     "@graphql-codegen/cli": "^5.0.7",
     "@graphql-codegen/client-preset": "^4.8.3",
 
-    "typescript": "^5.9.2",
+    "@typescript/native-preview": "^7.0.0-dev.20250829.3",
     "@types/bun": "^1.2.20",
     "@types/react": "^19.1.11",
     "@types/react-dom": "^19.1.7",
