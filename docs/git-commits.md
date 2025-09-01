@@ -52,15 +52,17 @@ Some `Scope`s are bound to a single `Type`, eg `build(AI)`.
 - `monitor` - eg Sentry
 - `types` - TypeScript or Python typings
 - `admin` - Django Admin, ie no impact on the user-facing logic
+- `perf` - performance of SQL, UI, etc
 
 #### Unused
 - `browsr` - browser extension
 - `track` - analytics tracking, eg PostHog
 
-#### Special `Scope`s for the `docs` `Type`:
+#### Special `Scope`s for `docs`
 - `refac`
 - `arch` - abbreviation of `docs(architecture)`
 - `README` - either `server/` or `client/` or root `/` README files
+- `roadmap` - `docs/roadmap/*`
 - `{file name without the ".md" extension}`
 
 ### Text style

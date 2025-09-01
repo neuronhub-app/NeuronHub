@@ -1,4 +1,4 @@
-## NeuronHub - Privacy-First Tech Expertise Sharing
+## NeuronHub
 
 <doc-architecture>
 
@@ -9,7 +9,7 @@
 
 <doc-roadmap-current>
 
-@./docs/roadmap/current.md
+@./docs/roadmap/roadmap-v0.2.md
 
 </doc-roadmap-current>
 
