@@ -59,8 +59,7 @@
     "includes": [
       "src/**",
       "e2e/**",
-      "graphql/**",
-      "!graphql/gql-tada/graphql-env.d.ts", // isn't lintable
+      "!graphql/**", // generated code
 
       "biome.jsonc",
       "tsconfig.json",

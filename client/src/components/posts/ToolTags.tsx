@@ -12,6 +12,7 @@ import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
+// todo refac: rename to PostTags
 // todo !! if author sets is_vote_positive - put it before `is_important`
 // todo !! after finding what tag is_important, make sure they're still sorted by votes
 // todo !! add count for is_vote_positive=false
