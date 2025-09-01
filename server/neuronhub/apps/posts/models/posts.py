@@ -264,7 +264,9 @@ class PostTag(AnonimazableTimeStampedModel):
     class Meta:
         unique_together = ["tag_parent", "name"]
 
-    @model_cached_property(only=["name", "tag_parent"], prefetch_related=["tag_parent"])
+    @model_cached_property(
+        only=["name", "tag_parent", "is_review_tag"], prefetch_related=["tag_parent"]
+    )
     def label(self) -> str:
         """
         # todo UX: @computed field + db_index=True

@@ -6,7 +6,6 @@ import strawberry
 import strawberry_django
 from asgiref.sync import async_to_sync
 from django.db.models import QuerySet
-from sentry_sdk import capture_message
 from strawberry import Info
 from strawberry import UNSET
 from strawberry import auto
@@ -58,11 +57,9 @@ class PostTypeI:
     recommended_to_users: list[UserType]
     recommended_to_groups: list[UserConnectionGroupType]
 
-    tags: list[PostTagType] = strawberry_django.field(prefetch_related=["author", "votes"])
-    votes: list[PostVoteType] = strawberry_django.field(prefetch_related=["author"])
-    tag_votes: list[PostTagVoteType] = strawberry_django.field(
-        prefetch_related=["tag_votes__tag", "tag_votes__author"]
-    )
+    tags: list[PostTagType] = strawberry_django.field()
+    votes: list[PostVoteType] = strawberry_django.field()
+    tag_votes: list[PostTagVoteType] = strawberry_django.field()
 
     company: auto
     domain: auto
@@ -189,9 +186,11 @@ class PostTagFilter:
 class PostTagType:
     id: auto
     posts: list[PostType]
-    tag_parent: PostTagType | None
+    tag_parent: PostTagType | None = strawberry_django.field(
+        disable_optimization=True,  # it helps, but `PostTag.label` prefetch_related() messes it up
+    )
     tag_children: list[PostTagType]
-    votes: list[PostTagVoteType] = strawberry_django.field(prefetch_related=["author"])
+    votes: list[PostTagVoteType]
     author: UserType
 
     name: auto

@@ -1,7 +1,8 @@
-from neuronhub.apps.posts.models import Post, PostTag, PostTagVote
+from neuronhub.apps.posts.models import Post, PostTagVote
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
+# #AI
 class TestPostTagVoteGraphQL(NeuronTestCase):
     async def test_user_post_tag_votes_query(self):
         post = await self.gen.posts.create(
