@@ -1,5 +1,6 @@
 [claude]
     run = "claude --dangerously-skip-permissions"
+    env = { TSC_CONFIG = "tsconfig.quiet.json" } # prob has no effect
 
 ["claude:monitor"]
     run = "uv tool run claude-monitor --plan max20 --refresh-rate 1 --time-format 24h --timezone America/Los_Angeles"

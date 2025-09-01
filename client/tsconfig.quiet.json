@@ -1,0 +1,7 @@
+// for LLMs runtime
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noErrorTruncation": false
+  }
+}

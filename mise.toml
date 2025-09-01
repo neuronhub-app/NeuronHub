@@ -146,7 +146,7 @@
         outputs = { auto = true }
 
 [tasks."lint"]
-    depends = ["typegen --output=silent", "format"]
+    depends = ["typegen --output=silent", "format --output=silent"]
     run = "mise run lint:*"
 
     [tasks."lint:server"]
@@ -158,7 +158,7 @@
     [tasks."lint:client"]
         dir = "client"
         run = [
-            "bun run tsgo --noEmit",
+            "bun run tsgo --noEmit --project tsconfig.quiet.json",
             "bun run biome lint --write --unsafe",
         ]
         sources = ["src/**/*", "e2e/**/*"]
