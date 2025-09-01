@@ -21,11 +21,19 @@ export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
     );
     state.mutable.isLoading = false;
     if (response.success) {
-      toast.success(`Review for "${props.toolTitle}" deleted`);
-      await navigate(urls.reviews.list);
+      return onDeleteSuccess();
     } else {
-      toast.error(`Error from server: ${response.error}`);
+      if (response.errorMessage === "The operation was aborted.") {
+        // fails on Apollo side by throwing an AbortError, while all's good on Django. Prob Apollo bug.
+        return onDeleteSuccess();
+      }
+      toast.error(`Error from server: ${response.errorMessage}`);
     }
+  }
+
+  function onDeleteSuccess() {
+    toast.success(`Review for "${props.toolTitle}" deleted`);
+    return navigate(urls.reviews.list);
   }
 
   return (
