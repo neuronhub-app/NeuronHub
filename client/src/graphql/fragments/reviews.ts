@@ -1,15 +1,20 @@
+import { ids } from "@/e2e/ids";
 import { type FragmentOf, graphql } from "@/gql-tada";
 import {
   PostCommentsFragment,
   PostFragment,
   type PostFragmentType,
 } from "@/graphql/fragments/posts";
+import { PostTagFragment } from "@/graphql/fragments/tags";
 
 export const PostReviewFragment = graphql(
   `
     fragment PostReviewFragment on PostReviewType {
       ...PostFragment
 
+			review_tags {
+				...PostTagFragment
+			}
       review_importance
       review_usage_status
       review_rating
@@ -17,7 +22,7 @@ export const PostReviewFragment = graphql(
       reviewed_at
     }
   `,
-  [PostFragment],
+  [PostFragment, PostTagFragment],
 );
 
 // Review detail
@@ -32,7 +37,9 @@ export const PostReviewDetailFragment = graphql(
   [PostReviewFragment, PostCommentsFragment],
 );
 export type PostReviewDetailFragmentType = FragmentOf<typeof PostReviewDetailFragment>;
-export type PostReviewFragmentType = FragmentOf<typeof PostReviewFragment>;
+export type PostReviewFragmentType = FragmentOf<typeof PostReviewFragment> & {
+  parent: PostFragmentType;
+};
 
 export function isReview(
   post: PostFragmentType | PostReviewFragmentType,
@@ -73,3 +80,11 @@ export const PostReviewEditFragment = graphql(
   [PostReviewFragment, PostCommentsFragment],
 );
 export type PostReviewEditFragmentType = FragmentOf<typeof PostReviewEditFragment>;
+
+export function isEditMode(
+  review?: PostReviewEditFragmentType,
+): review is PostReviewEditFragmentType & {
+  parent: PostFragmentType;
+} {
+  return Boolean(review);
+}

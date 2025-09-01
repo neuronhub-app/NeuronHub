@@ -10,6 +10,8 @@ When the condition fails, the following can be returned (following this priority
 """
 directive @IsAuthenticated repeatable on FIELD_DEFINITION
 
+directive @oneOf on INPUT_OBJECT
+
 input BoolBaseFilterLookup {
   """Exact match. Filter will be skipped on `null` value"""
   exact: Boolean
@@ -92,6 +94,15 @@ type Mutation {
   test_db_stubs_repopulate: String!
 }
 
+enum Ordering {
+  ASC
+  ASC_NULLS_FIRST
+  ASC_NULLS_LAST
+  DESC
+  DESC_NULLS_FIRST
+  DESC_NULLS_LAST
+}
+
 type PostCommentType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
@@ -131,6 +142,10 @@ input PostFilter {
   DISTINCT: Boolean
 }
 
+input PostReviewOrder @oneOf {
+  reviewed_at: Ordering
+}
+
 type PostReviewType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
@@ -163,6 +178,7 @@ type PostReviewType implements PostTypeI {
   review_rating: Int
   review_importance: Int
   review_experience_hours: Int
+  review_tags(filters: PostTagFilter): [PostTagType!]!
   reviewed_at: DateTime!
   is_review_later: Boolean!
 }
@@ -182,7 +198,9 @@ type PostTagType {
   id: ID!
   posts(filters: PostFilter): [PostType!]!
   tag_parent: PostTagType
+  tag_parent_field: PostTagType
   tag_children(filters: PostTagFilter): [PostTagType!]!
+  tag_children_field: [PostTagType!]!
   votes: [PostTagVoteType!]!
   author: UserType!
   name: String!
@@ -374,6 +392,7 @@ input PostTypeInput {
   review_rating: Int
   review_experience_hours: Int
   review_importance: Int
+  review_tags: [PostTagTypeInput!]
   is_review_later: Boolean
   reviewed_at: DateTime
   tool_type: ToolType
@@ -399,7 +418,7 @@ type Query {
   post_comment(pk: ID!): PostCommentType
   posts(filters: PostFilter): [PostType!]!
   post_tools(filters: PostFilter): [PostToolType!]!
-  post_reviews: [PostReviewType!]!
+  post_reviews(ordering: [PostReviewOrder!]! = []): [PostReviewType!]!
   post_comments(filters: PostFilter): [PostCommentType!]!
   tags(filters: PostTagFilter): [PostTagType!]!
 }

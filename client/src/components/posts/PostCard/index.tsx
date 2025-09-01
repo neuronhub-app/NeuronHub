@@ -1,4 +1,4 @@
-import { Heading, HStack, IconButton, Show, Stack, Text } from "@chakra-ui/react";
+import { Flex, Heading, HStack, IconButton, Show, Stack, Text, VStack } from "@chakra-ui/react";
 import { marked } from "marked";
 import { FaPenToSquare } from "react-icons/fa6";
 import { NavLink } from "react-router";
@@ -6,7 +6,9 @@ import { useUser } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { RatingBars } from "@/components/posts/PostReviewCard/RatingBars";
+import { ReviewTags } from "@/components/posts/PostReviewCard/ReviewTags";
 import { UsageStatusBlock } from "@/components/posts/PostReviewCard/UsageStatus";
+import { ToolTags } from "@/components/posts/ToolTags";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import { isReview } from "@/graphql/fragments/reviews";
@@ -63,17 +65,20 @@ export function PostCard(props: { post: PostListItemType }) {
       </NavLink>
 
       {isReview(post) && (
-        <HStack gap="gap.lg" px={0.5}>
-          <UsageStatusBlock status={post.review_usage_status} color="fg.secondary" />
-          <RatingBars rating={post.review_rating} type="rating" color="fg.secondary" />
-          <RatingBars rating={post.review_importance} type="importance" color="fg.secondary" />
-          <RatingBars
-            rating={post.review_experience_hours}
-            type="experience"
-            color="fg.secondary"
-            boxSize="22px"
-          />
-        </HStack>
+        <VStack align="flex-start" gap="2">
+          <HStack gap="gap.lg" px={0.5}>
+            <UsageStatusBlock status={post.review_usage_status} color="fg.secondary" />
+            <RatingBars rating={post.review_rating} type="rating" color="fg.secondary" />
+            <RatingBars rating={post.review_importance} type="importance" color="fg.secondary" />
+            <RatingBars
+              rating={post.review_experience_hours}
+              type="experience"
+              color="fg.secondary"
+              boxSize="22px"
+            />
+          </HStack>
+          <ReviewTags tags={post.review_tags} authorId={post.author.id} />
+        </VStack>
       )}
 
       <Show when={post.content}>
@@ -83,6 +88,14 @@ export function PostCard(props: { post: PostListItemType }) {
           size="md"
         />
       </Show>
+
+      <Flex mt="gap.sm">
+        {isReview(post) ? (
+          <ToolTags tags={post.parent.tags} postId={post.parent.id} />
+        ) : (
+          <ToolTags tags={post.tags} postId={post.id} />
+        )}
+      </Flex>
     </Stack>
   );
 }

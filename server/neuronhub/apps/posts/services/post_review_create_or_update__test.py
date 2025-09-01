@@ -24,7 +24,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
                 ],
             ),
         )
-        assert 0 == await review.tags.acount()
+        assert 1 == await review.tags.acount()  # Now review.tags stores author's selection
         assert 1 == await tool.tags.acount()
 
         tag_vote = await tool.tag_votes.aget(tag__name=tag_name, author=self.user)
@@ -108,7 +108,9 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         )
 
         assert {tag_name_1, tag_name_2} == {tag.name async for tag in tool.tags.all()}
-        assert 0 == await review_updated.tags.acount()
+        assert (
+            2 == await review_updated.tags.acount()
+        )  # Now review.tags stores author's selection
 
     async def test_Review_tags_editing_and_voting_updates_PostTagVote(self):
         tool = await self.gen.posts.tool()
@@ -136,3 +138,83 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
             author=self.user,
         )
         assert tag_vote.is_vote_positive is False
+
+    async def test_review_tags_are_saved_to_review_not_empty(self):
+        tool = await self.gen.posts.tool()
+        tag_name = "Python"
+
+        review = await post_review_create_or_update(
+            author=self.user,
+            data=PostTypeInput(
+                parent=PostTypeInput(id=tool.id),
+                title="Review",
+                tags=[PostTagTypeInput(name=tag_name)],
+            ),
+        )
+
+        assert 1 == await review.tags.acount()
+        assert tag_name == (await review.tags.afirst()).name
+
+    async def test_review_tags_subset_of_tool_tags(self):
+        tool = await self.gen.posts.tool()
+        tag_name_1 = "Python"
+        tag_name_2 = "Django"
+
+        # Create review with tag1
+        review = await post_review_create_or_update(
+            author=self.user,
+            data=PostTypeInput(
+                parent=PostTypeInput(id=tool.id),
+                title="Review",
+                tags=[PostTagTypeInput(name=tag_name_1)],
+            ),
+        )
+
+        # Update review with tag2 only
+        await post_review_create_or_update(
+            author=self.user,
+            data=PostTypeInput(
+                id=review.id,
+                tags=[PostTagTypeInput(name=tag_name_2)],
+            ),
+        )
+
+        # Tool should have both tags (union)
+        tool_tags = {tag.name async for tag in tool.tags.all()}
+        assert {tag_name_1, tag_name_2} == tool_tags
+
+        # Review should only have tag2 (author's current selection)
+        review_tags = {tag.name async for tag in review.tags.all()}
+        assert {tag_name_2} == review_tags
+
+    async def test_removing_from_review_tags_keeps_in_tool_tags(self):
+        tool = await self.gen.posts.tool()
+        tag_name_1 = "Python"
+        tag_name_2 = "Django"
+
+        # Create review with both tags
+        review = await post_review_create_or_update(
+            author=self.user,
+            data=PostTypeInput(
+                parent=PostTypeInput(id=tool.id),
+                title="Review",
+                tags=[PostTagTypeInput(name=tag_name_1), PostTagTypeInput(name=tag_name_2)],
+            ),
+        )
+
+        # Update review to remove tag1
+        await post_review_create_or_update(
+            author=self.user,
+            data=PostTypeInput(
+                id=review.id,
+                tags=[PostTagTypeInput(name=tag_name_2)],
+            ),
+        )
+
+        # Tool should still have both tags
+        tool_tags = {tag.name async for tag in tool.tags.all()}
+        assert {tag_name_1, tag_name_2} == tool_tags
+
+        # Review should only have tag2
+        review_tags = {tag.name async for tag in review.tags.all()}
+        assert {tag_name_2} == review_tags

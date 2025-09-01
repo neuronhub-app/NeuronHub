@@ -143,10 +143,12 @@ export namespace schemas {
     review_rating: z.number().min(0).max(100).nullable(),
     review_importance: z.number().min(0).max(100).nullable(),
     review_usage_status: z.enum(enumConvert(UsageStatus)).nullable(),
+    review_tags: getSelectVotableSchema(),
     reviewed_at: z.iso.date().optional(),
     is_review_later: z.boolean().optional(),
   });
   export type Review = z.infer<typeof Review>;
+  export type ReviewForm = UseFormReturn<Review>;
 
   // excludes `sharable.Schema`, because it's always public
   export const Tool = Abstract.safeExtend({

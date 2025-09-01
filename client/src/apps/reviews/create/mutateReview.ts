@@ -3,7 +3,7 @@ import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 
 export async function mutateReview(values: schemas.Review & { parent?: { id: ID } }) {
-  const { recommend_to, visible_to, parent, tags, ...valuesRest } = values;
+  const { recommend_to, visible_to, parent, tags, review_tags, ...valuesRest } = values;
 
   const isEditMode = Boolean(values.id);
 
@@ -17,6 +17,10 @@ export async function mutateReview(values: schemas.Review & { parent?: { id: ID 
       input: {
         ...(isEditMode ? {} : { parent }),
         tags: tags.map(tag => {
+          const { label, ...tagValues } = tag;
+          return tagValues;
+        }),
+        review_tags: review_tags?.map(tag => {
           const { label, ...tagValues } = tag;
           return tagValues;
         }),

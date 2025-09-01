@@ -7,7 +7,7 @@ import {
   type IconProps,
   VStack,
 } from "@chakra-ui/react";
-import { AsyncCreatableSelect, components, type MultiValue } from "chakra-react-select";
+import { AsyncCreatableSelect, components } from "chakra-react-select";
 import type { MessageSquarePlus } from "lucide-react";
 import { type ReactNode, useRef } from "react";
 import { useFormContext } from "react-hook-form";
@@ -15,7 +15,7 @@ import { FaMessage, FaRegMessage } from "react-icons/fa6";
 import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
-import { schemas } from "@/components/posts/form/schemas";
+import type { schemas } from "@/components/posts/form/schemas";
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -31,7 +31,7 @@ import { client } from "@/graphql/client";
 import { useInit } from "@/utils/useInit";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-// for: .tags & .alternatives
+// Post.tags, .review_tags, .alternatives
 export interface SelectVotableOption {
   id: ID;
   name: string;
@@ -43,18 +43,27 @@ export interface SelectVotableOption {
   tag_parent?: { id: ID; name: string } | null;
 }
 
-export type SelectVotableField = "tags"; // will add later `.alternatives`
+export type SelectVotableField = "tags" | "review_tags"; // will add `.alternatives` later
 
 export function SelectVotable(props: {
   isAllowCreate?: boolean;
   fieldName: SelectVotableField;
   label?: string;
+  helpText?: string;
   isReviewTags?: boolean; // see docs [[PostTag#is_review_tag]]
   postId?: ID;
+  isReadOnly?: boolean;
+  optionIdsHidden?: ID[];
+  onChange?: (options: SelectVotableOption[]) => void;
   "data-testid"?: string;
 }) {
-  const form = schemas.useFormContextAbstract([props.fieldName]);
-  const options = form.watch(props.fieldName);
+  // todo fix(types): assertion
+  // const form = schemas.useFormContextAbstract([props.fieldName]);
+  const form: schemas.ReviewForm = useFormContext();
+  const optionIdsHidden = props.optionIdsHidden ?? [];
+  const options = form
+    .watch(props.fieldName)
+    .filter(option => !optionIdsHidden.includes(option.id));
   const fieldError = form.formState.errors[props.fieldName];
   const user = useUser();
 
@@ -68,15 +77,17 @@ export function SelectVotable(props: {
   useInit({
     isBlocked: !props.postId || !user?.post_tag_votes || !options,
     init: () => {
-      const optionsWithVotes = options.map(option => {
-        const userVote = user!.post_tag_votes.find(
-          vote => vote.post.id === props.postId && vote.tag.id === option.id,
-        );
-        if (userVote) {
-          return { ...option, is_vote_positive: userVote.is_vote_positive };
-        }
-        return option;
-      });
+      const optionsWithVotes = options
+        .filter(option => !optionIdsHidden.includes(option.id))
+        .map(option => {
+          const userVote = user!.post_tag_votes.find(
+            vote => vote.post.id === props.postId && vote.tag.id === option.id,
+          );
+          if (userVote) {
+            return { ...option, is_vote_positive: userVote.is_vote_positive };
+          }
+          return option;
+        });
 
       // #AI looks idiotic
       if (JSON.stringify(options) !== JSON.stringify(optionsWithVotes)) {
@@ -102,14 +113,21 @@ export function SelectVotable(props: {
           {props.label ?? props.fieldName}
         </Field.Label>
 
+        {props.helpText && <Field.HelperText>{props.helpText}</Field.HelperText>}
+
         <AsyncCreatableSelect
           cacheOptions
           defaultOptions
           isMulti
           isClearable={false}
+          isSearchable={!props.isReadOnly}
+          openMenuOnClick={!props.isReadOnly}
           closeMenuOnSelect={false}
-          value={options}
-          onChange={(optionsNew: MultiValue<SelectVotableOption>, _) => {
+          value={options.filter(option => !optionIdsHidden.includes(option.id))}
+          onChange={(optionsNew, _) => {
+            // @ts-expect-error #bad-infer, also erroring re ReadOnly<T> makes no sense here
+            props.onChange?.(optionsNew);
+
             form.setValue(
               props.fieldName,
               optionsNew.map(optionNew => {
@@ -147,11 +165,19 @@ export function SelectVotable(props: {
                 is_review_tag: props.isReviewTags ?? false,
               },
             });
-            return response.data!.tags;
+            return response.data!.tags.filter(option => !optionIdsHidden.includes(option.id));
           }}
           getOptionLabel={option => option.label ?? option.name}
           getOptionValue={option => option.name}
           components={{
+            MultiValueRemove: props.isReadOnly
+              ? () => null
+              : propsRemove => (
+                  <components.MultiValueRemove
+                    {...propsRemove}
+                    data-testid={ids.post.form.tags.tag.remove}
+                  />
+                ),
             MultiValueLabel: propsMultiVal => (
               <components.MultiValueLabel {...propsMultiVal}>
                 <HStack gap="2" px={0.5} py={0.5}>

@@ -163,6 +163,7 @@ class Post(AnonimazableTimeStampedModel):
     # review fields
     # ---------------------
 
+    review_tags = ManyToManyField("posts.PostTag", related_name="post_reviews", blank=True)
     review_rating = models.PositiveIntegerField(
         blank=True,
         null=True,

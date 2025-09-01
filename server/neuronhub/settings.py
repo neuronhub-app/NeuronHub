@@ -142,7 +142,7 @@ else:
     }
 
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Los_Angeles"
 USE_L10N = False  # to make admin dates readable
 USE_I18N = True
 USE_TZ = True

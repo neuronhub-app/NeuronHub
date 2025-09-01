@@ -115,10 +115,12 @@ async def _create_review_pycharm(user: User, gen: Gen):
             title="PyCharm",
             tool_type=Post.ToolType.Program,
             crunchbase_url="crunchbase.com/organization/jetbrains",
-            content="""
+            content=textwrap.dedent(
+                """
                 PyCharm is an integrated development environment (IDE) used in computer programming, 
                 specifically for the Python language. It is developed by the Czech company JetBrains.
-            """,
+                """
+            ),
             url="jetbrains.com/pycharm",
             company_name="JetBrains",
             company_domain="jetbrains.com",
@@ -128,26 +130,6 @@ async def _create_review_pycharm(user: User, gen: Gen):
         )
     )
 
-    await create_tags(
-        post=pycharm,
-        author=user,
-        params=[
-            TagParams("Software / IDE", is_vote_pos=True, is_important=True),
-            TagParams("Dev / Python", is_vote_pos=True),
-            TagParams("Dev / Kotlin"),
-            TagParams("Dev / TypeScript"),
-            TagParams("Dev / Database"),
-            TagParams("Dev / Django", is_vote_pos=True),
-            TagParams("Dev / Web Development", is_vote_pos=True),
-            TagParams("Dev / JavaScript"),
-            TagParams("Dev / JetBrains", is_important=True),
-            TagParams("Dev / Java"),
-            TagParams("Dev / Open Source Core"),
-            TagParams("Business / Subscription"),
-            TagParams("Business / Paid"),
-            TagParams("Business / Free Trial"),
-        ],
-    )
     review = await Post.objects.acreate(
         type=Post.Type.Review,
         parent=pycharm,
@@ -167,10 +149,41 @@ async def _create_review_pycharm(user: User, gen: Gen):
         review_rating=67,
         review_importance=83,
         review_experience_hours=17_000,
-        reviewed_at=timezone.now() - datetime.timedelta(days=8, hours=5, minutes=30),
+        reviewed_at=timezone.now(),
         visibility=Visibility.PUBLIC,
     )
-    await create_review_tags(
+    tag_web_dev = "Dev / Web Development"
+    tag_django = "Dev / Django"
+    await _create_tags(
+        post=pycharm,
+        author=await gen.users.user(username=users.random_1, is_get_or_create=True),
+        params=[
+            TagParams("Software / IDE", is_important=True),
+            TagParams("Dev / Kotlin"),
+            TagParams("Dev / TypeScript"),
+            TagParams("Dev / Database"),
+            TagParams(tag_web_dev, is_vote_pos=True),
+            TagParams(tag_django),
+            TagParams("Dev / JavaScript"),
+            TagParams("Dev / JetBrains", is_important=True),
+            TagParams("Dev / Java"),
+            TagParams("Business / Subscription"),
+            TagParams("Business / Paid"),
+            TagParams("Business / Free Trial"),
+        ],
+    )
+    await _create_tags(
+        post=review,
+        author=user,
+        params=[
+            # repeat tags
+            TagParams(tag_web_dev, is_vote_pos=True),
+            TagParams(tag_django, is_vote_pos=True),
+            TagParams("Dev / Open Source Core"),
+            TagParams("Dev / Python", is_vote_pos=True),
+        ],
+    )
+    await _create_review_tags(
         post=review,
         params=[
             ReviewTagParams(ReviewTagName.stability, is_vote_pos=False),
@@ -210,7 +223,7 @@ async def _create_review_iterm(user: User, gen: Gen):
         )
     )
 
-    await create_tags(
+    await _create_tags(
         post=tool,
         author=user,
         params=[
@@ -237,6 +250,7 @@ async def _create_review_iterm(user: User, gen: Gen):
         review_rating=75,
         review_importance=51,
         review_experience_hours=7_000,
+        reviewed_at=timezone.now() - datetime.timedelta(days=10),
         visibility=Visibility.PUBLIC,
     )
     await gen.posts.create(
@@ -248,7 +262,7 @@ async def _create_review_iterm(user: User, gen: Gen):
         )
     )
 
-    await create_review_tags(
+    await _create_review_tags(
         post=review,
         params=[
             ReviewTagParams(ReviewTagName.open_source, is_vote_pos=True),
@@ -276,7 +290,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
     if alternatives:
         await tool.alternatives.aadd(*alternatives)
 
-    await create_tags(
+    await _create_tags(
         post=tool,
         author=user,
         params=[
@@ -300,7 +314,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
     )
     comment = await gen.posts.comment(parent=review, author=user)
     await gen.posts.comment(parent=comment, author=user)
-    await create_review_tags(
+    await _create_review_tags(
         post=review,
         params=[
             ReviewTagParams(ReviewTagName.expectations, is_vote_pos=True),
@@ -322,7 +336,7 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
             company_ownership_name="Public",
         )
     )
-    await create_tags(
+    await _create_tags(
         post=tool,
         author=user,
         params=[
@@ -364,7 +378,7 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
             company_ownership_name="Private",
         )
     )
-    await create_tags(
+    await _create_tags(
         post=tool,
         author=user,
         params=[
@@ -397,7 +411,7 @@ class TagParams:
     is_important: bool | None = None
 
 
-async def create_tags(post: Post, author: User, params: list[TagParams]):
+async def _create_tags(post: Post, author: User, params: list[TagParams]):
     await asyncio.gather(
         *[
             create_tag(
@@ -418,17 +432,17 @@ class ReviewTagParams:
     is_vote_pos: bool | None = None
 
 
-async def create_review_tags(post: Post, params: list[ReviewTagParams]):
-    await asyncio.gather(*[_create_single_review_tag(post, param) for param in params])
+async def _create_review_tags(post: Post, params: list[ReviewTagParams]):
+    await asyncio.gather(*[_create_review_tag(post, param) for param in params])
 
 
-async def _create_single_review_tag(post: Post, param: ReviewTagParams):
+async def _create_review_tag(post: Post, param: ReviewTagParams):
     if param.is_vote_pos is not None:
         tag, _ = await PostTag.objects.aget_or_create(
             name=param.name.value,
             defaults=dict(is_review_tag=True, author=post.author),
         )
-        await post.tags.aadd(tag)
+        await post.review_tags.aadd(tag)
         await PostTagVote.objects.acreate(
             post=post,
             tag=tag,

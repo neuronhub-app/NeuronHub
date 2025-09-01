@@ -51,7 +51,7 @@ export function CommentForm(
         draft.clear();
         props.onSave();
       } else {
-        showError(response.error);
+        showError(response.errorMessage);
       }
     } else {
       const response = await commentCreate({ parentId: props.parentId, content: data.content });
@@ -60,7 +60,7 @@ export function CommentForm(
         form.reset();
         draft.clear();
       } else {
-        showError(response.error);
+        showError(response.errorMessage);
       }
     }
 

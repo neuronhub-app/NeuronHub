@@ -1,5 +1,5 @@
-import type { OperationVariables } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+import type { ErrorLike, OperationVariables } from "@apollo/client";
+import { Box, Text } from "@chakra-ui/react";
 import { captureException } from "@sentry/react";
 import type { TadaDocumentNode } from "gql.tada";
 import type { JSX } from "react";
@@ -9,20 +9,20 @@ export function mutateAndRefetchMountedQueries<TData, TVariables extends Operati
   mutation: TadaDocumentNode<TData, TVariables>,
   variables: TVariables,
 ) {
-  return mutateAndRefetch(mutation, variables, { isRefetchAll: false });
+  return mutateAndRefetch(mutation, variables, { isResetStore: false });
 }
 
 export function mutateDeleteAndResetStore<TData, TVariables extends OperationVariables>(
   mutation: TadaDocumentNode<TData, TVariables>,
   variables: TVariables,
 ) {
-  return mutateAndRefetch(mutation, variables, { isRefetchAll: true });
+  return mutateAndRefetch(mutation, variables, { isResetStore: true });
 }
 
 async function mutateAndRefetch<TData, TVariables extends OperationVariables>(
   mutation: TadaDocumentNode<TData, TVariables>,
   variables: TVariables,
-  options?: { isRefetchAll: boolean },
+  options?: { isResetStore: boolean },
 ): Promise<
   | {
       success: true;
@@ -31,42 +31,54 @@ async function mutateAndRefetch<TData, TVariables extends OperationVariables>(
   | {
       data?: TData;
       success: false;
-      error: string | JSX.Element;
+      errorMessage: string | JSX.Element;
+      error: ErrorLike;
     }
 > {
   try {
     const result = await client.mutate({ mutation, variables });
 
     if (result.error) {
-      return returnError(result.error);
+      return returnError({ error: result.error });
     }
 
-    if (options?.isRefetchAll) {
+    if (options?.isResetStore) {
       await client.resetStore();
     } else {
       await client.refetchQueries({ include: "active" });
     }
 
     if (result.data === undefined) {
-      return returnError(
-        <>
-          <Text>
-            The server reported that your operation was completed, but responded abnormally -
-            with nothing.
-          </Text>
-          <Text>Please carefully try again, or contact support.</Text>
-        </>,
-      );
+      return returnError({
+        error: new Error("No response.data"),
+        msg: (
+          <Box>
+            <Text>
+              The server reported that your operation was completed, but responded abnormally -
+              with nothing.
+            </Text>
+            <Text>Please carefully try again, or contact support.</Text>
+          </Box>
+        ),
+      });
     }
 
-    return { success: true, data: result.data! };
+    return { success: true, data: result.data };
   } catch (error) {
-    return returnError(error);
+    if (error instanceof Error) {
+      return returnError({ error });
+    }
+    return returnError({ error: new Error(String(error)) });
   }
 }
 
-function returnError(error: Error | JSX.Element | unknown) {
-  captureException(error);
-  const message = error instanceof Error ? error.message : "An error occurred";
-  return { success: false as const, error: message };
+function returnError(args: { error: ErrorLike; msg?: JSX.Element }) {
+  captureException(args.error);
+
+  const message = args.error instanceof Error ? args.error.message : "An error occurred";
+  return {
+    success: false as const,
+    error: args.error,
+    errorMessage: args.msg ?? message,
+  };
 }

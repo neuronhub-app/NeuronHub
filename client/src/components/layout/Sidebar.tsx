@@ -153,7 +153,7 @@ export function UserProfile() {
     if (res.success) {
       navigate(urls.login);
     } else {
-      toast.error(`Failed to log out: ${res.error}`);
+      toast.error(`Failed to log out: ${res.errorMessage}`);
     }
   }
 

@@ -3,7 +3,7 @@
 
 Prob most of this file is redundant, ie Strawberry + BasePermission can be ~enough.
 
-But `tags` are different - `/` must be parsed on backend/frontend.
+But `tags` are different - the separator `/` must be parsed on backend/frontend.
 """
 
 from __future__ import annotations
@@ -39,44 +39,62 @@ async def post_review_create_or_update(author: User, data: PostTypeInput) -> Pos
 
     is_edit_mode = bool(data.id)
     if is_edit_mode:
-        review = await Post.objects.select_related("parent").aget(id=data.id, author=author)
+        post_review = await Post.objects.select_related("parent").aget(id=data.id, author=author)
         for field, value in field_values.items():
-            setattr(review, field, value)
-        await review.asave()
+            setattr(post_review, field, value)
+        await post_review.asave()
 
-        tool = review.parent
-        assert tool
+        post = post_review.parent
+        assert post
     else:
         assert data.parent
-        tool = await Post.objects.aget(id=data.parent.id)
-        review, _ = await Post.objects.aupdate_or_create(
-            parent=tool,
+        post = await Post.objects.aget(id=data.parent.id)
+        post_review = await Post.objects.acreate(
+            parent=post,
             author=author,
             type=Post.Type.Review,
-            defaults=field_values,
+            **field_values,
         )
 
-    if data.tags:
-        for tag_input in data.tags:
-            await create_tag(
-                name_raw=tag_input.name,
-                post=tool,
-                author=author,
-                is_vote_positive=_prase_field(tag_input.is_vote_positive),
-                is_important=_prase_field(tag_input.is_important),
-                comment=tag_input.comment if tag_input.comment else "",
-            )
+    await _create_review_tags_and_update_post_tags(
+        data=data, post=post, post_review=post_review, author=author
+    )
 
     if data.alternatives:
         await PostRelated.objects.abulk_create(
             [
-                PostRelated(post=tool, author=author, **alternative_input)
+                PostRelated(post=post, author=author, **alternative_input)
                 for alternative_input in data.alternatives
             ]
         )
 
-    return review
+    return post_review
 
 
-def _prase_field[Val](field: Val | UNSET) -> Val | None:
+async def _create_review_tags_and_update_post_tags(
+    data: PostTypeInput, post: Post, post_review: Post, author: User
+):
+    if not data.tags:
+        return
+
+    post_review_tags = []
+    for tag_input in data.tags:
+        tag = await create_tag(
+            name_raw=tag_input.name,
+            post=post,
+            author=author,
+            is_vote_positive=_prase_field(tag_input.is_vote_positive),
+            is_important=_prase_field(tag_input.is_important),
+            comment=tag_input.comment if tag_input.comment else "",
+        )
+        post_review_tags.append(tag)
+    await post_review.tags.aset(post_review_tags)
+
+    # ensure parent.tags ⊇ post_review.tags
+    post_tags = [tag async for tag in post.tags.all()]
+    post_tags.extend(post_review_tags)
+    await post.tags.aset(post_tags)
+
+
+def _prase_field[T](field: T | None | UNSET) -> T | None:
     return field if field is not UNSET else None

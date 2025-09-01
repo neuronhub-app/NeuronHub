@@ -106,7 +106,7 @@ function ReviewButton(props: {
             },
           );
           if (!res.success) {
-            toast.error(`Failed to update your ${props.fieldName}: ${res.error}`);
+            toast.error(`Failed to update your ${props.fieldName}: ${res.errorMessage}`);
           }
 
           state.mutable.isLoading = false;

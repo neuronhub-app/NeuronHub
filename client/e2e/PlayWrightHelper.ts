@@ -48,8 +48,8 @@ export class PlayWrightHelper {
     return this.get(id).waitFor({ timeout: this.timeout + this.timeoutWaitExtra });
   }
 
-  async expectText(text: string) {
-    await this.page.waitForSelector(`text="${text}"`);
+  async expectText(text: string, options: { timeout?: number } = {}) {
+    await this.page.waitForSelector(`text="${text}"`, options);
   }
 
   async waitForState(testId: string, state: "checked" | "unchecked") {

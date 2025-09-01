@@ -188,6 +188,15 @@ class PostsGen:
     async def tool(self, author: User = None) -> Post:
         return await self.create(self.Params(type=Post.Type.Tool, author=author or self.user))
 
+    async def review(self, author: User = None) -> Post:
+        return await self.create(
+            self.Params(
+                type=Post.Type.Review,
+                author=author or self.user,
+                parent=await self.create(self.Params(type=Post.Type.Tool)),
+            )
+        )
+
     async def vote(
         self,
         post: Post,
@@ -204,17 +213,21 @@ class PostsGen:
 
     async def tag(
         self,
-        name: str,
+        name: str = None,
+        post: Post = None,
         author: User = None,
         is_important: bool = False,
     ):
         from neuronhub.apps.posts.models import PostTag
 
-        return await PostTag.objects.acreate(
-            name=name,
+        tag = await PostTag.objects.acreate(
+            name=name or self.faker.word(),
             author=author or self.user,
             is_important=is_important,
         )
+        if post:
+            await post.tags.aadd(tag)
+        return tag
 
     async def create(self, params: Params = Params(type=Post.Type.Post)) -> Post:
         from neuronhub.apps.posts.models import Post

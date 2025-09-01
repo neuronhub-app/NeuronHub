@@ -98,8 +98,12 @@ class PostToolType(PostTypeI):
     alternatives: list[PostToolType]
 
 
-# noinspection PyDataclass
-@strawberry_django.type(Post)
+@strawberry_django.order_type(Post)
+class PostReviewOrder:
+    reviewed_at: auto
+
+
+@strawberry_django.type(Post, ordering=PostReviewOrder)
 class PostReviewType(PostTypeI):
     TYPE = Post.Type.Review
 
@@ -109,6 +113,7 @@ class PostReviewType(PostTypeI):
     review_rating: auto
     review_importance: auto
     review_experience_hours: auto
+    review_tags: list[PostTagType] = strawberry_django.field()
     reviewed_at: auto
     is_review_later: auto
 
@@ -157,6 +162,7 @@ class PostTypeInput:
     review_rating: auto
     review_experience_hours: auto
     review_importance: auto
+    review_tags: list[PostTagTypeInput] | None
     is_review_later: auto
     reviewed_at: auto
 

@@ -9,6 +9,7 @@ from neuronhub.apps.users.models import User
 logger = logging.getLogger(__name__)
 
 
+# todo refac: rename to create_or_update_tag
 async def create_tag(
     name_raw: str,
     post: Post,
@@ -16,7 +17,7 @@ async def create_tag(
     is_vote_positive: bool = None,
     is_important: bool = None,
     comment: str = "",
-) -> PostTag | None:
+) -> PostTag:
     post_tag_defaults = dict(author=author, is_important=is_important)
     is_can_edit_importance = False
 

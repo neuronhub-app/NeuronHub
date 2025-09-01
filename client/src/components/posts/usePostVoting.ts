@@ -61,7 +61,7 @@ export function usePostVoting(props: {
       { id: props.postId, isVotePositive: newVoteValue },
     );
     if (!res.success) {
-      toast.error(res.error);
+      toast.error(res.errorMessage);
     }
 
     state.mutable.isLoadingUpvote = false;

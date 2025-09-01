@@ -8,7 +8,7 @@ export function PostReviewList() {
     graphql(
       `
         query ReviewList {
-          post_reviews {
+          post_reviews(ordering: { reviewed_at: DESC }) {
             ...PostReviewFragment
           }
         }

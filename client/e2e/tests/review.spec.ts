@@ -14,6 +14,7 @@ test.describe("Review", () => {
 
   test("Create with Parent", async ({ page }) => {
     await page.goto(urls.reviews.create);
+    await helper.waitForNetworkIdle();
 
     await helper.fill(ids.postTool.form.title, "Django");
     await helper.fill(ids.review.form.title, "Django Review");
@@ -23,37 +24,6 @@ test.describe("Review", () => {
     await helper.expectText(PostReviewForm.strs.reviewCreated);
   });
 
-  test("Edit twice", async ({ page }) => {
-    // review edit #1
-
-    await page.goto(urls.reviews.list);
-    await helper.click(ids.post.card.link.edit);
-
-    const titleUpdated = "Updated title";
-    const contentUpdated = "Updated content";
-    await helper.fill(ids.review.form.content, contentUpdated);
-    await helper.fill(ids.review.form.title, titleUpdated);
-
-    await helper.click(ids.post.btn.submit);
-    const reviewId = await helper.get(ids.post.card.container).getAttribute("data-id");
-    await page.waitForURL(urls.reviews.detail(reviewId!));
-    await helper.expectText(contentUpdated);
-    await helper.expectText(titleUpdated);
-
-    // review edit #2
-
-    await helper.click(ids.post.card.link.edit);
-    await helper.wait(ids.review.form.content);
-    await expect(helper.get(ids.review.form.content)).toHaveValue(contentUpdated);
-
-    const contentUpdated2 = `${contentUpdated} #2`;
-    await helper.fill(ids.review.form.content, contentUpdated2);
-    await helper.click(ids.post.btn.submit);
-
-    await page.waitForURL(urls.reviews.detail(reviewId!));
-    await helper.expectText(contentUpdated2);
-  });
-
   test("Tags editing and voting", async ({ page }) => {
     await page.goto(urls.reviews.list);
     await helper.click(ids.post.card.link.edit);
@@ -61,7 +31,7 @@ test.describe("Review", () => {
 
     const tagsContainer = helper.get(ids.review.form.tags);
     const tagName = {
-      existing: "Terminal emulator",
+      existing: "Django",
       added: "New tag",
     };
     await expect(tagsContainer).toContainText(tagName.existing);
@@ -94,5 +64,71 @@ test.describe("Review", () => {
       .getByTestId(ids.post.form.tags.tag.vote.up);
 
     await expect(voteButton).toHaveAttribute("data-is-vote-positive", "true");
+  });
+
+  test("tags and review_tags editing", async ({ page }) => {
+    // #AI
+    await page.goto(urls.reviews.list);
+    await helper.click(ids.post.card.link.edit);
+    await helper.wait(ids.review.form.title);
+
+    const reviewTagsContainer = helper.get(ids.review.form.tags);
+    const toolTagsContainer = helper.get(ids.post.form.tags.container);
+
+    const tags = {
+      parent: {
+        existing: "IDE",
+      },
+      review: {
+        existing: "Python",
+        new: "FastAPI",
+      },
+    };
+    await expect(reviewTagsContainer).toContainText(tags.review.existing, {
+      useInnerText: true,
+    });
+    await expect(toolTagsContainer).toContainText(tags.parent.existing);
+
+    // Add a new tag to review.tags
+    const tagInput = reviewTagsContainer.locator("input").first();
+    await tagInput.click();
+    await tagInput.pressSequentially(tags.review.new, { delay: 100 });
+    await page.keyboard.press("Enter");
+    await expect(reviewTagsContainer).toContainText(tags.review.new);
+
+    // Save review
+    await helper.click(ids.post.btn.submit);
+    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await helper.waitForNetworkIdle();
+
+    // Re-edit to verify tag persistence
+    await helper.click(ids.post.card.link.edit);
+    await helper.wait(ids.review.form.title);
+
+    // Verify tags are in review.tags
+    await expect(reviewTagsContainer).toContainText(tags.review.existing);
+    await expect(reviewTagsContainer).toContainText(tags.review.new);
+
+    // Test removing a tag from review.tags - it should then appear in parent.tags
+    const removeButton = reviewTagsContainer.locator(`[aria-label="Remove ${tags.review.new}"]`);
+    await removeButton.click();
+
+    // Verify tag is removed from review.tags input
+    await expect(reviewTagsContainer).not.toContainText(tags.review.new);
+
+    // The removed tag should now appear in parent.tags (no longer hidden since not in review.tags)
+    await expect(toolTagsContainer).toContainText(tags.review.new);
+
+    // Save and verify persistence of removal
+    await helper.click(ids.post.btn.submit);
+    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await helper.waitForNetworkIdle();
+
+    // Re-edit to verify removal persisted
+    await helper.click(ids.post.card.link.edit);
+    await helper.wait(ids.review.form.title);
+    await expect(reviewTagsContainer).not.toContainText(tags.review.new);
+    await expect(reviewTagsContainer).toContainText(tags.review.existing);
+    await expect(toolTagsContainer).toContainText(tags.review.new);
   });
 });

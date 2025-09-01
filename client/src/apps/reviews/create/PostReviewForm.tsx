@@ -1,6 +1,7 @@
-import { Fieldset, Flex, Heading, HStack, Icon, Text, VStack } from "@chakra-ui/react";
+import { Fieldset, Flex, Heading, HStack, Icon, Show, Text, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatISO } from "date-fns";
+import { marked } from "marked";
 import type { JSX } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -22,9 +23,10 @@ import { PostToolFields } from "@/components/posts/form/PostToolFields";
 import { SelectVotable } from "@/components/posts/form/SelectVotable";
 import { schemas } from "@/components/posts/form/schemas";
 import { Button } from "@/components/ui/button";
+import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
-import type { PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
+import { isEditMode, type PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
 import { UsageStatus, Visibility } from "~/graphql/enums";
@@ -48,7 +50,19 @@ export namespace PostReviewForm {
           id: null,
           title: "",
           tool_type: "Program",
-          tags: [],
+          tags: props.review
+            ? (props.review.parent?.tags?.map(tag => {
+                const tool = props.review?.parent;
+                const userVote = user!.post_tag_votes.find(
+                  vote => vote.post.id === tool?.id && vote.tag.id === tag.id,
+                );
+                return {
+                  id: tag.id,
+                  name: tag.name,
+                  is_vote_positive: userVote?.is_vote_positive ?? null,
+                };
+              }) ?? [])
+            : [],
         },
       }),
       review: useForm<schemas.Review>({
@@ -69,7 +83,7 @@ export namespace PostReviewForm {
                 representation: "date",
               }),
               tags:
-                props.review.parent?.tags?.map(tag => {
+                props.review.tags.map(tag => {
                   const tool = props.review?.parent;
                   const userVote = user!.post_tag_votes.find(
                     vote => vote.post.id === tool?.id && vote.tag.id === tag.id,
@@ -78,6 +92,19 @@ export namespace PostReviewForm {
                     id: tag.id,
                     name: tag.name,
                     is_vote_positive: userVote?.is_vote_positive ?? null,
+                  };
+                }) ?? [],
+              review_tags:
+                props.review.review_tags.map(tag => {
+                  const tool = props.review?.parent;
+                  const userVote = user!.post_tag_votes.find(
+                    vote => vote.post.id === tool?.id && vote.tag.id === tag.id,
+                  );
+                  return {
+                    id: tag.id,
+                    name: tag.name,
+                    is_vote_positive: userVote?.is_vote_positive ?? null,
+                    label: tag.label,
                   };
                 }) ?? [],
               ...schemas.sharable.deserialize(props.review),
@@ -91,18 +118,20 @@ export namespace PostReviewForm {
               review_rating: null,
               review_importance: null,
               tags: [],
+              review_tags: [],
             },
       }),
     };
-    const isEditMode = Boolean(props.review);
 
     async function handleSubmit() {
       const isInvalid = !(await forms.review.trigger());
       if (isInvalid) {
+        toast.error("Invalid review form");
+        console.error(forms.review.formState.errors);
         return;
       }
 
-      if (isEditMode) {
+      if (isEditMode(props.review)) {
         await forms.review.handleSubmit(async reviewData => {
           const response = await mutateReview(reviewData);
           if (response.success) {
@@ -115,6 +144,7 @@ export namespace PostReviewForm {
       } else {
         const isInvalid = !(await forms.tool.trigger());
         if (isInvalid) {
+          toast.error("Tool form is invalid");
           return;
         }
 
@@ -123,6 +153,7 @@ export namespace PostReviewForm {
           review: forms.review.getValues(),
         };
 
+        // todo ! creates a PostTool duplicate if review below fails and user triesagain
         const { tags, alternatives, ...toolFields } = data.tool;
         const toolResponse = await mutateAndRefetchMountedQueries(
           graphql(`
@@ -132,14 +163,14 @@ export namespace PostReviewForm {
             input: {
               ...toolFields,
               // todo refac: move to schemas.abstract.serialize()
-              tags: tags ? tags.map(tag => ({ id: tag.id, name: tag.name })) : undefined,
+              tags: tags ? tags.map(tag => ({ id: tag.id, name: tag.name })) : undefined, // todo !(tags) call create_tags()
               alternatives: alternatives ? { set: alternatives.map(alt => alt.id) } : undefined,
             },
           },
         );
 
         if (!toolResponse.success) {
-          return toast.error(`Tool creation failed: ${toolResponse.error}`);
+          return toast.error(`Tool creation failed: ${toolResponse.errorMessage}`);
         }
 
         const response = await mutateReview({
@@ -155,9 +186,16 @@ export namespace PostReviewForm {
       }
     }
 
+    const state = {
+      review: forms.review.watch(),
+      tool: forms.tool.watch(),
+    };
+
     return (
       <VStack alignItems="flex-start" w="100%" gap="gap.lg">
-        <Heading fontSize="2xl">{isEditMode ? "Edit review" : "Add review"}</Heading>
+        <Heading fontSize="2xl">
+          {isEditMode(props.review) ? "Edit review" : "Add review"}
+        </Heading>
 
         <VStack asChild w="100%" alignItems="flex-start" gap="gap.xl">
           <form
@@ -166,24 +204,46 @@ export namespace PostReviewForm {
               await handleSubmit();
             }}
           >
-            {!isEditMode && (
-              <FormProvider {...forms.tool}>
-                <Fieldset.Root>
-                  <Fieldset.Legend fontSize="lg" color="fg.fieldset-title">
-                    Tool
-                  </Fieldset.Legend>
-                  <Fieldset.Content display="flex" gap="gap.md">
+            <FormProvider {...forms.tool}>
+              <Fieldset.Root>
+                {!isEditMode(props.review) && (
+                  <Fieldset.Legend fontSize="xl">Tool</Fieldset.Legend>
+                )}
+                <Fieldset.Content display="flex" gap="gap.md">
+                  {isEditMode(props.review) ? (
+                    <>
+                      <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">
+                        {props.review.parent.title}
+                      </Heading>
+                      <Show when={props.review.parent.content}>
+                        <Prose
+                          // biome-ignore lint/security/noDangerouslySetInnerHtml: cleaned by server
+                          dangerouslySetInnerHTML={{
+                            __html: marked.parse(props.review.parent.content),
+                          }}
+                          size="md"
+                          w="fit-content"
+                        />
+                      </Show>
+
+                      <SelectVotable
+                        fieldName="tags"
+                        isReadOnly={true}
+                        postId={props.review?.parent?.id}
+                        optionIdsHidden={state.review.tags.map(tag => tag.id)}
+                        {...ids.set(ids.post.form.tags.container)}
+                      />
+                    </>
+                  ) : (
                     <PostToolFields form={forms.tool} />
-                  </Fieldset.Content>
-                </Fieldset.Root>
-              </FormProvider>
-            )}
+                  )}
+                </Fieldset.Content>
+              </Fieldset.Root>
+            </FormProvider>
 
             <FormProvider {...forms.review}>
               <Fieldset.Root>
-                <Fieldset.Legend fontSize="lg" color="fg.fieldset-title">
-                  Review
-                </Fieldset.Legend>
+                <Fieldset.Legend fontSize="xl">Review</Fieldset.Legend>
 
                 <Fieldset.Content display="flex" gap="gap.lg">
                   <VStack gap="gap.lg" align="flex-start" maxW="full">
@@ -198,6 +258,17 @@ export namespace PostReviewForm {
                       label="Content"
                       isShowIconMarkdown
                       {...ids.set(ids.review.form.content)}
+                    />
+
+                    <SelectVotable
+                      fieldName="tags"
+                      label="Tool Tags"
+                      helpText={`Added to ${props.review?.parent?.title ?? "the Tool"} by your Review, and are shown before other ${props.review?.parent?.title ?? "Tool"}'s tags.`}
+                      postId={props.review?.parent?.id}
+                      onChange={optionsNew => {
+                        // todo feat(UX): if a user removes a tag that exists on parent.tags - add it to parent.tags Form
+                      }}
+                      {...ids.set(ids.review.form.tags)}
                     />
 
                     <VStack w="50%" gap="gap.lg">
@@ -222,31 +293,13 @@ export namespace PostReviewForm {
                       />
                     </VStack>
 
-                    {isEditMode && (
-                      <SelectVotable
-                        fieldName="tags"
-                        postId={props.review?.parent?.id}
-                        {...ids.set(ids.review.form.tags)}
-                      />
-                    )}
-
-                    {/* todo ! add field Post.review_tags */}
-                    {/*<SelectVotable fieldName="review_tags" label="Review tags" />*/}
-
-                    {/*<FormChakraSelect*/}
-                    {/*  form={form}*/}
-                    {/*  formRegister={form.register("importance")}*/}
-                    {/*  label="Importance"*/}
-                    {/*  fieldName="importance"*/}
-                    {/*  placeholder="How important is it?"*/}
-                    {/*  options={[*/}
-                    {/*    { label: "Extra low", value: Importance.ExtraLow },*/}
-                    {/*    { label: "Low", value: Importance.Low },*/}
-                    {/*    { label: "Medium", value: Importance.Medium },*/}
-                    {/*    { label: "High", value: Importance.High },*/}
-                    {/*    { label: "Urgent", value: Importance.Urgent },*/}
-                    {/*  ]}*/}
-                    {/*/>*/}
+                    <SelectVotable
+                      fieldName="review_tags"
+                      label="Assessment Traits"
+                      isReviewTags={true}
+                      postId={props.review?.id}
+                      {...ids.set(ids.review.form.review_tags)}
+                    />
 
                     <HStack justify="space-between" w="full" gap="gap.md">
                       <FormChakraSegmentControl
@@ -301,7 +354,7 @@ export namespace PostReviewForm {
                     {...ids.set(ids.post.btn.submit)}
                     size="lg"
                   >
-                    {isEditMode ? (
+                    {isEditMode(props.review) ? (
                       <>
                         <FiSave />
                         Save Review

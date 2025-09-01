@@ -30,6 +30,7 @@ export namespace ids {
             down: "post.form.tags.tag.vote.down",
           },
           comment: "post.form.tags.tag.comment",
+          remove: "post.form.tags.tag.remove",
         },
       },
     },
@@ -51,6 +52,7 @@ export namespace ids {
       usageStatus: "review.form.usageStatus",
       rating: "review.form.rating",
       tags: "review.form.tags",
+      review_tags: "review.form.review_tags",
     },
     tag: {
       container: "review.tag.container",
