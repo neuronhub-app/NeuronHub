@@ -12,7 +12,7 @@ from neuronhub.apps.posts.models import Post
 from neuronhub.apps.users.models import User
 
 
-async def filter_posts_by_user(
+def filter_posts_by_user(
     user: AbstractUser | AnonymousUser | AbstractBaseUser,
     posts: QuerySet[Post] | None = None,
 ) -> QuerySet[Post]:

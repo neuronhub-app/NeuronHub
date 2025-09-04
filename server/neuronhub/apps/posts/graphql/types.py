@@ -6,7 +6,6 @@ import strawberry
 import strawberry_django
 from django.db.models import QuerySet
 from strawberry import Info
-from strawberry import UNSET
 from strawberry import auto
 from strawberry_django.auth.utils import get_current_user
 
@@ -74,7 +73,7 @@ class PostTypeI:
         user = get_current_user(info)
         if hasattr(cls, "TYPE"):
             queryset = queryset.filter(type=cls.TYPE)
-        return async_to_sync(filter_posts_by_user)(user, posts=queryset)
+        return filter_posts_by_user(user, posts=queryset)
 
 
 @strawberry_django.type(Post, filters=PostFilter)
