@@ -6,7 +6,7 @@
   - [x] split PostReviewForm on sub field sets, add Zod `schemas.ts`
   - [x] Tool creation
   - [x] add `review.tags` logic
-  - [~] add `review.review_tags`
+  - [x] add `review.review_tags`
   - [ ] PostTool list
   - [ ] Post create/edit
   - [ ] Post.image field
@@ -24,8 +24,6 @@
 - [ ] API paginate
 - [ ] signup
 - [ ] pros/cons list indicator with icons
-- [ ] [post-form]
-  - [ ] `alternative` votes and comments
 
 ### v0.3.0.0 - Public Alpha
 

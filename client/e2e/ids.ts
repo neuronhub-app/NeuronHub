@@ -43,7 +43,7 @@ export namespace ids {
   } as const;
 
   export const review = {
-    // todo rename to `post.form`, ie the main Post form
+    // todo refac: join into `post.form`, ie the main Post form since it's a part of it
     form: {
       parentTitle: "review.form.parentTitle",
       title: "review.form.title",

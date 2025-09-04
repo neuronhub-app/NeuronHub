@@ -21,3 +21,4 @@ Example: `todo refac(auth): limit user access to other users`
 
 `<scope>` values see in the [git commit Scopes](/docs/git-commits.md#Scopes), eg:
 - `UX` - an annoyance, real or potential
+- `UI` - visual improvements

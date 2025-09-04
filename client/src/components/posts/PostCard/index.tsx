@@ -1,14 +1,25 @@
-import { Flex, Heading, HStack, IconButton, Show, Stack, Text, VStack } from "@chakra-ui/react";
+import {
+  Flex,
+  Heading,
+  HStack,
+  IconButton,
+  Show,
+  Stack,
+  Text,
+  VStack,
+  Wrap,
+} from "@chakra-ui/react";
 import { marked } from "marked";
 import { FaPenToSquare } from "react-icons/fa6";
 import { NavLink } from "react-router";
 import { useUser } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
+import { PostTags } from "@/components/posts/PostCard/PostTags";
+import { ReviewTagsWithVotes } from "@/components/posts/PostCard/ReviewTagsWithVotes";
 import { RatingBars } from "@/components/posts/PostReviewCard/RatingBars";
 import { ReviewTags } from "@/components/posts/PostReviewCard/ReviewTags";
 import { UsageStatusBlock } from "@/components/posts/PostReviewCard/UsageStatus";
-import { ToolTags } from "@/components/posts/ToolTags";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import { isReview } from "@/graphql/fragments/reviews";
@@ -89,13 +100,30 @@ export function PostCard(props: { post: PostListItemType }) {
         />
       </Show>
 
-      <Flex mt="gap.sm">
-        {isReview(post) ? (
-          <ToolTags tags={post.parent.tags} postId={post.parent.id} />
-        ) : (
-          <ToolTags tags={post.tags} postId={post.id} />
-        )}
-      </Flex>
+      <Stack mt="gap.sm" gap="gap.sm">
+        <Flex>
+          {isReview(post) ? (
+            <Wrap>
+              {post.tags.length !== 0 && (
+                <ReviewTagsWithVotes
+                  tags={post.tags}
+                  authorId={post.author.id}
+                  reviewId={post.id}
+                />
+              )}
+
+              <PostTags
+                tags={post.parent.tags}
+                tagsExcluded={post.tags.map(tag => tag.id)}
+                postId={post.parent.id}
+                isWrapChildren={false}
+              />
+            </Wrap>
+          ) : (
+            <PostTags tags={post.tags} postId={post.id} />
+          )}
+        </Flex>
+      </Stack>
     </Stack>
   );
 }
