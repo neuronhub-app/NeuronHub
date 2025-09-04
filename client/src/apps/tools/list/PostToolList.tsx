@@ -3,27 +3,27 @@ import { graphql } from "@/gql-tada";
 import { PostFragment } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 
-export function PostList() {
+export function PostToolList() {
   const { data, error, isLoadingFirstTime } = useApolloQuery(
     graphql(
       `
-				query PostList {
-					posts(filters: { type: { exact: Post } }) {
-						...PostFragment
-					}
-				}
-			`,
+        query ToolList {
+          post_tools(filters: {}) {
+            ...PostFragment
+          }
+        }
+      `,
       [PostFragment],
     ),
   );
 
   // @ts-expect-error #bad-infer
-  const posts: PostListItemType[] = data?.posts ?? [];
+  const posts: PostListItemType[] = data?.post_tools ?? [];
   return (
     <ListContainer
-      title="Posts"
+      title="Tools"
       items={posts}
-      urlNamespace="posts"
+      urlNamespace="tools"
       isLoadingFirstTime={isLoadingFirstTime}
       error={error}
     />

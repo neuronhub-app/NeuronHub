@@ -72,7 +72,10 @@ export default [
       route("/:id", "./apps/posts/detail/index.tsx"),
       route(`/:id/${op.edit}`, "./apps/posts/edit/index.tsx"),
     ]),
-    ...prefix(urls.tools.list, [route(`/${op.create}`, "./apps/tools/create/index.tsx")]),
+    ...prefix(urls.tools.list, [
+      route("/", "./apps/tools/list/index.tsx"),
+      route(`/${op.create}`, "./apps/tools/create/index.tsx"),
+    ]),
     ...prefix(urls.user.settings.detail, [
       layout("./apps/users/settings/UserSettingsLayout.tsx", [
         route("/profile", "./apps/users/settings/profile/index.tsx"),

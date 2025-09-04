@@ -31,7 +31,7 @@ export type PostListItemType = PostFragmentType | PostReviewFragmentType;
 export function ListContainer(props: {
   title: string;
   items: Array<PostListItemType>;
-  urlNamespace: "reviews" | "posts";
+  urlNamespace: "reviews" | "posts" | "tools";
   isLoadingFirstTime: boolean;
   error?: Error | null;
   children?: ReactNode;

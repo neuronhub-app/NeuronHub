@@ -11,6 +11,7 @@ import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
 
+// todo !(review): compare to PostReviewForm and how it needs to be updated after #44 was implemented
 export namespace PostToolForm {
   export const strs = {
     toolCreated: "Tool added",
