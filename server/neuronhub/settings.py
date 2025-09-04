@@ -259,19 +259,12 @@ LOGGING = {
         "level": "INFO",
     },
 }
-# in E2E Mise `--quite` doesn't work on runserver, and `--silent` drops stderr; so we drop logs except errors #AI
 if E2E_TEST:
-    LOGGING["handlers"]["null"] = {"class": "logging.NullHandler"}
+    # Mise's `--quite` doesn't work on `runserver`, and `--silent` drops all stderr - so we set django to WARNING instead of INFO
     LOGGING["loggers"] = {
-        "django.server": {
-            "handlers": ["null"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        # keep stderr
         "django": {
             "handlers": ["console"],
-            "level": "ERROR",
+            "level": "WARNING",
             "propagate": True,
         },
     }
@@ -281,9 +274,9 @@ rich.traceback.install(
     width=_line_width,  # max-width=100vw, so who cares
     code_width=_line_width,
     show_locals=True,
-    locals_max_length=1,  # crop vars to 1 newline, eg cls
+    locals_max_length=1,  # crop 1 newline, eg cls
     locals_max_string=_line_width,
-    suppress=[django],  # hide Dango's locals - it's too verbose
+    suppress=[django],  # too verbose
 )
 
 
