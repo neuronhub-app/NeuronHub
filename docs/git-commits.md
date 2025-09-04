@@ -65,6 +65,12 @@ Some `Scope`s are bound to a single `Type`, eg `build(AI)`.
 - `roadmap` - `docs/roadmap/*`
 - `{file name without the ".md" extension}`
 
+### Tags
+
+Added at the end of a commit first line.
+
+- `#AI-slop` - eg removing nonsensual code that slipped the review
+
 ### Text style
 
 First noun, then verb.
