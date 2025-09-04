@@ -152,9 +152,6 @@ async def _create_review_pycharm(user: User, gen: Gen):
         reviewed_at=timezone.now(),
         visibility=Visibility.PUBLIC,
     )
-    tag_web_dev = "Dev / Web Development"
-    tag_django = "Dev / Django"
-    tag_kotlin = "Dev / Kotlin"
     await _create_tags(
         post=pycharm,
         author=await gen.users.user(username=users.random_1, is_get_or_create=True),
@@ -162,9 +159,9 @@ async def _create_review_pycharm(user: User, gen: Gen):
             TagParams("Software / IDE", is_important=True),
             TagParams("Dev / TypeScript"),
             TagParams("Dev / Database"),
-            TagParams(tag_kotlin),
-            TagParams(tag_web_dev, is_vote_pos=True),
-            TagParams(tag_django),
+            TagParams(tags.kotlin),
+            TagParams(tags.web_dev, is_vote_pos=True),
+            TagParams(tags.django),
             TagParams("Dev / JavaScript"),
             TagParams("Dev / JetBrains", is_important=True),
             TagParams("Dev / Java"),
@@ -177,7 +174,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
         post=pycharm,
         author=user,
         params=[
-            TagParams(tag_kotlin, is_vote_pos=True),
+            TagParams(tags.kotlin, is_vote_pos=True),
         ],
     )
     await _create_tags(
@@ -185,8 +182,8 @@ async def _create_review_pycharm(user: User, gen: Gen):
         author=user,
         params=[
             # repeat tags
-            TagParams(tag_web_dev, is_vote_pos=True),
-            TagParams(tag_django, is_vote_pos=True),
+            TagParams(tags.web_dev, is_vote_pos=True),
+            TagParams(tags.django, is_vote_pos=True),
             TagParams("Dev / Open Source Core"),
             TagParams("Dev / Python", is_vote_pos=True),
         ],
@@ -239,7 +236,7 @@ async def _create_review_iterm(user: User, gen: Gen):
             TagParams("Dev / License / GPL v2", is_vote_pos=True, is_important=True),
             TagParams("Dev / CLI"),
             TagParams("OS / Linux", is_vote_pos=False, is_important=True),
-            TagParams("OS / macOS", is_important=True),
+            TagParams(tags.macos, is_important=True),
         ],
     )
 
@@ -260,6 +257,11 @@ async def _create_review_iterm(user: User, gen: Gen):
         review_experience_hours=7_000,
         reviewed_at=timezone.now() - datetime.timedelta(days=10),
         visibility=Visibility.PUBLIC,
+    )
+    await _create_tags(
+        post=review,
+        author=user,
+        params=[TagParams(tags.macos, is_vote_pos=True)],
     )
     await gen.posts.create(
         gen.posts.Params(
@@ -304,7 +306,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
         params=[
             TagParams("Software / Terminal emulator", is_vote_pos=True),
             TagParams("OS / Linux", is_vote_pos=True),
-            TagParams("OS / macOS", is_vote_pos=True),
+            TagParams(tags.macos, is_vote_pos=True),
             TagParams("Dev / Zig"),
             TagParams("Dev / Swift"),
             TagParams("Dev / License / MIT", is_important=True),
@@ -455,3 +457,12 @@ async def _create_review_tags(review: Post, params: list[ReviewTagParams]):
         ]
     )
     await review.review_tags.aadd(*tags)
+
+
+class tags:
+    macos = "OS / macOS"
+    django = "Dev / Django"
+    web_dev = "Dev / Web Development"
+    python = "Dev / Python"
+    jetbrains = "Dev / JetBrains"
+    kotlin = "Dev / Kotlin"
