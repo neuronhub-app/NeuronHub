@@ -34,8 +34,8 @@ _meta_model = "posttag"
 
 class PostTagInline(admin.TabularInline):
     """
-    weird django thing - it creates a meta-level `Post_tags` (posttag [[_meta_model]]) model
-    when it's a M2M through inline
+    Weird Django: creates a meta-level `Post_tags` model (posttag [[_meta_model]])
+    for M2M through admin.*Inlines pages.
     """
 
     model = Post.tags.through
@@ -46,10 +46,9 @@ class PostTagInline(admin.TabularInline):
     fields = [
         _meta_model,
         "name",
-        "is_important",
+        "is_vote_positive",
         "author",
-        "description",
-        "is_review_tag",
+        "is_important",
     ]
     raw_id_fields = [_meta_model]
 
@@ -59,10 +58,20 @@ class PostTagInline(admin.TabularInline):
     ordering = [f"-{_meta_model}__is_important", f"-{_meta_model}__created_at"]
 
     def name(self, obj):
-        return str(obj.posttag)
+        return str(obj.posttag.label)
 
     def is_important(self, obj):
-        return obj.posttag.is_important
+        if obj.posttag.is_important:
+            return "⭐"
+        else:
+            return ""
+
+    @admin.display(description="vote")
+    def is_vote_positive(self, obj):
+        if vote := obj.posttag.votes.filter(author=obj.post.author).first():
+            return vote.is_vote_positive
+        else:
+            return "-"
 
     def author(self, obj):
         return obj.posttag.author.username
@@ -83,10 +92,18 @@ class PostTagInline(admin.TabularInline):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
+        # not tested, might be making perf worse
         return qs.select_related(
             f"{_meta_model}__author",  # for [[PostTagInline#author]]
             f"{_meta_model}__tag_parent",  # for [[PostTagInline#name]]
+        ).prefetch_related(
+            f"{_meta_model}__votes",  # for [[PostTagInline#is_vote_positive]]
         )
+
+
+class PostReviewTagInline(PostTagInline):
+    model = Post.review_tags.through  # type: ignore
+    verbose_name = "Review Tag"
 
 
 class PostVoteInline(admin.TabularInline):
@@ -123,6 +140,7 @@ class ToolCompanyAdmin(admin.ModelAdmin):
 class PostAdmin(SimpleHistoryAdmin):
     inlines = [
         PostTagInline,
+        PostReviewTagInline,
         PostVoteInline,
     ]
 
