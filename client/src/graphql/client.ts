@@ -1,5 +1,6 @@
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
+import { RemoveTypenameFromVariablesLink } from "@apollo/client/link/remove-typename";
 import { env } from "@/env";
 
 export const client = createApolloClient();
@@ -24,6 +25,7 @@ function createApolloClient() {
       enabled: env.isDev,
     },
     link: ApolloLink.from([
+      new RemoveTypenameFromVariablesLink(), // Apollo force-adds .__typename everywhere -> gql.tada can't see it until runtime crashes
       new HttpLink({
         uri: env.VITE_SERVER_URL_API,
         credentials: "include",

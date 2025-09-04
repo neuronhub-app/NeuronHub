@@ -13,13 +13,14 @@ import typing
 from strawberry import UNSET
 
 from neuronhub.apps.posts.models import Post, PostRelated
-from neuronhub.apps.posts.services.create_tag import create_tag
+from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 from neuronhub.apps.users.models import User
 
 if typing.TYPE_CHECKING:
-    from neuronhub.apps.posts.graphql.types import PostTypeInput
+    from neuronhub.apps.posts.graphql.types import PostTypeInput, PostTagTypeInput
 
 
+# todo refac-name: review_create_or_update
 async def post_review_create_or_update(author: User, data: PostTypeInput) -> Post:
     field_values = {}
     for field, value in [
@@ -56,9 +57,7 @@ async def post_review_create_or_update(author: User, data: PostTypeInput) -> Pos
             **field_values,
         )
 
-    await _create_review_tags_and_update_post_tags(
-        data=data, post=post, post_review=post_review, author=author
-    )
+    await _tags_create_or_update(data=data, post=post, post_review=post_review, author=author)
 
     if data.alternatives:
         await PostRelated.objects.abulk_create(
@@ -71,30 +70,35 @@ async def post_review_create_or_update(author: User, data: PostTypeInput) -> Pos
     return post_review
 
 
-async def _create_review_tags_and_update_post_tags(
+async def _tags_create_or_update(
     data: PostTypeInput, post: Post, post_review: Post, author: User
 ):
-    if not data.tags:
-        return
+    if data.tags:
+        tags = [await _tag_create_or_update(tag_input, post, author) for tag_input in data.tags]
+        await post_review.tags.aset(tags)
 
-    post_review_tags = []
-    for tag_input in data.tags:
-        tag = await create_tag(
-            name_raw=tag_input.name,
-            post=post,
-            author=author,
-            is_vote_positive=_prase_field(tag_input.is_vote_positive),
-            is_important=_prase_field(tag_input.is_important),
-            comment=tag_input.comment if tag_input.comment else "",
-        )
-        post_review_tags.append(tag)
-    await post_review.tags.aset(post_review_tags)
+        # ensure parent.tags ⊇ post_review.tags
+        post_tags = [tag async for tag in post.tags.all()]
+        post_tags.extend(tags)
+        await post.tags.aset(post_tags)
 
-    # ensure parent.tags ⊇ post_review.tags
-    post_tags = [tag async for tag in post.tags.all()]
-    post_tags.extend(post_review_tags)
-    await post.tags.aset(post_tags)
+    if data.review_tags:
+        review_tags = [
+            await _tag_create_or_update(tag_input, post_review, author, is_review_tag=True)
+            for tag_input in data.review_tags
+        ]
+        await post_review.review_tags.aset(review_tags)
 
 
-def _prase_field[T](field: T | None | UNSET) -> T | None:
-    return field if field is not UNSET else None
+async def _tag_create_or_update(
+    tag_input: PostTagTypeInput, post: Post, author: User, is_review_tag=False
+):
+    return await tag_create_or_update(
+        name_raw=tag_input.name,
+        post=post,
+        author=author,
+        is_vote_positive=tag_input.is_vote_positive,  # Pass UNSET/None/bool directly
+        comment=tag_input.comment if tag_input.comment else "",
+        is_review_tag=is_review_tag,
+        is_important=tag_input.is_important if tag_input.is_important is not UNSET else None,
+    )

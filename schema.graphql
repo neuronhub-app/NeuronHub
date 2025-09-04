@@ -90,6 +90,7 @@ type Mutation {
   post_review_create_or_update(data: PostTypeInput!): PostType! @IsAuthenticated
   create_post_comment(data: PostTypeInput!): PostCommentType! @IsAuthenticated
   create_or_update_post_vote(id: ID!, is_vote_positive: Boolean, is_changed_my_mind: Boolean = null): Boolean! @IsAuthenticated
+  post_tag_vote_create_or_update(post_id: ID!, tag_id: ID!, is_vote_positive: Boolean, comment: String = null): Boolean! @IsAuthenticated
   update_post_seen_status(id: ID!): Boolean! @IsAuthenticated
   test_db_stubs_repopulate: String!
 }
@@ -198,9 +199,7 @@ type PostTagType {
   id: ID!
   posts(filters: PostFilter): [PostType!]!
   tag_parent: PostTagType
-  tag_parent_field: PostTagType
   tag_children(filters: PostTagFilter): [PostTagType!]!
-  tag_children_field: [PostTagType!]!
   votes: [PostTagVoteType!]!
   author: UserType!
   name: String!
@@ -214,8 +213,10 @@ input PostTagTypeInput {
   name: String!
   id: ID
   comment: String
+  is_review_tag: Boolean
   is_vote_positive: Boolean
   is_important: Boolean
+  tag_parent: PostTagTypeInput
 }
 
 type PostTagVoteType {

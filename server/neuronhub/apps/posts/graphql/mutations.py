@@ -12,7 +12,7 @@ from neuronhub.apps.posts.graphql.types import PostCommentType
 from neuronhub.apps.posts.graphql.types import PostType
 from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.models import Post
-from neuronhub.apps.posts.models.posts import PostVote
+from neuronhub.apps.posts.models.posts import PostVote, PostTagVote
 from neuronhub.apps.posts.services.post_review_create_or_update import (
     post_review_create_or_update,
 )
@@ -86,6 +86,7 @@ class PostsMutation:
 
         return cast(PostCommentType, comment)
 
+    # todo refac-name: post_vote_create_or_update
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def create_or_update_post_vote(
         self,
@@ -100,6 +101,26 @@ class PostsMutation:
             defaults={
                 "is_vote_positive": is_vote_positive,
                 "is_changed_my_mind": is_changed_my_mind,
+            },
+        )
+        return True
+
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def post_tag_vote_create_or_update(
+        self,
+        post_id: strawberry.ID,
+        tag_id: strawberry.ID,
+        is_vote_positive: bool | None,
+        info: Info,
+        comment: str | None = None,
+    ) -> bool:
+        await PostTagVote.objects.aupdate_or_create(
+            post_id=post_id,
+            tag_id=tag_id,
+            author=info.context.request.user,
+            defaults={
+                "is_vote_positive": is_vote_positive,
+                "comment": comment or "",
             },
         )
         return True

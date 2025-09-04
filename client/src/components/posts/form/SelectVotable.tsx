@@ -11,9 +11,10 @@ import { AsyncCreatableSelect, components } from "chakra-react-select";
 import type { MessageSquarePlus } from "lucide-react";
 import { type ReactNode, useRef } from "react";
 import { useFormContext } from "react-hook-form";
+import toast from "react-hot-toast";
 import { FaMessage, FaRegMessage } from "react-icons/fa6";
 import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
-import { useUser } from "@/apps/users/useUserCurrent";
+
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import type { schemas } from "@/components/posts/form/schemas";
 import {
@@ -28,7 +29,8 @@ import {
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
-import { useInit } from "@/utils/useInit";
+import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { useIsLoading } from "@/utils/useIsLoading";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 // Post.tags, .review_tags, .alternatives
@@ -45,56 +47,33 @@ export interface SelectVotableOption {
 
 export type SelectVotableField = "tags" | "review_tags"; // will add `.alternatives` later
 
-export function SelectVotable(props: {
-  isAllowCreate?: boolean;
-  fieldName: SelectVotableField;
-  label?: string;
-  helpText?: string;
-  isReviewTags?: boolean; // see docs [[PostTag#is_review_tag]]
-  postId?: ID;
-  isReadOnly?: boolean;
-  optionIdsHidden?: ID[];
-  onChange?: (options: SelectVotableOption[]) => void;
-  "data-testid"?: string;
-}) {
-  // todo fix(types): assertion
+export function SelectVotable(
+  props: {
+    isAllowCreate?: boolean;
+    fieldName: SelectVotableField;
+    label?: string;
+    helpText?: string;
+    isReviewTags?: boolean; // see docs [[PostTag#is_review_tag]]
+    optionIdsHidden?: ID[];
+    onChange?: (options: SelectVotableOption[]) => void;
+    "data-testid"?: string;
+  } & (
+    | { postId?: ID; isSelectReadOnlyInReviewForm?: false }
+    | { postId: ID; isSelectReadOnlyInReviewForm: true }
+  ),
+) {
+  // todo refac(types): assertion
   // const form = schemas.useFormContextAbstract([props.fieldName]);
   const form: schemas.ReviewForm = useFormContext();
+
   const optionIdsHidden = props.optionIdsHidden ?? [];
-  const options = form
-    .watch(props.fieldName)
-    .filter(option => !optionIdsHidden.includes(option.id));
-  const fieldError = form.formState.errors[props.fieldName];
-  const user = useUser();
+  const options = form.watch(props.fieldName).filter(opt => !optionIdsHidden.includes(opt.id));
 
   const commentInputRef = useRef<HTMLInputElement>(null);
 
   const state = useValtioProxyRef({
     isDialogOpen: false,
     optionSelected: null as SelectVotableOption | null,
-  });
-
-  useInit({
-    isBlocked: !props.postId || !user?.post_tag_votes || !options,
-    init: () => {
-      const optionsWithVotes = options
-        .filter(option => !optionIdsHidden.includes(option.id))
-        .map(option => {
-          const userVote = user!.post_tag_votes.find(
-            vote => vote.post.id === props.postId && vote.tag.id === option.id,
-          );
-          if (userVote) {
-            return { ...option, is_vote_positive: userVote.is_vote_positive };
-          }
-          return option;
-        });
-
-      // #AI looks idiotic
-      if (JSON.stringify(options) !== JSON.stringify(optionsWithVotes)) {
-        form.setValue(props.fieldName, optionsWithVotes);
-      }
-    },
-    deps: [props.postId, user?.post_tag_votes, options?.length],
   });
 
   function getOptionIndex(option: SelectVotableOption): number {
@@ -105,6 +84,11 @@ export function SelectVotable(props: {
     const optionNumber = getOptionIndex(option);
     return options[optionNumber]?.comment ?? "";
   }
+
+  const isSelectReadOnlyInReviewForm = Boolean(
+    props.isSelectReadOnlyInReviewForm && props.postId,
+  );
+  const fieldError = form.formState.errors[props.fieldName];
 
   return (
     <Field.Root invalid={!!fieldError} minW="50%" data-testid={props["data-testid"]}>
@@ -120,18 +104,18 @@ export function SelectVotable(props: {
           defaultOptions
           isMulti
           isClearable={false}
-          isSearchable={!props.isReadOnly}
-          openMenuOnClick={!props.isReadOnly}
+          isSearchable={!isSelectReadOnlyInReviewForm}
+          openMenuOnClick={!isSelectReadOnlyInReviewForm}
           closeMenuOnSelect={false}
           value={options.filter(option => !optionIdsHidden.includes(option.id))}
           onChange={(optionsNew, _) => {
-            // @ts-expect-error #bad-infer, also erroring re ReadOnly<T> makes no sense here
+            // @ts-expect-error #bad-infer + ReadOnly<T> error makes no sense
             props.onChange?.(optionsNew);
 
             form.setValue(
               props.fieldName,
               optionsNew.map(optionNew => {
-                // stop react-select from re-creating `Option` and loosing attributes of [[SelectVotableOption]]
+                // stop react-select from re-creating `Option` and loosing [[SelectVotableOption]] attrs
                 const option = options?.find(opt => opt.id === optionNew.id);
                 return option ?? optionNew;
               }),
@@ -139,7 +123,7 @@ export function SelectVotable(props: {
           }}
           getNewOptionData={(input: string) => ({ id: input, name: input, label: input })}
           loadOptions={async (input: string) => {
-            // todo UX: throttle
+            // todo perf(UX): throttle
             const response = await client.query({
               query: graphql(`
 								query ToolTagsQuery($name: String, $is_review_tag: Boolean!) {
@@ -170,7 +154,7 @@ export function SelectVotable(props: {
           getOptionLabel={option => option.label ?? option.name}
           getOptionValue={option => option.name}
           components={{
-            MultiValueRemove: props.isReadOnly
+            MultiValueRemove: isSelectReadOnlyInReviewForm
               ? () => null
               : propsRemove => (
                   <components.MultiValueRemove
@@ -188,14 +172,18 @@ export function SelectVotable(props: {
                       isPositive={true}
                       option={propsMultiVal.data}
                       options={options}
-                      fieldName={props.fieldName}
+                      onChange={({ optsUpdated }) => form.setValue(props.fieldName, optsUpdated)}
+                      postId={props.postId}
+                      isSelectReadOnlyInReviewForm={isSelectReadOnlyInReviewForm}
                       data-testid={ids.post.form.tags.tag.vote.up}
                     />
                     <VoteButton
                       isPositive={false}
                       option={propsMultiVal.data}
                       options={options}
-                      fieldName={props.fieldName}
+                      onChange={({ optsUpdated }) => form.setValue(props.fieldName, optsUpdated)}
+                      postId={props.postId}
+                      isSelectReadOnlyInReviewForm={isSelectReadOnlyInReviewForm}
                       data-testid={ids.post.form.tags.tag.vote.down}
                     />
                     <OptionButton
@@ -264,43 +252,63 @@ export function SelectVotable(props: {
 function VoteButton(props: {
   option: SelectVotableOption;
   options: SelectVotableOption[];
-  fieldName: SelectVotableField;
+  postId?: ID;
+  onChange: (args: { optsUpdated: SelectVotableOption[] }) => void;
   isPositive: boolean;
+  isSelectReadOnlyInReviewForm: boolean;
   "data-testid": string;
 }): ReactNode {
-  const form = useFormContext<schemas.Tool | schemas.PostAbstract | schemas.Review>();
+  const loading = useIsLoading();
 
-  function onVoteButtonClick(): void {
-    const optionOld = props.options.find(opt => opt.name === props.option.name)!;
-    const optionNew = toggleVoteValue(optionOld, props.isPositive);
-    const optionsNew = props.options.map(opt =>
-      opt.name === props.option.name ? optionNew : opt,
-    );
-    form.setValue(props.fieldName, optionsNew);
+  async function onVoteButtonClick() {
+    const optionOld = props.options.find(opt => opt.id === props.option.id)!;
+    const isUserCancellingVote = props.isPositive === optionOld.is_vote_positive;
+    const optionUpdated = {
+      ...optionOld,
+      is_vote_positive: isUserCancellingVote ? null : props.isPositive,
+    };
+    props.onChange({
+      optsUpdated: props.options.map(opt => (opt.id === props.option.id ? optionUpdated : opt)),
+    });
+
+    const isMutateImmediately = props.isSelectReadOnlyInReviewForm;
+    if (isMutateImmediately) {
+      await loading.track(() =>
+        mutatePostTagVote({
+          optionNew: optionUpdated,
+          // @ts-expect-error #bad-infer
+          postId: props.postId,
+        }),
+      );
+    }
   }
 
-  const isButtonActive = props.options.some(
-    option => option.name === props.option.name && option.is_vote_positive === props.isPositive,
+  const isUserVoted = props.options.some(
+    option => option.is_vote_positive === props.isPositive && option.id === props.option.id,
   );
   let icon: typeof MdOutlineThumbUp;
   if (props.isPositive) {
     icon = MdOutlineThumbUp;
-    if (isButtonActive) {
+    if (isUserVoted) {
       icon = MdThumbUp;
     }
   } else {
     icon = MdOutlineThumbDown;
-    if (isButtonActive) {
+    if (isUserVoted) {
       icon = MdThumbDown;
     }
   }
   return (
     <OptionButton
-      color={isButtonActive ? (props.isPositive ? "green.fg" : "red.fg") : "gray.500"}
+      color={isUserVoted ? (props.isPositive ? "green.fg" : "red.fg") : "gray.500"}
       onClick={onVoteButtonClick}
       icon={icon}
+      isLoading={loading.isActive}
       data-testid={props["data-testid"]}
-      data-is-vote-positive={isButtonActive && props.isPositive}
+      // todo refac: remove or simplify or make clear it's for E2E #AI
+      data-is-vote-positive={isUserVoted && props.isPositive}
+      data-is-active={isUserVoted}
+      data-vote-type={props.isPositive ? "up" : "down"}
     />
   );
 }
@@ -310,8 +318,11 @@ export function OptionButton(props: {
   onClick: () => void;
   iconSize?: IconProps["fontSize"];
   color?: IconProps["color"];
+  isLoading?: boolean;
   "data-testid": string;
   "data-is-vote-positive"?: boolean;
+  "data-is-active"?: boolean;
+  "data-vote-type"?: string;
 }) {
   return (
     <IconButton
@@ -323,8 +334,12 @@ export function OptionButton(props: {
       variant="ghost"
       _hover={{ bg: "gray.subtle" }}
       colorPalette="gray"
+      loading={props.isLoading}
+      disabled={props.isLoading}
       data-testid={props["data-testid"]}
       data-is-vote-positive={props["data-is-vote-positive"]}
+      data-is-active={props["data-is-active"]}
+      data-vote-type={props["data-vote-type"]}
     >
       <Icon fontSize={props.iconSize}>
         <props.icon />
@@ -333,13 +348,24 @@ export function OptionButton(props: {
   );
 }
 
-function toggleVoteValue(option: SelectVotableOption, isPositive: boolean): SelectVotableOption {
-  if (
-    (isPositive && option.is_vote_positive === true) ||
-    (!isPositive && option.is_vote_positive === false)
-  ) {
-    return { ...option, is_vote_positive: null };
+async function mutatePostTagVote(opts: { postId: ID; optionNew: SelectVotableOption }) {
+  const response = await mutateAndRefetchMountedQueries(
+    graphql(`
+			mutation CreateOrUpdatePostTagVote( $post_id: ID! $tag_id: ID! $is_vote_positive: Boolean ) {
+				post_tag_vote_create_or_update(
+					post_id: $post_id
+					tag_id: $tag_id
+					is_vote_positive: $is_vote_positive
+				)
+			}
+		`),
+    {
+      post_id: opts.postId,
+      tag_id: opts.optionNew.id,
+      is_vote_positive: opts.optionNew.is_vote_positive,
+    },
+  );
+  if (!response.success) {
+    toast.error(`Vote failed: ${response.errorMessage}`);
   }
-
-  return { ...option, is_vote_positive: isPositive };
 }

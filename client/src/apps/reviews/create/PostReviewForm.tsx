@@ -44,7 +44,7 @@ export namespace PostReviewForm {
     const user = useUser();
     const loading = useIsLoading();
 
-    // todo UX: fix broken `reValidateMode: "onChange"` - after refactor to 2 forms validates only on <button type="submit"> click
+    // todo refac(UX): fix broken `reValidateMode: "onChange"` - after refactor to 2 forms validates only on <button type="submit"> click
     const forms = {
       tool: useForm<schemas.Tool>({
         resolver: zodResolver(schemas.Tool),
@@ -53,19 +53,7 @@ export namespace PostReviewForm {
           id: null,
           title: "",
           tool_type: "Program",
-          tags: props.review
-            ? (props.review.parent?.tags?.map(tag => {
-                const tool = props.review?.parent;
-                const userVote = user!.post_tag_votes.find(
-                  vote => vote.post.id === tool?.id && vote.tag.id === tag.id,
-                );
-                return {
-                  id: tag.id,
-                  name: tag.name,
-                  is_vote_positive: userVote?.is_vote_positive ?? null,
-                };
-              }) ?? [])
-            : [],
+          tags: loadTags(props.review?.parent?.tags),
         },
       }),
       review: useForm<schemas.Review>({
@@ -85,31 +73,8 @@ export namespace PostReviewForm {
               reviewed_at: formatISO(new Date(props.review.reviewed_at), {
                 representation: "date",
               }),
-              tags:
-                props.review.tags.map(tag => {
-                  const tool = props.review?.parent;
-                  const userVote = user!.post_tag_votes.find(
-                    vote => vote.post.id === tool?.id && vote.tag.id === tag.id,
-                  );
-                  return {
-                    id: tag.id,
-                    name: tag.name,
-                    is_vote_positive: userVote?.is_vote_positive ?? null,
-                  };
-                }) ?? [],
-              review_tags:
-                props.review.review_tags.map(tag => {
-                  const tool = props.review?.parent;
-                  const userVote = user!.post_tag_votes.find(
-                    vote => vote.post.id === tool?.id && vote.tag.id === tag.id,
-                  );
-                  return {
-                    id: tag.id,
-                    name: tag.name,
-                    is_vote_positive: userVote?.is_vote_positive ?? null,
-                    label: tag.label,
-                  };
-                }) ?? [],
+              tags: loadTags(props.review.tags),
+              review_tags: loadTags(props.review.review_tags, { isReviewTags: true }),
               ...schemas.sharable.deserialize(props.review),
             }
           : {
@@ -126,12 +91,32 @@ export namespace PostReviewForm {
       }),
     };
 
+    function loadTags(tags?: schemas.PostAbstract["tags"], opts?: { isReviewTags: true }) {
+      if (!tags) {
+        return [];
+      }
+      return tags.map(tag => {
+        const userTagVote = user!.post_tag_votes.find(vote => {
+          const isThisPostVote = [props.review?.id, props.review?.parent?.id].includes(
+            vote.post.id,
+          );
+          return isThisPostVote && vote.tag.id === tag.id;
+        });
+        return {
+          id: tag.id,
+          name: tag.name,
+          is_vote_positive: userTagVote?.is_vote_positive ?? null,
+          // non-review_tags .label includes all `tag_parent.name`s - verbose af
+          label: opts?.isReviewTags && tag.label,
+        };
+      });
+    }
+
     async function handleSubmit() {
       const isInvalid = !(await forms.review.trigger());
       if (isInvalid) {
-        toast.error("Invalid review form");
         console.error(forms.review.formState.errors);
-        return;
+        return toast.error("Invalid review form");
       }
 
       if (isEditMode(props.review)) {
@@ -147,8 +132,7 @@ export namespace PostReviewForm {
       } else {
         const isInvalid = !(await forms.tool.trigger());
         if (isInvalid) {
-          toast.error("Tool form is invalid");
-          return;
+          return toast.error("Tool form is invalid");
         }
 
         const data = {
@@ -160,8 +144,8 @@ export namespace PostReviewForm {
         const { tags, alternatives, ...toolFields } = data.tool;
         const toolResponse = await mutateAndRefetchMountedQueries(
           graphql(`
-              mutation CreateToolForReview($input: PostTypeInput!) { create_post(data: $input) { id } }
-            `),
+						mutation CreateToolForReview($input: PostTypeInput!) { create_post(data: $input) { id } }
+					`),
           {
             input: {
               ...toolFields,
@@ -231,7 +215,7 @@ export namespace PostReviewForm {
 
                       <SelectVotable
                         fieldName="tags"
-                        isReadOnly={true}
+                        isSelectReadOnlyInReviewForm={true}
                         postId={props.review?.parent?.id}
                         optionIdsHidden={state.review.tags.map(tag => tag.id)}
                         {...ids.set(ids.post.form.tags.container)}

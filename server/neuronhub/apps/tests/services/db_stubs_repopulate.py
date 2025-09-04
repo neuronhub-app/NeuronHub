@@ -20,7 +20,7 @@ from neuronhub.apps.posts.models.posts import PostVote
 from neuronhub.apps.tests.test_gen import Gen, UsersGen
 from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
-from neuronhub.apps.posts.services.create_tag import create_tag
+from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 from neuronhub.apps.users.models import User, UserConnectionGroup
 
 
@@ -143,7 +143,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
             - Git UI and shortcuts
             - JS/TS integration performance has been improving, but still not as good as VS Code
             - Bugs are frequent. Less than in VS Code, but still a lot
-            """
+            """.strip()
         ),
         review_usage_status=UsageStatus.USING,
         review_rating=67,
@@ -154,14 +154,15 @@ async def _create_review_pycharm(user: User, gen: Gen):
     )
     tag_web_dev = "Dev / Web Development"
     tag_django = "Dev / Django"
+    tag_kotlin = "Dev / Kotlin"
     await _create_tags(
         post=pycharm,
         author=await gen.users.user(username=users.random_1, is_get_or_create=True),
         params=[
             TagParams("Software / IDE", is_important=True),
-            TagParams("Dev / Kotlin"),
             TagParams("Dev / TypeScript"),
             TagParams("Dev / Database"),
+            TagParams(tag_kotlin),
             TagParams(tag_web_dev, is_vote_pos=True),
             TagParams(tag_django),
             TagParams("Dev / JavaScript"),
@@ -170,6 +171,13 @@ async def _create_review_pycharm(user: User, gen: Gen):
             TagParams("Business / Subscription"),
             TagParams("Business / Paid"),
             TagParams("Business / Free Trial"),
+        ],
+    )
+    await _create_tags(
+        post=pycharm,
+        author=user,
+        params=[
+            TagParams(tag_kotlin, is_vote_pos=True),
         ],
     )
     await _create_tags(
@@ -184,7 +192,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
         ],
     )
     await _create_review_tags(
-        post=review,
+        review=review,
         params=[
             ReviewTagParams(ReviewTagName.stability, is_vote_pos=False),
             ReviewTagParams(ReviewTagName.value, is_vote_pos=True),
@@ -244,7 +252,7 @@ async def _create_review_iterm(user: User, gen: Gen):
             """
             - Fast native render (Objective-C/Swift)
             - no extra features, like history/fish/llm/etc
-            """
+            """.strip()
         ),
         review_usage_status=UsageStatus.USING,
         review_rating=75,
@@ -263,7 +271,7 @@ async def _create_review_iterm(user: User, gen: Gen):
     )
 
     await _create_review_tags(
-        post=review,
+        review=review,
         params=[
             ReviewTagParams(ReviewTagName.open_source, is_vote_pos=True),
             ReviewTagParams(ReviewTagName.stability, is_vote_pos=True),
@@ -315,7 +323,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
     comment = await gen.posts.comment(parent=review, author=user)
     await gen.posts.comment(parent=comment, author=user)
     await _create_review_tags(
-        post=review,
+        review=review,
         params=[
             ReviewTagParams(ReviewTagName.expectations, is_vote_pos=True),
         ],
@@ -412,9 +420,9 @@ class TagParams:
 
 
 async def _create_tags(post: Post, author: User, params: list[TagParams]):
-    await asyncio.gather(
+    tags = await asyncio.gather(
         *[
-            create_tag(
+            tag_create_or_update(
                 name_raw=param.name,
                 post=post,
                 author=author,
@@ -424,28 +432,26 @@ async def _create_tags(post: Post, author: User, params: list[TagParams]):
             for param in params
         ]
     )
+    await post.tags.aadd(*tags)
 
 
 @dataclass
 class ReviewTagParams:
     name: ReviewTagName
-    is_vote_pos: bool | None = None
+    is_vote_pos: bool
 
 
-async def _create_review_tags(post: Post, params: list[ReviewTagParams]):
-    await asyncio.gather(*[_create_review_tag(post, param) for param in params])
-
-
-async def _create_review_tag(post: Post, param: ReviewTagParams):
-    if param.is_vote_pos is not None:
-        tag, _ = await PostTag.objects.aget_or_create(
-            name=param.name.value,
-            defaults=dict(is_review_tag=True, author=post.author),
-        )
-        await post.review_tags.aadd(tag)
-        await PostTagVote.objects.acreate(
-            post=post,
-            tag=tag,
-            author=post.author,
-            is_vote_positive=param.is_vote_pos,
-        )
+async def _create_review_tags(review: Post, params: list[ReviewTagParams]):
+    tags = await asyncio.gather(
+        *[
+            tag_create_or_update(
+                post=review,
+                name_raw=param.name,
+                author=review.author,
+                is_vote_positive=param.is_vote_pos,
+                is_review_tag=True,
+            )
+            for param in params
+        ]
+    )
+    await review.review_tags.aadd(*tags)

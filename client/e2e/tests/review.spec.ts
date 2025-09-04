@@ -24,45 +24,68 @@ test.describe("Review", () => {
     await helper.expectText(PostReviewForm.strs.reviewCreated);
   });
 
-  test("Tags editing and voting", async ({ page }) => {
+  test("Tags review.tags voting and ", async ({ page }) => {
     await page.goto(urls.reviews.list);
     await helper.click(ids.post.card.link.edit);
     await helper.wait(ids.review.form.title);
 
-    const tagsContainer = helper.get(ids.review.form.tags);
+    const tagsReviewContainer = helper.get(ids.review.form.tags);
     const tagName = {
       existing: "Django",
       added: "New tag",
     };
-    await expect(tagsContainer).toContainText(tagName.existing);
+    await expect(tagsReviewContainer).toContainText(tagName.existing);
 
-    // upvote `tagName.existing` #AI
-    await tagsContainer
+    // Verify initial state
+    const voteUpButton = tagsReviewContainer
       .locator(`[data-name="${tagName.existing}"]`)
-      .getByTestId(ids.post.form.tags.tag.vote.up)
-      .click();
+      .getByTestId(ids.post.form.tags.tag.vote.up);
+    const voteDownButton = tagsReviewContainer
+      .locator(`[data-name="${tagName.existing}"]`)
+      .getByTestId(ids.post.form.tags.tag.vote.down);
+    await expect(voteUpButton).toHaveAttribute("data-is-active", "true");
+    await expect(voteDownButton).toHaveAttribute("data-is-active", "false");
 
-    // Add new tag
-    const input = tagsContainer.locator("input").first();
+    // Click downvote on upvoted
+    await voteDownButton.click();
+    await expect(voteUpButton).toHaveAttribute("data-is-active", "false");
+    await expect(voteDownButton).toHaveAttribute("data-is-active", "true");
+    // Save
+    await helper.click(ids.post.btn.submit);
+    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await helper.waitForNetworkIdle();
+    // Re-open the form
+    await helper.click(ids.post.card.link.edit);
+    await helper.wait(ids.review.form.title);
+
+    // Verify downvote persisted
+    await expect(voteUpButton).toHaveAttribute("data-is-active", "false");
+    await expect(voteDownButton).toHaveAttribute("data-is-active", "true");
+
+    // Try to change back to upvote
+    await voteUpButton.click();
+    await expect(voteUpButton).toHaveAttribute("data-is-active", "true");
+    await expect(voteDownButton).toHaveAttribute("data-is-active", "false");
+
+    // Add tagName.added
+    const input = tagsReviewContainer.locator("input").first();
     await input.click();
     await input.pressSequentially(tagName.added, { delay: 100 });
     await page.keyboard.press("Enter");
-    await expect(tagsContainer).toContainText(tagName.added);
+    await expect(tagsReviewContainer).toContainText(tagName.added);
     await helper.click(ids.post.btn.submit);
     await helper.expectText(PostReviewForm.strs.reviewUpdated);
     await helper.waitForNetworkIdle();
 
-    // Re-edit to verify persistence
+    // Re-open the form
     await helper.click(ids.post.card.link.edit);
     await helper.wait(ids.review.form.title);
-    const tagsUpdated = helper.get(ids.review.form.tags);
-    await expect(tagsUpdated).toContainText(tagName.existing);
-    await expect(tagsUpdated).toContainText(tagName.added);
+    await expect(tagsReviewContainer).toContainText(tagName.existing);
+    await expect(tagsReviewContainer).toContainText(tagName.added);
 
-    const voteButton = tagsUpdated
+    const voteButton = tagsReviewContainer
       .locator(`[data-name="${tagName.existing}"]`)
       .getByTestId(ids.post.form.tags.tag.vote.up);
-
     await expect(voteButton).toHaveAttribute("data-is-vote-positive", "true");
   });
 

@@ -4,7 +4,6 @@ import logging
 
 import strawberry
 import strawberry_django
-from asgiref.sync import async_to_sync
 from django.db.models import QuerySet
 from strawberry import Info
 from strawberry import UNSET
@@ -214,7 +213,9 @@ class PostTagVoteType:
 @strawberry_django.input(PostTag, partial=True)
 class PostTagTypeInput:
     name: str
-    id: strawberry.ID | None = UNSET
-    comment: str | None = UNSET
-    is_vote_positive: bool | None = UNSET
-    is_important: bool | None = UNSET
+    id: strawberry.ID | None
+    comment: str | None
+    is_review_tag: bool | None
+    is_vote_positive: bool | None
+    is_important: bool | None
+    tag_parent: PostTagTypeInput | None

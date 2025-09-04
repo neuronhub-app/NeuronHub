@@ -77,6 +77,8 @@ First noun, then verb.
 
 If the brain can read it - the shorter the better. Target visual scanning, not legalese. Fuck English grammar, eg prefixes "the / a / an".
 
+For fields of an object known form the context - write `.tags` instead of `Post.tags`.
+
 #### Bad shortening
 
 Bad to replace familiar words with less familiar:
