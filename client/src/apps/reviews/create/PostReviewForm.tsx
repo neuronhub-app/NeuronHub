@@ -10,6 +10,7 @@ import { FaBookmark, FaCircleXmark, FaClockRotateLeft, FaHeartPulse } from "reac
 import { FiSave } from "react-icons/fi";
 import { HiOutlineClock } from "react-icons/hi2";
 import { useNavigate } from "react-router";
+
 import { mutateReview } from "@/apps/reviews/create/mutateReview";
 import { PostReviewDeleteButton } from "@/apps/reviews/create/PostReviewDeleteButton";
 import { useUser } from "@/apps/users/useUserCurrent";
@@ -29,6 +30,7 @@ import { graphql } from "@/gql-tada";
 import { isEditMode, type PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
+import { useIsLoading } from "@/utils/useIsLoading";
 import { UsageStatus, Visibility } from "~/graphql/enums";
 
 export namespace PostReviewForm {
@@ -40,6 +42,7 @@ export namespace PostReviewForm {
   export function Comp(props: { review?: PostReviewEditFragmentType }) {
     const navigate = useNavigate();
     const user = useUser();
+    const loading = useIsLoading();
 
     // todo UX: fix broken `reValidateMode: "onChange"` - after refactor to 2 forms validates only on <button type="submit"> click
     const forms = {
@@ -201,7 +204,7 @@ export namespace PostReviewForm {
           <form
             onSubmit={async event => {
               event.preventDefault();
-              await handleSubmit();
+              await loading.track(() => handleSubmit());
             }}
           >
             <FormProvider {...forms.tool}>
@@ -350,7 +353,7 @@ export namespace PostReviewForm {
                 <HStack>
                   <Button
                     type="submit"
-                    loading={forms.review.formState.isSubmitting}
+                    loading={loading.isActive}
                     {...ids.set(ids.post.btn.submit)}
                     size="lg"
                   >
