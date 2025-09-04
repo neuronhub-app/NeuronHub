@@ -6,12 +6,12 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
 class GraphqlTypesOptimizerTest(NeuronTestCase):
-    async def test_post_reviews_requires_below_20_SQL_queries(self):
+    async def test_post_reviews_requires_below_17_SQL_queries(self):
         await db_stubs_repopulate()
         for _ in range(5):
             await self.gen.posts.tag(post=await self.gen.posts.review())
 
-        await sync_to_async(self._assert_num_queries)(number=20)
+        await sync_to_async(self._assert_num_queries)(number=17)
 
     def _assert_num_queries(self, number: int):
         with self.assertNumQueries(number):

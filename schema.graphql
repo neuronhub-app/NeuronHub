@@ -184,6 +184,10 @@ type PostReviewType implements PostTypeI {
   is_review_later: Boolean!
 }
 
+type PostSimpleType {
+  id: ID!
+}
+
 input PostTagFilter {
   id: IDBaseFilterLookup
   name: StrFilterLookup
@@ -221,7 +225,7 @@ input PostTagTypeInput {
 
 type PostTagVoteType {
   id: ID!
-  post: PostTypeI!
+  post: PostSimpleType!
   tag: PostTagType!
   author: UserType!
   is_vote_positive: Boolean

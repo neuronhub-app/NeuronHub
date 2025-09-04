@@ -198,10 +198,22 @@ class PostTagType:
     label: auto
 
 
+@strawberry_django.type(Post)
+class PostSimpleType:
+    """
+    Using PostTypeI on PostTagVoteType.post breaks with the error below.
+    Prob the Strawberry optimizer + [[PostTypeI#get_queryset]] crsah.
+
+    > ValueError: Tried to prefetch 2 queries with different filters to the same attribute
+    """
+
+    id: auto
+
+
 @strawberry_django.type(PostTagVote)
 class PostTagVoteType:
     id: auto
-    post: PostTypeI
+    post: PostSimpleType
     tag: PostTagType
     author: UserType
 
