@@ -2,29 +2,29 @@
 
 ### v0.1.0.0 - personal deploy
 
-- [ ] [post-form]
-  - [x] split PostReviewForm on sub field sets, add Zod `schemas.ts`
-  - [x] Tool creation
-  - [x] add `review.tags` logic
-  - [x] add `review.review_tags`
-  - [ ] PostTool list
-  - [ ] Post create/edit
-  - [ ] Post.image field
+- [x] refactor ReviewForm on sub fields; add schemas.ts
+- [x] Tool create
+- [x] add `review.tags` and `review.review_tags` logic
+- [x] Tool list
+- [ ] Tool.image upload
+- [ ] Post
+	- create
+	- edit
 
 ### v0.2.0.0 - invite-only release
 
-- [ ] Dokploy
-- [ ] In PostReview allow to select a PostTool using the `tool.title` input
+- Dokploy
+- Review.parent select with `tool.title`
 
 ### v0.2.1.0
 
-- [ ] Git repo
-- [ ] Sentry
-- [ ] `review_experience` field
-- [ ] API paginate
-- [ ] signup
-- [ ] pros/cons list indicator with icons
+- Git repo
+- Sentry
+- pagination
+- Signup
+- Review pros/cons list indicator with icons
+- Comments unread indicator
 
 ### v0.3.0.0 - Public Alpha
 
-[roadmap for v0.3](/docs/roadmap/roadmap-v0.3-public.md)
+[roadmap v0.3](/docs/roadmap/roadmap-v0.3-public.md)
