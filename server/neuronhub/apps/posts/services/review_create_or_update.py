@@ -21,7 +21,7 @@ if typing.TYPE_CHECKING:
 
 
 # todo refac-name: review_create_or_update
-async def post_review_create_or_update(author: User, data: PostTypeInput) -> Post:
+async def review_create_or_update(author: User, data: PostTypeInput) -> Post:
     field_values = {}
     for field, value in [
         ("title", data.title),

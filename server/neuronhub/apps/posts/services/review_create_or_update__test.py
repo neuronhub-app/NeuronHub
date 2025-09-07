@@ -2,8 +2,8 @@ from strawberry import UNSET
 
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models import PostTagVote, Post
-from neuronhub.apps.posts.services.post_review_create_or_update import (
-    post_review_create_or_update,
+from neuronhub.apps.posts.services.review_create_or_update import (
+    review_create_or_update,
 )
 from neuronhub.apps.posts.graphql.types import PostTypeInput, PostTagTypeInput
 from neuronhub.apps.tests.test_cases import NeuronTestCase
@@ -15,7 +15,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         tag_input = PostTagTypeInput(name=f"Dev / {tag_name}", is_vote_positive=True)
 
         tool = await self.gen.posts.tool()
-        review = await post_review_create_or_update(
+        review = await review_create_or_update(
             author=self.user,
             data=PostTypeInput(
                 parent=PostTypeInput(id=tool.id), title="Review", tags=[tag_input]
@@ -33,7 +33,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         tag_name = "Python"
 
         tool = await self.gen.posts.tool()
-        await post_review_create_or_update(
+        await review_create_or_update(
             author=self.user,
             data=PostTypeInput(
                 parent=PostTypeInput(id=tool.id),
@@ -55,7 +55,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         tag_name_1 = "Python"
         tag_name_2 = "Django"
 
-        review = await post_review_create_or_update(
+        review = await review_create_or_update(
             author=self.user,
             data=PostTypeInput(
                 parent=PostTypeInput(id=tool.id),
@@ -63,7 +63,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
                 tags=[PostTagTypeInput(name=tag_name_1)],
             ),
         )
-        review_updated = await post_review_create_or_update(
+        review_updated = await review_create_or_update(
             author=self.user,
             data=PostTypeInput(
                 id=review.id,
@@ -79,7 +79,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
 
         # Review create
         tag_input = PostTagTypeInput(name="Name", comment="Comment", is_vote_positive=True)
-        review_created = await post_review_create_or_update(
+        review_created = await review_create_or_update(
             data=PostTypeInput(
                 parent=PostTypeInput(id=tool.id), title="Review", tags=[tag_input]
             ),
@@ -90,23 +90,23 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         # Change vote
         tag_input.is_vote_positive = False
         post_input = PostTypeInput(id=review_created.id, tags=[tag_input])
-        await post_review_create_or_update(author=self.user, data=post_input)
+        await review_create_or_update(author=self.user, data=post_input)
         assert await self.is_vote_exists_exact(review_created, tag_input)
 
         # Remove vote -> keeps comment
         tag_input.is_vote_positive = None
-        await post_review_create_or_update(author=self.user, data=post_input)
+        await review_create_or_update(author=self.user, data=post_input)
         assert await self.is_vote_exists_exact(review_created, tag_input)
 
         # Remove vote + comment -> delete PostTagVote
         tag_input.comment = ""
-        await post_review_create_or_update(author=self.user, data=post_input)
+        await review_create_or_update(author=self.user, data=post_input)
         assert not await self.is_vote_exists(review_created, tag_input)
 
         # Comment add
         tag_input.comment = "comment new"
         tag_input.is_vote_positive = UNSET
-        await post_review_create_or_update(author=self.user, data=post_input)
+        await review_create_or_update(author=self.user, data=post_input)
         assert await self.is_vote_exists_exact(review_created, tag_input)
 
     @staticmethod
@@ -131,7 +131,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
             Tool = "Python"
             Review = ReviewTagName.stability.value
 
-        review = await post_review_create_or_update(
+        review = await review_create_or_update(
             author=self.user,
             data=PostTypeInput(
                 parent=PostTypeInput(id=tool.id),
@@ -155,7 +155,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
             stability_1 = "stability"
             value_2 = "value_2"
 
-        review = await post_review_create_or_update(
+        review = await review_create_or_update(
             author=self.user,
             data=PostTypeInput(
                 parent=PostTypeInput(id=(await self.gen.posts.tool()).id),
@@ -210,7 +210,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
 
         tag_name_1 = "Python"
         tag_name_2 = "Django"
-        review = await post_review_create_or_update(
+        review = await review_create_or_update(
             author=self.user,
             data=PostTypeInput(
                 parent=PostTypeInput(id=tool.id),
@@ -220,7 +220,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         )
 
         # remove tag_name_1
-        await post_review_create_or_update(
+        await review_create_or_update(
             author=self.user,
             data=PostTypeInput(id=review.id, tags=[PostTagTypeInput(name=tag_name_2)]),
         )
@@ -242,7 +242,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         tag_python = await self.gen.posts.tag(post=tool, name="Python")
 
         # Create review with tags that have author votes
-        review = await post_review_create_or_update(
+        review = await review_create_or_update(
             author=self.user,
             data=PostTypeInput(
                 parent=PostTypeInput(id=tool.id),
@@ -308,7 +308,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         assert author_vote["is_vote_positive"] is True
 
         # Save review without any changes
-        await post_review_create_or_update(
+        await review_create_or_update(
             author=self.user,
             data=PostTypeInput(
                 id=review.id,
