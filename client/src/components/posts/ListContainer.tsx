@@ -124,7 +124,7 @@ export function ListContainer(props: {
                       _hover={{ color: "slate.400" }}
                     >
                       <BsChatLeftTextFill />{" "}
-                      <Text color="gray.400">{post.comments?.length}</Text>
+                      <Text color="gray.400">{countCommentsRecursively(post.comments)}</Text>
                     </IconButton>
                   </NavLink>
                 </Stack>
@@ -137,4 +137,18 @@ export function ListContainer(props: {
       </Flex>
     </Stack>
   );
+}
+
+function countCommentsRecursively(comments?: PostFragmentType["comments"]) {
+  if (!comments) {
+    return 0;
+  }
+  let count = comments.length;
+  for (const comment of comments) {
+    if (comment.comments) {
+      // @ts-expect-error #bad-infer
+      count += countCommentsRecursively(comment.comments);
+    }
+  }
+  return count;
 }

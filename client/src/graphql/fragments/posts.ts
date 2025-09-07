@@ -42,6 +42,12 @@ export const PostFragment = graphql(
         }
         created_at
         updated_at
+        comments {
+          id
+          comments {
+            id
+          }
+        }
       }
       parent {
         id
