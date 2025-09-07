@@ -143,7 +143,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
             - Git UI and shortcuts
             - JS/TS integration performance has been improving, but still not as good as VS Code
             - Bugs are frequent. Less than in VS Code, but still a lot
-            """.strip()
+            """
         ),
         review_usage_status=UsageStatus.USING,
         review_rating=67,
@@ -249,7 +249,7 @@ async def _create_review_iterm(user: User, gen: Gen):
             """
             - Fast native render (Objective-C/Swift)
             - no extra features, like history/fish/llm/etc
-            """.strip()
+            """
         ),
         review_usage_status=UsageStatus.USING,
         review_rating=75,
