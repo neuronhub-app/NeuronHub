@@ -40,57 +40,55 @@ async def post_review_create_or_update(author: User, data: PostTypeInput) -> Pos
 
     is_edit_mode = bool(data.id)
     if is_edit_mode:
-        post_review = await Post.objects.select_related("parent").aget(id=data.id, author=author)
+        review = await Post.objects.select_related("parent").aget(id=data.id, author=author)
         for field, value in field_values.items():
-            setattr(post_review, field, value)
-        await post_review.asave()
+            setattr(review, field, value)
+        await review.asave()
 
-        post = post_review.parent
-        assert post
+        tool = review.parent
+        assert tool
     else:
         assert data.parent
-        post = await Post.objects.aget(id=data.parent.id)
-        post_review = await Post.objects.acreate(
-            parent=post,
+        tool = await Post.objects.aget(id=data.parent.id)
+        review = await Post.objects.acreate(
+            parent=tool,
             author=author,
             type=Post.Type.Review,
             **field_values,
         )
 
-    await _tags_create_or_update(data=data, post=post, post_review=post_review, author=author)
+    await _tags_create_or_update(data=data, tool=tool, review=review, author=author)
 
     if data.alternatives:
         await PostRelated.objects.abulk_create(
             [
-                PostRelated(post=post, author=author, **alternative_input)
+                PostRelated(post=tool, author=author, **alternative_input)
                 for alternative_input in data.alternatives
             ]
         )
 
-    return post_review
+    return review
 
 
-async def _tags_create_or_update(
-    data: PostTypeInput, post: Post, post_review: Post, author: User
-):
+async def _tags_create_or_update(data: PostTypeInput, tool: Post, review: Post, author: User):
     if data.tags:
         tags = [
-            await _tag_create_or_update(tag_input, post_review, author)
+            await _tag_create_or_update(tag_input, post=review, author=author)
             for tag_input in data.tags
         ]
-        await post_review.tags.aset(tags)
+        await review.tags.aset(tags)
 
         # ensure review.parent.tags ⊇ review.tags
-        post_tags = [tag async for tag in post.tags.all()]
-        post_tags.extend(tags)
-        await post.tags.aset(post_tags)
+        tool_tags = [tag async for tag in tool.tags.all()]
+        tool_tags.extend(tags)
+        await tool.tags.aset(tool_tags)
 
     if data.review_tags:
         review_tags = [
-            await _tag_create_or_update(tag_input, post_review, author, is_review_tag=True)
+            await _tag_create_or_update(tag_input, review, author, is_review_tag=True)
             for tag_input in data.review_tags
         ]
-        await post_review.review_tags.aset(review_tags)
+        await review.review_tags.aset(review_tags)
 
 
 async def _tag_create_or_update(
