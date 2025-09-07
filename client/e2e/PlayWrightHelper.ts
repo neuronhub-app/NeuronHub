@@ -27,6 +27,7 @@ export class PlayWrightHelper {
     return this.page.getByTestId(id);
   }
 
+  // todo refac-name: getFirst() - LLM don't get it.
   get(id: string) {
     return this.getAll(id).first();
   }
@@ -52,6 +53,7 @@ export class PlayWrightHelper {
     await this.page.waitForSelector(`text="${text}"`, options);
   }
 
+  // todo refac: use expect.extend for clear error report
   async waitForState(testId: string, state: "checked" | "unchecked") {
     await expect(this.get(testId)).toHaveAttribute("data-state", state);
   }

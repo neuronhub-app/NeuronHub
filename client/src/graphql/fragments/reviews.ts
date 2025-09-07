@@ -1,4 +1,3 @@
-import { ids } from "@/e2e/ids";
 import { type FragmentOf, graphql } from "@/gql-tada";
 import {
   PostCommentsFragment,

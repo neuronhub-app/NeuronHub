@@ -4,6 +4,7 @@ import type { PostListItemType } from "@/components/posts/ListContainer";
 import { usePostVoting } from "@/components/posts/usePostVoting";
 import { ids } from "@/e2e/ids";
 
+// todo refac-name: PostActionsVoting
 export function PostButtonsVote(props: { post: PostListItemType }) {
   const voting = usePostVoting({ postId: props.post.id, votes: props.post.votes });
 

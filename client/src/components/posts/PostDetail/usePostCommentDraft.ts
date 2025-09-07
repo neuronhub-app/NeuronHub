@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-// @AI-slop todo refac: drop all. try to an existing package
+// #AI todo refac: drop all. try to an npm package
+// todo refac-name: useCommentDraft
 export function usePostCommentDraft(parentId: string) {
   const storageKey = `comment-draft-${parentId}`;
 

@@ -28,6 +28,7 @@ import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 export type PostListItemType = PostFragmentType | PostReviewFragmentType;
 
+// todo refac-name: PostList
 export function ListContainer(props: {
   title: string;
   items: Array<PostListItemType>;
@@ -108,7 +109,7 @@ export function ListContainer(props: {
                           <Icon>
                             <FaGithub />
                           </Icon>
-                          Github
+                          GitHub
                         </Link>
                       )}
                     </HStack>

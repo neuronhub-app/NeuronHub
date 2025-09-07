@@ -4,7 +4,7 @@ import { Radio, RadioGroup } from "@/components/ui/radio";
 import { gap } from "@/theme/theme";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-// todo !! rename to PostListSidebar
+// todo refac-name: PostListSidebar
 export function ReviewListSidebar() {
   return (
     <Stack p={{ base: gap.md, md: gap.lg }} bg="bg.panel" align="flex-start" w="fit-content">

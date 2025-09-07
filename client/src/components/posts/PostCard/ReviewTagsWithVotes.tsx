@@ -2,6 +2,7 @@ import { PostTag } from "@/components/posts/PostCard/PostTags";
 import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
 
+// todo refac-name: PostTagsVoted
 export function ReviewTagsWithVotes(props: {
   tags: PostTagFragmentType[];
   authorId: ID;

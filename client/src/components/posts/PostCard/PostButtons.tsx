@@ -15,8 +15,8 @@ import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMounte
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { UserListName } from "~/graphql/enums";
 
-// todo refac: put into PostCard [[./index.tsx]], and leave only `export ReviewButton`
 // this is overly complex & abstract for a child component
+// todo refac-name: PostCardActions
 export function PostButtons(props: { post: PostListItemType }) {
   const buttons: Array<ComponentProps<typeof ReviewButton>> = [
     {
@@ -49,6 +49,7 @@ export function PostButtons(props: { post: PostListItemType }) {
   );
 }
 
+// todo refac-name: PostCardActionSave
 function ReviewButton(props: {
   fieldName: UserListName;
   iconNotPresent: ReactNode;

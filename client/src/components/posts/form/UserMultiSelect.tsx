@@ -21,7 +21,7 @@ export type UserSelectOption =
   | NonNullable<schemas.sharable.Schema["recommend_to"]>[number]
   | NonNullable<schemas.sharable.Schema["visible_to"]>[number];
 
-// todo refac: rename to PostSharableSelect
+// todo refac-name: PostFormSelectSharable
 export function UserMultiSelect(props: {
   form: schemas.sharable.Form;
   fieldName: "recommend_to" | "visible_to";
