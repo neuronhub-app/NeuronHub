@@ -24,7 +24,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         assert await review.tags.acount() == 1  # Now review.tags stores author's selection
         assert await tool.tags.acount() == 1
 
-        tag_vote = await tool.tag_votes.aget(tag__name=tag_name, author=self.user)
+        tag_vote = await review.tag_votes.aget(tag__name=tag_name, author=self.user)
         assert tag_vote.is_vote_positive == tag_input.is_vote_positive
 
     async def test_tag_name_creates_parent(self):
@@ -85,29 +85,29 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
             ),
             author=self.user,
         )
-        assert await self.is_vote_exists_exact(tool, tag_input)
+        assert await self.is_vote_exists_exact(review_created, tag_input)
 
         # Change vote
         tag_input.is_vote_positive = False
         post_input = PostTypeInput(id=review_created.id, tags=[tag_input])
         await post_review_create_or_update(author=self.user, data=post_input)
-        assert await self.is_vote_exists_exact(tool, tag_input)
+        assert await self.is_vote_exists_exact(review_created, tag_input)
 
         # Remove vote -> keeps comment
         tag_input.is_vote_positive = None
         await post_review_create_or_update(author=self.user, data=post_input)
-        assert await self.is_vote_exists_exact(tool, tag_input)
+        assert await self.is_vote_exists_exact(review_created, tag_input)
 
         # Remove vote + comment -> delete PostTagVote
         tag_input.comment = ""
         await post_review_create_or_update(author=self.user, data=post_input)
-        assert not await self.is_vote_exists(tool, tag_input)
+        assert not await self.is_vote_exists(review_created, tag_input)
 
         # Comment add
         tag_input.comment = "comment new"
         tag_input.is_vote_positive = UNSET
         await post_review_create_or_update(author=self.user, data=post_input)
-        assert await self.is_vote_exists_exact(tool, tag_input)
+        assert await self.is_vote_exists_exact(review_created, tag_input)
 
     @staticmethod
     async def is_vote_exists_exact(tool: Post, tag_input: PostTagTypeInput):
@@ -232,3 +232,127 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         # Tool.tags is kept
         tool_tags = {tag.name async for tag in tool.tags.all()}
         assert tool_tags == {tag_name_1, tag_name_2}
+
+    # #AI
+    async def test_votes_persist_after_save_without_changes(self):
+        """Bug #53: votes disappear from list after saving form without changes"""
+        # Create tool with tags
+        tool = await self.gen.posts.tool()
+        tag_django = await self.gen.posts.tag(post=tool, name="Django")
+        tag_python = await self.gen.posts.tag(post=tool, name="Python")
+
+        # Create review with tags that have author votes
+        review = await post_review_create_or_update(
+            author=self.user,
+            data=PostTypeInput(
+                parent=PostTypeInput(id=tool.id),
+                title="Django Review",
+                tags=[
+                    PostTagTypeInput(name="Django", is_vote_positive=True),
+                    PostTagTypeInput(name="Python", is_vote_positive=False),
+                ],
+            ),
+        )
+
+        # Query to verify votes are visible (simulating list page)
+        result = await self.graphql_query(
+            """
+            query ReviewList {
+                post_reviews(ordering: {reviewed_at: DESC}) {
+                    id
+                    tags {
+                        name
+                        votes {
+                            id
+                            post { id }
+                            author { id }
+                            is_vote_positive
+                        }
+                    }
+                    parent {
+                        id
+                        tags {
+                            name
+                            votes {
+                                id
+                                post { id }
+                                author { id }
+                                is_vote_positive
+                            }
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        reviews = result.data["post_reviews"]
+        review_data = next(r for r in reviews if r["id"] == str(review.id))
+
+        # Check review.tags have votes from the author on the review
+        django_tag = next(t for t in review_data["tags"] if t["name"] == "Django")
+
+        # The bug: votes are on the tool, not the review
+        # When review has tags with votes, they should be on the review, not parent
+        author_vote = next(
+            (
+                v
+                for v in django_tag["votes"]
+                if v["author"]["id"] == str(self.user.id) and v["post"]["id"] == str(review.id)
+            ),
+            None,
+        )
+        assert author_vote is not None, (
+            "No author vote on review. Votes are on wrong post (tool instead of review)"
+        )
+        assert author_vote["is_vote_positive"] is True
+
+        # Save review without any changes
+        await post_review_create_or_update(
+            author=self.user,
+            data=PostTypeInput(
+                id=review.id,
+                tags=[
+                    PostTagTypeInput(name="Django", is_vote_positive=True),
+                    PostTagTypeInput(name="Python", is_vote_positive=False),
+                ],
+            ),
+        )
+
+        # Query again after save
+        result_after = await self.graphql_query(
+            """
+            query ReviewList {
+                post_reviews(ordering: {reviewed_at: DESC}) {
+                    id
+                    tags {
+                        name
+                        votes {
+                            id
+                            post { id }
+                            author { id }
+                            is_vote_positive
+                        }
+                    }
+                }
+            }
+            """
+        )
+
+        reviews_after = result_after.data["post_reviews"]
+        review_data_after = next(r for r in reviews_after if r["id"] == str(review.id))
+
+        # Bug: votes should still be visible but they disappear
+        django_tag_after = next(t for t in review_data_after["tags"] if t["name"] == "Django")
+        author_vote_after = next(
+            (
+                v
+                for v in django_tag_after["votes"]
+                if v["author"]["id"] == str(self.user.id) and v["post"]["id"] == str(review.id)
+            ),
+            None,
+        )
+        assert author_vote_after is not None, (
+            "Author vote disappeared after save without changes"
+        )
+        assert author_vote_after["is_vote_positive"] is True

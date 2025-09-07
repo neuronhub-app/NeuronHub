@@ -74,10 +74,13 @@ async def _tags_create_or_update(
     data: PostTypeInput, post: Post, post_review: Post, author: User
 ):
     if data.tags:
-        tags = [await _tag_create_or_update(tag_input, post, author) for tag_input in data.tags]
+        tags = [
+            await _tag_create_or_update(tag_input, post_review, author)
+            for tag_input in data.tags
+        ]
         await post_review.tags.aset(tags)
 
-        # ensure parent.tags ⊇ post_review.tags
+        # ensure review.parent.tags ⊇ review.tags
         post_tags = [tag async for tag in post.tags.all()]
         post_tags.extend(tags)
         await post.tags.aset(post_tags)

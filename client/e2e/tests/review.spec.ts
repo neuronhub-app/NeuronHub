@@ -24,7 +24,8 @@ test.describe("Review", () => {
     await helper.expectText(PostReviewForm.strs.reviewCreated);
   });
 
-  test("Tags review.tags voting and ", async ({ page }) => {
+  // #AI duplicates test below, low quality, refactor
+  test("Tags review.tags", async ({ page }) => {
     await page.goto(urls.reviews.list);
     await helper.click(ids.post.card.link.edit);
     await helper.wait(ids.review.form.title);
@@ -153,5 +154,45 @@ test.describe("Review", () => {
     await expect(reviewTagsContainer).not.toContainText(tags.review.new);
     await expect(reviewTagsContainer).toContainText(tags.review.existing);
     await expect(toolTagsContainer).toContainText(tags.review.new);
+  });
+
+  // #AI
+  test("tags votes persist after save without changes", async ({ page }) => {
+    // Load review list page and verify tags with votes are visible initially
+    await page.goto(urls.reviews.list);
+    await helper.waitForNetworkIdle();
+
+    // Find first review card (from db stubs)
+    const firstCard = helper.get(ids.post.card.container).first();
+
+    // Look for upvote/downvote icons on tags (these indicate author votes)
+    const upvoteIcons = firstCard.locator('[aria-label="upvote"]');
+    const downvoteIcons = firstCard.locator('[aria-label="downvote"]');
+
+    // Should have at least one vote icon initially (from stub data)
+    const initialUpvoteCount = await upvoteIcons.count();
+    const initialDownvoteCount = await downvoteIcons.count();
+    const totalInitialVotes = initialUpvoteCount + initialDownvoteCount;
+    expect(totalInitialVotes).toBeGreaterThan(0);
+
+    // Open edit form for first review
+    await helper.click(ids.post.card.link.edit);
+    await helper.wait(ids.review.form.title);
+
+    // Save without any changes
+    await helper.click(ids.post.btn.submit);
+    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await helper.waitForNetworkIdle();
+
+    // Go back to review list
+    await page.goto(urls.reviews.list);
+    await helper.waitForNetworkIdle();
+
+    // Bug: vote indicators should still be visible but they disappear after save
+    const upvoteIconsAfter = firstCard.locator('[aria-label="upvote"]');
+    const downvoteIconsAfter = firstCard.locator('[aria-label="downvote"]');
+    const totalVotesAfter =
+      (await upvoteIconsAfter.count()) + (await downvoteIconsAfter.count());
+    expect(totalVotesAfter).toBe(totalInitialVotes);
   });
 });
