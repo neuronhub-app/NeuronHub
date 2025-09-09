@@ -3,6 +3,7 @@ import {
   Heading,
   HStack,
   IconButton,
+  Image,
   Show,
   Stack,
   Text,
@@ -68,7 +69,15 @@ export function PostCard(props: { post: PostListItemType }) {
               {post.parent.title}
             </Heading>
           )}
-
+          {post.image && (
+            <Image
+              src={post.image.url}
+              maxH="200px"
+              objectFit="cover"
+              borderRadius="md"
+              {...ids.set(ids.post.card.image)}
+            />
+          )}
           <Text fontWeight="bold" color="fg.muted">
             {post.title}
           </Text>

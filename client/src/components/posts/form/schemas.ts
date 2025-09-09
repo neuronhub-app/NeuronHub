@@ -1,7 +1,7 @@
 import { type UseFormReturn, useFormContext as useFormContextOriginal } from "react-hook-form";
 import { z } from "zod/v4";
 import type { PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
-import { UsageStatus, Visibility } from "~/graphql/enums";
+import { PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
 export const UserType = z.enum(["User", "Group"]);
 
@@ -152,6 +152,7 @@ export namespace schemas {
 
   // excludes `sharable.Schema`, because it's always public
   export const Tool = Abstract.safeExtend({
+    type: z.enum(enumConvert(PostTypeEnum)).default(PostTypeEnum.Tool).optional(),
     tool_type: z
       .union([
         z.literal("Program"),
@@ -162,6 +163,7 @@ export namespace schemas {
         z.literal("Other"),
       ])
       .optional(),
+    image: z.file().nullable().optional(),
     alternatives: getSelectVotableSchema().optional(),
     github_url: z
       .union([z.string().includes("github.com").includes("/"), z.string().trim().length(0)])

@@ -59,7 +59,7 @@
     "includes": [
       "src/**",
       "e2e/**",
-      "!graphql/**", // generated code
+      "!graphql", // generated code
 
       "biome.jsonc",
       "tsconfig.json",

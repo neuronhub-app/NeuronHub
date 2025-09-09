@@ -7,6 +7,8 @@
 
     "useDefineForClassFields": true,
     "skipLibCheck": true,
+    "allowJs": true,
+    "maxNodeModuleJsDepth": 10,
 
     "isolatedModules": true,
     "moduleDetection": "force",

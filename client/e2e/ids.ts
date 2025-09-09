@@ -10,18 +10,21 @@ export namespace ids {
     btn: {
       readingList: "post.btn.reading-list",
       library: "post.btn.library",
-      submit: "post.btn.submit",
+      submit: "post.btn.submit", // todo refac: drop, use .form
       edit: "post.btn.edit",
     },
     card: {
       container: "post.card.container",
       id: "post.card.id",
+      image: "post.card.image",
       link: {
         detail: "post.card.link.detail",
         edit: "post.card.link.edit",
       },
     },
     form: {
+      title: "post.form.title",
+      image: "post.form.image",
       tags: {
         container: "post.form.tags.container",
         tag: {
@@ -33,6 +36,9 @@ export namespace ids {
           remove: "post.form.tags.tag.remove",
         },
       },
+      btn: {
+        submit: "post.form.btn.submit",
+      },
     },
   } as const;
 
@@ -43,14 +49,9 @@ export namespace ids {
   } as const;
 
   export const review = {
-    // todo refac: join into `post.form`, ie the main Post form since it's a part of it
     form: {
-      parentTitle: "review.form.parentTitle",
       title: "review.form.title",
-      source: "review.form.source",
       content: "review.form.content",
-      usageStatus: "review.form.usageStatus",
-      rating: "review.form.rating",
       tags: "review.form.tags",
       review_tags: "review.form.review_tags",
     },
@@ -75,22 +76,6 @@ export namespace ids {
     },
     edit: {
       btn: "comment.edit.btn",
-    },
-  } as const;
-
-  export const tool = {
-    tag: {
-      item: "tool.tag.item",
-    },
-  } as const;
-
-  export const postTool = {
-    form: {
-      title: "postTool.form.title",
-      tags: "postTool.form.tags",
-    },
-    btn: {
-      submit: "postTool.btn.submit",
     },
   } as const;
 

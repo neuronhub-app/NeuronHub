@@ -1,6 +1,8 @@
-import { ApolloClient, ApolloLink, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloClient, ApolloLink, InMemoryCache } from "@apollo/client";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { RemoveTypenameFromVariablesLink } from "@apollo/client/link/remove-typename";
+// @ts-expect-error - apollo-upload-client doesn't provide types for .mjs files
+import UploadHttpLink from "apollo-upload-client/UploadHttpLink.mjs";
 import { env } from "@/env";
 
 export const client = createApolloClient();
@@ -26,10 +28,9 @@ function createApolloClient() {
     },
     link: ApolloLink.from([
       new RemoveTypenameFromVariablesLink(), // Apollo force-adds .__typename everywhere -> gql.tada can't see it until runtime crashes
-      new HttpLink({
+      new UploadHttpLink({
         uri: env.VITE_SERVER_URL_API,
         credentials: "include",
-        // @ts-expect-error
         fetch: fetchUsingReadableUrl,
       }),
     ]),
@@ -41,6 +42,11 @@ function createApolloClient() {
 // - `/api/graphql/` -> `/api/graphql/Name`
 // - `/api/graphql/` -> `/api/graphql/mutate/Name`
 function fetchUsingReadableUrl(uri: RequestInfo | Request | URL, options?: RequestInit) {
+  // File uploads (FormData) -> pass through to regular fetch #AI
+  if (options?.body instanceof FormData) {
+    return fetch(uri, options);
+  }
+
   const bodyString = typeof options?.body === "string" ? options.body : "";
   const body = JSON.parse(bodyString);
 

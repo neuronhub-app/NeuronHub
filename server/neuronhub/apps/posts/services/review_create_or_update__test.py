@@ -181,7 +181,7 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         result = await self.graphql_query(
             """
             mutation PostReviewCreateOrUpdate($data: PostTypeInput!) {
-                post_review_create_or_update(data: $data) { id }
+                review_create_or_update(data: $data) { id }
             }
             """,
             {

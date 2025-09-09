@@ -187,6 +187,7 @@ class PostAdmin(SimpleHistoryAdmin):
                     "author",
                     "parent",
                     "content",
+                    "image",
                     "created_at",
                     "updated_at",
                 ]

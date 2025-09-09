@@ -42,12 +42,12 @@
 
     [tasks."dev:db"]
         dir = "devops"
-        run = "sudo docker compose up db --detach"
+        run = "sudo docker compose up db seaweedfs --detach"
         silent = true
 
     [tasks."dev:db-stop"]
         dir = "devops"
-        run = "sudo docker compose down db"
+        run = "sudo docker compose down db seaweedfs"
 
     [tasks."dev:server:e2e"]
         depends = ["dev:db", "dev:db:setup-e2e"]

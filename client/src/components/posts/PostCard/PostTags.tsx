@@ -8,7 +8,6 @@ import { MdOutlineThumbDown, MdOutlineThumbUp } from "react-icons/md";
 import { PiNetwork } from "react-icons/pi";
 import { SiKotlin } from "react-icons/si";
 import { Tooltip } from "@/components/ui/tooltip";
-import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
@@ -86,7 +85,6 @@ export function PostTag(props: {
       {...getOutlineContrastStyle({ variant: "subtle" })}
       opacity={0.9}
       bg={{ _light: "bg.subtle" }}
-      {...ids.set(ids.tool.tag.item)}
     >
       {tagIconParams && (
         <Tag.StartElement {...tagIconParams.props}>

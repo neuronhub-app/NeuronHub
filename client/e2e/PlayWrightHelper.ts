@@ -7,7 +7,7 @@ import type { urls } from "@/routes";
 
 export class PlayWrightHelper {
   constructor(
-    private page: Page,
+    public page: Page,
     private timeout = 4500,
     private timeoutWaitExtra = 1000,
   ) {
@@ -19,7 +19,9 @@ export class PlayWrightHelper {
     await this.login();
   }
 
-  async navigate(path: typeof urls.reviews.list | typeof urls.posts.list) {
+  async navigate(
+    path: typeof urls.reviews.list | typeof urls.posts.list | typeof urls.tools.list,
+  ) {
     return this.page.goto(path);
   }
 

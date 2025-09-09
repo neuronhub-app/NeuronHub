@@ -35,6 +35,15 @@ type DjangoFileType {
   url: String!
 }
 
+type DjangoImageType {
+  name: String!
+  path: String!
+  size: Int!
+  url: String!
+  width: Int!
+  height: Int!
+}
+
 input DjangoModelInput {
   id: ID!
 }
@@ -116,6 +125,7 @@ type PostCommentType implements PostTypeI {
   title: String!
   content: String!
   content_private: String!
+  image: DjangoImageType
   source: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
@@ -159,6 +169,7 @@ type PostReviewType implements PostTypeI {
   title: String!
   content: String!
   content_private: String!
+  image: DjangoImageType
   source: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
@@ -244,6 +255,7 @@ type PostToolType implements PostTypeI {
   title: String!
   content: String!
   content_private: String!
+  image: DjangoImageType
   source: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
@@ -276,6 +288,7 @@ type PostType implements PostTypeI {
   title: String!
   content: String!
   content_private: String!
+  image: DjangoImageType
   source: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
@@ -361,6 +374,7 @@ interface PostTypeI {
   title: String!
   content: String!
   content_private: String!
+  image: DjangoImageType
   source: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
@@ -393,6 +407,7 @@ input PostTypeInput {
   recommended_to_groups: ManyToManyInput
   tags: [PostTagTypeInput!]
   source: String
+  image: Upload
   review_usage_status: UsageStatus
   review_rating: Int
   review_experience_hours: Int

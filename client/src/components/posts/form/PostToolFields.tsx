@@ -8,6 +8,7 @@ import { SiCrunchbase } from "react-icons/si";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
+import { ImageUpload } from "@/components/posts/form/ImageUpload";
 import { SelectVotable } from "@/components/posts/form/SelectVotable";
 import type { schemas } from "@/components/posts/form/schemas";
 import { ids } from "@/e2e/ids";
@@ -66,7 +67,14 @@ export function PostToolFields(props: { form: UseFormReturn<schemas.Tool> }) {
         name="title"
         control={props.form.control}
         label={`${getToolTypeName(state.tool_type)} name`}
-        {...ids.setInput(ids.postTool.form.title)}
+        {...ids.setInput(ids.post.form.title)}
+      />
+
+      <ImageUpload
+        name="image"
+        control={props.form.control}
+        label={`${getToolTypeName(state.tool_type)} image`}
+        {...ids.setInput(ids.post.form.image)}
       />
 
       <HStack w="full" gap="gap.md">
@@ -102,7 +110,6 @@ export function PostToolFields(props: { form: UseFormReturn<schemas.Tool> }) {
         control={props.form.control}
         label="Source"
         placeholder="Link or reference"
-        {...ids.setInput(ids.review.form.source)}
       />
 
       <SelectVotable fieldName="tags" {...ids.set(ids.post.form.tags.container)} />

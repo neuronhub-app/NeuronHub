@@ -11,8 +11,7 @@ from corsheaders.defaults import default_headers
 from dotenv import load_dotenv
 from environs import Env
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
-from strawberry_django.settings import StrawberryDjangoSettings
-
+from strawberry_django.settings import strawberry_django_settings
 
 django_stubs_ext.monkeypatch()
 
@@ -153,6 +152,24 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SITE_ID = 1
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# SeaweedFS S3 #AI
+AWS_ACCESS_KEY_ID = "any"
+AWS_SECRET_ACCESS_KEY = "any"
+AWS_STORAGE_BUCKET_NAME = "media"
+AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", "http://host.docker.internal:8333")
+AWS_S3_USE_SSL = False
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = "public-read"
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_ADDRESSING_STYLE = "path"
+STORAGES = {
+    "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+
 ROOT_URLCONF = "neuronhub.urls"
 
 SERVER_PORT = env.int("SERVER_PORT", 8000)
@@ -280,15 +297,7 @@ rich.traceback.install(
 )
 
 
-DEFAULT_DJANGO_SETTINGS = StrawberryDjangoSettings(
-    FIELD_DESCRIPTION_FROM_HELP_TEXT=True,
-    TYPE_DESCRIPTION_FROM_MODEL_DOCSTRING=True,
-    GENERATE_ENUMS_FROM_CHOICES=True,
-    MUTATIONS_DEFAULT_ARGUMENT_NAME="data",
-    MUTATIONS_DEFAULT_HANDLE_ERRORS=False,
-    MAP_AUTO_ID_AS_GLOBAL_ID=False,
-    DEFAULT_PK_FIELD_NAME="id",  # default is "pk" - nice intention, but bad impl - "id" is soft-required in django
-    USE_DEPRECATED_FILTERS=False,
-    PAGINATION_DEFAULT_LIMIT=300,
-    ALLOW_MUTATIONS_WITHOUT_FILTERS=False,
-)
+DEFAULT_DJANGO_SETTINGS = strawberry_django_settings()
+DEFAULT_DJANGO_SETTINGS["GENERATE_ENUMS_FROM_CHOICES"] = True  # no reason atm, can remove
+# "pk" is a nice intention, but bad impl - "id" is soft-required in django
+DEFAULT_DJANGO_SETTINGS["DEFAULT_PK_FIELD_NAME"] = "id"

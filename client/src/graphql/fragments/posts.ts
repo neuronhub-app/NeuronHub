@@ -10,6 +10,10 @@ export const PostFragment = graphql(
       title
       content
       source
+      image {
+        url
+        name
+      }
       crunchbase_url
       github_url
       url

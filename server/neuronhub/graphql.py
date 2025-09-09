@@ -1,10 +1,12 @@
 import strawberry
+from django.core.files.uploadedfile import UploadedFile
 from django_extensions.db.fields import AutoSlugField
 from strawberry.extensions import ParserCache
 from strawberry.schema.config import StrawberryConfig
 from strawberry.tools import merge_types
 from strawberry_django.fields.types import field_type_map
 from strawberry_django.optimizer import DjangoOptimizerExtension
+from strawberry.file_uploads import Upload
 
 from neuronhub.apps.db.fields import MarkdownField
 
@@ -42,4 +44,5 @@ schema = strawberry.Schema(
         DjangoOptimizerExtension,
     ],
     config=StrawberryConfig(auto_camel_case=False),
+    scalar_overrides={UploadedFile: Upload},  # optional, for typing
 )

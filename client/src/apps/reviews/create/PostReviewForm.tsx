@@ -304,7 +304,6 @@ export namespace PostReviewForm {
                             "Not interested",
                           ),
                         ]}
-                        {...ids.set(ids.review.form.usageStatus)}
                         segmentGroupProps={{ size: "sm" }}
                       />
 

@@ -141,6 +141,7 @@ class Post(AnonimazableTimeStampedModel):
     content = anonymizable(MarkdownField(blank=True))
     content_private = anonymizable(MarkdownField(blank=True, help_text="Only for author"))
     source = CharField(max_length=140, blank=True)
+    image = models.ImageField(upload_to="posts/images/", blank=True, null=True)
 
     # tool fields
     # ---------------------

@@ -10,8 +10,9 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
+import { PostTypeEnum } from "~/graphql/enums";
 
-// todo !(review): compare to PostReviewForm and how it needs to be updated after #44 was implemented
+// todo !(review): compare to ReviewForm re its update needs after #44
 export namespace PostToolForm {
   export const strs = {
     toolCreated: "Tool added",
@@ -27,6 +28,7 @@ export namespace PostToolForm {
       reValidateMode: "onChange",
       defaultValues: {
         id: null,
+        type: PostTypeEnum.Tool,
         title: "",
         tool_type: "Program",
         tags: [],
@@ -70,7 +72,7 @@ export namespace PostToolForm {
                   <Button
                     type="submit"
                     loading={form.formState.isSubmitting}
-                    {...ids.set(ids.postTool.btn.submit)}
+                    {...ids.set(ids.post.form.btn.submit)}
                   >
                     Save
                   </Button>

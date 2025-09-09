@@ -18,5 +18,14 @@ services:
     ports:
       - "5432:5432"
 
+  seaweedfs:
+    image: chrislusf/seaweedfs:latest
+    command: server -s3
+    ports:
+      - "8333:8333"
+    volumes:
+      - seaweedfs_data:/data
+
 volumes:
   postgres_data:
+  seaweedfs_data:

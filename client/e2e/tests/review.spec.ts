@@ -16,7 +16,7 @@ test.describe("Review", () => {
     await page.goto(urls.reviews.create);
     await helper.waitForNetworkIdle();
 
-    await helper.fill(ids.postTool.form.title, "Django");
+    await helper.fill(ids.post.form.title, "Django");
     await helper.fill(ids.review.form.title, "Django Review");
     await helper.fill(ids.review.form.content, "Easy to build with");
     await helper.click(ids.post.btn.submit);

@@ -4,6 +4,7 @@ import logging
 
 import strawberry
 import strawberry_django
+from django.core.files.uploadedfile import UploadedFile
 from django.db.models import QuerySet
 from strawberry import Info
 from strawberry import auto
@@ -46,6 +47,7 @@ class PostTypeI:
     title: auto
     content: auto
     content_private: auto
+    image: auto
 
     source: auto
 
@@ -132,6 +134,7 @@ class PostVoteType:
 @strawberry_django.input(Post, partial=True)
 class PostTypeInput:
     id: auto
+    type: auto
 
     parent: PostTypeInput | None
     alternatives: auto
@@ -149,6 +152,7 @@ class PostTypeInput:
     tags: list[PostTagTypeInput] | None
 
     source: auto
+    image: UploadedFile | None
 
     # review fields
     review_usage_status: auto

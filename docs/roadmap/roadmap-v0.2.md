@@ -6,10 +6,10 @@
 - [x] Tool create
 - [x] add `review.tags` and `review.review_tags` logic
 - [x] Tool list
-- [ ] Tool.image upload
-- [ ] Post
-	- create
-	- edit
+- [x] Tool.image upload
+- Post
+	- [ ] create
+	- [ ] edit
 
 ### v0.2.0.0 - invite-only release
 

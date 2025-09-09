@@ -10,6 +10,7 @@ requires-python = "~=3.13.0"
 dependencies = [
     # django
     "django == 5.2.*",
+        "pillow == 11.*", # [i=high, rep=high, GH=high, @hugovk, 13.1k] for ImageField. @hugovk is an ex-Python release manager; used by Django
     "django-allauth == 65.*",
     "django-anymail == 13.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, KLOC +84/-40
     "django-cors-headers == 4.*", # [i=high, rep=highest, @adamchainz] Django Sec Team
@@ -23,6 +24,7 @@ dependencies = [
     "django-simple-history == 3.*", # [i=high, rep=norm, GH=norm, @django-commons, 2.4k]
     "django-countries == 7.*", # [i=low, rep=norm, GH=norm, @SmileyChris]
     "django-fieldsignals == 0.*", # [i=low, rep=norm, GH=norm, @craigds]
+    "django-storages[boto3] == 1.14.6", # [i=norm, rep=low, GH=high, @jschneier, 2.8k] for S3, author dropped it in 2011, maintainer is a no-name - single project
     "dj-database-url == 3.*", # [i=low, rep=norm, GH=norm, @mattseymour]
 
     # django fields

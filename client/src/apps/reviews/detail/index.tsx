@@ -8,7 +8,7 @@ import {
   type PostReviewDetailFragmentType,
 } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import type { Route } from "~/react-router/reviews/detail/+types/index";
+import type { Route } from "~/react-router/reviews/detail/+types";
 
 export default function PostReviewDetailRoute(props: Route.ComponentProps) {
   const { data, error, isLoadingFirstTime } = useApolloQuery(

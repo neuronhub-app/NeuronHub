@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from random import Random
 
 from asgiref.sync import sync_to_async
+from django.core.files.uploadedfile import SimpleUploadedFile
 from faker import Faker
 from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
 
@@ -43,6 +44,9 @@ class Gen:
         self.posts = PostsGen(faker=self.faker, user=self.users.user_default)
 
         return self
+
+    def image(self, content=b"image_content") -> SimpleUploadedFile:
+        return SimpleUploadedFile(name="image.jpg", content=content, content_type="image/jpeg")
 
 
 @dataclass

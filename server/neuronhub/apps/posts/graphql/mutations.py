@@ -30,6 +30,8 @@ class PostsMutation:
     update_post: PostType = mutations.update(PostTypeInput, extensions=[IsAuthenticated()])
     post_delete: PostType = mutations.delete(DjangoModelInput, extensions=[IsAuthenticated()])
 
+    # todo !(auth): permissions, eg .parent
+    # todo refac-name: post_create
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def create_post(
         self,
@@ -38,17 +40,13 @@ class PostsMutation:
     ) -> PostType:
         author: User = info.context.request.user
         res = await sync_to_async(resolvers.create)(
-            info,
+            info=info,
             model=Post,
-            data={
-                **vars(data),
-                "type": Post.Type.Tool,
-                "author": author,
-            },
+            data={**vars(data), "author": author},
         )
         return cast(PostType, res)
 
-    # todo ! (auth) check author on update
+    # todo !(auth) check author
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def review_create_or_update(
         self,
