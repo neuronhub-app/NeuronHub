@@ -20,7 +20,7 @@ test.describe("Tool", () => {
     await helper.fill(ids.post.form.title, tool.title);
 
     const input = helper.get(ids.post.form.image);
-    await input.setInputFiles(await generateImageSquareRed());
+    await input.setInputFiles(await genImagePng());
 
     await helper.click(ids.post.form.btn.submit);
     await expect(page).toHaveText(PostToolForm.strs.toolCreated);
@@ -34,7 +34,7 @@ test.describe("Tool", () => {
   });
 
   // #AI
-  async function generateImageSquareRed() {
+  async function genImagePng() {
     const imageCanvas = await helper.page.evaluateHandle(() => {
       const canvas = document.createElement("canvas");
       canvas.width = 100;
@@ -46,7 +46,7 @@ test.describe("Tool", () => {
     });
     const imageBlob = await helper.page.evaluate(canvas => {
       return new Promise<string>(resolve => {
-        (canvas as HTMLCanvasElement).toBlob(blob => {
+        canvas.toBlob(blob => {
           const reader = new FileReader();
           reader.onload = () => resolve(reader.result as string);
           reader.readAsDataURL(blob!);

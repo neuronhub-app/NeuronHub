@@ -13,6 +13,10 @@ export namespace ids {
       submit: "post.btn.submit", // todo refac: drop, use .form
       edit: "post.btn.edit",
     },
+    toast: {
+      created: "post.toast.created",
+      createFailed: "post.toast.create-failed",
+    },
     card: {
       container: "post.card.container",
       id: "post.card.id",

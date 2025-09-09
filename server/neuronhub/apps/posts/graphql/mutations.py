@@ -5,7 +5,6 @@ from asgiref.sync import sync_to_async
 from strawberry import Info
 from strawberry_django import mutations
 from strawberry_django.auth.utils import aget_current_user
-from strawberry_django.mutations import resolvers
 from strawberry_django.permissions import IsAuthenticated
 
 from neuronhub.apps.posts.graphql.types import PostCommentType
@@ -25,9 +24,10 @@ class DjangoModelInput:
     id: strawberry.ID
 
 
+# todo !(auth): permissions
 @strawberry.type
 class PostsMutation:
-    update_post: PostType = mutations.update(PostTypeInput, extensions=[IsAuthenticated()])
+    post_update: PostType = mutations.update(PostTypeInput, extensions=[IsAuthenticated()])
     post_delete: PostType = mutations.delete(DjangoModelInput, extensions=[IsAuthenticated()])
 
     # todo !(auth): permissions, eg .parent
@@ -38,13 +38,11 @@ class PostsMutation:
         data: PostTypeInput,
         info: Info,
     ) -> PostType:
+        from neuronhub.apps.posts.services.post_create import post_create
+
         author: User = info.context.request.user
-        res = await sync_to_async(resolvers.create)(
-            info=info,
-            model=Post,
-            data={**vars(data), "author": author},
-        )
-        return cast(PostType, res)
+        post = await post_create(author=author, data=data)
+        return cast(PostType, post)
 
     # todo !(auth) check author
     @strawberry.mutation(extensions=[IsAuthenticated()])

@@ -45,6 +45,7 @@ export namespace PostToolForm {
         {
           input: {
             ...rest,
+            type: PostTypeEnum.Tool,
             alternatives: alternatives ? { set: alternatives.map(alt => alt.id) } : undefined,
           },
         },
@@ -67,7 +68,7 @@ export namespace PostToolForm {
             <form onSubmit={form.handleSubmit(values => handleSubmit(values))}>
               <Fieldset.Root>
                 <Fieldset.Content display="flex" gap="gap.md">
-                  <PostToolFields form={form} />
+                  <PostToolFields />
 
                   <Button
                     type="submit"

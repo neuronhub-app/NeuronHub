@@ -42,10 +42,7 @@ export function CommentForm(
 
   async function handleSubmit(data: z.infer<typeof schema>) {
     if (isEditMode) {
-      const response = await commentUpdate({
-        id: props.comment.id,
-        content: data.content,
-      });
+      const response = await commentUpdate({ id: props.comment.id, content: data.content });
       if (response.success) {
         toast.success(strs.updatedComment);
         draft.clear();
@@ -147,7 +144,7 @@ async function commentCreate(input: { parentId: ID; content: string }) {
 
 async function commentUpdate(input: { id: ID; content: string }) {
   return mutateAndRefetchMountedQueries(
-    graphql(`mutation CommentUpdate($data: PostTypeInput!) { update_post(data: $data) { id } }`),
+    graphql(`mutation CommentUpdate($data: PostTypeInput!) { post_update(data: $data) { id } }`),
     {
       data: {
         id: input.id,

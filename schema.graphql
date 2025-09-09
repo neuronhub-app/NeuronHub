@@ -93,7 +93,7 @@ type Mutation {
   login(data: LoginInput!): LoginResponse!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   update_user_list(id: ID!, list_field_name: UserListName!, is_added: Boolean!): Boolean! @IsAuthenticated
-  update_post(data: PostTypeInput!): PostType! @IsAuthenticated
+  post_update(data: PostTypeInput!): PostType! @IsAuthenticated
   post_delete(data: DjangoModelInput!): PostType! @IsAuthenticated
   create_post(data: PostTypeInput!): PostType! @IsAuthenticated
   review_create_or_update(data: PostTypeInput!): PostType! @IsAuthenticated

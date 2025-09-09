@@ -69,6 +69,7 @@ export default [
     ]),
     ...prefix(urls.posts.list, [
       route("/", "./apps/posts/list/index.tsx"),
+      route(`/${op.create}`, "./apps/posts/create/index.tsx"),
       route("/:id", "./apps/posts/detail/index.tsx"),
       route(`/:id/${op.edit}`, "./apps/posts/edit/index.tsx"),
     ]),

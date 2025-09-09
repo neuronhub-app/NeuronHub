@@ -222,7 +222,7 @@ export namespace PostReviewForm {
                       />
                     </>
                   ) : (
-                    <PostToolFields form={forms.tool} />
+                    <PostToolFields />
                   )}
                 </Fieldset.Content>
               </Fieldset.Root>

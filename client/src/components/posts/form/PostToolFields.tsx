@@ -1,25 +1,24 @@
 import { HStack, Show, Text } from "@chakra-ui/react";
 import { Webhook } from "lucide-react";
 import type { JSX } from "react";
-import type { UseFormReturn } from "react-hook-form";
+import { useFormContext } from "react-hook-form";
 import { FaAppStoreIos, FaBook, FaCode, FaServer, FaShoppingCart } from "react-icons/fa";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
-import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
-import { ImageUpload } from "@/components/posts/form/ImageUpload";
-import { SelectVotable } from "@/components/posts/form/SelectVotable";
+import { PostFields } from "@/components/posts/form/PostFields";
 import type { schemas } from "@/components/posts/form/schemas";
 import { ids } from "@/e2e/ids";
 
-export function PostToolFields(props: { form: UseFormReturn<schemas.Tool> }) {
-  const state = props.form.watch();
+export function PostToolFields() {
+  const form = useFormContext<schemas.Tool>();
+  const state = form.watch();
 
   return (
     <>
       <FormChakraSegmentControl
-        control={props.form.control}
+        control={form.control}
         name="tool_type"
         label="Type"
         segmentGroupProps={{ size: "lg" }}
@@ -63,56 +62,32 @@ export function PostToolFields(props: { form: UseFormReturn<schemas.Tool> }) {
         </Text>
       </Show>
 
-      <FormChakraInput
-        name="title"
-        control={props.form.control}
-        label={`${getToolTypeName(state.tool_type)} name`}
-        {...ids.setInput(ids.post.form.title)}
-      />
-
-      <ImageUpload
-        name="image"
-        control={props.form.control}
-        label={`${getToolTypeName(state.tool_type)} image`}
-        {...ids.setInput(ids.post.form.image)}
+      <PostFields
+        titleLabel={`${getToolTypeName(state.tool_type)} name`}
+        titleId={ids.post.form.title}
+        contentLabel={`${getToolTypeName(state.tool_type)} description`}
       />
 
       <HStack w="full" gap="gap.md">
         <FormChakraInput
           name="domain"
-          control={props.form.control}
+          control={form.control}
           inputProps={{ placeholder: "name.com" }}
           label="Domain"
         />
         <FormChakraInput
           name="github_url"
-          control={props.form.control}
+          control={form.control}
           startElement={<LuGithub />}
           label="GitHub"
         />
         <FormChakraInput
           name="crunchbase_url"
-          control={props.form.control}
+          control={form.control}
           startElement={<SiCrunchbase />}
           label="Crunchbase"
         />
       </HStack>
-
-      <FormChakraTextarea
-        field={{ control: props.form.control, name: "content" }}
-        label={`${getToolTypeName(state.tool_type)} description`}
-        placeholder=""
-        isShowIconMarkdown
-      />
-
-      <FormChakraInput
-        name="source"
-        control={props.form.control}
-        label="Source"
-        placeholder="Link or reference"
-      />
-
-      <SelectVotable fieldName="tags" {...ids.set(ids.post.form.tags.container)} />
 
       {/* TODO: Fix alternatives field type issues
       <VStack align="flex-start" w="full" gap="gap.sm">
@@ -148,6 +123,7 @@ export function PostToolFields(props: { form: UseFormReturn<schemas.Tool> }) {
     </>
   );
 }
+
 function getToolTypeName(tool_type?: string) {
   return tool_type === "Other" ? "Tool" : tool_type;
 }
