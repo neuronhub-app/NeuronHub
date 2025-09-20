@@ -1,11 +1,12 @@
-import { expect, type Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
+
 import { config } from "@/e2e/config";
 import { env } from "@/env";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import type { urls } from "@/routes";
 
-export class PlayWrightHelper {
+export class PlaywrightHelper {
   constructor(
     public page: Page,
     private timeout = 4500,
@@ -51,15 +52,6 @@ export class PlayWrightHelper {
     return this.get(id).waitFor({ timeout: this.timeout + this.timeoutWaitExtra });
   }
 
-  async expectText(text: string, options: { timeout?: number } = {}) {
-    await this.page.waitForSelector(`text="${text}"`, options);
-  }
-
-  // todo refac: use expect.extend for clear error report
-  async waitForState(testId: string, state: "checked" | "unchecked") {
-    await expect(this.get(testId)).toHaveAttribute("data-state", state);
-  }
-
   waitForNetworkIdle() {
     return this.page.waitForLoadState("networkidle");
   }
@@ -79,6 +71,6 @@ export class PlayWrightHelper {
     await this.page.fill('input[name="username"]', config.user.username);
     await this.page.fill('input[name="password"]', config.user.password);
     await this.page.click('input[type="submit"]');
-    await this.expectText("Site administration");
+    await this.page.waitForSelector('text="Site administration"');
   }
 }

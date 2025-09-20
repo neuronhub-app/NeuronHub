@@ -1,75 +1,77 @@
 import { test } from "@playwright/test";
+
 import { strs } from "@/components/posts/PostDetail/CommentForm";
+import { expect } from "@/e2e/helpers/expect";
+import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
-import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 import { urls } from "@/routes";
 
 test.describe("Comments", () => {
-  let pwh: PlayWrightHelper;
+  let helper: PlaywrightHelper;
 
   test.beforeEach(async ({ page }) => {
-    pwh = new PlayWrightHelper(page);
-    await pwh.dbStubsRepopulateAndLogin();
+    helper = new PlaywrightHelper(page);
+    await helper.dbStubsRepopulateAndLogin();
   });
 
   test("create comment and vote", async ({ page }) => {
     // test creation
-    await pwh.navigate(urls.reviews.list);
-    await pwh.waitForNetworkIdle();
-    await pwh.click(ids.post.card.link.detail);
-    await pwh.wait(ids.comment.form.textarea);
+    await helper.navigate(urls.reviews.list);
+    await helper.waitForNetworkIdle();
+    await helper.click(ids.post.card.link.detail);
+    await helper.wait(ids.comment.form.textarea);
     const commentContent = "Test comment";
-    await pwh.get(ids.comment.form.textarea).fill(commentContent);
-    await pwh.click(ids.comment.form.submitBtn);
+    await helper.fill(ids.comment.form.textarea, commentContent);
+    await helper.click(ids.comment.form.submitBtn);
 
-    await pwh.expectText(strs.createdComment);
+    await expect(page).toHaveText(strs.createdComment);
 
     // test voting
-    await pwh.waitForState(ids.comment.vote.up, "unchecked");
-    await pwh.waitForState(ids.comment.vote.down, "unchecked");
+    await expect(page).toHaveChecked(ids.comment.vote.up, false);
+    await expect(page).toHaveChecked(ids.comment.vote.down, false);
 
-    await pwh.click(ids.comment.vote.up);
-    await pwh.waitForState(ids.comment.vote.up, "checked");
-    await pwh.waitForState(ids.comment.vote.down, "unchecked");
+    await helper.click(ids.comment.vote.up);
+    await expect(page).toHaveChecked(ids.comment.vote.up, true);
+    await expect(page).toHaveChecked(ids.comment.vote.down, false);
 
-    await pwh.click(ids.comment.vote.down);
-    await pwh.waitForState(ids.comment.vote.down, "checked");
-    await pwh.waitForState(ids.comment.vote.up, "unchecked");
+    await helper.click(ids.comment.vote.down);
+    await expect(page).toHaveChecked(ids.comment.vote.down, true);
+    await expect(page).toHaveChecked(ids.comment.vote.up, false);
 
-    await pwh.click(ids.comment.vote.down);
-    await pwh.waitForState(ids.comment.vote.down, "unchecked");
-    await pwh.waitForState(ids.comment.vote.up, "unchecked");
+    await helper.click(ids.comment.vote.down);
+    await expect(page).toHaveChecked(ids.comment.vote.down, false);
+    await expect(page).toHaveChecked(ids.comment.vote.up, false);
 
-    await pwh.click(ids.comment.vote.up);
-    await pwh.waitForState(ids.comment.vote.up, "checked");
+    await helper.click(ids.comment.vote.up);
+    await expect(page).toHaveChecked(ids.comment.vote.up, true);
 
     // reload to verify persistence
     await page.reload();
-    await pwh.waitForNetworkIdle();
-    await pwh.waitForState(ids.comment.vote.up, "checked");
-    await pwh.expectText(commentContent);
+    await helper.waitForNetworkIdle();
+    await expect(page).toHaveChecked(ids.comment.vote.up, true);
+    await expect(page).toHaveText(commentContent);
   });
 
   test("edit comment", async ({ page }) => {
     // open a Review
-    await pwh.navigate(urls.reviews.list);
-    await pwh.waitForNetworkIdle();
-    await pwh.click(ids.post.card.link.detail);
+    await helper.navigate(urls.reviews.list);
+    await helper.waitForNetworkIdle();
+    await helper.click(ids.post.card.link.detail);
 
     // edit
-    await pwh.click(ids.comment.edit.btn);
-    await pwh.wait(ids.comment.form.textarea);
+    await helper.click(ids.comment.edit.btn);
+    await helper.wait(ids.comment.form.textarea);
     const contentUpdated = "Updated comment content";
-    await pwh.get(ids.comment.form.textarea).clear();
-    await pwh.get(ids.comment.form.textarea).fill(contentUpdated);
+    await helper.get(ids.comment.form.textarea).clear();
+    await helper.fill(ids.comment.form.textarea, contentUpdated);
     // save
-    await pwh.click(ids.comment.form.saveBtn);
-    await pwh.expectText(strs.updatedComment);
-    await pwh.expectText(contentUpdated);
+    await helper.click(ids.comment.form.saveBtn);
+    await expect(page).toHaveText(strs.updatedComment);
+    await expect(page).toHaveText(contentUpdated);
 
     // reload to verify persistence
     await page.reload();
-    await pwh.waitForNetworkIdle();
-    await pwh.expectText(contentUpdated);
+    await helper.waitForNetworkIdle();
+    await expect(page).toHaveText(contentUpdated);
   });
 });

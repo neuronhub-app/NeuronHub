@@ -1,14 +1,15 @@
-import { expect, test } from "@playwright/test";
+import { test } from "@playwright/test";
 import { PostReviewForm } from "@/apps/reviews/create/PostReviewForm";
+import { expect } from "@/e2e/helpers/expect";
+import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
-import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 import { urls } from "@/routes";
 
 test.describe("Review", () => {
-  let helper: PlayWrightHelper;
+  let helper: PlaywrightHelper;
 
   test.beforeEach(async ({ page }) => {
-    helper = new PlayWrightHelper(page);
+    helper = new PlaywrightHelper(page);
     await helper.dbStubsRepopulateAndLogin();
   });
 
@@ -21,7 +22,7 @@ test.describe("Review", () => {
     await helper.fill(ids.review.form.content, "Easy to build with");
     await helper.click(ids.post.btn.submit);
 
-    await helper.expectText(PostReviewForm.strs.reviewCreated);
+    await expect(page).toHaveText(PostReviewForm.strs.reviewCreated);
   });
 
   // #AI duplicates test below, low quality, refactor
@@ -53,7 +54,7 @@ test.describe("Review", () => {
     await expect(voteDownButton).toHaveAttribute("data-is-active", "true");
     // Save
     await helper.click(ids.post.btn.submit);
-    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await expect(page).toHaveText(PostReviewForm.strs.reviewUpdated);
     await helper.waitForNetworkIdle();
     // Re-open the form
     await helper.click(ids.post.card.link.edit);
@@ -75,7 +76,7 @@ test.describe("Review", () => {
     await page.keyboard.press("Enter");
     await expect(tagsReviewContainer).toContainText(tagName.added);
     await helper.click(ids.post.btn.submit);
-    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await expect(page).toHaveText(PostReviewForm.strs.reviewUpdated);
     await helper.waitForNetworkIdle();
 
     // Re-open the form
@@ -122,7 +123,7 @@ test.describe("Review", () => {
 
     // Save review
     await helper.click(ids.post.btn.submit);
-    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await expect(page).toHaveText(PostReviewForm.strs.reviewUpdated);
     await helper.waitForNetworkIdle();
 
     // Re-edit to verify tag persistence
@@ -145,7 +146,7 @@ test.describe("Review", () => {
 
     // Save and verify persistence of removal
     await helper.click(ids.post.btn.submit);
-    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await expect(page).toHaveText(PostReviewForm.strs.reviewUpdated);
     await helper.waitForNetworkIdle();
 
     // Re-edit to verify removal persisted
@@ -181,7 +182,7 @@ test.describe("Review", () => {
 
     // Save without any changes
     await helper.click(ids.post.btn.submit);
-    await helper.expectText(PostReviewForm.strs.reviewUpdated);
+    await expect(page).toHaveText(PostReviewForm.strs.reviewUpdated);
     await helper.waitForNetworkIdle();
 
     // Go back to review list

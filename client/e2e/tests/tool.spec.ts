@@ -1,14 +1,15 @@
-import { expect, test } from "@playwright/test";
+import { test } from "@playwright/test";
 import { PostToolForm } from "@/apps/tools/create/PostToolForm";
+import { expect } from "@/e2e/helpers/expect";
+import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
-import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 import { urls } from "@/routes";
 
 test.describe("Tool", () => {
-  let helper: PlayWrightHelper;
+  let helper: PlaywrightHelper;
 
   test.beforeEach(async ({ page }) => {
-    helper = new PlayWrightHelper(page);
+    helper = new PlaywrightHelper(page);
     await helper.dbStubsRepopulateAndLogin();
   });
 
@@ -22,7 +23,7 @@ test.describe("Tool", () => {
     await input.setInputFiles(await generateImageSquareRed());
 
     await helper.click(ids.post.form.btn.submit);
-    await helper.expectText(PostToolForm.strs.toolCreated);
+    await expect(page).toHaveText(PostToolForm.strs.toolCreated);
     await helper.navigate(urls.tools.list);
 
     const image = helper.get(ids.post.card.image);
@@ -55,7 +56,7 @@ test.describe("Tool", () => {
     return {
       name: "test.png",
       mimeType: "image/png",
-      buffer: Buffer.from(imageBlob.split(",")[1], "base64"), // ahem, whatever...
+      buffer: Buffer.from(imageBlob.split(",")[1], "base64"), // it works - so whatever...
     };
   }
 });

@@ -1,13 +1,14 @@
-import { expect, type Page, test } from "@playwright/test";
+import { type Page, test } from "@playwright/test";
+import { expect } from "@/e2e/helpers/expect";
+import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
-import { PlayWrightHelper } from "@/e2e/PlayWrightHelper";
 import { urls } from "@/routes";
 
 test.describe("Post button actions", () => {
-  let pwh: PlayWrightHelper;
+  let pwh: PlaywrightHelper;
 
   test.beforeEach(async ({ page }) => {
-    pwh = new PlayWrightHelper(page);
+    pwh = new PlaywrightHelper(page);
     await pwh.dbStubsRepopulateAndLogin();
   });
 
@@ -24,7 +25,7 @@ test.describe("Post button actions", () => {
 
     await expect(pwh.get(btnId)).toBeVisible();
 
-    await pwh.waitForState(btnId, "unchecked");
+    await expect(page).toHaveChecked(btnId, false);
 
     // mutate
     const waitForUpdate = page.waitForResponse(response =>
@@ -32,9 +33,9 @@ test.describe("Post button actions", () => {
     );
     await pwh.click(btnId);
     await waitForUpdate;
-    await pwh.waitForState(btnId, "checked");
+    await expect(page).toHaveChecked(btnId, true);
 
     await page.reload();
-    await pwh.waitForState(btnId, "checked");
+    await expect(page).toHaveChecked(btnId, true);
   }
 });
