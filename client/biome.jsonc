@@ -55,6 +55,13 @@
     "indentStyle": "space",
     "lineWidth": 97,
   },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on",
+      },
+    },
+  },
   "files": {
     "includes": [
       "src/**",
