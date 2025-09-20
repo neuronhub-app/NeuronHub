@@ -62,7 +62,7 @@ dependencies = [
 
 [dependency-groups]
     dev = [
-        "ruff == 0.12.*",
+        "ruff == 0.13.*",
         "faker == 37.*",
         "objprint == 0.*",
         "pip == 25.*",
