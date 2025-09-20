@@ -395,6 +395,7 @@ interface PostTypeI {
 
 input PostTypeInput {
   id: ID
+  type: PostTypeEnum
   parent: PostTypeInput
   alternatives: ManyToManyInput
   title: String
