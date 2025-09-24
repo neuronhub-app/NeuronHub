@@ -1,7 +1,11 @@
 import type { ExpectMatcherState, Locator } from "@playwright/test";
 import type { MatcherReturnType } from "playwright/types/test";
 
-// Most of code from https://playwright.dev/docs/test-assertions#add-custom-matchers-using-expectextend
+/**
+ * I moved this out of [[expect.ts]] for LLM context rot sake.
+ *
+ * Mostly a copy-paste of [the docs example](https://playwright.dev/docs/test-assertions#add-custom-matchers-using-expectextend)
+ */
 export async function runPlaywrightMatcher(params: {
   locator: Locator;
   name: string;

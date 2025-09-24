@@ -233,6 +233,7 @@ class PostsGen:
             await post.tags.aadd(tag)
         return tag
 
+    # todo refac-rename: `post`
     async def create(self, params: Params = Params(type=Post.Type.Post)) -> Post:
         from neuronhub.apps.posts.models import Post
         from neuronhub.apps.posts.models import ToolCompany

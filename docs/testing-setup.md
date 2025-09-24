@@ -9,7 +9,7 @@ The biggest issues in tests are:
 
 Unit tests have great potential to speed up the development. But only when they're written within the high-quality framework, and focus on testing project's business logic.
 
-We do not fucking test third-party libraries, as Strawberry, GraphQL, etc.  
+We do not fucking test third-party libraries, as Strawberry, GraphQL, etc.
 
 ### Pytest
 
@@ -46,13 +46,14 @@ All fields of `Gen` are designed as optional with fallbacks.
 
 Add more generators when needed for more than one test function. Esp if for several files.
 
-##### Source code and usage
-```python
-@/server/neuronhub/apps/tests/test_gen.py
+Read the `test_gen.py` if you're working on Python tests.
 
-# usage:
+##### Usage
+
+```python
 user = await self.gen.users.user()
 post = await self.gen.posts.create()
+comment = await self.gen.posts.comment(parent=post)
 review_1 = await self.gen.posts.create(self.gen.posts.Params(
     type=Post.Type.Review,
     parent=post,
@@ -73,5 +74,6 @@ Notes:
 - If code needs timeouts as `waitForTimeout` - it is shit and must be rewritten.
 - `client/e2e/helpers/PlayWrightHelper.ts` is wrapper for bad Playwright API.
 - `client/e2e/helpers/expect.ts` adds `epxect(page).toHaveText → localor(text="$")` and `page.toHaveChecked → toHaveAttribute("data-state", $)`
+	- read if it you're adding E2E tests.
 - Use `data-testid` for locators, in JSX set as `{...ids.set(ids.post.btn.submit)}`, see `client/e2e/ids.ts`
 - Auth is by Django `/admin/login/` and cookie - CORS 100% works.

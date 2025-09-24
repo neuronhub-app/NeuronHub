@@ -1,3 +1,5 @@
+export type TestId = string;
+
 // todo refac: gen values from keys
 export namespace ids {
   export const post = {
@@ -95,15 +97,15 @@ export namespace ids {
     },
   } as const;
 
-  export function selector<S extends string>(id: S): `[data-testid="${S}"]` {
+  export function selector<S extends TestId>(id: S): `[data-testid="${S}"]` {
     return `[data-testid="${id}"]`;
   }
 
-  export function set<S extends string>(id: S): { "data-testid": S } {
+  export function set<S extends TestId>(id: S): { "data-testid": S } {
     return { "data-testid": id };
   }
 
-  export function setInput<Id extends string>(id: Id): { inputProps: { "data-testid": Id } } {
+  export function setInput<Id extends TestId>(id: Id): { inputProps: { "data-testid": Id } } {
     return { inputProps: { "data-testid": id } };
   }
 }

@@ -1,10 +1,13 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 import { config } from "@/e2e/config";
+import type { TestId } from "@/e2e/ids";
 import { env } from "@/env";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import type { urls } from "@/routes";
+
+export type LocatorMap = Record<TestId, Locator>;
 
 export class PlaywrightHelper {
   constructor(
@@ -22,8 +25,18 @@ export class PlaywrightHelper {
 
   async navigate(
     path: typeof urls.reviews.list | typeof urls.posts.list | typeof urls.tools.list,
+    opts = { idleWait: false },
   ) {
-    return this.page.goto(path);
+    await this.page.goto(path);
+
+    if (opts.idleWait) {
+      await this.page.waitForLoadState("networkidle");
+    }
+  }
+
+  locator(): LocatorMap {
+    const map = {};
+    return new Proxy(map, { get: (_, selector: TestId) => this.get(selector) });
   }
 
   getAll(id: string) {
@@ -38,6 +51,7 @@ export class PlaywrightHelper {
   async fill(id: string, content: string) {
     const input = this.get(id);
     await input.waitFor();
+    await input.clear();
     await input.fill(content);
   }
 
@@ -54,6 +68,17 @@ export class PlaywrightHelper {
 
   waitForNetworkIdle() {
     return this.page.waitForLoadState("networkidle");
+  }
+
+  async reload(opts = { idleWait: false }) {
+    await this.page.reload();
+    if (opts.idleWait) {
+      return this.page.waitForLoadState("networkidle");
+    }
+  }
+
+  async awaitMutation(name: "UserCurrent") {
+    return this.page.waitForResponse(response => response.url().includes(name));
   }
 
   async screenshot(name: string = "screenshot") {

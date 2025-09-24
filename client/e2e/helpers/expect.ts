@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import { expect as expectBase } from "@playwright/test";
 import { runPlaywrightMatcher } from "@/e2e/helpers/run-playwright-matcher";
 
@@ -17,25 +17,15 @@ export const expect = expectBase.extend({
     });
   },
 
-  async toHaveChecked(
-    page: Page,
-    id: string,
-    expected: boolean,
-    options?: { timeout?: number },
-  ) {
-    const locator = page.getByTestId(id).first();
+  async checked(locator: Locator) {
     return runPlaywrightMatcher({
       context: this,
-      name: "toHaveChecked",
+      name: "checked",
       locator,
-      expected,
+      expected: true,
       assertion: async () => {
         const expectation = this.isNot ? expectBase(locator).not : expectBase(locator);
-        await expectation.toHaveAttribute(
-          "data-state",
-          expected ? "checked" : "unchecked",
-          options,
-        );
+        await expectation.toHaveAttribute("data-state", "checked");
       },
     });
   },

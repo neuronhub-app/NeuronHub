@@ -6,7 +6,7 @@ import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { urls } from "@/routes";
 
-test.describe("Post Create", () => {
+test.describe("Post", () => {
   let helper: PlaywrightHelper;
 
   test.beforeEach(async ({ page }) => {
@@ -14,7 +14,7 @@ test.describe("Post Create", () => {
     await helper.dbStubsRepopulateAndLogin();
   });
 
-  test("Create Post with tags and verify on list", async ({ page }) => {
+  test("Create with tags", async ({ page }) => {
     await page.goto(urls.posts.create);
     await helper.waitForNetworkIdle();
 
