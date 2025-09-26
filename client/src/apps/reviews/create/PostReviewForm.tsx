@@ -218,7 +218,7 @@ export namespace PostReviewForm {
                         isSelectReadOnlyInReviewForm={true}
                         postId={props.review?.parent?.id}
                         optionIdsHidden={state.review.tags.map(tag => tag.id)}
-                        {...ids.set(ids.post.form.tags.container)}
+                        {...ids.set(ids.post.form.tags)}
                       />
                     </>
                   ) : (

@@ -1,4 +1,5 @@
 import {
+  Box,
   DialogBackdrop,
   Field,
   HStack,
@@ -159,7 +160,7 @@ export function SelectVotable(
               : propsRemove => (
                   <components.MultiValueRemove
                     {...propsRemove}
-                    data-testid={ids.post.form.tags.tag.remove}
+                    data-testid={ids.post.form.tag.remove}
                   />
                 ),
             MultiValueLabel: propsMultiVal => (
@@ -167,38 +168,44 @@ export function SelectVotable(
                 <HStack gap="2" px={0.5} py={0.5}>
                   {propsMultiVal.children}
 
-                  <HStack gap="px" data-name={propsMultiVal.data.name}>
-                    <VoteButton
-                      isPositive={true}
-                      option={propsMultiVal.data}
-                      options={options}
-                      onChange={({ optsUpdated }) => form.setValue(props.fieldName, optsUpdated)}
-                      postId={props.postId}
-                      isSelectReadOnlyInReviewForm={isSelectReadOnlyInReviewForm}
-                      data-testid={ids.post.form.tags.tag.vote.up}
-                    />
-                    <VoteButton
-                      isPositive={false}
-                      option={propsMultiVal.data}
-                      options={options}
-                      onChange={({ optsUpdated }) => form.setValue(props.fieldName, optsUpdated)}
-                      postId={props.postId}
-                      isSelectReadOnlyInReviewForm={isSelectReadOnlyInReviewForm}
-                      data-testid={ids.post.form.tags.tag.vote.down}
-                    />
-                    <OptionButton
-                      onClick={() => {
-                        state.mutable.optionSelected = propsMultiVal.data;
-                        state.mutable.isDialogOpen = true;
-                      }}
-                      icon={getOptionComment(propsMultiVal.data) ? FaMessage : FaRegMessage}
-                      color={
-                        getOptionComment(propsMultiVal.data) ? "fg.info" : "fg.muted-button"
-                      }
-                      iconSize=".75rem"
-                      data-testid={ids.post.form.tags.tag.comment}
-                    />
-                  </HStack>
+                  <Box data-testid={`tag-${propsMultiVal.data.name}`}>
+                    <HStack gap="px" data-testid={ids.post.form.tag.container}>
+                      <VoteButton
+                        isPositive={true}
+                        option={propsMultiVal.data}
+                        options={options}
+                        onChange={({ optsUpdated }) =>
+                          form.setValue(props.fieldName, optsUpdated)
+                        }
+                        postId={props.postId}
+                        isSelectReadOnlyInReviewForm={isSelectReadOnlyInReviewForm}
+                        data-testid={ids.post.form.tag.vote.up}
+                      />
+                      <VoteButton
+                        isPositive={false}
+                        option={propsMultiVal.data}
+                        options={options}
+                        onChange={({ optsUpdated }) =>
+                          form.setValue(props.fieldName, optsUpdated)
+                        }
+                        postId={props.postId}
+                        isSelectReadOnlyInReviewForm={isSelectReadOnlyInReviewForm}
+                        data-testid={ids.post.form.tag.vote.down}
+                      />
+                      <OptionButton
+                        onClick={() => {
+                          state.mutable.optionSelected = propsMultiVal.data;
+                          state.mutable.isDialogOpen = true;
+                        }}
+                        icon={getOptionComment(propsMultiVal.data) ? FaMessage : FaRegMessage}
+                        color={
+                          getOptionComment(propsMultiVal.data) ? "fg.info" : "fg.muted-button"
+                        }
+                        iconSize=".75rem"
+                        data-testid={ids.post.form.tag.comment}
+                      />
+                    </HStack>
+                  </Box>
                 </HStack>
               </components.MultiValueLabel>
             ),
@@ -305,10 +312,7 @@ function VoteButton(props: {
       icon={icon}
       isLoading={loading.isActive}
       data-testid={props["data-testid"]}
-      // todo refac: remove or simplify or make clear it's for E2E #AI
-      data-is-vote-positive={isUserVoted && props.isPositive}
-      data-is-active={isUserVoted}
-      data-vote-type={props.isPositive ? "up" : "down"}
+      data-state={isUserVoted ? "checked" : "unchecked"}
     />
   );
 }
@@ -320,9 +324,7 @@ export function OptionButton(props: {
   color?: IconProps["color"];
   isLoading?: boolean;
   "data-testid": string;
-  "data-is-vote-positive"?: boolean;
-  "data-is-active"?: boolean;
-  "data-vote-type"?: string;
+  "data-state"?: string;
 }) {
   return (
     <IconButton
@@ -337,9 +339,7 @@ export function OptionButton(props: {
       loading={props.isLoading}
       disabled={props.isLoading}
       data-testid={props["data-testid"]}
-      data-is-vote-positive={props["data-is-vote-positive"]}
-      data-is-active={props["data-is-active"]}
-      data-vote-type={props["data-vote-type"]}
+      data-state={props["data-state"]}
     >
       <Icon fontSize={props.iconSize}>
         <props.icon />

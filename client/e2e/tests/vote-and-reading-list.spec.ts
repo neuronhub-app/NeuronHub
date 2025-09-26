@@ -1,4 +1,4 @@
-import { type Page, test } from "@playwright/test";
+import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
 import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids, type TestId } from "@/e2e/ids";

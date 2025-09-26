@@ -15,46 +15,25 @@ test.describe("Post", () => {
   });
 
   test("Create with tags", async ({ page }) => {
-    await page.goto(urls.posts.create);
-    await helper.waitForNetworkIdle();
+    await helper.navigate(urls.posts.create);
 
-    const testTitle = `Test Post ${Date.now()}`;
+    const title = `Test Post ${Date.now()}`;
+    await helper.fill(ids.post.form.title, title);
 
-    // Fill basic fields
-    await helper.fill(ids.post.form.title, testTitle);
-
-    // Add tags
-    const tagsContainer = helper.get(ids.post.form.tags.container);
-    const tagInput = tagsContainer.locator("input").first();
-
-    const tagName = "Python";
-    await tagInput.click();
-    await tagInput.pressSequentially(tagName, { delay: 100 });
-    await page.keyboard.press("Enter");
-    await expect(tagsContainer).toContainText(tagName);
+    const tag = "Python";
+    await helper.addTag(tag);
 
     // Vote on the tag
-    const voteUpButton = tagsContainer
-      .locator(`[data-name="${tagName}"]`)
-      .getByTestId(ids.post.form.tags.tag.vote.up);
-    await voteUpButton.click();
-    await expect(voteUpButton).toHaveAttribute("data-is-active", "true");
-
-    // Submit the form
+    const vote = helper.getTagVoteButtons(tag);
+    await vote.up.click();
+    await expect(vote.up).checked();
     await helper.click(ids.post.btn.submit);
     await expect(page).toHaveText(PostCreateForm.strs.postCreated);
 
-    // Navigate to posts list to verify
-    await page.goto(urls.posts.list);
-    await helper.waitForNetworkIdle();
-
-    // Find the created post by title
-    const postCard = page
-      .locator(`[data-testid="${ids.post.card.container}"]`)
-      .filter({ hasText: testTitle });
+    // Verify in list
+    await helper.navigate(urls.posts.list, { idleWait: true });
+    const postCard = helper.getAll(ids.post.card.container).filter({ hasText: title });
     await expect(postCard).toBeVisible();
-
-    // Verify tag is displayed on the post
-    await expect(postCard).toContainText(tagName);
+    await expect(postCard).toContainText(tag);
   });
 });

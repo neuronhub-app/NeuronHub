@@ -31,16 +31,15 @@ export namespace ids {
     form: {
       title: "post.form.title",
       image: "post.form.image",
-      tags: {
-        container: "post.form.tags.container",
-        tag: {
-          vote: {
-            up: "post.form.tags.tag.vote.up",
-            down: "post.form.tags.tag.vote.down",
-          },
-          comment: "post.form.tags.tag.comment",
-          remove: "post.form.tags.tag.remove",
+      tags: "post.form.tags",
+      tag: {
+        container: "post.form.tag.container",
+        vote: {
+          up: "post.form.tag.vote.up",
+          down: "post.form.tag.vote.down",
         },
+        comment: "post.form.tag.comment",
+        remove: "post.form.tag.remove",
       },
       btn: {
         submit: "post.form.btn.submit",
@@ -60,6 +59,7 @@ export namespace ids {
       content: "review.form.content",
       tags: "review.form.tags",
       review_tags: "review.form.review_tags",
+      // Note: review_tags voting buttons use ids.post.form.tag since functionality is identical
     },
     tag: {
       container: "review.tag.container",

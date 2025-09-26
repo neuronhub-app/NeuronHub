@@ -29,4 +29,18 @@ export const expect = expectBase.extend({
       },
     });
   },
+
+  async toHaveTag(container: Locator, tagName: string) {
+    const tag = container.getByTestId(`tag-${tagName}`);
+    return runPlaywrightMatcher({
+      context: this,
+      name: "toHaveTag",
+      locator: tag,
+      expected: tagName,
+      assertion: async () => {
+        const expectation = this.isNot ? expectBase(tag).not : expectBase(tag);
+        await expectation.toBeVisible();
+      },
+    });
+  },
 });

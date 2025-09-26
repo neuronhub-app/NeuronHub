@@ -42,7 +42,7 @@ export function PostFields(props: {
         {...ids.setInput(ids.post.form.image)}
       />
 
-      <SelectVotable fieldName="tags" {...ids.set(ids.post.form.tags.container)} />
+      <SelectVotable fieldName="tags" {...ids.set(ids.post.form.tags)} />
     </>
   );
 }

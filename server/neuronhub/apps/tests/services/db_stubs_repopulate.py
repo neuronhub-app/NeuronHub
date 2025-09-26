@@ -185,7 +185,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
             TagParams(tags.web_dev, is_vote_pos=True),
             TagParams(tags.django, is_vote_pos=True),
             TagParams("Dev / Open Source Core"),
-            TagParams("Dev / Python", is_vote_pos=True),
+            TagParams(tags.python, is_vote_pos=True),
         ],
     )
     await _create_review_tags(
