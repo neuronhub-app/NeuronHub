@@ -7,33 +7,31 @@ import { ids } from "@/e2e/ids";
 import { urls } from "@/routes";
 
 test.describe("Post", () => {
-  let helper: PlaywrightHelper;
+  let play: PlaywrightHelper;
 
   test.beforeEach(async ({ page }) => {
-    helper = new PlaywrightHelper(page);
-    await helper.dbStubsRepopulateAndLogin();
+    play = new PlaywrightHelper(page);
+    await play.dbStubsRepopulateAndLogin();
   });
 
   test("Create with tags", async ({ page }) => {
-    await helper.navigate(urls.posts.create);
+    await play.navigate(urls.posts.create);
 
-    const title = `Test Post ${Date.now()}`;
-    await helper.fill(ids.post.form.title, title);
-
-    const tag = "Python";
-    await helper.addTag(tag);
-
-    // Vote on the tag
-    const vote = helper.getTagVoteButtons(tag);
+    const post = { title: `Test Post ${Date.now()}`, tag: "TypeScript" };
+    await play.fill(ids.post.form.title, post.title);
+    await play.addTag(post.tag);
+    // Vote on Tag
+    const vote = play.getTagVoteButtons(post.tag);
     await vote.up.click();
     await expect(vote.up).checked();
-    await helper.click(ids.post.btn.submit);
+    await play.click(ids.post.btn.submit);
     await expect(page).toHaveText(PostCreateForm.strs.postCreated);
 
+    // todo ! test .title of tools.detail() redirect
+
     // Verify in list
-    await helper.navigate(urls.posts.list, { idleWait: true });
-    const postCard = helper.getAll(ids.post.card.container).filter({ hasText: title });
-    await expect(postCard).toBeVisible();
-    await expect(postCard).toContainText(tag);
+    await play.navigate(urls.posts.list, { idleWait: true });
+    const card = play.getAll(ids.post.card.container).filter({ hasText: post.title });
+    await expect(card).toContainText(post.tag);
   });
 });

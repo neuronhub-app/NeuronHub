@@ -6,29 +6,29 @@ import { ids } from "@/e2e/ids";
 import { urls } from "@/routes";
 
 test.describe("Review", () => {
-  let helper: PlaywrightHelper;
+  let play: PlaywrightHelper;
   let $: LocatorMap;
 
   test.beforeEach(async ({ page }) => {
-    helper = new PlaywrightHelper(page);
-    await helper.dbStubsRepopulateAndLogin();
-    $ = helper.locator();
+    play = new PlaywrightHelper(page);
+    await play.dbStubsRepopulateAndLogin();
+    $ = play.locator();
   });
 
   test("Create with a Parent", async ({ page }) => {
-    await helper.navigate(urls.reviews.create, { idleWait: true });
+    await play.navigate(urls.reviews.create, { idleWait: true });
 
-    await helper.fill(ids.post.form.title, "Django");
-    await helper.fill(ids.review.form.title, "Django Review");
-    await helper.fill(ids.review.form.content, "Easy to build with");
-    await helper.click(ids.post.btn.submit);
+    await play.fill(ids.post.form.title, "Django");
+    await play.fill(ids.review.form.title, "Django Review");
+    await play.fill(ids.review.form.content, "Easy to build with");
+    await play.click(ids.post.btn.submit);
 
     await expect(page).toHaveText(PostReviewForm.strs.reviewCreated);
   });
 
   test("Edit Review.tags & Tool.tags", async () => {
-    await helper.navigate(urls.reviews.list);
-    await helper.click(ids.post.card.link.edit);
+    await play.navigate(urls.reviews.list);
+    await play.click(ids.post.card.link.edit);
 
     const tags = {
       parent: { existing: "IDE" },
@@ -41,7 +41,7 @@ test.describe("Review", () => {
     await expect(toolTags).toHaveTag(tags.parent.existing);
 
     // Add
-    await helper.addTag(tags.review.new, { isReviewTag: true });
+    await play.addTag(tags.review.new, { isReviewTag: true });
     await submitAndReload();
     await expect(reviewTags).toHaveTag(tags.review.new);
 
@@ -53,11 +53,11 @@ test.describe("Review", () => {
   });
 
   test("Tag (existing) voting & add a Tag", async () => {
-    await helper.navigate(urls.reviews.list);
-    await helper.click(ids.post.card.link.edit);
+    await play.navigate(urls.reviews.list);
+    await play.click(ids.post.card.link.edit);
 
     const tags = { existing: "Django", new: "New tag" };
-    const vote = helper.getTagVoteButtons(tags.existing, { isReviewTag: true });
+    const vote = play.getTagVoteButtons(tags.existing, { isReviewTag: true });
 
     // initial check
     await expect(vote.up).checked();
@@ -70,7 +70,7 @@ test.describe("Review", () => {
     await expect(vote.down).checked();
 
     // add new
-    await helper.addTag(tags.new, { isReviewTag: true });
+    await play.addTag(tags.new, { isReviewTag: true });
     await submitAndReload();
     await expect($[ids.review.form.tags]).toHaveTag(tags.existing);
     await expect($[ids.review.form.tags]).toHaveTag(tags.new);
@@ -79,9 +79,9 @@ test.describe("Review", () => {
   });
 
   async function submitAndReload() {
-    await helper.click(ids.post.btn.submit);
-    await expect(helper.page).toHaveText(PostReviewForm.strs.reviewUpdated);
-    await helper.page.waitForLoadState("networkidle");
-    await helper.click(ids.post.card.link.edit);
+    await play.click(ids.post.btn.submit);
+    await expect(play.page).toHaveText(PostReviewForm.strs.reviewUpdated);
+    await play.page.waitForLoadState("networkidle");
+    await play.click(ids.post.card.link.edit);
   }
 });

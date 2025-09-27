@@ -6,27 +6,27 @@ import { ids } from "@/e2e/ids";
 import { urls } from "@/routes";
 
 test.describe("Tool", () => {
-  let helper: PlaywrightHelper;
+  let play: PlaywrightHelper;
 
   test.beforeEach(async ({ page }) => {
-    helper = new PlaywrightHelper(page);
-    await helper.dbStubsRepopulateAndLogin();
+    play = new PlaywrightHelper(page);
+    await play.dbStubsRepopulateAndLogin();
   });
 
   test("Create with Image", async ({ page }) => {
     await page.goto(urls.tools.create);
 
     const tool = { title: "Docker" };
-    await helper.fill(ids.post.form.title, tool.title);
+    await play.fill(ids.post.form.title, tool.title);
 
-    const input = helper.get(ids.post.form.image);
+    const input = play.get(ids.post.form.image);
     await input.setInputFiles(await genImagePng());
 
-    await helper.click(ids.post.form.btn.submit);
+    await play.click(ids.post.form.btn.submit);
     await expect(page).toHaveText(PostToolForm.strs.toolCreated);
-    await helper.navigate(urls.tools.list);
+    await play.navigate(urls.tools.list);
 
-    const image = helper.get(ids.post.card.image);
+    const image = play.get(ids.post.card.image);
     const isLoaded = await image.evaluate((img: HTMLImageElement) => {
       return img.complete && img.naturalWidth > 0;
     });
@@ -35,7 +35,7 @@ test.describe("Tool", () => {
 
   // #AI
   async function genImagePng() {
-    const imageCanvas = await helper.page.evaluateHandle(() => {
+    const imageCanvas = await play.page.evaluateHandle(() => {
       const canvas = document.createElement("canvas");
       canvas.width = 100;
       canvas.height = 100;
@@ -44,7 +44,7 @@ test.describe("Tool", () => {
       context.fillRect(0, 0, 100, 100);
       return canvas;
     });
-    const imageBlob = await helper.page.evaluate(canvas => {
+    const imageBlob = await play.page.evaluate(canvas => {
       return new Promise<string>(resolve => {
         canvas.toBlob(blob => {
           const reader = new FileReader();

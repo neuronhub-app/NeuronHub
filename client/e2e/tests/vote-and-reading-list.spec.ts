@@ -5,35 +5,35 @@ import { ids, type TestId } from "@/e2e/ids";
 import { urls } from "@/routes";
 
 test.describe("Post - action button", () => {
-  let helper: PlaywrightHelper;
+  let play: PlaywrightHelper;
 
   test.beforeEach(async ({ page }) => {
-    helper = new PlaywrightHelper(page);
-    await helper.dbStubsRepopulateAndLogin();
+    play = new PlaywrightHelper(page);
+    await play.dbStubsRepopulateAndLogin();
   });
 
-  test("Upvote", async ({ page }) => {
+  test("Upvote", async () => {
     await clickAndTestState(ids.post.vote.up);
   });
 
-  test("Add to Reading List", async ({ page }) => {
+  test("Add to Reading List", async () => {
     await clickAndTestState(ids.post.btn.readingList);
   });
 
   async function clickAndTestState(btnId: TestId) {
-    await helper.navigate(urls.reviews.list);
+    await play.navigate(urls.reviews.list);
 
-    const button = helper.get(btnId);
+    const button = play.get(btnId);
     await expect(button).toBeVisible();
 
     await expect(button).not.checked();
 
-    const mutation = helper.awaitMutation("UserCurrent");
+    const mutation = play.awaitMutation("UserCurrent");
     await button.click();
     await mutation;
     await expect(button).checked();
 
-    await helper.reload();
+    await play.reload();
     await expect(button).checked();
   }
 });
