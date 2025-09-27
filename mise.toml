@@ -40,14 +40,14 @@
         run = "bun run react-router dev --host --port=$CLIENT_PORT"
         env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT') }}"
 
+    # todo refac-name: docker-services?
     [tasks."dev:db"]
         dir = "devops"
-        run = "sudo docker compose up db seaweedfs --detach"
+        run = "sudo docker compose up db s3 --detach"
         silent = true
-
     [tasks."dev:db-stop"]
         dir = "devops"
-        run = "sudo docker compose down db seaweedfs"
+        run = "sudo docker compose down db s3"
 
     [tasks."dev:server:e2e"]
         depends = ["dev:db", "dev:db:setup-e2e"]
@@ -100,7 +100,7 @@
 [tasks."typegen"]
     depends = "typegen:server"
     run = "mise run typegen:client:*"
-    description = "Strawberry Django -> schema.graphql -> TypeScript enums"
+    description = "Strawberry → schema.graphql → TypeScript enums; and @chakra-ui"
 
     [tasks."typegen:server"]
         dir = "server"
