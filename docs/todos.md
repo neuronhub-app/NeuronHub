@@ -6,9 +6,11 @@ reviewed_at: 2025.09.03
 
 The plaintext format `todo <explanation>` leads to over-saturation and eventual ignore by everybody.
 
-Specify as `todo <prio>(<scope>): <explanation>`
+Specify as `todo <prio>(<scope>)<:?> <explanation>`
 
-Example: `todo refac(auth): limit user access to other users`
+Examples
+- `todo refac(auth): access to other users`
+- `todo ! drop #AI-slop`
 
 `<prio>` values:
 - `!!` - a must for commits on `master`

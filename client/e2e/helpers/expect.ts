@@ -17,6 +17,8 @@ export const expect = expectBase.extend({
     });
   },
 
+  // todo refac-name: to be unique
+  // .stateChecked? .checkedState didn't look clear
   async checked(locator: Locator) {
     return runPlaywrightMatcher({
       context: this,

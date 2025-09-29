@@ -91,6 +91,13 @@ export function Card(props: { id: ID; className?: string }) {
 }
 ```
 
-## Notes
+## Tags
+
+Code blocks can be marked with:
+- `#AI`: not every line is reviewed → consider broken
+- `#AI-slop`: trash to drop or rewrite
+- `#bad-infer`: broken TS type inference - over time check if they fixed it
+
+## Extra
 
 If you were told to enforce the code style - read the [code-style-detailed](/docs/code-style-detailed.md).

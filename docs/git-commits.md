@@ -2,12 +2,15 @@
 reviewed_at: 2025.08.27
 ---
 
-A good Git commit allows to eye-scan the log to fix prod at 3am.
+Good Git commits allow to quickly fix prod at 3am by eye-scanning the log.
 
-We use an iteration over [conventionalcommits.org](https://www.conventionalcommits.org). The main differences:
-- `!` is used to show changes impact & importance. Eg a squashed branch commit can change dozens KLOCs, vs a `feat` with a new UI checkbox.
-- "BREAKING CHANGE"s are added to the description, and only targets self-hosting users.
-- `Refs:` aren't required in the footer, but required in the first line (to convert to `<a href> in GitHub).
+We use an iteration over [conventionalcommits.org](https://www.conventionalcommits.org).
+
+The main differences:
+- focus on dev visual comprehension, not release notes gen
+- `!` is used to show changes impact. Eg a squashed `feat` commit can change half the codebase, vs a `feat` for a new UI button.
+- `BREAKING CHANGE`s are added to the body - for self-hosting users.
+- `Refs:` required not in the footer, but the first line - they render as `<a href> in GitHub.
 
 Conventions:
 - capitalize Django models, React components, product names, etc - to visually distinct them
@@ -67,25 +70,23 @@ Some `Scope`s are bound to a single `Type`, eg `build(AI)`.
 
 ### Tags
 
-Added at the end of a commit first line.
-
-- `#AI-slop` - eg removing nonsensual code that slipped the review
+Added at the end of a commit first line. See [Tags](/docs/code-style.md#Tags)
 
 ### Text style
 
-First noun, then verb.
-
-If the brain can read it - the shorter the better. Target visual scanning, not legalese. Fuck English grammar, eg prefixes "the / a / an".
-
-For fields of an object known form the context - write `.tags` instead of `Post.tags`.
+- First noun, then verb.
+- If the brain can read it - the shorter the better
+	- Target visual scanning, not legalese
+	- Fuck English grammar, eg redundant prefixes "the / a / an"
+- For attributes of an object known form context - prefix with a dot. Eg `.tags`, instead of `Post.tags`.
 
 #### Bad shortening
 
 Bad to replace familiar words with less familiar:
 - `brwsr` for `browser` - bad
-- `smth` for `something` - ~ok, known
-- `mgmt` for `management` - bad here, might be ok in a non-public small dev team
+- `smth` for `something` - fine, known
+- `mgmt` for `management` - bad. Might be ok in a small team.
 
 Bad if brain is familiar with a sentence (set of "tokens"), but it's written as abbreviations, eg:
 - bad: `refac: imprv auth w/ opt JWT tkn & upd usr mgmt admn`
-- ok: `refac(auth): JWT token optimize; user admin cleanup`
+- ok: `refac(auth): optimize JWT token; cleanup user admin`
