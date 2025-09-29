@@ -26,8 +26,7 @@ test.describe("Post", () => {
     await expect(vote.up).checked();
     await play.click(ids.post.btn.submit);
     await expect(page).toHaveText(PostCreateForm.strs.postCreated);
-
-    // todo ! test .title of tools.detail() redirect
+    await expect(page).toHaveText(post.title);
 
     // Verify in list
     await play.navigate(urls.posts.list, { idleWait: true });

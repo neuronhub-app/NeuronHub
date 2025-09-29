@@ -1,4 +1,6 @@
 import { layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
+
+import type { PostListItemType } from "@/components/posts/ListContainer";
 import type { ID } from "@/gql-tada";
 
 export const urls = {
@@ -54,7 +56,23 @@ export const urls = {
       },
     },
   },
+  getPostUrls(post: PostListItemType) {
+    let urlsSet: PostUrls = this.posts;
+    // import @/graphql/fragments/reviews isReview() kills react-router
+    if (post.__typename === "PostReviewType") {
+      urlsSet = this.reviews;
+    }
+    if (post.__typename === "PostToolType") {
+      urlsSet = this.tools;
+    }
+    return {
+      detail: urlsSet.detail(post.id),
+      edit: urlsSet.edit(post.id),
+    };
+  },
 } as const;
+
+type PostUrls = typeof urls.posts | typeof urls.reviews | typeof urls.tools;
 
 const op = { create: "create", edit: "edit" } as const;
 
@@ -76,6 +94,8 @@ export default [
     ...prefix(urls.tools.list, [
       route("/", "./apps/tools/list/index.tsx"),
       route(`/${op.create}`, "./apps/tools/create/index.tsx"),
+      route("/:id", "./apps/tools/detail/index.tsx"),
+      route(`/:id/${op.edit}`, "./apps/tools/edit/index.tsx"),
     ]),
     ...prefix(urls.user.settings.detail, [
       layout("./apps/users/settings/UserSettingsLayout.tsx", [

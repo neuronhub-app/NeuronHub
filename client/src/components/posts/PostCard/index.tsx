@@ -13,6 +13,7 @@ import {
 import { marked } from "marked";
 import { FaPenToSquare } from "react-icons/fa6";
 import { NavLink } from "react-router";
+
 import { useUser } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
@@ -26,7 +27,6 @@ import { ids } from "@/e2e/ids";
 import { isReview } from "@/graphql/fragments/reviews";
 import { urls } from "@/routes";
 
-// todo refac: too many isReview() → must be another comp
 export function PostCard(props: { post: PostListItemType }) {
   const user = useUser();
 
@@ -36,7 +36,7 @@ export function PostCard(props: { post: PostListItemType }) {
     <Stack gap="gap.sm" {...ids.set(ids.post.card.container)} data-id={post.id}>
       <HStack justify="space-between" align="center">
         <PostDatetime datetimeStr={isReview(post) ? post.reviewed_at : post.updated_at} />
-        {user?.id === props.post.author?.id && (
+        {user?.id === post.author?.id && (
           <IconButton
             asChild
             variant="subtle-ghost"
@@ -46,23 +46,14 @@ export function PostCard(props: { post: PostListItemType }) {
             aria-label="edit"
             {...ids.set(ids.post.card.link.edit)}
           >
-            <NavLink
-              to={
-                isReview(props.post)
-                  ? urls.reviews.edit(props.post.id)
-                  : urls.posts.edit(props.post.id)
-              }
-            >
+            <NavLink to={urls.getPostUrls(post).edit}>
               <FaPenToSquare />
             </NavLink>
           </IconButton>
         )}
       </HStack>
 
-      <NavLink
-        to={isReview(post) ? urls.reviews.detail(post.id) : urls.posts.detail(post.id)}
-        {...ids.set(ids.post.card.link.detail)}
-      >
+      <NavLink to={urls.getPostUrls(post).detail} {...ids.set(ids.post.card.link.detail)}>
         <Stack gap="gap.sm">
           {isReview(post) && post.parent && (
             <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">

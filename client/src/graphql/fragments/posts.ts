@@ -152,3 +152,7 @@ export const PostDetailFragment = graphql(
 export type PostFragmentType = FragmentOf<typeof PostFragment>;
 
 export type PostDetailFragmentType = FragmentOf<typeof PostDetailFragment>;
+
+export function isTool(post: PostFragmentType): boolean {
+  return post.__typename === "PostToolType";
+}

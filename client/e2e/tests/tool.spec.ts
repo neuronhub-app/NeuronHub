@@ -16,7 +16,7 @@ test.describe("Tool", () => {
   test("Create with Image", async ({ page }) => {
     await page.goto(urls.tools.create);
 
-    const tool = { title: "Docker" };
+    const tool = { title: `Docker ${new Date()}` };
     await play.fill(ids.post.form.title, tool.title);
 
     const input = play.get(ids.post.form.image);
@@ -24,6 +24,7 @@ test.describe("Tool", () => {
 
     await play.click(ids.post.form.btn.submit);
     await expect(page).toHaveText(PostToolForm.strs.toolCreated);
+    await expect(page).toHaveText(tool.title);
     await play.navigate(urls.tools.list);
 
     const image = play.get(ids.post.card.image);

@@ -53,7 +53,7 @@ export namespace PostToolForm {
 
       if (response.success) {
         toast.success(strs.toolCreated);
-        navigate(urls.posts.detail(response.data.create_post.id));
+        navigate(urls.tools.detail(response.data.create_post.id));
       } else {
         toast.error(strs.toolCreateFailed);
       }
