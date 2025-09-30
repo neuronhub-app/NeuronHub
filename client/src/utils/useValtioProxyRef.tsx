@@ -31,3 +31,5 @@ export function useValtioProxyRef<T extends object>(val: T, devtoolsName?: strin
     snap: useSnapshot(state),
   };
 }
+
+export const useStateValtio = useValtioProxyRef;

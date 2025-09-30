@@ -33,9 +33,8 @@ class PostsMutation:
         post = await post_update_or_create(author=cast(User, user), data=data)
         return cast(PostType, post)
 
-    # todo refac-name: post_vote_create_or_update
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def create_or_update_post_vote(
+    async def post_vote_update_or_create(
         self,
         id: strawberry.ID,
         is_vote_positive: bool | None,

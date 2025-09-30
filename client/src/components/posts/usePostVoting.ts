@@ -3,7 +3,7 @@ import { useUser } from "@/apps/users/useUserCurrent";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useInit } from "@/utils/useInit";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useValtioProxyRef";
 
 export function usePostVoting(props: {
   postId: ID;
@@ -15,7 +15,7 @@ export function usePostVoting(props: {
 }) {
   const user = useUser();
 
-  const state = useValtioProxyRef({
+  const state = useStateValtio({
     isLoadingUpvote: false,
     isLoadingDownvote: false,
     isVotePositive: null as boolean | null,
@@ -54,8 +54,8 @@ export function usePostVoting(props: {
 
     const res = await mutateAndRefetchMountedQueries(
       graphql(`
-        mutation CreateOrUpdatePostVote($id: ID!, $isVotePositive: Boolean) {
-          create_or_update_post_vote(id: $id, is_vote_positive: $isVotePositive)
+        mutation PostVoteUpdateOrCreateOrUpdate($id: ID!, $isVotePositive: Boolean) {
+          post_vote_update_or_create(id: $id, is_vote_positive: $isVotePositive)
         }
       `),
       { id: props.postId, isVotePositive: newVoteValue },
