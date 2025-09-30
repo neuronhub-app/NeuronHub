@@ -1,14 +1,16 @@
 import {
+  Box,
   Container,
   type ContainerProps,
   Flex,
   HStack,
   IconButton,
+  Link,
   Stack,
 } from "@chakra-ui/react";
 import type { SVGProps } from "react";
 import { LuAlignRight } from "react-icons/lu";
-import { Outlet } from "react-router";
+import { NavLink, Outlet } from "react-router";
 import { Sidebar } from "@/components/layout/Sidebar";
 import {
   DrawerBackdrop,
@@ -17,17 +19,7 @@ import {
   DrawerRoot,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-
-export function links() {
-  const faviconLinks = [
-    { rel: "icon", type: "image/svg+xml", href: "/favicon/favicon.svg" },
-    { rel: "icon", type: "image/png", href: "/favicon/favicon-96x96.png", sizes: "96x96" },
-    { rel: "shortcut icon", href: "/favicon/favicon.ico" },
-    { rel: "apple-touch-icon", href: "/favicon/apple-touch-icon.png", sizes: "180x180" },
-    { rel: "manifest", href: "/favicon/site.webmanifest" },
-  ];
-  return faviconLinks;
-}
+import { urls } from "@/routes";
 
 export default function RootLayout() {
   return (
@@ -47,11 +39,26 @@ export default function RootLayout() {
   );
 }
 
+export function links() {
+  const faviconLinks = [
+    { rel: "icon", type: "image/svg+xml", href: "/favicon/favicon.svg" },
+    { rel: "icon", type: "image/png", href: "/favicon/favicon-96x96.png", sizes: "96x96" },
+    { rel: "shortcut icon", href: "/favicon/favicon.ico" },
+    { rel: "apple-touch-icon", href: "/favicon/apple-touch-icon.png", sizes: "180x180" },
+    { rel: "manifest", href: "/favicon/site.webmanifest" },
+  ];
+  return faviconLinks;
+}
+
 function Navbar(props: ContainerProps) {
   return (
     <Container py="2.5" borderBottomWidth="1px" {...props}>
       <HStack justify="space-between">
-        <Logo />
+        <Link asChild w="fit-content">
+          <NavLink to={urls.posts.list}>
+            <NeuronLogo />
+          </NavLink>
+        </Link>
 
         <DrawerRoot placement="start">
           <DrawerTrigger asChild>
@@ -70,7 +77,7 @@ function Navbar(props: ContainerProps) {
   );
 }
 
-function Logo(props: SVGProps<SVGSVGElement>) {
+function NeuronLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg
       height="28"

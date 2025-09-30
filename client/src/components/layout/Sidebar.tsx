@@ -30,8 +30,8 @@ const groups = [
   {
     title: "",
     links: [
-      { to: "/tools", icon: LuLayoutDashboard, label: "Tools" },
       { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts" },
+      { to: urls.tools.list, icon: LuLayoutDashboard, label: "Tools" },
       { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },
       { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
       { to: "/library", icon: LuLibrary, label: "Library" },
@@ -55,14 +55,27 @@ export function Sidebar(props: StackProps) {
       {...props}
     >
       <Stack gap="6">
-        <Flex alignSelf="start" align="center" gap={3}>
-          <Icon color="primary" size="xl">
-            <PiGraph />
-          </Icon>
-          <Text fontSize="1.4rem" fontWeight="bold">
-            NeuronHub
-          </Text>
-        </Flex>
+        <NavLink to={urls.posts.list}>
+          <Bleed
+            block="gap.sm"
+            inline="gap.sm"
+            p="gap.sm"
+            _hover={{
+              bgColor: "colorPalette.subtle",
+            }}
+            borderRadius="sm"
+          >
+            <Flex alignSelf="start" align="center" gap={3} w="fit-content">
+              <Icon color="primary" size="xl">
+                <PiGraph />
+              </Icon>
+              <Text fontSize="1.4rem" fontWeight="bold">
+                NeuronHub
+              </Text>
+            </Flex>
+          </Bleed>
+        </NavLink>
+
         <Stack gap="6">
           {groups.map((group, index) => (
             <Stack
