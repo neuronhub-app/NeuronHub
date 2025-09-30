@@ -31,7 +31,7 @@ import { isEditMode, type PostReviewEditFragmentType } from "@/graphql/fragments
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { UsageStatus, Visibility } from "~/graphql/enums";
+import { PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
 export namespace PostReviewForm {
   export const strs = {
@@ -140,16 +140,18 @@ export namespace PostReviewForm {
           review: forms.review.getValues(),
         };
 
-        // todo ! creates a PostTool duplicate if review below fails and user triesagain
+        // todo ! fix: creates a Tool duplicate if Review below fails and user tries again
         const { tags, alternatives, ...toolFields } = data.tool;
         const toolResponse = await mutateAndRefetchMountedQueries(
           graphql(`
-						mutation CreateToolForReview($input: PostTypeInput!) { create_post(data: $input) { id } }
+						mutation ToolCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }
 					`),
           {
             input: {
               ...toolFields,
+              type: PostTypeEnum.Tool,
               // todo refac: move to schemas.abstract.serialize()
+              // (upd: already moved, just need to replace it here)
               tags: tags ? tags.map(tag => ({ id: tag.id, name: tag.name })) : undefined, // todo !(tags) call create_tags()
               alternatives: alternatives ? { set: alternatives.map(alt => alt.id) } : undefined,
             },
@@ -162,7 +164,7 @@ export namespace PostReviewForm {
 
         const response = await mutateReview({
           ...data.review,
-          parent: { id: toolResponse.data.create_post.id },
+          parent: { id: toolResponse.data.post_update_or_create.id },
         });
         if (response.success) {
           toast.success(strs.reviewCreated);

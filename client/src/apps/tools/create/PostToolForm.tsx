@@ -40,7 +40,7 @@ export namespace PostToolForm {
 
       const response = await mutateAndRefetchMountedQueries(
         graphql(
-          `mutation ToolCreate($input: PostTypeInput!) { create_post(data: $input) { id } }`,
+          `mutation ToolCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }`,
         ),
         {
           input: {
@@ -53,7 +53,7 @@ export namespace PostToolForm {
 
       if (response.success) {
         toast.success(strs.toolCreated);
-        navigate(urls.tools.detail(response.data.create_post.id));
+        navigate(urls.tools.detail(response.data.post_update_or_create.id));
       } else {
         toast.error(strs.toolCreateFailed);
       }

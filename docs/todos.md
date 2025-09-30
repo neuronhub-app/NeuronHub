@@ -16,6 +16,7 @@ Examples
 - `!!` - a must for commits on `master`
 - `!` - a must, once the edge case becomes feasible in prod
 - `feat` - feature
+- `fix`
 - `refac` - significant, not urgent
 - `refac-name` - renaming, specifically postponed as Git sucks at renaming history, ie to batch the history fuck-up to a chosen moment. 
 - `perf` - performance, low to avoid premature optimizations

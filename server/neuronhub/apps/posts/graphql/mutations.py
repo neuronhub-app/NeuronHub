@@ -20,24 +20,13 @@ class DjangoModelInput:
     id: strawberry.ID
 
 
-# todo !(auth): permissions
+# todo ! fix(auth): permissions
 @strawberry.type
 class PostsMutation:
     post_update: PostType = mutations.update(PostTypeInput, extensions=[IsAuthenticated()])
     post_delete: PostType = mutations.delete(DjangoModelInput, extensions=[IsAuthenticated()])
 
-    # todo !(auth): permissions, eg .parent
-    # todo refac-name: post_create
-    @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def create_post(
-        self,
-        data: PostTypeInput,
-        info: Info,
-    ) -> PostType:
-        author: User = info.context.request.user
-        post = await post_update_or_create(author=author, data=data)
-        return cast(PostType, post)
-
+    # todo ! fix(auth): "accidental" .parent access
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def post_update_or_create(self, data: PostTypeInput, info: Info) -> PostType:
         user = await aget_current_user(info)
