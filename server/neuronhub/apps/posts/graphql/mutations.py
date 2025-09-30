@@ -7,13 +7,11 @@ from strawberry_django import mutations
 from strawberry_django.auth.utils import aget_current_user
 from strawberry_django.permissions import IsAuthenticated
 
-from neuronhub.apps.posts.graphql.types import PostCommentType
 from neuronhub.apps.posts.graphql.types import PostType
 from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models.posts import PostVote, PostTagVote
 from neuronhub.apps.posts.services.post_update_or_create import post_update_or_create
-from neuronhub.apps.posts.services.create_post_comment import create_post_comment
 from neuronhub.apps.users.models import User
 
 
@@ -55,33 +53,6 @@ class PostsMutation:
         user = await aget_current_user(info)
         post = await post_update_or_create(author=cast(User, user), data=data)
         return cast(PostType, post)
-
-    @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def create_post_comment(self, data: PostTypeInput, info: Info) -> PostCommentType:
-        user = await aget_current_user(info)
-
-        if not data.parent:
-            raise ValueError("Parent is required for creating a comment")
-
-        parent = await Post.objects.aget(id=data.parent.id)
-
-        visible_to_users = (
-            None if data.visible_to_users is strawberry.UNSET else data.visible_to_users
-        )
-        visible_to_groups = (
-            None if data.visible_to_groups is strawberry.UNSET else data.visible_to_groups
-        )
-
-        comment = await create_post_comment(
-            author=cast(User, user),
-            parent=parent,
-            content=data.content,
-            visibility=data.visibility,
-            visible_to_users=visible_to_users,
-            visible_to_groups=visible_to_groups,
-        )
-
-        return cast(PostCommentType, comment)
 
     # todo refac-name: post_vote_create_or_update
     @strawberry.mutation(extensions=[IsAuthenticated()])

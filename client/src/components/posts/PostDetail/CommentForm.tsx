@@ -10,7 +10,7 @@ import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import type { PostCommentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { Visibility } from "~/graphql/enums";
+import { PostTypeEnum, Visibility } from "~/graphql/enums";
 
 export function CommentForm(
   props:
@@ -129,11 +129,12 @@ export const strs = {
 async function commentCreate(input: { parentId: ID; content: string }) {
   return mutateAndRefetchMountedQueries(
     graphql(
-      `mutation CommentUpdate($data: PostTypeInput!) { create_post_comment(data: $data) { id } }`,
+      `mutation CommentUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
     ),
     {
       data: {
         parent: { id: input.parentId },
+        type: PostTypeEnum.Comment,
         content: input.content,
         tags: [],
         visibility: Visibility.Public,
@@ -144,10 +145,13 @@ async function commentCreate(input: { parentId: ID; content: string }) {
 
 async function commentUpdate(input: { id: ID; content: string }) {
   return mutateAndRefetchMountedQueries(
-    graphql(`mutation CommentUpdate($data: PostTypeInput!) { post_update(data: $data) { id } }`),
+    graphql(
+      `mutation CommentUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
+    ),
     {
       data: {
         id: input.id,
+        type: PostTypeEnum.Comment,
         content: input.content,
         tags: [],
         visibility: Visibility.Public,

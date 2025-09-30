@@ -9,6 +9,25 @@ from neuronhub.apps.posts.graphql.types import PostTypeInput, PostTagTypeInput
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
+class CommentTest(NeuronTestCase):
+    async def test_comment_create_sets_correct_type(self):
+        post = await self.gen.posts.create()
+        content_test = "Test comment content"
+
+        comment = await post_update_or_create(
+            author=self.user,
+            data=PostTypeInput(
+                type=Post.Type.Comment,
+                parent=PostTypeInput(id=post.id),
+                content=content_test,
+            ),
+        )
+        assert comment.type == Post.Type.Comment
+        assert comment.content == content_test
+        assert comment.parent_id == post.id
+        assert comment.author_id == self.user.id
+
+
 class ReviewCreateOrUpdateTest(NeuronTestCase):
     async def test_creates_PostTag_with_a_comment(self):
         tag_name = "Python"
