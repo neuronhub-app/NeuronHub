@@ -5,14 +5,14 @@
 - [x] add `review.tags` and `review.review_tags` logic
 - [x] Tool list
 - [x] Tool.image upload
-- [x] Post create
+- [x] Post create/edit
 - [ ] Dokploy
 
 ### v0.2.1.0
 
 - Reading list & Library
 - Review.parent select with `tool.title`
-- Post CRUD
+- Post create/edit Tag voting (resets on load atm)
 
 ### v0.2.2.0
 
