@@ -1,6 +1,6 @@
 [claude]
     run = "claude --dangerously-skip-permissions"
-    env = { TSC_CONFIG = "tsconfig.quiet.json" } # prob has no effect
+    env = { TSC_CONFIG = "tsconfig.quiet.json" } # #prob-redundant
 
-["claude:monitor"]
-    run = "uv tool run claude-monitor --plan max20 --refresh-rate 1 --time-format 24h --timezone America/Los_Angeles"
+["claude:usage"]
+    run = "claude --dangerously-skip-permissions '/usage'"
