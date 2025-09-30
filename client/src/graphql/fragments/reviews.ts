@@ -1,6 +1,7 @@
 import { type FragmentOf, graphql } from "@/gql-tada";
 import {
   PostCommentsFragment,
+  PostEditFragment,
   PostFragment,
   type PostFragmentType,
 } from "@/graphql/fragments/posts";
@@ -24,8 +25,6 @@ export const PostReviewFragment = graphql(
   [PostFragment, PostTagFragment],
 );
 
-// Review detail
-
 export const PostReviewDetailFragment = graphql(
   `
     fragment PostReviewDetailFragment on PostReviewType {
@@ -40,43 +39,17 @@ export type PostReviewFragmentType = FragmentOf<typeof PostReviewFragment> & {
   parent: PostFragmentType;
 };
 
-export function isReview(
-  post: PostFragmentType | PostReviewFragmentType,
-): post is PostReviewFragmentType {
-  return post.__typename === "PostReviewType";
-}
-
-// Review edit
-
 export const PostReviewEditFragment = graphql(
   `
     fragment PostReviewEditFragment on PostReviewType {
+      ...PostEditFragment
       ...PostReviewFragment
       ...PostCommentsFragment
 
-			content_private
 			is_review_later
-
-      visibility
-      recommended_to_users {
-        id
-        username
-      }
-      recommended_to_groups {
-        id
-        name
-      }
-      visible_to_users {
-        id
-        username
-      }
-      visible_to_groups {
-        id
-        name
-      }
     }
   `,
-  [PostReviewFragment, PostCommentsFragment],
+  [PostReviewFragment, PostEditFragment, PostCommentsFragment],
 );
 export type PostReviewEditFragmentType = FragmentOf<typeof PostReviewEditFragment>;
 
@@ -86,4 +59,10 @@ export function isEditMode(
   parent: PostFragmentType;
 } {
   return Boolean(review);
+}
+
+export function isReview(
+  post: PostFragmentType | PostReviewFragmentType,
+): post is PostReviewFragmentType {
+  return post.__typename === "PostReviewType";
 }

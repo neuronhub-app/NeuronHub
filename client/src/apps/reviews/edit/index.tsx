@@ -9,13 +9,7 @@ import type { Route } from "~/react-router/reviews/edit/+types/index";
 export default function PostReviewEditRoute(props: Route.ComponentProps) {
   const { data, error, isLoadingFirstTime } = useApolloQuery(
     graphql(
-      `
-      query PostReviewEdit($pk: ID!) {
-        post_review(pk: $pk) {
-          ...PostReviewEditFragment
-        }
-      }
-    `,
+      `query PostReviewEdit($pk: ID!) { post_review(pk: $pk) { ...PostReviewEditFragment } }`,
       [PostReviewEditFragment],
     ),
     { pk: props.params.id },

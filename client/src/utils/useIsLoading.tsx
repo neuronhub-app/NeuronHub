@@ -1,6 +1,6 @@
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-/** A simple wrap for .isLoading state in try/finally */
+/** A simple shorthand for an .isLoading state in a try/finally */
 export function useIsLoading() {
   const state = useValtioProxyRef({ isLoading: false });
 

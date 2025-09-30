@@ -1,14 +1,16 @@
-import { Fieldset, Heading, VStack } from "@chakra-ui/react";
+import { Fieldset, Heading, HStack, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
+import { PostDeleteButton } from "@/apps/posts/PostDeleteButton";
 import { PostFields } from "@/components/posts/form/PostFields";
 import { PostSharableFields } from "@/components/posts/form/PostSharableFields";
 import { schemas } from "@/components/posts/form/schemas";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
+import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
 import { PostTypeEnum, Visibility } from "~/graphql/enums";
@@ -16,59 +18,67 @@ import { PostTypeEnum, Visibility } from "~/graphql/enums";
 export namespace PostCreateForm {
   export const strs = {
     postCreated: "Post created",
+    postUpdated: "Post updated",
     postCreateFailed: "Failed to create post",
+    postUpdateFailed: "Failed to update post",
   } as const;
 
-  export function Comp() {
+  export function Comp(props: { post?: PostEditFragmentType }) {
     const navigate = useNavigate();
+    const post = props.post;
 
     const form = useForm<schemas.Post>({
       resolver: zodResolver(schemas.Post),
       mode: "onBlur",
       reValidateMode: "onChange",
-      defaultValues: {
-        id: null,
-        title: "",
-        content: "",
-        visibility: Visibility.Private,
-        tags: [],
-      },
+      defaultValues: isEditMode(post)
+        ? schemas.post.deserialize(post)
+        : {
+            id: null,
+            title: "",
+            content: "",
+            visibility: Visibility.Private,
+            tags: [],
+          },
     });
 
     async function handleSubmit(values: schemas.Post) {
-      const response = await mutateAndRefetchMountedQueries(
-        graphql(
-          `mutation PostCreate($input: PostTypeInput!) { create_post(data: $input) { id } }`,
-        ),
-        {
-          input: {
-            type: PostTypeEnum.Post,
-            title: values.title,
-            content: values.content,
-            source: values.source,
-            tags: values.tags
-              ? values.tags.map(tag => ({
-                  id: tag.id,
-                  name: tag.name,
-                  comment: tag.comment,
-                }))
-              : undefined,
-            ...schemas.sharable.serialize(values),
-          },
-        },
-      );
+      if (isEditMode(post)) {
+        const response = await mutateAndRefetchMountedQueries(
+          graphql(
+            `mutation PostUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
+          ),
+          { data: schemas.post.serialize(values) },
+        );
 
-      if (response.success) {
-        toast.success(strs.postCreated);
-        navigate(urls.posts.detail(response.data.create_post.id));
+        if (response.success) {
+          toast.success(strs.postUpdated);
+          navigate(urls.posts.detail(post.id));
+        } else {
+          toast.error(strs.postUpdateFailed);
+        }
       } else {
-        toast.error(strs.postCreateFailed);
+        const response = await mutateAndRefetchMountedQueries(
+          graphql(
+            `mutation PostCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }`,
+          ),
+          {
+            input: { type: PostTypeEnum.Post, ...schemas.post.serialize(values) },
+          },
+        );
+
+        if (response.success) {
+          toast.success(strs.postCreated);
+          navigate(urls.posts.detail(response.data.post_update_or_create.id));
+        } else {
+          toast.error(strs.postCreateFailed);
+        }
       }
     }
 
     return (
       <VStack alignItems="flex-start" w="100%" maxW="900px" gap="gap.lg">
-        <Heading fontSize="2xl">Create post</Heading>
+        <Heading fontSize="2xl">{isEditMode(post) ? "Edit post" : "Create post"}</Heading>
 
         <VStack asChild w="100%" alignItems="flex-start" gap="gap.xl">
           <FormProvider {...form}>
@@ -83,18 +93,25 @@ export namespace PostCreateForm {
                 </Fieldset.Content>
               </Fieldset.Root>
 
-              <Button
-                type="submit"
-                loading={form.formState.isSubmitting}
-                {...ids.set(ids.post.btn.submit)}
-                size="lg"
-              >
-                Create Post
-              </Button>
+              <HStack>
+                <Button
+                  type="submit"
+                  loading={form.formState.isSubmitting}
+                  {...ids.set(ids.post.btn.submit)}
+                  size="lg"
+                >
+                  {isEditMode(post) ? "Save Post" : "Create Post"}
+                </Button>
+                {isEditMode(post) && <PostDeleteButton id={post.id} title={post.title} />}
+              </HStack>
             </form>
           </FormProvider>
         </VStack>
       </VStack>
     );
   }
+}
+
+export function isEditMode(post?: PostEditFragmentType): post is PostEditFragmentType {
+  return Boolean(post);
 }

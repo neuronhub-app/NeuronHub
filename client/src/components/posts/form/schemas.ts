@@ -1,5 +1,6 @@
 import { type UseFormReturn, useFormContext as useFormContextOriginal } from "react-hook-form";
 import { z } from "zod/v4";
+import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 import { PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
@@ -76,7 +77,7 @@ export namespace schemas {
       };
     }
 
-    export function deserialize(post: PostReviewEditFragmentType) {
+    export function deserialize(post: PostReviewEditFragmentType | PostEditFragmentType) {
       return {
         visibility: Schema.shape.visibility.parse(post.visibility),
         recommend_to: deserializeOptions(post.recommended_to_users, post.recommended_to_groups),
@@ -138,6 +139,43 @@ export namespace schemas {
 
   export const Post = Abstract.safeExtend(sharable.Schema.shape);
   export type Post = z.infer<typeof Post>;
+
+  export namespace post {
+    export function deserialize(data: PostEditFragmentType): Post {
+      return {
+        id: data.id,
+        title: data.title,
+        content: data.content,
+        source: data.source,
+        tags:
+          data.tags?.map(tag => ({
+            id: tag.id,
+            name: tag.name,
+            label: tag.label,
+            is_vote_positive: null,
+          })) ?? [],
+        ...sharable.deserialize(data),
+      };
+    }
+
+    export function serialize(values: Post) {
+      return {
+        id: values.id,
+        title: values.title,
+        content: values.content,
+        source: values.source,
+        tags: values.tags
+          ? values.tags.map(tag => ({
+              id: tag.id,
+              name: tag.name,
+              comment: tag.comment,
+              is_vote_positive: tag.is_vote_positive,
+            }))
+          : undefined,
+        ...sharable.serialize(values),
+      };
+    }
+  }
 
   export const Review = Abstract.safeExtend(sharable.Schema.shape).safeExtend({
     review_rating: z.number().min(0).max(100).nullable(),

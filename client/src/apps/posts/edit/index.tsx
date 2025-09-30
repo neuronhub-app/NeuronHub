@@ -1,5 +1,31 @@
+import { captureException } from "@sentry/react";
+import toast from "react-hot-toast";
+import { PostCreateForm } from "@/apps/posts/create/PostCreateForm";
+import { graphql } from "@/gql-tada";
+import { PostEditFragment, type PostEditFragmentType } from "@/graphql/fragments/posts";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/posts/edit/+types/index";
 
 export default function PostEditRoute(props: Route.ComponentProps) {
-  return <>WIP. ID: {props.params.id}</>;
+  const { data, error, isLoadingFirstTime } = useApolloQuery(
+    graphql(`query PostEdit($id: ID!) { post(pk: $id) { ...PostEditFragment } }`, [
+      PostEditFragment,
+    ]),
+    { id: props.params.id },
+  );
+
+  if (error) {
+    toast.error("Load error");
+    captureException(error);
+  }
+  if (isLoadingFirstTime) {
+    return <div>Loading...</div>;
+  }
+  if (!data?.post) {
+    return <div>Post not found</div>;
+  }
+
+  // @ts-expect-error #bad-infer by Apollo
+  const post: PostEditFragmentType = data?.post ?? undefined;
+  return <PostCreateForm.Comp post={post} />;
 }

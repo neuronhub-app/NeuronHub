@@ -1,6 +1,7 @@
 import { schemas } from "@/components/posts/form/schemas";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { PostTypeEnum } from "~/graphql/enums";
 
 export async function mutateReview(values: schemas.Review & { parent?: { id: ID } }) {
   const { recommend_to, visible_to, parent, tags, review_tags, ...valuesRest } = values;
@@ -16,6 +17,7 @@ export async function mutateReview(values: schemas.Review & { parent?: { id: ID 
     {
       input: {
         ...(isEditMode ? {} : { parent }),
+        type: PostTypeEnum.Review,
         tags: tags.map(tag => {
           const { label, ...tagValues } = tag;
           return tagValues;

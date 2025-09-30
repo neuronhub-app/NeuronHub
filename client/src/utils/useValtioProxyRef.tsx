@@ -9,11 +9,12 @@ import { env } from "@/env";
  *
  * Shows at a glance all mutation/reads using IDE navigation with state/mutable/snap refs.
  *
- * The [devtools](https://github.com/pmndrs/valtio/blob/main/docs/api/utils/devtools.mdx)
+ * And the [devtools](https://github.com/pmndrs/valtio/blob/main/docs/api/utils/devtools.mdx)
  * easily show every mutation.
  *
- * Also, Vite's HMR resets the state on recompile, when Valtio is used outside of React lifecycle,
- * ie outside of a Component.
+ * Warning: Vite's HMR resets the state of everything outside a React Component, eg Valtio's `proxy()`.
+ *
+ * todo refac-name: useStateValtio
  */
 export function useValtioProxyRef<T extends object>(val: T, devtoolsName?: string) {
   const ref = useRef(proxy(val));

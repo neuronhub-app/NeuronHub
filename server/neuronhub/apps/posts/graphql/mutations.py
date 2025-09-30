@@ -12,9 +12,7 @@ from neuronhub.apps.posts.graphql.types import PostType
 from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models.posts import PostVote, PostTagVote
-from neuronhub.apps.posts.services.review_create_or_update import (
-    review_create_or_update,
-)
+from neuronhub.apps.posts.services.post_update_or_create import post_update_or_create
 from neuronhub.apps.posts.services.create_post_comment import create_post_comment
 from neuronhub.apps.users.models import User
 
@@ -38,13 +36,10 @@ class PostsMutation:
         data: PostTypeInput,
         info: Info,
     ) -> PostType:
-        from neuronhub.apps.posts.services.post_create import post_create
-
         author: User = info.context.request.user
-        post = await post_create(author=author, data=data)
+        post = await post_update_or_create(author=author, data=data)
         return cast(PostType, post)
 
-    # todo !(auth) check author
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def review_create_or_update(
         self,
@@ -52,8 +47,14 @@ class PostsMutation:
         info: Info,
     ) -> PostType:
         author: User = info.context.request.user
-        review = await review_create_or_update(author, data)
+        review = await post_update_or_create(author, data)
         return cast(PostType, review)
+
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def post_update_or_create(self, data: PostTypeInput, info: Info) -> PostType:
+        user = await aget_current_user(info)
+        post = await post_update_or_create(author=cast(User, user), data=data)
+        return cast(PostType, post)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def create_post_comment(self, data: PostTypeInput, info: Info) -> PostCommentType:

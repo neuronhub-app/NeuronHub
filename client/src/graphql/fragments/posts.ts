@@ -153,6 +153,38 @@ export type PostFragmentType = FragmentOf<typeof PostFragment>;
 
 export type PostDetailFragmentType = FragmentOf<typeof PostDetailFragment>;
 
+export const PostEditFragment = graphql(
+  `
+    fragment PostEditFragment on PostTypeI {
+      ...PostFragment
+      ...PostCommentsFragment
+
+      content_private
+
+      visibility
+      recommended_to_users {
+        id
+        username
+      }
+      recommended_to_groups {
+        id
+        name
+      }
+      visible_to_users {
+        id
+        username
+      }
+      visible_to_groups {
+        id
+        name
+      }
+    }
+  `,
+  [PostFragment, PostCommentsFragment],
+);
+
+export type PostEditFragmentType = FragmentOf<typeof PostEditFragment>;
+
 export function isTool(post: PostFragmentType): boolean {
   return post.__typename === "PostToolType";
 }
