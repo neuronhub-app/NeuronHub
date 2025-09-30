@@ -19,6 +19,7 @@ export namespace schemas {
     title: z.string().min(1),
     content: z.string().optional(),
     source: z.string().optional(),
+    source_author: z.string().optional(),
     tags: getSelectVotableSchema(),
   });
   export type PostAbstract = z.infer<typeof Abstract>;
@@ -147,6 +148,7 @@ export namespace schemas {
         title: data.title,
         content: data.content,
         source: data.source,
+        source_author: data.source_author,
         tags:
           data.tags?.map(tag => ({
             id: tag.id,
@@ -164,6 +166,7 @@ export namespace schemas {
         title: values.title,
         content: values.content,
         source: values.source,
+        source_author: values.source_author,
         tags: values.tags
           ? values.tags.map(tag => ({
               id: tag.id,

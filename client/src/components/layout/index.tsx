@@ -1,5 +1,4 @@
 import {
-  Box,
   Container,
   type ContainerProps,
   Flex,

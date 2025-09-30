@@ -14,13 +14,13 @@ class TestCreatePostMutation(NeuronTestCase):
 
         result = await self.graphql_query(
             """
-            mutation PostCreate($data: PostTypeInput!) { create_post(data: $data) { id } }
+            mutation PostCreate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }
             """,
             variables={"data": dict(title=post_input.title, image=post_input.image)},
         )
         assert not result.errors
 
-        post = await Post.objects.aget(id=result.data["create_post"]["id"])
+        post = await Post.objects.aget(id=result.data["post_update_or_create"]["id"])
         assert post_input.title == post.title
         assert post.image.url.startswith(settings.MEDIA_URL)
         assert post_input.image_content in await sync_to_async(post.image.read)()

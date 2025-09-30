@@ -83,27 +83,29 @@ export namespace PostCreateForm {
         <VStack asChild w="100%" alignItems="flex-start" gap="gap.xl">
           <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(values => handleSubmit(values))}>
-              <Fieldset.Root>
-                <Fieldset.Content display="flex" gap="gap.lg">
-                  <VStack gap="gap.lg" align="flex-start" maxW="full">
-                    <PostFields />
-                  </VStack>
+              <VStack gap="gap.lg" align="flex-start">
+                <Fieldset.Root>
+                  <Fieldset.Content gap="gap.lg">
+                    <VStack gap="gap.lg" align="flex-start" maxW="full">
+                      <PostFields isShowAuthorProfileInput />
+                    </VStack>
 
-                  <PostSharableFields />
-                </Fieldset.Content>
-              </Fieldset.Root>
+                    <PostSharableFields />
+                  </Fieldset.Content>
+                </Fieldset.Root>
 
-              <HStack>
-                <Button
-                  type="submit"
-                  loading={form.formState.isSubmitting}
-                  {...ids.set(ids.post.btn.submit)}
-                  size="lg"
-                >
-                  {isEditMode(post) ? "Save Post" : "Create Post"}
-                </Button>
-                {isEditMode(post) && <PostDeleteButton id={post.id} title={post.title} />}
-              </HStack>
+                <HStack>
+                  <Button
+                    type="submit"
+                    loading={form.formState.isSubmitting}
+                    {...ids.set(ids.post.btn.submit)}
+                    size="lg"
+                  >
+                    {isEditMode(post) ? "Save Post" : "Create Post"}
+                  </Button>
+                  {isEditMode(post) && <PostDeleteButton id={post.id} title={post.title} />}
+                </HStack>
+              </VStack>
             </form>
           </FormProvider>
         </VStack>

@@ -1,3 +1,4 @@
+import { HStack } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
@@ -10,6 +11,7 @@ export function PostFields(props: {
   titleLabel?: string;
   titleId?: string;
   contentLabel?: string;
+  isShowAuthorProfileInput?: boolean;
 }) {
   const form = useFormContext<schemas.PostAbstract>();
 
@@ -20,6 +22,7 @@ export function PostFields(props: {
         control={form.control}
         label={props.titleLabel ?? "Title"}
         {...ids.setInput(props.titleId ?? ids.post.form.title)} // todo wtf
+        required
       />
 
       <FormChakraTextarea
@@ -28,12 +31,24 @@ export function PostFields(props: {
         isShowIconMarkdown
       />
 
-      <FormChakraInput
-        name="source"
-        control={form.control}
-        label="Source"
-        placeholder="Link or reference"
-      />
+      <HStack w="100%" gap="gap.lg">
+        <FormChakraInput
+          name="source"
+          control={form.control}
+          label="Source"
+          helpText="Link or reference"
+        />
+
+        {props.isShowAuthorProfileInput && (
+          <FormChakraInput
+            name="source_author"
+            control={form.control}
+            label="Author profile"
+            helpText="URL to HackerNews, Mastodon, etc"
+            isUrlPrefix
+          />
+        )}
+      </HStack>
 
       <ImageUpload
         name="image"

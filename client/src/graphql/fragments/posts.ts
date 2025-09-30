@@ -10,6 +10,7 @@ export const PostFragment = graphql(
       title
       content
       source
+      source_author
       image {
         url
         name

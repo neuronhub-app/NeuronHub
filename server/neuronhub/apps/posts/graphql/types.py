@@ -50,6 +50,7 @@ class PostTypeI:
     image: auto
 
     source: auto
+    source_author: auto
 
     visibility: auto
     visible_to_users: list[UserType]
@@ -152,6 +153,7 @@ class PostTypeInput:
     tags: list[PostTagTypeInput] | None
 
     source: auto
+    source_author: auto
     image: UploadedFile | None
 
     # review fields

@@ -125,6 +125,7 @@ type PostCommentType implements PostTypeI {
   content_private: String!
   image: DjangoImageType
   source: String!
+  source_author: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -169,6 +170,7 @@ type PostReviewType implements PostTypeI {
   content_private: String!
   image: DjangoImageType
   source: String!
+  source_author: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -255,6 +257,7 @@ type PostToolType implements PostTypeI {
   content_private: String!
   image: DjangoImageType
   source: String!
+  source_author: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -288,6 +291,7 @@ type PostType implements PostTypeI {
   content_private: String!
   image: DjangoImageType
   source: String!
+  source_author: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -374,6 +378,7 @@ interface PostTypeI {
   content_private: String!
   image: DjangoImageType
   source: String!
+  source_author: String!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -406,6 +411,7 @@ input PostTypeInput {
   recommended_to_groups: ManyToManyInput
   tags: [PostTagTypeInput!]
   source: String
+  source_author: String
   image: Upload
   review_usage_status: UsageStatus
   review_rating: Int
