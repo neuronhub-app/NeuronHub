@@ -39,16 +39,6 @@ class PostsMutation:
         return cast(PostType, post)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def review_create_or_update(
-        self,
-        data: PostTypeInput,
-        info: Info,
-    ) -> PostType:
-        author: User = info.context.request.user
-        review = await post_update_or_create(author, data)
-        return cast(PostType, review)
-
-    @strawberry.mutation(extensions=[IsAuthenticated()])
     async def post_update_or_create(self, data: PostTypeInput, info: Info) -> PostType:
         user = await aget_current_user(info)
         post = await post_update_or_create(author=cast(User, user), data=data)

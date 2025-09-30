@@ -10,8 +10,8 @@ export async function mutateReview(values: schemas.Review & { parent?: { id: ID 
 
   const response = await mutateAndRefetchMountedQueries(
     graphql(`
-      mutation PostReviewCreateOrUpdate($input: PostTypeInput!) { 
-        review_create_or_update(data: $input) { id parent { id } } 
+      mutation ReviewUpdateOrCreate($input: PostTypeInput!) { 
+        post_update_or_create(data: $input) { id parent { id } } 
       }
     `),
     {
@@ -35,7 +35,7 @@ export async function mutateReview(values: schemas.Review & { parent?: { id: ID 
   if (response.success) {
     return {
       success: true as const,
-      data: { id: response.data.review_create_or_update.id },
+      data: { id: response.data.post_update_or_create.id },
     };
   }
   return response;
