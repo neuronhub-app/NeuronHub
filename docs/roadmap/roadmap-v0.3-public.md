@@ -1,14 +1,14 @@
 ### v0.3.0.0
 
 - [!!] Meilisearch fuzzy match
-- [!!] User.aliases
-	- [#54](/.claude/issues/not-started/54-user-aliases.md)
+- [!!] User.aliases #54
 	- User profile .avatar
-- PostCard .tags voting
-- Post styles, eg split as `content` -> `content_polite` + `content_direct`
-	- styles visibility settings
+	- Post.content_direct and polite Visibility settings
+- Post.tags voting on list page
+- Tag split: is_important vs not
+	- or by user|author votes
 - [!!] Meilisearch tags facets
-- `Post.alternatives` votes
+- Post.alternatives votes
 - [!] recurring export
 - [!!] Security review
 	- extra tests for `filter_posts_by_user`
