@@ -2,7 +2,7 @@
 # ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.12.1"
+LABEL version="0.1.12.2"
 
 USER coder
 
@@ -65,7 +65,6 @@ RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 RUN sudo apt install --yes gpg-agent # for node
 RUN mise install uv bun biome node claude
 
-RUN mise exec uv --command "uv tool install claude-monitor"
 RUN mise exec node --command "npx playwright install-deps"
 RUN mise exec node --command "npx playwright install chromium --with-deps"
 
