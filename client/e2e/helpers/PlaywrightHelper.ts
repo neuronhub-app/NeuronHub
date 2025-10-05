@@ -11,6 +11,7 @@ export type LocatorMap = Record<TestId, Locator>;
 
 export class PlaywrightHelper {
   $: LocatorMap;
+  private screenshotCounter = 0;
 
   constructor(
     public page: Page,
@@ -46,7 +47,7 @@ export class PlaywrightHelper {
     await input.fill(content);
   }
 
-  async click(id: string, options: { wait: boolean } = { wait: true }) {
+  async click(id: string, options = { wait: true }) {
     if (options.wait) {
       await this.get(id).waitFor({ state: "attached" }); // "attached" added by #AI. It isn't bad. Probably. Playwright is a mess
     }
@@ -116,8 +117,13 @@ export class PlaywrightHelper {
     };
   }
 
-  async screenshot(name: string = "screenshot") {
-    return this.page.screenshot({ path: `${name}.png`, fullPage: true });
+  async screenshot(name: string = "screenshot", { fullPage = false } = {}) {
+    this.screenshotCounter += 1;
+    return this.page.screenshot({
+      path: `e2e/screenshots/${this.screenshotCounter}-${name}.png`,
+      caret: "initial",
+      fullPage,
+    });
   }
 
   private async login() {
