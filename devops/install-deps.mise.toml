@@ -12,6 +12,7 @@
     run = "bun install"
 
 ["install-deps:playwright"]
+    dir = "client"
     run = "bun run playwright install chromium --with-deps"
 
 ["install-deps:claude"]
