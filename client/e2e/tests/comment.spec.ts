@@ -1,6 +1,5 @@
 import { test } from "@playwright/test";
 
-import { strs } from "@/components/posts/PostDetail/CommentForm";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
@@ -22,8 +21,7 @@ test.describe("Comments", () => {
     await play.click(ids.post.card.link.detail);
     const commentContent = "Test comment";
     await play.fill(ids.comment.form.textarea, commentContent);
-    await play.click(ids.comment.form.submitBtn);
-    await expect(page).toHaveText(strs.createdComment);
+    await play.submit(ids.post.form);
 
     const vote = {
       up: $[ids.comment.vote.up],
@@ -63,9 +61,8 @@ test.describe("Comments", () => {
     await play.click(ids.comment.edit.btn);
     const contentNew = "New comment content";
     await play.fill(ids.comment.form.textarea, contentNew);
-    await play.click(ids.comment.form.saveBtn);
+    await play.submit(ids.post.form);
     // confirm
-    await expect(page).toHaveText(strs.updatedComment);
     await expect(page).toHaveText(contentNew);
 
     // reload → test persistence

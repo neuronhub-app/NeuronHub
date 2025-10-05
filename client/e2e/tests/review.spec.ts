@@ -1,5 +1,4 @@
 import { test } from "@playwright/test";
-import { PostReviewForm } from "@/apps/reviews/create/PostReviewForm";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
@@ -15,15 +14,13 @@ test.describe("Review", () => {
     $ = play.locator();
   });
 
-  test("Create with a Parent", async ({ page }) => {
+  test("Create with a Parent", async () => {
     await play.navigate(urls.reviews.create, { idleWait: true });
 
     await play.fill(ids.post.form.title, "Django");
     await play.fill(ids.review.form.title, "Django Review");
     await play.fill(ids.review.form.content, "Easy to build with");
-    await play.click(ids.post.btn.submit);
-
-    await expect(page).toHaveText(PostReviewForm.strs.reviewCreated);
+    await play.submit(ids.post.form);
   });
 
   test("Edit Review.tags & Tool.tags", async () => {
@@ -79,8 +76,7 @@ test.describe("Review", () => {
   });
 
   async function submitAndReload() {
-    await play.click(ids.post.btn.submit);
-    await expect(play.page).toHaveText(PostReviewForm.strs.reviewUpdated);
+    await play.submit(ids.post.form);
     await play.page.waitForLoadState("networkidle");
     await play.click(ids.post.card.link.edit);
   }

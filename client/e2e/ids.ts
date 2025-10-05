@@ -12,7 +12,6 @@ export namespace ids {
     btn: {
       readingList: "post.btn.reading-list",
       library: "post.btn.library",
-      submit: "post.btn.submit", // todo refac: drop, use .form
       edit: "post.btn.edit",
     },
     toast: {
@@ -32,6 +31,9 @@ export namespace ids {
       title: "post.form.title",
       image: "post.form.image",
       tags: "post.form.tags",
+      state: {
+        saved: "post.form.state.saved",
+      },
       tag: {
         container: "post.form.tag.container",
         vote: {

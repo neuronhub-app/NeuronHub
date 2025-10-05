@@ -1,6 +1,5 @@
 import { test } from "@playwright/test";
 
-import { PostCreateForm } from "@/apps/posts/create/PostCreateForm";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
@@ -26,8 +25,7 @@ test.describe("Post", () => {
     const vote = play.getTagVoteButtons(post.tag);
     await vote.up.click();
     await expect(vote.up).checked();
-    await play.click(ids.post.btn.submit);
-    await expect(page).toHaveText(PostCreateForm.strs.postCreated);
+    await play.submit(ids.post.form);
     await expect(page).toHaveText(post.title);
 
     // Verify in list
@@ -40,8 +38,7 @@ test.describe("Post", () => {
     await expect($[ids.post.form.tags]).toHaveTag(post.tag);
     const titleUpdated = `${post.title} edited`;
     await play.fill(ids.post.form.title, titleUpdated);
-    await play.click(ids.post.btn.submit);
-    await expect(page).toHaveText(PostCreateForm.strs.postUpdated);
+    await play.submit(ids.post.form);
     await expect(page).toHaveText(titleUpdated);
   });
 });

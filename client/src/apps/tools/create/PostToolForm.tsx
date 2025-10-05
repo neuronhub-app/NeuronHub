@@ -1,7 +1,6 @@
 import { Fieldset, Heading, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import { PostToolFields } from "@/components/posts/form/PostToolFields";
 import { schemas } from "@/components/posts/form/schemas";
@@ -10,15 +9,11 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
+import { toast } from "@/utils/toast";
 import { PostTypeEnum } from "~/graphql/enums";
 
 // todo !(review): compare to ReviewForm re its update needs after #44
 export namespace PostToolForm {
-  export const strs = {
-    toolCreated: "Tool added",
-    toolCreateFailed: "Failed to save tool",
-  } as const;
-
   export function Comp() {
     const navigate = useNavigate();
 
@@ -52,10 +47,10 @@ export namespace PostToolForm {
       );
 
       if (response.success) {
-        toast.success(strs.toolCreated);
+        toast.success("Tool created");
         navigate(urls.tools.detail(response.data.post_update_or_create.id));
       } else {
-        toast.error(strs.toolCreateFailed);
+        toast.error("Failed to save Tool");
       }
     }
 

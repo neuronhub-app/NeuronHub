@@ -1,8 +1,8 @@
 import { Fieldset, Heading, HStack, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
+import { toast } from "@/utils/toast";
 import { PostDeleteButton } from "@/apps/posts/PostDeleteButton";
 import { PostFields } from "@/components/posts/form/PostFields";
 import { PostSharableFields } from "@/components/posts/form/PostSharableFields";
@@ -16,13 +16,6 @@ import { urls } from "@/routes";
 import { PostTypeEnum, Visibility } from "~/graphql/enums";
 
 export namespace PostCreateForm {
-  export const strs = {
-    postCreated: "Post created",
-    postUpdated: "Post updated",
-    postCreateFailed: "Failed to create post",
-    postUpdateFailed: "Failed to update post",
-  } as const;
-
   export function Comp(props: { post?: PostEditFragmentType }) {
     const navigate = useNavigate();
     const post = props.post;
@@ -52,10 +45,10 @@ export namespace PostCreateForm {
         );
 
         if (response.success) {
-          toast.success(strs.postUpdated);
+          toast.success("Post updated");
           navigate(urls.posts.detail(post.id));
         } else {
-          toast.error(strs.postUpdateFailed);
+          toast.error("Failed to update post");
         }
       } else {
         const response = await mutateAndRefetchMountedQueries(
@@ -68,10 +61,10 @@ export namespace PostCreateForm {
         );
 
         if (response.success) {
-          toast.success(strs.postCreated);
+          toast.success("Post created");
           navigate(urls.posts.detail(response.data.post_update_or_create.id));
         } else {
-          toast.error(strs.postCreateFailed);
+          toast.error("Failed to create post");
         }
       }
     }
@@ -98,7 +91,7 @@ export namespace PostCreateForm {
                   <Button
                     type="submit"
                     loading={form.formState.isSubmitting}
-                    {...ids.set(ids.post.btn.submit)}
+                    {...ids.set(ids.post.form.btn.submit)}
                     size="lg"
                   >
                     {isEditMode(post) ? "Save Post" : "Create Post"}

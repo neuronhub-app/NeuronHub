@@ -4,7 +4,6 @@ import { formatISO } from "date-fns";
 import { marked } from "marked";
 import type { JSX } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { FaStar } from "react-icons/fa";
 import { FaBookmark, FaCircleXmark, FaClockRotateLeft, FaHeartPulse } from "react-icons/fa6";
 import { FiSave } from "react-icons/fi";
@@ -14,6 +13,7 @@ import { useNavigate } from "react-router";
 import { mutateReview } from "@/apps/reviews/create/mutateReview";
 import { PostReviewDeleteButton } from "@/apps/reviews/create/PostReviewDeleteButton";
 import { useUser } from "@/apps/users/useUserCurrent";
+import { toast } from "@/utils/toast";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -34,11 +34,6 @@ import { useIsLoading } from "@/utils/useIsLoading";
 import { PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
 export namespace PostReviewForm {
-  export const strs = {
-    reviewCreated: "Review added",
-    reviewUpdated: "Review updated",
-  } as const;
-
   export function Comp(props: { review?: PostReviewEditFragmentType }) {
     const navigate = useNavigate();
     const user = useUser();
@@ -123,7 +118,7 @@ export namespace PostReviewForm {
         await forms.review.handleSubmit(async reviewData => {
           const response = await mutateReview(reviewData);
           if (response.success) {
-            toast.success(strs.reviewUpdated);
+            toast.success("Review updated");
             navigate(urls.reviews.detail(response.data.id));
           } else {
             toast.error(`Update failed: ${response.error}`);
@@ -167,7 +162,7 @@ export namespace PostReviewForm {
           parent: { id: toolResponse.data.post_update_or_create.id },
         });
         if (response.success) {
-          toast.success(strs.reviewCreated);
+          toast.success("Review added");
           navigate(urls.reviews.detail(response.data.id));
         } else {
           toast.error(`Creation failed: ${response.error}`);
@@ -339,7 +334,7 @@ export namespace PostReviewForm {
                   <Button
                     type="submit"
                     loading={loading.isActive}
-                    {...ids.set(ids.post.btn.submit)}
+                    {...ids.set(ids.post.form.btn.submit)}
                     size="lg"
                   >
                     {isEditMode(props.review) ? (

@@ -1,5 +1,4 @@
 import { test } from "@playwright/test";
-import { PostToolForm } from "@/apps/tools/create/PostToolForm";
 import { expect } from "@/e2e/helpers/expect";
 import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
@@ -22,8 +21,7 @@ test.describe("Tool", () => {
     const input = play.get(ids.post.form.image);
     await input.setInputFiles(await genImagePng());
 
-    await play.click(ids.post.form.btn.submit);
-    await expect(page).toHaveText(PostToolForm.strs.toolCreated);
+    await play.submit(ids.post.form);
     await expect(page).toHaveText(tool.title);
     await play.navigate(urls.tools.list);
 

@@ -48,9 +48,14 @@ export class PlaywrightHelper {
 
   async click(id: string, options: { wait: boolean } = { wait: true }) {
     if (options.wait) {
-      await this.get(id).waitFor({ state: "attached" });
+      await this.get(id).waitFor({ state: "attached" }); // "attached" added by #AI. It isn't bad. Probably. Playwright is a mess
     }
     return this.get(id).click();
+  }
+
+  async submit(form: typeof ids.post.form) {
+    await this.click(form.btn.submit);
+    await this.get(form.state.saved).waitFor();
   }
 
   async reload(opts = { idleWait: false }) {

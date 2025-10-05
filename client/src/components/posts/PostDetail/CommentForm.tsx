@@ -2,8 +2,8 @@ import { Button, HStack, Show, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type JSX, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
 import { z } from "zod";
+import { toast } from "@/utils/toast";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { usePostCommentDraft } from "@/components/posts/PostDetail/usePostCommentDraft";
 import { ids } from "@/e2e/ids";
@@ -44,7 +44,7 @@ export function CommentForm(
     if (isEditMode) {
       const response = await commentUpdate({ id: props.comment.id, content: data.content });
       if (response.success) {
-        toast.success(strs.updatedComment);
+        toast.success("Comment updated");
         draft.clear();
         props.onSave();
       } else {
@@ -53,7 +53,7 @@ export function CommentForm(
     } else {
       const response = await commentCreate({ parentId: props.parentId, content: data.content });
       if (response.success) {
-        toast.success(strs.createdComment);
+        toast.success("Comment posted");
         form.reset();
         draft.clear();
       } else {
@@ -84,7 +84,7 @@ export function CommentForm(
                 variant="subtle"
                 size="sm"
                 loading={form.formState.isSubmitting}
-                {...ids.set(ids.comment.form.saveBtn)}
+                {...ids.set(ids.post.form.btn.submit)}
               >
                 Save
               </Button>
@@ -111,7 +111,7 @@ export function CommentForm(
             size="sm"
             alignSelf="flex-start"
             loading={form.formState.isSubmitting}
-            {...ids.set(ids.comment.form.submitBtn)}
+            {...ids.set(ids.post.form.btn.submit)}
           >
             Post
           </Button>
@@ -120,11 +120,6 @@ export function CommentForm(
     </form>
   );
 }
-
-export const strs = {
-  createdComment: "Comment posted",
-  updatedComment: "Comment updated",
-};
 
 async function commentCreate(input: { parentId: ID; content: string }) {
   return mutateAndRefetchMountedQueries(
