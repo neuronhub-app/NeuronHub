@@ -5,8 +5,9 @@
 	- User profile .avatar
 	- Post.content_direct and polite Visibility settings
 - Post.tags voting on list page
-- Tag split: is_important vs not
-	- or by user|author votes
+- Tag by `.is_important`
+	- author "stars" `.is_important` in UI
+    - extend by author & user votes
 - [!!] Meilisearch tags facets
 - Post.alternatives votes
 - [!] recurring export

@@ -1,6 +1,5 @@
 import { HStack, Show, Text } from "@chakra-ui/react";
 import { Webhook } from "lucide-react";
-import type { JSX } from "react";
 import { useFormContext } from "react-hook-form";
 import { FaAppStoreIos, FaBook, FaCode, FaServer, FaShoppingCart } from "react-icons/fa";
 import { LuGithub } from "react-icons/lu";
@@ -10,6 +9,7 @@ import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentCo
 import { PostFields } from "@/components/posts/form/PostFields";
 import type { schemas } from "@/components/posts/form/schemas";
 import { ids } from "@/e2e/ids";
+import { ToolType } from "~/graphql/enums";
 
 export function PostToolFields() {
   const form = useFormContext<schemas.Tool>();
@@ -23,12 +23,12 @@ export function PostToolFields() {
         label="Type"
         segmentGroupProps={{ size: "lg" }}
         items={[
-          getToolType("Program", <FaCode />),
-          getToolType("SaaS", <FaServer />),
-          getToolType("Material", <FaBook />),
-          getToolType("App", <FaAppStoreIos />),
-          getToolType("Product", <FaShoppingCart />),
-          getToolType("Other", <Webhook />),
+          { value: ToolType.Program, icon: <FaCode /> },
+          { value: ToolType.SaaS, icon: <FaServer /> },
+          { value: ToolType.Material, icon: <FaBook /> },
+          { value: ToolType.App, icon: <FaAppStoreIos /> },
+          { value: ToolType.Product, icon: <FaShoppingCart /> },
+          { value: ToolType.Other, icon: <Webhook /> },
         ]}
       />
       <Show when={state.tool_type === "Program"}>
@@ -126,16 +126,4 @@ export function PostToolFields() {
 
 function getToolTypeName(tool_type?: string) {
   return tool_type === "Other" ? "Tool" : tool_type;
-}
-
-function getToolType(value: string, icon: JSX.Element, label?: string) {
-  return {
-    value: value,
-    label: (
-      <HStack>
-        <Text>{icon}</Text>
-        <Text>{label ?? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()}</Text>
-      </HStack>
-    ),
-  };
 }

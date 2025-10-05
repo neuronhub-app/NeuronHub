@@ -49,14 +49,24 @@ async def _update_or_create(data: PostTypeInput, author: User):
 
 def _parse_data(data: PostTypeInput) -> dict:
     field_values = {}
+    # todo refac: iter over all → exclude .tags, .review_tags, etc
     for field_name, field_val in [
         ("type", data.type),
+        # Type.Post
+        ("category", data.category),
         ("title", data.title),
         ("source", data.source),
+        ("source_author", data.source_author),
         ("content", data.content),
         ("content_private", data.content_private),
         ("image", data.image),
         ("visibility", data.visibility),
+        # Type.Tool
+        ("tool_type", data.tool_type),
+        ("domain", data.domain),
+        ("github_url", data.github_url),
+        ("crunchbase_url", data.crunchbase_url),
+        ("url", data.url),
         # Type.Review
         ("review_rating", data.review_rating),
         ("review_usage_status", data.review_usage_status),

@@ -13,7 +13,6 @@ import { useNavigate } from "react-router";
 import { mutateReview } from "@/apps/reviews/create/mutateReview";
 import { PostReviewDeleteButton } from "@/apps/reviews/create/PostReviewDeleteButton";
 import { useUser } from "@/apps/users/useUserCurrent";
-import { toast } from "@/utils/toast";
 import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCard";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -30,6 +29,7 @@ import { graphql } from "@/gql-tada";
 import { isEditMode, type PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
+import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
@@ -291,15 +291,19 @@ export namespace PostReviewForm {
                         name="review_usage_status"
                         label="Usage status"
                         items={[
-                          getToolType(UsageStatus.Using, <FaHeartPulse />),
-                          getToolType(UsageStatus.WantToUse, <FaBookmark />, "Want to use"),
-                          getToolType(UsageStatus.Used, <FaClockRotateLeft />),
-                          getToolType(UsageStatus.Interested, <FaStar />),
-                          getToolType(
-                            UsageStatus.NotInterested,
-                            <FaCircleXmark />,
-                            "Not interested",
-                          ),
+                          { value: UsageStatus.Using, icon: <FaHeartPulse /> },
+                          {
+                            value: UsageStatus.WantToUse,
+                            icon: <FaBookmark />,
+                            label: "Want to use",
+                          },
+                          { value: UsageStatus.Used, icon: <FaClockRotateLeft /> },
+                          { value: UsageStatus.Interested, icon: <FaStar /> },
+                          {
+                            value: UsageStatus.NotInterested,
+                            icon: <FaCircleXmark />,
+                            label: "Not interested",
+                          },
                         ]}
                         segmentGroupProps={{ size: "sm" }}
                       />

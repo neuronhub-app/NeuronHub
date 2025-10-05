@@ -59,6 +59,13 @@ class CommentManager(PostManagerAbstract):
     type = PostTypeEnum.Comment
 
 
+class PostCategory(models.TextChoices):
+    Knowledge = "knowledge"
+    Opinion = "opinion"
+    Question = "question"
+    News = "news"
+
+
 @anonymizer.register
 class Post(AnonimazableTimeStampedModel):
     objects = models.Manager()
@@ -69,6 +76,13 @@ class Post(AnonimazableTimeStampedModel):
 
     Type = PostTypeEnum
     type = TextChoicesField(Type, default=Type.Post)
+
+    category = TextChoicesField(
+        PostCategory,
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     parent = models.ForeignKey(
         "self",

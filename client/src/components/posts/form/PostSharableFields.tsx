@@ -1,5 +1,4 @@
-import { HStack, Icon, Text, VStack } from "@chakra-ui/react";
-import type { JSX } from "react";
+import { Text, VStack } from "@chakra-ui/react";
 import { FaGlobe, FaShieldHalved, FaUsers, FaUsersGear } from "react-icons/fa6";
 import { HiLockClosed } from "react-icons/hi2";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -27,13 +26,21 @@ export function PostSharableFields() {
           name="visibility"
           label="Visibility"
           items={[
-            getVisibilityOption(Visibility.Private, <HiLockClosed />),
-            getVisibilityOption(Visibility.UsersSelected, <FaUsersGear />, "Users selected"),
-            getVisibilityOption(Visibility.Connections, <FaUsers />),
-            getVisibilityOption(Visibility.SubscribersPaid, <FaUsers />, "Subscribers (paid)"),
-            getVisibilityOption(Visibility.Subscribers, <FaUsers />),
-            getVisibilityOption(Visibility.Internal, <FaShieldHalved />, "Authenticated users"),
-            getVisibilityOption(Visibility.Public, <FaGlobe />),
+            { value: Visibility.Private, icon: <HiLockClosed /> },
+            { value: Visibility.UsersSelected, icon: <FaUsersGear />, label: "Users selected" },
+            { value: Visibility.Connections, icon: <FaUsers /> },
+            {
+              value: Visibility.SubscribersPaid,
+              icon: <FaUsers />,
+              label: "Subscribers (paid)",
+            },
+            { value: Visibility.Subscribers, icon: <FaUsers /> },
+            {
+              value: Visibility.Internal,
+              icon: <FaShieldHalved />,
+              label: "Authenticated users",
+            },
+            { value: Visibility.Public, icon: <FaGlobe /> },
           ]}
           segmentGroupProps={{ size: "sm" }}
         />
@@ -65,16 +72,4 @@ export function PostSharableFields() {
       </VStack>
     </>
   );
-}
-
-function getVisibilityOption(value: string, icon: JSX.Element, label?: string) {
-  return {
-    value: value,
-    label: (
-      <HStack>
-        <Icon fontSize="md">{icon}</Icon>
-        <Text>{label ?? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()}</Text>
-      </HStack>
-    ),
-  };
 }

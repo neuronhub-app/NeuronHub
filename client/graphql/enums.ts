@@ -7,6 +7,13 @@ export enum Ordering {
   DescNullsLast = 'DESC_NULLS_LAST'
 }
 
+export enum PostCategory {
+  Knowledge = 'Knowledge',
+  News = 'News',
+  Opinion = 'Opinion',
+  Question = 'Question'
+}
+
 export enum PostTypeEnum {
   Comment = 'Comment',
   Post = 'Post',

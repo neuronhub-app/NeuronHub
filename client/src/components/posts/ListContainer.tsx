@@ -25,12 +25,14 @@ import { ids } from "@/e2e/ids";
 import type { PostFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewFragmentType } from "@/graphql/fragments/reviews";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
+import { PostCategory } from "~/graphql/enums";
 
 export type PostListItemType = PostFragmentType | PostReviewFragmentType;
 
 // todo refac-name: PostList
 export function ListContainer(props: {
-  title: string;
+  title?: string;
+  category?: PostCategory;
   items: Array<PostListItemType>;
   urlNamespace: "reviews" | "posts" | "tools";
   isLoadingFirstTime: boolean;
@@ -40,7 +42,7 @@ export function ListContainer(props: {
   return (
     <Stack gap="gap.lg">
       <HStack justify="space-between">
-        <Heading size="2xl">{props.title}</Heading>
+        <Heading size="2xl">{getPostCategoryName(props.category) ?? "Posts"}</Heading>
 
         <NavLink to={`/${props.urlNamespace}/create`}>
           <Button size="md" variant="subtle">
@@ -137,6 +139,19 @@ export function ListContainer(props: {
       </Flex>
     </Stack>
   );
+}
+
+function getPostCategoryName(category?: PostCategory) {
+  if (!category) {
+    return;
+  }
+  switch (category) {
+    case PostCategory.Opinion:
+      return "Opinions";
+    case PostCategory.Question:
+      return "Questions";
+  }
+  return category;
 }
 
 function countCommentsRecursively(comments?: PostFragmentType["comments"]) {

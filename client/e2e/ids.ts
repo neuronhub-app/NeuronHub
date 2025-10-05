@@ -30,6 +30,7 @@ export namespace ids {
     form: {
       title: "post.form.title",
       image: "post.form.image",
+      category: "post.form.category",
       tags: "post.form.tags",
       state: {
         saved: "post.form.state.saved",

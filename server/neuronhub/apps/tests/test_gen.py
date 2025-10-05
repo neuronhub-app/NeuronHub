@@ -11,7 +11,7 @@ from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
 from neuronhub.apps.anonymizer.fields import Visibility
 
 from neuronhub.apps.users.models import User
-from neuronhub.apps.posts.models import Post
+from neuronhub.apps.posts.models import Post, PostCategory
 from neuronhub.apps.posts.models.types import PostTypeEnum
 
 
@@ -159,6 +159,7 @@ class PostsGen:
         author: User | None = None
         visibility: Visibility = Visibility.PUBLIC
         visible_to_users: list[User] | None = None
+        category: PostCategory | None = None
 
         # tools
         # ------
@@ -233,8 +234,11 @@ class PostsGen:
             await post.tags.aadd(tag)
         return tag
 
-    # todo refac-rename: `post`
-    async def create(self, params: Params = Params(type=Post.Type.Post)) -> Post:
+    async def post(self, params: Params = Params()) -> Post:
+        return await self.create(params)
+
+    # todo refac-rename: `_create`
+    async def create(self, params: Params = Params()) -> Post:
         from neuronhub.apps.posts.models import Post
         from neuronhub.apps.posts.models import ToolCompany
         from neuronhub.apps.tests.services.db_stubs_repopulate import create_company_ownership

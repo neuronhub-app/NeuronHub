@@ -11,7 +11,7 @@ from django.utils import timezone
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
-from neuronhub.apps.posts.models import PostRelated
+from neuronhub.apps.posts.models import PostRelated, PostCategory
 from neuronhub.apps.posts.models import UsageStatus
 from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
@@ -355,8 +355,9 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
             TagParams("Dev / License / Closed-source"),
         ],
     )
-    await gen.posts.create(
+    await gen.posts.post(
         gen.posts.Params(
+            category=PostCategory.Knowledge,
             title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this",
             content=textwrap.dedent(
                 """
@@ -398,10 +399,11 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
             TagParams("Dev / License / Apache 2", is_important=True),
         ],
     )
-    await gen.posts.create(
+    await gen.posts.post(
         gen.posts.Params(
             title="Aider leaderboards are becoming popular on HN for new models assessment",
             content="https://aider.chat/docs/leaderboards",
+            category=PostCategory.Opinion,
             parent=tool,
             author=user,
         )
@@ -422,7 +424,7 @@ class TagParams:
 
 
 async def _create_tags(post: Post, author: User, params: list[TagParams]):
-    tags = await asyncio.gather(
+    tags_new = await asyncio.gather(
         *[
             tag_create_or_update(
                 name_raw=param.name,
@@ -434,7 +436,7 @@ async def _create_tags(post: Post, author: User, params: list[TagParams]):
             for param in params
         ]
     )
-    await post.tags.aadd(*tags)
+    await post.tags.aadd(*tags_new)
 
 
 @dataclass

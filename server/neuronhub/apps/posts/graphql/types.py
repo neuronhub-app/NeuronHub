@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 @strawberry_django.filter_type(Post, lookups=True)
 class PostFilter:
     type: auto
+    category: auto
     title: auto
 
 
@@ -43,6 +44,7 @@ class PostTypeI:
     comments: list[PostCommentType] = strawberry_django.field(field_name="children")
 
     type: auto
+    category: auto
 
     title: auto
     content: auto
@@ -136,6 +138,7 @@ class PostVoteType:
 class PostTypeInput:
     id: auto
     type: auto
+    category: auto
 
     parent: PostTypeInput | None
     alternatives: auto

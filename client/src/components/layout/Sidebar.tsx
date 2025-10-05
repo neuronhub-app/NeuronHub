@@ -1,7 +1,9 @@
 import {
   Bleed,
   Box,
+  Button,
   type ButtonProps,
+  Collapsible,
   Flex,
   HStack,
   Icon,
@@ -11,15 +13,24 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { MessageSquareText } from "lucide-react";
+import type { ComponentType } from "react";
 import toast from "react-hot-toast";
 import { FaRegBookmark } from "react-icons/fa6";
 import { GoCommentDiscussion } from "react-icons/go";
-import { LuLayoutDashboard, LuLibrary, LuLogIn, LuLogOut, LuSettings } from "react-icons/lu";
+import {
+  LuChevronDown,
+  LuFile,
+  LuLayoutDashboard,
+  LuLibrary,
+  LuLogIn,
+  LuLogOut,
+  LuSettings,
+} from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink, useNavigate } from "react-router";
+
 import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
@@ -30,12 +41,28 @@ const groups = [
   {
     title: "",
     links: [
-      { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts" },
+      {
+        to: urls.posts.list,
+        icon: GoCommentDiscussion,
+        label: "Posts",
+        children: [
+          { label: "All", to: urls.posts.list },
+          { label: "Knowledge", to: urls.posts.knowledge },
+          { label: "Opinion", to: urls.posts.opinion },
+          { label: "News", to: urls.posts.news },
+          { label: "Question", to: urls.posts.question },
+        ] as const,
+      },
       { to: urls.tools.list, icon: LuLayoutDashboard, label: "Tools" },
       { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },
       { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
       { to: "/library", icon: LuLibrary, label: "Library" },
-    ],
+    ] as Array<{
+      to: LinkProps["to"];
+      icon: ComponentType;
+      label: string;
+      children?: ReadonlyArray<{ label: string; to: LinkProps["to"] }>;
+    }>,
   },
 ];
 
@@ -79,10 +106,8 @@ export function Sidebar(props: StackProps) {
         <Stack gap="6">
           {groups.map((group, index) => (
             <Stack
-              key={
-                // biome-ignore lint/suspicious/noArrayIndexKey: wrong
-                index
-              }
+              // biome-ignore lint/suspicious/noArrayIndexKey: wrong - it's a const ffs
+              key={index}
               gap="2"
             >
               {group.title && (
@@ -93,16 +118,20 @@ export function Sidebar(props: StackProps) {
               <Stack gap="1">
                 {group.links.map((link, index) => (
                   <Bleed
-                    key={
-                      // biome-ignore lint/suspicious/noArrayIndexKey: wrong
-                      index
-                    }
+                    // biome-ignore lint/suspicious/noArrayIndexKey: wrong
+                    key={index}
                     inline={styles.inline}
                   >
-                    <SidebarLink to={link.to}>
-                      <link.icon />
-                      {link.label}
-                    </SidebarLink>
+                    {link.children ? (
+                      <SidebarLinkGroup label={link.label} to={link.to} icon={link.icon}>
+                        {link.children}
+                      </SidebarLinkGroup>
+                    ) : (
+                      <SidebarLink to={link.to}>
+                        <link.icon />
+                        {link.label}
+                      </SidebarLink>
+                    )}
                   </Bleed>
                 ))}
               </Stack>
@@ -154,6 +183,82 @@ function SidebarLink(props: { to?: LinkProps["to"] } & ButtonProps) {
         </Button>
       )}
     </NavLink>
+  );
+}
+
+function SidebarLinkGroup(props: {
+  to?: LinkProps["to"];
+  label: string;
+  icon?: React.ComponentType;
+  children: ReadonlyArray<{
+    to: LinkProps["to"];
+    label: string;
+  }>;
+}) {
+  const IconComponent = props.icon || LuFile;
+  return (
+    <Collapsible.Root defaultOpen>
+      <HStack width="full" position="relative">
+        <NavLink to={props.to ?? "/"} style={{ flex: 1 }}>
+          {linkProps => (
+            <Button
+              variant="ghost"
+              width="full"
+              justifyContent="start"
+              gap="3"
+              color="fg.muted"
+              _hover={{
+                bg: "colorPalette.subtle",
+                color: "colorPalette.fg",
+              }}
+              _currentPage={{
+                color: "colorPalette.fg",
+              }}
+              aria-current={linkProps.isActive ? "page" : undefined}
+              pr="10"
+            >
+              <IconComponent />
+              {props.label}
+            </Button>
+          )}
+        </NavLink>
+        <Collapsible.Trigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            position="absolute"
+            right="0"
+            color="fg.muted"
+            _hover={{
+              bg: "colorPalette.subtle",
+            }}
+          >
+            <Collapsible.Context>
+              {context => (
+                <Icon
+                  aria-hidden
+                  transition="transform 0.2s"
+                  transformOrigin="center"
+                  transform={context.open ? "rotate(180deg)" : undefined}
+                >
+                  <LuChevronDown />
+                </Icon>
+              )}
+            </Collapsible.Context>
+          </Button>
+        </Collapsible.Trigger>
+      </HStack>
+
+      <Collapsible.Content>
+        <Stack gap="1" py="1">
+          {props.children.map(link => (
+            <SidebarLink key={link.to.toString()} to={link.to} ps="12">
+              {link.label}
+            </SidebarLink>
+          ))}
+        </Stack>
+      </Collapsible.Content>
+    </Collapsible.Root>
   );
 }
 

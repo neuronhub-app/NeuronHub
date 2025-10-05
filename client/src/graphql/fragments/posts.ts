@@ -7,6 +7,7 @@ export const PostFragment = graphql(
       id
       __typename
       type
+      category
       title
       content
       source

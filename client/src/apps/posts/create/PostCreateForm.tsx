@@ -80,7 +80,7 @@ export namespace PostCreateForm {
                 <Fieldset.Root>
                   <Fieldset.Content gap="gap.lg">
                     <VStack gap="gap.lg" align="flex-start" maxW="full">
-                      <PostFields isShowAuthorProfileInput />
+                      <PostFields isShowAuthorProfileInput isShowCategoryField />
                     </VStack>
 
                     <PostSharableFields />

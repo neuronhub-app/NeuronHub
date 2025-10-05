@@ -80,6 +80,8 @@ export class PlaywrightHelper {
       | typeof urls.posts.list
       | typeof urls.posts.create
       | typeof urls.tools.list
+      | typeof urls.posts.knowledge
+      | typeof urls.posts.news
       | typeof urls.tools.create
       | typeof urls.reviews.list
       | typeof urls.reviews.create,

@@ -1,5 +1,4 @@
 import { layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
-
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import type { ID } from "@/gql-tada";
 
@@ -20,6 +19,19 @@ export const urls = {
   },
   posts: {
     list: "/posts",
+    get knowledge() {
+      // todo refac: use enums, not magic strs. but react-router breaks on import
+      return `${this.list}/knowledge` as const;
+    },
+    get opinion() {
+      return `${this.list}/opinion` as const;
+    },
+    get news() {
+      return `${this.list}/news` as const;
+    },
+    get question() {
+      return `${this.list}/question` as const;
+    },
     get create() {
       return `${this.list}/${op.create}` as const;
     },
@@ -87,6 +99,10 @@ export default [
     ]),
     ...prefix(urls.posts.list, [
       route("/", "./apps/posts/list/index.tsx"),
+      route("/knowledge", "./apps/posts/list/knowledge.tsx"),
+      route("/opinion", "./apps/posts/list/opinion.tsx"),
+      route("/news", "./apps/posts/list/news.tsx"),
+      route("/question", "./apps/posts/list/question.tsx"),
       route(`/${op.create}`, "./apps/posts/create/index.tsx"),
       route("/:id", "./apps/posts/detail/index.tsx"),
       route(`/:id/${op.edit}`, "./apps/posts/edit/index.tsx"),

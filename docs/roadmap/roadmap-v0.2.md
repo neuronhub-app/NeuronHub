@@ -9,8 +9,8 @@
 	- [x] created
 	- [x] edit
 	- [x] .source_author field
-    - [ ] .category: Knowledge (Quote, Opinion, Idea, Guide, Link), News, Read later, Humor
-	- [ ] .content split -> `content_polite` + `content_direct`
+    - [x] .category: Knowledge, Opinion, News
+	- [ ] .content split -> `content_polite` + `content_direct` + `content_rant`
 	- [ ] fix Tag votes (resets on Post form init)
 - [ ] Dokploy
 

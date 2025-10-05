@@ -2,7 +2,7 @@ import { type UseFormReturn, useFormContext as useFormContextOriginal } from "re
 import { z } from "zod/v4";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
-import { PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
+import { PostCategory, PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
 export const UserType = z.enum(["User", "Group"]);
 
@@ -18,6 +18,7 @@ export namespace schemas {
     id: z.string().nullable(),
     title: z.string().min(1),
     content: z.string().optional(),
+    category: z.enum(enumConvert(PostCategory)).optional().nullable(),
     source: z.string().optional(),
     source_author: z.string().optional(),
     tags: getSelectVotableSchema(),
@@ -149,6 +150,7 @@ export namespace schemas {
         content: data.content,
         source: data.source,
         source_author: data.source_author,
+        category: data.category as PostCategory | null,
         tags:
           data.tags?.map(tag => ({
             id: tag.id,
@@ -167,6 +169,7 @@ export namespace schemas {
         content: values.content,
         source: values.source,
         source_author: values.source_author,
+        category: values.category ?? null,
         tags: values.tags
           ? values.tags.map(tag => ({
               id: tag.id,

@@ -111,6 +111,61 @@ enum Ordering {
   DESC_NULLS_LAST
 }
 
+enum PostCategory {
+  Knowledge
+  Opinion
+  Question
+  News
+}
+
+input PostCategoryFilterLookup {
+  """Exact match. Filter will be skipped on `null` value"""
+  exact: PostCategory
+
+  """Assignment test. Filter will be skipped on `null` value"""
+  is_null: Boolean
+
+  """
+  Exact match of items in a given list. Filter will be skipped on `null` value
+  """
+  in_list: [PostCategory!]
+
+  """Case-insensitive exact match. Filter will be skipped on `null` value"""
+  i_exact: PostCategory
+
+  """
+  Case-sensitive containment test. Filter will be skipped on `null` value
+  """
+  contains: PostCategory
+
+  """
+  Case-insensitive containment test. Filter will be skipped on `null` value
+  """
+  i_contains: PostCategory
+
+  """Case-sensitive starts-with. Filter will be skipped on `null` value"""
+  starts_with: PostCategory
+
+  """Case-insensitive starts-with. Filter will be skipped on `null` value"""
+  i_starts_with: PostCategory
+
+  """Case-sensitive ends-with. Filter will be skipped on `null` value"""
+  ends_with: PostCategory
+
+  """Case-insensitive ends-with. Filter will be skipped on `null` value"""
+  i_ends_with: PostCategory
+
+  """
+  Case-sensitive regular expression match. Filter will be skipped on `null` value
+  """
+  regex: PostCategory
+
+  """
+  Case-insensitive regular expression match. Filter will be skipped on `null` value
+  """
+  i_regex: PostCategory
+}
+
 type PostCommentType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
@@ -120,6 +175,7 @@ type PostCommentType implements PostTypeI {
   children: [PostTypeI!]!
   comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
+  category: PostCategory
   title: String!
   content: String!
   content_private: String!
@@ -145,6 +201,7 @@ type PostCommentType implements PostTypeI {
 
 input PostFilter {
   type: PostTypeEnumFilterLookup
+  category: PostCategoryFilterLookup
   title: StrFilterLookup
   AND: PostFilter
   OR: PostFilter
@@ -165,6 +222,7 @@ type PostReviewType implements PostTypeI {
   children: [PostTypeI!]!
   comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
+  category: PostCategory
   title: String!
   content: String!
   content_private: String!
@@ -252,6 +310,7 @@ type PostToolType implements PostTypeI {
   children: [PostTypeI!]!
   comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
+  category: PostCategory
   title: String!
   content: String!
   content_private: String!
@@ -286,6 +345,7 @@ type PostType implements PostTypeI {
   children: [PostTypeI!]!
   comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
+  category: PostCategory
   title: String!
   content: String!
   content_private: String!
@@ -373,6 +433,7 @@ interface PostTypeI {
   children: [PostTypeI!]!
   comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
+  category: PostCategory
   title: String!
   content: String!
   content_private: String!
@@ -399,6 +460,7 @@ interface PostTypeI {
 input PostTypeInput {
   id: ID
   type: PostTypeEnum
+  category: PostCategory
   parent: PostTypeInput
   alternatives: ManyToManyInput
   title: String
