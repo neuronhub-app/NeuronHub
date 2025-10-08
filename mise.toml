@@ -32,12 +32,12 @@
     [tasks."dev:server"]
         depends = "dev:db"
         dir = "server"
-        run = "uv run manage.py runserver $SERVER_PORT"
+        run = "uv run manage.py runserver {{ get_env(name='SERVER_PORT') }}"
 
     [tasks."dev:client"]
         depends = "dev:db"
         dir = "client"
-        run = "bun run react-router dev --host --port=$CLIENT_PORT"
+        run = "bun run react-router dev --host --port={{ get_env(name='CLIENT_PORT') }}"
         env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT') }}"
 
     # todo refac-name: docker-services?
@@ -52,15 +52,15 @@
     [tasks."dev:server:e2e"]
         depends = ["dev:db", "dev:db:setup-e2e"]
         dir = "server"
-        run = "uv run manage.py runserver $SERVER_PORT_E2E"
-        env.SERVER_URL = "http://localhost:{{env.SERVER_PORT_E2E}}"
+        run = "uv run manage.py runserver {{ get_env(name='SERVER_PORT_E2E') }}"
+        env.SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
         env.E2E_TEST = "true"
-        env.E2E_DB_NAME = "{{env.E2E_DB_NAME}}"
+        env.E2E_DB_NAME = "{{ get_env(name='E2E_DB_NAME') }}"
 
     [tasks."dev:client:e2e"]
         dir = "client"
-        run = "bun run react-router dev --host --port=$CLIENT_PORT_E2E"
-        env.VITE_SERVER_URL = "http://localhost:{{env.SERVER_PORT_E2E}}"
+        run = "bun run react-router dev --host --port={{ get_env(name='CLIENT_PORT_E2E') }}"
+        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
 
     [tasks."dev:e2e"]
         depends = ["dev:server:e2e", "dev:client:e2e"]
@@ -81,7 +81,7 @@
         dir = "client"
         run = "bun run playwright test --config=e2e/playwright.config.ts"
         alias = "e2e"
-        env = { VITE_SERVER_URL = "http://localhost:{{env.SERVER_PORT_E2E}}" }
+        env = { VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}" }
 
 
 [tasks."django:migrate"]
@@ -146,8 +146,14 @@
         outputs = { auto = true }
 
 [tasks."lint"]
-    depends = ["typegen --output=silent", "format --output=silent"]
-    run = "mise run lint:*"
+    depends = [
+        "typegen --output=silent",
+        "format --output=silent",
+    ]
+    run = [
+        "mise lint:server",
+        "mise lint:client",
+    ]
 
     [tasks."lint:server"]
         dir = "server"
