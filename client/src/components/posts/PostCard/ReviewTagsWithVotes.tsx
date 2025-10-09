@@ -2,7 +2,8 @@ import { PostTag } from "@/components/posts/PostCard/PostTags";
 import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
 
-// todo refac-name: PostTagsVoted
+// todo refac-name: ReviewCardTags
+// todo refac: can it be merged with PostCard? Don't see much special here, besides `authorVote`
 export function ReviewTagsWithVotes(props: {
   tags: PostTagFragmentType[];
   authorId: ID;
