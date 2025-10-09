@@ -3,8 +3,8 @@ import { useFormContext } from "react-hook-form";
 import { FaLightbulb, FaNewspaper, FaQuestion, FaThumbsUp } from "react-icons/fa";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
-import { PostContentFields } from "@/components/posts/form/PostContentFields";
 import { ImageUpload } from "@/components/posts/form/ImageUpload";
+import { PostContentFields } from "@/components/posts/form/PostContentFields";
 import { SelectVotable } from "@/components/posts/form/SelectVotable";
 import type { schemas } from "@/components/posts/form/schemas";
 import { ids } from "@/e2e/ids";
@@ -73,7 +73,11 @@ export function PostFields(props: {
         {...ids.setInput(ids.post.form.image)}
       />
 
-      <SelectVotable fieldName="tags" {...ids.set(ids.post.form.tags)} />
+      <SelectVotable
+        fieldName="tags"
+        postId={form.watch("id") ?? undefined}
+        {...ids.set(ids.post.form.tags)}
+      />
     </>
   );
 }

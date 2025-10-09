@@ -1,5 +1,6 @@
 import { type UseFormReturn, useFormContext as useFormContextOriginal } from "react-hook-form";
 import { z } from "zod/v4";
+import type { User } from "@/apps/users/useUserCurrent";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 import { PostCategory, PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
@@ -147,7 +148,7 @@ export namespace schemas {
   export type Post = z.infer<typeof Post>;
 
   export namespace post {
-    export function deserialize(data: PostEditFragmentType): Post {
+    export function deserialize(data: PostEditFragmentType, user?: User | null): Post {
       return {
         id: data.id,
         title: data.title,
@@ -158,12 +159,17 @@ export namespace schemas {
         source_author: data.source_author,
         category: data.category as PostCategory | null,
         tags:
-          data.tags?.map(tag => ({
-            id: tag.id,
-            name: tag.name,
-            label: tag.label,
-            is_vote_positive: null,
-          })) ?? [],
+          data.tags?.map(tag => {
+            const userTagVote = user?.post_tag_votes.find(vote => {
+              return vote.post.id === data.id && vote.tag.id === tag.id;
+            });
+            return {
+              id: tag.id,
+              name: tag.name,
+              label: tag.label,
+              is_vote_positive: userTagVote?.is_vote_positive ?? null,
+            };
+          }) ?? [],
         ...sharable.deserialize(data),
       };
     }

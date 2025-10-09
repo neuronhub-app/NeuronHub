@@ -88,6 +88,8 @@ test.describe("Post", () => {
     await expect($[ids.post.form.tags]).toHaveTag(post.tag);
     await expect(categoryBtn).checked();
 
+    await expect(vote.up).checked();
+
     await play.fill(ids.post.form.title, post.titleUpdated);
     await play.submit(ids.post.form);
     await expect(page).toHaveText(post.titleUpdated);

@@ -4,6 +4,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "@/utils/toast";
 import { PostDeleteButton } from "@/apps/posts/PostDeleteButton";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { PostFields } from "@/components/posts/form/PostFields";
 import { PostSharableFields } from "@/components/posts/form/PostSharableFields";
 import { schemas } from "@/components/posts/form/schemas";
@@ -19,13 +20,14 @@ export namespace PostCreateForm {
   export function Comp(props: { post?: PostEditFragmentType }) {
     const navigate = useNavigate();
     const post = props.post;
+    const user = useUser();
 
     const form = useForm<schemas.Post>({
       resolver: zodResolver(schemas.Post),
       mode: "onBlur",
       reValidateMode: "onChange",
       defaultValues: isEditMode(post)
-        ? schemas.post.deserialize(post)
+        ? schemas.post.deserialize(post, user)
         : {
             id: null,
             title: "",

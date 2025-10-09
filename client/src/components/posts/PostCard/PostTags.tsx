@@ -7,19 +7,23 @@ import { HiOutlineServerStack } from "react-icons/hi2";
 import { MdOutlineThumbDown, MdOutlineThumbUp } from "react-icons/md";
 import { PiNetwork } from "react-icons/pi";
 import { SiKotlin } from "react-icons/si";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 // todo feat(UI): after tag.is_important, make ensure still sorted by votes
+// todo refac-name: PostCardTags
 export function PostTags(props: {
   tags: PostTagFragmentType[];
   postId: ID;
   tagsExcluded?: ID[];
-  isWrapChildren?: boolean;
+  isRenderInline?: boolean;
 }) {
-  const isWrapChildren = props.isWrapChildren ?? true;
+  const isInlineRender = props.isRenderInline ?? true;
+
+  const user = useUser();
 
   const tagsFiltered = props.tagsExcluded
     ? props.tags.filter(tag => !props.tagsExcluded?.includes(tag.id))
@@ -49,14 +53,27 @@ export function PostTags(props: {
     return a.name.localeCompare(b.name);
   });
 
-  const tagsWithoutParent = tagsSorted
-    .filter(tag => tag.tag_children?.length === 0)
-    .map(tag => <PostTag key={tag.id} tag={tag} postId={props.postId} />);
+  // todo refac: move .parent filter to backend
+  const tagsWithoutParent = tagsSorted.filter(tag => tag.tag_children?.length === 0);
+  const tags = tagsWithoutParent.map(tag => {
+    const userVote = user?.post_tag_votes.find(
+      vote => vote.post.id === props.postId && vote.tag.id === tag.id,
+    );
+    return (
+      <PostTag
+        key={tag.id}
+        tag={tag}
+        postId={props.postId}
+        isUserOrAuthorVotedPositive={userVote?.is_vote_positive}
+      />
+    );
+  });
 
-  if (isWrapChildren) {
-    return <Wrap>{tagsWithoutParent}</Wrap>;
+  if (isInlineRender) {
+    // post.tags are inlined; review.parent.tags are not
+    return <Wrap>{tags}</Wrap>;
   }
-  return tagsWithoutParent;
+  return tags;
 }
 
 // todo feat(UI): add vote count
@@ -96,7 +113,7 @@ export function PostTag(props: {
 
       {isUserOrAuthorVoted && (
         // todo feat(UI): make icon Solid if both User+Author voted same; show User vote negative
-        <Tooltip content={props.voteTooltip}>
+        <Tooltip content={props.voteTooltip ?? "Author's vote"}>
           <Tag.EndElement boxSize={iconSize} pt="px" _hover={{ cursor: "help" }}>
             {props.isUserOrAuthorVotedPositive === false && (
               <Icon display="flex" color="red.600" aria-label="upvote">
