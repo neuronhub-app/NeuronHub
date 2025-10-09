@@ -6,6 +6,7 @@ import { Tag } from "@/components/ui/tag";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 
+// todo refac-name: PostCardContent
 export function PostContent(props: { post: PostListItemType }) {
   const items: Array<{ field: PostContentField; label: string; id: string; content: string }> =
     [];

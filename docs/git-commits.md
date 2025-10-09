@@ -62,7 +62,8 @@ Some `Scope`s are bound to a single `Type`, eg `build(AI)`.
 - `track` - analytics tracking, eg PostHog
 
 #### Special `Scope`s for `docs`
-- `refac`
+- `refac` - refactoring of text
+- `refac-pending` - for refactor-pending.md file
 - `arch` - abbreviation of `docs(architecture)`
 - `README` - either `server/` or `client/` or root `/` README files
 - `roadmap` - `docs/roadmap/*`
