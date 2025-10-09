@@ -16,7 +16,7 @@ export const UserType = z.enum(["User", "Group"]);
 export namespace schemas {
   // Post fields shared by all
   export const Abstract = z.object({
-    id: z.string().nullable(),
+    id: z.string().nullable().optional(),
     title: z.string().min(1),
     content_polite: z.string().optional(),
     content_direct: z.string().optional(),

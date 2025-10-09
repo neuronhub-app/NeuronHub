@@ -2,7 +2,6 @@ import { Fieldset, Heading, HStack, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
-import { toast } from "@/utils/toast";
 import { PostDeleteButton } from "@/apps/posts/PostDeleteButton";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostFields } from "@/components/posts/form/PostFields";
@@ -14,6 +13,7 @@ import { graphql } from "@/gql-tada";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
+import { toast } from "@/utils/toast";
 import { PostTypeEnum, Visibility } from "~/graphql/enums";
 
 export namespace PostCreateForm {
@@ -29,9 +29,7 @@ export namespace PostCreateForm {
       defaultValues: isEditMode(post)
         ? schemas.post.deserialize(post, user)
         : {
-            id: null,
             title: "",
-            content_polite: "",
             visibility: Visibility.Private,
             tags: [],
           },
