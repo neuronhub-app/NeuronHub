@@ -22,6 +22,9 @@ export namespace ids {
       container: "post.card.container",
       id: "post.card.id",
       image: "post.card.image",
+      content_polite: "post.card.content_polite",
+      content_direct: "post.card.content_direct",
+      content_rant: "post.card.content_rant",
       link: {
         detail: "post.card.link.detail",
         edit: "post.card.link.edit",
@@ -29,6 +32,9 @@ export namespace ids {
     },
     form: {
       title: "post.form.title",
+      content_polite: "post.form.content_polite",
+      content_direct: "post.form.content_direct",
+      content_rant: "post.form.content_rant",
       image: "post.form.image",
       category: "post.form.category",
       tags: "post.form.tags",
@@ -59,10 +65,9 @@ export namespace ids {
   export const review = {
     form: {
       title: "review.form.title",
-      content: "review.form.content",
       tags: "review.form.tags",
       review_tags: "review.form.review_tags",
-      // Note: review_tags voting buttons use ids.post.form.tag since functionality is identical
+      // Note: .review_tags voting uses ids.post.form.tag
     },
     tag: {
       container: "review.tag.container",

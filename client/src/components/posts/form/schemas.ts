@@ -17,7 +17,9 @@ export namespace schemas {
   export const Abstract = z.object({
     id: z.string().nullable(),
     title: z.string().min(1),
-    content: z.string().optional(),
+    content_polite: z.string().optional(),
+    content_direct: z.string().optional(),
+    content_rant: z.string().optional(),
     category: z.enum(enumConvert(PostCategory)).optional().nullable(),
     source: z.string().optional(),
     source_author: z.string().optional(),
@@ -27,7 +29,9 @@ export namespace schemas {
   export type PostAbstractForm = UseFormReturn<PostAbstract>;
 
   export function useFormContextAbstract(
-    fieldsRequired: Array<"title" | "content" | "tags"> = ["title", "content"],
+    fieldsRequired: Array<
+      "title" | "content_polite" | "content_direct" | "content_rant" | "tags"
+    > = ["title", "content_polite"],
   ): PostAbstractForm {
     const form: PostAbstractForm = useFormContextOriginal();
     for (const fieldRequired of fieldsRequired) {
@@ -147,7 +151,9 @@ export namespace schemas {
       return {
         id: data.id,
         title: data.title,
-        content: data.content,
+        content_polite: data.content_polite,
+        content_direct: data.content_direct,
+        content_rant: data.content_rant,
         source: data.source,
         source_author: data.source_author,
         category: data.category as PostCategory | null,
@@ -166,7 +172,9 @@ export namespace schemas {
       return {
         id: values.id,
         title: values.title,
-        content: values.content,
+        content_polite: values.content_polite,
+        content_direct: values.content_direct,
+        content_rant: values.content_rant,
         source: values.source,
         source_author: values.source_author,
         category: values.category ?? null,

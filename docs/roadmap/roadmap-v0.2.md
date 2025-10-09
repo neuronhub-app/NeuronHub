@@ -6,28 +6,29 @@
 - [x] Tool list
 - [x] Tool.image upload
 - [x] Post
-	- [x] created
+	- [x] create
 	- [x] edit
 	- [x] .source_author field
     - [x] .category: Knowledge, Opinion, News
-	- [ ] .content split -> `content_polite` + `content_direct` + `content_rant`
-	- [ ] fix Tag votes (resets on Post form init)
-- [ ] Dokploy
+	- [x] `content_polite`, `content_direct`, `content_rant`
+	- [ ] fix Tag votes (PostForm init drops it)
+- [ ] Deploy: S3, TLS
 
 ### v0.2.1.0
 
-- Review.parent select with `tool.title`
+- `Review.parent` select by `tool.title`
+- .source_author field
 - Reading list & Library
 
 ### v0.2.2.0
 
 - Sentry
-- pagination
 - User Signup
-- [refactor-pending](/docs/refactor-pending.md)
 - Browser extension
-- Review pros/cons icons
+- [refactor-pending](/docs/refactor-pending.md)
+- pagination
 - "Unread" or "Inbox"
+- Review pros/cons icons
 
 ### v0.3.0.0 - Public Deploy
 

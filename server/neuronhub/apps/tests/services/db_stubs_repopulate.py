@@ -99,13 +99,13 @@ async def _create_users(gen: Gen):
 
 @dataclass
 class users:
-    connected_1 = "u_connected_1"
-    connected_2 = "u_connected_2"
-    engineer_1 = "u_engineer_1"
-    engineer_2 = "u_engineer_2"
-    engineer_3 = "u_engineer_3"
-    random_1 = "u_random_1"
-    random_2 = "u_random_2"
+    connected_1 = "john_connected_1"
+    connected_2 = "max_connected_2"
+    engineer_1 = "david_engineer_1"
+    engineer_2 = "dane_engineer_2"
+    engineer_3 = "dove_engineer_3"
+    random_1 = "mark_random_1"
+    random_2 = "mole_random_2"
 
 
 async def _create_review_pycharm(user: User, gen: Gen):
@@ -115,9 +115,9 @@ async def _create_review_pycharm(user: User, gen: Gen):
             title="PyCharm",
             tool_type=Post.ToolType.Program,
             crunchbase_url="crunchbase.com/organization/jetbrains",
-            content=textwrap.dedent(
+            content_polite=textwrap.dedent(
                 """
-                PyCharm is an integrated development environment (IDE) used in computer programming, 
+                PyCharm is an integrated development environment (IDE) used in computer programming,
                 specifically for the Python language. It is developed by the Czech company JetBrains.
                 """
             ),
@@ -135,7 +135,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
         parent=pycharm,
         author=user,
         title="Fine, haven't seen better for Python or Django",
-        content=textwrap.dedent(
+        content_polite=textwrap.dedent(
             """
             - Better than VS Code for Python
             - Python/Django stubs and completions
@@ -143,6 +143,13 @@ async def _create_review_pycharm(user: User, gen: Gen):
             - Git UI and shortcuts
             - JS/TS integration performance has been improving, but still not as good as VS Code
             - Bugs are frequent. Less than in VS Code, but still a lot
+            """
+        ),
+        content_direct=textwrap.dedent(
+            """
+            - Best IDE for Python/Django. Period.
+            - Debugger works, VS Code's doesn't
+            - JS/TS support still meh, bugs in every release
             """
         ),
         review_usage_status=UsageStatus.USING,
@@ -205,7 +212,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
             Post.Type.Comment,
             parent=comment,
             author=user,
-            content="VS Code has better extensions ecosystem, but PyCharm has superior debugging and refactoring capabilities for Python projects.",
+            content_polite="VS Code has better extensions ecosystem, but PyCharm has superior debugging and refactoring capabilities for Python projects.",
         )
     )
 
@@ -218,7 +225,7 @@ async def _create_review_iterm(user: User, gen: Gen):
             tool_type=Post.ToolType.Program,
             crunchbase_url="crunchbase.com/organization/iterm2",
             github_url="github.com/gnachman/iTerm2",
-            content="iTerm2 is a terminal emulator for macOS that does amazing things. It brings the terminal into "
+            content_polite="iTerm2 is a terminal emulator for macOS that does amazing things. It brings the terminal into "
             "the modern age with features you never knew you always wanted.",
             company_name="iTerm2",
             company_domain="iterm2.com",
@@ -245,10 +252,15 @@ async def _create_review_iterm(user: User, gen: Gen):
         parent=tool,
         author=user,
         title="Good shortcuts and render config, actively maintained",
-        content=textwrap.dedent(
+        content_polite=textwrap.dedent(
             """
             - Fast native render (Objective-C/Swift)
             - no extra features, like history/fish/llm/etc
+            """
+        ),
+        content_rant=textwrap.dedent(
+            """
+            - Stop adding AI/LLM bullshit to terminals
             """
         ),
         review_usage_status=UsageStatus.USING,
@@ -268,7 +280,7 @@ async def _create_review_iterm(user: User, gen: Gen):
             Post.Type.Comment,
             parent=review,
             author=user,
-            content="Have you tried the GPU rendering option? It makes scrolling buttery smooth.",
+            content_polite="Have you tried the GPU rendering option? It makes scrolling buttery smooth.",
         )
     )
 
@@ -290,7 +302,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
             type=Post.Type.Tool,
             tool_type=Post.ToolType.Program,
             github_url="github.com/ghostty-org/ghostty",
-            content="Ghostty is a terminal emulator that differentiates itself by being fast, feature-rich, "
+            content_polite="Ghostty is a terminal emulator that differentiates itself by being fast, feature-rich, "
             "and native.Performance is a category where people start getting really argumentative, "
             "so the only claim I make is that Ghostty aims to be in the same class as the fastest terminal "
             "emulators",
@@ -338,7 +350,7 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
             title="UniFi Network",
             type=Post.Type.Tool,
             tool_type=Post.ToolType.Program,
-            content="Ubiquiti UniFi Network Application for managing UniFi networking devices.",
+            content_polite="Ubiquiti UniFi Network Application for managing UniFi networking devices.",
             url="ui.com/cloud-gateways",
             company_name="Ubiquiti",
             company_domain="ui.com",
@@ -359,14 +371,14 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
         gen.posts.Params(
             category=PostCategory.Knowledge,
             title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this",
-            content=textwrap.dedent(
+            content_polite=textwrap.dedent(
                 """
                 From LLM:
-                > 1. No UI solution - requires custom scripts that survive firmware updates and enforce routing rules, 
-                eg see the dead github.com/peacey/split-vpn
-                > 2. Can create a separate VLAN for VPN traffic with custom policy routing through config.gateway.json
+                > - No UI solution - requires custom scripts that survive firmware updates and enforce routing rules, eg see the dead github.com/peacey/split-vpn  
+                > - Can create a separate VLAN for VPN traffic with custom policy routing through config.gateway.json
                 """
             ),
+            content_direct="Policy Routing is fucked - IP leaks; They admit it's shit",
             parent=tool,
             author=user,
         )
@@ -380,7 +392,7 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
             title="Aider",
             type=Post.Type.Tool,
             tool_type=Post.ToolType.Program,
-            content="Aider is most popular on HN CLI-first AI coder wrapper. Owned by one angel SWE, for now anyway.",
+            content_polite="Aider is most popular on HN CLI-first AI coder wrapper. Owned by one angel SWE, for now anyway.",
             url="aider.chat",
             github_url="github.com/paul-gauthier/aider",
             company_name="Aider",
@@ -402,7 +414,7 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
     await gen.posts.post(
         gen.posts.Params(
             title="Aider leaderboards are becoming popular on HN for new models assessment",
-            content="https://aider.chat/docs/leaderboards",
+            content_polite="https://aider.chat/docs/leaderboards",
             category=PostCategory.Opinion,
             parent=tool,
             author=user,

@@ -16,16 +16,47 @@ test.describe("Post", () => {
     $ = play.locator();
   });
 
+  test("Create with few content_* text", async ({ page }) => {
+    await play.navigate(urls.posts.create);
+
+    const post = {
+      title: `Multi-content Post ${Date.now()}`,
+      content_polite: "Content - polite.",
+      content_direct: "Content - direct.",
+      content_rant: "Content - rant.",
+    };
+
+    await play.fill(ids.post.form.title, post.title);
+    await play.fill(ids.post.form.content_polite, post.content_polite);
+
+    await $[ids.post.card.content_direct].click();
+    await play.fill(ids.post.form.content_direct, post.content_direct);
+
+    await $[ids.post.card.content_rant].click();
+    await play.fill(ids.post.form.content_rant, post.content_rant);
+
+    await play.submit(ids.post.form);
+
+    await expect(page).toHaveText(post.content_polite);
+    await expect(page).toHaveText(post.content_direct);
+    await expect(page).toHaveText(post.content_rant);
+  });
+
   test("Create with a Tag and Category → edit .title", async ({ page }) => {
     await play.navigate(urls.posts.create);
 
     const post = {
       title: `Test Post ${Date.now()}`,
+      content: "This is test content for the post",
       tag: "TypeScript",
       category: PostCategory.Knowledge,
       titleUpdated: `Test Post ${Date.now()} 2`,
     };
     await play.fill(ids.post.form.title, post.title);
+
+    // Fill content - the accordion should be open by default for content_polite
+    await play.fill(ids.post.form.content_polite, post.content);
+
     const categoryBtn = $[`${ids.post.form.category}.${post.category}`];
     await categoryBtn.click();
 

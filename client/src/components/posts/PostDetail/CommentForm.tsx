@@ -17,7 +17,7 @@ export function CommentForm(
     | { mode: "create"; parentId: ID }
     | {
         mode: "edit";
-        comment: Pick<PostCommentType, "id" | "content" | "parent">;
+        comment: Pick<PostCommentType, "id" | "content_polite" | "parent">;
         onCancel: () => void;
         onSave: () => void;
       },
@@ -26,23 +26,26 @@ export function CommentForm(
   const draft = usePostCommentDraft(isEditMode ? `edit-${props.comment.id}` : props.parentId);
 
   const schema = z.object({
-    content: z.string().min(1).max(5000),
+    content_polite: z.string().min(1).max(5000),
   });
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      content: draft.content || (isEditMode ? props.comment.content : ""),
+      content_polite: draft.content || (isEditMode ? props.comment.content_polite : ""),
     },
   });
 
-  const content = form.watch("content");
+  const content = form.watch("content_polite");
   useEffect(() => {
     draft.update(content ?? "");
   }, [content, draft.update]);
 
   async function handleSubmit(data: z.infer<typeof schema>) {
     if (isEditMode) {
-      const response = await commentUpdate({ id: props.comment.id, content: data.content });
+      const response = await commentUpdate({
+        id: props.comment.id,
+        content_polite: data.content_polite,
+      });
       if (response.success) {
         toast.success("Comment updated");
         draft.clear();
@@ -51,7 +54,10 @@ export function CommentForm(
         showError(response.errorMessage);
       }
     } else {
-      const response = await commentCreate({ parentId: props.parentId, content: data.content });
+      const response = await commentCreate({
+        parentId: props.parentId,
+        content_polite: data.content_polite,
+      });
       if (response.success) {
         toast.success("Comment posted");
         form.reset();
@@ -70,9 +76,9 @@ export function CommentForm(
     <form onSubmit={form.handleSubmit(handleSubmit)}>
       <Stack gap={4}>
         <FormChakraTextarea
-          field={{ name: "content", control: form.control }}
+          field={{ name: "content_polite", control: form.control }}
           placeholder="Write a comment..."
-          errorText={form.formState.errors.content?.message}
+          errorText={form.formState.errors.content_polite?.message}
           {...ids.set(ids.comment.form.textarea)}
         />
         <Show
@@ -121,7 +127,7 @@ export function CommentForm(
   );
 }
 
-async function commentCreate(input: { parentId: ID; content: string }) {
+async function commentCreate(input: { parentId: ID; content_polite: string }) {
   return mutateAndRefetchMountedQueries(
     graphql(
       `mutation CommentUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
@@ -130,7 +136,7 @@ async function commentCreate(input: { parentId: ID; content: string }) {
       data: {
         parent: { id: input.parentId },
         type: PostTypeEnum.Comment,
-        content: input.content,
+        content_polite: input.content_polite,
         tags: [],
         visibility: Visibility.Public,
       },
@@ -138,7 +144,7 @@ async function commentCreate(input: { parentId: ID; content: string }) {
   );
 }
 
-async function commentUpdate(input: { id: ID; content: string }) {
+async function commentUpdate(input: { id: ID; content_polite: string }) {
   return mutateAndRefetchMountedQueries(
     graphql(
       `mutation CommentUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
@@ -147,7 +153,7 @@ async function commentUpdate(input: { id: ID; content: string }) {
       data: {
         id: input.id,
         type: PostTypeEnum.Comment,
-        content: input.content,
+        content_polite: input.content_polite,
         tags: [],
         visibility: Visibility.Public,
       },

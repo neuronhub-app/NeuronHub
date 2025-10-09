@@ -19,7 +19,7 @@ test.describe("Review", () => {
 
     await play.fill(ids.post.form.title, "Django");
     await play.fill(ids.review.form.title, "Django Review");
-    await play.fill(ids.review.form.content, "Easy to build with");
+    await play.fill(ids.post.form.content_polite, "Easy to build with");
     await play.submit(ids.post.form);
   });
 

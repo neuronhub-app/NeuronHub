@@ -163,7 +163,9 @@ class PostAdmin(SimpleHistoryAdmin):
     ]
     search_fields = [
         "title",
-        "content",
+        "content_polite",
+        "content_direct",
+        "content_rant",
         "author__username",
         "parent__title",
     ]
@@ -186,7 +188,9 @@ class PostAdmin(SimpleHistoryAdmin):
                     "slug",
                     "author",
                     "parent",
-                    "content",
+                    "content_polite",
+                    "content_direct",
+                    "content_rant",
                     "image",
                     "created_at",
                     "updated_at",

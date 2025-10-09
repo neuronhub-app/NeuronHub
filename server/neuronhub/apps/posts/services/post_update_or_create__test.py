@@ -19,11 +19,11 @@ class CommentTest(NeuronTestCase):
             data=PostTypeInput(
                 type=Post.Type.Comment,
                 parent=PostTypeInput(id=post.id),
-                content=content_test,
+                content_polite=content_test,
             ),
         )
         assert comment.type == Post.Type.Comment
-        assert comment.content == content_test
+        assert comment.content_polite == content_test
         assert comment.parent_id == post.id
         assert comment.author_id == self.user.id
 

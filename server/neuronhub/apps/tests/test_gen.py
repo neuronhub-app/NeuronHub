@@ -155,7 +155,9 @@ class PostsGen:
         type: PostTypeEnum = Post.Type.Post
         parent: Post | None = None
         title: str = ""
-        content: str = ""
+        content_polite: str = ""
+        content_direct: str = ""
+        content_rant: str = ""
         author: User | None = None
         visibility: Visibility = Visibility.PUBLIC
         visible_to_users: list[User] | None = None
@@ -256,19 +258,20 @@ class PostsGen:
                 ),
             )
 
-        is_tool = params.type == Post.Type.Tool
         post = await Post.objects.acreate(
             type=params.type,
             parent=params.parent,
             title=params.title or self.faker.sentence(),
-            content=params.content or self.faker.text(max_nb_chars=500),
+            content_polite=params.content_polite or self.faker.text(max_nb_chars=500),
+            content_direct=params.content_direct,
+            content_rant=params.content_rant,
             author=params.author or self.user,
             visibility=params.visibility,
             # tools
             # ------
             tool_type=params.tool_type,
             company=company,
-            url=params.url or (self.faker.url() if is_tool else ""),
+            url=params.url or (self.faker.url() if params.type == Post.Type.Tool else ""),
             crunchbase_url=params.crunchbase_url,
             github_url=params.github_url,
         )

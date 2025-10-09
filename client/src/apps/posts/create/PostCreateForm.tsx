@@ -29,7 +29,7 @@ export namespace PostCreateForm {
         : {
             id: null,
             title: "",
-            content: "",
+            content_polite: "",
             visibility: Visibility.Private,
             tags: [],
           },
