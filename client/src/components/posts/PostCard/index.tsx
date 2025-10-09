@@ -108,7 +108,7 @@ export function PostCard(props: { post: PostListItemType }) {
                 tags={post.parent.tags}
                 tagsExcluded={post.tags.map(tag => tag.id)}
                 postId={post.parent.id}
-                isWrapChildren={false}
+                isRenderInline={false}
               />
             </Wrap>
           ) : (
