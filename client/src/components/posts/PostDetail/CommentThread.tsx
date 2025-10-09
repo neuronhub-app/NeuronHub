@@ -66,10 +66,7 @@ export function CommentThread(props: { comment: PostCommentType }) {
               comment={
                 props.comment as Pick<PostCommentType, "id" | "content_polite" | "parent">
               }
-              onCancel={() => {
-                state.mutable.editingCommentId = null;
-              }}
-              onSave={() => {
+              onEditFinish={() => {
                 state.mutable.editingCommentId = null;
               }}
             />
@@ -134,10 +131,7 @@ export function CommentThread(props: { comment: PostCommentType }) {
                           comment={
                             reply as Pick<PostCommentType, "id" | "content_polite" | "parent">
                           }
-                          onCancel={() => {
-                            state.mutable.editingReplyId = null;
-                          }}
-                          onSave={() => {
+                          onEditFinish={() => {
                             state.mutable.editingReplyId = null;
                           }}
                         />

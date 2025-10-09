@@ -1,29 +1,29 @@
 import { Button, HStack, Show, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type JSX, useEffect } from "react";
+import type { JSX } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { toast } from "@/utils/toast";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
-import { usePostCommentDraft } from "@/components/posts/PostDetail/usePostCommentDraft";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import type { PostCommentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { toast } from "@/utils/toast";
 import { PostTypeEnum, Visibility } from "~/graphql/enums";
 
 export function CommentForm(
   props:
-    | { mode: "create"; parentId: ID }
+    | {
+        mode: "create";
+        parentId: ID;
+      }
     | {
         mode: "edit";
         comment: Pick<PostCommentType, "id" | "content_polite" | "parent">;
-        onCancel: () => void;
-        onSave: () => void;
+        onEditFinish: () => void;
       },
 ) {
   const isEditMode = props.mode === "edit";
-  const draft = usePostCommentDraft(isEditMode ? `edit-${props.comment.id}` : props.parentId);
 
   const schema = z.object({
     content_polite: z.string().min(1).max(5000),
@@ -31,14 +31,9 @@ export function CommentForm(
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
-      content_polite: draft.content || (isEditMode ? props.comment.content_polite : ""),
+      content_polite: isEditMode ? props.comment.content_polite : "",
     },
   });
-
-  const content = form.watch("content_polite");
-  useEffect(() => {
-    draft.update(content ?? "");
-  }, [content, draft.update]);
 
   async function handleSubmit(data: z.infer<typeof schema>) {
     if (isEditMode) {
@@ -48,8 +43,7 @@ export function CommentForm(
       });
       if (response.success) {
         toast.success("Comment updated");
-        draft.clear();
-        props.onSave();
+        props.onEditFinish();
       } else {
         showError(response.errorMessage);
       }
@@ -61,7 +55,6 @@ export function CommentForm(
       if (response.success) {
         toast.success("Comment posted");
         form.reset();
-        draft.clear();
       } else {
         showError(response.errorMessage);
       }
@@ -99,9 +92,8 @@ export function CommentForm(
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  draft.clear();
                   if (props.mode === "edit") {
-                    props.onCancel();
+                    props.onEditFinish();
                   }
                 }}
                 {...ids.set(ids.comment.form.cancelBtn)}
