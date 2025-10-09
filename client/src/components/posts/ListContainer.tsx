@@ -29,6 +29,11 @@ import { PostCategory } from "~/graphql/enums";
 
 export type PostListItemType = PostFragmentType | PostReviewFragmentType;
 
+export type PostContentField = keyof Pick<
+  PostListItemType,
+  "content_polite" | "content_direct" | "content_rant"
+>;
+
 // todo refac-name: PostList
 export function ListContainer(props: {
   title?: string;

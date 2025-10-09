@@ -99,13 +99,13 @@ async def _create_users(gen: Gen):
 
 @dataclass
 class users:
-    connected_1 = "u_connected_1"
-    connected_2 = "u_connected_2"
-    engineer_1 = "u_engineer_1"
-    engineer_2 = "u_engineer_2"
-    engineer_3 = "u_engineer_3"
-    random_1 = "u_random_1"
-    random_2 = "u_random_2"
+    connected_1 = "john_connected_1"
+    connected_2 = "max_connected_2"
+    engineer_1 = "david_engineer_1"
+    engineer_2 = "dane_engineer_2"
+    engineer_3 = "dove_engineer_3"
+    random_1 = "mark_random_1"
+    random_2 = "mole_random_2"
 
 
 async def _create_review_pycharm(user: User, gen: Gen):
@@ -135,7 +135,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
         parent=pycharm,
         author=user,
         title="Fine, haven't seen better for Python or Django",
-        content=textwrap.dedent(
+        content_polite=textwrap.dedent(
             """
             - Better than VS Code for Python
             - Python/Django stubs and completions
@@ -245,7 +245,7 @@ async def _create_review_iterm(user: User, gen: Gen):
         parent=tool,
         author=user,
         title="Good shortcuts and render config, actively maintained",
-        content=textwrap.dedent(
+        content_polite=textwrap.dedent(
             """
             - Fast native render (Objective-C/Swift)
             - no extra features, like history/fish/llm/etc

@@ -3,7 +3,7 @@ import { useFormContext } from "react-hook-form";
 import { FaLightbulb, FaNewspaper, FaQuestion, FaThumbsUp } from "react-icons/fa";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
-import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
+import { PostContentFields } from "@/components/posts/form/PostContentFields";
 import { ImageUpload } from "@/components/posts/form/ImageUpload";
 import { SelectVotable } from "@/components/posts/form/SelectVotable";
 import type { schemas } from "@/components/posts/form/schemas";
@@ -45,11 +45,7 @@ export function PostFields(props: {
         />
       )}
 
-      <FormChakraTextarea
-        field={{ control: form.control, name: "content" }}
-        label={props.contentLabel ?? "Content"}
-        isShowIconMarkdown
-      />
+      <PostContentFields />
 
       <HStack w="100%" gap="gap.lg">
         <FormChakraInput

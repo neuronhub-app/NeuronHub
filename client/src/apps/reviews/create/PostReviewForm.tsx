@@ -17,7 +17,7 @@ import { FormChakraCheckboxCard } from "@/components/forms/FormChakraCheckboxCar
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
 import { FormChakraSlider } from "@/components/forms/FormChakraSlider";
-import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
+import { PostContentFields } from "@/components/posts/form/PostContentFields";
 import { PostSharableFields } from "@/components/posts/form/PostSharableFields";
 import { PostToolFields } from "@/components/posts/form/PostToolFields";
 import { SelectVotable } from "@/components/posts/form/SelectVotable";
@@ -58,7 +58,9 @@ export namespace PostReviewForm {
           ? {
               id: props.review.id,
               title: props.review.title,
-              content: props.review.content,
+              content_polite: props.review.content_polite,
+              content_direct: props.review.content_direct,
+              content_rant: props.review.content_rant,
               // todo refac: move to schemas.props.review.deserialize()
               review_rating: props.review.review_rating,
               review_importance: props.review.review_importance,
@@ -199,11 +201,22 @@ export namespace PostReviewForm {
                       <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">
                         {props.review.parent.title}
                       </Heading>
-                      <Show when={props.review.parent.content}>
+                      <Show
+                        when={
+                          props.review.parent.content_polite ||
+                          props.review.parent.content_direct ||
+                          props.review.parent.content_rant
+                        }
+                      >
                         <Prose
                           // biome-ignore lint/security/noDangerouslySetInnerHtml: cleaned by server
                           dangerouslySetInnerHTML={{
-                            __html: marked.parse(props.review.parent.content),
+                            __html: marked.parse(
+                              props.review.parent.content_polite ||
+                                props.review.parent.content_direct ||
+                                props.review.parent.content_rant ||
+                                "",
+                            ),
                           }}
                           size="md"
                           w="fit-content"
@@ -237,12 +250,7 @@ export namespace PostReviewForm {
                       label="Title"
                       {...ids.setInput(ids.review.form.title)}
                     />
-                    <FormChakraTextarea
-                      field={{ control: forms.review.control, name: "content" }}
-                      label="Content"
-                      isShowIconMarkdown
-                      {...ids.set(ids.review.form.content)}
-                    />
+                    <PostContentFields />
 
                     <SelectVotable
                       fieldName="tags"

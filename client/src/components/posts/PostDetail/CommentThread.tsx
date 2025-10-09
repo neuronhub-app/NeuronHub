@@ -52,11 +52,20 @@ export function CommentThread(props: { comment: PostCommentType }) {
 
           <Show
             when={isEditing}
-            fallback={<Text whiteSpace="pre-wrap">{props.comment.content}</Text>}
+            fallback={
+              <Text whiteSpace="pre-wrap">
+                {props.comment.content_polite ||
+                  props.comment.content_direct ||
+                  props.comment.content_rant ||
+                  ""}
+              </Text>
+            }
           >
             <CommentForm
               mode="edit"
-              comment={props.comment}
+              comment={
+                props.comment as Pick<PostCommentType, "id" | "content_polite" | "parent">
+              }
               onCancel={() => {
                 state.mutable.editingCommentId = null;
               }}
@@ -111,11 +120,20 @@ export function CommentThread(props: { comment: PostCommentType }) {
                       </HStack>
                       <Show
                         when={isEditingReply}
-                        fallback={<Text whiteSpace="pre-wrap">{reply.content}</Text>}
+                        fallback={
+                          <Text whiteSpace="pre-wrap">
+                            {reply.content_polite ||
+                              reply.content_direct ||
+                              reply.content_rant ||
+                              ""}
+                          </Text>
+                        }
                       >
                         <CommentForm
                           mode="edit"
-                          comment={reply}
+                          comment={
+                            reply as Pick<PostCommentType, "id" | "content_polite" | "parent">
+                          }
                           onCancel={() => {
                             state.mutable.editingReplyId = null;
                           }}

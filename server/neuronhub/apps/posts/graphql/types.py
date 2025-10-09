@@ -47,7 +47,9 @@ class PostTypeI:
     category: auto
 
     title: auto
-    content: auto
+    content_polite: auto
+    content_direct: auto
+    content_rant: auto
     content_private: auto
     image: auto
 
@@ -144,7 +146,9 @@ class PostTypeInput:
     alternatives: auto
 
     title: auto
-    content: auto
+    content_polite: auto
+    content_direct: auto
+    content_rant: auto
     content_private: str | None
 
     visibility: auto

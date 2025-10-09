@@ -4,25 +4,23 @@ import {
   HStack,
   IconButton,
   Image,
-  Show,
   Stack,
   Text,
   VStack,
   Wrap,
 } from "@chakra-ui/react";
-import { marked } from "marked";
 import { FaPenToSquare } from "react-icons/fa6";
 import { NavLink } from "react-router";
 
 import { useUser } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
+import { PostContent } from "@/components/posts/PostCard/PostContent";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { PostTags } from "@/components/posts/PostCard/PostTags";
 import { ReviewTagsWithVotes } from "@/components/posts/PostCard/ReviewTagsWithVotes";
 import { RatingBars } from "@/components/posts/PostReviewCard/RatingBars";
 import { ReviewTags } from "@/components/posts/PostReviewCard/ReviewTags";
 import { UsageStatusBlock } from "@/components/posts/PostReviewCard/UsageStatus";
-import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import { isReview } from "@/graphql/fragments/reviews";
 import { urls } from "@/routes";
@@ -92,13 +90,7 @@ export function PostCard(props: { post: PostListItemType }) {
         </VStack>
       )}
 
-      <Show when={post.content}>
-        <Prose
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: cleaned by server
-          dangerouslySetInnerHTML={{ __html: marked.parse(post.content) }}
-          size="md"
-        />
-      </Show>
+      <PostContent post={post} />
 
       <Stack mt="gap.sm" gap="gap.sm">
         <Flex>

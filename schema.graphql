@@ -177,7 +177,9 @@ type PostCommentType implements PostTypeI {
   type: PostTypeEnum!
   category: PostCategory
   title: String!
-  content: String!
+  content_polite: String!
+  content_direct: String!
+  content_rant: String!
   content_private: String!
   image: DjangoImageType
   source: String!
@@ -224,7 +226,9 @@ type PostReviewType implements PostTypeI {
   type: PostTypeEnum!
   category: PostCategory
   title: String!
-  content: String!
+  content_polite: String!
+  content_direct: String!
+  content_rant: String!
   content_private: String!
   image: DjangoImageType
   source: String!
@@ -312,7 +316,9 @@ type PostToolType implements PostTypeI {
   type: PostTypeEnum!
   category: PostCategory
   title: String!
-  content: String!
+  content_polite: String!
+  content_direct: String!
+  content_rant: String!
   content_private: String!
   image: DjangoImageType
   source: String!
@@ -347,7 +353,9 @@ type PostType implements PostTypeI {
   type: PostTypeEnum!
   category: PostCategory
   title: String!
-  content: String!
+  content_polite: String!
+  content_direct: String!
+  content_rant: String!
   content_private: String!
   image: DjangoImageType
   source: String!
@@ -435,7 +443,9 @@ interface PostTypeI {
   type: PostTypeEnum!
   category: PostCategory
   title: String!
-  content: String!
+  content_polite: String!
+  content_direct: String!
+  content_rant: String!
   content_private: String!
   image: DjangoImageType
   source: String!
@@ -464,7 +474,9 @@ input PostTypeInput {
   parent: PostTypeInput
   alternatives: ManyToManyInput
   title: String
-  content: String
+  content_polite: String
+  content_direct: String
+  content_rant: String
   content_private: String
   visibility: Visibility
   visible_to_users: ManyToManyInput

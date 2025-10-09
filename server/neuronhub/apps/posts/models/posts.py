@@ -152,7 +152,9 @@ class Post(AnonimazableTimeStampedModel):
 
     slug = AutoSlugField(populate_from="title", unique=True)
     title = anonymizable(models.CharField(max_length=140, blank=True))
-    content = anonymizable(MarkdownField(blank=True))
+    content_polite = anonymizable(MarkdownField(blank=True))
+    content_direct = anonymizable(MarkdownField(blank=True))
+    content_rant = anonymizable(MarkdownField(blank=True))
     content_private = anonymizable(MarkdownField(blank=True, help_text="Only for author"))
     source = CharField(max_length=140, blank=True)
     source_author = CharField(max_length=500, blank=True)

@@ -9,7 +9,9 @@ export const PostFragment = graphql(
       type
       category
       title
-      content
+      content_polite
+      content_direct
+      content_rant
       source
       source_author
       image {
@@ -38,7 +40,9 @@ export const PostFragment = graphql(
       comments {
         id
         type
-        content
+        content_polite
+        content_direct
+        content_rant
         author {
           id
           username
@@ -61,7 +65,9 @@ export const PostFragment = graphql(
         title
         ... on PostToolType {
           tool_type
-          content
+          content_polite
+          content_direct
+          content_rant
           domain
           github_url
           crunchbase_url
@@ -97,7 +103,9 @@ export const PostCommentsFragment = graphql(
         parent {
           id
         }
-        content
+        content_polite
+        content_direct
+        content_rant
         visibility
         created_at
         updated_at
@@ -123,7 +131,9 @@ export const PostCommentsFragment = graphql(
           parent {
             id
           }
-          content
+          content_polite
+          content_direct
+          content_rant
           visibility
           created_at
           updated_at
