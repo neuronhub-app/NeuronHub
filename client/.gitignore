@@ -1,4 +1,4 @@
-.output/
+build/
 .vite/
 .react-router/
 node_modules/

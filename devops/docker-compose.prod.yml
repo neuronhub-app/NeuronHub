@@ -1,62 +1,16 @@
-# not used atm
-
 name: neuronhub
 
 services:
-  postgres:
-    image: postgres:17-alpine
-    environment:
-      POSTGRES_DB: neuronhub
-      POSTGRES_USER: neuronhub
-      POSTGRES_HOST_AUTH_METHOD: trust
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready --username neuronhub"]
-      interval: 5s
-      timeout: 5s
-
   server:
-    build: ../server/
-    working_dir: /app/server
-    command: ["echo", "server/ built"]
-
-    environment:
-      DATABASE_URL: postgres://neuronhub@postgres:5432/neuronhub
-      ALLOWED_HOSTS: "*"
-      SERVER_URL: http://server:8000
-      CLIENT_URL: http://client:3000
-    volumes:
-      - .:/app
-      - server_lib:/app/server/.venv
-    depends_on:
-      postgres:
-        condition: service_healthy
+    image: ghcr.io/neuronhub-app/neuronhub/server:0.2.0.0
+    env_file:
+      - path: .env
     ports:
       - "8000:8000"
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8000/healthcheck/"]
-      interval: 3s
-      timeout: 7s
 
   client:
-    build: ../client/
-    working_dir: /app/client
-    command: ["echo", "client/ built"]
-
-    environment:
-      VITE_API_URL: http://server:8000
-    volumes:
-      - .:/app
-      - server_lib:/app/server/.venv
-      - client_lib:/app/client/node_modules
-    depends_on:
-      server:
-        condition: service_completed_successfully
+    image: ghcr.io/neuronhub-app/neuronhub/client:0.2.0.0
+    env_file:
+      - path: .env
     ports:
       - "3000:3000"
-
-volumes:
-  postgres_data:
-  server_lib:
-  client_lib:
