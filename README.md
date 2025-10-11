@@ -1,10 +1,9 @@
----
-reviewed_at: 2025.08.02
----
+For project description see [docs/architecture.md](/docs/architecture.md).
 
-### Setup
+Development Setup
+--------------------------------
 
-For complete env setup see [Coder.com Dockerfile](/devops/coder/Dockerfile).
+The complete env setup you can find in [Coder.com Dockerfile](/devops/coder/Dockerfile).
 
 Install `Mise`, then:
 ```shell
@@ -16,13 +15,12 @@ mise dev
 ```
 
 URLs
-- http://localhost:8000/admin
-- http://localhost:3000
+- http://localhost:7999/admin
+- http://localhost:2999
 
 Read [mise.toml](/mise.toml) for more.
 
-### Docs
+### Code style
 
-- [architecture](/docs/architecture.md)
 - [testing setup](/docs/testing-setup.md)
 - [code style](/docs/code-style.md)
