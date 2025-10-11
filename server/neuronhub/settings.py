@@ -28,7 +28,7 @@ class DjangoEnv(Enum):
     PROD = "prod"
 
 
-DJANGO_ENV = DjangoEnv(env.str("DJANGO_ENV", DjangoEnv.LOCAL.value))
+DJANGO_ENV = DjangoEnv(env.str("DJANGO_ENV", DjangoEnv.LOCAL.value))  # todo ! default to PROD
 
 if DJANGO_ENV is DjangoEnv.LOCAL:
     load_dotenv(os.path.join(BASE_DIR, ".env.local"), override=True)
@@ -155,8 +155,8 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # SeaweedFS S3 #AI
-AWS_ACCESS_KEY_ID = "any"
-AWS_SECRET_ACCESS_KEY = "any"
+AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "any")
+AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "any")
 AWS_STORAGE_BUCKET_NAME = "media"
 AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", "http://host.docker.internal:8333")
 AWS_S3_USE_SSL = False
@@ -166,7 +166,7 @@ AWS_QUERYSTRING_AUTH = False
 AWS_S3_ADDRESSING_STYLE = "path"
 STORAGES = {
     "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
-    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
 
