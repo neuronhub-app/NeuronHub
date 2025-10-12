@@ -63,9 +63,7 @@ export function CommentThread(props: { comment: PostCommentType }) {
           >
             <CommentForm
               mode="edit"
-              comment={
-                props.comment as Pick<PostCommentType, "id" | "content_polite" | "parent">
-              }
+              comment={props.comment}
               onEditFinish={() => {
                 state.mutable.editingCommentId = null;
               }}
@@ -128,9 +126,7 @@ export function CommentThread(props: { comment: PostCommentType }) {
                       >
                         <CommentForm
                           mode="edit"
-                          comment={
-                            reply as Pick<PostCommentType, "id" | "content_polite" | "parent">
-                          }
+                          comment={reply}
                           onEditFinish={() => {
                             state.mutable.editingReplyId = null;
                           }}
