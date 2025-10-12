@@ -12,12 +12,13 @@
     - [x] .category: Knowledge, Opinion, News
 	- [x] `content_polite`, `content_direct`, `content_rant`
 	- [x] fix Tag votes (PostForm init drops it)
-- [ ] Deploy: S3, TLS
+- Deploy
+  - [x] Django
+  - [ ] S3
 
 ### v0.2.1.0
 
 - `Review.parent` select by `tool.title`
-- .source_author field
 - Reading list & Library
 
 ### v0.2.2.0

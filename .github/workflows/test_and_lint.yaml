@@ -1,0 +1,75 @@
+name: Test and lint
+
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "**/*.md"
+      - "**/Dockerfile"
+      - "devops/coder/**"
+  pull_request:
+    types: [ opened, synchronize, ready_for_review ]
+    branches:
+      - master
+
+jobs:
+  test_and_lint:
+    name: Test and lint
+    if: github.event.pull_request.draft == false
+
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.0-noble
+
+    services:
+      db:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: neuronhub
+          POSTGRES_USER: neuronhub
+          POSTGRES_HOST_AUTH_METHOD: trust
+        options: >-
+          --health-cmd "pg_isready --username neuronhub"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      s3:
+        image: adobe/s3mock:latest
+        ports:
+          - 9090:9090
+        env:
+          initialBuckets: media
+    env:
+      DATABASE_HOST: db
+      AWS_S3_ENDPOINT_URL: http://s3:9090
+
+    steps:
+      - name: Run Git checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Mise
+        uses: jdx/mise-action@v3
+        with:
+          experimental: true
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          working-directory: ${{ github.workspace }}/server
+
+      - run: mise run install-deps:server
+
+      - name: Pytest
+        run: mise run test:pytest
+
+      - run: mise run install-deps:client
+
+      # Playwright isn't stable yet - always fails first tests with timeouts (cold db cache), but even a 15s timeout is useless
+      #- run: mise run test:e2e
+      #  env:
+      #    E2E_DB_NAME: neuronhub # override default, as calling `psql "CREATE DATABASE ..."` in Playwright image is PITA
+
+      - run: mise run format
+      - run: mise run lint

@@ -1,10 +1,11 @@
 ["dev:db:setup-e2e"]
     run = """
-        #!/usr/bin/env fish
-        sudo docker compose --file ./devops/docker-compose.yml exec db bash -c "psql --user=neuronhub --command='CREATE DATABASE {{ get_env(name='E2E_DB_NAME') }};'" 2>/dev/null || true
-        sudo docker compose --file ./devops/docker-compose.yml exec s3 sh -c "mkdir --parents media" 2>/dev/null || true
+        #!/usr/bin/env bash
 
-        cd server/
-        set --export DATABASE_NAME {{ get_env(name='E2E_DB_NAME') }} # `mise django:migrate` atm ignores envs in shebang scripts
-        uv run manage.py migrate
+        if [ "$GITHUB_ACTIONS" = "true" ]; then
+            echo "In GitHub CI skipping Mise Task dev:db:setup-e2e"
+        else
+            sudo docker compose --file ./devops/docker-compose.yml exec db bash -c "psql --user=neuronhub --command='CREATE DATABASE {{ get_env(name='E2E_DB_NAME') }};'" 2>/dev/null || true
+            sudo docker compose --file ./devops/docker-compose.yml exec s3 sh -c "mkdir --parents media" 2>/dev/null || true
+        fi
     """

@@ -9,13 +9,15 @@ import type { urls } from "@/routes";
 
 export type LocatorMap = Record<TestId, Locator>;
 
+const timeoutDefault: number = 4500;
+
 export class PlaywrightHelper {
   $: LocatorMap;
   private screenshotCounter = 0;
 
   constructor(
     public page: Page,
-    private timeout = 4500,
+    private timeout = timeoutDefault,
   ) {
     this.page.setDefaultTimeout(this.timeout);
     this.$ = this.locator();
@@ -62,7 +64,7 @@ export class PlaywrightHelper {
   async reload(opts = { idleWait: false }) {
     await this.page.reload();
     if (opts.idleWait) {
-      return this.page.waitForLoadState("networkidle");
+      await this.waitForNetworkIdle();
     }
   }
 
@@ -86,12 +88,12 @@ export class PlaywrightHelper {
       | typeof urls.tools.create
       | typeof urls.reviews.list
       | typeof urls.reviews.create,
-    opts = { idleWait: false },
+    opts?: { idleWait?: boolean; idleWaitTimeout?: number },
   ) {
     await this.page.goto(path);
 
-    if (opts.idleWait) {
-      await this.page.waitForLoadState("networkidle");
+    if (opts?.idleWait) {
+      await this.waitForNetworkIdle({ idleWaitTimeout: opts.idleWaitTimeout ?? this.timeout });
     }
   }
 
@@ -115,6 +117,10 @@ export class PlaywrightHelper {
       up: tagWrapper.getByTestId(ids.post.form.tag.vote.up),
       down: tagWrapper.getByTestId(ids.post.form.tag.vote.down),
     };
+  }
+
+  async waitForNetworkIdle(opts = { idleWaitTimeout: timeoutDefault }) {
+    return this.page.waitForLoadState("networkidle", { timeout: opts.idleWaitTimeout });
   }
 
   async screenshot(name: string = "screenshot", { fullPage = false } = {}) {

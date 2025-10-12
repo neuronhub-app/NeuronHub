@@ -9,11 +9,14 @@
 
 ["install-deps:client"]
     dir = "client"
-    run = "bun install"
+    run = "bun install --frozen-lockfile"
 
 ["install-deps:playwright"]
     dir = "client"
-    run = "bun run playwright install chromium --with-deps"
+    run = [
+        "bunx playwright install",
+        "bunx playwright install chromium --with-deps",
+    ]
 
 ["install-deps:claude"]
     run = "bun install --global @modelcontextprotocol/server-memory @modelcontextprotocol/server-sequential-thinking"

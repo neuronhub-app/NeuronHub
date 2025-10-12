@@ -56,6 +56,7 @@ Some `Scope`s are bound to a single `Type`, eg `build(AI)`.
 - `types` - TypeScript or Python typings
 - `admin` - Django Admin, ie no impact on the user-facing logic
 - `perf` - performance of SQL, UI, etc
+- `CI` - GitHub CI or others
 
 #### Unused
 - `browsr` - browser extension

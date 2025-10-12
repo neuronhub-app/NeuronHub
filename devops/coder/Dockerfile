@@ -1,8 +1,9 @@
-# Coder.com Workspace image
-# ==========================================
 FROM codercom/example-base:ubuntu
 
-LABEL version="0.1.12.2"
+LABEL version="0.2.0.1"
+LABEL org.opencontainers.image.source="https://github.com/neuronhub-app/neuronhub/blob/master/devops/coder/Dockerfile"
+LABEL org.opencontainers.image.description="Coder.com image for local dev and GitHub CI"
+
 
 USER coder
 

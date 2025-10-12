@@ -2,8 +2,6 @@
     bun = "latest"
     uv = "latest"
     biome = "latest"
-    claude = "latest"
-        node = "latest"
 
 [settings]
     python.uv_venv_auto = true
@@ -24,7 +22,6 @@
     CLIENT_PORT = 3000
     CLIENT_PORT_E2E = 3001
 
-    E2E_DB_NAME = "test_neuronhub_e2e"
 
 [tasks."dev"]
     depends = ["dev:db", "dev:server", "dev:client"]
@@ -43,7 +40,14 @@
     # todo refac-name: docker-services?
     [tasks."dev:db"]
         dir = "devops"
-        run = "sudo docker compose up db s3 --detach"
+        run = """
+        if [ "$GITHUB_ACTIONS" = "true" ]; then
+            echo "In GitHub CI skipping Mise Task dev:db"
+        else
+            sudo docker compose up db s3 --detach
+            sudo docker exec neuronhub-s3-1 mkdir -p /data/media
+        fi
+        """
         silent = true
     [tasks."dev:db-stop"]
         dir = "devops"
@@ -52,10 +56,13 @@
     [tasks."dev:server:e2e"]
         depends = ["dev:db", "dev:db:setup-e2e"]
         dir = "server"
-        run = "uv run manage.py runserver {{ get_env(name='SERVER_PORT_E2E') }}"
+        run = [
+            "mise django:migrate",
+            "uv run manage.py runserver {{ get_env(name='SERVER_PORT_E2E') }}",
+        ]
         env.SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
         env.E2E_TEST = "true"
-        env.E2E_DB_NAME = "{{ get_env(name='E2E_DB_NAME') }}"
+        env.E2E_DB_NAME = "{{ get_env(name='E2E_DB_NAME', default='test_neuronhub_e2e') }}"
 
     [tasks."dev:client:e2e"]
         dir = "client"
@@ -84,7 +91,8 @@
         dir = "client"
         run = "bun run playwright test --config=e2e/playwright.config.ts"
         alias = "e2e"
-        env = { VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}" }
+        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
+        env.E2E_DB_NAME = "{{ get_env(name='E2E_DB_NAME', default='test_neuronhub_e2e') }}" # duplicate with `dev:server:e2e`, as Playwright resets env when starts Mise from [[playwright.config.ts]]
 
 
 [tasks."django:migrate"]
@@ -102,7 +110,11 @@
 
 [tasks."typegen"]
     depends = "typegen:server"
-    run = "mise run typegen:client:*"
+    run = [
+        "mise run typegen:client:graphql",
+        "mise run typegen:client:react",
+        "mise run typegen:client:chakra",
+    ]
     description = "Strawberry → schema.graphql → TypeScript enums; and @chakra-ui"
 
     [tasks."typegen:server"]

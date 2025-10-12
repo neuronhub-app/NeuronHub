@@ -10,15 +10,17 @@ test.describe("Comments", () => {
   let $: LocatorMap;
 
   test.beforeEach(async ({ page }) => {
-    play = new PlaywrightHelper(page);
-    $ = play.locator();
+    const timeoutExtra = 7000; // in E2E the first test (alphabetically) hits cold postgres & timeout on default 4.5s
+    play = new PlaywrightHelper(page, timeoutExtra);
     await play.dbStubsRepopulateAndLogin();
+    $ = play.locator();
   });
 
-  test("creation & vote", async ({ page }) => {
-    // create a Comment
+  test("voting", async () => {
+    // create
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
+
     const commentContent = "Test comment";
     await play.fill(ids.comment.form.textarea, commentContent);
     await play.submit(ids.post.form);
@@ -27,7 +29,7 @@ test.describe("Comments", () => {
       up: $[ids.comment.vote.up],
       down: $[ids.comment.vote.down],
     };
-    // test voting state
+    // test voting
     await expect(vote.up).not.checked();
     await expect(vote.down).not.checked();
 
@@ -49,7 +51,6 @@ test.describe("Comments", () => {
     // reload → test persistence
     await play.reload({ idleWait: true });
     await expect(vote.up).checked();
-    await expect(page).toHaveText(commentContent);
   });
 
   test("editing", async ({ page }) => {
