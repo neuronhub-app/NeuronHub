@@ -6,6 +6,7 @@ import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { urls } from "@/routes";
 
+// will stay unused for a while, mb until v0.3
 test.describe("Login", () => {
   let play: PlaywrightHelper;
 
@@ -14,7 +15,7 @@ test.describe("Login", () => {
     await play.dbStubsRepopulate();
   });
 
-  test("with invalid credentials", async ({ page }) => {
+  test.skip("with invalid credentials", async ({ page }) => {
     await page.goto(urls.login);
 
     await play.fill(ids.auth.login.username, "wrong");
@@ -24,7 +25,7 @@ test.describe("Login", () => {
     await expect(play.get(ids.auth.login.error)).toBeVisible();
   });
 
-  test("with email", async ({ page }) => {
+  test.skip("with email", async ({ page }) => {
     await page.goto(urls.login);
     await play.fill(ids.auth.login.username, config.user.email);
     await play.fill(ids.auth.login.password, config.user.password);

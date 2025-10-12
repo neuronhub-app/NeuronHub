@@ -89,8 +89,8 @@ type PostUrls = typeof urls.posts | typeof urls.reviews | typeof urls.tools;
 const op = { create: "create", edit: "edit" } as const;
 
 export default [
-  route("/login", "./apps/auth/login/index.tsx"),
   layout("./components/layout/index.tsx", [
+    route("/", "./apps/home/index.tsx"),
     ...prefix(urls.reviews.list, [
       route("/", "./apps/reviews/list/index.tsx"),
       route(`/${op.create}`, "./apps/reviews/create/index.tsx"),

@@ -33,6 +33,7 @@ import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { ids } from "@/e2e/ids";
+import { env } from "@/env";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
@@ -269,7 +270,7 @@ export function UserProfile() {
   async function handleLogout() {
     const res = await mutateAndRefetchMountedQueries(graphql(`mutation Logout { logout }`), {});
     if (res.success) {
-      navigate(urls.login);
+      window.location.href = `${env.VITE_SERVER_URL}/admin/login/`;
     } else {
       toast.error(`Failed to log out: ${res.errorMessage}`);
     }
@@ -278,12 +279,16 @@ export function UserProfile() {
   if (!user) {
     return (
       <HStack gap="3" justify="space-between">
-        <NavLink to={urls.login}>
-          <Button variant="outline" width="full">
-            <LuLogIn />
-            Login
-          </Button>
-        </NavLink>
+        <Button
+          variant="outline"
+          width="full"
+          onClick={() => {
+            window.location.href = `${env.VITE_SERVER_URL}/admin/login/`;
+          }}
+        >
+          <LuLogIn />
+          Login
+        </Button>
         <ColorModeButton />
       </HStack>
     );
