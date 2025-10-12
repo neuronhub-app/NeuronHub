@@ -8,8 +8,6 @@ docs/private/
 client/e2e/config.schema.json
 client/e2e/config.json
 
-server/.env.local
-
 # caches
 __pycache__
 server/.*_cache/
@@ -17,3 +15,5 @@ server/.venv/
 .*_cache/
 
 mise.local.toml
+
+**/.env*

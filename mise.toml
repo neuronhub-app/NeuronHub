@@ -69,7 +69,10 @@
 [tasks."test"]
     dir = "server"
     depends = "dev:db"
-    run = "mise run test:*"
+    run = [
+        "mise run test:pytest",
+        "mise run test:e2e",
+    ]
 
     [tasks."test:pytest"]
         dir = "server"
