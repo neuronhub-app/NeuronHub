@@ -63,6 +63,7 @@ async def db_stubs_repopulate(
     await _create_review_ghostly(user, alternatives=[tool_iterm], gen=gen)
     await _create_tool_and_post_unifi_network(user, gen=gen)
     await _create_tool_and_post_aider(user, gen=gen)
+    await _create_post_news(user, gen=gen)
     return gen
 
 
@@ -356,6 +357,7 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
             company_domain="ui.com",
             company_country="US",
             company_ownership_name="Public",
+            visibility=Visibility.INTERNAL,
         )
     )
     await _create_tags(
@@ -367,21 +369,36 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
             TagParams("Dev / License / Closed-source"),
         ],
     )
-    await gen.posts.post(
+    post = await gen.posts.post(
         gen.posts.Params(
             category=PostCategory.Knowledge,
             title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this",
             content_polite=textwrap.dedent(
                 """
                 From LLM:
-                > - No UI solution - requires custom scripts that survive firmware updates and enforce routing rules, eg see the dead github.com/peacey/split-vpn  
+                > - No UI solution - requires custom scripts that survive firmware updates and enforce routing rules, eg see the dead github.com/peacey/split-vpn
                 > - Can create a separate VLAN for VPN traffic with custom policy routing through config.gateway.json
                 """
             ),
             content_direct="Policy Routing is fucked - IP leaks; They admit it's shit",
             parent=tool,
             author=user,
+            visibility=Visibility.INTERNAL,
         )
+    )
+    await _create_tags(
+        post=post,
+        author=user,
+        params=[
+            TagParams("Dev / VPN"),
+            TagParams("Dev / Security", is_important=True),
+            TagParams("Software / Network", is_vote_pos=True),
+        ],
+    )
+    await PostVote.objects.acreate(
+        post=post,
+        author=user,
+        is_vote_positive=False,
     )
     return tool
 
@@ -411,16 +428,78 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
             TagParams("Dev / License / Apache 2", is_important=True),
         ],
     )
-    await gen.posts.post(
+    post = await gen.posts.post(
         gen.posts.Params(
             title="Aider leaderboards are becoming popular on HN for new models assessment",
             content_polite="https://aider.chat/docs/leaderboards",
             category=PostCategory.Opinion,
             parent=tool,
             author=user,
+            visibility=Visibility.INTERNAL,
         )
     )
+    await _create_tags(
+        post=post,
+        author=user,
+        params=[
+            TagParams("Dev / AI", is_vote_pos=True),
+            TagParams("Dev / Benchmarks"),
+            TagParams("Community / Hacker News", is_vote_pos=True),
+        ],
+    )
+    await PostVote.objects.acreate(
+        post=post,
+        author=user,
+        is_vote_positive=True,
+    )
     return tool
+
+
+async def _create_post_news(user: User, gen: Gen) -> Post:
+    post = await gen.posts.post(
+        gen.posts.Params(
+            title="Django 5.2 LTS released with async improvements and enhanced ORM capabilities",
+            content_polite=textwrap.dedent(
+                """
+                Django 5.2 has been released as a Long-Term Support (LTS) version with significant improvements:
+                - Enhanced async support for views and middleware
+                - Improved ORM performance with better query optimization
+                - New database backends support and better PostgreSQL integration
+                - Security updates and bug fixes
+
+                This release will receive extended support until April 2028.
+                """
+            ),
+            content_direct=textwrap.dedent(
+                """
+                Django 5.2 LTS just dropped:
+                - Finally better async support
+                - ORM got faster
+                - PostgreSQL improvements
+                - Supported until 2028
+                """
+            ),
+            category=PostCategory.News,
+            author=user,
+            visibility=Visibility.PUBLIC,
+        )
+    )
+    await _create_tags(
+        post=post,
+        author=user,
+        params=[
+            TagParams(tags.django, is_vote_pos=True, is_important=True),
+            TagParams(tags.python, is_vote_pos=True),
+            TagParams("Dev / Web Framework", is_vote_pos=True),
+            TagParams("Software / Release", is_important=True),
+        ],
+    )
+    await PostVote.objects.acreate(
+        post=post,
+        author=user,
+        is_vote_positive=True,
+    )
+    return post
 
 
 async def create_company_ownership(name: str) -> ToolCompanyOwnership:
