@@ -1,6 +1,6 @@
 FROM astral/uv:python3.13-bookworm
 
-LABEL org.opencontainers.image.source="https://github.com/neuronhub-app/neuronhub/blob/main/server/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/neuronhub-app/neuronhub/blob/master/server/Dockerfile"
 
 
 WORKDIR /app

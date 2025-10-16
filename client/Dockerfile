@@ -1,6 +1,6 @@
 FROM node:24-slim
 
-LABEL org.opencontainers.image.source="https://github.com/neuronhub-app/neuronhub/blob/main/client/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/neuronhub-app/neuronhub/blob/master/client/Dockerfile"
 
 
 WORKDIR /app
