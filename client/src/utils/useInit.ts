@@ -6,7 +6,7 @@ import { type DependencyList, useEffect } from "react";
  * With async + loading blocking.
  */
 export function useInit(options: {
-  init: () => void | Promise<void>;
+  onInit: () => void | Promise<void>;
   deps?: DependencyList;
   isBlocked?: boolean;
 }) {
@@ -14,11 +14,11 @@ export function useInit(options: {
     if (options.isBlocked) {
       return;
     }
-    const output = options.init();
-    if (output instanceof Promise) {
-      output.catch(captureException);
+    const initOutput = options.onInit();
+    if (initOutput instanceof Promise) {
+      initOutput.catch(captureException);
     } else {
-      return output;
+      return initOutput;
     }
   }, [options.deps, options.isBlocked]);
 }

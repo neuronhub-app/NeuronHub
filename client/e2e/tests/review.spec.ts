@@ -14,12 +14,26 @@ test.describe("Review", () => {
     $ = play.locator();
   });
 
-  test("Create with a Parent", async () => {
+  test("Create", async ({ page }) => {
     await play.navigate(urls.reviews.create, { idleWait: true });
 
-    await play.fill(ids.post.form.title, "Django");
+    const tool = $[ids.post.form.title].locator("input").first();
+    await tool.click();
+    await tool.pressSequentially("Django", { delay: 100 });
+    await page.keyboard.press("Enter");
+
     await play.fill(ids.review.form.title, "Django Review");
     await play.fill(ids.post.form.content_polite, "Easy to build with");
+    await play.submit(ids.post.form);
+
+    // Test 2: create with an existing .parent
+    await play.navigate(urls.reviews.create, { idleWait: true });
+
+    await tool.click();
+    await tool.pressSequentially("PyCharm", { delay: 100 });
+    await page.keyboard.press("Enter");
+
+    await play.fill(ids.review.form.title, "Test Review");
     await play.submit(ids.post.form);
   });
 

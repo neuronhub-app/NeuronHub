@@ -1,8 +1,7 @@
-import { Fieldset, Flex, Heading, HStack, Icon, Show, Text, VStack } from "@chakra-ui/react";
+import { Fieldset, Flex, Heading, HStack, Show, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatISO } from "date-fns";
 import { marked } from "marked";
-import type { JSX } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaStar } from "react-icons/fa";
 import { FaBookmark, FaCircleXmark, FaClockRotateLeft, FaHeartPulse } from "react-icons/fa6";
@@ -25,7 +24,7 @@ import { schemas } from "@/components/posts/form/schemas";
 import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
-import { graphql } from "@/gql-tada";
+import { graphql, type ID } from "@/gql-tada";
 import { isEditMode, type PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
@@ -110,8 +109,8 @@ export namespace PostReviewForm {
     }
 
     async function handleSubmit() {
-      const isInvalid = !(await forms.review.trigger());
-      if (isInvalid) {
+      const isFormInvalid = !(await forms.review.trigger());
+      if (isFormInvalid) {
         console.error(forms.review.formState.errors);
         return toast.error("Invalid review form");
       }
@@ -127,41 +126,14 @@ export namespace PostReviewForm {
           }
         })();
       } else {
-        const isInvalid = !(await forms.tool.trigger());
-        if (isInvalid) {
+        const isFormInvalid = !(await forms.tool.trigger());
+        if (isFormInvalid) {
           return toast.error("Tool form is invalid");
         }
 
-        const data = {
-          tool: forms.tool.getValues(),
-          review: forms.review.getValues(),
-        };
-
-        // todo ! fix: creates a Tool duplicate if Review below fails and user tries again
-        const { tags, alternatives, ...toolFields } = data.tool;
-        const toolResponse = await mutateAndRefetchMountedQueries(
-          graphql(`
-						mutation ToolCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }
-					`),
-          {
-            input: {
-              ...toolFields,
-              type: PostTypeEnum.Tool,
-              // todo refac: move to schemas.abstract.serialize()
-              // (upd: already moved, just need to replace it here)
-              tags: tags ? tags.map(tag => ({ id: tag.id, name: tag.name })) : undefined, // todo !(tags) call create_tags()
-              alternatives: alternatives ? { set: alternatives.map(alt => alt.id) } : undefined,
-            },
-          },
-        );
-
-        if (!toolResponse.success) {
-          return toast.error(`Tool creation failed: ${toolResponse.errorMessage}`);
-        }
-
         const response = await mutateReview({
-          ...data.review,
-          parent: { id: toolResponse.data.post_update_or_create.id },
+          ...forms.review.getValues(),
+          parent: { id: await getToolOrCreate() },
         });
         if (response.success) {
           toast.success("Review added");
@@ -170,6 +142,37 @@ export namespace PostReviewForm {
           toast.error(`Creation failed: ${response.error}`);
         }
       }
+    }
+
+    async function getToolOrCreate(): Promise<ID> {
+      const values = forms.tool.getValues();
+
+      const isToolSelected = Boolean(values.id);
+      if (isToolSelected && values.id) {
+        return values.id;
+      }
+
+      // todo ! fix: creates a Tool duplicate if Review submit fails and user tries again
+      const { tags, alternatives, ...toolFields } = values;
+      const response = await mutateAndRefetchMountedQueries(
+        graphql(`
+					mutation ToolCreate($input: PostTypeInput!) {
+						post_update_or_create(data: $input) { id }
+					}
+				`),
+        {
+          input: {
+            ...toolFields,
+            type: PostTypeEnum.Tool,
+            tags: schemas.post.serializeTags(tags),
+          },
+        },
+      );
+      if (!response.success) {
+        toast.error(`Tool creation failed: ${response.errorMessage}`);
+        throw new Error("Tool creation failed");
+      }
+      return response.data.post_update_or_create.id;
     }
 
     const state = {
@@ -232,7 +235,7 @@ export namespace PostReviewForm {
                       />
                     </>
                   ) : (
-                    <PostToolFields />
+                    <PostToolFields isToolSelectAllowed={true} />
                   )}
                 </Fieldset.Content>
               </Fieldset.Root>
@@ -375,16 +378,4 @@ export namespace PostReviewForm {
       </VStack>
     );
   }
-}
-
-function getToolType(value: string, icon: JSX.Element, label?: string) {
-  return {
-    value: value,
-    label: (
-      <HStack>
-        <Icon fontSize="md">{icon}</Icon>
-        <Text>{label ?? value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()}</Text>
-      </HStack>
-    ),
-  };
 }

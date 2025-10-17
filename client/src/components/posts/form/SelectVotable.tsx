@@ -57,6 +57,7 @@ export function SelectVotable(
     isReviewTags?: boolean; // see docs [[PostTag#is_review_tag]]
     optionIdsHidden?: ID[];
     onChange?: (options: SelectVotableOption[]) => void;
+    isReadOnly?: boolean;
     "data-testid"?: string;
   } & (
     | { postId?: ID; isSelectReadOnlyInReviewForm?: false }
@@ -101,6 +102,7 @@ export function SelectVotable(
         {props.helpText && <Field.HelperText>{props.helpText}</Field.HelperText>}
 
         <AsyncCreatableSelect
+          isDisabled={props.isReadOnly}
           cacheOptions
           defaultOptions
           isMulti

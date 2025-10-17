@@ -1,4 +1,4 @@
-import { Field, Flex, Float, Icon, Textarea } from "@chakra-ui/react";
+import { Field, Flex, Float, Icon, Textarea, type TextareaProps } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
 import { FaMarkdown } from "react-icons/fa";
@@ -13,6 +13,7 @@ export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
   optionalText?: ReactNode;
   isShowIconMarkdown?: boolean;
   fieldProps?: Omit<Field.RootProps, "label">;
+  textareaProps?: Partial<TextareaProps>;
   "data-testid"?: string;
 }) {
   const { field, fieldState } = useController(props.field);
@@ -37,6 +38,7 @@ export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {
             borderColor: "gray.300",
             _dark: { borderColor: "gray.700" },
           }}
+          {...props.textareaProps}
         />
         {props.isShowIconMarkdown && (
           <Float offset="6" placement="bottom-end">

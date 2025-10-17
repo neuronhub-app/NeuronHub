@@ -9,9 +9,12 @@ export const UserType = z.enum(["User", "Group"]);
 
 /**
  * Caveats:
- * - `z.array().default([])` - breaks TS types. No idea. We have to init it as `[]`, or form thinks it's `undefined`.
+ * - `z.array().default([])` - breaks TS types. No idea. We have to init it as `[]`, or form thinks it's `undefined`. #[[ts-array-bug]]
  * - `z.enum().default(<any valid enum string>)` - breaks the validation or crashes JetBrains Gateway. Set it on form then.
  *    Eg `.default(Visibility.Private)` works, but doesn't display in UI.
+ *
+ * todo refac: use objects to drop keywords overload as `export`, `function`, etc?
+ * todo refac: split on 2-3 files
  */
 export namespace schemas {
   // Post fields shared by all
@@ -184,16 +187,19 @@ export namespace schemas {
         source: values.source,
         source_author: values.source_author,
         category: values.category ?? null,
-        tags: values.tags
-          ? values.tags.map(tag => ({
-              id: tag.id,
-              name: tag.name,
-              comment: tag.comment,
-              is_vote_positive: tag.is_vote_positive,
-            }))
-          : undefined,
+        tags: serializeTags(values.tags),
         ...sharable.serialize(values),
       };
+    }
+    export function serializeTags(tags: Post["tags"]) {
+      if (tags) {
+        return tags.map(tag => ({
+          id: tag.id,
+          name: tag.name,
+          comment: tag.comment,
+          is_vote_positive: tag.is_vote_positive,
+        }));
+      }
     }
   }
 
@@ -232,8 +238,10 @@ export namespace schemas {
     domain: z.string().optional(),
   });
   export type Tool = z.infer<typeof Tool>;
+  export type ToolForm = UseFormReturn<Tool>;
 
   function getSelectVotableSchema() {
+    // no .default([]) as [[ts-array-bug]]
     return z.array(
       z.object({
         id: z.string(),

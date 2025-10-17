@@ -1,4 +1,4 @@
-import { HStack } from "@chakra-ui/react";
+import { HStack, Show } from "@chakra-ui/react";
 import { useFormContext } from "react-hook-form";
 import { FaLightbulb, FaNewspaper, FaQuestion, FaThumbsUp } from "react-icons/fa";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
@@ -12,22 +12,28 @@ import { PostCategory } from "~/graphql/enums";
 
 export function PostFields(props: {
   titleLabel?: string;
-  titleId?: string;
   contentLabel?: string;
   isShowAuthorProfileInput?: boolean;
   isShowCategoryField?: boolean;
+  isReadOnly?: boolean;
+  isHideTitle?: boolean;
 }) {
   const form = useFormContext<schemas.PostAbstract>();
 
   return (
     <>
-      <FormChakraInput
-        name="title"
-        control={form.control}
-        label={props.titleLabel ?? "Title"}
-        {...ids.setInput(props.titleId ?? ids.post.form.title)} // todo wtf #AI
-        required
-      />
+      {!props.isHideTitle && (
+        <FormChakraInput
+          name="title"
+          control={form.control}
+          label={props.titleLabel ?? "Title"}
+          inputProps={{
+            disabled: props.isReadOnly,
+            ...ids.set(ids.post.form.title),
+          }}
+          required
+        />
+      )}
 
       {props.isShowCategoryField && (
         <FormChakraSegmentControl
@@ -45,7 +51,7 @@ export function PostFields(props: {
         />
       )}
 
-      <PostContentFields />
+      <PostContentFields isReadOnly={props.isReadOnly} />
 
       <HStack w="100%" gap="gap.lg">
         <FormChakraInput
@@ -53,6 +59,7 @@ export function PostFields(props: {
           control={form.control}
           label="Source"
           helpText="Link or reference"
+          inputProps={{ disabled: props.isReadOnly }}
         />
 
         {props.isShowAuthorProfileInput && (
@@ -62,20 +69,24 @@ export function PostFields(props: {
             label="Author profile"
             helpText="URL to HackerNews, Mastodon, etc"
             isUrlPrefix
+            inputProps={{ disabled: props.isReadOnly }}
           />
         )}
       </HStack>
 
-      <ImageUpload
-        name="image"
-        control={form.control}
-        label="Image"
-        {...ids.setInput(ids.post.form.image)}
-      />
+      <Show when={!props.isReadOnly}>
+        <ImageUpload
+          name="image"
+          control={form.control}
+          label="Image"
+          {...ids.setInput(ids.post.form.image)}
+        />
+      </Show>
 
       <SelectVotable
         fieldName="tags"
         postId={form.watch("id") ?? undefined}
+        isReadOnly={props.isReadOnly}
         {...ids.set(ids.post.form.tags)}
       />
     </>
