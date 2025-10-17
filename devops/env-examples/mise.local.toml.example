@@ -1,5 +1,5 @@
 [env]
-    # to isolate E2E by port + db
+    # to isolate E2E by port + db, eg for using several Claude Code instances
     E2E_SERVER_PORT = 8001
     E2E_CLIENT_PORT = 3001
     E2E_DB_NAME = "test_neuronhub_1"

@@ -126,8 +126,8 @@ if DJANGO_ENV == DjangoEnv.BUILD:
     }
 else:
     db_host = env.str("DATABASE_HOST", "host.docker.internal")
-    db_user = env.str("DATABASE_USER", "neuronhub")
     db_name = env.str("DATABASE_NAME", "neuronhub")
+    db_user = env.str("DATABASE_USER", db_name)
     if E2E_TEST:
         db_name = env.str("E2E_DB_NAME")
     DATABASES = {
@@ -135,7 +135,7 @@ else:
             conn_max_age=600,
             default=env.str(
                 "DATABASE_URL",
-                f"postgres://{db_user}@{db_host}:5432/{db_name}",
+                f"postgres://{db_user}:{db_user}@{db_host}:5432/{db_name}",
             ),
         )
     }
@@ -176,7 +176,7 @@ SERVER_PORT = env.int("SERVER_PORT", 8000)
 SERVER_URL = env.str("SERVER_URL", f"http://localhost:{SERVER_PORT}")
 CLIENT_URL = env.str("CLIENT_URL", "http://localhost:3000")
 DOMAIN = env.str("DOMAIN", CLIENT_URL.replace("https://", "").replace("http://", ""))
-DOMAIN_PROD = "neuronhub.io"
+DOMAIN_PROD = "neuronhub.app"
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [

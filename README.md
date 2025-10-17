@@ -5,13 +5,23 @@ Development Setup
 
 The complete env setup you can find in [Coder.com Dockerfile](/devops/coder/Dockerfile).
 
-Install `Mise`, then:
+### MacOS
+
+Install [Mise](https://mise.jdx.dev/getting-started.html), then:
+
+```shell
+cp devops/env-examples/mise.macos.toml.example mise.local.toml
+```
+
+Then follow the Linux steps below.
+
+### Linux
+
 ```shell
 mise install
-mise install-deps
-mise django:migrate
-mise django:stubs-repopulate
-mise dev
+mise run install-deps
+mise run dev:db-init
+mise run dev
 ```
 
 URLs

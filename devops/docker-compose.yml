@@ -18,14 +18,5 @@ services:
     ports:
       - "5432:5432"
 
-  s3:
-    image: rclone/rclone
-    volumes:
-      - s3_data:/data
-    command: serve s3 /data --addr :8333
-    ports:
-      - "8333:8333"
-
 volumes:
   postgres_data:
-  s3_data:

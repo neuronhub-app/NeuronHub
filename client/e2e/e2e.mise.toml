@@ -2,7 +2,7 @@
     run = """
         #!/usr/bin/env bash
 
-        if [ "$GITHUB_ACTIONS" = "true" ]; then
+        if [[ "$IS_DB_EXTERNAL" = "true" || "$GITHUB_ACTIONS" = "true" ]]; then
             echo "In GitHub CI skipping Mise Task dev:db:setup-e2e"
         else
             sudo docker compose --file ./devops/docker-compose.yml exec db bash -c "psql --user=neuronhub --command='CREATE DATABASE {{ get_env(name='E2E_DB_NAME') }};'" 2>/dev/null || true

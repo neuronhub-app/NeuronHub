@@ -1,0 +1,9 @@
+[env]
+    IS_DB_EXTERNAL = true
+    DATABASE_HOST = "localhost"
+    DATABASE_NAME = "neuronhub"
+
+# optional
+[tools]
+    node = "24"
+    claude= "latest"

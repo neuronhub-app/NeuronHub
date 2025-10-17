@@ -2,6 +2,7 @@
     bun = "latest"
     uv = "latest"
     biome = "latest"
+    rclone = "latest"
 
 [settings]
     python.uv_venv_auto = true
@@ -12,6 +13,7 @@
         "devops/upgrade-deps.mise.toml",
         "devops/claude.mise.toml",
         "devops/coder/docker.mise.toml",
+        "devops/dev-env-darwin.mise.toml",
         "client/e2e/e2e.mise.toml",
     ]
 
@@ -24,7 +26,7 @@
 
 
 [tasks."dev"]
-    depends = ["dev:db", "dev:server", "dev:client"]
+    depends = ["dev:db", "dev:s3", "dev:server", "dev:client"]
 
     [tasks."dev:server"]
         depends = "dev:db"
@@ -37,21 +39,22 @@
         run = "bun run react-router dev --host --port={{ get_env(name='CLIENT_PORT') }}"
         env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT') }}"
 
-    # todo refac-name: docker-services?
+    [tasks."dev:s3"]
+        run = "rclone serve s3 ./media --addr :8333"
+
     [tasks."dev:db"]
         dir = "devops"
         run = """
-        if [ "$GITHUB_ACTIONS" = "true" ]; then
-            echo "In GitHub CI skipping Mise Task dev:db"
+        if [ "$IS_DB_EXTERNAL" = "true" ]; then
+            echo "Using external PostgreSQL"
         else
-            sudo docker compose up db s3 --detach
-            sudo docker exec neuronhub-s3-1 mkdir -p /data/media
+            sudo docker compose up db --detach
         fi
         """
         silent = true
     [tasks."dev:db-stop"]
         dir = "devops"
-        run = "sudo docker compose down db s3"
+        run = "sudo docker compose down db"
 
     [tasks."dev:server:e2e"]
         depends = ["dev:db", "dev:db:setup-e2e"]
