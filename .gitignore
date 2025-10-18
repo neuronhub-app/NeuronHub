@@ -5,15 +5,15 @@
 
 docs/private/
 
-client/e2e/config.schema.json
-client/e2e/config.json
-
 # caches
 __pycache__
 server/.*_cache/
 server/.venv/
 .*_cache/
 
+# env
 mise.local.toml
-
 **/.env*
+
+# s3
+server/media/

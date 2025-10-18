@@ -40,7 +40,11 @@
         env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT') }}"
 
     [tasks."dev:s3"]
-        run = "rclone serve s3 ./media --addr :8333"
+        dir = "server"
+        run = [
+            "mkdir -p media",
+            "rclone serve s3 . --addr :8333",
+        ]
 
     [tasks."dev:db"]
         dir = "devops"
