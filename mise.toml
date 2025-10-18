@@ -45,7 +45,7 @@
     [tasks."dev:db"]
         dir = "devops"
         run = """
-        if [ "$IS_DB_EXTERNAL" = "true" ]; then
+        if [[ "$IS_DB_EXTERNAL" = "true" || "$GITHUB_ACTIONS" = "true" ]]; then
             echo "Using external PostgreSQL"
         else
             sudo docker compose up db --detach
