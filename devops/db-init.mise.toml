@@ -1,5 +1,7 @@
 ["dev:db-init"]
     run = """
+        #!/usr/bin/env bash
+
         if [ "$IS_DB_EXTERNAL" = "true" ]; then
             brew install postgresql@17
             brew services start postgresql@17
