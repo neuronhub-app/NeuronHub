@@ -1,25 +1,26 @@
 import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
-import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
+import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { urls } from "@/routes";
 
 test.describe("Tool", () => {
   let play: PlaywrightHelper;
+  let $: LocatorMap;
 
   test.beforeEach(async ({ page }) => {
     play = new PlaywrightHelper(page);
     await play.dbStubsRepopulateAndLogin();
+    $ = play.locator();
   });
 
-  test("Create with Image", async ({ page }) => {
+  test("Create with an .image", async ({ page }) => {
     await page.goto(urls.tools.create);
 
     const tool = { title: `Docker ${new Date()}` };
     await play.fill(ids.post.form.title, tool.title);
 
-    const input = play.get(ids.post.form.image);
-    await input.setInputFiles(await genImagePng());
+    await $[ids.post.form.image].setInputFiles(await genImagePng());
 
     await play.submit(ids.post.form);
     await expect(page).toHaveText(tool.title);
