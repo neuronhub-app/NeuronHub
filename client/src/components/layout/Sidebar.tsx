@@ -17,17 +17,9 @@ import type { ComponentType } from "react";
 import toast from "react-hot-toast";
 import { FaRegBookmark } from "react-icons/fa6";
 import { GoCommentDiscussion } from "react-icons/go";
-import {
-  LuChevronDown,
-  LuFile,
-  LuLayoutDashboard,
-  LuLibrary,
-  LuLogIn,
-  LuLogOut,
-  LuSettings,
-} from "react-icons/lu";
+import { LuLayoutDashboard, LuLibrary, LuLogIn, LuLogOut, LuSettings } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
-import { type LinkProps, NavLink, useNavigate } from "react-router";
+import { type LinkProps, NavLink, useLocation } from "react-router";
 
 import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
@@ -58,7 +50,7 @@ const groups = [
       { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },
       { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
       { to: "/library", icon: LuLibrary, label: "Library" },
-    ] as Array<{
+    ] satisfies Array<{
       to: LinkProps["to"];
       icon: ComponentType;
       label: string;
@@ -159,10 +151,10 @@ export function Sidebar(props: StackProps) {
   );
 }
 
-function SidebarLink(props: { to?: LinkProps["to"] } & ButtonProps) {
+function SidebarLink(props: { to: LinkProps["to"] } & ButtonProps) {
   const { children, to, ...buttonProps } = props;
   return (
-    <NavLink to={to ?? "/"}>
+    <NavLink to={to}>
       {linkProps => (
         <Button
           variant="ghost"
@@ -188,19 +180,21 @@ function SidebarLink(props: { to?: LinkProps["to"] } & ButtonProps) {
 }
 
 function SidebarLinkGroup(props: {
-  to?: LinkProps["to"];
+  to: LinkProps["to"];
   label: string;
-  icon?: React.ComponentType;
+  icon: ComponentType;
   children: ReadonlyArray<{
     to: LinkProps["to"];
     label: string;
   }>;
 }) {
-  const IconComponent = props.icon || LuFile;
+  const location = useLocation();
+  const isInNamespace = location.pathname.startsWith(String(props.to));
+
   return (
-    <Collapsible.Root defaultOpen>
+    <Collapsible.Root open={isInNamespace}>
       <HStack width="full" position="relative">
-        <NavLink to={props.to ?? "/"} style={{ flex: 1 }}>
+        <NavLink to={props.to} style={{ flex: 1 }}>
           {linkProps => (
             <Button
               variant="ghost"
@@ -218,36 +212,11 @@ function SidebarLinkGroup(props: {
               aria-current={linkProps.isActive ? "page" : undefined}
               pr="10"
             >
-              <IconComponent />
+              <props.icon />
               {props.label}
             </Button>
           )}
         </NavLink>
-        <Collapsible.Trigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            position="absolute"
-            right="0"
-            color="fg.muted"
-            _hover={{
-              bg: "colorPalette.subtle",
-            }}
-          >
-            <Collapsible.Context>
-              {context => (
-                <Icon
-                  aria-hidden
-                  transition="transform 0.2s"
-                  transformOrigin="center"
-                  transform={context.open ? "rotate(180deg)" : undefined}
-                >
-                  <LuChevronDown />
-                </Icon>
-              )}
-            </Collapsible.Context>
-          </Button>
-        </Collapsible.Trigger>
       </HStack>
 
       <Collapsible.Content>
@@ -265,7 +234,6 @@ function SidebarLinkGroup(props: {
 
 export function UserProfile() {
   const user = useUser();
-  const navigate = useNavigate();
 
   async function handleLogout() {
     const res = await mutateAndRefetchMountedQueries(graphql(`mutation Logout { logout }`), {});
