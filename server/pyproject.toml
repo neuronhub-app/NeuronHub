@@ -53,6 +53,7 @@ dependencies = [
     "markdownify == 1.*", # [i=norm, rep=norm, GH=norm, @matthewwithanm, 1.7k] another project 2.3k stars. Other MD packages suck.
     "python-dotenv == 1.*", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few posts on saurabh-kumar.com/blog/
     "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - his `marshmallow` used by Microsoft, AWS, etc
+    "requests == 2.*",
 ]
 
 # Python 3.14 support, waiting on GraphQL 3.3.*
@@ -68,10 +69,11 @@ dependencies = [
         "pip == 25.*",
         "wat == 0.7.*",
         "pytest == 8.*",
-            "pytest-django == 4.*",
-            "pytest-pspec ~= 0.0.4", # ~dead, mostly useless
-            "pytest-rich == 0.*",
-    ]
+        "pytest-django == 4.*",
+        "pytest-pspec ~= 0.0.4", # ~dead, mostly useless
+        "pytest-rich == 0.*",
+        "types-requests == 2.*",
+]
 
 
 [tool.django-stubs]

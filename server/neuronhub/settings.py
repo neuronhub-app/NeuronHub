@@ -68,6 +68,7 @@ INSTALLED_APPS = [
     "neuronhub.apps.orgs",
     "neuronhub.apps.posts",
     "neuronhub.apps.tests",
+    "neuronhub.apps.importer",
 ]
 
 MIDDLEWARE = [
@@ -261,7 +262,6 @@ if IS_SENTRY_ENABLED:
         ],
     )
 
-TEST_RUNNER = "django_rich.test.RichRunner"
 
 LOGGING = {
     "version": 1,
@@ -286,12 +286,13 @@ if E2E_TEST:
         },
     }
 
+TEST_RUNNER = "django_rich.test.RichRunner"
 _line_width = 120
 rich.traceback.install(
-    width=_line_width,  # max-width=100vw, so who cares
+    width=_line_width,  # default max-width=100vw, so who cares
     code_width=_line_width,
     show_locals=True,
-    locals_max_length=1,  # crop 1 newline, eg cls
+    locals_max_length=2,  # amount of locals
     locals_max_string=_line_width,
     suppress=[django],  # too verbose
 )
@@ -299,5 +300,5 @@ rich.traceback.install(
 
 DEFAULT_DJANGO_SETTINGS = strawberry_django_settings()
 DEFAULT_DJANGO_SETTINGS["GENERATE_ENUMS_FROM_CHOICES"] = True  # no reason atm, can remove
-# "pk" is a nice intention, but bad impl - "id" is soft-required in django
+# "pk" by default is a nice idea, but bad implementation - "id" is soft-required in django
 DEFAULT_DJANGO_SETTINGS["DEFAULT_PK_FIELD_NAME"] = "id"

@@ -126,7 +126,14 @@ class Post(AnonimazableTimeStampedModel):
         help_text="Marked 'seen' if present in browser's ViewBox for ~4 seconds",
     )
 
-    history = HistoricalRecords(cascade_delete_history=True)
+    history = HistoricalRecords(
+        cascade_delete_history=True,
+        excluded_fields=[
+            "users_read_later",
+            "users_library",
+            "seen_by_users",
+        ],
+    )
 
     # permissions
     # ---------------------
@@ -150,13 +157,13 @@ class Post(AnonimazableTimeStampedModel):
     # content
     # ---------------------
 
-    slug = AutoSlugField(populate_from="title", unique=True)
-    title = anonymizable(models.CharField(max_length=140, blank=True))
+    slug = AutoSlugField(populate_from="title", allow_duplicates=True)
+    title = anonymizable(models.CharField(max_length=255, blank=True))
     content_polite = anonymizable(MarkdownField(blank=True))
     content_direct = anonymizable(MarkdownField(blank=True))
     content_rant = anonymizable(MarkdownField(blank=True))
     content_private = anonymizable(MarkdownField(blank=True, help_text="Only for author"))
-    source = CharField(max_length=140, blank=True)
+    source = CharField(max_length=255, blank=True)
     source_author = CharField(max_length=500, blank=True)
     image = models.ImageField(upload_to="posts/images/", blank=True, null=True)
 

@@ -22,8 +22,8 @@
 ### TBD
 
 - notifications
-- `review.review_experience` field
-- `vote.is_changed_my_mind` field
+- Add Review.review_experience field
+- Add Vote.is_changed_my_mind field
 - LLM moderation
 - `Post.Type.Quote`
 	- show "Quotes" under "Posts" in left menu, default is "All"

@@ -17,3 +17,5 @@ mise.local.toml
 
 # s3
 server/media/
+
+server/**/stubs/*.json

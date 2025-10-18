@@ -10,15 +10,14 @@
 	- [x] edit
 	- [x] .source_author field
     - [x] .category: Knowledge, Opinion, News
-	- [x] `content_polite`, `content_direct`, `content_rant`
+	- [x] .content_polite, .content_direct, .content_rant
 	- [x] fix Tag votes (PostForm init drops it)
-- Deploy
-  - [x] Django
-  - [ ] S3
+- [x] on Review select Tool by title
+- [ ] Deploy
+- [ ] apps.importer
 
 ### v0.2.1.0
 
-- `Review.parent` select by `tool.title`
 - Reading list & Library
 
 ### v0.2.2.0

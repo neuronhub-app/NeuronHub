@@ -130,6 +130,7 @@ Constraints: React is legacy, GraphQL cache is overengineered, fuck hyped patter
 
 - `apps/posts/` - core `Post` models and logic
 - `apps/tests/` - faker `Gen` factories, db_stubs_repopulate, pytest base class, etc
+- `apps/importer/` - importer of Posts from external sources, eg HackerNews
 
 A typical `neuronhub.apps` module structure: `models.py` → `services.py` → `graphql/{types,resolvers,mutations}.py`.
 
