@@ -2,6 +2,7 @@ import { layout, prefix, type RouteConfig, route } from "@react-router/dev/route
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import type { ID } from "@/gql-tada";
 
+// todo refac-name: use singular namespaces, ie `review` not `reviews`
 export const urls = {
   home: "/",
   login: "/login",

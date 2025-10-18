@@ -8,6 +8,13 @@ import { client } from "@/graphql/client";
 import { useInit } from "@/utils/useInit";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
+/**
+ * Note: in the future consider @chakra-ui Combobox with render of .image & .content. But atm we can't as it lacks the `create` mode.
+ * - https://www.chakra-ui.com/docs/components/combobox#hook-form
+ * - https://www.chakra-ui.com/docs/components/combobox#custom-item - to render .image and .content
+ * - https://www.chakra-ui.com/docs/components/combobox#links - link can be to urls.tools.detail
+ * - https://www.chakra-ui.com/docs/components/combobox#highlight-matching-text
+ */
 export function ToolAsyncSelect(props: { form: schemas.ToolForm }) {
   const form = props.form;
 
