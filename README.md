@@ -1,36 +1,38 @@
-For project description see [docs/architecture.md](/docs/architecture.md).
+For project intro see [docs/architecture.md](/docs/architecture.md).
 
 Development Setup
 --------------------------------
 
-The complete env setup you can find in [Coder.com Dockerfile](/devops/coder/Dockerfile).
+### Linux & Docker
+
+1. Install [Mise](https://mise.jdx.dev/getting-started.html)
+2. `git clone {url}`
+3. `cd neuronhub`
+4. ```shell
+	mise trust
+	mise install
+	mise run install-deps
+	mise run dev:db-init
+	mise run dev
+	```
+
+dev URLs:
+- http://localhost:8000/admin
+- http://localhost:3000
 
 ### MacOS
 
-Install [Mise](https://mise.jdx.dev/getting-started.html), then:
+To run without Docker, after `git clone` copy this env file:
+- `cp devops/env-examples/mise.macos.toml.example mise.local.toml`
 
-```shell
-cp devops/env-examples/mise.macos.toml.example mise.local.toml
-```
+The rest of steps are the same as for Linux.
 
-Then follow the Linux steps below.
+The [mise.toml](/mise.toml) has all tasks and scripts.
 
-### Linux
-
-```shell
-mise install
-mise run install-deps
-mise run dev:db-init
-mise run dev
-```
-
-URLs
-- http://localhost:7999/admin
-- http://localhost:2999
-
-Read [mise.toml](/mise.toml) for more.
-
-### Code style
+Documentation
+--------------------------------
 
 - [testing setup](/docs/testing-setup.md)
 - [code style](/docs/code-style.md)
+
+For more see the [docs/](/docs/) dir.
