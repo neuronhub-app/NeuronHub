@@ -1,12 +1,14 @@
 ---
-reviewed_at: 2025.08.31
+reviewed_at: 2025.10.20
 ---
 
 ## Architecture
 
 ### Overview
 
-Privacy-first sharing of tech expertise among SWEs: libraries, products, publications, opinions, news, links, etc. Users can publish separate versions of their `models.Post` to different user groups (circles). Users use `User.aliases` for anonymity, each UserAlias has its own reputation in its Areas: SWE, Physics, Math, Biology, etc.
+Privacy-first sharing of expertise: products, publications, opinions, news, links, etc.
+- Users can publish separate versions of their `models.Post` (News, Comments, Reviews, etc) to different User groups (circles).
+- Users use `User.aliases` for anonymity, each UserAlias has its own reputation in its Areas: SWE, Physics, Math, Biology, etc.
 
 ### Core Models
 
@@ -37,7 +39,8 @@ classDiagram
             
             %% CharField
             title
-            content
+            content_polite
+            content_direct
             source
 
             %% Sharing
@@ -118,7 +121,12 @@ classDiagram
 - Client: React Router v7, @chakra-ui, react-hook-form, Zod, Valtio, Apollo, gql-tada, Bun, Biome
 - DevOps: Mise, Coder, Docker
 
-Constraints: React is legacy, GraphQL cache is overengineered, fuck hyped patterns.
+#### Constraints
+- JavaScript ecosystem is bad
+- GraphQL cache design isn't feasible
+- Django is heavily in tech debt
+- React state management became legacy due to the `Proxy` objects
+- React Router server API and SSR won't be used
 
 ### Project Structure
 
@@ -134,7 +142,7 @@ Constraints: React is legacy, GraphQL cache is overengineered, fuck hyped patter
 
 A typical `neuronhub.apps` module structure: `models.py` → `services.py` → `graphql/{types,resolvers,mutations}.py`.
 
-Tags and votes are unified across `Post`'s <<projection>>s with models: `PostTag`, `PostVote`, `PostTagVote`. 
+Tags and votes are unified across `Post`'s `<<projection>>`s with models: `PostTag`, `PostVote`, `PostTagVote`. 
 
 ```python
 class Visibility(models.TextChoices):
@@ -157,14 +165,14 @@ class Visibility(models.TextChoices):
 - `src/components/` - components shared between `src/apps/`
   - `forms/` - Chakra inputs adapted for react-hook-form.
   - `posts/` - shared code for all `Post` react-hook-forms.
-  - `posts/form/*.tsx` - fields or field sets for use in `Post` forms.
-  - `posts/form/schemas.ts` - all Zod `export namespace schemas` for `Post` react-hook-forms, and their serializers + deserializers.
-  - `ui/` - deprecated bad "Closed Components" forced by old @chakra-ui. We're slowly replacing them with `@chakra-ui/react` imports.
+  - `posts/form/*.tsx` - fields for use in `Post` forms.
+  - `posts/form/schemas.ts` - all Zod `export namespace schemas` for `Post` react-hook-forms, and serializers + deserializers.
+  - `ui/` - deprecated bad "Closed Components" forced by the old @chakra-ui. We're replacing them with `@chakra-ui/react` imports.
   - `layout/` - react-router layouts.
 - GraphQL
-  - `src/graphql/client.ts` - Apollo `client`
   - `src/graphql/mutateAndRefetchMountedQueries.ts` - use it instead `client.mutate()`
   - `src/graphql/useApolloQuery.ts` - use instead broken `useQuery`, including its `isLoadingFirstTime` instead of `loading`
-  - `src/codegen.ts` - only generates TS Enums, for types we use gql.tada.
+  - `src/graphql/client.ts` - Apollo `client`
+  - `src/codegen.ts` - is only used for TS enums generation - for GraphQL types we use gql.tada.
 - `src/theme/` - @chakra-ui theme config and semantic tokens
 - `src/env.ts` - typed `env`
