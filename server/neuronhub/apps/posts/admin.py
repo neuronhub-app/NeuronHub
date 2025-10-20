@@ -241,6 +241,15 @@ class PostAdmin(SimpleHistoryAdmin):
                 )
             },
         ),
+        (
+            "Source",
+            {
+                "fields": (
+                    "source",
+                    "source_author",
+                )
+            },
+        ),
     )
 
     @admin.display(description="parent")

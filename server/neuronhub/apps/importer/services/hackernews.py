@@ -10,6 +10,7 @@ todo refac: recompose
 from __future__ import annotations
 
 import asyncio
+import logging
 from datetime import datetime
 from enum import Enum
 from typing import NotRequired, TypedDict, cast
@@ -42,9 +43,11 @@ async def import_posts(
     post_ids: list[ID] = await request_json(
         f"{Config.Api.firebase}/{category.value}stories.json", is_use_cache=is_use_cache
     )
+    _log_import(f"{post_ids} posts")
     posts_imported = await asyncio.gather(
-        *[import_post(post_id, is_use_cache=is_use_cache) for post_id in post_ids]
+        *[import_post(post_id, is_use_cache=is_use_cache) for post_id in post_ids[:2]]
     )
+    _log_import("Completed")
     return posts_imported
 
 
@@ -92,6 +95,8 @@ type DateISO = str
 
 
 async def _import_post_json(post_json: PostAlgolia, is_use_cache: bool = False) -> Post:
+    _log_import(f"Post #{post_json['id']}")
+
     if author_name := post_json["author"]:
         await _user_source_get_or_create(author_name)
 
@@ -115,6 +120,8 @@ async def _import_post_json(post_json: PostAlgolia, is_use_cache: bool = False) 
     )
 
     if post_json["children"]:
+        _log_import(f"Post #{post_json['id']} - comments ({len(post_json['children'])})")
+
         child_ranks = await _derive_comment_ranks(parent=post_json, is_use_cache=is_use_cache)
         for child in post_json["children"]:
             child_rank = child_ranks.get(child["id"])
@@ -142,13 +149,15 @@ async def _import_comment_json(
     post_comment, _ = await Post.objects.aupdate_or_create(
         type=Post.Type.Comment,
         parent=parent,
-        post_source=post_source,
+        post_source=post_source,  # todo ! this is a matcher, Django doesn't pass it as a kwarg
         defaults=dict(
             visibility=Visibility.PUBLIC,
+            post_source=post_source,
             source_author=await _user_source_get_or_create(comment_json["author"]),
             content_polite=markdownify(comment_json["text"]),
         ),
     )
+    _log_import(f"Post #<id> - comment #{comment_json['id']}")
 
     if comment_json["children"]:
         comment_ranks = await _derive_comment_ranks(comment_json, is_use_cache=is_use_cache)
@@ -221,3 +230,10 @@ class CommentFirebase(TypedDict):
     parent: ID
     kids: list[ID]
     time: int
+
+
+logger = logging.getLogger(__name__)
+
+
+def _log_import(text: str):
+    logger.info(f"Importing: {text}")
