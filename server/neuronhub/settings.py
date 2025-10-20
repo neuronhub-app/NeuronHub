@@ -1,3 +1,4 @@
+import asyncio
 import os
 from enum import Enum
 from pathlib import Path
@@ -294,7 +295,7 @@ rich.traceback.install(
     show_locals=True,
     locals_max_length=2,  # amount of locals
     locals_max_string=_line_width,
-    suppress=[django],  # too verbose
+    suppress=[django, asyncio],  # too verbose
 )
 
 

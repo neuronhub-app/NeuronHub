@@ -13,8 +13,9 @@ class PostSource(TimeStampedModel):
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_query_name="source_data",
-        related_name="sources_data",
+        related_query_name="post_source",
+        related_name="posts_source",
+        null=True,
     )
 
     domain = TextChoicesField(ImportDomain, blank=True, null=True, default=None)

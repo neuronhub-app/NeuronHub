@@ -81,12 +81,13 @@ class ApiCache:
             json.dump(data, file, indent=4)
 
     def _build_json_path(self, url: str) -> Path:
-        match = re.search(r"/items?/(?P<item_id>\d+)", url)
-        assert match
         cache_dir = Path(__file__).parent / "cache"
-        return (
-            cache_dir / f"post-{_get_api_source(url).value}-{match.group('item_id')}.cache.json"
-        )
+        if match := re.search(r"/items?/(?P<item_id>\d+)", url):
+            return (
+                cache_dir
+                / f"post-{_get_api_source(url).value}-{match.group('item_id')}.cache.json"
+            )
+        return cache_dir / "list.cache.json"
 
 
 def _get_api_source(url: str) -> ApiSource:

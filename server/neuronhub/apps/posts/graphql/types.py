@@ -36,7 +36,7 @@ class PostTypeI:
     TYPE: PostTypeEnum
 
     id: auto
-    author: UserType
+    author: UserType | None
     seen_by_users: auto
 
     parent: PostTypeI | None

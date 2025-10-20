@@ -169,7 +169,7 @@ input PostCategoryFilterLookup {
 type PostCommentType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  author: UserType!
+  author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostCommentType
   children: [PostTypeI!]!
@@ -218,7 +218,7 @@ input PostReviewOrder @oneOf {
 type PostReviewType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  author: UserType!
+  author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostToolType!
   children: [PostTypeI!]!
@@ -308,7 +308,7 @@ type PostTagVoteType {
 type PostToolType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  author: UserType!
+  author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!
@@ -345,7 +345,7 @@ type PostToolType implements PostTypeI {
 type PostType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  author: UserType!
+  author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!
@@ -435,7 +435,7 @@ input PostTypeEnumFilterLookup {
 interface PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  author: UserType!
+  author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!

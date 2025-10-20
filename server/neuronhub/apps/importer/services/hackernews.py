@@ -13,6 +13,7 @@ import asyncio
 from datetime import datetime
 from enum import Enum
 from typing import NotRequired, TypedDict, cast
+from markdownify import markdownify
 
 
 from neuronhub.apps.anonymizer.fields import Visibility
@@ -97,7 +98,7 @@ async def _import_post_json(post_json: PostAlgolia, is_use_cache: bool = False) 
     post = await Post.objects.acreate(
         type=Post.Type.Post,
         title=post_json["title"],
-        content_direct=post_json["text"] or "",
+        content_direct=markdownify(post_json["text"] or ""),
         source=_build_HN_item_url(post_json["id"]),
         source_author=author_name,
         visibility=Visibility.PUBLIC,
@@ -130,24 +131,22 @@ async def _import_comment_json(
     rank: int | None = None,
     is_use_cache: bool = False,
 ) -> Post | None:
-    post_comment, _ = await Post.objects.aupdate_or_create(
-        type=Post.Type.Comment,
-        parent=parent,
-        source_data__id_external=comment_json["id"],
-        defaults=dict(
-            visibility=Visibility.PUBLIC,
-            source_author=await _user_source_get_or_create(comment_json["author"]),
-            content_direct=comment_json["text"],
-        ),
-    )
-    await PostSource.objects.aupdate_or_create(
-        post=post_comment,
+    post_source, _ = await PostSource.objects.aupdate_or_create(
         domain=ImportDomain.HackerNews,
         id_external=comment_json["id"],
-        created_at_external=_parse_datetime(comment_json["created_at"]),
         defaults=dict(
             json=_clean_HN_json(comment_json),
             rank=rank,
+        ),
+    )
+    post_comment, _ = await Post.objects.aupdate_or_create(
+        type=Post.Type.Comment,
+        parent=parent,
+        post_source=post_source,
+        defaults=dict(
+            visibility=Visibility.PUBLIC,
+            source_author=await _user_source_get_or_create(comment_json["author"]),
+            content_polite=markdownify(comment_json["text"]),
         ),
     )
 

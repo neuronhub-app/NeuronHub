@@ -116,6 +116,10 @@
     dir = "server"
     run = "uv run manage.py db_stubs_repopulate"
 
+[tasks."django:import-hn"]
+    dir = "server"
+    run = "uv run manage.py import_hn"
+
 
 [tasks."typegen"]
     depends = "typegen:server"

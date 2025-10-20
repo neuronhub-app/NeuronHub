@@ -86,7 +86,7 @@ export function PostCard(props: { post: PostListItemType }) {
               boxSize="22px"
             />
           </HStack>
-          <ReviewTags tags={post.review_tags} authorId={post.author.id} />
+          {post.author && <ReviewTags tags={post.review_tags} authorId={post.author.id} />}
         </VStack>
       )}
 
@@ -96,7 +96,7 @@ export function PostCard(props: { post: PostListItemType }) {
         <Flex>
           {isReview(post) ? (
             <Wrap>
-              {post.tags.length !== 0 && (
+              {post.tags.length !== 0 && post.author && (
                 <ReviewTagsWithVotes
                   tags={post.tags}
                   authorId={post.author.id}
