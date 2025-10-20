@@ -1,8 +1,15 @@
+"""
+todo refac: api limit should be a class or a namespace
+"""
+
 from __future__ import annotations
 
 import asyncio
 import json
+import re
 from datetime import timedelta
+from json import JSONDecodeError
+from pathlib import Path
 from typing import Any
 
 import requests
@@ -13,7 +20,12 @@ from django.utils import timezone
 from neuronhub.apps.importer.models import ApiHourlyLimit, ApiSource
 
 
-async def request_json(url: str) -> Any:
+async def request_json(url: str, is_use_cache: bool = False) -> Any:
+    cache = ApiCache(url)
+    if is_use_cache:
+        if response := await cache.get():
+            return response
+
     retries_max = 3
     for retry_current in range(retries_max):
         try:
@@ -22,9 +34,12 @@ async def request_json(url: str) -> Any:
 
             response = await sync_to_async(requests.get)(url, timeout=10)
             response.raise_for_status()
-            return response.json()
-        except (requests.RequestException, json.JSONDecodeError):
-            if retry_current == retries_max:
+            response_json = response.json()
+            if is_use_cache:
+                await cache.save(response_json)
+            return response_json
+        except (requests.RequestException, JSONDecodeError):
+            if retry_current >= retries_max:
                 raise
             await asyncio.sleep(2**retry_current)
     else:
@@ -47,6 +62,31 @@ async def _get_api_limit(url: str) -> ApiHourlyLimit:
         created_at__gte=timezone.now() - timedelta(hours=1),
     )
     return limit
+
+
+class ApiCache:
+    def __init__(self, url: str):
+        self._path: Path = self._build_json_path(url)
+
+    async def get(self) -> Any | None:
+        if not self._path.exists():
+            return None
+
+        with open(self._path) as file:
+            return json.load(file)
+
+    async def save(self, data: Any) -> None:
+        self._path.parent.mkdir(parents=True, exist_ok=True)
+        with open(self._path, "w") as file:
+            json.dump(data, file, indent=4)
+
+    def _build_json_path(self, url: str) -> Path:
+        match = re.search(r"/items?/(?P<item_id>\d+)", url)
+        assert match
+        cache_dir = Path(__file__).parent / "cache"
+        return (
+            cache_dir / f"post-{_get_api_source(url).value}-{match.group('item_id')}.cache.json"
+        )
 
 
 def _get_api_source(url: str) -> ApiSource:

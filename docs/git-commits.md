@@ -41,13 +41,14 @@ If you're unsure which `Scope` to use, use the highest in the list below - they'
 Some `Scope`s are bound to a single `Type`, eg `build(AI)`.
 
 - `post-form` - the most complex `react-hook-form`s for `Post` creation/editing
+- `importer` - for `apps.importer`
 - `tags` - `PostTag` logic
-- `auth` - `apps.users`, permissions, etc
 - `comment` - re create, edit, vote, etc
-- `API` - API layers: Apollo GraphQL, Strawberry resolvers, etc
 - `upgrade[<uv|Bun>]` - pyproject.toml, package.json, lock files, or related changes
 - `test(E2E)` - Playwright
+- `API` - API layers: Apollo GraphQL, Strawberry resolvers, etc
 - `gen` - `tests/test_gen::Gen` and `db_stubs_repopulate`
+- `auth` - `apps.users`, permissions, etc
 - `build(AI)` - Claude, Aider, etc
 - `build(Mise)` - eg `mise.toml`
 - `build(Docker)`
