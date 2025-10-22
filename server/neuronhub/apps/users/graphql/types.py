@@ -11,7 +11,7 @@ from neuronhub.apps.users.models import UserConnectionGroup
 class UserConnectionGroupType:
     id: auto
     name: auto
-    connections: list["UserType"]
+    connections: list["UserType"]  # noqa: UP037 - false, break python3.14
 
 
 @strawberry_django.type(User)

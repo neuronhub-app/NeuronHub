@@ -1,7 +1,4 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
 
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import AnonymousUser
@@ -10,12 +7,9 @@ from django.test import RequestFactory
 from django.test import TestCase
 from strawberry.types import ExecutionResult
 
+from neuronhub.apps.users.models import User
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.graphql import schema
-
-
-if TYPE_CHECKING:
-    from neuronhub.apps.users.models import User
 
 
 class NeuronTestCase(TestCase):

@@ -14,10 +14,7 @@ Potential issues:
 - todo[?](auth) assert all Models with an `author/user` field are registered
 """
 
-from __future__ import annotations
-
 import random
-import typing
 from datetime import datetime
 from datetime import timedelta
 
@@ -27,10 +24,7 @@ from django.db.models import Field
 from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.db.models_abstract import TimeStampedModel
-
-
-if typing.TYPE_CHECKING:
-    from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import User
 
 
 async def anonymize_user_data(

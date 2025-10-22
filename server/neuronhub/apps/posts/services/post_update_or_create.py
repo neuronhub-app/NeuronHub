@@ -4,18 +4,12 @@ Most of this file may be redundant, ie Strawberry + BasePermission can be ~enoug
 But `tags` are different - the separator `/` must be parsed on backend/frontend.
 """
 
-from __future__ import annotations
-
-import typing
-
 from strawberry import UNSET
 
 from neuronhub.apps.posts.models import Post, PostRelated
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 from neuronhub.apps.users.models import User
-
-if typing.TYPE_CHECKING:
-    from neuronhub.apps.posts.graphql.types import PostTypeInput, PostTagTypeInput
+from neuronhub.apps.posts.graphql.types import PostTypeInput, PostTagTypeInput
 
 
 async def post_update_or_create(author: User, data: PostTypeInput) -> Post:

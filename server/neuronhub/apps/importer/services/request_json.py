@@ -2,8 +2,6 @@
 todo refac: api limit should be a class or a namespace
 """
 
-from __future__ import annotations
-
 import asyncio
 import json
 import re

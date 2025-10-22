@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import textwrap
 
 from django.db import models
