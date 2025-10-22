@@ -14,6 +14,11 @@ export const PostFragment = graphql(
       content_rant
       source
       source_author
+      posts_source {
+        id
+        created_at_external
+        json
+      }
       image {
         url
         name
@@ -86,69 +91,75 @@ export const PostFragment = graphql(
   [PostTagFragment],
 );
 
+export const CommentFieldsFragment = graphql(
+  `
+    fragment CommentFieldsFragment on PostTypeI {
+      id
+      type
+      __typename
+      author {
+        id
+        username
+        avatar {
+          url
+        }
+      }
+      parent {
+        id
+      }
+      content_polite
+      content_direct
+      content_rant
+      visibility
+      created_at
+      updated_at
+      source_author
+      posts_source {
+        id
+        created_at_external
+        json
+      }
+      votes {
+        id
+        is_vote_positive
+        author {
+          id
+        }
+      }
+    }
+  `,
+);
+
+// #AI. questionable to say the least.
 export const PostCommentsFragment = graphql(
   `
     fragment PostCommentsFragment on PostTypeI {
       comments {
-        id
-        type
-        __typename
-        author {
-          id
-          username
-          avatar {
-            url
-          }
-        }
-        parent {
-          id
-        }
-        content_polite
-        content_direct
-        content_rant
-        visibility
-        created_at
-        updated_at
-        votes {
-          id
-          is_vote_positive
-          author {
-            id
-          }
-        }
-
+        ...CommentFieldsFragment
         comments {
-          id
-          type
-          __typename
-          author {
-            id
-            username
-            avatar {
-              url
-            }
-          }
-          parent {
-            id
-          }
-          content_polite
-          content_direct
-          content_rant
-          visibility
-          created_at
-          updated_at
-          votes {
-            id
-            is_vote_positive
-            author {
-              id
+          ...CommentFieldsFragment
+          comments {
+            ...CommentFieldsFragment
+            comments {
+              ...CommentFieldsFragment
+              comments {
+                ...CommentFieldsFragment
+                comments {
+                  ...CommentFieldsFragment
+                  comments {
+                    ...CommentFieldsFragment
+                  }
+                }
+              }
             }
           }
         }
       }
     }
   `,
+  [CommentFieldsFragment],
 );
+
 export type PostCommentType = FragmentOf<typeof PostCommentsFragment>["comments"][number];
 
 export const PostDetailFragment = graphql(

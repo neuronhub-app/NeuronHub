@@ -123,12 +123,13 @@ export class PlaywrightHelper {
     return this.page.waitForLoadState("networkidle", { timeout: opts.idleWaitTimeout });
   }
 
-  async screenshot(name: string = "screenshot", { fullPage = false } = {}) {
+  async screenshot(name: string = "screenshot", { fullPage = false, maxH = 3000 } = {}) {
     this.screenshotCounter += 1;
     return this.page.screenshot({
       path: `e2e/screenshots/${this.screenshotCounter}-${name}.png`,
       caret: "initial",
       fullPage,
+      clip: { x: 0, y: 0, height: maxH, width: 1280 },
     });
   }
 

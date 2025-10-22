@@ -1,145 +1,265 @@
-import { Box, Button, For, HStack, Show, Text, VStack } from "@chakra-ui/react";
+import {
+  Avatar,
+  Badge,
+  Box,
+  Button,
+  Flex,
+  For,
+  HStack,
+  Show,
+  Spacer,
+  Stack,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
+import { marked } from "marked";
+import type { JSX } from "react";
+import { GoPencil } from "react-icons/go";
+
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentVoteBar } from "@/components/posts/PostDetail/CommentVoteBar";
+import { Prose } from "@/components/ui/prose";
+import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
-import type { ID } from "@/gql-tada";
-import type { PostCommentType } from "@/graphql/fragments/posts";
+import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
+import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-export function CommentThread(props: { comment: PostCommentType }) {
+export function CommentThread(props: {
+  post: PostDetailFragmentType | PostReviewDetailFragmentType;
+  comment: PostCommentType;
+  depth?: number;
+  isLastChild?: boolean;
+}) {
   const user = useUser();
 
   const state = useValtioProxyRef({
-    editingCommentId: null as null | ID,
-    editingReplyId: null as null | ID,
+    isEditing: false,
+    isShowReplyForm: false,
   });
 
-  const isAuthor = user?.id === props.comment.author?.id;
-  const isEditing = state.snap.editingCommentId === props.comment.id;
+  const username =
+    (props.comment.source_author || props.comment.author?.username) ?? "Anonymous";
 
   return (
-    <Box>
-      <VStack align="stretch" gap={4}>
-        <Box p={4} borderWidth={1} borderRadius="md" borderColor="slate.subtle">
-          <HStack mb={2} justify="space-between">
-            <Box>
-              <Text fontWeight="semibold" display="inline">
-                {props.comment.author?.username}
-              </Text>
-              <PostDatetime
-                datetimeStr={props.comment.created_at}
-                style={{ display: "inline", ml: 2 }}
-              />
-            </Box>
-            <HStack>
-              <Show when={isAuthor && !isEditing}>
-                <Button
-                  size="xs"
-                  variant="ghost"
-                  onClick={() => {
-                    state.mutable.editingCommentId = props.comment.id;
+    <Box as="section" pos="relative">
+      <LineToggle
+        isHasChildren={props.comment.comments?.length > 0}
+        isLastChild={props.isLastChild}
+        depth={props.depth ?? 0}
+      />
+
+      <Flex as="article" gap="gap.sm" tabIndex={-1}>
+        <Flex gap="gap.sm" flex="1">
+          <Avatar.Root size="2xs" colorPalette={pickPaletteForUser(username)}>
+            <Avatar.Fallback name={username} />
+            <Avatar.Image src={props.comment.author?.avatar?.url} />
+          </Avatar.Root>
+
+          <VStack align="flex-start" gap={0} w="full">
+            <Box aria-label="comment-box" px="1" rounded="l3" w="full">
+              <HStack justify="space-between">
+                {/* Header: Name, Date, Tags */}
+                <HStack gap="gap.sm">
+                  <Text fontSize="sm" fontWeight="semibold">
+                    {username}
+                  </Text>
+
+                  {props.comment.source_author === props.post.source_author && (
+                    <Tooltip content="Original Poster" positioning={{ placement: "top" }}>
+                      <Badge size="xs" variant="solid">
+                        OP
+                      </Badge>
+                    </Tooltip>
+                  )}
+
+                  <PostDatetime
+                    datetimeStr={
+                      props.comment.posts_source[0]?.created_at_external ??
+                      props.comment.created_at
+                    }
+                    size="xs"
+                  />
+                </HStack>
+              </HStack>
+
+              {!state.snap.isEditing && (
+                <Prose
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
+                  dangerouslySetInnerHTML={{
+                    __html: marked.parse(
+                      props.comment.content_polite ||
+                        props.comment.content_direct ||
+                        props.comment.content_rant,
+                    ),
                   }}
-                  {...ids.set(ids.comment.edit.btn)}
-                >
-                  Edit
-                </Button>
-              </Show>
+                  size="sm"
+                  maxW="full"
+                />
+              )}
+              {state.snap.isEditing && (
+                <CommentForm
+                  mode="edit"
+                  comment={props.comment}
+                  onEditFinish={() => {
+                    state.mutable.isEditing = false;
+                  }}
+                />
+              )}
+            </Box>
+
+            <Flex role="toolbar">
               <CommentVoteBar comment={props.comment} />
-            </HStack>
-          </HStack>
 
-          <Show
-            when={isEditing}
-            fallback={
-              <Text whiteSpace="pre-wrap">
-                {props.comment.content_polite ||
-                  props.comment.content_direct ||
-                  props.comment.content_rant ||
-                  ""}
-              </Text>
-            }
-          >
-            <CommentForm
-              mode="edit"
-              comment={props.comment}
-              onEditFinish={() => {
-                state.mutable.editingCommentId = null;
-              }}
-            />
-          </Show>
-        </Box>
+              <Spacer w="1.5" />
 
-        <Show when={user}>
-          <Box ml={8}>
-            <CommentForm mode="create" parentId={props.comment.id} />
-          </Box>
-        </Show>
+              {user && (
+                <CommentToolbarButton
+                  label="Reply"
+                  onClick={() => {
+                    state.mutable.isShowReplyForm = !state.snap.isShowReplyForm;
+                  }}
+                  id={ids.comment.btn.reply}
+                />
+              )}
 
-        <Show when={props.comment.comments && props.comment.comments.length > 0}>
-          <Box ml={8}>
-            <VStack align="stretch" gap={4}>
-              <For each={props.comment.comments ?? []}>
-                {reply => {
-                  const isReplyAuthor = user?.id === reply.author?.id;
-                  const isEditingReply = state.snap.editingReplyId === reply.id;
+              {user?.id === props.comment.author?.id && !state.snap.isEditing && (
+                <CommentToolbarButton
+                  label="Edit"
+                  onClick={() => {
+                    state.mutable.isEditing = true;
+                  }}
+                  icon={<GoPencil />}
+                  id={ids.comment.btn.edit}
+                />
+              )}
+            </Flex>
 
-                  return (
-                    <Box key={reply.id} p={4} borderWidth={1} borderRadius="md">
-                      <HStack mb={2} justify="space-between">
-                        <Box>
-                          <Text fontWeight="semibold" display="inline">
-                            {reply.author?.username}
-                          </Text>
-                          <PostDatetime
-                            datetimeStr={reply.created_at}
-                            style={{ display: "inline", ml: 2 }}
-                          />
-                        </Box>
-                        <HStack>
-                          <Show when={isReplyAuthor && !isEditingReply}>
-                            <Button
-                              size="xs"
-                              variant="ghost"
-                              onClick={() => {
-                                state.mutable.editingReplyId = reply.id;
-                              }}
-                              {...ids.set(ids.comment.edit.btn)}
-                            >
-                              Edit
-                            </Button>
-                          </Show>
-                          <CommentVoteBar comment={reply} />
-                        </HStack>
-                      </HStack>
-                      <Show
-                        when={isEditingReply}
-                        fallback={
-                          <Text whiteSpace="pre-wrap">
-                            {reply.content_polite ||
-                              reply.content_direct ||
-                              reply.content_rant ||
-                              ""}
-                          </Text>
-                        }
-                      >
-                        <CommentForm
-                          mode="edit"
-                          comment={reply}
-                          onEditFinish={() => {
-                            state.mutable.editingReplyId = null;
-                          }}
-                        />
-                      </Show>
-                    </Box>
-                  );
-                }}
-              </For>
-            </VStack>
-          </Box>
-        </Show>
-      </VStack>
+            {state.snap.isShowReplyForm && (
+              <Box mt="gap.sm" w="full">
+                <CommentForm
+                  mode="create"
+                  parentId={props.comment.id}
+                  onCancel={() => {
+                    state.mutable.isShowReplyForm = false;
+                  }}
+                />
+              </Box>
+            )}
+          </VStack>
+        </Flex>
+      </Flex>
+
+      {/* Children */}
+      <Show when={props.comment.comments?.length}>
+        <Stack gap="gap.md" mt="gap.md" pl={9}>
+          <For each={props.comment.comments}>
+            {(comment, index) => (
+              <CommentThread
+                key={comment.id}
+                post={props.post}
+                comment={comment}
+                depth={(props.depth ?? 0) + 1}
+                isLastChild={index === props.comment.comments.length - 1}
+              />
+            )}
+          </For>
+        </Stack>
+      </Show>
     </Box>
   );
+}
+
+function CommentToolbarButton(props: {
+  onClick: () => void;
+  id: string;
+  icon?: JSX.Element;
+  label: string;
+}) {
+  return (
+    <Button
+      variant="ghost"
+      size="2xs"
+      color="fg.subtle"
+      gap="gap.sm"
+      onClick={props.onClick}
+      {...ids.set(props.id)}
+    >
+      {props.icon} {props.label}
+    </Button>
+  );
+}
+
+function LineToggle(props: { isHasChildren: boolean; isLastChild?: boolean; depth: number }) {
+  const left = -6;
+
+  const avatarMiddle = 3;
+  const avatarDistance = avatarMiddle * 2;
+
+  const zIndex = {
+    line: 0,
+    lineHider: 1,
+    lineChildRounded: 2,
+  };
+  return (
+    <>
+      {props.isHasChildren && (
+        <Box
+          pos="absolute"
+          width="2px"
+          left={avatarMiddle}
+          top="0"
+          bottom="0"
+          borderStartWidth="2px"
+          zIndex={zIndex.line}
+        />
+      )}
+      {props.depth > 0 && (
+        <Box
+          pos="absolute"
+          width={avatarDistance}
+          height="9"
+          left={left}
+          top={left}
+          bottom="0"
+          borderStartWidth="2px"
+          borderBottomWidth="2px"
+          roundedBottomLeft="l3"
+          zIndex={zIndex.lineChildRounded}
+        />
+      )}
+      {props.isLastChild && props.depth > 0 && (
+        <Box
+          pos="absolute"
+          width="px"
+          left={left}
+          top="0"
+          bottom="0"
+          borderStartWidth="2px"
+          borderColor="bg.subtle"
+          zIndex={zIndex.lineHider}
+        />
+      )}
+    </>
+  );
+}
+
+function pickPaletteForUser(username: string) {
+  const colorPalette = [
+    "gray",
+    "slate",
+    "red",
+    "pink",
+    "purple",
+    "sky",
+    "cyan",
+    "teal",
+    "green",
+    "yellow",
+    "orange",
+  ];
+  const index = username.charCodeAt(0) % colorPalette.length;
+  return colorPalette[index];
 }

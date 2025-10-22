@@ -1,3 +1,7 @@
+export enum ImportDomain {
+  HackerNews = 'HackerNews'
+}
+
 export enum Ordering {
   Asc = 'ASC',
   AscNullsFirst = 'ASC_NULLS_FIRST',

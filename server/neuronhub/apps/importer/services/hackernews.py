@@ -128,7 +128,9 @@ class ImporterHackerNews:
                 "json": post_data,
                 "url_of_source": post_data.get("url", ""),
                 "score": post_data.get("points", 0),
-                "created_at_external": self._parse_datetime(post_data["created_at"]),
+                "created_at_external": datetime.fromisoformat(
+                    post_data["created_at"].replace("Z", "+00:00")
+                ),
             }
         else:
             comment_data = cast(algolia.Comment, data)
@@ -242,7 +244,7 @@ class ImporterHackerNews:
             defaults={"username": username, "score": 0},
         )
         if is_created:
-            # todo fetch karma and profile
+            # todo prob: fetch karma and profile
             pass
 
         return user.username
@@ -261,10 +263,6 @@ class ImporterHackerNews:
             ]
 
         return cast(algolia.Comment, comment_clean)
-
-    @staticmethod
-    def _parse_datetime(date_raw: DateISO) -> datetime | None:
-        return datetime.fromisoformat(date_raw.replace("Z", "+00:00"))
 
     @staticmethod
     def _build_HN_item_url(item_id: ID) -> str:

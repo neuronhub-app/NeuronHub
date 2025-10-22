@@ -13,8 +13,10 @@
 	- [x] .content_polite, .content_direct, .content_rant
 	- [x] fix Tag votes (PostForm init drops it)
 - [x] on Review select Tool by title
+- [x] apps.importer
+- [x] Comment deep threads & new UI
+- [ ] Comment Highlight
 - [ ] Deploy
-- [ ] apps.importer
 
 ### v0.2.1.0
 

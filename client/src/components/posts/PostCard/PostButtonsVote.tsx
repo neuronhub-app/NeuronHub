@@ -5,6 +5,7 @@ import { usePostVoting } from "@/components/posts/usePostVoting";
 import { ids } from "@/e2e/ids";
 
 // todo refac-name: PostActionsVoting
+// todo refac: dedup using better code from [[CommentVoteBar.tsx]]
 export function PostButtonsVote(props: { post: PostListItemType }) {
   const voting = usePostVoting({ postId: props.post.id, votes: props.post.votes });
 
@@ -22,7 +23,9 @@ export function PostButtonsVote(props: { post: PostListItemType }) {
       >
         <FaChevronUp />
       </IconButton>
+
       <Flex {...ids.set(ids.post.vote.count)}>{voting.sum}</Flex>
+
       <IconButton
         loading={voting.isLoadingDownvote}
         onClick={() => voting.vote({ isPositive: false })}

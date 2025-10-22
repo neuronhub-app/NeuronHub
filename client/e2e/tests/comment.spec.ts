@@ -59,7 +59,7 @@ test.describe("Comments", () => {
     await play.click(ids.post.card.link.detail);
 
     // edit
-    await play.click(ids.comment.edit.btn);
+    await play.click(ids.comment.btn.edit);
     const contentNew = "New comment content";
     await play.fill(ids.comment.form.textarea, contentNew);
     await play.submit(ids.post.form);

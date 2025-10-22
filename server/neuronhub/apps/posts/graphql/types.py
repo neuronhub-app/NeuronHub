@@ -15,6 +15,7 @@ from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
+from neuronhub.apps.importer.graphql.types import PostSourceType
 from neuronhub.apps.posts.services.filter_posts_by_user import filter_posts_by_user
 from neuronhub.apps.users.graphql.types import UserConnectionGroupType
 from neuronhub.apps.users.graphql.types import UserType
@@ -55,6 +56,7 @@ class PostTypeI:
 
     source: auto
     source_author: auto
+    posts_source: list[PostSourceType] = strawberry_django.field()
 
     visibility: auto
     visible_to_users: list[UserType]

@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from django.utils import timezone
 
 from neuronhub.apps.anonymizer.fields import Visibility
+from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models import PostRelated, PostCategory
@@ -64,6 +65,12 @@ async def db_stubs_repopulate(
     await _create_tool_and_post_unifi_network(user, gen=gen)
     await _create_tool_and_post_aider(user, gen=gen)
     await _create_post_news(user, gen=gen)
+
+    # todo refac: do only on request, as it adds +3s
+    post_with_50_comments = 45645349
+    importer = ImporterHackerNews(is_use_cache=True, is_logs_enabled=False)
+    await importer.import_post(post_with_50_comments)
+
     return gen
 
 

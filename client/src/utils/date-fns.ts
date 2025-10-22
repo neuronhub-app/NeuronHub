@@ -2,12 +2,29 @@ import { differenceInDays, format, formatDistanceToNowStrict, isSameYear } from 
 
 export namespace datetime {
   export function full(dateRaw: Date | string | unknown) {
+    if (!dateRaw) {
+      return "";
+    }
     const date = new Date(String(dateRaw));
+
+    // #AI, related to #77
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
     return format(date, "MMMM d, yyyy h:mmaaaaa'm");
   }
 
   export function relative(dateRaw: Date | string | unknown) {
+    if (!dateRaw) {
+      return "";
+    }
     const date = new Date(String(dateRaw));
+
+    // #AI, related to #77
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
     let dateStr = `${formatDistanceToNowStrict(date)} ago`;
 
     const daysAgo = differenceInDays(new Date(), date);

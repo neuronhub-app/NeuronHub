@@ -1,4 +1,4 @@
-import { For, Heading, Show, Stack } from "@chakra-ui/react";
+import { For, Heading, Show, Stack, VStack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard";
@@ -29,13 +29,18 @@ export function PostDetail(props: {
           <Stack gap="gap.lg">
             <Heading size="lg">Comments</Heading>
 
-            <For each={props.post.comments.filter(comment => !comment.parent)}>
-              {comment => {
-                // @ts-expect-error #bad-infer
-                const commentTyped: PostCommentType = comment;
-                return <CommentThread key={comment.id} comment={commentTyped} />;
-              }}
-            </For>
+            <VStack px={0} align="flex-start" gap="gap.md">
+              <For each={props.post.comments.filter(comment => !comment.parent)}>
+                {comment => {
+                  // @ts-expect-error #bad-infer
+                  const commentTyped: PostCommentType = comment;
+
+                  return (
+                    <CommentThread key={comment.id} comment={commentTyped} post={props.post!} />
+                  );
+                }}
+              </For>
+            </VStack>
 
             <Show when={user}>
               <CommentForm mode="create" parentId={props.post.id} />

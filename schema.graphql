@@ -65,6 +65,15 @@ input IDBaseFilterLookup {
   in_list: [ID!]
 }
 
+enum ImportDomain {
+  HackerNews
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf).
+"""
+scalar JSON @specifiedBy(url: "https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf")
+
 input LoginInput {
   username_or_email: String!
   password: String!
@@ -184,6 +193,7 @@ type PostCommentType implements PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
+  posts_source: [PostSourceType!]!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -233,6 +243,7 @@ type PostReviewType implements PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
+  posts_source: [PostSourceType!]!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -259,6 +270,21 @@ type PostReviewType implements PostTypeI {
 
 type PostSimpleType {
   id: ID!
+}
+
+type PostSourceType {
+  id: ID!
+  post: DjangoModelType
+  domain: ImportDomain
+  id_external: String!
+  rank: Int
+  url: String!
+  url_of_source: String!
+  score: Int
+  json: JSON!
+  created_at_external: DateTime
+  created_at: DateTime!
+  updated_at: DateTime!
 }
 
 input PostTagFilter {
@@ -323,6 +349,7 @@ type PostToolType implements PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
+  posts_source: [PostSourceType!]!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -360,6 +387,7 @@ type PostType implements PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
+  posts_source: [PostSourceType!]!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -450,6 +478,7 @@ interface PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
+  posts_source: [PostSourceType!]!
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!

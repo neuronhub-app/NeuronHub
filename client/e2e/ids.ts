@@ -78,6 +78,7 @@ export namespace ids {
   } as const;
 
   export const comment = {
+    // todo refac-name: .btn.upvote and .btn.downvote
     vote: {
       up: "comment.vote.up",
       down: "comment.vote.down",
@@ -88,8 +89,9 @@ export namespace ids {
       saveBtn: "comment.form.save-btn",
       cancelBtn: "comment.form.cancel-btn",
     },
-    edit: {
-      btn: "comment.edit.btn",
+    btn: {
+      edit: "comment.btn.edit",
+      reply: "comment.btn.reply",
     },
   } as const;
 

@@ -1,8 +1,9 @@
-import { Button, HStack, Show, Stack } from "@chakra-ui/react";
+import { Button, HStack, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { JSX } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
@@ -16,6 +17,7 @@ export function CommentForm(
     | {
         mode: "create";
         parentId: ID;
+        onCancel?: () => void;
       }
     | {
         mode: "edit";
@@ -55,6 +57,9 @@ export function CommentForm(
       if (response.success) {
         toast.success("Comment posted");
         form.reset();
+        if (props.onCancel) {
+          props.onCancel();
+        }
       } else {
         showError(response.errorMessage);
       }
@@ -67,53 +72,63 @@ export function CommentForm(
 
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)}>
-      <Stack gap={4}>
+      <Stack gap="gap.sm" pt="gap.md">
         <FormChakraTextarea
           field={{ name: "content_polite", control: form.control }}
           placeholder="Write a comment..."
           errorText={form.formState.errors.content_polite?.message}
           {...ids.set(ids.comment.form.textarea)}
         />
-        <Show
-          when={!isEditMode}
-          fallback={
-            <HStack>
-              <Button
-                type="submit"
-                variant="subtle"
-                size="sm"
-                loading={form.formState.isSubmitting}
-                {...ids.set(ids.post.form.btn.submit)}
-              >
-                Save
-              </Button>
+
+        {!isEditMode && (
+          <HStack>
+            {props.onCancel && (
               <Button
                 type="button"
                 variant="ghost"
-                size="sm"
-                onClick={() => {
-                  if (props.mode === "edit") {
-                    props.onEditFinish();
-                  }
-                }}
+                size="xs"
+                onClick={() => props.onCancel?.()}
                 {...ids.set(ids.comment.form.cancelBtn)}
               >
                 Cancel
               </Button>
-            </HStack>
-          }
-        >
-          <Button
-            type="submit"
-            variant="subtle"
-            size="sm"
-            alignSelf="flex-start"
-            loading={form.formState.isSubmitting}
-            {...ids.set(ids.post.form.btn.submit)}
-          >
-            Post
-          </Button>
-        </Show>
+            )}
+
+            <Button
+              type="submit"
+              variant="subtle"
+              size="xs"
+              loading={form.formState.isSubmitting}
+              {...ids.set(ids.post.form.btn.submit)}
+            >
+              Post
+            </Button>
+          </HStack>
+        )}
+
+        {isEditMode && (
+          <HStack>
+            <Button
+              type="button"
+              variant="ghost"
+              size="xs"
+              onClick={() => props.onEditFinish()}
+              {...ids.set(ids.comment.form.cancelBtn)}
+            >
+              Cancel
+            </Button>
+
+            <Button
+              type="submit"
+              variant="subtle"
+              size="xs"
+              loading={form.formState.isSubmitting}
+              {...ids.set(ids.post.form.btn.submit)}
+            >
+              Save
+            </Button>
+          </HStack>
+        )}
       </Stack>
     </form>
   );
