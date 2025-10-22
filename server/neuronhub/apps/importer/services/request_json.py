@@ -21,7 +21,7 @@ from neuronhub.apps.importer.models import ApiHourlyLimit, ApiSource
 
 
 async def request_json(url: str, is_use_cache: bool = False) -> Any:
-    cache = ApiCache(url)
+    cache = ApiCachePermanent(url)
     if is_use_cache:
         if response := await cache.get():
             return response
@@ -64,7 +64,7 @@ async def _get_api_limit(url: str) -> ApiHourlyLimit:
     return limit
 
 
-class ApiCache:
+class ApiCachePermanent:
     def __init__(self, url: str):
         self._path: Path = self._build_json_path(url)
 
