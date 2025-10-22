@@ -3,7 +3,7 @@
 name = "neuronhub"
 version = "0.0.0.0"
 description = ""
-requires-python = "~=3.13.0"
+requires-python = "~=3.14.0"
 
 # For audit, packages doc reputation. Format:
 # [i={importance for project}, rep={reputation online}, GH={github history quality}, @{GH username}, {number of stars}k]
@@ -77,7 +77,7 @@ dependencies = [
 
 
 [tool.mypy]
-    python_version = "3.13"
+    python_version = "3.14"
     plugins = ["mypy_django_plugin.main", "strawberry.ext.mypy_plugin"]
     explicit_package_bases = true
     ignore_missing_imports = true
