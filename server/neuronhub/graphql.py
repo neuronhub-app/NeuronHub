@@ -18,22 +18,29 @@ field_type_map.update(
         AutoSlugField: str,
     }
 )
+
 # imports that rely on [[field_type_map]] we modify above
+
 from neuronhub.apps.users.graphql.resolvers import UsersQuery
+from neuronhub.apps.users.graphql.mutations import UserMutation
+
 from neuronhub.apps.posts.graphql.resolvers import PostsQuery
 from neuronhub.apps.posts.graphql.mutations import PostsMutation
+
 from neuronhub.apps.tests.graphql.mutations import TestsMutation
-from neuronhub.apps.users.graphql.mutations import UserMutation
+
+from neuronhub.apps.highlighter.graphql import HighlighterQuery
+from neuronhub.apps.highlighter.graphql import HighlighterMutation
 
 
 Query = merge_types(
     "Query",
-    types=(UsersQuery, PostsQuery),
+    types=(UsersQuery, PostsQuery, HighlighterQuery),
 )
 
 
 @strawberry.type
-class Mutation(UserMutation, PostsMutation, TestsMutation):
+class Mutation(UserMutation, PostsMutation, TestsMutation, HighlighterMutation):
     pass
 
 

@@ -1,4 +1,7 @@
+import type { OperationVariables } from "@apollo/client";
 import type { Locator, Page } from "@playwright/test";
+import type { TadaDocumentNode } from "gql.tada";
+import { print } from "graphql";
 import { config } from "@/e2e/config";
 import { expect } from "@/e2e/helpers/expect";
 import { ids, type TestId } from "@/e2e/ids";
@@ -17,7 +20,7 @@ export class PlaywrightHelper {
 
   constructor(
     public page: Page,
-    private timeout = timeoutDefault,
+    public timeout = timeoutDefault,
   ) {
     this.page.setDefaultTimeout(this.timeout);
     this.$ = this.locator();
@@ -26,6 +29,21 @@ export class PlaywrightHelper {
   async dbStubsRepopulateAndLogin() {
     await this.dbStubsRepopulate();
     await this.login();
+  }
+
+  // #AI, but reviewed. Seems ok. Mb use the fixed on 2025-10-28 [[useApolloQuery.ts]] types.
+  async graphqlQuery<TData, TVariables extends OperationVariables>(
+    query: TadaDocumentNode<TData, TVariables>,
+    variables: TVariables,
+  ): Promise<{ data: TData }> {
+    // use Playwright's request context, which shares cookies with the browser,
+    // while client.query runs in isolated by PW Vite env
+    const response = await this.page.request.post(`${env.VITE_SERVER_URL}/api/graphql`, {
+      headers: { "Content-Type": "application/json" },
+      data: { query: print(query), variables },
+    });
+
+    return response.json();
   }
 
   locator(): LocatorMap {

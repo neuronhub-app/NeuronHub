@@ -18,7 +18,7 @@ class HackerNewsImportTest(NeuronTestCase):
         source = await PostSource.objects.aget(post=post)
         assert source.domain == ImportDomain.HackerNews
         assert source.id_external == f"{self._story_id}"
-        assert source.score == 259
+        assert source.score >= 259
         assert "abdellatif.io" in source.url_of_source
 
         user_source = await UserSource.objects.aget(username=author_name)

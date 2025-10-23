@@ -44,10 +44,13 @@ export const system = createSystem(
         html: {
           colorPalette: "blue",
         },
+        mark: {
+          bg: { _dark: "sky.600", _light: "sky.200" },
+        },
       },
 
       theme: {
-        recipes: recipes,
+        recipes,
         tokens,
         semanticTokens: {
           colors: theme.colors,

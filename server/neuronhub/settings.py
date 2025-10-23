@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     "neuronhub.apps.posts",
     "neuronhub.apps.tests",
     "neuronhub.apps.importer",
+    "neuronhub.apps.highlighter",
 ]
 
 MIDDLEWARE = [

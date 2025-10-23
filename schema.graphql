@@ -109,6 +109,12 @@ type Mutation {
   post_tag_vote_create_or_update(post_id: ID!, tag_id: ID!, is_vote_positive: Boolean, comment: String = null): Boolean! @IsAuthenticated
   update_post_seen_status(id: ID!): Boolean! @IsAuthenticated
   test_db_stubs_repopulate: String!
+  post_highlight_create(data: PostHighlightTypeInput!): Boolean! @IsAuthenticated
+  post_highlight_delete(data: DjangoModelInput!): Boolean! @IsAuthenticated
+}
+
+input OneToManyInput {
+  set: ID
 }
 
 enum Ordering {
@@ -219,6 +225,22 @@ input PostFilter {
   OR: PostFilter
   NOT: PostFilter
   DISTINCT: Boolean
+}
+
+type PostHighlightType {
+  id: ID!
+  post: DjangoModelType
+  user: DjangoModelType!
+  text: String!
+  text_prefix: String!
+  text_postfix: String!
+}
+
+input PostHighlightTypeInput {
+  post: OneToManyInput
+  text: String!
+  text_prefix: String
+  text_postfix: String
 }
 
 input PostReviewOrder @oneOf {
@@ -549,6 +571,8 @@ type Query {
   post_reviews(ordering: [PostReviewOrder!]! = []): [PostReviewType!]!
   post_comments(filters: PostFilter): [PostCommentType!]!
   tags(filters: PostTagFilter): [PostTagType!]!
+  post_highlights(post_ids: [ID!]!): [PostHighlightType!]! @IsAuthenticated
+  post_highlight(post_id: ID!): PostHighlightType! @IsAuthenticated
 }
 
 input StrFilterLookup {

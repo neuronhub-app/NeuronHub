@@ -82,6 +82,7 @@
         depends = ["dev:server:e2e", "dev:client:e2e"]
 
 
+
 [tasks."test"]
     dir = "server"
     depends = "dev:db"
@@ -148,6 +149,7 @@
         dir = "client"
         run = "bun run react-router typegen"
         sources = ["src/apps/**/index.tsx", "src/routes.ts"]
+        silent = true
 
     [tasks."typegen:client:chakra"]
         dir = "client"

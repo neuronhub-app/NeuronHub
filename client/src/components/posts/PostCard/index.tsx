@@ -1,17 +1,7 @@
-import {
-  Flex,
-  Heading,
-  HStack,
-  IconButton,
-  Image,
-  Stack,
-  Text,
-  VStack,
-  Wrap,
-} from "@chakra-ui/react";
+import { Flex, Heading, HStack, IconButton, Image, Stack, VStack, Wrap } from "@chakra-ui/react";
+import { FaHackerNewsSquare } from "react-icons/fa";
 import { FaPenToSquare } from "react-icons/fa6";
 import { NavLink } from "react-router";
-
 import { useUser } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostContent } from "@/components/posts/PostCard/PostContent";
@@ -67,9 +57,15 @@ export function PostCard(props: { post: PostListItemType }) {
               {...ids.set(ids.post.card.image)}
             />
           )}
-          <Text fontWeight="bold" color="fg.muted">
-            {post.title}
-          </Text>
+          <Heading
+            fontSize="lg"
+            color="fg.muted"
+            display="flex"
+            gap="gap.sm"
+            alignItems="center"
+          >
+            {post.source.includes("news.ycombinator.com") && <FaHackerNewsSquare />} {post.title}
+          </Heading>
         </Stack>
       </NavLink>
 
@@ -86,6 +82,7 @@ export function PostCard(props: { post: PostListItemType }) {
               boxSize="22px"
             />
           </HStack>
+
           {post.author && <ReviewTags tags={post.review_tags} authorId={post.author.id} />}
         </VStack>
       )}

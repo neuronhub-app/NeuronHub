@@ -6,12 +6,11 @@ import {
   Icon,
   IconButton,
   Link,
-  Show,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import type { ReactNode } from "react";
-import { BsChatLeftTextFill } from "react-icons/bs";
+import { FaComments, FaHackerNewsSquare } from "react-icons/fa";
 import { FaGithub, FaPlus } from "react-icons/fa6";
 import { SiCrunchbase } from "react-icons/si";
 import { NavLink } from "react-router";
@@ -70,7 +69,7 @@ export function ListContainer(props: {
             {...ids.set(ids.post.list)}
           >
             {post => (
-              <HStack key={post?.id} gap="gap.md" align="flex-start">
+              <HStack as="article" key={post?.id} gap="gap.md" align="flex-start">
                 <Stack>
                   <PostButtonsVote post={post} />
                   <PostButtons post={post} />
@@ -86,13 +85,37 @@ export function ListContainer(props: {
                 >
                   <PostCard post={post} />
 
-                  <HStack justify="space-between">
-                    <PostAuthor author={post.author} />
+                  <HStack justify="space-between" align="flex-end">
+                    <Flex gap="gap.lg">
+                      <PostAuthor post={post} />
+                      <NavLink
+                        to={`/${props.urlNamespace}/${post.id}`}
+                        style={{ width: "min-content" }}
+                      >
+                        <IconButton
+                          variant="plain"
+                          colorPalette="gray"
+                          aria-label="Comments"
+                          color="gray.300"
+                          _hover={{ color: "slate.400" }}
+                          size="sm"
+                          h="auto"
+                        >
+                          <FaComments />{" "}
+                          <Text color="gray.400">{countCommentsRecursively(post.comments)}</Text>
+                        </IconButton>
+                      </NavLink>
+                    </Flex>
 
-                    <HStack gap="gap.md" fontSize="sm">
-                      <Show when={post.source}>
-                        <Link href={post.source}>Source</Link>
-                      </Show>
+                    <Flex gap="gap.md" fontSize="sm">
+                      {post.source && (
+                        <Link href={post.source}>
+                          {post.source.includes("news.ycombinator.com") && (
+                            <FaHackerNewsSquare />
+                          )}{" "}
+                          Source
+                        </Link>
+                      )}
 
                       {post.crunchbase_url && (
                         <Link
@@ -119,21 +142,8 @@ export function ListContainer(props: {
                           GitHub
                         </Link>
                       )}
-                    </HStack>
+                    </Flex>
                   </HStack>
-
-                  <NavLink to={`/${props.urlNamespace}/${post.id}`}>
-                    <IconButton
-                      variant="plain"
-                      colorPalette="gray"
-                      aria-label="Comments"
-                      color="gray.300"
-                      _hover={{ color: "slate.400" }}
-                    >
-                      <BsChatLeftTextFill />{" "}
-                      <Text color="gray.400">{countCommentsRecursively(post.comments)}</Text>
-                    </IconButton>
-                  </NavLink>
                 </Stack>
               </HStack>
             )}

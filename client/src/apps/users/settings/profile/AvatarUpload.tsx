@@ -23,7 +23,7 @@ export const AvatarUpload = (props: PhotoUploadProps) => {
       onFileChange={e => {
         const win = env.getWindow();
         const reader = new win.FileReader();
-        reader.onload = () => setSrc(reader.result as string);
+        reader.onload = () => setSrc(reader.result as unknown as string);
         reader.readAsDataURL(e.acceptedFiles[0]);
       }}
       {...rest}

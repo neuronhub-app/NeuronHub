@@ -16,7 +16,9 @@ import { marked } from "marked";
 import type { JSX } from "react";
 import { GoPencil } from "react-icons/go";
 
+import { highlighter } from "@/apps/highlighter/highlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
+import { getAvatarColorForUsername } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentVoteBar } from "@/components/posts/PostDetail/CommentVoteBar";
@@ -53,7 +55,7 @@ export function CommentThread(props: {
 
       <Flex as="article" gap="gap.sm" tabIndex={-1}>
         <Flex gap="gap.sm" flex="1">
-          <Avatar.Root size="2xs" colorPalette={pickPaletteForUser(username)}>
+          <Avatar.Root size="2xs" colorPalette={getAvatarColorForUsername(username)}>
             <Avatar.Fallback name={username} />
             <Avatar.Image src={props.comment.author?.avatar?.url} />
           </Avatar.Root>
@@ -85,20 +87,7 @@ export function CommentThread(props: {
                 </HStack>
               </HStack>
 
-              {!state.snap.isEditing && (
-                <Prose
-                  // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-                  dangerouslySetInnerHTML={{
-                    __html: marked.parse(
-                      props.comment.content_polite ||
-                        props.comment.content_direct ||
-                        props.comment.content_rant,
-                    ),
-                  }}
-                  size="sm"
-                  maxW="full"
-                />
-              )}
+              {!state.snap.isEditing && <CommentContent comment={props.comment} />}
               {state.snap.isEditing && (
                 <CommentForm
                   mode="edit"
@@ -170,6 +159,27 @@ export function CommentThread(props: {
       </Show>
     </Box>
   );
+}
+
+function CommentContent(props: { comment: PostCommentType }) {
+  const prose = (
+    <>
+      <Prose
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
+        dangerouslySetInnerHTML={{
+          __html: marked.parse(
+            props.comment.content_polite ||
+              props.comment.content_direct ||
+              props.comment.content_rant,
+          ),
+        }}
+        size="sm"
+        maxW="full"
+        {...highlighter.setModelData(props.comment.id, "comment")}
+      />
+    </>
+  );
+  return prose;
 }
 
 function CommentToolbarButton(props: {
@@ -244,22 +254,4 @@ function LineToggle(props: { isHasChildren: boolean; isLastChild?: boolean; dept
       )}
     </>
   );
-}
-
-function pickPaletteForUser(username: string) {
-  const colorPalette = [
-    "gray",
-    "slate",
-    "red",
-    "pink",
-    "purple",
-    "sky",
-    "cyan",
-    "teal",
-    "green",
-    "yellow",
-    "orange",
-  ];
-  const index = username.charCodeAt(0) % colorPalette.length;
-  return colorPalette[index];
 }

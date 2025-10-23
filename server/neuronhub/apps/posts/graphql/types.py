@@ -120,7 +120,6 @@ class PostReviewType(PostTypeI):
     is_review_later: auto
 
 
-# noinspection PyDataclass
 @strawberry_django.type(Post, filters=PostFilter)
 class PostCommentType(PostTypeI):
     TYPE = Post.Type.Comment
@@ -217,7 +216,7 @@ class PostTagType:
 class PostSimpleType:
     """
     Using PostTypeI on PostTagVoteType.post breaks with the error below.
-    Prob the Strawberry optimizer + [[PostTypeI#get_queryset]] crsah.
+    Prob the Strawberry optimizer + [[PostTypeI#get_queryset]] clash.
 
     > ValueError: Tried to prefetch 2 queries with different filters to the same attribute
     """

@@ -95,6 +95,13 @@ export namespace ids {
     },
   } as const;
 
+  export const highlighter = {
+    btn: {
+      save: "highlighter.btn.save",
+    },
+    span: "highlighter.span",
+  } as const;
+
   export const auth = {
     login: {
       username: "auth.login.username",

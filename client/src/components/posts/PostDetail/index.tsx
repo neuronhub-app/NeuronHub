@@ -1,5 +1,6 @@
 import { For, Heading, Show, Stack, VStack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
+import { useHighlighter } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
@@ -15,6 +16,8 @@ export function PostDetail(props: {
   children?: ReactNode;
 }) {
   const user = useUser();
+
+  const highlighter = useHighlighter({ comments: props.post?.comments });
 
   return (
     <Stack>
@@ -36,7 +39,11 @@ export function PostDetail(props: {
                   const commentTyped: PostCommentType = comment;
 
                   return (
-                    <CommentThread key={comment.id} comment={commentTyped} post={props.post!} />
+                    <CommentThread
+                      key={comment.id}
+                      comment={highlighter.highlight(commentTyped)}
+                      post={props.post!}
+                    />
                   );
                 }}
               </For>
