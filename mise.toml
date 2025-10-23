@@ -11,6 +11,7 @@
     includes = [
         "devops/install-deps.mise.toml",
         "devops/upgrade-deps.mise.toml",
+        "devops/db-init.mise.toml",
         "devops/claude.mise.toml",
         "devops/coder/docker.mise.toml",
         "devops/dev-env-darwin.mise.toml",
