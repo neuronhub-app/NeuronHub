@@ -111,6 +111,7 @@ type Mutation {
   test_db_stubs_repopulate: String!
   post_highlight_create(data: PostHighlightTypeInput!): Boolean! @IsAuthenticated
   post_highlight_delete(data: DjangoModelInput!): Boolean! @IsAuthenticated
+  post_import_refresh(id_external: String!): PostImportRefreshResult!
 }
 
 input OneToManyInput {
@@ -241,6 +242,10 @@ input PostHighlightTypeInput {
   text: String!
   text_prefix: String
   text_postfix: String
+}
+
+type PostImportRefreshResult {
+  comments_added: Int!
 }
 
 input PostReviewOrder @oneOf {

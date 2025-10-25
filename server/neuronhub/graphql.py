@@ -32,6 +32,8 @@ from neuronhub.apps.tests.graphql.mutations import TestsMutation
 from neuronhub.apps.highlighter.graphql import HighlighterQuery
 from neuronhub.apps.highlighter.graphql import HighlighterMutation
 
+from neuronhub.apps.importer.graphql.mutations import ImporterMutation
+
 
 Query = merge_types(
     "Query",
@@ -40,7 +42,9 @@ Query = merge_types(
 
 
 @strawberry.type
-class Mutation(UserMutation, PostsMutation, TestsMutation, HighlighterMutation):
+class Mutation(
+    UserMutation, PostsMutation, TestsMutation, HighlighterMutation, ImporterMutation
+):
     pass
 
 

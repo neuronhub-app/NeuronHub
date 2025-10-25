@@ -25,6 +25,8 @@
     CLIENT_PORT = 3000
     CLIENT_PORT_E2E = 3001
 
+    S3_PORT = 8333
+
 
 [tasks."dev"]
     depends = ["dev:db", "dev:s3", "dev:server", "dev:client"]
@@ -44,7 +46,7 @@
         dir = "server"
         run = [
             "mkdir -p media",
-            "rclone serve s3 . --addr :8333",
+            "rclone serve s3 . --addr :{{ env.S3_PORT }}",
         ]
 
     [tasks."dev:db"]

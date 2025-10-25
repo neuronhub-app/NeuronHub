@@ -13,6 +13,7 @@ export namespace ids {
       readingList: "post.btn.reading-list",
       library: "post.btn.library",
       edit: "post.btn.edit",
+      importRefresh: "post.btn.import-refresh",
     },
     toast: {
       created: "post.toast.created",

@@ -1,10 +1,11 @@
-import { For, Heading, Show, Stack, VStack } from "@chakra-ui/react";
+import { For, Heading, HStack, Show, Stack, VStack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { useHighlighter } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
+import { PostImportRefreshButton } from "@/components/posts/PostDetail/PostImportRefreshButton";
 import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 
@@ -19,9 +20,16 @@ export function PostDetail(props: {
 
   const highlighter = useHighlighter({ comments: props.post?.comments });
 
+  const idExternal = props.post?.posts_source?.[0]?.id_external;
+
   return (
     <Stack>
-      <Heading size="2xl">{props.title}</Heading>
+      <HStack justify="space-between" align="center">
+        <Heading size="2xl">{props.title}</Heading>
+        <Show when={idExternal}>
+          <PostImportRefreshButton idExternal={idExternal!} />
+        </Show>
+      </HStack>
       {props.isLoading && <p>Loading...</p>}
       {props.error && <p>Error: {props.error.message}</p>}
 

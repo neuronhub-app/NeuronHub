@@ -16,6 +16,7 @@ export const PostFragment = graphql(
       source_author
       posts_source {
         id
+        id_external
         created_at_external
         json
       }
@@ -116,6 +117,7 @@ export const CommentFieldsFragment = graphql(
       source_author
       posts_source {
         id
+        id_external
         created_at_external
         json
       }
