@@ -53,7 +53,7 @@ class PostTagInline(admin.TabularInline):
     raw_id_fields = [_meta_model]
 
     # all must be readonly except 1
-    readonly_fields = fields[1:]  # type: ignore
+    readonly_fields = fields[1:]  # type: ignore # everything but first input (field "id") for Tag selection
 
     ordering = [f"-{_meta_model}__is_important", f"-{_meta_model}__created_at"]
 
@@ -153,6 +153,7 @@ class PostAdmin(SimpleHistoryAdmin):
         "created_at",
         "updated_at",
     ]
+    list_select_related = ["parent"]
     list_filter = [
         "type",
         "visibility",
@@ -256,9 +257,6 @@ class PostAdmin(SimpleHistoryAdmin):
     def _get_parent_title_short(self, obj: Post) -> str:
         return str(obj.parent.title)[:20] if obj.parent else ""
 
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("parent")
-
 
 @admin.register(PostTag)
 class PostTagAdmin(admin.ModelAdmin):
@@ -267,6 +265,7 @@ class PostTagAdmin(admin.ModelAdmin):
         "author",
         "created_at",
     ]
+    list_select_related = ["tag_parent__tag_parent__tag_parent"]
     search_fields = [
         "name",
     ]
@@ -274,9 +273,6 @@ class PostTagAdmin(admin.ModelAdmin):
         "tag_parent",
         "author",
     ]
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).select_related("tag_parent__tag_parent__tag_parent")
 
     def get_search_results(self, request, queryset, search_term):
         queryset, may_have_duplicates = super().get_search_results(
