@@ -1,5 +1,6 @@
 import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
+import { highlighter } from "@/apps/highlighter/highlighter";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import type { PostCommentType } from "@/graphql/fragments/posts";
@@ -35,33 +36,31 @@ export function useHighlighter(props: { comments?: PostCommentType[] }) {
     }
   }, [data]);
 
+  // todo isn't triggered by the non-changed content. use valtio listener
   function highlightComment(comment: PostCommentType): PostCommentType {
     if (!state.snap.highlights || !state.snap.highlights[comment.id]) {
       return comment;
     }
-
     const commentNew = { ...comment };
-
-    let commentNewContent =
-      comment.content_polite || comment.content_direct || comment.content_rant;
+    let commentNewContent = comment.content_polite;
 
     for (const postHighlight of state.snap.highlights[comment.id]) {
       const { text, text_prefix, text_postfix } = postHighlight;
 
       if (commentNewContent.includes(text)) {
-        const textHighlighted = `<mark data-testid=${ids.highlighter.span} data-highlight-id="${postHighlight.id}">${text}</mark>`;
-        // try matching
+        const textHighlighted = `<mark data-testid=${ids.highlighter.span} data-${highlighter.attrs.highlightId}="${postHighlight.id}">${text}</mark>`;
+        // try matching #AI
         if (text_prefix || text_postfix) {
-          const contextPattern = `${text_prefix}${text}${text_postfix}`;
-          if (commentNewContent.includes(contextPattern)) {
+          const pattern = `${text_prefix}${text}${text_postfix}`;
+          if (commentNewContent.includes(pattern)) {
             commentNewContent = commentNewContent.replace(
-              contextPattern,
+              pattern,
               `${text_prefix}${textHighlighted}${text_postfix}`,
             );
             continue;
           }
         }
-        // fallback to .replace()
+        // fallback to .replace() #AI
         commentNewContent = commentNewContent.replace(text, textHighlighted);
       }
     }
@@ -82,8 +81,6 @@ const PostHighlightsQuery = graphql(`
 `);
 type PostHighlights = ResultOf<typeof PostHighlightsQuery>;
 type PostHighlight = NonNullable<PostHighlights["post_highlights"]>[number];
-
-// const HighlightType = ReturnType
 
 function collectIdsRecursively(comments: PostCommentType[]): ID[] {
   const ids: ID[] = [];

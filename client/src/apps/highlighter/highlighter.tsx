@@ -19,11 +19,14 @@ export namespace highlighter {
       function handleSelection() {
         const selection = document.getSelection();
         if (selection?.toString() && selection.rangeCount > 0) {
-          state.mutable.text = selection.toString().trim();
-
+          state.mutable.text = selection.toString().trim(); // #AI not sure why, we try to match verbatim. it seems to work atm
           const { text_prefix, text_postfix } = getSelectionContext(selection);
           state.mutable.text_prefix = text_prefix;
           state.mutable.text_postfix = text_postfix;
+        } else {
+          state.mutable.text = "";
+          state.mutable.text_prefix = "";
+          state.mutable.text_postfix = "";
         }
       }
       document.addEventListener("selectionchange", handleSelection);
@@ -111,7 +114,7 @@ export namespace highlighter {
   } {
     const selectionRange = selection.getRangeAt(0);
 
-    const selectionElem = isElement(selectionRange.commonAncestorContainer)
+    const selectionElem = isHTMLElement(selectionRange.commonAncestorContainer)
       ? selectionRange.commonAncestorContainer
       : selectionRange.commonAncestorContainer.parentElement;
 
@@ -160,11 +163,7 @@ export namespace highlighter {
         }
       }
     }
-    return text.trim();
-  }
-
-  function isElement(node: Node | Element): node is Element {
-    return node.nodeType === Node.ELEMENT_NODE;
+    return text.trim(); // #AI not sure why, we try to match verbatim. it seems to work atm
   }
 
   async function saveHighlight(args: {
@@ -205,8 +204,9 @@ export namespace highlighter {
   export const attrs = {
     flag: "highlightable",
     id: "id",
+    highlightId: "highlight-id",
     type: "type",
-  };
+  } as const;
 
   type ModelHighlightable = { id: ID; type: highlighter.ModelType };
 
@@ -229,4 +229,13 @@ export namespace highlighter {
     }
     return null;
   }
+}
+
+export function isHTMLElement(node: Node | Element | EventTarget | null): node is HTMLElement {
+  return (
+    // @ts-expect-error #bad-infer
+    node?.nodeType === Node.ELEMENT_NODE &&
+    // @ts-expect-error #bad-infer
+    node.dataset
+  );
 }

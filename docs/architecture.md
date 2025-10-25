@@ -162,6 +162,7 @@ class Visibility(models.TextChoices):
   - has specialized dirs to match the react-router urls structure, eg has both `/posts` and `reviews/`.
   - react-router v7 `export default` are in empty `index.tsx` files.
   - when a component or hook are used only by one page - it's placed in same dir as react-router `index.tsx`.
+- `src/apps/highlighter` - badly written apps.highlighter UI logic
 - `src/components/` - components shared between `src/apps/`
   - `forms/` - Chakra inputs adapted for react-hook-form.
   - `posts/` - shared code for all `Post` react-hook-forms.

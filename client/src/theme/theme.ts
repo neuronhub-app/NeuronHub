@@ -46,6 +46,17 @@ export const system = createSystem(
         },
         mark: {
           bg: { _dark: "sky.600", _light: "sky.200" },
+          transition: "background 0.3s",
+          _hover: {
+            bg: {
+              _dark: "sky.500",
+              _light: "sky.300",
+            },
+            cursor: "pointer",
+          },
+          get _active() {
+            return this._hover;
+          },
         },
       },
 

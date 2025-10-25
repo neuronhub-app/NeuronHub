@@ -94,7 +94,7 @@ export function Card(props: { id: ID; className?: string }) {
 ## Tags
 
 Code blocks can be marked with:
-- `#AI` - not every line is reviewed → consider broken
+- `#AI` - not fully reviewed or tested LLM code → consider dangerous
 - `#AI-slop` - trash to drop or rewrite
 - `#bad-infer` - broken TS type inference - over time check if they fixed it
 - `#prob-redundant` - may not be useful, but removing will require extra testing

@@ -72,12 +72,7 @@ test.describe("Comments", () => {
     await expect(page).toHaveText(contentNew);
   });
 
-  /**
-   * - use testid, no random shit strings
-   * - test render by testid, using content generated here
-   * - console.log() must be bound to real code, not random strings
-   */
-  test("highlighting text", async ({ page }) => {
+  test("highlight", async ({ page }) => {
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
     await play.waitForNetworkIdle();
@@ -93,14 +88,13 @@ test.describe("Comments", () => {
     await play.submit(ids.post.form);
     await expect(page).toHaveText(comment.content);
 
-    // Get the comment ID for later verification
     const commentId = await page.evaluate(attrs => {
       const commentEl = document.querySelector(`[data-${attrs.flag}="true"]`);
       if (!commentEl) throw new Error();
       return commentEl.getAttribute(`data-${attrs.id}`);
     }, highlighter.attrs);
 
-    // create PostHighlight
+    // test create
     await page.evaluate(
       ctx => {
         const commentEl = document.querySelector(`[data-${ctx.attrs.flag}="true"]`);
@@ -130,14 +124,14 @@ test.describe("Comments", () => {
     await expect($[ids.highlighter.btn.save]).toBeVisible();
     await $[ids.highlighter.btn.save].click();
 
-    // Verify the selection was cleared
+    // test selection clearing
     const hasSelection = await page.evaluate(() => {
       const selection = window.getSelection();
       return selection && selection.toString().length > 0;
     });
     expect(hasSelection).toBe(false);
 
-    // test highlight was saved
+    // test highlight save
     const highlight = await play.graphqlQuery(
       graphql(`
         query GetHighlights($ids: [ID!]!) {
@@ -151,13 +145,20 @@ test.describe("Comments", () => {
     expect(highlight.data.post_highlights[0].text).toBe(comment.highlighted);
     expect(highlight.data.post_highlights[0].post?.pk).toBe(commentId);
 
-    // test highlight is visible WITHOUT page reload (auto-refetch works)
+    // test visible wo/ a reload
     await expect($[ids.highlighter.span]).toBeVisible();
     await expect($[ids.highlighter.span]).toHaveText(comment.highlighted);
 
-    // test persistence after reload
+    // test reload
     await play.reload({ idleWait: true });
     await expect($[ids.highlighter.span]).toBeVisible();
     await expect($[ids.highlighter.span]).toHaveText(comment.highlighted);
+
+    // test delete
+    await $[ids.highlighter.span].click();
+    await expect($[ids.highlighter.btn.delete]).toBeVisible();
+    await $[ids.highlighter.btn.delete].click();
+    await play.reload({ idleWait: true });
+    await expect($[ids.highlighter.span]).not.toBeAttached();
   });
 });

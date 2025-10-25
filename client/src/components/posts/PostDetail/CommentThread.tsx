@@ -12,17 +12,15 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { marked } from "marked";
 import type { JSX } from "react";
 import { GoPencil } from "react-icons/go";
 
-import { highlighter } from "@/apps/highlighter/highlighter";
+import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { getAvatarColorForUsername } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentVoteBar } from "@/components/posts/PostDetail/CommentVoteBar";
-import { Prose } from "@/components/ui/prose";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
@@ -87,7 +85,7 @@ export function CommentThread(props: {
                 </HStack>
               </HStack>
 
-              {!state.snap.isEditing && <CommentContent comment={props.comment} />}
+              {!state.snap.isEditing && <PostContentHighlighted post={props.comment} />}
               {state.snap.isEditing && (
                 <CommentForm
                   mode="edit"
@@ -159,27 +157,6 @@ export function CommentThread(props: {
       </Show>
     </Box>
   );
-}
-
-function CommentContent(props: { comment: PostCommentType }) {
-  const prose = (
-    <>
-      <Prose
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-        dangerouslySetInnerHTML={{
-          __html: marked.parse(
-            props.comment.content_polite ||
-              props.comment.content_direct ||
-              props.comment.content_rant,
-          ),
-        }}
-        size="sm"
-        maxW="full"
-        {...highlighter.setModelData(props.comment.id, "comment")}
-      />
-    </>
-  );
-  return prose;
 }
 
 function CommentToolbarButton(props: {

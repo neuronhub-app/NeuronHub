@@ -99,6 +99,7 @@ export namespace ids {
   export const highlighter = {
     btn: {
       save: "highlighter.btn.save",
+      delete: "highlighter.btn.delete",
     },
     span: "highlighter.span",
   } as const;
