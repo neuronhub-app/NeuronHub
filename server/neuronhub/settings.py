@@ -133,6 +133,7 @@ else:
     db_user = env.str("DATABASE_USER", db_name)
     if E2E_TEST:
         db_name = env.str("E2E_DB_NAME")
+        db_user = env.str("E2E_DB_NAME")
     DATABASES = {
         "default": dj_database_url.config(
             conn_max_age=600,

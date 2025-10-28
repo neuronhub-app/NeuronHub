@@ -45,7 +45,7 @@ Some `Scope`s are bound to a single `Type`, eg `build(AI)`.
 - `tags` - `PostTag` logic
 - `comment` - re create, edit, vote, etc
 - `upgrade[<uv|Bun>]` - pyproject.toml, package.json, lock files, or related changes
-- `test(E2E)` - Playwright
+- `E2E` - Playwright
 - `API` - API layers: Apollo GraphQL, Strawberry resolvers, etc
 - `gen` - `tests/test_gen::Gen` and `db_stubs_repopulate`
 - `auth` - `apps.users`, permissions, etc

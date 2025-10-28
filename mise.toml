@@ -25,6 +25,8 @@
     CLIENT_PORT = 3000
     CLIENT_PORT_E2E = 3001
 
+    E2E_DB_NAME = "test_neuronhub_e2e"
+
     S3_PORT = 8333
 
 
@@ -73,7 +75,7 @@
         ]
         env.SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
         env.E2E_TEST = "true"
-        env.E2E_DB_NAME = "{{ get_env(name='E2E_DB_NAME', default='test_neuronhub_e2e') }}"
+        env.E2E_DB_NAME = " {{ env.E2E_DB_NAME }}"
 
     [tasks."dev:client:e2e"]
         dir = "client"
@@ -104,7 +106,7 @@
         run = "bun run playwright test --config=e2e/playwright.config.ts"
         alias = "e2e"
         env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
-        env.E2E_DB_NAME = "{{ get_env(name='E2E_DB_NAME', default='test_neuronhub_e2e') }}" # duplicate with `dev:server:e2e`, as Playwright resets env when starts Mise from [[playwright.config.ts]]
+        env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}" # duplicate with `dev:server:e2e`, as Playwright resets env when starts Mise from [[playwright.config.ts]]
 
 
 [tasks."django:migrate"]
