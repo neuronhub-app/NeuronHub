@@ -1,3 +1,4 @@
+import { Box } from "@chakra-ui/react";
 import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { highlighter } from "@/apps/highlighter/highlighter";
@@ -48,7 +49,15 @@ export function useHighlighter(props: { comments?: PostCommentType[] }) {
       const { text, text_prefix, text_postfix } = postHighlight;
 
       if (commentNewContent.includes(text)) {
-        const textHighlighted = `<mark data-testid=${ids.highlighter.span} data-${highlighter.attrs.highlightId}="${postHighlight.id}">${text}</mark>`;
+        const textHighlighted = `
+          <mark
+            data-testid=${ids.highlighter.span}
+            data-${highlighter.attrs.highlightId}="${postHighlight.id}"
+            data-${highlighter.attrs.highlightActive}="${false}"
+          >
+            ${text}
+          </mark>
+        `;
         // try matching #AI
         if (text_prefix || text_postfix) {
           const pattern = `${text_prefix}${text}${text_postfix}`;

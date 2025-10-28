@@ -209,6 +209,7 @@ export namespace highlighter {
     id: "id",
     highlightId: "highlight-id",
     type: "type",
+    highlightActive: "highlight-active",
   } as const;
 
   type ModelHighlightable = { id: ID; type: highlighter.ModelType };

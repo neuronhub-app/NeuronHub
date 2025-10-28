@@ -67,11 +67,11 @@ export function PostContentHighlighted(props: { post: PostCommentType }) {
       positioning={{
         getAnchorRect: () => {
           const elem = document.querySelector(
-            `[data-highlight-id="${state.snap.activeHighlightId}"]`,
-          );
-          return elem!.getBoundingClientRect();
+            `[data-${highlighter.attrs.highlightId}="${state.snap.activeHighlightId}"]`,
+          )!;
+          return elem.getBoundingClientRect();
         },
-        placement: "right",
+        placement: "bottom",
       }}
       open={Boolean(state.snap.activeHighlightId)}
       onPointerDownOutside={() => {
@@ -93,10 +93,10 @@ export function PostContentHighlighted(props: { post: PostCommentType }) {
 
       <Portal>
         <Menu.Positioner>
-          {/* @chakra-ui forgot to style define its var()s, so it's a 0x0 square. for now. adding var() makes it worse - its CSS written to break <Arrow /> */}
+          {/* @chakra-ui forgot to define its var()s, so it's a 0x0 square. For now. Adding css={{ --arrow-size=<> }} makes it worse - its CSS written to break <Arrow /> */}
           <Menu.Arrow />
 
-          <Menu.Content minW="auto">
+          <Menu.Content minW="auto" p={0}>
             <Menu.Item
               value="remove"
               onClick={handleDeleteHighlight}

@@ -5,6 +5,8 @@ import {
   defineTokens,
   mergeConfigs,
 } from "@chakra-ui/react";
+import { semanticTokens } from "@chakra-ui/react/theme";
+import { get } from "react-hook-form";
 import { theme } from "@/theme/colors";
 import { recipes } from "@/theme/recipes";
 
@@ -55,6 +57,9 @@ export const system = createSystem(
             cursor: "pointer",
           },
           get _active() {
+            return this._hover;
+          },
+          get _focus() {
             return this._hover;
           },
         },
