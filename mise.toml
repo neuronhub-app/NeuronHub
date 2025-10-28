@@ -71,16 +71,16 @@
         dir = "server"
         run = [
             "mise django:migrate",
-            "uv run manage.py runserver {{ get_env(name='SERVER_PORT_E2E') }}",
+            "uv run manage.py runserver {{ env.SERVER_PORT_E2E }}",
         ]
-        env.SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
+        env.SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
         env.E2E_TEST = "true"
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
 
     [tasks."dev:client:e2e"]
         dir = "client"
         run = "bun run react-router dev --host --port={{ get_env(name='CLIENT_PORT_E2E') }}"
-        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
+        env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
 
     [tasks."dev:e2e"]
         depends = ["dev:server:e2e", "dev:client:e2e"]
@@ -105,7 +105,7 @@
         dir = "client"
         run = "bun run playwright test --config=e2e/playwright.config.ts"
         alias = "e2e"
-        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
+        env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}" # duplicate with `dev:server:e2e`, as Playwright resets env when starts Mise from [[playwright.config.ts]]
 
 
