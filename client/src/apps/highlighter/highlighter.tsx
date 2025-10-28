@@ -11,10 +11,16 @@ export namespace highlighter {
   export function useHook() {
     const saveButtonRef = useRef<HTMLButtonElement | null>(null);
 
-    const state = useValtioProxyRef({ text: "", text_prefix: "", text_postfix: "" });
+    const state = useValtioProxyRef({
+      text: "",
+      text_prefix: "",
+      text_postfix: "",
+      isPressedKey: {
+        B: false,
+        Meta: false,
+      },
+    });
     const loading = useIsLoading();
-
-    const isTextSelected = Boolean(document.getSelection()?.toString());
 
     useEffect(() => {
       function handleSelection() {
@@ -42,18 +48,57 @@ export namespace highlighter {
           saveButtonRef.current!.click();
         }
       }
-      window.addEventListener("keydown", handleShortcut);
+      document.addEventListener("keydown", handleShortcut);
       return () => {
-        window.removeEventListener("keydown", handleShortcut);
+        document.removeEventListener("keydown", handleShortcut);
       };
     }, []);
+
+    useEffect(() => {
+      function isKeyMeta(event: KeyboardEvent) {
+        return event.key === "Meta" || event.code === "MetaLeft" || event.code === "MetaRight";
+      }
+
+      function handleKeyDown(event: KeyboardEvent) {
+        if (event.code === "KeyB") {
+          state.mutable.isPressedKey.B = true;
+        }
+        if (isKeyMeta(event)) {
+          state.mutable.isPressedKey.Meta = true;
+        }
+      }
+
+      function handleKeyUp(event: KeyboardEvent) {
+        if (event.code === "KeyB") {
+          state.mutable.isPressedKey.B = false;
+        }
+        if (isKeyMeta(event)) {
+          state.mutable.isPressedKey.Meta = false;
+        }
+      }
+
+      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("keyup", handleKeyUp);
+
+      return () => {
+        document.removeEventListener("keydown", handleKeyDown);
+        document.removeEventListener("keyup", handleKeyUp);
+      };
+    }, []);
+
+    const isTextSelected = Boolean(state.snap.text);
 
     return {
       component: () => {
         return (
-          <ActionBar.Root open={isTextSelected} initialFocusEl={() => saveButtonRef.current}>
+          <ActionBar.Root
+            open={isTextSelected}
+            initialFocusEl={() => saveButtonRef.current}
+            skipAnimationOnMount={true}
+            immediate={true}
+          >
             <ActionBar.Positioner>
-              <ActionBar.Content p={0}>
+              <ActionBar.Content p={0} animationDuration="0s">
                 <Button
                   size="xs"
                   variant="ghost"
@@ -83,15 +128,25 @@ export namespace highlighter {
                     state.mutable.text = "";
                     state.mutable.text_prefix = "";
                     state.mutable.text_postfix = "";
+                    state.mutable.isPressedKey.Meta = false;
+                    state.mutable.isPressedKey.B = false;
                     selection.empty();
                   }}
                 >
                   Highlight{" "}
-                  <Kbd size="sm" fontSize="2xs">
+                  <Kbd
+                    size="sm"
+                    fontSize="2xs"
+                    variant={state.mutable.isPressedKey.Meta ? "raised" : "outline"}
+                  >
                     Meta
                   </Kbd>
                   +
-                  <Kbd size="sm" fontSize="2xs">
+                  <Kbd
+                    size="sm"
+                    fontSize="2xs"
+                    variant={state.mutable.isPressedKey.B ? "raised" : "outline"}
+                  >
                     B
                   </Kbd>
                 </Button>
