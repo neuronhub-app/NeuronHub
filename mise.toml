@@ -75,7 +75,7 @@
         ]
         env.SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT_E2E') }}"
         env.E2E_TEST = "true"
-        env.E2E_DB_NAME = " {{ env.E2E_DB_NAME }}"
+        env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
 
     [tasks."dev:client:e2e"]
         dir = "client"
