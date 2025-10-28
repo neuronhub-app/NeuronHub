@@ -1,11 +1,12 @@
 ["dev:db:setup-e2e"]
+    dir = "devops"
     run = """
         #!/usr/bin/env bash
 
         if [[ "$IS_DB_EXTERNAL" = "true" || "$GITHUB_ACTIONS" = "true" ]]; then
             echo "In GitHub CI skipping Mise Task dev:db:setup-e2e"
         else
-            sudo docker compose --file ./devops/docker-compose.yml exec db bash -c "psql --user=neuronhub --command='CREATE DATABASE {{ get_env(name='E2E_DB_NAME') }};'" 2>/dev/null || true
-            sudo docker compose --file ./devops/docker-compose.yml exec s3 sh -c "mkdir --parents media" 2>/dev/null || true
+            sudo docker compose exec db bash -c "createuser --username=neuronhub --superuser {{ env.E2E_DB_NAME }}" || true
+            sudo docker compose exec db bash -c "createdb --username=neuronhub --user={{ env.E2E_DB_NAME }} {{ env.E2E_DB_NAME }}" || true
         fi
     """
