@@ -86,7 +86,8 @@ test.describe("Comments", () => {
     await play.screenshot();
     await play.fill(ids.comment.form.textarea, comment.content);
     await play.submit(ids.post.form);
-    await expect(page).toHaveText(comment.content);
+    await play.waitForNetworkIdle();
+    await expect(page.getByText(comment.highlighted)).toBeVisible();
 
     const commentId = await page.evaluate(attrs => {
       const commentEl = document.querySelector(`[data-${attrs.flag}="true"]`);
@@ -135,7 +136,7 @@ test.describe("Comments", () => {
     const highlight = await play.graphqlQuery(
       graphql(`
         query GetHighlights($ids: [ID!]!) {
-          post_highlights(post_ids: $ids) { id post { pk } text text_prefix text_postfix }
+          post_highlights(post_ids: $ids) { id post { id } text text_prefix text_postfix }
         }
       `),
       { ids: [commentId!] },
@@ -143,7 +144,7 @@ test.describe("Comments", () => {
     expect(highlight.data).toBeDefined();
     expect(highlight.data.post_highlights).toHaveLength(1);
     expect(highlight.data.post_highlights[0].text).toBe(comment.highlighted);
-    expect(highlight.data.post_highlights[0].post?.pk).toBe(commentId);
+    expect(highlight.data.post_highlights[0].post?.id).toBe(commentId);
 
     // test visible wo/ a reload
     await expect($[ids.highlighter.span]).toBeVisible();

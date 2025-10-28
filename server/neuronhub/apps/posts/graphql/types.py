@@ -124,7 +124,7 @@ class PostReviewType(PostTypeI):
 class PostCommentType(PostTypeI):
     TYPE = Post.Type.Comment
 
-    parent: PostCommentType | None
+    parent: PostTypeI | None
     comments: list[PostCommentType] = strawberry_django.field(field_name="children")
 
 

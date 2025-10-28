@@ -137,7 +137,7 @@ export namespace highlighter {
                   <Kbd
                     size="sm"
                     fontSize="2xs"
-                    variant={state.mutable.isPressedKey.Meta ? "raised" : "outline"}
+                    variant={state.snap.isPressedKey.Meta ? "raised" : "outline"}
                   >
                     Meta
                   </Kbd>
@@ -145,7 +145,7 @@ export namespace highlighter {
                   <Kbd
                     size="sm"
                     fontSize="2xs"
-                    variant={state.mutable.isPressedKey.B ? "raised" : "outline"}
+                    variant={state.snap.isPressedKey.B ? "raised" : "outline"}
                   >
                     B
                   </Kbd>

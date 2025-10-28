@@ -5,8 +5,6 @@ import {
   defineTokens,
   mergeConfigs,
 } from "@chakra-ui/react";
-import { semanticTokens } from "@chakra-ui/react/theme";
-import { get } from "react-hook-form";
 import { theme } from "@/theme/colors";
 import { recipes } from "@/theme/recipes";
 

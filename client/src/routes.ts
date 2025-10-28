@@ -6,6 +6,7 @@ import type { ID } from "@/gql-tada";
 export const urls = {
   home: "/",
   login: "/login",
+  library: "/library",
   reviews: {
     list: "/reviews",
     get create() {
@@ -92,6 +93,7 @@ const op = { create: "create", edit: "edit" } as const;
 export default [
   layout("./components/layout/index.tsx", [
     route("/", "./apps/home/index.tsx"),
+    route(urls.library, "./apps/library/index.tsx"),
     ...prefix(urls.reviews.list, [
       route("/", "./apps/reviews/list/index.tsx"),
       route(`/${op.create}`, "./apps/reviews/create/index.tsx"),

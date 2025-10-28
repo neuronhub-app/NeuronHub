@@ -1,21 +1,20 @@
 ### v0.2.0.0
 
+- [x] refactor ReviewForm on sub fields; add schemas.ts
 - [x] Tool create
 - [x] Tool.image upload
 - [x] Post
 	- [x] .content_polite, .content_direct, .content_rant
 - [x] on Review select Tool by title
 - [x] apps.importer
-- [x] Comment threads & UI
+- [x] Comment deep threads & new UI
 - [x] Comment Highlight
 - [ ] Show Highlights in Library
-  - [x] logic
-  - [ ] UI
-- [ ] HN sync by Hatchet
+- [ ] HN bg sync - Hatchet Docker
 - [ ] Deploy
 - [ ] User Signup & Login
 - [ ] Comment.visibility
-  - prefill with the last selection, as YouTube does
+  - prefill the last selection, as YouTube does
 
 ### v0.2.1.0
 

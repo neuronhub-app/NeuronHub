@@ -158,6 +158,7 @@ class ImporterHackerNews:
                     "source": self._build_HN_item_url(post_data["id"]),
                 },
             )
+            # todo async
             if not post_source.post:
                 post_source.post = post
                 await post_source.asave(update_fields=["post"])

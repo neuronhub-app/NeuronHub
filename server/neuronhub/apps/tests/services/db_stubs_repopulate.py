@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from django.utils import timezone
 
 from neuronhub.apps.anonymizer.fields import Visibility
+from neuronhub.apps.highlighter.models import PostHighlight
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
@@ -33,6 +34,7 @@ async def db_stubs_repopulate(
 ) -> Gen:
     if is_delete_posts:
         for model in [
+            PostHighlight,
             PostTagVote,
             PostTag,
             PostVote,
@@ -213,13 +215,22 @@ async def _create_review_pycharm(user: User, gen: Gen):
         gen.posts.Params(Post.Type.Comment, parent=review, author=user)
     )
     # Add nested comment (reply)
-    await gen.posts.create(
+    nested_comment = await gen.posts.create(
         gen.posts.Params(
             Post.Type.Comment,
             parent=comment,
             author=user,
             content_polite="VS Code has better extensions ecosystem, but PyCharm has superior debugging and refactoring capabilities for Python projects.",
         )
+    )
+    # todo ! use f"" strings #AI-slop
+    # Create a highlight on the nested comment
+    await PostHighlight.objects.acreate(
+        post=nested_comment,
+        user=user,
+        text="superior debugging and refactoring capabilities",
+        text_prefix="PyCharm has ",
+        text_postfix=" for Python",
     )
 
 
@@ -281,13 +292,22 @@ async def _create_review_iterm(user: User, gen: Gen):
         author=user,
         params=[TagParams(tags.macos, is_vote_pos=True)],
     )
-    await gen.posts.create(
+    iterm_comment = await gen.posts.create(
         gen.posts.Params(
             Post.Type.Comment,
             parent=review,
             author=user,
             content_polite="Have you tried the GPU rendering option? It makes scrolling buttery smooth.",
         )
+    )
+    # todo ! use f"" strings #AI-slop
+    # Create a highlight on this comment
+    await PostHighlight.objects.acreate(
+        post=iterm_comment,
+        user=user,
+        text="GPU rendering option",
+        text_prefix="tried the ",
+        text_postfix="? It makes",
     )
 
     await _create_review_tags(

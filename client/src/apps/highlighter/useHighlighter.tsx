@@ -1,4 +1,3 @@
-import { Box } from "@chakra-ui/react";
 import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { highlighter } from "@/apps/highlighter/highlighter";
@@ -25,12 +24,13 @@ export function useHighlighter(props: { comments?: PostCommentType[] }) {
     if (data?.post_highlights?.length) {
       const highlights: Record<ID, PostHighlight[]> = {};
       for (const highlight of data.post_highlights) {
-        if (highlight?.post?.pk) {
-          if (!highlights[highlight.post.pk]) {
-            highlights[highlight.post.pk] = [];
+        if (highlight?.post?.id) {
+          if (!highlights[highlight.post.id]) {
+            highlights[highlight.post.id] = [];
           }
-          // @ts-expect-error #bad-infer it is not DeepPartial. prob needs gql.tada or Apollo update
-          highlights[highlight.post.pk].push(highlight);
+          // @ts-expect-error #bad-infer it is not DeepPartial. prob needs Apollo update
+          const highlightTyped: PostHighlight = highlight;
+          highlights[highlight.post.id].push(highlightTyped);
         }
       }
       state.mutable.highlights = highlights;
@@ -51,7 +51,7 @@ export function useHighlighter(props: { comments?: PostCommentType[] }) {
       if (commentNewContent.includes(text)) {
         const textHighlighted = `
           <mark
-            data-testid=${ids.highlighter.span}
+            data-testid="${ids.highlighter.span}"
             data-${highlighter.attrs.highlightId}="${postHighlight.id}"
             data-${highlighter.attrs.highlightActive}="${false}"
           >
@@ -85,7 +85,7 @@ export function useHighlighter(props: { comments?: PostCommentType[] }) {
 
 const PostHighlightsQuery = graphql(`
   query GetPostHighlights($ids: [ID!]!) {
-    post_highlights(post_ids: $ids) { id post { pk } text_prefix text text_postfix }
+    post_highlights(post_ids: $ids) { id post { id } text_prefix text text_postfix }
   }
 `);
 type PostHighlights = ResultOf<typeof PostHighlightsQuery>;

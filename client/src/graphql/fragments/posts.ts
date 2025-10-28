@@ -55,6 +55,7 @@ export const PostFragment = graphql(
         }
         parent {
           id
+          type
         }
         created_at
         updated_at

@@ -6,6 +6,7 @@ import { FaTrashCan } from "react-icons/fa6";
 
 import { highlighter, isHTMLElement } from "@/apps/highlighter/highlighter";
 import { Prose } from "@/components/ui/prose";
+import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import type { PostCommentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
@@ -101,6 +102,7 @@ export function PostContentHighlighted(props: { post: PostCommentType }) {
               value="remove"
               onClick={handleDeleteHighlight}
               disabled={loading.isActive}
+              {...ids.set(ids.highlighter.btn.delete)}
             >
               {loading.isActive ? (
                 <Spinner size="sm" />

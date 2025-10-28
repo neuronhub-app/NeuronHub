@@ -8,6 +8,7 @@ import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
 import { PostImportRefreshButton } from "@/components/posts/PostDetail/PostImportRefreshButton";
 import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
+import { PostTypeEnum } from "~/graphql/enums";
 
 export function PostDetail(props: {
   title: string;
@@ -41,7 +42,12 @@ export function PostDetail(props: {
             <Heading size="lg">Comments</Heading>
 
             <VStack px={0} align="flex-start" gap="gap.md">
-              <For each={props.post.comments.filter(comment => !comment.parent)}>
+              <For
+                each={props.post.comments.filter(
+                  // top-level comments
+                  comment => comment.parent?.type !== PostTypeEnum.Comment,
+                )}
+              >
                 {comment => {
                   // @ts-expect-error #bad-infer
                   const commentTyped: PostCommentType = comment;

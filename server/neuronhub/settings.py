@@ -120,6 +120,7 @@ WSGI_APPLICATION = "neuronhub.wsgi.application"
 ASGI_APPLICATION = "neuronhub.asgi.application"
 
 E2E_TEST = env.bool("E2E_TEST", False)
+
 if DJANGO_ENV == DjangoEnv.BUILD:
     DATABASES = {
         "default": {

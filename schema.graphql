@@ -187,7 +187,7 @@ type PostCommentType implements PostTypeI {
   id: ID!
   author: UserType
   seen_by_users: [DjangoModelType!]!
-  parent: PostCommentType
+  parent: PostTypeI
   children: [PostTypeI!]!
   comments(filters: PostFilter): [PostCommentType!]!
   type: PostTypeEnum!
@@ -230,11 +230,13 @@ input PostFilter {
 
 type PostHighlightType {
   id: ID!
-  post: DjangoModelType
+  post: PostTypeI!
   user: DjangoModelType!
   text: String!
   text_prefix: String!
   text_postfix: String!
+  created_at: DateTime!
+  root_post: PostTypeI!
 }
 
 input PostHighlightTypeInput {
@@ -578,6 +580,7 @@ type Query {
   tags(filters: PostTagFilter): [PostTagType!]!
   post_highlights(post_ids: [ID!]!): [PostHighlightType!]! @IsAuthenticated
   post_highlight(post_id: ID!): PostHighlightType! @IsAuthenticated
+  user_highlights: [PostHighlightType!]! @IsAuthenticated
 }
 
 input StrFilterLookup {
