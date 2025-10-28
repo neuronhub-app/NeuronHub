@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
@@ -63,10 +64,12 @@ export namespace highlighter {
                     const selection = document.getSelection()!;
 
                     await loading.track(async () => {
+                      if (!selection.focusNode?.parentElement) {
+                        return toast.error("Invalid selection");
+                      }
                       const highlightModel = findHighlightedModel({
-                        element: selection.focusNode?.parentElement!,
+                        element: selection.focusNode.parentElement,
                       });
-
                       if (highlightModel) {
                         await saveHighlight({
                           id: highlightModel.id,
