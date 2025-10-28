@@ -57,7 +57,7 @@ export function useHighlighter(props: { comments?: PostCommentType[] }) {
           >
             ${text}
           </mark>
-        `;
+        `.trim();
         // try matching #AI
         if (text_prefix || text_postfix) {
           const pattern = `${text_prefix}${text}${text_postfix}`;
