@@ -138,9 +138,3 @@ For colors always use the adaptable tokens (eg `bg="bg.subtle"`, not `black`), b
 To get the raw values use the `system` from `theme.ts`, eg `system.token("colors.danager")`. Or the new syntax for strings `"{colors.red}"`.
 
 `mise lint` will re-generate Chakra theme types and tokens to lint them.
-
-#### Code Style
-
-Prefer
-- `<For>` over `.map()`
-- `<Show>` over ternaries
