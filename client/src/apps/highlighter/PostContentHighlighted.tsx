@@ -6,17 +6,24 @@ import { FaTrashCan } from "react-icons/fa6";
 import { highlighter, isHTMLElement } from "@/apps/highlighter/highlighter";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
+import type { ID } from "@/gql-tada";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { markedConfigured } from "@/utils/marked-configured";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
-import { HighlightType } from "@/apps/library/Library";
 
 /**
  * Shows highlights & deletion UI.
  */
-export function PostContentHighlighted(props: { post: HighlightType["post"] }) {
+export function PostContentHighlighted(props: {
+  post: {
+    id: ID;
+    content_polite: string;
+    content_direct: string;
+    content_rant: string;
+  };
+}) {
   const state = useValtioProxyRef<{
     activeHighlightId: string | null;
   }>({

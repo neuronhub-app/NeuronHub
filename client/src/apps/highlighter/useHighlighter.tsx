@@ -3,66 +3,82 @@ import { useEffect } from "react";
 import { highlighter } from "@/apps/highlighter/highlighter";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
-import type { PostCommentType } from "@/graphql/fragments/posts";
-import { useApolloQuery } from "@/graphql/useApolloQuery";
+import {
+  CommentFieldsFragment,
+  PostCommentsFragment,
+  type PostCommentType,
+  PostFragment,
+} from "@/graphql/fragments/posts";
+import { isQueryDataComplete, useApolloQuery } from "@/graphql/useApolloQuery";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-export function useHighlighter(props: { comments?: PostCommentType[] }) {
+interface UseHighlighterProps {
+  comments?: PostCommentType[];
+  posts?: Array<{ id: ID; comments?: Array<{ id: ID }> }>;
+}
+
+export function useHighlighter(props: UseHighlighterProps) {
   const state = useValtioProxyRef({
-    commentIds: [] as ID[],
+    postIds: [] as ID[],
     highlights: {} as Record<ID, PostHighlight[]>,
   });
+
   useEffect(() => {
     if (props.comments) {
-      state.mutable.commentIds = collectIdsRecursively(props.comments);
+      state.mutable.postIds = collectIdsRecursively(props.comments);
+    } else if (props.posts) {
+      // Collect IDs from any posts, not just comments
+      const ids: ID[] = [];
+      for (const post of props.posts) {
+        ids.push(post.id);
+        if (post.comments) {
+          ids.push(...collectIdsFromPosts(post.comments));
+        }
+      }
+      state.mutable.postIds = ids;
     }
-  }, [props.comments]);
+  }, [props.comments, props.posts]);
 
-  const { data } = useApolloQuery(PostHighlightsQuery, { ids: state.snap.commentIds });
+  const { data } = useApolloQuery(PostHighlightsQuery, { ids: state.snap.postIds });
 
   useEffect(() => {
-    if (data?.post_highlights?.length) {
+    if (isQueryDataComplete(data) && data.post_highlights) {
       const highlights: Record<ID, PostHighlight[]> = {};
       for (const highlight of data.post_highlights) {
-        if (highlight?.post?.id) {
+        if (isQueryDataComplete(highlight) && highlight?.post?.id) {
           if (!highlights[highlight.post.id]) {
             highlights[highlight.post.id] = [];
           }
-          // @ts-expect-error #bad-infer it is not DeepPartial. prob needs Apollo update
-          const highlightTyped: PostHighlight = highlight;
-          highlights[highlight.post.id].push(highlightTyped);
+          highlights[highlight.post.id].push(highlight);
         }
       }
       state.mutable.highlights = highlights;
     }
   }, [data]);
 
-  // todo isn't triggered by the non-changed content. use valtio listener
-  function highlightComment(comment: PostCommentType): PostCommentType {
-    if (!state.snap.highlights || !state.snap.highlights[comment.id]) {
-      return comment;
+  function highlight<T extends { id: ID; content_polite: string; comments?: T[] }>(post: T): T {
+    if (!state.snap.highlights || !state.snap.highlights[post.id]) {
+      return post;
     }
-    const commentNew = { ...comment };
-    let commentNewContent = comment.content_polite;
+    const postNew = { ...post };
+    let postNewContent = post.content_polite;
 
-    for (const postHighlight of state.snap.highlights[comment.id]) {
+    for (const postHighlight of state.snap.highlights[post.id]) {
       const { text, text_prefix, text_postfix } = postHighlight;
 
-      if (commentNewContent.includes(text)) {
+      if (postNewContent.includes(text)) {
         const textHighlighted = `
           <mark
             data-testid="${ids.highlighter.span}"
             data-${highlighter.attrs.highlightId}="${postHighlight.id}"
             data-${highlighter.attrs.highlightActive}="${false}"
-          >
-            ${text}
-          </mark>
+          >${text}</mark>
         `.trim();
         // try matching #AI
         if (text_prefix || text_postfix) {
           const pattern = `${text_prefix}${text}${text_postfix}`;
-          if (commentNewContent.includes(pattern)) {
-            commentNewContent = commentNewContent.replace(
+          if (postNewContent.includes(pattern)) {
+            postNewContent = postNewContent.replace(
               pattern,
               `${text_prefix}${textHighlighted}${text_postfix}`,
             );
@@ -70,24 +86,43 @@ export function useHighlighter(props: { comments?: PostCommentType[] }) {
           }
         }
         // fallback to .replace() #AI
-        commentNewContent = commentNewContent.replace(text, textHighlighted);
+        postNewContent = postNewContent.replace(text, textHighlighted);
       }
     }
-    commentNew.content_polite = commentNewContent;
-    commentNew.comments = comment.comments?.map(commentChild => highlightComment(commentChild));
-    return commentNew;
+    postNew.content_polite = postNewContent;
+    if (post.comments) {
+      postNew.comments = post.comments.map(child => highlight(child));
+    }
+    return postNew;
   }
 
   return {
-    highlight: highlightComment,
+    highlight: highlight,
   };
 }
 
-const PostHighlightsQuery = graphql(`
-  query GetPostHighlights($ids: [ID!]!) {
-    post_highlights(post_ids: $ids) { id post { id } text_prefix text text_postfix }
-  }
-`);
+const PostHighlightsQuery = graphql(
+  `
+    query GetPostHighlights($ids: [ID!]!) {
+      post_highlights(post_ids: $ids) {
+        id
+        text
+        text_prefix
+        text_postfix
+        created_at
+  
+        post {
+          ...CommentFieldsFragment
+        }
+        root_post {
+          ...PostFragment
+          ...PostCommentsFragment
+        }
+      }
+    }
+  `,
+  [PostFragment, CommentFieldsFragment, PostCommentsFragment],
+);
 type PostHighlights = ResultOf<typeof PostHighlightsQuery>;
 type PostHighlight = NonNullable<PostHighlights["post_highlights"]>[number];
 
@@ -100,4 +135,8 @@ function collectIdsRecursively(comments: PostCommentType[]): ID[] {
     }
   }
   return ids;
+}
+
+function collectIdsFromPosts(posts: Array<{ id: ID }>): ID[] {
+  return posts.map(p => p.id);
 }

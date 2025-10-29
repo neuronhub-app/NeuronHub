@@ -4,9 +4,8 @@ import {
   Box,
   Button,
   Flex,
-  For,
   HStack,
-  Show,
+  IconButton,
   Spacer,
   Stack,
   Text,
@@ -38,17 +37,24 @@ export function CommentThread(props: {
   const state = useValtioProxyRef({
     isEditing: false,
     isShowReplyForm: false,
+    isChildrenVisible: true,
   });
 
   const username =
     (props.comment.source_author || props.comment.author?.username) ?? "Anonymous";
 
+  const isHasChildren = Boolean(props.comment.comments?.length);
+  const isShowChildren = isHasChildren && state.snap.isChildrenVisible;
+
   return (
     <Box as="section" pos="relative">
       <LineToggle
-        isHasChildren={props.comment.comments?.length > 0}
+        isHasChildren={isHasChildren}
         isLastChild={props.isLastChild}
         depth={props.depth ?? 0}
+        onClick={() => {
+          state.mutable.isChildrenVisible = !state.mutable.isChildrenVisible;
+        }}
       />
 
       <Flex as="article" gap="gap.sm" tabIndex={-1}>
@@ -139,22 +145,32 @@ export function CommentThread(props: {
         </Flex>
       </Flex>
 
-      {/* Children */}
-      <Show when={props.comment.comments?.length}>
+      {isShowChildren && (
         <Stack gap="gap.md" mt="gap.md" pl={9}>
-          <For each={props.comment.comments}>
-            {(comment, index) => (
-              <CommentThread
-                key={comment.id}
-                post={props.post}
-                comment={comment}
-                depth={(props.depth ?? 0) + 1}
-                isLastChild={index === props.comment.comments.length - 1}
-              />
-            )}
-          </For>
+          {props.comment.comments.map((comment, index) => (
+            <CommentThread
+              key={comment.id}
+              post={props.post}
+              comment={comment}
+              depth={(props.depth ?? 0) + 1}
+              isLastChild={index === props.comment.comments.length - 1}
+            />
+          ))}
         </Stack>
-      </Show>
+      )}
+      {!isShowChildren && isHasChildren && (
+        <IconButton
+          size="2xs"
+          variant="subtle"
+          onClick={() => {
+            state.mutable.isChildrenVisible = !state.mutable.isChildrenVisible;
+          }}
+          zIndex={1}
+          colorScheme="gray"
+        >
+          +
+        </IconButton>
+      )}
     </Box>
   );
 }
@@ -179,7 +195,12 @@ function CommentToolbarButton(props: {
   );
 }
 
-function LineToggle(props: { isHasChildren: boolean; isLastChild?: boolean; depth: number }) {
+function LineToggle(props: {
+  isHasChildren: boolean;
+  isLastChild?: boolean;
+  depth: number;
+  onClick: () => void;
+}) {
   const left = -6;
 
   const avatarMiddle = 3;
@@ -189,6 +210,13 @@ function LineToggle(props: { isHasChildren: boolean; isLastChild?: boolean; dept
     line: 0,
     lineHider: 1,
     lineChildRounded: 2,
+  };
+
+  // todo turn into group-hover or use useValtioProxyRef to track it across all 3 components
+  // and it must hover the parent's `{isHasChildren && !isShowChildren && (<IconButton>)}`
+  // mb move the hover tracking state up the component. I'm assuming then it'll have to wrap this React into a `ref` passthrough or smth
+  const _hover = {
+    borderColor: "gray.900",
   };
   return (
     <>
@@ -201,6 +229,8 @@ function LineToggle(props: { isHasChildren: boolean; isLastChild?: boolean; dept
           bottom="0"
           borderStartWidth="2px"
           zIndex={zIndex.line}
+          _hover={_hover}
+          onClick={props.onClick}
         />
       )}
       {props.depth > 0 && (
@@ -215,6 +245,8 @@ function LineToggle(props: { isHasChildren: boolean; isLastChild?: boolean; dept
           borderBottomWidth="2px"
           roundedBottomLeft="l3"
           zIndex={zIndex.lineChildRounded}
+          _hover={_hover}
+          onClick={props.onClick}
         />
       )}
       {props.isLastChild && props.depth > 0 && (
@@ -227,6 +259,8 @@ function LineToggle(props: { isHasChildren: boolean; isLastChild?: boolean; dept
           borderStartWidth="2px"
           borderColor="bg.subtle"
           zIndex={zIndex.lineHider}
+          _hover={_hover}
+          onClick={props.onClick}
         />
       )}
     </>

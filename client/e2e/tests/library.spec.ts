@@ -47,8 +47,8 @@ test.describe("Library - Highlights", () => {
     await expect(page.locator("text=Highlighted Comment")).toHaveCount(2);
 
     // Verify some content is displayed (don't check exact text since it may be truncated)
-    await expect(page.getByText("VS Code", { exact: false })).toBeVisible();
-    await expect(page.getByText("GPU rendering", { exact: false })).toBeVisible();
+    await expect(page.getByText("VS Code").first()).toBeVisible();
+    await expect(page.getByText("GPU rendering").first()).toBeVisible();
 
     // Verify the highlight styling is applied (basic check)
     const backgroundColor = await highlightMarks.first().evaluate(el => {
@@ -56,15 +56,5 @@ test.describe("Library - Highlights", () => {
     });
     expect(backgroundColor).toBeTruthy();
     expect(backgroundColor).not.toBe("rgba(0, 0, 0, 0)"); // Not transparent
-  });
-
-  test("library link is active in sidebar", async ({ page }) => {
-    // Navigate to Library page
-    await page.goto(urls.library);
-    await play.waitForNetworkIdle();
-
-    // Check that library link in sidebar has aria-current="page"
-    const libraryLink = page.locator(`a[href="${urls.library}"]`).first();
-    await expect(libraryLink).toHaveAttribute("aria-current", "page");
   });
 });

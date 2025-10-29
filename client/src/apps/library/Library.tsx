@@ -7,7 +7,6 @@ import { graphql, type ID, type ResultOf } from "@/gql-tada";
 import {
   CommentFieldsFragment,
   PostCommentsFragment,
-  type PostCommentType,
   PostFragment,
 } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
@@ -25,8 +24,8 @@ const UserHighlightsQuery = graphql(
 
         post {
           ...CommentFieldsFragment
+          ...PostCommentsFragment
         }
-
         root_post {
           ...PostFragment
           ...PostCommentsFragment
@@ -43,7 +42,7 @@ type HighlightGroup = {
     id: ID;
     text: HighlightType["text"];
     created_at: HighlightType["created_at"];
-    comment: HighlightType["post"];
+    post: HighlightType["post"];
   }>;
 };
 export type HighlightType = ResultOf<typeof UserHighlightsQuery>["user_highlights"][number];
@@ -64,13 +63,13 @@ function groupHighlightsByPost(highlights: HighlightType[]): HighlightGroup[] {
     }
 
     const postHighlights = groups.get(highlight.root_post.id)!.highlights;
-    const isHighlightUnique = !postHighlights.find(h => h.comment.id === highlight.post.id);
+    const isHighlightUnique = !postHighlights.find(h => h.post.id === highlight.post.id);
     if (isHighlightUnique) {
       postHighlights.push({
         id: highlight.id,
         text: highlight.text,
         created_at: highlight.created_at,
-        comment: highlight.post,
+        post: highlight.post,
       });
     }
   }
@@ -81,23 +80,21 @@ export function Library() {
   const { data, error, isLoadingFirstTime } = useApolloQuery(UserHighlightsQuery, {});
 
   const groupedHighlights = useMemo(
-    // @ts-expect-error #bad-infer
     () => groupHighlightsByPost(data?.user_highlights ?? ([] satisfies HighlightType[])),
     [data?.user_highlights],
   );
 
-  // Collect all comments from all root posts for highlighter
-  const allComments = useMemo(() => {
-    const comments: PostCommentType[] = [];
+  const postsFromGroups = useMemo(() => {
+    const posts: Array<HighlightType["post"]> = [];
     for (const group of groupedHighlights) {
-      if (group.root_post.comments) {
-        comments.push(...group.root_post.comments);
+      for (const highlight of group.highlights) {
+        posts.push(highlight.post);
       }
     }
-    return comments;
+    return posts;
   }, [groupedHighlights]);
 
-  const highlighter = useHighlighter({ comments: allComments });
+  const highlighter = useHighlighter({ posts: postsFromGroups });
 
   return (
     <Stack gap="gap.lg">
@@ -142,13 +139,13 @@ export function Library() {
                       <Text fontSize="xs" color="fg.muted">
                         Comment by{" "}
                         {/* todo the date format is shit, we need to use client/src/utils/date-fns.ts */}
-                        {highlight.comment.source_author ||
-                          highlight.comment.author?.username ||
+                        {highlight.post.source_author ||
+                          highlight.post.author?.username ||
                           "Anonymous"}
                         {" · "}
                         {new Date(
-                          highlight.comment.posts_source?.[0]?.created_at_external ||
-                            highlight.comment.created_at,
+                          highlight.post.posts_source?.[0]?.created_at_external ||
+                            highlight.post.created_at,
                         ).toLocaleDateString()}
                       </Text>
                       <Text fontSize="xs" color="fg.subtle">
@@ -156,7 +153,7 @@ export function Library() {
                       </Text>
                     </Stack>
 
-                    <PostContentHighlighted post={highlighter.highlight(highlight.comment)} />
+                    <PostContentHighlighted post={highlighter.highlight(highlight.post)} />
                   </Box>
                 </Stack>
               ))}

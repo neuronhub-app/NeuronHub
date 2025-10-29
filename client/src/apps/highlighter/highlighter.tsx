@@ -26,7 +26,7 @@ export namespace highlighter {
       function handleSelection() {
         const selection = document.getSelection();
         if (selection?.toString() && selection.rangeCount > 0) {
-          state.mutable.text = selection.toString().trim(); // #AI not sure why, we try to match verbatim. it seems to work atm
+          state.mutable.text = selection.toString();
           const { text_prefix, text_postfix } = getSelectionContext(selection);
           state.mutable.text_prefix = text_prefix;
           state.mutable.text_postfix = text_postfix;
@@ -54,6 +54,7 @@ export namespace highlighter {
       };
     }, []);
 
+    // todo refac: move out to reduce complexity
     useEffect(() => {
       function isKeyMeta(event: KeyboardEvent) {
         return event.key === "Meta" || event.code === "MetaLeft" || event.code === "MetaRight";
@@ -194,34 +195,42 @@ export namespace highlighter {
     selectionRange: Range,
     highlightableElem: Element,
     direction: "prefix" | "postfix",
-    maxChars: number = 20,
+    maxChars: number = 40,
   ): string {
     const elemRange = document.createRange();
     elemRange.selectNodeContents(highlightableElem);
 
     if (direction === "prefix") {
       elemRange.setEnd(selectionRange.startContainer, selectionRange.startOffset);
-    } else {
+    }
+    if (direction === "postfix") {
       elemRange.setStart(selectionRange.endContainer, selectionRange.endOffset);
     }
 
-    let text = elemRange.toString();
-    if (text.length > maxChars) {
+    let textContext = elemRange.toString();
+
+    const isTrimNeeded = textContext.length > maxChars;
+    if (isTrimNeeded) {
       if (direction === "prefix") {
-        text = text.slice(-maxChars);
-        const firstSpaceIndex = text.indexOf(" ");
-        if (firstSpaceIndex > 0) {
-          text = text.slice(firstSpaceIndex + 1);
-        }
-      } else {
-        text = text.slice(0, maxChars);
-        const lastSpaceIndex = text.lastIndexOf(" ");
-        if (lastSpaceIndex > 0) {
-          text = text.slice(0, lastSpaceIndex);
-        }
+        textContext = textContext.slice(-maxChars);
+        // const firstSpaceIndex = textContext.indexOf(" ");
+        // // For prefix, trim at first word boundary but preserve trailing spaces
+        // // if (firstSpaceIndex > 0 && firstSpaceIndex < text.length - 1) {
+        // if (firstSpaceIndex > 0) { // why?
+        //   textContext = textContext.slice(firstSpaceIndex + 1);
+        // }
+      }
+      if (direction === "postfix") {
+        textContext = textContext.slice(0, maxChars);
+        // const lastSpaceIndex = textContext.lastIndexOf(" ");
+        // if (lastSpaceIndex > 0) { // why?
+        // // trim at last word boundary but preserve leading spaces
+        // // if (lastSpaceIndex > 0 && lastSpaceIndex < text.length - 1) {
+        //   textContext = textContext.slice(0, lastSpaceIndex);
+        // }
       }
     }
-    return text.trim(); // #AI not sure why, we try to match verbatim. it seems to work atm
+    return textContext;
   }
 
   async function saveHighlight(args: {

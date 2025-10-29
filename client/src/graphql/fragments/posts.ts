@@ -108,6 +108,7 @@ export const CommentFieldsFragment = graphql(
       }
       parent {
         id
+        type
       }
       content_polite
       content_direct

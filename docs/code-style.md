@@ -98,6 +98,7 @@ Code blocks can be marked with:
 - `#AI-slop` - trash to drop or rewrite
 - `#bad-infer` - broken TS type inference - over time check if they fixed it
 - `#prob-redundant` - may not be useful, but removing will require extra testing
+- `#draft` - not working or not ready for prod
 
 ## Extra
 

@@ -6,7 +6,7 @@ import { PostCard } from "@/components/posts/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
 import { PostImportRefreshButton } from "@/components/posts/PostDetail/PostImportRefreshButton";
-import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
+import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { PostTypeEnum } from "~/graphql/enums";
 
@@ -42,23 +42,17 @@ export function PostDetail(props: {
             <Heading size="lg">Comments</Heading>
 
             <VStack px={0} align="flex-start" gap="gap.md">
-              <For
-                each={props.post.comments.filter(
-                  // top-level comments
-                  comment => comment.parent?.type !== PostTypeEnum.Comment,
-                )}
-              >
-                {comment => {
-                  const commentTyped: PostCommentType = comment;
-
-                  return (
+              <For each={props.post.comments}>
+                {comment =>
+                  // only render top-level comments
+                  comment.parent?.type !== PostTypeEnum.Comment ? (
                     <CommentThread
                       key={comment.id}
-                      comment={highlighter.highlight(commentTyped)}
+                      comment={highlighter.highlight(comment)}
                       post={props.post!}
                     />
-                  );
-                }}
+                  ) : null
+                }
               </For>
             </VStack>
 
