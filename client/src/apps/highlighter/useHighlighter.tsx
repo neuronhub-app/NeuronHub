@@ -74,7 +74,10 @@ export function useHighlighter(props: UseHighlighterProps) {
             data-${highlighter.attrs.highlightActive}="${false}"
           >${text}</mark>
         `.trim();
-        // try matching #AI
+
+        // try matching
+        // todo fix: use regex matching. currently breaks if text_prefix/postfix capture `\n` or whatever
+        // #AI
         if (text_prefix || text_postfix) {
           const pattern = `${text_prefix}${text}${text_postfix}`;
           if (postNewContent.includes(pattern)) {

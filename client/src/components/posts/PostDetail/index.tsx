@@ -42,17 +42,28 @@ export function PostDetail(props: {
             <Heading size="lg">Comments</Heading>
 
             <VStack px={0} align="flex-start" gap="gap.md">
+              {/* .map() here causes #bad-infer */}
               <For each={props.post.comments}>
-                {comment =>
-                  // only render top-level comments
-                  comment.parent?.type !== PostTypeEnum.Comment ? (
-                    <CommentThread
-                      key={comment.id}
-                      comment={highlighter.highlight(comment)}
-                      post={props.post!}
-                    />
-                  ) : null
-                }
+                {(comment, _index) => {
+                  const isTopComment = comment.parent?.type !== PostTypeEnum.Comment;
+                  if (isTopComment) {
+                    const topLevelComments = props.post!.comments.filter(
+                      c => c.parent?.type !== PostTypeEnum.Comment,
+                    );
+                    const topLevelIndex = topLevelComments.findIndex(c => c.id === comment.id);
+                    return (
+                      <CommentThread
+                        key={comment.id}
+                        comment={highlighter.highlight(comment)}
+                        post={props.post!}
+                        depth={0}
+                        isLastChild={topLevelIndex === topLevelComments.length - 1}
+                        isFirstChild={true}
+                        height={{ parent: 0, toolbar: 0, avatar: 0 }} // init values
+                      />
+                    );
+                  }
+                }}
               </For>
             </VStack>
 

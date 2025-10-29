@@ -94,6 +94,10 @@ export namespace ids {
       edit: "comment.btn.edit",
       reply: "comment.btn.reply",
     },
+    thread: {
+      line: "comment.thread.line",
+      toggleButton: "comment.thread.toggle-button",
+    },
   } as const;
 
   export const highlighter = {
