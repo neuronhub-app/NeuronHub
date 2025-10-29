@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Any, NotRequired, TypedDict, cast
+
 from markdownify import markdownify
 
 
@@ -158,11 +159,6 @@ class ImporterHackerNews:
                     "source": self._build_HN_item_url(post_data["id"]),
                 },
             )
-            # todo async
-            if not post_source.post:
-                post_source.post = post
-                await post_source.asave(update_fields=["post"])
-
         else:  # type = comment
             assert parent
             post, _ = await Post.objects.aupdate_or_create(
