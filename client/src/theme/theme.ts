@@ -61,6 +61,9 @@ export const system = createSystem(
             return this._hover;
           },
         },
+        em: {
+          fontStyle: "italic",
+        },
       },
 
       theme: {
