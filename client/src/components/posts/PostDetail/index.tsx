@@ -49,7 +49,6 @@ export function PostDetail(props: {
                 )}
               >
                 {comment => {
-                  // @ts-expect-error #bad-infer
                   const commentTyped: PostCommentType = comment;
 
                   return (

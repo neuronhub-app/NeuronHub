@@ -2,7 +2,7 @@ import { captureException } from "@sentry/react";
 import toast from "react-hot-toast";
 import { PostCreateForm } from "@/apps/posts/create/PostCreateForm";
 import { graphql } from "@/gql-tada";
-import { PostEditFragment, type PostEditFragmentType } from "@/graphql/fragments/posts";
+import { PostEditFragment } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/posts/edit/+types/index";
 
@@ -24,8 +24,5 @@ export default function PostEditRoute(props: Route.ComponentProps) {
   if (!data?.post) {
     return <div>Post not found</div>;
   }
-
-  // @ts-expect-error #bad-infer by Apollo
-  const post: PostEditFragmentType = data?.post ?? undefined;
-  return <PostCreateForm.Comp post={post} />;
+  return <PostCreateForm.Comp post={data?.post ?? undefined} />;
 }

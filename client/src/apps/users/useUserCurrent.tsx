@@ -20,17 +20,13 @@ export function useUser() {
 
   useEffect(() => {
     if (data?.user_current) {
-      // @ts-expect-error #bad-infer, by Apollo
-      const userCurrent: User = data.user_current;
-      user.state.current = userCurrent;
+      user.state.current = data.user_current;
     }
 
     if (data?.user_current?.connection_groups) {
-      const connectionsUntyped = data.user_current.connection_groups
+      const connections = data.user_current.connection_groups
         .flatMap(group => group?.connections)
         .filter(Boolean);
-      // @ts-expect-error #bad-infer, by Apollo
-      const connections: UserConnection[] = connectionsUntyped;
       const connectionsUniqueMap = new Map(
         connections.map(conn => [`${conn.id}-${conn.username}`, conn]),
       );

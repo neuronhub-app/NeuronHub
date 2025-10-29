@@ -1,4 +1,4 @@
-import { ListContainer, type PostListItemType } from "@/components/posts/ListContainer";
+import { ListContainer } from "@/components/posts/ListContainer";
 import { graphql } from "@/gql-tada";
 import { PostReviewFragment } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
@@ -16,13 +16,10 @@ export function PostReviewList() {
       [PostReviewFragment],
     ),
   );
-
-  // @ts-expect-error bad infer
-  const posts: PostListItemType[] = data?.post_reviews ?? [];
   return (
     <ListContainer
       title="Reviews"
-      items={posts}
+      items={data?.post_reviews ?? []}
       urlNamespace="reviews"
       isLoadingFirstTime={isLoadingFirstTime}
       error={error}
