@@ -77,10 +77,12 @@ test.describe("Comments", () => {
     await play.click(ids.post.card.link.detail);
     await play.waitForNetworkIdle();
 
+    // Test both regular text and code blocks in one comment
     const comment = {
       highlighted: "highlight some text",
+      highlightedCode: "important code",
       get content() {
-        return `Test comment. We will ${this.highlighted}. For testing.`;
+        return `Test comment. We will ${this.highlighted}. Also test inline \`${this.highlightedCode}\` in backticks.`;
       },
     };
     await play.screenshot();
@@ -161,5 +163,53 @@ test.describe("Comments", () => {
     await $[ids.highlighter.btn.delete].click();
     await play.reload({ idleWait: true });
     await expect($[ids.highlighter.span]).not.toBeAttached();
+
+    // Test 2: Highlight text in code blocks
+    await play.fill(
+      ids.comment.form.textarea,
+      `Test inline code: \`${comment.highlightedCode}\` here.`,
+    );
+    await play.submit(ids.post.form);
+    await play.waitForNetworkIdle();
+
+    // Select text inside code block
+    await page.evaluate(
+      ctx => {
+        const codeElement = document.querySelector("code");
+        if (!codeElement) throw new Error("Code element not found");
+
+        const textNode = Array.from(codeElement.childNodes).find(
+          node =>
+            node.nodeType === Node.TEXT_NODE && node.textContent?.includes(ctx.highlightedCode),
+        );
+        if (!textNode) throw new Error("Text in code not found");
+
+        const range = document.createRange();
+        const startOffset = textNode.textContent!.indexOf(ctx.highlightedCode);
+        range.setStart(textNode, startOffset);
+        range.setEnd(textNode, startOffset + ctx.highlightedCode.length);
+
+        const selection = window.getSelection();
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      },
+      { highlightedCode: comment.highlightedCode },
+    );
+
+    await expect($[ids.highlighter.btn.save]).toBeVisible();
+    await $[ids.highlighter.btn.save].click();
+    await play.waitForNetworkIdle();
+
+    // Reload and verify highlight in code block renders correctly (not escaped)
+    await play.reload({ idleWait: true });
+    const highlightSpans = await page.locator(`[data-testid="${ids.highlighter.span}"]`).all();
+    expect(highlightSpans.length).toBeGreaterThan(0);
+
+    // Verify at least one highlight is in a code block
+    const isInCodeBlock = await page.evaluate(() => {
+      const highlights = document.querySelectorAll(`[data-testid="highlighter.span"]`);
+      return Array.from(highlights).some(h => h.closest("code") !== null);
+    });
+    expect(isInCodeBlock).toBe(true);
   });
 });

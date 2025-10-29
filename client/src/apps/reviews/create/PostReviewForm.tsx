@@ -1,14 +1,12 @@
 import { Fieldset, Flex, Heading, HStack, Show, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatISO } from "date-fns";
-import { marked } from "marked";
 import { FormProvider, useForm } from "react-hook-form";
 import { FaStar } from "react-icons/fa";
 import { FaBookmark, FaCircleXmark, FaClockRotateLeft, FaHeartPulse } from "react-icons/fa6";
 import { FiSave } from "react-icons/fi";
 import { HiOutlineClock } from "react-icons/hi2";
 import { useNavigate } from "react-router";
-
 import { mutateReview } from "@/apps/reviews/create/mutateReview";
 import { PostReviewDeleteButton } from "@/apps/reviews/create/PostReviewDeleteButton";
 import { useUser } from "@/apps/users/useUserCurrent";
@@ -28,6 +26,7 @@ import { graphql, type ID } from "@/gql-tada";
 import { isEditMode, type PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
+import { markedConfigured } from "@/utils/marked-configured";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
@@ -214,7 +213,7 @@ export namespace PostReviewForm {
                         <Prose
                           // biome-ignore lint/security/noDangerouslySetInnerHtml: cleaned by server
                           dangerouslySetInnerHTML={{
-                            __html: marked.parse(
+                            __html: markedConfigured.parse(
                               props.review.parent.content_polite ||
                                 props.review.parent.content_direct ||
                                 props.review.parent.content_rant ||

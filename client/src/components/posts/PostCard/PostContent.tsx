@@ -1,10 +1,10 @@
 import { Stack } from "@chakra-ui/react";
-import { marked } from "marked";
 import type { PostContentField, PostListItemType } from "@/components/posts/ListContainer";
 import { Prose } from "@/components/ui/prose";
 import { Tag } from "@/components/ui/tag";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
+import { markedConfigured } from "@/utils/marked-configured";
 
 // todo refac-name: PostCardContent
 export function PostContent(props: { post: PostListItemType }) {
@@ -46,7 +46,7 @@ export function PostContent(props: { post: PostListItemType }) {
     const prose = (
       <Prose
         // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-        dangerouslySetInnerHTML={{ __html: marked.parse(item.content) }}
+        dangerouslySetInnerHTML={{ __html: markedConfigured.parse(item.content) }}
         size="md"
         mt={-1}
         {...ids.set(item.id)}
@@ -85,7 +85,7 @@ export function PostContent(props: { post: PostListItemType }) {
           </Tooltip>
           <Prose
             // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-            dangerouslySetInnerHTML={{ __html: marked.parse(item.content) }}
+            dangerouslySetInnerHTML={{ __html: markedConfigured.parse(item.content) }}
             size="md"
             {...ids.set(item.id)}
           />

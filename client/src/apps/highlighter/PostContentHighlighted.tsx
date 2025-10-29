@@ -1,5 +1,4 @@
 import { Icon, Menu, Portal, Spinner } from "@chakra-ui/react";
-import { marked } from "marked";
 import type * as React from "react";
 import { useRef } from "react";
 import { FaTrashCan } from "react-icons/fa6";
@@ -8,15 +7,16 @@ import { highlighter, isHTMLElement } from "@/apps/highlighter/highlighter";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
-import type { PostCommentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { markedConfigured } from "@/utils/marked-configured";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { HighlightType } from "@/apps/library/Library";
 
 /**
  * Shows highlights & deletion UI.
  */
-export function PostContentHighlighted(props: { post: PostCommentType }) {
+export function PostContentHighlighted(props: { post: HighlightType["post"] }) {
   const state = useValtioProxyRef<{
     activeHighlightId: string | null;
   }>({
@@ -83,7 +83,7 @@ export function PostContentHighlighted(props: { post: PostCommentType }) {
         onClick={handleProseClick}
         // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
         dangerouslySetInnerHTML={{
-          __html: marked.parse(
+          __html: markedConfigured.parse(
             props.post.content_polite || props.post.content_direct || props.post.content_rant,
           ),
         }}
