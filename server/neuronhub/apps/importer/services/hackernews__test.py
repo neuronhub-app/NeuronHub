@@ -31,18 +31,24 @@ class HackerNewsImportTest(NeuronTestCase):
         assert comments > 0
 
     async def test_import_story_with_comment_ranks(self):
-        post = await self._import_test_post()
+        await self._import_test_post()
 
-        comment_sources = []
+        comment_sources_all: list[dict[str, int]] = []  # type: ignore
         async for source in (
-            PostSource.objects.filter(post__parent=post)
-            .order_by("-rank")[:15]
-            .values_list("rank", "id_external")
+            PostSource.objects.filter(post__type=Post.Type.Comment)
+            .select_related("post")
+            .values_list("id", "rank")
         ):
-            comment_sources.append(source)
+            comment_sources_all.append(source)
 
-        for rank, _ in comment_sources:
-            assert rank is not None
+        comments_count = await Post.objects.filter(type=Post.Type.Comment).acount()
+        comment_sources_ranked = 0
+        for comment_id, rank in comment_sources_all:
+            if rank is not None:
+                comment_sources_ranked += 1
+
+        assert len(comment_sources_all) == comment_sources_ranked, "All Comments must have .rank"
+        assert len(comment_sources_all) == comments_count
 
     async def _import_test_post(self):
         importer = ImporterHackerNews(is_use_cache=True, is_logs_enabled=False)

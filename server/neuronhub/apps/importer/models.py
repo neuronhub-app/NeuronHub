@@ -35,6 +35,9 @@ class PostSource(TimeStampedModel):
 
     created_at_external = models.DateTimeField(blank=True, null=True)
 
+    def __str__(self):
+        return f"PostSource(id={self.id}, score={self.score or self.rank})"
+
 
 class UserSource(TimeStampedModel):
     post = models.ForeignKey(

@@ -114,6 +114,7 @@ class ImporterHackerNews:
         is_post: bool,
         parent: Post | None = None,
         rank: int | None = None,
+        comment_ranks: dict[ID, Rank] | None = None,
     ) -> Post:
         self._log_progress(data["id"], Post.Type.Post if is_post else Post.Type.Comment)
 
@@ -171,14 +172,20 @@ class ImporterHackerNews:
                 },
             )
 
+        post_source.post_id = post.id
+        await post_source.asave(update_fields=["post"])
+
         if comments := data.get("children"):
             if not self._comments_total:
                 self._comments_total = self._count_total_comments_recursively(comments)
                 self._comments_imported = 0
 
-            comment_ranks = {}
+            # For top-level posts, compute all comment ranks recursively
             if is_post:
                 comment_ranks = await self._derive_comment_ranks(data)
+            # For nested comments, use the ranks passed from parent
+            else:
+                comment_ranks = comment_ranks or {}
 
             await asyncio.gather(
                 *[
@@ -187,6 +194,7 @@ class ImporterHackerNews:
                         is_post=False,
                         parent=post,
                         rank=comment_ranks.get(comment["id"]),
+                        comment_ranks=comment_ranks,  # Pass the full ranks dict to nested imports
                     )
                     for comment in comments
                 ]
@@ -209,14 +217,35 @@ class ImporterHackerNews:
         item_json: firebase.Post | firebase.Comment = await self._request_json(
             f"{self._api_firebase}/item/{parent['id']}.json"
         )
-        comments = item_json["kids"]
-        if not comments:
+        comment_ids = item_json.get("kids", [])
+        if not comment_ids:
             return {}
 
+        return await self._derive_ranks_by_ids_recursively(comment_ids)
+
+    async def _derive_ranks_by_ids_recursively(self, comment_ids: list[ID]) -> dict[ID, Rank]:
         comment_ranks: dict[ID, Rank] = {}
-        for comment_position, comment_id in enumerate(comments):
-            comment_ranks[comment_id] = len(comments) - comment_position
+
+        for comment_id_position, comment_id in enumerate(comment_ids):
+            comment_ranks[comment_id] = len(comment_ids) - comment_id_position
+
+        children_ranks = await asyncio.gather(
+            *[self._get_nested_comment_ranks(comment_id) for comment_id in comment_ids]
+        )
+        for child_ranks in children_ranks:
+            comment_ranks.update(child_ranks)
+
         return comment_ranks
+
+    async def _get_nested_comment_ranks(self, comment_id: ID) -> dict[ID, Rank]:
+        item_json: firebase.Comment = await self._request_json(
+            f"{self._api_firebase}/item/{comment_id}.json"
+        )
+        nested_comment_ids = item_json.get("kids", [])
+        if not nested_comment_ids:
+            return {}
+
+        return await self._derive_ranks_by_ids_recursively(nested_comment_ids)
 
     def _log_progress(self, item_id: ID, post_type: PostTypeEnum):
         if not self.is_logs_enabled:
