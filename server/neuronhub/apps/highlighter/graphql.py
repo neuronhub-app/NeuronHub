@@ -16,6 +16,12 @@ from neuronhub.apps.posts.models import Post
 from neuronhub.apps.users.models import User
 
 
+@strawberry_django.order_type(PostHighlight)
+class PostHighlightOrder:
+    created_at: auto
+    updated_at: auto
+
+
 @strawberry_django.type(PostHighlight)
 class PostHighlightType:
     id: auto

@@ -6,7 +6,13 @@ from neuronhub.apps.users.models import User
 
 
 class PostHighlight(TimeStampedModel):
-    post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True)
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_query_name="post_highlight",
+        related_name="post_highlights",
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     text_prefix = models.CharField(max_length=64, blank=True, help_text="for position matcher")

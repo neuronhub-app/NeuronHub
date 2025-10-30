@@ -67,9 +67,9 @@ async def db_stubs_repopulate(
     await _create_post_news(user, gen=gen)
 
     # todo refac: do only on request, as it adds +3s
-    post_with_50_comments = 45645349
+    post_with_90_comments_and_idents = 45487476
     importer = ImporterHackerNews(is_use_cache=True, is_logs_enabled=False)
-    await importer.import_post(post_with_50_comments)
+    await importer.import_post(post_with_90_comments_and_idents)
 
     return gen
 

@@ -15,7 +15,7 @@ from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
-from neuronhub.apps.importer.graphql.types import PostSourceType
+from neuronhub.apps.importer.graphql.types import PostSourceType, PostSourceOrder
 from neuronhub.apps.posts.services.filter_posts_by_user import filter_posts_by_user
 from neuronhub.apps.users.graphql.types import UserConnectionGroupType
 from neuronhub.apps.users.graphql.types import UserType
@@ -29,6 +29,13 @@ class PostFilter:
     type: auto
     category: auto
     title: auto
+
+
+@strawberry_django.order_type(Post)
+class PostOrder:
+    created_at: auto
+    updated_at: auto
+    post_source: PostSourceOrder
 
 
 # seems as a bug in PyCharm re PyDataclass
@@ -85,7 +92,7 @@ class PostTypeI:
         return filter_posts_by_user(user, posts=queryset)
 
 
-@strawberry_django.type(Post, filters=PostFilter)
+@strawberry_django.type(Post, filters=PostFilter, ordering=PostOrder)
 class PostType(PostTypeI):
     TYPE = Post.Type.Post
 
@@ -120,7 +127,7 @@ class PostReviewType(PostTypeI):
     is_review_later: auto
 
 
-@strawberry_django.type(Post, filters=PostFilter)
+@strawberry_django.type(Post, filters=PostFilter, ordering=PostOrder)
 class PostCommentType(PostTypeI):
     TYPE = Post.Type.Comment
 

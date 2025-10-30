@@ -189,7 +189,7 @@ type PostCommentType implements PostTypeI {
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!
-  comments(filters: PostFilter): [PostCommentType!]!
+  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -250,6 +250,12 @@ type PostImportRefreshResult {
   comments_added: Int!
 }
 
+input PostOrder @oneOf {
+  created_at: Ordering
+  updated_at: Ordering
+  post_source: PostSourceOrder
+}
+
 input PostReviewOrder @oneOf {
   reviewed_at: Ordering
 }
@@ -261,7 +267,7 @@ type PostReviewType implements PostTypeI {
   seen_by_users: [DjangoModelType!]!
   parent: PostToolType!
   children: [PostTypeI!]!
-  comments(filters: PostFilter): [PostCommentType!]!
+  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -301,6 +307,14 @@ type PostSimpleType {
   id: ID!
 }
 
+input PostSourceOrder @oneOf {
+  created_at: Ordering
+  updated_at: Ordering
+  created_at_external: Ordering
+  rank: Ordering
+  score: Ordering
+}
+
 type PostSourceType {
   id: ID!
   post: DjangoModelType
@@ -329,7 +343,7 @@ input PostTagFilter {
 
 type PostTagType {
   id: ID!
-  posts(filters: PostFilter): [PostType!]!
+  posts(filters: PostFilter, ordering: [PostOrder!]! = []): [PostType!]!
   tag_parent: PostTagType
   tag_children(filters: PostTagFilter): [PostTagType!]!
   votes: [PostTagVoteType!]!
@@ -367,7 +381,7 @@ type PostToolType implements PostTypeI {
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!
-  comments(filters: PostFilter): [PostCommentType!]!
+  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -405,7 +419,7 @@ type PostType implements PostTypeI {
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!
-  comments(filters: PostFilter): [PostCommentType!]!
+  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -496,7 +510,7 @@ interface PostTypeI {
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
   children: [PostTypeI!]!
-  comments(filters: PostFilter): [PostCommentType!]!
+  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -573,10 +587,10 @@ type Query {
   post_tool(pk: ID!): PostToolType
   post_review(pk: ID!): PostReviewType
   post_comment(pk: ID!): PostCommentType
-  posts(filters: PostFilter): [PostType!]!
+  posts(filters: PostFilter, ordering: [PostOrder!]! = []): [PostType!]!
   post_tools(filters: PostFilter): [PostToolType!]!
   post_reviews(ordering: [PostReviewOrder!]! = []): [PostReviewType!]!
-  post_comments(filters: PostFilter): [PostCommentType!]!
+  post_comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   tags(filters: PostTagFilter): [PostTagType!]!
   post_highlights(post_ids: [ID!]!): [PostHighlightType!]! @IsAuthenticated
   post_highlight(post_id: ID!): PostHighlightType! @IsAuthenticated

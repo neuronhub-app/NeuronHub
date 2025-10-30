@@ -43,7 +43,7 @@ export const PostFragment = graphql(
           id
         }
       }
-      comments {
+      comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
         id
         type
         content_polite
@@ -59,9 +59,9 @@ export const PostFragment = graphql(
         }
         created_at
         updated_at
-        comments {
+        comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
           id
-          comments {
+          comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
             id
           }
         }
@@ -138,19 +138,19 @@ export const CommentFieldsFragment = graphql(
 export const PostCommentsFragment = graphql(
   `
     fragment PostCommentsFragment on PostTypeI {
-      comments {
+      comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
         ...CommentFieldsFragment
-        comments {
+        comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
           ...CommentFieldsFragment
-          comments {
+          comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
             ...CommentFieldsFragment
-            comments {
+            comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
               ...CommentFieldsFragment
-              comments {
+              comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
                 ...CommentFieldsFragment
-                comments {
+                comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
                   ...CommentFieldsFragment
-                  comments {
+                  comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
                     ...CommentFieldsFragment
                   }
                 }
