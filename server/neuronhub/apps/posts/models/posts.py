@@ -99,6 +99,14 @@ class Post(AnonimazableTimeStampedModel):
         ),
         related_name="children",
     )
+    parent_root = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        help_text="eg Post<Comment> can have a .parent Post<Comment>, but .parent_root is always not a Comment",
+        related_name="root_children",
+    )
 
     alternatives = models.ManyToManyField(
         "self",
@@ -122,6 +130,12 @@ class Post(AnonimazableTimeStampedModel):
         related_name="posts_seen",
         blank=True,
         help_text="Marked 'seen' if present in browser's ViewBox for ~4 seconds",
+    )
+    collapsed_by_users = models.ManyToManyField(
+        User,
+        related_name="posts_collapsed",
+        blank=True,
+        help_text="Collapsed in the UI, eg CommentThread",
     )
 
     history = HistoricalRecords(

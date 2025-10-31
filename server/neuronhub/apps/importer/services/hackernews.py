@@ -97,7 +97,10 @@ class ImporterHackerNews:
             *[self._request_json(f"{self._api_algolia}/items/{post_id}") for post_id in post_ids]
         )
         posts_imported = await asyncio.gather(
-            *[self._import_item(data=post_json, is_post=True) for post_json in post_jsons]
+            *[
+                self._import_item(data=post_json, is_post=True, is_root=True)
+                for post_json in post_jsons
+            ]
         )
 
         self._log_import("Completed")
@@ -105,7 +108,7 @@ class ImporterHackerNews:
 
     async def import_post(self, id_ext: ID) -> Post:
         post_json = await self._request_json(f"{self._api_algolia}/items/{id_ext}")
-        return await self._import_item(data=post_json, is_post=True)
+        return await self._import_item(data=post_json, is_root=True, is_post=True)
 
     async def _import_item(
         self,
@@ -113,6 +116,8 @@ class ImporterHackerNews:
         data: algolia.Post | algolia.Comment,
         is_post: bool,
         parent: Post | None = None,
+        parent_root: Post | None = None,
+        is_root: bool = False,
         rank: int | None = None,
         comment_ranks: dict[ID, Rank] | None = None,
     ) -> Post:
@@ -156,12 +161,12 @@ class ImporterHackerNews:
             post, _ = await Post.objects.aupdate_or_create(
                 type=Post.Type.Post,
                 post_source=post_source,
-                defaults={
+                defaults=dict(
                     **post_defaults,
-                    "title": post_data["title"],
-                    "content_direct": markdownify(post_data.get("text") or ""),
-                    "source": self._build_HN_item_url(post_data["id"]),
-                },
+                    title=post_data["title"],
+                    content_direct=markdownify(post_data.get("text") or ""),
+                    source=self._build_HN_item_url(post_data["id"]),
+                ),
             )
         else:  # type = comment
             assert parent
@@ -169,11 +174,14 @@ class ImporterHackerNews:
                 type=Post.Type.Comment,
                 parent=parent,
                 post_source=post_source,
-                defaults={
+                defaults=dict(
                     **post_defaults,
-                    "content_polite": markdownify(data["text"]),
-                },
+                    content_polite=markdownify(data["text"]),
+                ),
             )
+
+        if is_root:
+            parent_root = post
 
         post_source.post_id = post.id
         await post_source.asave(update_fields=["post"])
@@ -196,6 +204,7 @@ class ImporterHackerNews:
                         data=comment,
                         is_post=False,
                         parent=post,
+                        parent_root=parent_root,
                         rank=comment_ranks.get(comment["id"]),
                         comment_ranks=comment_ranks,  # Pass the full ranks dict to nested imports
                     )

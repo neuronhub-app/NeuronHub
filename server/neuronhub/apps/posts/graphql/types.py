@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 @strawberry_django.filter_type(Post, lookups=True)
 class PostFilter:
+    parent_root: auto
     type: auto
     category: auto
     title: auto
@@ -48,6 +49,7 @@ class PostTypeI:
     seen_by_users: auto
 
     parent: PostTypeI | None
+    parent_root: PostTypeI | None
     children: list[PostTypeI]
     comments: list[PostCommentType] = strawberry_django.field(field_name="children")
 

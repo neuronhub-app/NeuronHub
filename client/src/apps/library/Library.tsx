@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, HStack, IconButton, Stack, Text, } from "@chakra-ui/react";
+import { Box, Flex, Heading, HStack, IconButton, Stack, Text } from "@chakra-ui/react";
 import { useMemo } from "react";
 import { FaComments } from "react-icons/fa";
 import { NavLink } from "react-router";

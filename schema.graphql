@@ -44,6 +44,10 @@ type DjangoImageType {
   height: Int!
 }
 
+input DjangoModelFilterInput {
+  pk: ID!
+}
+
 input DjangoModelInput {
   id: ID!
 }
@@ -188,6 +192,7 @@ type PostCommentType implements PostTypeI {
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
+  parent_root: PostTypeI
   children: [PostTypeI!]!
   comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
@@ -219,6 +224,7 @@ type PostCommentType implements PostTypeI {
 }
 
 input PostFilter {
+  parent_root: DjangoModelFilterInput
   type: PostTypeEnumFilterLookup
   category: PostCategoryFilterLookup
   title: StrFilterLookup
@@ -266,6 +272,7 @@ type PostReviewType implements PostTypeI {
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostToolType!
+  parent_root: PostTypeI
   children: [PostTypeI!]!
   comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
@@ -380,6 +387,7 @@ type PostToolType implements PostTypeI {
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
+  parent_root: PostTypeI
   children: [PostTypeI!]!
   comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
@@ -418,6 +426,7 @@ type PostType implements PostTypeI {
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
+  parent_root: PostTypeI
   children: [PostTypeI!]!
   comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
@@ -509,6 +518,7 @@ interface PostTypeI {
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
+  parent_root: PostTypeI
   children: [PostTypeI!]!
   comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
@@ -687,6 +697,7 @@ type UserType {
   post_tag_votes: [PostTagVoteType!]!
   read_later: [DjangoModelType!]!
   library: [DjangoModelType!]!
+  posts_collapsed(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
 }
 
 input UserTypeInput {

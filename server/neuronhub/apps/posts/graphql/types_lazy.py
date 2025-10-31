@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from neuronhub.apps.posts.graphql.types import PostType
     from neuronhub.apps.posts.graphql.types import PostVoteType
     from neuronhub.apps.posts.graphql.types import PostTagVoteType
+    from neuronhub.apps.posts.graphql.types import PostCommentType
 
 
 _posts_types = lazy("neuronhub.apps.posts.graphql.types")
@@ -15,6 +16,7 @@ _posts_types = lazy("neuronhub.apps.posts.graphql.types")
 PostTypeLazy = Annotated["PostType", _posts_types]
 PostVoteTypeLazy = Annotated["PostVoteType", _posts_types]
 PostTagVoteTypeLazy = Annotated["PostTagVoteType", _posts_types]
+PostCommentTypeLazy = Annotated["PostCommentType", _posts_types]
 
 
 class ReviewTagName(models.TextChoices):

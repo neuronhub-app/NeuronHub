@@ -3,6 +3,7 @@ from strawberry import auto
 
 from neuronhub.apps.posts.graphql.types_lazy import PostVoteTypeLazy
 from neuronhub.apps.posts.graphql.types_lazy import PostTagVoteTypeLazy
+from neuronhub.apps.posts.graphql.types_lazy import PostCommentTypeLazy
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
 
@@ -31,6 +32,8 @@ class UserType:
 
     read_later: auto
     library: auto
+
+    posts_collapsed: list[PostCommentTypeLazy]
 
 
 @strawberry_django.input(User, partial=True)
