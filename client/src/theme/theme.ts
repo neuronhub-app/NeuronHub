@@ -44,6 +44,7 @@ export const system = createSystem(
         html: {
           colorPalette: "blue",
         },
+        // todo refac: move to apps.highlight, import from it in globalCss
         mark: {
           bg: { _dark: "sky.600", _light: "sky.200" },
           transition: "background 0.3s",
@@ -60,9 +61,6 @@ export const system = createSystem(
           get _focus() {
             return this._hover;
           },
-        },
-        em: {
-          fontStyle: "italic",
         },
       },
 
