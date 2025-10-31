@@ -137,6 +137,9 @@ class ImporterHackerNews:
             source_defaults = {
                 "json": self._clean_HN_json(comment_data),
                 "rank": rank,
+                "created_at_external": datetime.fromisoformat(
+                    comment_data["created_at"].replace("Z", "+00:00")
+                ),
             }
 
         post_source, _ = await PostSource.objects.aupdate_or_create(
