@@ -1,8 +1,13 @@
-import { Box, Heading, Stack, Text } from "@chakra-ui/react";
+import { Box, Flex, Heading, HStack, IconButton, Stack, Text, } from "@chakra-ui/react";
 import { useMemo } from "react";
+import { FaComments } from "react-icons/fa";
+import { NavLink } from "react-router";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import { useHighlighter } from "@/apps/highlighter/useHighlighter";
+import { countCommentsRecursively } from "@/components/posts/ListContainer";
 import { PostCard } from "@/components/posts/PostCard";
+import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
+import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { graphql, type ID, type ResultOf } from "@/gql-tada";
 import {
   CommentFieldsFragment,
@@ -10,6 +15,7 @@ import {
   PostFragment,
 } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { urls } from "@/routes";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 const UserHighlightsQuery = graphql(
@@ -103,54 +109,70 @@ export function Library() {
       {isLoadingFirstTime && <Text>Loading highlights...</Text>}
       {error && <Text color="fg.error">Error: {error.message}</Text>}
 
-      <Stack gap="gap.2xl">
+      <Stack gap="gap.lg">
         {groupedHighlights.map(group => (
           <Stack
             key={group.root_post.id}
-            gap="gap.lg"
+            gap="gap.sm"
             bg="bg.subtle"
             p="gap.lg"
             borderRadius="lg"
             {...getOutlineContrastStyle({ variant: "subtle" })}
           >
-            {/* Show the root post */}
-            <Stack gap="gap.sm">
-              <Text fontSize="xs" color="fg.muted" fontWeight="medium">
-                From Post
-              </Text>
-              <PostCard post={group.root_post} />
-            </Stack>
+            <PostCard post={group.root_post} />
+
+            <Flex gap="gap.lg">
+              <PostAuthor post={group.root_post} />
+              <NavLink
+                to={urls.getPostUrls(group.root_post).detail}
+                style={{ width: "min-content" }}
+              >
+                <IconButton
+                  variant="plain"
+                  colorPalette="gray"
+                  aria-label="Comments"
+                  color="gray.300"
+                  _hover={{ color: "slate.400" }}
+                  size="sm"
+                  h="auto"
+                >
+                  <FaComments />{" "}
+                  <Text color="gray.400">
+                    {countCommentsRecursively(group.root_post.comments)}
+                  </Text>
+                </IconButton>
+              </NavLink>
+            </Flex>
 
             <Stack aria-label="author & date" gap="gap.md">
               {group.highlights.map(highlight => (
                 <Stack gap="gap.sm" key={highlight.id}>
-                  <Text fontSize="xs" color="fg.muted" fontWeight="medium">
-                    Highlighted Comment
+                  <Text fontSize="xs" color="fg.subtle">
+                    Highlighted <PostDatetime datetimeStr={highlight.created_at} size="xs" />
                   </Text>
 
                   <Box
                     bg="bg.panel"
                     p="gap.md"
+                    pb="gap.sm"
                     borderRadius="md"
                     borderLeftWidth="3px"
                     borderColor="colorPalette.solid"
                   >
                     <Stack aria-label="author & date" gap="gap.xs" mb="gap.sm">
-                      <Text fontSize="xs" color="fg.muted">
-                        Comment by{" "}
-                        {/* todo the date format is shit, we need to use client/src/utils/date-fns.ts */}
-                        {highlight.post.source_author ||
-                          highlight.post.author?.username ||
-                          "Anonymous"}
-                        {" · "}
-                        {new Date(
-                          highlight.post.posts_source?.[0]?.created_at_external ||
-                            highlight.post.created_at,
-                        ).toLocaleDateString()}
-                      </Text>
-                      <Text fontSize="xs" color="fg.subtle">
-                        Highlighted on {new Date(highlight.created_at).toLocaleDateString()}
-                      </Text>
+                      <HStack gap="gap.sm">
+                        <Text fontSize="sm" color="fg.muted">
+                          {highlight.post.source_author || highlight.post.author?.username}
+                        </Text>
+
+                        <PostDatetime
+                          datetimeStr={
+                            highlight.post.posts_source?.[0]?.created_at_external ??
+                            highlight.post.created_at
+                          }
+                          size="xs"
+                        />
+                      </HStack>
                     </Stack>
 
                     <PostContentHighlighted post={highlighter.highlight(highlight.post)} />

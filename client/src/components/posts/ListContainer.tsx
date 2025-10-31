@@ -169,7 +169,7 @@ function getPostCategoryName(category?: PostCategory) {
   return category;
 }
 
-function countCommentsRecursively(comments?: PostFragmentType["comments"]) {
+export function countCommentsRecursively(comments?: PostFragmentType["comments"]) {
   if (!comments) {
     return 0;
   }

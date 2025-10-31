@@ -40,6 +40,12 @@ export function PostContent(props: { post: PostListItemType }) {
     return null;
   }
 
+  const style = {
+    mt: -1,
+    maxW: "3xl",
+    size: "sm",
+  } as const;
+
   if (items.length === 1) {
     const item = items[0];
 
@@ -47,8 +53,7 @@ export function PostContent(props: { post: PostListItemType }) {
       <Prose
         // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
         dangerouslySetInnerHTML={{ __html: markedConfigured.parse(item.content) }}
-        size="md"
-        mt={-1}
+        {...style}
         {...ids.set(item.id)}
       />
     );
@@ -86,7 +91,7 @@ export function PostContent(props: { post: PostListItemType }) {
           <Prose
             // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
             dangerouslySetInnerHTML={{ __html: markedConfigured.parse(item.content) }}
-            size="md"
+            {...style}
             {...ids.set(item.id)}
           />
         </Stack>
