@@ -10,7 +10,7 @@ requires-python = "~=3.14.0"
 dependencies = [
     # django
     "django == 5.2.*",
-        "pillow == 11.*", # [i=high, rep=high, GH=high, @hugovk, 13.1k] for ImageField. @hugovk is an ex-Python release manager; used by Django
+        "pillow == 12.*", # [i=high, rep=high, GH=high, @hugovk, 13.1k] for ImageField. @hugovk is an ex-Python release manager; used by Django
     "django-allauth == 65.*",
     "django-anymail == 13.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, KLOC +84/-40
     "django-cors-headers == 4.*", # [i=high, rep=highest, @adamchainz] Django Sec Team
@@ -69,7 +69,7 @@ dependencies = [
         "pytest-pspec ~= 0.0.4", # ~dead, mostly useless
         "pytest-rich == 0.*",
         "types-requests == 2.*",
-]
+    ]
 
 
 [tool.django-stubs]
