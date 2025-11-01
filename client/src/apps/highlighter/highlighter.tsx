@@ -90,6 +90,7 @@ export namespace highlighter {
     const isTextSelected = Boolean(state.snap.text);
 
     return {
+      // todo refac-name: ActionBar
       component: () => {
         return (
           <ActionBar.Root

@@ -25,24 +25,28 @@ export function PostCard(props: { post: PostListItemType }) {
 
   return (
     <Stack gap="gap.sm" {...ids.set(ids.post.card.container)} data-id={post.id}>
-      <HStack align="center" justify="space-between">
+      <HStack align="flex-start" justify="space-between">
         <NavLink to={postUrl} {...ids.set(ids.post.card.link.detail)}>
-          <HStack>
-            <Stack gap="gap.sm">
-              {isReview(post) && post.parent && (
+          <Stack gap="gap.sm">
+            {isReview(post) && post.parent && (
+              <Flex align="center" gap="gap.md">
                 <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">
                   {post.parent.title}
                 </Heading>
-              )}
-              {post.image && (
-                <Image
-                  src={post.image.url}
-                  maxH="200px"
-                  objectFit="cover"
-                  borderRadius="md"
-                  {...ids.set(ids.post.card.image)}
-                />
-              )}
+                <PostDatetime datetimeStr={post.reviewed_at} />
+              </Flex>
+            )}
+            {post.image && (
+              <Image
+                src={post.image.url}
+                maxH="200px"
+                objectFit="cover"
+                borderRadius="md"
+                {...ids.set(ids.post.card.image)}
+              />
+            )}
+
+            <Flex align="center" gap="gap.md">
               <Heading
                 fontSize="lg"
                 color="fg.muted"
@@ -54,9 +58,9 @@ export function PostCard(props: { post: PostListItemType }) {
                 {/* todo UX: show .parent_root.title */}
                 {post.title ? post.title : `${post.type}`}
               </Heading>
-            </Stack>
-            <PostDatetime datetimeStr={isReview(post) ? post.reviewed_at : post.updated_at} />
-          </HStack>
+              {!isReview(post) && <PostDatetime datetimeStr={post.updated_at} />}
+            </Flex>
+          </Stack>
         </NavLink>
 
         {user?.id === post.author?.id && (
