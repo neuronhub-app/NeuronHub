@@ -21,6 +21,8 @@ class UserType:
     id: auto
     username: auto
 
+    is_superuser: auto
+
     first_name: auto
     last_name: auto
     email: auto

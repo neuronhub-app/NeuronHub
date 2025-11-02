@@ -4,6 +4,7 @@ Most of this file may be redundant, ie Strawberry + BasePermission can be ~enoug
 But `tags` are different - the separator `/` must be parsed on backend/frontend.
 """
 
+from django.db.models import Q
 from strawberry import UNSET
 
 from neuronhub.apps.posts.models import Post, PostRelated
@@ -23,11 +24,22 @@ async def _update_or_create(data: PostTypeInput, author: User):
     data_parsed = _parse_data(data)
     is_edit_mode = bool(data.id)
     if is_edit_mode:
-        post = await Post.objects.select_related("parent").aget(id=data.id, author=author)
+        is_allow_edit_imports = author.is_superuser
+        if is_allow_edit_imports:
+            post = await Post.objects.select_related("parent").aget(
+                Q(author=author) | Q(author=None),
+                id=data.id,
+            )
+        else:
+            post = await Post.objects.select_related("parent").aget(
+                author=author,
+                id=data.id,
+            )
         for field, value in data_parsed.items():
             setattr(post, field, value)
         await post.asave()
     else:
+        # create Post
         is_parent_required = data.type in [Post.Type.Review, Post.Type.Comment]
         if is_parent_required:
             assert data.parent

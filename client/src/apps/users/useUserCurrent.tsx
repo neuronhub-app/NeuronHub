@@ -48,6 +48,7 @@ export const UserQueryDoc = graphql(`
       username
       name: username
       email
+      is_superuser
       
       library { pk }
       

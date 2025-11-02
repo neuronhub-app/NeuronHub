@@ -685,6 +685,7 @@ enum UserListName {
 type UserType {
   id: ID!
   username: String!
+  is_superuser: Boolean!
   first_name: String!
   last_name: String!
   email: String!
