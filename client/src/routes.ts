@@ -93,6 +93,7 @@ const op = { create: "create", edit: "edit" } as const;
 export default [
   layout("./components/layout/index.tsx", [
     route("/", "./apps/home/index.tsx"),
+    route("/login", "./apps/auth/login/index.tsx"),
     route(urls.library, "./apps/library/index.tsx"),
     ...prefix(urls.reviews.list, [
       route("/", "./apps/reviews/list/index.tsx"),

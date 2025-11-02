@@ -247,16 +247,12 @@ export function UserProfile() {
   if (!user) {
     return (
       <HStack gap="3" justify="space-between">
-        <Button
-          variant="outline"
-          width="full"
-          onClick={() => {
-            window.location.href = `${env.VITE_SERVER_URL}/admin/login/`;
-          }}
-        >
-          <LuLogIn />
-          Login
-        </Button>
+        <NavLink to={urls.login}>
+          <Button variant="outline" width="full">
+            <LuLogIn />
+            Login
+          </Button>
+        </NavLink>
         <ColorModeButton />
       </HStack>
     );

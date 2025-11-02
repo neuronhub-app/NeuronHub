@@ -8,7 +8,6 @@ from strawberry_django.fields.types import field_type_map
 from strawberry_django.optimizer import DjangoOptimizerExtension
 from strawberry.file_uploads import Upload
 
-from neuronhub.apps.auth.graphql_extension import LoginRequiredExtension
 from neuronhub.apps.db.fields import MarkdownField
 
 # Add missing types:
@@ -52,7 +51,6 @@ schema = strawberry.Schema(
     query=Query,
     mutation=Mutation,
     extensions=[
-        LoginRequiredExtension,
         ParserCache(maxsize=128),  # 128 MB; it clogs RAM indefinitely by default
         DjangoOptimizerExtension,
     ],

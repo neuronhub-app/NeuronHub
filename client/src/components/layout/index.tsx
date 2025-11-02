@@ -8,11 +8,9 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import type { SVGProps } from "react";
-import { useEffect } from "react";
 import { LuAlignRight } from "react-icons/lu";
 import { NavLink, Outlet } from "react-router";
 import { highlighter } from "@/apps/highlighter/highlighter";
-import { UserQueryDoc } from "@/apps/users/useUserCurrent";
 import { Sidebar } from "@/components/layout/Sidebar";
 import {
   DrawerBackdrop,
@@ -21,20 +19,10 @@ import {
   DrawerRoot,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { env } from "@/env";
-import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/routes";
 
 export default function RootLayout() {
-  const { error } = useApolloQuery(UserQueryDoc);
-
   const highlighterHook = highlighter.useHook();
-
-  useEffect(() => {
-    if (error?.message === "Login required") {
-      window.location.href = `${env.VITE_SERVER_URL}/admin/login/`;
-    }
-  }, [error]);
 
   return (
     <>
