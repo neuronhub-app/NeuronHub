@@ -44,10 +44,6 @@ type DjangoImageType {
   height: Int!
 }
 
-input DjangoModelFilterInput {
-  pk: ID!
-}
-
 input DjangoModelInput {
   id: ID!
 }
@@ -224,7 +220,7 @@ type PostCommentType implements PostTypeI {
 }
 
 input PostFilter {
-  parent_root: DjangoModelFilterInput
+  parent_root_id: IDBaseFilterLookup
   type: PostTypeEnumFilterLookup
   category: PostCategoryFilterLookup
   title: StrFilterLookup
@@ -683,6 +679,7 @@ type UserConnectionGroupType {
 enum UserListName {
   read_later
   library
+  posts_collapsed
 }
 
 type UserType {

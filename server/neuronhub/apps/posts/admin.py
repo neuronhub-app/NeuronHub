@@ -172,6 +172,7 @@ class PostAdmin(SimpleHistoryAdmin):
     ]
     autocomplete_fields = [
         "parent",
+        "parent_root",
         "author",
         "visible_to_users",
         "visible_to_groups",
@@ -189,6 +190,7 @@ class PostAdmin(SimpleHistoryAdmin):
                     "slug",
                     "author",
                     "parent",
+                    "parent_root",
                     "content_polite",
                     "content_direct",
                     "content_rant",

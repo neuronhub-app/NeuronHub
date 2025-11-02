@@ -13,18 +13,23 @@ import {
 } from "@chakra-ui/react";
 import { type ComponentProps, type JSX, useEffect, useRef } from "react";
 import { GoPencil } from "react-icons/go";
+import { useSnapshot } from "valtio/react";
 
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { getAvatarColorForUsername } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
+import { collapsedCommentsState } from "@/components/posts/PostDetail";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentVoteBar } from "@/components/posts/PostDetail/CommentVoteBar";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
+import { graphql } from "@/gql-tada";
+import { client } from "@/graphql/client";
 import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { UserListName } from "~/graphql/enums";
 
 const styleGlobal = {
   indent: 9,
@@ -234,9 +239,17 @@ function CommentToolbarButton(props: {
 function useCommentLeftLine(
   props: ComponentProps<typeof CommentThread> & { isHasChildren: boolean },
 ) {
+  const user = useUser();
+  const collapsedStateSnapshot = useSnapshot(collapsedCommentsState);
+
   const state = useValtioProxyRef({
-    isCommentCollapsed: false,
+    isCommentCollapsed: collapsedStateSnapshot.collapsedCommentIds.has(props.comment.id),
   });
+  useEffect(() => {
+    state.mutable.isCommentCollapsed = collapsedStateSnapshot.collapsedCommentIds.has(
+      props.comment.id,
+    );
+  }, [collapsedStateSnapshot.collapsedCommentIds]);
 
   const [childrenGap] = useToken("spacing", styleGlobal.childrenGap);
   const style = {
@@ -253,8 +266,30 @@ function useCommentLeftLine(
     },
   } as const;
 
-  function toggleCollapse() {
-    state.mutable.isCommentCollapsed = !state.mutable.isCommentCollapsed;
+  async function toggleCollapse() {
+    const newCollapsedState = !state.mutable.isCommentCollapsed;
+    state.mutable.isCommentCollapsed = newCollapsedState;
+
+    if (state.mutable.isCommentCollapsed) {
+      collapsedCommentsState.collapsedCommentIds.add(props.comment.id);
+    } else {
+      collapsedCommentsState.collapsedCommentIds.delete(props.comment.id);
+    }
+    // save to db
+    if (user) {
+      await client.mutate({
+        mutation: graphql(`
+          mutation UpdateCollapsedComments($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
+            update_user_list(id: $id, list_field_name: $list_field_name, is_added: $is_added)
+          }
+        `),
+        variables: {
+          id: props.comment.id,
+          list_field_name: UserListName.PostsCollapsed,
+          is_added: state.mutable.isCommentCollapsed,
+        },
+      });
+    }
   }
 
   return {

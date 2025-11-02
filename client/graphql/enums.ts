@@ -44,6 +44,7 @@ export enum UsageStatus {
 
 export enum UserListName {
   Library = 'library',
+  PostsCollapsed = 'posts_collapsed',
   ReadLater = 'read_later'
 }
 

@@ -1,14 +1,22 @@
 import { For, Heading, HStack, Show, Stack, VStack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
+import { proxy } from "valtio";
 import { useHighlighter } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
 import { PostImportRefreshButton } from "@/components/posts/PostDetail/PostImportRefreshButton";
+import { graphql, type ID } from "@/gql-tada";
+import { client } from "@/graphql/client";
 import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
+import { useInit } from "@/utils/useInit";
 import { PostTypeEnum } from "~/graphql/enums";
+
+export const collapsedCommentsState = proxy({
+  collapsedCommentIds: new Set<ID>(),
+});
 
 export function PostDetail(props: {
   title: string;
@@ -22,6 +30,29 @@ export function PostDetail(props: {
   const highlighter = useHighlighter({ comments: props.post?.comments });
 
   const idExternal = props.post?.posts_source?.[0]?.id_external;
+
+  useInit({
+    isBlocked: !(user && props.post?.id),
+    onInit: async () => {
+      const res = await client.query({
+        query: graphql(
+          `
+            query UserCollapsedComments($parent_root_id: ID!) {
+              user_current {
+                posts_collapsed(filters: { parent_root_id: { exact: $parent_root_id } }) {
+                  id
+                }
+              }
+            }
+          `,
+        ),
+        variables: { parent_root_id: props.post!.id },
+      });
+      collapsedCommentsState.collapsedCommentIds = new Set(
+        res.data!.user_current!.posts_collapsed.map(post => post.id),
+      );
+    },
+  });
 
   return (
     <Stack>

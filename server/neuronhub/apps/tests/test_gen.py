@@ -152,6 +152,7 @@ class PostsGen:
     class Params:
         type: PostTypeEnum = Post.Type.Post
         parent: Post | None = None
+        parent_root: Post | None = None
         title: str = ""
         content_polite: str = ""
         content_direct: str = ""
@@ -176,6 +177,7 @@ class PostsGen:
     async def comment(
         self,
         parent: Post = None,
+        parent_root: Post = None,
         author: User = None,
         visibility: Visibility = Visibility.PUBLIC,
         visible_to_users: list[User] = None,
@@ -183,6 +185,7 @@ class PostsGen:
         return await self.create(
             self.Params(
                 parent=parent,
+                parent_root=parent_root,
                 type=Post.Type.Comment,
                 author=author or self.user,
                 visibility=visibility,
@@ -259,6 +262,7 @@ class PostsGen:
         post = await Post.objects.acreate(
             type=params.type,
             parent=params.parent,
+            parent_root=params.parent_root,  # Will be auto-calculated in save() if None
             title=params.title or self.faker.sentence(),
             content_polite=params.content_polite or self.faker.text(max_nb_chars=500),
             content_direct=params.content_direct,

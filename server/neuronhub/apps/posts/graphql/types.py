@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 @strawberry_django.filter_type(Post, lookups=True)
 class PostFilter:
-    parent_root: auto
+    parent_root_id: auto
     type: auto
     category: auto
     title: auto
