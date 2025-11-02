@@ -89,7 +89,9 @@ export function PostTag(props: {
     votesSum += vote.is_vote_positive ? 1 : -1;
   }
 
-  const isUserOrAuthorVoted = props.isUserOrAuthorVotedPositive !== undefined;
+  const isUserOrAuthorVoted =
+    props.isUserOrAuthorVotedPositive !== null &&
+    props.isUserOrAuthorVotedPositive !== undefined;
   const isVotedOrImportant = props.tag.is_important || isUserOrAuthorVoted;
   const tagIconParams = isVotedOrImportant ? getTagIconParams(props.tag) : null;
 

@@ -260,7 +260,7 @@ function useCommentLeftLine(
       widthClickable: props.height.avatar ? `${props.height.avatar}px` : "full",
       color: "border",
       hover: {
-        bg: "blackAlpha.50",
+        bg: { _light: "blackAlpha.50", _dark: "whiteAlpha.50" },
         color: "gray.600",
       },
     },

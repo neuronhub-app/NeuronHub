@@ -12,7 +12,7 @@ Development Setup
 	mise trust
 	mise install
 	mise run install-deps
-	mise run dev:db-init
+	mise run dev:db-init # FYI its db_stubs_repopulate takes few minutes 
 	mise run dev
 	```
 
