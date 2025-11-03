@@ -4,7 +4,7 @@ from django.urls import NoReverseMatch
 from django.urls import reverse
 from simple_history.admin import SimpleHistoryAdmin
 
-from neuronhub.apps.posts.models import Post
+from neuronhub.apps.posts.models import Post, PostTypeEnum
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models import PostTagVote
 from neuronhub.apps.posts.models import PostRelated
@@ -39,7 +39,6 @@ class PostTagInline(admin.TabularInline):
     """
 
     model = Post.tags.through
-    extra = 0
     verbose_name = "Tag"
     autocomplete_fields = [_meta_model]
 
@@ -56,6 +55,8 @@ class PostTagInline(admin.TabularInline):
     readonly_fields = fields[1:]  # type: ignore # everything but first input (field "id") for Tag selection
 
     ordering = [f"-{_meta_model}__is_important", f"-{_meta_model}__created_at"]
+
+    extra = 0
 
     def name(self, obj):
         return str(obj.posttag.label)
@@ -145,15 +146,16 @@ class PostAdmin(SimpleHistoryAdmin):
     ]
 
     list_display = [
-        "title",
+        "_get_title",
         "type",
         "_get_parent_title_short",
+        "_get_parent_root_title_short",
         "author",
         "visibility",
         "created_at",
         "updated_at",
     ]
-    list_select_related = ["parent"]
+    list_select_related = ["parent", "parent_root"]
     list_filter = [
         "type",
         "visibility",
@@ -255,9 +257,23 @@ class PostAdmin(SimpleHistoryAdmin):
         ),
     )
 
+    @admin.display(description="title")
+    def _get_title(self, obj: Post) -> str:
+        return obj.title[:20] if obj.title else obj.content_polite[:20]
+
     @admin.display(description="parent")
     def _get_parent_title_short(self, obj: Post) -> str:
-        return str(obj.parent.title)[:20] if obj.parent else ""
+        if not obj.parent:
+            return ""
+
+        if obj.parent.type == PostTypeEnum.Comment:
+            return obj.parent.content_polite[:20]
+        else:
+            return obj.parent.title[:20] if obj.parent.title else ""
+
+    @admin.display(description="root")
+    def _get_parent_root_title_short(self, obj: Post) -> str:
+        return obj.parent_root.title[:20] if obj.parent_root else ""
 
 
 @admin.register(PostTag)

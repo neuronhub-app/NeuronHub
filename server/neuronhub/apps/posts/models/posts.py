@@ -233,7 +233,7 @@ class Post(AnonimazableTimeStampedModel):
             case Post.Type.Review:
                 return f"[{self.type}] {self.title} [{self.review_rating}]"
             case Post.Type.Comment:
-                return f"[{self.type}] {self.title}"
+                return f"[{self.type}] {self.content_polite[:30]}"
 
         return f"{self.title}"
 
@@ -339,7 +339,7 @@ class PostTag(AnonimazableTimeStampedModel):
 @anonymizer.register
 class PostTagVote(AnonimazableTimeStampedModel):
     """
-    A vote on a PostTag of the given Post.
+    A User's vote on a PostTag of the Post.
     """
 
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="tag_votes")
