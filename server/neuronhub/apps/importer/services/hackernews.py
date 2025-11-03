@@ -10,6 +10,7 @@ from markdownify import markdownify
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.importer.models import ImportDomain, PostSource, UserSource
+from neuronhub.apps.importer.services.import_html_meta import import_html_meta, ImportMetaInput
 from neuronhub.apps.importer.services.request_json import request_json
 from neuronhub.apps.posts.models import Post, PostTypeEnum
 
@@ -127,25 +128,6 @@ class ImporterHackerNews:
         if author := data.get("author"):
             author_name = await self._user_source_get_or_create(author)
 
-        if is_post:
-            post_data = cast(algolia.Post, data)
-            source_defaults = {
-                "json": post_data,
-                "url_of_source": post_data.get("url", ""),
-                "score": post_data.get("points", 0),
-                "created_at_external": datetime.fromisoformat(
-                    post_data["created_at"].replace("Z", "+00:00")
-                ),
-            }
-        else:
-            comment_data = cast(algolia.Comment, data)
-            source_defaults = {
-                "json": self._clean_HN_json(comment_data),
-                "rank": rank,
-                "created_at_external": datetime.fromisoformat(
-                    comment_data["created_at"].replace("Z", "+00:00")
-                ),
-            }
         post_defaults = {
             "visibility": Visibility.PUBLIC,
             "source_author": author_name,
@@ -175,15 +157,17 @@ class ImporterHackerNews:
                 ),
             )
 
+        source = await self._source_update_or_create(
+            post=post, data=data, is_post=is_post, rank=rank
+        )
+
         if is_root:
             parent_root = post
 
-        post_source, _ = await PostSource.objects.aupdate_or_create(
-            post=post,
-            domain=ImportDomain.HackerNews,
-            id_external=data["id"],
-            defaults=source_defaults,
-        )
+            meta = import_html_meta(ImportMetaInput(url=source.url_of_source))
+            logger.info(meta)
+            post.content_polite = meta.content
+            await post.asave()
 
         if comments := data.get("children"):
             if not self._comments_total:
@@ -212,6 +196,40 @@ class ImporterHackerNews:
             )
 
         return post
+
+    async def _source_update_or_create(
+        self,
+        post: Post,
+        data: algolia.Post | algolia.Comment,
+        is_post: bool,
+        rank: int | None = None,
+    ) -> PostSource:
+        post_data: algolia.Post | algolia.Comment
+        if is_post:
+            post_data = cast(algolia.Post, data)
+            defaults = {
+                "json": post_data,
+                "url_of_source": post_data.get("url", ""),
+                "score": post_data.get("points", 0),
+            }
+        else:
+            post_data = cast(algolia.Comment, data)
+            defaults = {
+                "json": self._clean_HN_json(post_data),
+                "rank": rank,
+            }
+        post_source, _ = await PostSource.objects.aupdate_or_create(
+            post=post,
+            domain=ImportDomain.HackerNews,
+            id_external=data["id"],
+            defaults={
+                **defaults,
+                "created_at_external": datetime.fromisoformat(
+                    post_data["created_at"].replace("Z", "+00:00")
+                ),
+            },
+        )
+        return post_source
 
     def _count_total_comments_recursively(self, comments: list[algolia.Comment]) -> int:
         count_total = len(comments)
