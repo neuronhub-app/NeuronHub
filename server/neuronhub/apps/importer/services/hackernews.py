@@ -146,12 +146,6 @@ class ImporterHackerNews:
                     comment_data["created_at"].replace("Z", "+00:00")
                 ),
             }
-
-        post_source, _ = await PostSource.objects.aupdate_or_create(
-            domain=ImportDomain.HackerNews,
-            id_external=data["id"],
-            defaults=source_defaults,
-        )
         post_defaults = {
             "visibility": Visibility.PUBLIC,
             "source_author": author_name,
@@ -160,7 +154,7 @@ class ImporterHackerNews:
             post_data = cast(algolia.Post, data)
             post, _ = await Post.objects.aupdate_or_create(
                 type=Post.Type.Post,
-                post_source=post_source,
+                post_source__id_external=data["id"],
                 defaults=dict(
                     **post_defaults,
                     title=post_data["title"],
@@ -173,18 +167,23 @@ class ImporterHackerNews:
             post, _ = await Post.objects.aupdate_or_create(
                 type=Post.Type.Comment,
                 parent=parent,
-                post_source=post_source,
+                post_source__id_external=data["id"],
                 defaults=dict(
                     **post_defaults,
                     content_polite=markdownify(data["text"]),
+                    parent_root=parent_root,
                 ),
             )
 
         if is_root:
             parent_root = post
 
-        post_source.post_id = post.id
-        await post_source.asave(update_fields=["post"])
+        post_source, _ = await PostSource.objects.aupdate_or_create(
+            post=post,
+            domain=ImportDomain.HackerNews,
+            id_external=data["id"],
+            defaults=source_defaults,
+        )
 
         if comments := data.get("children"):
             if not self._comments_total:
