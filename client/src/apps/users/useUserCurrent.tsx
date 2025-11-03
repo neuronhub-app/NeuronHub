@@ -10,6 +10,7 @@ export namespace user {
   export const state = proxy({
     current: null as User | null,
     connections: [] as UserConnection[],
+    postsCollapsed: [],
   });
 }
 
@@ -21,16 +22,16 @@ export function useUser() {
   useEffect(() => {
     if (data?.user_current) {
       user.state.current = data.user_current;
-    }
 
-    if (data?.user_current?.connection_groups) {
-      const connections = data.user_current.connection_groups
-        .flatMap(group => group?.connections)
-        .filter(Boolean);
-      const connectionsUniqueMap = new Map(
-        connections.map(conn => [`${conn.id}-${conn.username}`, conn]),
-      );
-      user.state.connections = Array.from(connectionsUniqueMap.values());
+      if (data.user_current.connection_groups) {
+        const connections = data.user_current.connection_groups
+          .flatMap(group => group?.connections)
+          .filter(Boolean);
+        const connectionsUniqueMap = new Map(
+          connections.map(conn => [`${conn.id}-${conn.username}`, conn]),
+        );
+        user.state.connections = Array.from(connectionsUniqueMap.values());
+      }
     }
 
     if (error) {

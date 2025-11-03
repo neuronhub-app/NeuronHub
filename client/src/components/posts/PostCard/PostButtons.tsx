@@ -51,7 +51,7 @@ export function PostButtons(props: { post: PostListItemType }) {
 
 // todo refac-name: PostCardActionSave
 function ReviewButton(props: {
-  fieldName: UserListName;
+  fieldName: typeof UserListName.Library | typeof UserListName.ReadLater;
   iconNotPresent: ReactNode;
   iconPresent: ReactNode;
   id: ID;

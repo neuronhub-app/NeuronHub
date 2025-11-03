@@ -10,7 +10,10 @@ import type { UserListName } from "~/graphql/enums";
 
 // todo feat(UI): clipboard action on click
 // todo feat(UI): mutate Post.recommended_to_users/groups
-export function PostButtonShare(props: { id: ID; fieldName: UserListName }) {
+export function PostButtonShare(props: {
+  id: ID;
+  fieldName: typeof UserListName.Library | typeof UserListName.ReadLater;
+}) {
   const userSnap = useSnapshot(user.state);
 
   const state = useValtioProxyRef({
