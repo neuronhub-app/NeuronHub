@@ -201,7 +201,7 @@ type PostCommentType implements PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
-  posts_source: [PostSourceType!]!
+  post_source: PostSourceType
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -281,7 +281,7 @@ type PostReviewType implements PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
-  posts_source: [PostSourceType!]!
+  post_source: PostSourceType
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -320,7 +320,7 @@ input PostSourceOrder @oneOf {
 
 type PostSourceType {
   id: ID!
-  post: DjangoModelType
+  post: DjangoModelType!
   domain: ImportDomain
   id_external: String!
   rank: Int
@@ -396,7 +396,7 @@ type PostToolType implements PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
-  posts_source: [PostSourceType!]!
+  post_source: PostSourceType
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -435,7 +435,7 @@ type PostType implements PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
-  posts_source: [PostSourceType!]!
+  post_source: PostSourceType
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!
@@ -527,7 +527,7 @@ interface PostTypeI {
   image: DjangoImageType
   source: String!
   source_author: String!
-  posts_source: [PostSourceType!]!
+  post_source: PostSourceType
   visibility: Visibility!
   visible_to_users: [UserType!]!
   visible_to_groups: [UserConnectionGroupType!]!

@@ -65,7 +65,7 @@ class PostTypeI:
 
     source: auto
     source_author: auto
-    posts_source: list[PostSourceType] = strawberry_django.field()
+    post_source: PostSourceType | None = strawberry_django.field()
 
     visibility: auto
     visible_to_users: list[UserType]

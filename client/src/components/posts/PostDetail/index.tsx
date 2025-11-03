@@ -29,7 +29,7 @@ export function PostDetail(props: {
 
   const highlighter = useHighlighter({ comments: props.post?.comments });
 
-  const idExternal = props.post?.posts_source?.[0]?.id_external;
+  const idExternal = props.post?.post_source?.id_external;
 
   useInit({
     isBlocked: !(user && props.post?.id),
@@ -39,6 +39,7 @@ export function PostDetail(props: {
           `
             query UserCollapsedComments($parent_root_id: ID!) {
               user_current {
+                id
                 posts_collapsed(filters: { parent_root_id: { exact: $parent_root_id } }) {
                   id
                 }

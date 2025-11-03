@@ -167,7 +167,7 @@ export function Library() {
 
                         <PostDatetime
                           datetimeStr={
-                            highlight.post.posts_source?.[0]?.created_at_external ??
+                            highlight.post.post_source?.created_at_external ??
                             highlight.post.created_at
                           }
                           size="xs"

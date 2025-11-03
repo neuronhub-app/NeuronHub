@@ -22,7 +22,7 @@ test.describe("Importer Refresh", () => {
           posts {
             id
             title
-            posts_source {
+            post_source {
               id_external
             }
           }
@@ -31,7 +31,7 @@ test.describe("Importer Refresh", () => {
       {},
     );
 
-    const importedPost = postQuery.data.posts.find(p => p.posts_source.length > 0);
+    const importedPost = postQuery.data.posts.find(p => p.post_source);
     if (!importedPost) {
       throw new Error("No imported post found");
     }

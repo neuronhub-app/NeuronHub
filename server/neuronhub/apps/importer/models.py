@@ -10,12 +10,11 @@ class ImportDomain(models.TextChoices):
 
 
 class PostSource(TimeStampedModel):
-    post = models.ForeignKey(
+    post = models.OneToOneField(
         Post,
         on_delete=models.CASCADE,
         related_query_name="post_source",
-        related_name="posts_source",
-        null=True,
+        related_name="post_source",
     )
 
     domain = TextChoicesField(ImportDomain, blank=True, null=True, default=None)

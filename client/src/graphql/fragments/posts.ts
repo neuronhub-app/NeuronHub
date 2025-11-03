@@ -14,7 +14,7 @@ export const PostFragment = graphql(
       content_rant
       source
       source_author
-      posts_source {
+      post_source {
         id
         id_external
         created_at_external
@@ -120,7 +120,7 @@ export const CommentFieldsFragment = graphql(
       created_at
       updated_at
       source_author
-      posts_source {
+      post_source {
         id
         id_external
         created_at_external

@@ -70,6 +70,7 @@
         depends = ["dev:db", "dev:db:setup-e2e"]
         dir = "server"
         run = [
+            "mise django:migrate importer zero",
             "mise django:migrate",
             "uv run manage.py runserver {{ env.SERVER_PORT_E2E }}",
         ]

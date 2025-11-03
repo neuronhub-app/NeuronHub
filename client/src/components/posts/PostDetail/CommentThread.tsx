@@ -127,8 +127,7 @@ export function CommentThread(props: {
 
                 <PostDatetime
                   datetimeStr={
-                    props.comment.posts_source?.[0]?.created_at_external ??
-                    props.comment.created_at
+                    props.comment.post_source?.created_at_external ?? props.comment.created_at
                   }
                   size="xs"
                 />
