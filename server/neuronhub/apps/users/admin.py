@@ -11,6 +11,38 @@ class UserConnectionGroupInline(admin.TabularInline):
     autocomplete_fields = ["connections"]
 
 
+class UserListLibraryInline(admin.TabularInline):
+    verbose_name_plural = "Posts - Library"
+    model = User.library.through
+    autocomplete_fields = ["post"]
+    verbose_name = "Post"
+    extra = 0
+
+
+class UserListReadLaterInline(admin.TabularInline):
+    verbose_name_plural = "Posts - Read Later"
+    model = User.read_later.through
+    autocomplete_fields = ["post"]
+    verbose_name = "Post"
+    extra = 0
+
+
+class UserListCollapsedInline(admin.TabularInline):
+    verbose_name_plural = "Posts - Collapsed"
+    model = User.posts_collapsed.through
+    autocomplete_fields = ["post"]
+    verbose_name = "Post"
+    extra = 0
+
+
+class UserListPostsSeenInline(admin.TabularInline):
+    verbose_name_plural = "Posts - Seen"
+    model = User.posts_seen.through
+    autocomplete_fields = ["post"]
+    verbose_name = "Post"
+    extra = 0
+
+
 @admin.register(User)
 class UserAdmin(DjangoUserAdmin):
     list_display = [
@@ -35,6 +67,7 @@ class UserAdmin(DjangoUserAdmin):
         "is_staff",
         "is_superuser",
     ]
+
     fieldsets = (
         (
             None,
@@ -75,6 +108,10 @@ class UserAdmin(DjangoUserAdmin):
     )
     inlines = [
         UserConnectionGroupInline,
+        UserListLibraryInline,
+        UserListReadLaterInline,
+        UserListCollapsedInline,
+        UserListPostsSeenInline,
     ]
 
 
