@@ -32,5 +32,5 @@ def import_html_meta(
 
     return ImportMetaOutput(
         content=meta_dict.get("og:description") or meta_dict.get("description") or "",  # type: ignore
-        image=meta_dict.get("og:image", ""),
+        image=str(meta_dict.get("og:image", "")),
     )

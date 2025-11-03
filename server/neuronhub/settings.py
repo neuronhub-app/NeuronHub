@@ -301,7 +301,6 @@ rich.traceback.install(
     suppress=[django, asyncio],  # too verbose
 )
 
-
 DEFAULT_DJANGO_SETTINGS = strawberry_django_settings()
 DEFAULT_DJANGO_SETTINGS["GENERATE_ENUMS_FROM_CHOICES"] = True  # no reason atm, can remove
 # "pk" by default is a nice idea, but bad implementation - "id" is soft-required in django
