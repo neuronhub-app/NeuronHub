@@ -199,6 +199,7 @@ SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN", None)
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_AGE = 3600 * 24 * 30  # 1 month
 
+# for Sentry traces
 CORS_ALLOW_HEADERS = (
     *default_headers,
     "baggage",
@@ -259,11 +260,15 @@ IS_SENTRY_ENABLED = env.bool(
 )
 if IS_SENTRY_ENABLED:
     sentry_sdk.init(
-        dsn="https://examplePublicKey@o0.ingest.sentry.io/0",
-        send_default_pii=DJANGO_ENV is not DjangoEnv.PROD,
+        dsn="https://95e2a0f5e598e9f0623f9289426513cb@o4506533516673024.ingest.us.sentry.io/4506533517787136",
+        send_default_pii=True,  # IP is excluded
+        traces_sample_rate=0.5,
+        profile_session_sample_rate=0.5,
+        profile_lifecycle="trace",
         integrations=[
             StrawberryIntegration(async_execution=True),
         ],
+        release=env.str("VITE_RELEASE_VERSION", "neuronhub@0.2.1.1"),
     )
 
 

@@ -2,9 +2,6 @@
   "name": "neuronhub",
   "private": true,
   "type": "module",
-  "scripts": {
-    "react-router": "./scripts/react-router-wrapper.sh"
-  },
   "dependencies": {
     "@chakra-ui/react": "^3.28.1",
       "@emotion/react": "^11.14.0",
@@ -34,7 +31,7 @@
     "marked": "^16.4.1",
     "date-fns": "^4.1.0",
     "@date-fns/tz": "^1.4.1",
-    "@sentry/react": "^10.22.0",
+    "@sentry/react-router": "^10.22.0",
     "envalid": "^8.1.0",
 
     "@apollo/client": "^4.0.9",

@@ -165,7 +165,6 @@ class ImporterHackerNews:
             parent_root = post
 
             meta = import_html_meta(ImportMetaInput(url=source.url_of_source))
-            logger.info(meta)
             post.content_polite = meta.content
             await post.asave()
 

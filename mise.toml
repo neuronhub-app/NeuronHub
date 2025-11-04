@@ -14,6 +14,7 @@
         "devops/db-init.mise.toml",
         "devops/claude.mise.toml",
         "devops/coder/docker.mise.toml",
+        "devops/docker.mise.toml",
         "devops/dev-env-darwin.mise.toml",
         "client/e2e/e2e.mise.toml",
     ]
@@ -28,6 +29,9 @@
     E2E_DB_NAME = "test_neuronhub_e2e"
 
     S3_PORT = 8333
+
+    VITE_RELEASE_VERSION = "0.2.1.1"
+    VITE_RELEASE_NAME = "neuronhub@{{ env.VITE_RELEASE_VERSION }}"
 
 
 [tasks."dev"]

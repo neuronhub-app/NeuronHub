@@ -18,6 +18,7 @@ import { cleanEnv, port, str, url } from "envalid";
  *
  */
 const envRaw = typeof process === "undefined" ? import.meta.env : process.env;
+
 const envCleaned = cleanEnv(envRaw, {
   NODE_ENV: str({
     choices: ["development", "staging", "production"],
@@ -25,6 +26,8 @@ const envCleaned = cleanEnv(envRaw, {
   }),
 
   VITE_SERVER_URL: url({ default: "http://localhost:8000" }),
+
+  VITE_RELEASE_NAME: str(), // for Sentry Source Maps, defined in [[mise.toml]]
 
   CLIENT_PORT_E2E: port({ default: 3001 }),
 });

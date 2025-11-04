@@ -1,0 +1,56 @@
+# $schema: https://mise.jdx.dev/schema/mise-task.json
+
+
+["docker:push"]
+    usage = """flag "--app <name>" { choices "server" "client" }"""
+    run = [
+        """sudo docker push ghcr.io/neuronhub-app/neuronhub/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}""",
+    ]
+
+
+["docker:rm"]
+    usage = """flag "--app <name>" { choices "server" "client" }"""
+    run = "sudo docker rmi ghcr.io/neuronhub-app/neuronhub/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}"
+
+
+["docker:build"]
+    usage = """
+        flag "--app <name>" { choices "server" "client" }
+        flag "--no_cache" default=#false
+    """
+    # Found no other sane way to pass `mise env` to `docker build`,
+    # will burn it and move to Podman later.
+    run = """
+#!/usr/bin/env bash
+
+cd ${usage_app?}
+
+ENV_FILE=.env
+COMPOSE_FILE=docker-compose.yml
+
+mise env --dotenv > $ENV_FILE
+
+cat > $COMPOSE_FILE <<EOF
+            services:
+              ${usage_app?}:
+                image: ghcr.io/neuronhub-app/neuronhub/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}
+                build:
+                  context: .
+                  args:
+                    VITE_RELEASE_NAME: {{ env.VITE_RELEASE_NAME }}
+                    VITE_SERVER_URL: https://backend.{{ env.DOMAIN_NAME }}
+                    SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN }}
+                env_file:
+                  - path: $ENV_FILE
+
+EOF
+
+CACHE_FLAG=""
+if [ "${usage_no_cache}" = "true" ]; then
+  CACHE_FLAG="--no-cache"
+fi
+
+sudo docker compose --progress=plain build $CACHE_FLAG
+
+rm $ENV_FILE $COMPOSE_FILE
+"""

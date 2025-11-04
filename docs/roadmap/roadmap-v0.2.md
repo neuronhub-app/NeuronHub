@@ -5,10 +5,14 @@
 - [x] in ReviewForm select Tool by title
 - [x] apps.importer & apps.highlighter
 - [x] Comment deep threads & new UI
-- [ ] HN sync by Hatchet
-- [ ] Deploy
+- [ ] HN sync
+  - [ ] meta.image
+  - [ ] Hatchet
+- [ ] Comments
+  - [ ] visibility
 - [ ] User Signup & Login
-- [ ] Comment.visibility
+- [ ] Comment.
+- [ ] Deploy
 
 ### v0.2.1.0
 

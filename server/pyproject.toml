@@ -48,7 +48,7 @@ dependencies = [
     "psycopg[binary] == 3.*",
     "rich == 14.*", # [i=norm, rep=high, GH=high, @willmcgugan, 55k]
     "python-dateutil == 2.*", # [i=norm rep=high, GH=high, @pganssle, 2.5k] ganssle.io, lots of publications and articles
-    "sentry-sdk == 2.*",
+    "sentry-sdk[django] == 2.*",
     "humanize == 4.*", # [i=low, rep=norm, GH=norm, @jmoiron]
     "markdownify == 1.*", # [i=norm, rep=norm, GH=norm, @matthewwithanm, 1.7k] another project 2.3k stars. Other MD packages suck.
     "python-dotenv == 1.*", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few posts on saurabh-kumar.com/blog/
