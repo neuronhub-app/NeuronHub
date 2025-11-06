@@ -26,6 +26,7 @@ def import_html_meta(
     meta_dict = {}
     for meta_tag in soup.find_all("meta"):
         if name := (meta_tag.get("property") or meta_tag.get("name")):
+            # noinspection PyUnboundLocalVariable
             meta_dict[name] = meta_tag.get("content", "")
 
     # ctx.log(f"importing meta: {meta_dict}")
