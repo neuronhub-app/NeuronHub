@@ -15,7 +15,7 @@ Sentry.init({
   tracesSampleRate: 1.0,
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
-  environment: env.NODE_ENV,
+  environment: env.isProd ? "production" : env.NODE_ENV,
   release: env.VITE_RELEASE_NAME,
   enableLogs: env.isProd,
   // setup API endpoint, see https://docs.sentry.io/platforms/javascript/guides/react-router/troubleshooting/#dealing-with-ad-blockers

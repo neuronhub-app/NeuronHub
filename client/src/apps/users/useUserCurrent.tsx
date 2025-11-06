@@ -1,4 +1,5 @@
 import { captureException } from "@sentry/react";
+import { setUser } from "@sentry/react-router";
 import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { proxy } from "valtio";
@@ -33,6 +34,8 @@ export function useUser() {
         user.state.connections = Array.from(connectionsUniqueMap.values());
       }
     }
+
+    setUser(user.state.current);
 
     if (error) {
       captureException(error);
