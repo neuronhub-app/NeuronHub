@@ -31,8 +31,8 @@ export default function RootLayout() {
       <Flex flex="1" pos="relative" h="full">
         <Sidebar hideBelow="md" maxH="100vh" minH="100vh" pos="sticky" top={0} />
 
-        <Stack pb="12" flex="1" alignItems="stretch" bg="bg.subtle">
-          <Container maxW="7xl" mt={6}>
+        <Stack flex="1" alignItems="stretch" bg="bg.subtle">
+          <Container maxW="7xl" mt={6} h="full">
             {<Outlet />}
           </Container>
         </Stack>

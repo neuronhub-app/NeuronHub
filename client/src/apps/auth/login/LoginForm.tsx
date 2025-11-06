@@ -1,12 +1,13 @@
 import { Button, Card, Center, Container, Fieldset, Heading, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { z } from "zod";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
-import { client } from "@/graphql/client";
+import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
@@ -30,8 +31,12 @@ export function LoginForm() {
     },
   });
 
+  useEffect(() => {
+    form.setFocus("username_or_email");
+  }, [form.setFocus]);
+
   return (
-    <Center minH="100vh">
+    <Center minH="full">
       <Container maxW="md">
         <Card.Root p={8}>
           <Stack gap={6}>
@@ -41,12 +46,13 @@ export function LoginForm() {
 
             <form
               onSubmit={form.handleSubmit(async data => {
-                const result = await client.mutate({
-                  mutation: graphql(
+                const result = await mutateAndRefetch(
+                  graphql(
                     `mutation Login($data: LoginInput!) { login(data: $data) { success error } }`,
                   ),
-                  variables: { data },
-                });
+                  { data },
+                  { isResetAndRefetchAll: true },
+                );
                 if (result.data?.login?.success) {
                   navigate(urls.reviews.list);
                 } else {
@@ -64,6 +70,7 @@ export function LoginForm() {
                       inputProps={{
                         autoComplete: "username",
                         ...ids.set(ids.auth.login.username),
+                        autofocus: true,
                       }}
                     />
 
@@ -71,7 +78,6 @@ export function LoginForm() {
                       control={form.control}
                       name="password"
                       label="Password"
-                      placeholder="Enter your password"
                       inputProps={{
                         type: "password",
                         autoComplete: "current-password",

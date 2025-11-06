@@ -32,7 +32,7 @@ export function FormChakraInput<
     helpText?: string;
     isUrlPrefix?: boolean;
     onKeyEnter?: () => void;
-    inputProps?: ComponentProps<typeof Input> & { "data-testid"?: string };
+    inputProps?: ComponentProps<typeof Input> & { "data-testid"?: string; autofocus?: boolean };
     startElement?: ReactElement | string;
   }) {
   const { field, fieldState } = useController<TFieldValues, TName>({
@@ -52,6 +52,7 @@ export function FormChakraInput<
       <InputGroup w="full" startElement={startElement} startElementProps={startElementProps}>
         <Input
           {...field}
+          autofocus={Boolean(inputProps?.autofocus)}
           placeholder={placeholder}
           ps={isUrlPrefix ? "7ch" : undefined} // padding for "https://"
           {...inputProps}

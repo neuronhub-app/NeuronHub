@@ -25,9 +25,8 @@ import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { ids } from "@/e2e/ids";
-import { env } from "@/env";
 import { graphql } from "@/gql-tada";
-import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/routes";
 
 const groups = [
@@ -236,9 +235,13 @@ export function UserProfile() {
   const user = useUser();
 
   async function handleLogout() {
-    const res = await mutateAndRefetchMountedQueries(graphql(`mutation Logout { logout }`), {});
+    const res = await mutateAndRefetch(
+      graphql(`mutation Logout { logout }`),
+      {},
+      { isResetAndRefetchAll: true },
+    );
     if (res.success) {
-      window.location.href = `${env.VITE_SERVER_URL}/admin/login/`;
+      window.location.reload();
     } else {
       toast.error(`Failed to log out: ${res.errorMessage}`);
     }
