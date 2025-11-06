@@ -78,10 +78,11 @@ Added at the end of a commit first line. See [Tags](/docs/code-style.md#Tags)
 ### Text style
 
 - First noun, then verb.
-- If the brain can read it - the shorter the better
-	- Target visual scanning, not legalese
-	- Fuck English grammar, eg redundant prefixes "the / a / an"
+- If the brain can read it - the shorter the better.
+	- Target visual scanning, not legalese.
+	- Fuck English grammar, eg redundant prefixes "the / a / an".
 - For attributes of an object known form context - prefix with a dot. Eg `.tags`, instead of `Post.tags`.
+- For React components - wrap in brackets as `<Name/>`.
 
 #### Bad shortening
 
