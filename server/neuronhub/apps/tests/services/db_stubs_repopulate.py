@@ -8,6 +8,8 @@ from django.utils import timezone
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.highlighter.models import PostHighlight
+from neuronhub.apps.importer.models import PostSource
+from neuronhub.apps.importer.models import UserSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
@@ -42,6 +44,8 @@ async def db_stubs_repopulate(
             PostRelated,
             ToolCompany,
             ToolCompanyOwnership,
+            PostSource,
+            UserSource,
         ]:
             await model._default_manager.all().adelete()
 
