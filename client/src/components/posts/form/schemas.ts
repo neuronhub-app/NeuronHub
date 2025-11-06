@@ -80,6 +80,7 @@ export namespace schemas {
           : undefined;
       }
       return {
+        visibility: fields.visibility,
         visible_to_users: serializeField(fields.visible_to, "User"),
         visible_to_groups: serializeField(fields.visible_to, "Group"),
         recommended_to_users: serializeField(fields.recommend_to, "User"),
