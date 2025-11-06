@@ -181,7 +181,7 @@ SERVER_PORT = env.int("SERVER_PORT", 8000)
 SERVER_URL = env.str("SERVER_URL", f"http://localhost:{SERVER_PORT}")
 CLIENT_URL = env.str("CLIENT_URL", "http://localhost:3000")
 DOMAIN = env.str("DOMAIN", CLIENT_URL.replace("https://", "").replace("http://", ""))
-DOMAIN_PROD = "neuronhub.app"
+DOMAIN_NAME = env.str("DOMAIN_NAME", "neuronhub.app")
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [
@@ -260,15 +260,16 @@ IS_SENTRY_ENABLED = env.bool(
 )
 if IS_SENTRY_ENABLED:
     sentry_sdk.init(
-        dsn="https://95e2a0f5e598e9f0623f9289426513cb@o4506533516673024.ingest.us.sentry.io/4506533517787136",
+        dsn="https://417078bf385cad9c59d41a020892e689@o4507887634284544.ingest.us.sentry.io/4510305221869575",
         send_default_pii=True,  # IP is excluded
+        enable_logs=True,
         traces_sample_rate=0.5,
         profile_session_sample_rate=0.5,
         profile_lifecycle="trace",
         integrations=[
             StrawberryIntegration(async_execution=True),
         ],
-        release=env.str("VITE_RELEASE_VERSION", "neuronhub@0.2.1.1"),
+        release=env.str("VITE_RELEASE_VERSION", ""),
     )
 
 

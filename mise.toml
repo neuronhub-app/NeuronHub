@@ -20,6 +20,8 @@
     ]
 
 [env]
+    DOMAIN_NAME = "neuronhub.app"
+
     SERVER_PORT = 8000
     SERVER_PORT_E2E = 8001
 

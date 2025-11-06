@@ -16,6 +16,8 @@ graphql_view = AsyncGraphQLView.as_view(
     graphql_ide="graphiql" if settings.DJANGO_ENV == DjangoEnv.LOCAL else None,
     multipart_uploads_enabled=True,  # required for File upload (according to the docs)
 )
+
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("select2/", include("django_select2.urls")),
