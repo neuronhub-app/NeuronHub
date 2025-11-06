@@ -3,6 +3,9 @@ FROM astral/uv:python3.14-bookworm
 LABEL org.opencontainers.image.source="https://github.com/neuronhub-app/neuronhub/blob/master/server/Dockerfile"
 LABEL org.opencontainers.image.description="Daphne serving Django ASGI"
 
+ARG SENTRY_PROJECT
+ARG SERVER_PORT=8000
+
 RUN apt update && apt install ca-certificates --yes # for Sentry
 
 WORKDIR /app
@@ -14,4 +17,4 @@ COPY . ./
 
 RUN uv run manage.py collectstatic
 
-CMD ["uv", "run", "daphne", "--bind", "0.0.0.0", "--port", "8000", "neuronhub.asgi:application"]
+CMD ["uv", "run", "daphne", "--bind", "0.0.0.0", "--port", "$SERVER_PORT", "neuronhub.asgi:application"]

@@ -260,7 +260,7 @@ IS_SENTRY_ENABLED = env.bool(
 )
 if IS_SENTRY_ENABLED:
     sentry_sdk.init(
-        dsn="https://417078bf385cad9c59d41a020892e689@o4507887634284544.ingest.us.sentry.io/4510305221869575",
+        dsn=env.str("SENTRY_DSN_BACKEND", ""),
         send_default_pii=True,  # IP is excluded
         enable_logs=True,
         traces_sample_rate=0.5,
@@ -269,7 +269,7 @@ if IS_SENTRY_ENABLED:
         integrations=[
             StrawberryIntegration(async_execution=True),
         ],
-        release=env.str("VITE_RELEASE_VERSION", ""),
+        release=env.str("VITE_RELEASE_NAME", ""),
     )
 
 

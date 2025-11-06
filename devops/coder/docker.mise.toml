@@ -1,9 +1,0 @@
-# $schema: https://mise.jdx.dev/schema/mise-task.json
-
-["docker:coder:build"]
-    dir = "devops/coder"
-    run = "sudo docker build --tag ghcr.io/neuronhub/coder:{{ env.VITE_RELEASE_VERSION }} ."
-
-["docker:coder:push"]
-    dir = "devops/coder"
-    run = "sudo docker push ghcr.io/neuronhub/coder:{{ env.VITE_RELEASE_VERSION }}"

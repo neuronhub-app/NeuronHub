@@ -24,6 +24,13 @@ const envCleaned = cleanEnv(envRaw, {
     choices: ["development", "staging", "production"],
     default: "development",
   }),
+  // alias to NODE_ENV, that for some reason is used by the `react-router build`
+  MODE: str({
+    choices: ["development", "staging", "production"],
+    default: "development",
+  }),
+
+  SENTRY_DSN_FRONTEND: str({ default: "" }),
 
   VITE_SERVER_URL: url({ default: "http://localhost:8000" }),
 

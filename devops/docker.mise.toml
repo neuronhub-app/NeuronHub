@@ -2,55 +2,85 @@
 
 
 ["docker:push"]
-    usage = """flag "--app <name>" { choices "server" "client" }"""
+    usage = """flag "--app <name>" { choices "server" "client" "coder" }"""
     run = [
-        """sudo docker push ghcr.io/neuronhub-app/neuronhub/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}""",
+        """sudo docker push ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}""",
     ]
 
 
 ["docker:rm"]
-    usage = """flag "--app <name>" { choices "server" "client" }"""
-    run = "sudo docker rmi ghcr.io/neuronhub-app/neuronhub/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}"
+    usage = """flag "--app <name>" { choices "server" "client" "coder" }"""
+    run = "sudo docker rmi ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}"
 
 
 ["docker:build"]
     usage = """
-        flag "--app <name>" { choices "server" "client" }
+        flag "--app <name>" { choices "server" "client" "coder" }
         flag "--no_cache" default=#false
     """
     # Found no other sane way to pass `mise env` to `docker build`,
     # will burn it and move to Podman later.
     run = """
-#!/usr/bin/env bash
+        #!/usr/bin/env bash
 
-cd ${usage_app?}
+        # Set working dir
+        # ------------------------------
 
-ENV_FILE=.env
-COMPOSE_FILE=docker-compose.yml
+        CWD="${usage_app?}"
+        if [ "${usage_app?}" = "coder" ]; then
+          CWD="devops/coder"
+        fi
 
-mise env --dotenv > $ENV_FILE
+        cd $CWD
 
-cat > $COMPOSE_FILE <<EOF
+
+        # Sentry PROJECT_NAME mapping
+        # ------------------------------
+
+        SENTRY_PROJECT=""
+        if [ "${usage_app?}" = "client" ]; then
+          SENTRY_PROJECT={{ env.PROJECT_NAME }}-frontend
+        fi
+        if [ "${usage_app?}" = "server" ]; then
+          SENTRY_PROJECT={{ env.PROJECT_NAME }}-backend
+        fi
+
+
+        # Force-pass Mise env & tag the docker build
+        # ------------------------------
+
+        COMPOSE_FILE=docker-compose.yaml
+        cat > $COMPOSE_FILE <<EOF
             services:
               ${usage_app?}:
-                image: ghcr.io/neuronhub-app/neuronhub/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}
+                image: ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}
                 build:
                   context: .
                   args:
-                    VITE_RELEASE_NAME: {{ env.VITE_RELEASE_NAME }}
+                    # for React Router build
                     VITE_SERVER_URL: https://backend.{{ env.DOMAIN_NAME }}
+
+                    # for Sentry
                     SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN }}
-                env_file:
-                  - path: $ENV_FILE
+                    SENTRY_ORG: {{ env.SENTRY_ORG }}
+                    SENTRY_PROJECT: $SENTRY_PROJECT
+                    SENTRY_DSN_FRONTEND: {{ env.SENTRY_DSN_FRONTEND }}
+                    SENTRY_DSN_BACKEND: {{ env.SENTRY_DSN_BACKEND }}
+                    VITE_RELEASE_VERSION: {{ env.VITE_RELEASE_VERSION }}
+                    VITE_RELEASE_NAME: {{ env.VITE_RELEASE_NAME }}
+                    PROJECT_NAME: {{ env.PROJECT_NAME }}
 
 EOF
 
-CACHE_FLAG=""
-if [ "${usage_no_cache}" = "true" ]; then
-  CACHE_FLAG="--no-cache"
-fi
+        # Build
+        # ------------------------------
 
-sudo docker compose --progress=plain build $CACHE_FLAG
+        CACHE_FLAG=""
+        if [ "${usage_no_cache}" = "true" ]; then
+          CACHE_FLAG="--no-cache"
+        fi
 
-rm $ENV_FILE $COMPOSE_FILE
-"""
+        sudo docker compose --progress=plain build $CACHE_FLAG
+
+        rm $COMPOSE_FILE
+    """

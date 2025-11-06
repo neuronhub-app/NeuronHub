@@ -13,14 +13,30 @@
         "devops/upgrade-deps.mise.toml",
         "devops/db-init.mise.toml",
         "devops/claude.mise.toml",
-        "devops/coder/docker.mise.toml",
         "devops/docker.mise.toml",
         "devops/dev-env-darwin.mise.toml",
         "client/e2e/e2e.mise.toml",
     ]
 
 [env]
+    PROJECT_NAME = "neuronhub"
+
     DOMAIN_NAME = "neuronhub.app"
+
+    GITHUB_ORG = "neuronhub"
+    GITHUB_REPO = "neuronhub-app"
+    GITHUB_PATH = "{{ env.GITHUB_ORG }}/{{ env.GITHUB_REPO }}"
+
+    # Sentry
+
+    SENTRY_ORG = "{{ env.PROJECT_NAME }}"
+    SENTRY_DSN_FRONTEND = "https://97d9ce8ba2e7102f6ccfed17dd2e25aa@o4507887634284544.ingest.us.sentry.io/4510303776145408"
+    SENTRY_DSN_BACKEND = "https://417078bf385cad9c59d41a020892e689@o4507887634284544.ingest.us.sentry.io/4510305221869575"
+    VITE_RELEASE_VERSION = "0.2.1.2"
+    VITE_RELEASE_NAME = "{{ env.PROJECT_NAME }}@{{ env.VITE_RELEASE_VERSION }}"
+
+
+    # Dev env
 
     SERVER_PORT = 8000
     SERVER_PORT_E2E = 8001
@@ -32,8 +48,6 @@
 
     S3_PORT = 8333
 
-    VITE_RELEASE_VERSION = "0.2.1.1"
-    VITE_RELEASE_NAME = "neuronhub@{{ env.VITE_RELEASE_VERSION }}"
 
 
 [tasks."dev"]

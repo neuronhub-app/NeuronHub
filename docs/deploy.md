@@ -10,17 +10,19 @@ name: neuronhub
 services:
   server:
     image: ghcr.io/neuronhub-app/neuronhub/server:${{major_tag}}
+    command: bash -c "uv run manage.py migrate && uv run daphne --bind 0.0.0.0 --port ${{server=8000}} neuronhub.asgi:application"
     env_file:
       - path: .env
     ports:
       - "${{server=8000}}:${{server=8000}}"
+    pull_policy: always
   client:
     image: ghcr.io/neuronhub-app/neuronhub/client:${{major_tag}}
-    command: sh -c "bun run react-router build || true && bunx serve --single build/client --listen tcp://0.0.0.0:${{client=3000}}"
     env_file:
       - path: .env
     ports:
       - "${{client=3000}}:${{client=3000}}"
+    pull_policy: always
 ```
 
 `.env` file
@@ -46,8 +48,13 @@ AWS_SECRET_ACCESS_KEY=${{key_secret}}
 # ========================================================
 
 VITE_SERVER_URL=https://backend.${{domain}}
-# https://docs.sentry.io/platforms/javascript/guides/react-router/#source-maps-upload
-SENTRY_AUTH_TOKEN=${{token_for_source_maps}}
+
+
+# Sentry
+# ========================================================
+
+SENTRY_DSN_BACKEND=${{dsn_backend}}
+SENTRY_DSN_FRONTEND=${{dsn_frontend}}
 ```
 
 ### S3 server
@@ -80,4 +87,4 @@ SECRET_ACCESS_KEY=${{key_secret}}
 
 Watch out for the `BREAKING CHANGE` notes in the release descriptions - it's specifically for self-hosting.
 
-You can use `:latest` docker tag, but I advice to hardcode the non-breaking release eg`1.3`, as the two last numbers are for non-breaking changes, ie `1.3.15.1` won't break your deployment.
+You can use `:latest` docker tag, but I advice to hardcode the non-breaking release eg `1.3`, as the two last numbers are for non-breaking changes, ie `1.3.15.1` won't break your deployment.
