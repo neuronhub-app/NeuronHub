@@ -63,7 +63,8 @@ export function PostCard(props: { post: PostListItemType }) {
           </Stack>
         </NavLink>
 
-        {(user?.id === post.author?.id || (user?.is_superuser && post.author === null)) && (
+        {((user && user?.id === post.author?.id) ||
+          (user?.is_superuser && post.author === null)) && (
           <IconButton
             asChild
             variant="subtle-ghost"
