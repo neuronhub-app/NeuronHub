@@ -23,8 +23,8 @@
 
     DOMAIN_NAME = "neuronhub.app"
 
-    GITHUB_ORG = "neuronhub"
-    GITHUB_REPO = "neuronhub-app"
+    GITHUB_ORG = "neuronhub-app"
+    GITHUB_REPO = "neuronhub"
     GITHUB_PATH = "{{ env.GITHUB_ORG }}/{{ env.GITHUB_REPO }}"
 
     # Sentry
