@@ -5,7 +5,6 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { PostCategory } from "~/graphql/enums";
 
 export function PostList(props: { category?: PostCategory }) {
-  const variables = props.category ? { category: props.category } : {};
   const { data, error, isLoadingFirstTime } = useApolloQuery(
     graphql(
       `
@@ -17,7 +16,7 @@ export function PostList(props: { category?: PostCategory }) {
 			`,
       [PostFragment],
     ),
-    variables,
+    { category: props.category },
   );
   return (
     <ListContainer
