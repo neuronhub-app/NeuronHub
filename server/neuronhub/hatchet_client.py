@@ -23,6 +23,8 @@ class ImportMetaOutput(BaseModel):
 
 
 def start_worker():
+    from neuronhub.apps.importer.services.import_html_meta import import_html_meta
+
     worker = hatchet.worker("worker", slots=8, workflows=[import_html_meta])
     worker.start()
 
