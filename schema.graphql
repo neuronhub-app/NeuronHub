@@ -190,7 +190,6 @@ type PostCommentType implements PostTypeI {
   parent: PostTypeI
   parent_root: PostTypeI
   children: [PostTypeI!]!
-  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -217,6 +216,7 @@ type PostCommentType implements PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments: [PostCommentType!]!
   comments_count: Int!
 }
 
@@ -271,7 +271,6 @@ type PostReviewType implements PostTypeI {
   parent: PostToolType!
   parent_root: PostTypeI
   children: [PostTypeI!]!
-  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -298,6 +297,7 @@ type PostReviewType implements PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments: [PostCommentType!]!
   comments_count: Int!
   review_usage_status: UsageStatus
   review_rating: Int
@@ -387,7 +387,6 @@ type PostToolType implements PostTypeI {
   parent: PostTypeI
   parent_root: PostTypeI
   children: [PostTypeI!]!
-  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -414,6 +413,7 @@ type PostToolType implements PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments: [PostCommentType!]!
   comments_count: Int!
   tool_type: ToolType
   alternatives(filters: PostFilter): [PostToolType!]!
@@ -427,7 +427,6 @@ type PostType implements PostTypeI {
   parent: PostTypeI
   parent_root: PostTypeI
   children: [PostTypeI!]!
-  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -454,6 +453,7 @@ type PostType implements PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments: [PostCommentType!]!
   comments_count: Int!
 }
 
@@ -520,7 +520,6 @@ interface PostTypeI {
   parent: PostTypeI
   parent_root: PostTypeI
   children: [PostTypeI!]!
-  comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   type: PostTypeEnum!
   category: PostCategory
   title: String!
@@ -547,6 +546,7 @@ interface PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments: [PostCommentType!]!
   comments_count: Int!
 }
 

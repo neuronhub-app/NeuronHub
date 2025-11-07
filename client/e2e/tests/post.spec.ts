@@ -57,7 +57,7 @@ test.describe("Post", () => {
     // Fill content - the accordion should be open by default for content_polite
     await play.fill(ids.post.form.content_polite, post.content);
 
-    const categoryBtn = $[`${ids.post.form.category}.${post.category}`];
+    const categoryBtn = $[`category.${post.category}`];
     await categoryBtn.click();
 
     // Tag

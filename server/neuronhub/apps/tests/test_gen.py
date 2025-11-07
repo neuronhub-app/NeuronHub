@@ -176,18 +176,23 @@ class PostsGen:
 
     async def comment(
         self,
+        parent_root: Post,
         parent: Post = None,
-        parent_root: Post = None,
         author: User = None,
+        content_polite: str | None = None,
         visibility: Visibility = Visibility.PUBLIC,
         visible_to_users: list[User] = None,
     ) -> Post:
+        if not parent:
+            parent = parent_root
+
         return await self.create(
             self.Params(
                 parent=parent,
                 parent_root=parent_root,
                 type=Post.Type.Comment,
                 author=author or self.user,
+                content_polite=content_polite,
                 visibility=visibility,
                 visible_to_users=visible_to_users,
             )
@@ -262,7 +267,7 @@ class PostsGen:
         post = await Post.objects.acreate(
             type=params.type,
             parent=params.parent,
-            parent_root=params.parent_root,  # Will be auto-calculated in save() if None
+            parent_root=params.parent_root,
             title=params.title or self.faker.sentence(),
             content_polite=params.content_polite or self.faker.text(max_nb_chars=500),
             content_direct=params.content_direct,

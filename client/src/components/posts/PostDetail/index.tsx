@@ -1,5 +1,6 @@
 import { For, Heading, Show, Stack, Text, VStack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 import { proxy } from "valtio";
 import { useHighlighter } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
@@ -25,7 +26,12 @@ export function PostDetail(props: {
 }) {
   const user = useUser();
 
-  const highlighter = useHighlighter({ comments: props.post?.comments });
+  const commentTree = useMemo(
+    () => (props.post?.comments ? buildCommentTree(props.post.comments) : []),
+    [props.post?.comments],
+  );
+
+  const highlighter = useHighlighter({ comments: commentTree });
 
   useInit({
     isBlocked: !(user && props.post?.id),
@@ -60,35 +66,26 @@ export function PostDetail(props: {
         <Stack gap="gap.xl">
           <PostCard post={props.post} isDetailPage />
 
-          <Stack gap={props.post.comments.length ? "gap.lg" : "0"}>
+          <Stack gap={commentTree.length ? "gap.lg" : "0"}>
             <Heading fontSize="lg" display="flex" gap="gap.sm" alignItems="center">
               Comments <Text color="fg.subtle">{props.post.comments_count}</Text>
             </Heading>
 
-            <Show when={props.post.comments.length}>
+            <Show when={commentTree.length > 0}>
               <VStack px={0} align="flex-start" gap="gap.md">
-                {/* .map() here causes #bad-infer */}
-                <For each={props.post.comments}>
-                  {(comment, _index) => {
-                    const isTopComment = comment.parent?.type !== PostTypeEnum.Comment;
-                    if (isTopComment) {
-                      const topLevelComments = props.post!.comments.filter(
-                        c => c.parent?.type !== PostTypeEnum.Comment,
-                      );
-                      const topLevelIndex = topLevelComments.findIndex(c => c.id === comment.id);
-                      return (
-                        <CommentThread
-                          key={comment.id}
-                          comment={highlighter.highlight(comment)}
-                          post={props.post!}
-                          depth={0}
-                          isLastChild={topLevelIndex === topLevelComments.length - 1}
-                          isFirstChild={true}
-                          height={{ parent: 0, toolbar: 0, avatar: 0 }} // init values
-                        />
-                      );
-                    }
-                  }}
+                {/* Render top-level comments from the tree */}
+                <For each={commentTree}>
+                  {(comment, index) => (
+                    <CommentThread
+                      key={comment.id}
+                      comment={highlighter.highlight(comment)}
+                      post={props.post!}
+                      depth={0}
+                      isLastChild={index === commentTree.length - 1}
+                      isFirstChild={true}
+                      height={{ parent: 0, toolbar: 0, avatar: 0 }} // init values
+                    />
+                  )}
                 </For>
               </VStack>
             </Show>
@@ -101,4 +98,32 @@ export function PostDetail(props: {
       )}
     </Stack>
   );
+}
+
+export type PostCommentTree = PostDetailFragmentType["comments"][number] & {
+  comments: PostCommentTree[];
+};
+
+function buildCommentTree(commentsFlat: PostDetailFragmentType["comments"]) {
+  const commentMap = new Map<ID, PostCommentTree>();
+  const commentTree: PostCommentTree[] = [];
+
+  // set `.comments = []`
+  for (const comment of commentsFlat) {
+    commentMap.set(comment.id, { ...comment, comments: [] });
+  }
+  // build commentTree
+  for (const comment of commentsFlat) {
+    const commentWithChildren = commentMap.get(comment.id)!;
+
+    const isTopLevel = !comment.parent || comment.parent.type !== PostTypeEnum.Comment;
+    if (isTopLevel) {
+      commentTree.push(commentWithChildren);
+    } else if (comment.parent && commentMap.has(comment.parent.id)) {
+      const parent = commentMap.get(comment.parent.id)!;
+      parent.comments.push(commentWithChildren);
+    }
+  }
+
+  return commentTree;
 }

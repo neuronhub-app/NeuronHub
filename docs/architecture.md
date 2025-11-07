@@ -71,7 +71,8 @@ classDiagram
 
         class PostComment {
             <<projection>>
-            parent: Post
+            parent_root: Post
+            parent: Post | PostComment
             author: User
             content: str
         }

@@ -5,7 +5,7 @@ from neuronhub.apps.users.graphql.types_lazy import UserListName
 class TestUserCollapsedPosts(NeuronTestCase):
     async def test_query_collapsed_posts(self):
         post = await self.gen.posts.create()
-        comment = await self.gen.posts.comment(parent=post, parent_root=post)
+        comment = await self.gen.posts.comment(post)
 
         result = await self.graphql_query(
             """

@@ -39,9 +39,18 @@ export namespace ids {
       image: "post.form.image",
       category: "post.form.category",
       tags: "post.form.tags",
-      state: {
-        saved: "post.form.state.saved",
+      sharingFieldsToggle: "post.form.sharing-fields-toggle",
+      visibility: {
+        private: "post.form.visibility.private",
+        usersSelected: "post.form.visibility.users-selected",
+        connections: "post.form.visibility.connections",
+        subscribersPaid: "post.form.visibility.subscribers-paid",
+        subscribers: "post.form.visibility.subscribers",
+        internal: "post.form.visibility.internal",
+        public: "post.form.visibility.public",
       },
+      visibleTo: "post.form.visible-to",
+      recommendTo: "post.form.recommend-to",
       tag: {
         container: "post.form.tag.container",
         vote: {
@@ -60,6 +69,9 @@ export namespace ids {
   export const form = {
     input: {
       error: "form.input.error",
+    },
+    notification: {
+      success: "form.notification.success",
     },
   } as const;
 
@@ -86,6 +98,7 @@ export namespace ids {
     },
     form: {
       textarea: "comment.form.textarea",
+      textareaEdit: "comment.form.textarea.edit",
       submitBtn: "comment.form.submit-btn",
       saveBtn: "comment.form.save-btn",
       cancelBtn: "comment.form.cancel-btn",

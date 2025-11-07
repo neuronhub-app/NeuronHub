@@ -19,15 +19,20 @@ import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighte
 import { useUser } from "@/apps/users/useUserCurrent";
 import { getAvatarColorForUsername } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
-import { collapsedCommentsState } from "@/components/posts/PostDetail";
+import { collapsedCommentsState, type PostCommentTree } from "@/components/posts/PostDetail";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentVoteBar } from "@/components/posts/PostDetail/CommentVoteBar";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
-import type { PostCommentType, PostDetailFragmentType } from "@/graphql/fragments/posts";
+import {
+  PostEditFragment,
+  type PostDetailFragmentType,
+  type PostEditFragmentType,
+} from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
+import { toast } from "@/utils/toast";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { UserListName } from "~/graphql/enums";
 
@@ -43,7 +48,7 @@ const styleGlobal = {
 
 export function CommentThread(props: {
   post: PostDetailFragmentType | PostReviewDetailFragmentType;
-  comment: PostCommentType;
+  comment: PostCommentTree;
   depth: number;
   isFirstChild: boolean;
   isLastChild: boolean;
@@ -57,8 +62,10 @@ export function CommentThread(props: {
 
   const state = useValtioProxyRef({
     isEditing: false,
+    isLoadingEdit: false,
     isShowReplyForm: false,
     parentHeightPx: 0,
+    commentForEdit: null as PostEditFragmentType | null,
   });
 
   const refs = {
@@ -136,13 +143,20 @@ export function CommentThread(props: {
 
             {isCommentUnfolded &&
               (state.snap.isEditing ? (
-                <CommentForm
-                  mode="edit"
-                  comment={props.comment}
-                  onEditFinish={() => {
-                    state.mutable.isEditing = false;
-                  }}
-                />
+                state.snap.isLoadingEdit ? (
+                  <Text fontSize="sm" color="fg.subtle">
+                    Loading...
+                  </Text>
+                ) : state.snap.commentForEdit ? (
+                  <CommentForm
+                    mode="edit"
+                    comment={state.snap.commentForEdit}
+                    onEditFinish={() => {
+                      state.mutable.isEditing = false;
+                      state.mutable.commentForEdit = null;
+                    }}
+                  />
+                ) : null
               ) : (
                 <PostContentHighlighted post={props.comment} />
               ))}
@@ -167,8 +181,31 @@ export function CommentThread(props: {
               {user?.id === props.comment.author?.id && !state.snap.isEditing && (
                 <CommentToolbarButton
                   label="Edit"
-                  onClick={() => {
+                  onClick={async () => {
+                    state.mutable.isLoadingEdit = true;
                     state.mutable.isEditing = true;
+
+                    // Fetch comment with visibility fields before editing
+                    const { data } = await client.query({
+                      query: graphql(
+                        `query CommentEdit($id: ID!) {
+                          post_comment(pk: $id) {
+                            ...PostEditFragment
+                          }
+                        }`,
+                        [PostEditFragment],
+                      ),
+                      variables: { id: props.comment.id },
+                    });
+
+                    if (data?.post_comment) {
+                      state.mutable.commentForEdit = data.post_comment;
+                      state.mutable.isLoadingEdit = false;
+                    } else {
+                      toast.error("Failed to load comment for editing");
+                      state.mutable.isEditing = false;
+                      state.mutable.isLoadingEdit = false;
+                    }
                   }}
                   icon={<GoPencil />}
                   id={ids.comment.btn.edit}

@@ -40,7 +40,6 @@ export function PostFields(props: {
           control={form.control}
           name="category"
           label="Category"
-          data-testid={ids.post.form.category}
           segmentGroupProps={{ size: "md" }}
           items={[
             { value: PostCategory.Knowledge, icon: <FaLightbulb /> },

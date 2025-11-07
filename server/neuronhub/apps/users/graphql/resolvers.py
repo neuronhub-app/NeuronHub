@@ -9,12 +9,7 @@ from neuronhub.apps.users.graphql.types import UserType
 
 
 def resolve_current_user(info: Info) -> UserType | None:
-    """
-    This is a copy of strawberry_django.auth.resolve_current_user(),
-    but strawberry's version raises an error if the user isn't logged in, which we don't want.
-
-    todo[refactor] check if still true
-    """
+    # todo refac: drop if `strawberry_django/auth/queries.py::current_user` stops throwing Errors (still does)
     user = get_current_user(info)
     if getattr(user, "is_authenticated", False):
         return cast(UserType, user)

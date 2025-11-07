@@ -62,7 +62,13 @@ export namespace schemas {
     ): Form {
       const form: Form = useFormContextOriginal();
       for (const fieldRequired of fieldsRequired) {
-        const state = form.getFieldState(fieldRequired);
+        let state: ReturnType<typeof form.getFieldState>;
+        try {
+          state = form.getFieldState(fieldRequired);
+        } catch (error) {
+          console.error(fieldRequired, error);
+          return form;
+        }
         if (state.isDirty === undefined) {
           throw new Error(`Missing "${fieldRequired}" form field`);
         }

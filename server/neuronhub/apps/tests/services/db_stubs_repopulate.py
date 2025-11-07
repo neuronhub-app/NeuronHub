@@ -34,6 +34,11 @@ async def db_stubs_repopulate(
     is_delete_users_extra: bool = True,
     is_delete_user_default: bool = False,
 ) -> Gen:
+    """
+    Populates the db with Posts, Tools, Reviews, tags, votes, etc.
+
+    E2E tests run on it, so it includes edge cases.
+    """
     if is_delete_posts:
         for model in [
             PostHighlight,
@@ -215,17 +220,12 @@ async def _create_review_pycharm(user: User, gen: Gen):
             ReviewTagParams(ReviewTagName.ease_of_use, is_vote_pos=False),
         ],
     )
-    comment = await gen.posts.create(
-        gen.posts.Params(Post.Type.Comment, parent=review, author=user)
-    )
-    # Add nested comment (reply)
-    nested_comment = await gen.posts.create(
-        gen.posts.Params(
-            Post.Type.Comment,
-            parent=comment,
-            author=user,
-            content_polite="VS Code has better extensions ecosystem, but PyCharm has superior debugging and refactoring capabilities for Python projects.",
-        )
+    comment = await gen.posts.comment(review, author=user)
+    nested_comment = await gen.posts.comment(
+        review,
+        parent=comment,
+        author=user,
+        content_polite="VS Code has better extensions ecosystem, but PyCharm has superior debugging and refactoring capabilities for Python projects.",
     )
     # todo ! use f"" strings #AI-slop
     # Create a highlight on the nested comment
@@ -296,13 +296,10 @@ async def _create_review_iterm(user: User, gen: Gen):
         author=user,
         params=[TagParams(tags.macos, is_vote_pos=True)],
     )
-    iterm_comment = await gen.posts.create(
-        gen.posts.Params(
-            Post.Type.Comment,
-            parent=review,
-            author=user,
-            content_polite="Have you tried the GPU rendering option? It makes scrolling buttery smooth.",
-        )
+    iterm_comment = await gen.posts.comment(
+        review,
+        author=user,
+        content_polite="Have you tried the GPU rendering option? It makes scrolling buttery smooth.",
     )
     # todo ! use f"" strings #AI-slop
     # Create a highlight on this comment
@@ -364,8 +361,8 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
         reviewed_at=timezone.now() - datetime.timedelta(days=35),
         visibility=Visibility.PUBLIC,
     )
-    comment = await gen.posts.comment(parent=review, author=user)
-    await gen.posts.comment(parent=comment, author=user)
+    comment = await gen.posts.comment(review, author=user)
+    await gen.posts.comment(review, parent=comment, author=user)
     await _create_review_tags(
         review=review,
         params=[

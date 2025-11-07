@@ -83,7 +83,7 @@ export namespace PostCreateForm {
                       <PostFields isShowAuthorProfileInput isShowCategoryField />
                     </VStack>
 
-                    <PostSharableFields />
+                    <PostSharableFields isShowContentPrivate />
                   </Fieldset.Content>
                 </Fieldset.Root>
 

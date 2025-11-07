@@ -53,7 +53,7 @@ Read the `test_gen.py` if you're working on Python tests.
 ```python
 user = await self.gen.users.user()
 post = await self.gen.posts.create()
-comment = await self.gen.posts.comment(parent=post)
+comment = await self.gen.posts.comment(parent_root=post)
 review_1 = await self.gen.posts.create(self.gen.posts.Params(
     type=Post.Type.Review,
     parent=post,

@@ -18,7 +18,8 @@ export const expect = expectBase.extend({
   },
 
   // todo refac-name: to be unique
-  // .stateChecked? .checkedState didn't look clear
+  // .stateChecked? .checkedState didn't look clear.
+  // todo refac: use aria-checked={boolean}
   async checked(locator: Locator) {
     return runPlaywrightMatcher({
       context: this,

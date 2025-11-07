@@ -8,11 +8,7 @@ import { PostCard } from "@/components/posts/PostCard";
 import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { graphql, type ID, type ResultOf } from "@/gql-tada";
-import {
-  CommentFieldsFragment,
-  PostCommentsFragment,
-  PostFragment,
-} from "@/graphql/fragments/posts";
+import { CommentFieldsFragment, PostFragment } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/routes";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
@@ -29,16 +25,14 @@ const UserHighlightsQuery = graphql(
 
         post {
           ...CommentFieldsFragment
-          ...PostCommentsFragment
         }
         root_post {
           ...PostFragment
-          ...PostCommentsFragment
         }
       }
     }
   `,
-  [CommentFieldsFragment, PostFragment, PostCommentsFragment],
+  [CommentFieldsFragment, PostFragment],
 );
 
 type HighlightGroup = {

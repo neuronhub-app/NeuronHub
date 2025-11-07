@@ -5,6 +5,7 @@ import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelpe
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { urls } from "@/routes";
+import { Visibility } from "~/graphql/enums";
 
 test.describe("Comments", () => {
   let play: PlaywrightHelper;
@@ -59,17 +60,28 @@ test.describe("Comments", () => {
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
 
-    // edit
+    // edit first Comment
     await play.click(ids.comment.btn.edit);
     const contentNew = "New comment content";
-    await play.fill(ids.comment.form.textarea, contentNew);
+    await play.fill(ids.comment.form.textareaEdit, contentNew);
+
+    await $[ids.post.form.sharingFieldsToggle].check();
+    await $[`visibility.${Visibility.Internal}`].click();
+
     await play.submit(ids.post.form);
-    // confirm
     await expect(page).toHaveText(contentNew);
 
     // reload → test persistence
     await play.reload({ idleWait: true });
     await expect(page).toHaveText(contentNew);
+
+    // verify visibility loads correctly from server
+    await play.click(ids.comment.btn.edit);
+    await $[ids.post.form.sharingFieldsToggle].check();
+    await expect($[`visibility.${Visibility.Internal}`]).checked();
+
+    // cancel editing
+    await play.click(ids.comment.form.cancelBtn);
   });
 
   test("highlight", async ({ page }) => {

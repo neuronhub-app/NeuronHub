@@ -94,10 +94,10 @@ export const CommentFieldsFragment = graphql(
       content_polite
       content_direct
       content_rant
-      visibility
       created_at
       updated_at
       source_author
+
       post_source {
         id
         id_external
@@ -115,47 +115,45 @@ export const CommentFieldsFragment = graphql(
   `,
 );
 
-// #AI. questionable to say the least.
-export const PostCommentsFragment = graphql(
+export const CommentSharableFragment = graphql(
   `
-    fragment PostCommentsFragment on PostTypeI {
-      comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-        ...CommentFieldsFragment
-        comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-          ...CommentFieldsFragment
-          comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-            ...CommentFieldsFragment
-            comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-              ...CommentFieldsFragment
-              comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-                ...CommentFieldsFragment
-                comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-                  ...CommentFieldsFragment
-                  comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-                    ...CommentFieldsFragment
-                  }
-                }
-              }
-            }
-          }
-        }
+    fragment CommentSharableFragment on PostTypeI {
+      visibility
+      recommended_to_users {
+        id
+        username
+      }
+      recommended_to_groups {
+        id
+        name
+      }
+      visible_to_groups {
+        id
+        name
+      }
+      visible_to_users {
+        id
+        username
       }
     }
   `,
-  [CommentFieldsFragment],
 );
-
-export type PostCommentType = FragmentOf<typeof PostCommentsFragment>["comments"][number];
 
 export const PostDetailFragment = graphql(
   `
     fragment PostDetailFragment on PostTypeI {
       ...PostFragment
-      ...PostCommentsFragment
+      comments {
+        ...CommentFieldsFragment
+      }
     }
   `,
-  [PostFragment, PostCommentsFragment],
+  [PostFragment, CommentFieldsFragment],
 );
+
+// #AI it was redefined by AI during #91 and #94, in an idiotic way - review later #prob-redundant
+// for now i leave it to on gql.tada to error up on wrong usage
+export type PostCommentType = FragmentOf<typeof CommentFieldsFragment>;
 
 export type PostFragmentType = FragmentOf<typeof PostFragment>;
 
@@ -165,7 +163,6 @@ export const PostEditFragment = graphql(
   `
     fragment PostEditFragment on PostTypeI {
       ...PostFragment
-      ...PostCommentsFragment
 
       content_private
 
@@ -188,7 +185,7 @@ export const PostEditFragment = graphql(
       }
     }
   `,
-  [PostFragment, PostCommentsFragment],
+  [PostFragment],
 );
 
 export type PostEditFragmentType = FragmentOf<typeof PostEditFragment>;

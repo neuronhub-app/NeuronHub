@@ -1,19 +1,15 @@
 import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { highlighter } from "@/apps/highlighter/highlighter";
+import type { PostCommentTree } from "@/components/posts/PostDetail";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
-import {
-  CommentFieldsFragment,
-  PostCommentsFragment,
-  type PostCommentType,
-  PostFragment,
-} from "@/graphql/fragments/posts";
-import { isQueryDataComplete, useApolloQuery } from "@/graphql/useApolloQuery";
+import { CommentFieldsFragment, PostFragment } from "@/graphql/fragments/posts";
+import { isQueryDataComplete } from "@/graphql/useApolloQuery";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 interface UseHighlighterProps {
-  comments?: PostCommentType[];
+  comments?: PostCommentTree[];
   posts?: Array<{ id: ID; comments?: Array<{ id: ID }> }>;
 }
 
@@ -119,17 +115,16 @@ const PostHighlightsQuery = graphql(
         }
         root_post {
           ...PostFragment
-          ...PostCommentsFragment
         }
       }
     }
   `,
-  [PostFragment, CommentFieldsFragment, PostCommentsFragment],
+  [PostFragment, CommentFieldsFragment],
 );
 type PostHighlights = ResultOf<typeof PostHighlightsQuery>;
 type PostHighlight = NonNullable<PostHighlights["post_highlights"]>[number];
 
-function collectIdsRecursively(comments: PostCommentType[]): ID[] {
+function collectIdsRecursively(comments: PostCommentTree[]): ID[] {
   const ids: ID[] = [];
   for (const comment of comments) {
     ids.push(comment.id);

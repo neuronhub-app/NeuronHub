@@ -4,8 +4,9 @@ import logging
 
 import strawberry
 import strawberry_django
+from asgiref.sync import sync_to_async
 from django.core.files.uploadedfile import UploadedFile
-from django.db.models import QuerySet
+from django.db.models import QuerySet, F
 from strawberry import Info
 from strawberry import auto
 from strawberry_django.auth.utils import get_current_user
@@ -51,7 +52,6 @@ class PostTypeI:
     parent: PostTypeI | None
     parent_root: PostTypeI | None
     children: list[PostTypeI]
-    comments: list[PostCommentType] = strawberry_django.field(field_name="children")
 
     type: auto
     category: auto
@@ -94,6 +94,15 @@ class PostTypeI:
         return filter_posts_by_user(user, posts=queryset)
 
     @strawberry_django.field
+    async def comments(self: Post, info: Info) -> list[PostCommentType]:
+        comments_qs = Post.objects.filter(parent_root=self, type=Post.Type.Comment)
+        comments_filtered = filter_posts_by_user(user=get_current_user(info), posts=comments_qs)
+        comments_ordered = comments_filtered.order_by(
+            F("post_source__rank").desc(nulls_first=None)
+        )
+        return await sync_to_async(list)(comments_ordered)
+
+    @strawberry_django.field
     async def comments_count(self: Post) -> int:
         return await Post.objects.filter(parent_root=self, type=Post.Type.Comment).acount()
 
@@ -109,7 +118,7 @@ class PostToolType(PostTypeI):
 
     tool_type: auto
 
-    # todo !! must be PostRelatedType
+    # todo ! must be PostRelatedType
     alternatives: list[PostToolType]
 
 
@@ -138,7 +147,6 @@ class PostCommentType(PostTypeI):
     TYPE = Post.Type.Comment
 
     parent: PostTypeI | None
-    comments: list[PostCommentType] = strawberry_django.field(field_name="children")
 
 
 @strawberry_django.type(PostVote)

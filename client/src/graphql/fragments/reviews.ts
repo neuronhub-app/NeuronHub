@@ -1,6 +1,6 @@
 import { type FragmentOf, graphql } from "@/gql-tada";
 import {
-  PostCommentsFragment,
+  CommentFieldsFragment,
   PostEditFragment,
   PostFragment,
   type PostFragmentType,
@@ -29,10 +29,12 @@ export const PostReviewDetailFragment = graphql(
   `
     fragment PostReviewDetailFragment on PostReviewType {
       ...PostReviewFragment
-      ...PostCommentsFragment
+      comments {
+        ...CommentFieldsFragment
+      }
     }
   `,
-  [PostReviewFragment, PostCommentsFragment],
+  [PostReviewFragment, CommentFieldsFragment],
 );
 export type PostReviewDetailFragmentType = FragmentOf<typeof PostReviewDetailFragment>;
 export type PostReviewFragmentType = FragmentOf<typeof PostReviewFragment> & {
@@ -44,12 +46,11 @@ export const PostReviewEditFragment = graphql(
     fragment PostReviewEditFragment on PostReviewType {
       ...PostEditFragment
       ...PostReviewFragment
-      ...PostCommentsFragment
 
 			is_review_later
     }
   `,
-  [PostReviewFragment, PostEditFragment, PostCommentsFragment],
+  [PostReviewFragment, PostEditFragment],
 );
 export type PostReviewEditFragmentType = FragmentOf<typeof PostReviewEditFragment>;
 

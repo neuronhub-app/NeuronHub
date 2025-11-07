@@ -7,18 +7,33 @@ import { schemas } from "@/components/posts/form/schemas";
 import { UserMultiSelect } from "@/components/posts/form/UserMultiSelect";
 import { Visibility } from "~/graphql/enums";
 
-export function PostSharableFields() {
+export function PostSharableFields(props: {
+  isShowContentPrivate?: boolean;
+  isShowRecommendTo?: boolean;
+  size?: "sm" | "md";
+}) {
+  const isShowRecommendTo = props.isShowRecommendTo ?? true;
+  const size = props.size ?? "md";
+
   const form = schemas.sharable.useFormContext();
   const state = form.watch();
 
+  const style = {
+    visibility: {
+      size: size === "md" ? "sm" : "xs",
+    },
+  };
+
   return (
     <>
-      <FormChakraTextarea
-        field={{ control: form.control, name: "content_private" }}
-        label="Private note"
-        placeholder="Only visible to you"
-        isShowIconMarkdown
-      />
+      {props.isShowContentPrivate && (
+        <FormChakraTextarea
+          field={{ control: form.control, name: "content_private" }}
+          label="Private note"
+          placeholder="Only visible to you"
+          isShowIconMarkdown
+        />
+      )}
 
       <VStack align="flex-start">
         <FormChakraSegmentControl
@@ -29,11 +44,6 @@ export function PostSharableFields() {
             { value: Visibility.Private, icon: <HiLockClosed /> },
             { value: Visibility.UsersSelected, icon: <FaUsersGear />, label: "Users selected" },
             { value: Visibility.Connections, icon: <FaUsers /> },
-            {
-              value: Visibility.SubscribersPaid,
-              icon: <FaUsers />,
-              label: "Subscribers (paid)",
-            },
             { value: Visibility.Subscribers, icon: <FaUsers /> },
             {
               value: Visibility.Internal,
@@ -49,7 +59,6 @@ export function PostSharableFields() {
             Visibility.UsersSelected,
             Visibility.Connections,
             Visibility.ConnectionGroupsSelected,
-            Visibility.SubscribersPaid,
             Visibility.Subscribers,
           ]).has(state.visibility as Visibility) && (
             <UserMultiSelect
@@ -64,12 +73,14 @@ export function PostSharableFields() {
           )}
       </VStack>
 
-      <VStack align="flex-start" w="full" gap="gap.sm">
-        <Text fontSize="sm" fontWeight="semibold">
-          Recommend to
-        </Text>
-        <UserMultiSelect form={form} fieldName="recommend_to" />
-      </VStack>
+      {isShowRecommendTo && (
+        <VStack align="flex-start" w="full" gap="gap.sm">
+          <Text fontSize="sm" fontWeight="semibold">
+            Recommend to
+          </Text>
+          <UserMultiSelect form={form} fieldName="recommend_to" />
+        </VStack>
+      )}
     </>
   );
 }

@@ -43,9 +43,13 @@ async def _update_or_create(data: PostTypeInput, author: User):
         is_parent_required = data.type in [Post.Type.Review, Post.Type.Comment]
         if is_parent_required:
             assert data.parent
-            # todo refac: drop aget()? id is enough
             parent = await Post.objects.aget(id=data.parent.id)
-            post = await Post.objects.acreate(parent=parent, author=author, **data_parsed)
+            post = await Post.objects.acreate(
+                parent=parent,
+                parent_root_id=parent.parent_root_id if parent.parent_root_id else parent.id,
+                author=author,
+                **data_parsed,
+            )
             await _create_posts_related(parent, data, author)
         else:
             post = await Post.objects.acreate(author=author, **data_parsed)

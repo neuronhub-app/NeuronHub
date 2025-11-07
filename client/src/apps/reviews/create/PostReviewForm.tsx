@@ -328,7 +328,7 @@ export namespace PostReviewForm {
                     </HStack>
                   </VStack>
 
-                  <PostSharableFields />
+                  <PostSharableFields isShowContentPrivate />
                 </Fieldset.Content>
               </Fieldset.Root>
 

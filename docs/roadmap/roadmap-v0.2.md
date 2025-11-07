@@ -1,4 +1,4 @@
-### v0.2.0.0
+### v0.2
 
 - [x] Tool.image upload
 - [x] Post .content_polite, .content_direct, .content_rant
@@ -7,25 +7,27 @@
 - [x] Comment deep threads & new UI
 - [x] Deploy
 - [x] Sentry
+
+### v0.2.3.0
+
+- [x] feat: Comments.visibility to the <CommentForm/>
+- [x] UI: fix <CommentThread/> left lint
+- [x] fix: Comment perf fix by `.parent_root` field
+- [ ] feat: Comment singular collapse (ie "mask as read")
+
+### v0.2.4.0
+
+- [ ] Algolia
 - [ ] HN sync
   - [ ] meta.image saving
   - [ ] Hatchet
-- [ ] Comments
-  - [ ] visibility
-- [ ] User Signup & Login
-- [ ] Comment perf
+- [ ] User Signup
+- [ ] Reading list
 
-### v0.2.1.0
+### v0.2.5.0
 
-- Reading list
-
-### v0.2.2.0
-
-- Sentry
-- Browser extension
 - [refactor-pending](/docs/refactor-pending.md)
-- pagination
-- "Unread" or "Inbox"
+- "Inbox"
 - Review pros/cons icons
 
 ### v0.3.0.0
