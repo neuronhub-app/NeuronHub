@@ -15,6 +15,7 @@ export namespace highlighter {
       text: "",
       text_prefix: "",
       text_postfix: "",
+      isSavable: false,
       isPressedKey: {
         B: false,
         Meta: false,
@@ -27,9 +28,10 @@ export namespace highlighter {
         const selection = document.getSelection();
         if (selection?.toString() && selection.rangeCount > 0) {
           state.mutable.text = selection.toString();
-          const { text_prefix, text_postfix } = getSelectionContext(selection);
+          const { text_prefix, text_postfix, isSavable } = getSelectionContext(selection);
           state.mutable.text_prefix = text_prefix;
           state.mutable.text_postfix = text_postfix;
+          state.mutable.isSavable = isSavable;
         } else {
           state.mutable.text = "";
           state.mutable.text_prefix = "";
@@ -94,7 +96,7 @@ export namespace highlighter {
       component: () => {
         return (
           <ActionBar.Root
-            open={isTextSelected}
+            open={isTextSelected && state.snap.isSavable}
             initialFocusEl={() => saveButtonRef.current}
             skipAnimationOnMount={true}
             immediate={true}
@@ -171,6 +173,7 @@ export namespace highlighter {
   function getSelectionContext(selection: Selection): {
     text_prefix: string;
     text_postfix: string;
+    isSavable: boolean;
   } {
     const selectionRange = selection.getRangeAt(0);
 
@@ -179,16 +182,17 @@ export namespace highlighter {
       : selectionRange.commonAncestorContainer.parentElement;
 
     if (!selectionElem) {
-      return { text_prefix: "", text_postfix: "" };
+      return { text_prefix: "", text_postfix: "", isSavable: false };
     }
 
     const highlightableElem = selectionElem.closest(`[data-${attrs.flag}]`);
     if (!highlightableElem) {
-      return { text_prefix: "", text_postfix: "" };
+      return { text_prefix: "", text_postfix: "", isSavable: false };
     }
     return {
       text_prefix: getRangeContext(selectionRange, highlightableElem, "prefix"),
       text_postfix: getRangeContext(selectionRange, highlightableElem, "postfix"),
+      isSavable: true,
     };
   }
 
