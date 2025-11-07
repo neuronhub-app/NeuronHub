@@ -1,6 +1,7 @@
 import { Icon, Tag, Wrap } from "@chakra-ui/react";
 import { BiChip, BiLogoDjango } from "react-icons/bi";
 import { DiOpensource } from "react-icons/di";
+import { FaHackerNewsSquare } from "react-icons/fa";
 import { FaApple, FaCode, FaLinux, FaPython, FaTerminal } from "react-icons/fa6";
 import { GoLaw } from "react-icons/go";
 import { HiOutlineServerStack } from "react-icons/hi2";
@@ -154,6 +155,7 @@ const iconParamsMap = {
   macOS: { icon: FaApple, props: {} },
   Python: { icon: FaPython, props: { boxSize: iconSize } },
   Kotlin: { icon: SiKotlin, props: { boxSize: 2.5 } },
+  HackerNews: { icon: FaHackerNewsSquare, props: {} },
   Linux: { icon: FaLinux, props: { boxSize: iconSize - 0.5 } },
   get IDE() {
     return this["Dev Tool"];

@@ -588,3 +588,4 @@ class tags:
     python = "Dev / Python"
     jetbrains = "Dev / JetBrains"
     kotlin = "Dev / Kotlin"
+    hacker_news = "Source / HackerNews"

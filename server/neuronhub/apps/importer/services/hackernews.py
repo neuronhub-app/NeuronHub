@@ -13,6 +13,7 @@ from neuronhub.apps.importer.models import ImportDomain, PostSource, UserSource
 from neuronhub.apps.importer.services.import_html_meta import import_html_meta, ImportMetaInput
 from neuronhub.apps.importer.services.request_json import request_json
 from neuronhub.apps.posts.models import Post, PostTypeEnum
+from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 
 logger = logging.getLogger(__name__)
 
@@ -122,6 +123,8 @@ class ImporterHackerNews:
         rank: int | None = None,
         comment_ranks: dict[ID, Rank] | None = None,
     ) -> Post:
+        from neuronhub.apps.tests.services.db_stubs_repopulate import tags
+
         self._log_progress(data["id"], Post.Type.Post if is_post else Post.Type.Comment)
 
         author_name = None
@@ -144,6 +147,8 @@ class ImporterHackerNews:
                     source=self._build_HN_item_url(post_data["id"]),
                 ),
             )
+            tag = await tag_create_or_update(tags.hacker_news, post=post, is_important=True)
+            await post.tags.aadd(tag)
         else:  # type = comment
             assert parent
             post, _ = await Post.objects.aupdate_or_create(

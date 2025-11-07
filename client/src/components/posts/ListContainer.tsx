@@ -110,7 +110,7 @@ export function ListContainer(props: {
 
                     <Flex gap="gap.md" fontSize="sm">
                       {post.source && (
-                        <Link href={post.source}>
+                        <Link href={post.source} color="fg.subtle" variant="underline">
                           {post.source.includes("news.ycombinator.com") && (
                             <FaHackerNewsSquare />
                           )}{" "}
@@ -168,18 +168,4 @@ function getPostCategoryName(category?: PostCategory) {
       return "Questions";
   }
   return category;
-}
-
-export function countCommentsRecursively(comments?: PostFragmentType["comments"]) {
-  if (!comments) {
-    return 0;
-  }
-  let count = comments.length;
-  for (const comment of comments) {
-    if (comment.comments) {
-      // @ts-expect-error #bad-infer
-      count += countCommentsRecursively(comment.comments);
-    }
-  }
-  return count;
 }
