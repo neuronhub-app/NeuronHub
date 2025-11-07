@@ -3,10 +3,7 @@ import toast from "react-hot-toast";
 
 import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
-import {
-  PostReviewDetailFragment,
-  type PostReviewDetailFragmentType,
-} from "@/graphql/fragments/reviews";
+import { PostReviewDetailFragment } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/reviews/detail/+types";
 
@@ -29,10 +26,11 @@ export default function PostReviewDetailRoute(props: Route.ComponentProps) {
     captureException(error);
   }
 
-  // @ts-expect-error #bad-infer, by Apollo
-  const review: PostReviewDetailFragmentType = data?.post_review ?? undefined;
-
   return (
-    <PostDetail title="Review" post={review} isLoading={isLoadingFirstTime} error={error} />
+    <PostDetail
+      post={data?.post_review ?? undefined}
+      isLoading={isLoadingFirstTime}
+      error={error}
+    />
   );
 }

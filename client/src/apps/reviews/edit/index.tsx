@@ -27,7 +27,5 @@ export default function PostReviewEditRoute(props: Route.ComponentProps) {
   if (!data?.post_review) {
     return <div>Review not found</div>;
   }
-  // @ts-expect-error bad-infer by Apollo
-  const review: PostReviewEditFragmentType = data?.post_review ?? undefined;
-  return <PostReviewForm.Comp review={review} />;
+  return <PostReviewForm.Comp review={data?.post_review ?? undefined} />;
 }
