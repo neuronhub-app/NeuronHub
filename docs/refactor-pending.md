@@ -5,6 +5,6 @@
 ### Client
 
 - restructure `client/src` per #59
-- replace `.toHaveText(CreateForm.strs)` with a `testid` for a *success* msg. Add `helper.submit(ids.post)`
 - merge detail pages logic of `apps/<type>/edit/index.tsx`
+- use `index.tsx` files only for `export` -> name the main files same as comp, eg `PostCard.tsx`
 - prefix `components/posts/PostCard/*` components with `PostCard*` - to show they're not react-hook-from, but for render-only
