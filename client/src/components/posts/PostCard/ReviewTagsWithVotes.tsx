@@ -12,7 +12,7 @@ export function ReviewTagsWithVotes(props: {
   const tagsWithVote = props.tags.map(tag => {
     // if author voted on review.tags (publicly), not review.parent.tags (privately)
     const authorVote = tag.votes.find(
-      vote => vote.author.id === props.authorId && vote.post.id === props.reviewId,
+      vote => vote.author?.id === props.authorId && vote.post.id === props.reviewId,
     );
     return {
       ...tag,

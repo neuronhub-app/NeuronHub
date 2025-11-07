@@ -212,11 +212,11 @@ class PostTagType:
     id: auto
     posts: list[PostType]
     tag_parent: PostTagType | None = strawberry_django.field(
-        disable_optimization=True,  # it helps, but `PostTag.label` prefetch_related() messes it up
+        disable_optimization=True,  # it's good on avg, but here it calls prefetch_related() for PostTag.label, missing up the SQL
     )
     tag_children: list[PostTagType]
     votes: list[PostTagVoteType]
-    author: UserType
+    author: UserType | None
 
     name: auto
     description: auto
@@ -242,7 +242,7 @@ class PostTagVoteType:
     id: auto
     post: PostSimpleType
     tag: PostTagType
-    author: UserType
+    author: UserType | None
 
     is_vote_positive: auto
     is_changed_my_mind: auto

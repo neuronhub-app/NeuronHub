@@ -352,7 +352,7 @@ type PostTagType {
   tag_parent: PostTagType
   tag_children(filters: PostTagFilter): [PostTagType!]!
   votes: [PostTagVoteType!]!
-  author: UserType!
+  author: UserType
   name: String!
   description: String!
   is_important: Boolean
@@ -374,7 +374,7 @@ type PostTagVoteType {
   id: ID!
   post: PostSimpleType!
   tag: PostTagType!
-  author: UserType!
+  author: UserType
   is_vote_positive: Boolean
   is_changed_my_mind: Boolean!
 }

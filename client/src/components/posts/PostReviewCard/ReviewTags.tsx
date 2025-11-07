@@ -33,7 +33,7 @@ export function ReviewTags(props: { tags: PostTagFragmentType[]; authorId: ID })
 }
 
 function ReviewTagElem(props: { tag: PostTagFragmentType; authorId: ID }) {
-  const authorVote = props.tag.votes.find(vote => vote.author.id === props.authorId);
+  const authorVote = props.tag.votes.find(vote => vote.author?.id === props.authorId);
   return (
     <Tag.Root
       key={props.tag.id}
