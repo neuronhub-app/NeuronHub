@@ -31,7 +31,7 @@ services:
 # ========================================================
 
 DJANGO_ENV=prod
-DATABASE_URL=postgresql://${{user}}:${{password}}@${{host}}:${{port}}/${{db_name}}
+DATABASE_URL=postgresql://${{db_user}}:${{db_password}}@${{db_host}}:${{db_port}}/${{db_name}}
 SECRET_KEY=${{django_secret}}
 
 SERVER_URL=https://backend.${{domain}}
@@ -57,7 +57,11 @@ SENTRY_DSN_BACKEND=${{dsn_backend}}
 SENTRY_DSN_FRONTEND=${{dsn_frontend}}
 ```
 
-### S3 server
+### Postgres 17 database
+
+At your discretion.
+
+### S3 Rclone server
 
 Create a dir for s3 like `mkdir -p /srv/neuronhub/storage/` - the `storage` name is hardcoded in Django.
 
@@ -83,8 +87,61 @@ ACCESS_KEY_ID=${{key_id}}
 SECRET_ACCESS_KEY=${{key_secret}}
 ```
 
+### Hatchet.run (background jobs)
+
+```yaml
+  hatchet-postgres:
+    image: postgres:15.6
+    command: postgres -c 'max_connections=200'
+    restart: always
+    env_file:
+      - path: .env
+    environment:
+      - POSTGRES_USER=hatchet
+      - POSTGRES_DB=hatchet
+    volumes:
+      - hatchet_postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${{db_port_hatchet}}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d hatchet -U hatchet"]
+      interval: 2s
+      timeout: 2s
+      retries: 3
+      start_period: 3s
+  hatchet-lite:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:latest
+    ports:
+      - "8888:8888" # web panel
+      - "7077:7077" # worker
+    depends_on:
+      hatchet-postgres:
+        condition: service_healthy
+    environment:
+      # see https://docs.hatchet.run/self-hosting/configuration-options
+      SERVER_AUTH_COOKIE_DOMAIN: localhost
+      SERVER_AUTH_COOKIE_INSECURE: "t"
+      SERVER_GRPC_BIND_ADDRESS: "0.0.0.0"
+      SERVER_GRPC_INSECURE: "t"
+      SERVER_GRPC_BROADCAST_ADDRESS: localhost:7077
+      SERVER_GRPC_PORT: "7077"
+      SERVER_URL: http://0.0.0.0:8888
+      SERVER_AUTH_SET_EMAIL_VERIFIED: "t"
+      SERVER_DEFAULT_ENGINE_VERSION: "V1"
+      SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: localhost:7077
+    volumes:
+      - "hatchet_config:/config"
+```
+
+`.env` file
+```shell
+POSTGRES_PASSWORD=${{db_password_hatchet}}
+DATABASE_URL="postgresql://hatchet:hatchet@${{db_password_hatchet}}:${{db_port_hatchet}}/hatchet?sslmode=disable"
+```
+
+
 ## Upgrades
 
 Watch out for the `BREAKING CHANGE` notes in the release descriptions - it's specifically for self-hosting.
 
-You can use `:latest` docker tag, but I advice to hardcode the non-breaking release eg `1.3`, as the two last numbers are for non-breaking changes, ie `1.3.15.1` won't break your deployment.
+You can use `:latest` docker tag, but I advice to hardcode the non-breaking release eg `1.1`, as the two last numbers are for non-breaking changes, ie `1.1.2.2` won't break your deployment.

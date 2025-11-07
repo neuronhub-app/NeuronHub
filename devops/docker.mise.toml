@@ -2,24 +2,34 @@
 
 
 ["docker:push"]
-    usage = """flag "--app <name>" { choices "server" "client" "coder" }"""
-    run = [
-        """sudo docker push ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}""",
-    ]
-
+    usage = """
+        flag "--app <name>" { choices "server" "client" "coder" }
+    """
+    dir = "devops/"
+    run = """
+        python3 docker_tag_and_push.py \
+            --app=${usage_app?} \
+            --github-path="{{ env.GITHUB_PATH }}" \
+            --version="{{ env.VITE_RELEASE_VERSION }}"
+    """
 
 ["docker:rm"]
-    usage = """flag "--app <name>" { choices "server" "client" "coder" }"""
-    run = "sudo docker rmi ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}"
+    usage = """
+        flag "--app <name>" { choices "server" "client" "coder" }
+        flag "--version <version>" env="VITE_RELEASE_VERSION"
+    """
+    run = "sudo docker rmi ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:${usage_version?}"
 
 
 ["docker:build"]
     usage = """
         flag "--app <name>" { choices "server" "client" "coder" }
+        flag "--version <version>" env="VITE_RELEASE_VERSION"
         flag "--no_cache" default=#false
     """
     # Found no other sane way to pass `mise env` to `docker build`,
     # will burn it and move to Podman later.
+    # todo move to a Python script
     run = """
         #!/usr/bin/env bash
 
@@ -53,10 +63,12 @@
         cat > $COMPOSE_FILE <<EOF
             services:
               ${usage_app?}:
-                image: ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:{{ env.VITE_RELEASE_VERSION }}
+                image: ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:${usage_version?}
                 build:
                   context: .
                   args:
+                    VITE_RELEASE_VERSION: ${usage_version?}
+
                     # for React Router build
                     VITE_SERVER_URL: https://backend.{{ env.DOMAIN_NAME }}
 
@@ -66,7 +78,6 @@
                     SENTRY_PROJECT: $SENTRY_PROJECT
                     SENTRY_DSN_FRONTEND: {{ env.SENTRY_DSN_FRONTEND }}
                     SENTRY_DSN_BACKEND: {{ env.SENTRY_DSN_BACKEND }}
-                    VITE_RELEASE_VERSION: {{ env.VITE_RELEASE_VERSION }}
                     VITE_RELEASE_NAME: {{ env.VITE_RELEASE_NAME }}
                     PROJECT_NAME: {{ env.PROJECT_NAME }}
 
