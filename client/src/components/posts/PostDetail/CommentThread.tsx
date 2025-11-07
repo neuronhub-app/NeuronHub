@@ -303,7 +303,6 @@ function useCommentLeftLine(
         <Box
           onClick={toggleCollapse}
           pos="absolute"
-          aria-role="line"
           className="group"
           top={`${props.height.avatar / 2}px`}
           height={

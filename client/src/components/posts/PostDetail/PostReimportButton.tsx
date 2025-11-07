@@ -1,4 +1,4 @@
-import { Button } from "@chakra-ui/react";
+import { Button, Icon } from "@chakra-ui/react";
 import toast from "react-hot-toast";
 import { FiRefreshCw } from "react-icons/fi";
 import { ids } from "@/e2e/ids";
@@ -7,7 +7,7 @@ import { client } from "@/graphql/client";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useIsLoading } from "@/utils/useIsLoading";
 
-export function PostImportRefreshButton(props: { idExternal: string }) {
+export function PostReimportButton(props: { idExternal: string }) {
   const loading = useIsLoading();
 
   async function refreshPost() {
@@ -29,6 +29,8 @@ export function PostImportRefreshButton(props: { idExternal: string }) {
         const commentsAdded = response.data.post_import_refresh.comments_added;
         if (commentsAdded > 0) {
           toast.success(`Added ${commentsAdded} new comment${commentsAdded !== 1 ? "s" : ""}`);
+        } else {
+          toast.success(`Refetch completed - no new comments`);
         }
       } else {
         toast.error(`Error: ${response.errorMessage}`);
@@ -38,15 +40,20 @@ export function PostImportRefreshButton(props: { idExternal: string }) {
 
   return (
     <Button
-      size="sm"
-      variant="outline"
+      size="2xs"
+      variant="subtle-ghost-v2"
+      h="auto"
+      gap="gap.sm"
+      colorPalette="gray"
       onClick={refreshPost}
       loading={loading.isActive}
       loadingText="Refreshing"
       data-testid={ids.post.btn.importRefresh}
     >
-      <FiRefreshCw />
-      Refresh from source
+      <Icon>
+        <FiRefreshCw />
+      </Icon>
+      Refetch
     </Button>
   );
 }

@@ -29,7 +29,7 @@ export const recipes = {
           colorPalette: "slate",
           bg: "bg.transparent",
           borderRadius: "lg",
-          color: { _light: "slate.300", _dark: "slate.500" },
+          color: { _light: "slate.400/70", _dark: "slate.500" },
           _hover: {
             color: { _light: "slate.500", _dark: "slate.200" },
             bg: { _light: "slate.200", _dark: "slate.500" },

@@ -1,14 +1,24 @@
-import { Flex, Heading, HStack, IconButton, Image, Stack, VStack, Wrap } from "@chakra-ui/react";
-import { FaHackerNewsSquare } from "react-icons/fa";
+import {
+  Button,
+  Flex,
+  Heading,
+  HStack,
+  Icon,
+  Image,
+  Stack,
+  VStack,
+  Wrap,
+} from "@chakra-ui/react";
+import type { ReactElement } from "react";
 import { FaPenToSquare } from "react-icons/fa6";
 import { NavLink } from "react-router";
-
 import { useUser } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostContent } from "@/components/posts/PostCard/PostContent";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { PostTags } from "@/components/posts/PostCard/PostTags";
 import { ReviewTagsWithVotes } from "@/components/posts/PostCard/ReviewTagsWithVotes";
+import { PostReimportButton } from "@/components/posts/PostDetail/PostReimportButton";
 import { RatingBars } from "@/components/posts/PostReviewCard/RatingBars";
 import { ReviewTags } from "@/components/posts/PostReviewCard/ReviewTags";
 import { UsageStatusBlock } from "@/components/posts/PostReviewCard/UsageStatus";
@@ -16,70 +26,13 @@ import { ids } from "@/e2e/ids";
 import { isReview } from "@/graphql/fragments/reviews";
 import { urls } from "@/routes";
 
-export function PostCard(props: { post: PostListItemType }) {
-  const user = useUser();
-
+// todo refac-name: file to PostCard.tsx
+export function PostCard(props: { post: PostListItemType; isDetailPage?: boolean }) {
   const post = props.post;
-
-  const postUrl = urls.getPostUrls(post).detail;
 
   return (
     <Stack gap="gap.sm" {...ids.set(ids.post.card.container)} data-id={post.id}>
-      <HStack align="flex-start" justify="space-between">
-        <NavLink to={postUrl} {...ids.set(ids.post.card.link.detail)}>
-          <Stack gap="gap.sm">
-            {isReview(post) && post.parent && (
-              <Flex align="center" gap="gap.md">
-                <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">
-                  {post.parent.title}
-                </Heading>
-                <PostDatetime datetimeStr={post.reviewed_at} />
-              </Flex>
-            )}
-            {post.image && (
-              <Image
-                src={post.image.url}
-                maxH="200px"
-                objectFit="cover"
-                borderRadius="md"
-                {...ids.set(ids.post.card.image)}
-              />
-            )}
-
-            <Flex align="center" gap="gap.md">
-              <Heading
-                fontSize="lg"
-                color="fg.muted"
-                display="flex"
-                gap="gap.sm"
-                alignItems="center"
-              >
-                {post.source.includes("news.ycombinator.com") && <FaHackerNewsSquare />}{" "}
-                {/* todo UX: show .parent_root.title */}
-                {post.title ? post.title : `${post.type}`}
-              </Heading>
-              {!isReview(post) && <PostDatetime datetimeStr={post.updated_at} />}
-            </Flex>
-          </Stack>
-        </NavLink>
-
-        {((user && user?.id === post.author?.id) ||
-          (user?.is_superuser && post.author === null)) && (
-          <IconButton
-            asChild
-            variant="subtle-ghost"
-            size="2xs"
-            p={1}
-            h="auto"
-            aria-label="edit"
-            {...ids.set(ids.post.card.link.edit)}
-          >
-            <NavLink to={urls.getPostUrls(post).edit}>
-              <FaPenToSquare />
-            </NavLink>
-          </IconButton>
-        )}
-      </HStack>
+      <PostHeader post={post} isDetailPage={props.isDetailPage} />
 
       {isReview(post) && (
         <VStack align="flex-start" gap="2">
@@ -106,7 +59,7 @@ export function PostCard(props: { post: PostListItemType }) {
           <Flex>
             {isReview(post) ? (
               <Wrap>
-                {post.tags.length !== 0 && post.author && (
+                {post.tags.length > 0 && post.author && (
                   <ReviewTagsWithVotes
                     tags={post.tags}
                     authorId={post.author.id}
@@ -128,5 +81,106 @@ export function PostCard(props: { post: PostListItemType }) {
         </Stack>
       )}
     </Stack>
+  );
+}
+
+function PostHeader(props: { post: PostListItemType; isDetailPage?: boolean }) {
+  const user = useUser();
+
+  const post = props.post;
+
+  function isUserCanEdit() {
+    const isUserAuthor = user && post.author?.id === user.id;
+    const isPostImported = post.author === null;
+    return isUserAuthor || (isPostImported && user?.is_superuser);
+  }
+
+  const idExternal = props.post?.post_source?.id_external;
+
+  return (
+    <HStack align="flex-start" justify="space-between">
+      <PostHeaderLink post={post} isDetailPage={props.isDetailPage}>
+        <Stack gap="gap.sm">
+          {isReview(post) && post.parent && (
+            <Flex align="center" gap="gap.md">
+              <Heading fontSize="xl" lineHeight={1.4} fontWeight="normal">
+                {post.parent.title}
+              </Heading>
+              <PostDatetime datetimeStr={post.reviewed_at} />
+            </Flex>
+          )}
+          {post.image && (
+            <Image
+              src={post.image.url}
+              maxH="200px"
+              objectFit="cover"
+              borderRadius="md"
+              {...ids.set(ids.post.card.image)}
+            />
+          )}
+
+          <Flex align="center" gap="gap.md">
+            <Heading
+              fontSize={props.isDetailPage ? "xl" : "lg"}
+              display="flex"
+              gap="gap.sm"
+              alignItems="center"
+            >
+              {/* todo UX: show .parent_root.title */}
+              {post.title ? post.title : `${post.type}`}
+            </Heading>
+            {!isReview(post) && <PostDatetime datetimeStr={post.updated_at} />}
+          </Flex>
+        </Stack>
+      </PostHeaderLink>
+
+      {isUserCanEdit() && (
+        <Flex gap="gap.sm" align="center">
+          {idExternal && <PostReimportButton idExternal={idExternal} />}
+
+          <NavLink to={urls.getPostUrls(post).edit}>
+            <Button
+              variant="subtle-ghost-v2"
+              size="2xs"
+              h="auto"
+              gap="gap.sm"
+              {...ids.set(ids.post.card.link.edit)}
+            >
+              <Icon boxSize={3} mb="1px">
+                <FaPenToSquare />
+              </Icon>
+              Edit
+            </Button>
+          </NavLink>
+        </Flex>
+      )}
+    </HStack>
+  );
+}
+
+function PostHeaderLink(props: {
+  post: PostListItemType;
+  isDetailPage?: boolean;
+  children: ReactElement;
+}) {
+  return (
+    <>
+      {props.isDetailPage ? (
+        <Flex>{props.children}</Flex>
+      ) : (
+        <NavLink
+          to={urls.getPostUrls(props.post).detail}
+          {...ids.set(ids.post.card.link.detail)}
+        >
+          <Flex
+            _hover={{ color: "fg.primary-muted" }}
+            transition="colors"
+            transitionDuration="fast"
+          >
+            {props.children}
+          </Flex>
+        </NavLink>
+      )}
+    </>
   );
 }

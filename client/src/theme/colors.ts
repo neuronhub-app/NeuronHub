@@ -2,12 +2,15 @@
 import type { SemanticTokenDefinition } from "@chakra-ui/react/dist/types/styled-system/types";
 
 export namespace theme {
-  const secondary = "teal";
+  const colorPrimary = "blue";
+  const colorSecondary = "teal";
+
+  const primary = {
+    value: { base: `{colors.${colorPrimary}.500}`, _dark: `{colors.${colorPrimary}.400}` },
+  };
 
   export const colors: SemanticTokenDefinition["colors"] = {
-    primary: {
-      value: { base: "{colors.blue.500}", _dark: "{colors.blue.400}" },
-    },
+    primary,
 
     fg: {
       "muted-button": {
@@ -16,10 +19,17 @@ export namespace theme {
       "fieldset-title": {
         value: { _light: "{colors.slate.500}", _dark: "{colors.slate.500}" },
       },
+      primary,
+      "primary-muted": {
+        value: {
+          _light: `{colors.${colorPrimary}.400}`,
+          _dark: `{colors.${colorPrimary}.400}`,
+        },
+      },
       secondary: {
         value: {
-          _light: `{colors.${secondary}.600}`,
-          _dark: `{colors.${secondary}.500}`,
+          _light: `{colors.${colorSecondary}.600}`,
+          _dark: `{colors.${colorSecondary}.500}`,
         },
       },
       muted: {
@@ -50,14 +60,14 @@ export namespace theme {
       secondary: {
         light: {
           value: {
-            _light: `{colors.${secondary}.100}`,
-            _dark: `{colors.${secondary}.950/70}`,
+            _light: `{colors.${colorSecondary}.100}`,
+            _dark: `{colors.${colorSecondary}.950/70}`,
           },
         },
         medium: {
           value: {
-            _light: `{colors.${secondary}.500/80}`,
-            _dark: `{colors.${secondary}.800}`,
+            _light: `{colors.${colorSecondary}.500/80}`,
+            _dark: `{colors.${colorSecondary}.800}`,
           },
         },
       },
