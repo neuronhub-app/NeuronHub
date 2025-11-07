@@ -4,7 +4,6 @@ import { FaComments } from "react-icons/fa";
 import { NavLink } from "react-router";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import { useHighlighter } from "@/apps/highlighter/useHighlighter";
-import { countCommentsRecursively } from "@/components/posts/ListContainer";
 import { PostCard } from "@/components/posts/PostCard";
 import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
@@ -136,10 +135,7 @@ export function Library() {
                   size="sm"
                   h="auto"
                 >
-                  <FaComments />{" "}
-                  <Text color="gray.400">
-                    {countCommentsRecursively(group.root_post.comments)}
-                  </Text>
+                  <FaComments /> <Text color="gray.400">{group.root_post.comments_count}</Text>
                 </IconButton>
               </NavLink>
             </Flex>

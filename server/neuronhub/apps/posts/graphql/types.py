@@ -93,6 +93,10 @@ class PostTypeI:
             queryset = queryset.filter(type=cls.TYPE)
         return filter_posts_by_user(user, posts=queryset)
 
+    @strawberry_django.field
+    async def comments_count(self: Post) -> int:
+        return await Post.objects.filter(parent_root=self, type=Post.Type.Comment).acount()
+
 
 @strawberry_django.type(Post, filters=PostFilter, ordering=PostOrder)
 class PostType(PostTypeI):

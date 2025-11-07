@@ -70,8 +70,10 @@ export function PostDetail(props: {
         <Stack gap="gap.xl">
           <PostCard post={props.post} />
 
-          <Stack gap="gap.lg">
-            <Heading size="lg">Comments</Heading>
+          <Stack gap={props.post.comments.length ? "gap.lg" : "0"}>
+            <Heading fontSize="lg" display="flex" gap="gap.sm" alignItems="center">
+              Comments <Text color="fg.subtle">{props.post.comments_count}</Text>
+            </Heading>
 
             <VStack px={0} align="flex-start" gap="gap.md">
               {/* .map() here causes #bad-infer */}

@@ -103,8 +103,7 @@ export function ListContainer(props: {
                           size="sm"
                           h="auto"
                         >
-                          <FaComments />{" "}
-                          <Text color="gray.400">{countCommentsRecursively(post.comments)}</Text>
+                          <FaComments /> <Text color="gray.400">{post.comments_count}</Text>
                         </IconButton>
                       </NavLink>
                     </Flex>

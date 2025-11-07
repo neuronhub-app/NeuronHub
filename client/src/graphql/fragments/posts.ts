@@ -18,7 +18,6 @@ export const PostFragment = graphql(
         id
         id_external
         created_at_external
-        json
       }
       image {
         url
@@ -28,6 +27,8 @@ export const PostFragment = graphql(
       github_url
       url
       domain
+        
+      comments_count
       
       author {
         id
@@ -41,29 +42,6 @@ export const PostFragment = graphql(
         is_vote_positive
         author {
           id
-        }
-      }
-      comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-        id
-        type
-        content_polite
-        content_direct
-        content_rant
-        author {
-          id
-          username
-        }
-        parent {
-          id
-          type
-        }
-        created_at
-        updated_at
-        comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-          id
-          comments(ordering: { post_source: { rank: DESC_NULLS_FIRST } }) {
-            id
-          }
         }
       }
       parent {

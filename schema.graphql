@@ -217,6 +217,7 @@ type PostCommentType implements PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments_count: Int!
 }
 
 input PostFilter {
@@ -297,6 +298,7 @@ type PostReviewType implements PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments_count: Int!
   review_usage_status: UsageStatus
   review_rating: Int
   review_importance: Int
@@ -412,6 +414,7 @@ type PostToolType implements PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments_count: Int!
   tool_type: ToolType
   alternatives(filters: PostFilter): [PostToolType!]!
 }
@@ -451,6 +454,7 @@ type PostType implements PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments_count: Int!
 }
 
 enum PostTypeEnum {
@@ -543,6 +547,7 @@ interface PostTypeI {
   github_url: String!
   created_at: DateTime!
   updated_at: DateTime!
+  comments_count: Int!
 }
 
 input PostTypeInput {
