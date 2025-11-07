@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@chakra-ui/react": "^3.28.1",
+    "@chakra-ui/react": "^3.29.0",
       "@emotion/react": "^11.14.0",
       "next-themes": "^0.4.6",
 
@@ -28,11 +28,11 @@
 
     "valtio": "^2.2.0",
     "zod": "^4.1.12",
-    "marked": "^16.4.1",
+    "marked": "^16.4.2",
     "date-fns": "^4.1.0",
     "@date-fns/tz": "^1.4.1",
-    "@sentry/react-router": "^10.22.0",
-    "envalid": "^8.1.0",
+    "@sentry/react-router": "^10.23.0",
+    "envalid": "^8.1.1",
 
     "@apollo/client": "^4.0.9",
       "apollo-upload-client": "^19.0.0",
@@ -42,15 +42,15 @@
     "graphql": "^16.12.0"
   },
   "devDependencies": {
-    "@chakra-ui/cli": "^3.28.1",
+    "@chakra-ui/cli": "^3.29.0",
       "globby": "^15.0.0",
 
-    "@biomejs/biome": "^2.3.3",
+    "@biomejs/biome": "^2.3.4",
 
     "@graphql-codegen/cli": "^6.0.1",
     "@graphql-codegen/client-preset": "^5.1.1",
 
-    "@typescript/native-preview": "^7.0.0-dev.20251103.1",
+    "@typescript/native-preview": "^7.0.0-dev.20251106.1",
     "@types/bun": "^1.3.1",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
@@ -60,9 +60,9 @@
     "npm-check-updates": "^19.1.2",
 
     "@redux-devtools/extension": "^3.3.0",
-    "shiki": "^3.14.0",
+    "shiki": "^3.15.0",
 
-    "vite": "^7.1.12",
+    "vite": "^7.2.1",
       "@vitejs/plugin-react": "^5.1.0",
       "@rollup/plugin-replace": "^6.0.3",
       "vite-tsconfig-paths": "^6.0.0-beta.4",
