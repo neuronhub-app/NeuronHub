@@ -1,3 +1,4 @@
+import { TZDate, tzName } from "@date-fns/tz";
 import { differenceInDays, format, formatDistanceToNowStrict, isSameYear } from "date-fns";
 
 export namespace datetime {
@@ -11,7 +12,10 @@ export namespace datetime {
     if (Number.isNaN(date.getTime())) {
       return "";
     }
-    return format(date, "MMMM d, yyyy h:mmaaaaa'm");
+    const tz = new TZDate(date).timeZone;
+    const tzNameShort = tz ? tzName(tz, date, "shortGeneric") : "";
+
+    return `${format(date, "MMM d, yyyy kk:mm")} ${tzNameShort}`.trim();
   }
 
   export function relative(dateRaw: Date | string | unknown) {
@@ -32,9 +36,9 @@ export namespace datetime {
 
     if (isMoreThan30Days) {
       if (isSameYear(date, new Date())) {
-        dateStr = format(date, "MMMM d, h:mmaaaaa'm");
+        dateStr = format(date, "MMM d, kk:mm");
       } else {
-        dateStr = format(date, "MMMM d, yyyy h:mmaaaaa'm");
+        dateStr = format(date, "MMM d, yyyy kk:mm");
       }
     }
     return dateStr;
