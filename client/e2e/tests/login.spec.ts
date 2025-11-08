@@ -15,7 +15,7 @@ test.describe("Login", () => {
     await play.dbStubsRepopulate();
   });
 
-  test.skip("with invalid credentials", async ({ page }) => {
+  test("with invalid credentials", async ({ page }) => {
     await page.goto(urls.login);
 
     await play.fill(ids.auth.login.username, "wrong");
@@ -25,7 +25,7 @@ test.describe("Login", () => {
     await expect(play.get(ids.auth.login.error)).toBeVisible();
   });
 
-  test.skip("with email", async ({ page }) => {
+  test("with email", async ({ page }) => {
     await page.goto(urls.login);
     await play.fill(ids.auth.login.username, config.user.email);
     await play.fill(ids.auth.login.password, config.user.password);
