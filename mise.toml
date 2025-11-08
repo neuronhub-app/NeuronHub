@@ -56,13 +56,13 @@
     [tasks."dev:server"]
         depends = "dev:db"
         dir = "server"
-        run = "uv run manage.py runserver {{ get_env(name='SERVER_PORT') }}"
+        run = "uv run manage.py runserver {{ env.SERVER_PORT }}"
 
     [tasks."dev:client"]
         depends = "dev:db"
         dir = "client"
-        run = "bun run react-router dev --host --port={{ get_env(name='CLIENT_PORT') }}"
-        env.VITE_SERVER_URL = "http://localhost:{{ get_env(name='SERVER_PORT') }}"
+        run = "bun run react-router dev --host --port={{ env.CLIENT_PORT }}"
+        env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT }}"
 
     [tasks."dev:s3"]
         dir = "server"
@@ -90,7 +90,6 @@
         depends = ["dev:db", "dev:db:setup-e2e"]
         dir = "server"
         run = [
-            "mise django:migrate importer zero",
             "mise django:migrate",
             "uv run manage.py runserver {{ env.SERVER_PORT_E2E }}",
         ]
@@ -100,7 +99,7 @@
 
     [tasks."dev:client:e2e"]
         dir = "client"
-        run = "bun run react-router dev --host --port={{ get_env(name='CLIENT_PORT_E2E') }}"
+        run = "bun run react-router dev --host --port={{ env.CLIENT_PORT_E2E }}"
         env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
 
     [tasks."dev:e2e"]
