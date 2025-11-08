@@ -90,9 +90,12 @@ function PostHeader(props: { post: PostListItemType; isDetailPage?: boolean }) {
   const post = props.post;
 
   function isUserCanEdit() {
-    const isUserAuthor = user && post.author?.id === user.id;
+    if (!user?.id) {
+      return false;
+    }
+    const isAuthor = user.id === post.author?.id;
     const isPostImported = post.author === null;
-    return isUserAuthor || (isPostImported && user?.is_superuser);
+    return isAuthor || (isPostImported && user.is_superuser);
   }
 
   const idExternal = props.post?.post_source?.id_external;
