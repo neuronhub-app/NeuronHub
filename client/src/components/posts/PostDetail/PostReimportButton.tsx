@@ -1,10 +1,10 @@
 import { Button, Icon } from "@chakra-ui/react";
-import toast from "react-hot-toast";
 import { FiRefreshCw } from "react-icons/fi";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
 
 export function PostReimportButton(props: { idExternal: string }) {

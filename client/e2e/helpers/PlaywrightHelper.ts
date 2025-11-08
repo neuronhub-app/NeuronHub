@@ -74,9 +74,12 @@ export class PlaywrightHelper {
     return this.get(id).click();
   }
 
-  async submit(form: typeof ids.post.form) {
+  async submit(form: typeof ids.post.form, options = { waitIdle: false }) {
     await this.click(form.btn.submit);
-    await this.get(form.state.saved).waitFor();
+    await this.get(ids.form.notification.success).waitFor();
+    if (options.waitIdle) {
+      await this.waitForNetworkIdle();
+    }
   }
 
   async reload(opts = { idleWait: false }) {

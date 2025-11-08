@@ -134,7 +134,7 @@ export namespace highlighter {
                     state.mutable.text_postfix = "";
                     state.mutable.isPressedKey.Meta = false;
                     state.mutable.isPressedKey.B = false;
-                    selection.empty();
+                    selection.removeAllRanges();
                   }}
                 >
                   Highlight{" "}

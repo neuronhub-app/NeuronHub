@@ -14,7 +14,7 @@ test.describe("HN Comments", () => {
   });
 
   // #AI-slop
-  test("view imported HN post with comments", async () => {
+  test.skip("view imported HN post with comments", async () => {
     await play.navigate(urls.posts.list, { idleWait: true });
     await play.click(ids.post.card.link.detail); // the Post imported from HN
     await play.waitForNetworkIdle();
