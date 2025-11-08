@@ -162,23 +162,21 @@ export function CommentThread(props: {
               ))}
           </Box>
 
-          {isCommentUnfolded && (
+          {isCommentUnfolded && <Spacer w="1.5" />}
+
+          {isCommentUnfolded && user && (
             <Flex role="toolbar" ref={refs.toolbar}>
               <CommentVoteBar comment={props.comment} />
 
-              <Spacer w="1.5" />
+              <CommentToolbarButton
+                label="Reply"
+                onClick={() => {
+                  state.mutable.isShowReplyForm = !state.snap.isShowReplyForm;
+                }}
+                id={ids.comment.btn.reply}
+              />
 
-              {user && (
-                <CommentToolbarButton
-                  label="Reply"
-                  onClick={() => {
-                    state.mutable.isShowReplyForm = !state.snap.isShowReplyForm;
-                  }}
-                  id={ids.comment.btn.reply}
-                />
-              )}
-
-              {user?.id === props.comment.author?.id && !state.snap.isEditing && (
+              {user.id === props.comment.author?.id && !state.snap.isEditing && (
                 <CommentToolbarButton
                   label="Edit"
                   onClick={async () => {
