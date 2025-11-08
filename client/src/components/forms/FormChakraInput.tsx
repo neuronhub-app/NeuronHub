@@ -52,7 +52,7 @@ export function FormChakraInput<
       <InputGroup w="full" startElement={startElement} startElementProps={startElementProps}>
         <Input
           {...field}
-          autofocus={Boolean(inputProps?.autofocus)}
+          autoFocus={Boolean(inputProps?.autofocus)}
           placeholder={placeholder}
           ps={isUrlPrefix ? "7ch" : undefined} // padding for "https://"
           {...inputProps}

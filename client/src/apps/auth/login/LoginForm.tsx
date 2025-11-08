@@ -70,7 +70,7 @@ export function LoginForm() {
                       inputProps={{
                         autoComplete: "username",
                         ...ids.set(ids.auth.login.username),
-                        autofocus: true,
+                        autoFocus: true,
                       }}
                     />
 
