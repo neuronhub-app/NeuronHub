@@ -281,6 +281,7 @@ class PostTagAdmin(admin.ModelAdmin):
     list_display = [
         "_get_name_full",
         "author",
+        "is_important",
         "created_at",
     ]
     list_select_related = ["tag_parent__tag_parent__tag_parent"]
