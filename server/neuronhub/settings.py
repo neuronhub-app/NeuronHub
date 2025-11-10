@@ -145,6 +145,18 @@ else:
         )
     }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "django_cache_table",
+        "OPTIONS": {
+            "TIMEOUT": None,  # only used in E2E tests atm, no need to expire
+            "MAX_ENTRIES": 2000,
+        },
+    }
+}
+
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/Los_Angeles"
 USE_L10N = False  # to make admin dates readable

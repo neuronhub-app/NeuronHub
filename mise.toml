@@ -131,7 +131,10 @@
 
 [tasks."django:migrate"]
     dir = "server"
-    run = "uv run manage.py migrate"
+    run = [
+        "uv run manage.py migrate",
+        "uv run manage.py createcachetable",
+    ]
 
 [tasks."django:makemigrations"]
     dir = "server"

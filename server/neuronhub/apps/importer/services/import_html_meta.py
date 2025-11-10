@@ -1,6 +1,8 @@
 import requests
+from asgiref.sync import sync_to_async
 from pydantic import BaseModel
 from bs4 import BeautifulSoup
+from django.core.cache import cache
 
 
 class ImportMetaInput(BaseModel):
@@ -14,15 +16,26 @@ class ImportMetaOutput(BaseModel):
 
 
 # @hatchet.task(name="import_html_meta", input_validator=ImportMetaInput)
-def import_html_meta(
+async def import_html_meta(
     args: ImportMetaInput,
     # ctx: Context,
+    is_use_cache: bool = True,
 ) -> ImportMetaOutput:
     # ctx.log(f"importing <meta> from {args.url}")
 
-    response = requests.get(args.url, timeout=10)
+    if is_use_cache:
+        if response_cached := await cache.aget(args.url):
+            return _extract_meta_from_html(response_cached)
 
-    soup = BeautifulSoup(response.text, "lxml")
+    response = await sync_to_async(requests.get)(args.url, timeout=10)
+    if is_use_cache:
+        await cache.aset(args.url, response.text)
+
+    return _extract_meta_from_html(response.text)
+
+
+def _extract_meta_from_html(html_raw: str):
+    soup = BeautifulSoup(html_raw, "lxml")
     meta_dict = {}
     for meta_tag in soup.find_all("meta"):
         if name := (meta_tag.get("property") or meta_tag.get("name")):

@@ -169,7 +169,7 @@ class ImporterHackerNews:
         if is_root:
             parent_root = post
 
-            meta = import_html_meta(ImportMetaInput(url=source.url_of_source))
+            meta = await import_html_meta(ImportMetaInput(url=source.url_of_source))
             post.content_polite = meta.content
             await post.asave()
 

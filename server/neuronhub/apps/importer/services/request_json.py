@@ -3,7 +3,6 @@ todo refac: api limit should be a class or a namespace
 """
 
 import asyncio
-import json
 import re
 from datetime import timedelta
 from json import JSONDecodeError
@@ -11,6 +10,8 @@ from pathlib import Path
 from typing import Any
 
 import requests
+from django.core.cache import cache
+
 from asgiref.sync import sync_to_async
 from django.db.models import F
 from django.utils import timezone
@@ -19,9 +20,8 @@ from neuronhub.apps.importer.models import ApiHourlyLimit, ApiSource
 
 
 async def request_json(url: str, is_use_cache: bool = False) -> Any:
-    cache = ApiCachePermanent(url)
     if is_use_cache:
-        if response := await cache.get():
+        if response := await cache.aget(_get_cache_key(url)):
             return response
 
     retries_max = 3
@@ -34,7 +34,7 @@ async def request_json(url: str, is_use_cache: bool = False) -> Any:
             response.raise_for_status()
             response_json = response.json()
             if is_use_cache:
-                await cache.save(response_json)
+                await cache.aset(_get_cache_key(url), response_json)
             return response_json
         except (requests.RequestException, JSONDecodeError):
             if retry_current >= retries_max:
@@ -62,30 +62,13 @@ async def _get_api_limit(url: str) -> ApiHourlyLimit:
     return limit
 
 
-class ApiCachePermanent:
-    def __init__(self, url: str):
-        self._path: Path = self._build_json_path(url)
-
-    async def get(self) -> Any | None:
-        if not self._path.exists():
-            return None
-
-        with open(self._path) as file:
-            return json.load(file)
-
-    async def save(self, data: Any) -> None:
-        self._path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self._path, "w") as file:
-            json.dump(data, file, indent=4)
-
-    def _build_json_path(self, url: str) -> Path:
-        cache_dir = Path(__file__).parent / "cache"
-        if match := re.search(r"/items?/(?P<item_id>\d+)", url):
-            return (
-                cache_dir
-                / f"post-{_get_api_source(url).value}-{match.group('item_id')}.cache.json"
-            )
-        return cache_dir / "list.cache.json"
+def _get_cache_key(url: str) -> Path:
+    cache_dir = Path(__file__).parent / "cache"
+    if match := re.search(r"/items?/(?P<item_id>\d+)", url):
+        return (
+            cache_dir / f"post-{_get_api_source(url).value}-{match.group('item_id')}.cache.json"
+        )
+    return cache_dir / "list.cache.json"
 
 
 def _get_api_source(url: str) -> ApiSource:
