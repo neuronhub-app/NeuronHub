@@ -295,6 +295,17 @@ if E2E_TEST:
             "propagate": True,
         },
     }
+    # supress asyncio.CancelledError: it's raised by Strawberry historically for no reason. See their github for details
+    LOGGING.setdefault("filters", {})
+    LOGGING["filters"]["suppress_cancelled"] = {
+        "()": "django.utils.log.CallbackFilter",
+        "callback": lambda record: not (
+            record.exc_info and record.exc_info[0] == asyncio.exceptions.CancelledError
+        ),
+    }
+    # noinspection PyTypeChecker
+    LOGGING["handlers"]["console"]["filters"] = ["suppress_cancelled"]
+
 
 TEST_RUNNER = "django_rich.test.RichRunner"
 _line_width = 120
