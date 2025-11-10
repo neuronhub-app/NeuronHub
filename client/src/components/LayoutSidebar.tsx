@@ -28,52 +28,52 @@ import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
 
-const groups = [
+const links: Array<SidebarLink> = [
   {
-    title: "",
-    links: [
-      {
-        to: urls.posts.list,
-        icon: GoCommentDiscussion,
-        label: "Posts",
-        children: [
-          { label: "All", to: urls.posts.list },
-          { label: "Knowledge", to: urls.posts.knowledge },
-          { label: "Opinion", to: urls.posts.opinion },
-          { label: "News", to: urls.posts.news },
-          { label: "Question", to: urls.posts.question },
-        ] as const,
-      },
-      { to: urls.tools.list, icon: LuLayoutDashboard, label: "Tools" },
-      { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },
-      { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
-      { to: "/library", icon: LuLibrary, label: "Library" },
-    ] satisfies Array<{
-      to: LinkProps["to"];
-      icon: ComponentType;
-      label: string;
-      children?: ReadonlyArray<{ label: string; to: LinkProps["to"] }>;
-    }>,
+    to: urls.posts.list,
+    icon: GoCommentDiscussion,
+    label: "Posts",
+    children: [
+      { label: "All", to: urls.posts.list },
+      { label: "Knowledge", to: urls.posts.knowledge },
+      { label: "Opinion", to: urls.posts.opinion },
+      { label: "News", to: urls.posts.news },
+      { label: "Question", to: urls.posts.question },
+    ] as const,
   },
+  { to: urls.tools.list, icon: LuLayoutDashboard, label: "Tools" },
+  { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },
+  { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
+  { to: "/library", icon: LuLibrary, label: "Library" },
 ];
 
-export function LayoutSidebar(props: StackProps) {
-  const styles = {
-    inline: 3,
-  };
+type SidebarLink = {
+  to: LinkProps["to"];
+  icon: ComponentType;
+  label: string;
+  children?: ReadonlyArray<{ label: string; to: LinkProps["to"] }>;
+};
 
+const styles = {
+  inline: 3,
+};
+
+export function LayoutSidebar(props: StackProps) {
   return (
     <Stack
-      flex="1"
-      p={{ base: "4", md: "6" }}
+      as="aside"
+      aria-label="Sidebar"
+      flex={{ base: "", xl: "1" }}
+      p={{ base: "gap.sm", md: "gap.md" }}
       bg="bg.panel"
       borderRightWidth="1px"
       justifyContent="space-between"
       maxW="xs"
+      overflow="auto"
       {...props}
     >
-      <Stack gap="6">
-        <NavLink to={urls.posts.list}>
+      <Stack as="nav" gap="gap.md">
+        <NavLink aria-label="Logo Link" to={urls.posts.list}>
           <Bleed
             block="gap.sm"
             inline="gap.sm"
@@ -83,65 +83,56 @@ export function LayoutSidebar(props: StackProps) {
             }}
             borderRadius="sm"
           >
-            <Flex alignSelf="start" align="center" gap={3} w="fit-content">
+            <Flex alignSelf="start" align="center" gap="3" w="fit-content">
               <Icon color="primary" size="xl">
                 <PiGraph />
               </Icon>
-              <Text fontSize="1.4rem" fontWeight="bold">
+              <Text fontSize={{ base: "sm", md: "md", xl: "1.4rem" }} fontWeight="bold">
                 NeuronHub
               </Text>
             </Flex>
           </Bleed>
         </NavLink>
 
-        <Stack gap="6">
-          {groups.map((group, index) => (
-            <Stack
-              // biome-ignore lint/suspicious/noArrayIndexKey: wrong - it's a const ffs
-              key={index}
-              gap="2"
-            >
-              {group.title && (
-                <Text fontWeight="medium" textStyle="sm">
-                  {group.title}
-                </Text>
-              )}
-              <Stack gap="1">
-                {group.links.map((link, index) => (
-                  <Bleed
-                    // biome-ignore lint/suspicious/noArrayIndexKey: wrong
-                    key={index}
-                    inline={styles.inline}
-                  >
-                    {link.children ? (
-                      <SidebarLinkGroup label={link.label} to={link.to} icon={link.icon}>
-                        {link.children}
-                      </SidebarLinkGroup>
-                    ) : (
-                      <SidebarLink to={link.to}>
-                        <link.icon />
-                        {link.label}
-                      </SidebarLink>
-                    )}
-                  </Bleed>
-                ))}
-              </Stack>
+        <Stack as="ul" aria-label="Nav Menu" gap="gap.md">
+          <Stack gap="gap.sm">
+            <Stack gap="gap.xs">
+              {links.map((link, index) => (
+                <Bleed
+                  as="li"
+                  aria-label="Nav Menu Item"
+                  // biome-ignore lint/suspicious/noArrayIndexKey: wrong
+                  key={index}
+                  inline={styles.inline}
+                >
+                  {link.children ? (
+                    <SidebarLinkGroup label={link.label} to={link.to} icon={link.icon}>
+                      {link.children}
+                    </SidebarLinkGroup>
+                  ) : (
+                    <SidebarLinkButton to={link.to}>
+                      <link.icon />
+                      {link.label}
+                    </SidebarLinkButton>
+                  )}
+                </Bleed>
+              ))}
             </Stack>
-          ))}
+          </Stack>
         </Stack>
       </Stack>
 
-      <Stack gap="4">
-        <Stack gap="1" px={0}>
+      <Stack aria-label="User Settings" as="section" gap="gap.sm">
+        <Stack gap="gap.sm" px={0}>
           <Bleed inline={styles.inline}>
-            <SidebarLink to={urls.user.settings.profile}>
+            <SidebarLinkButton to={urls.user.settings.profile}>
               <LuSettings />
               Settings
-            </SidebarLink>
+            </SidebarLinkButton>
           </Bleed>
         </Stack>
 
-        <Separator mb={3} />
+        <Separator mb="gap.md" />
 
         <UserProfile />
       </Stack>
@@ -149,7 +140,7 @@ export function LayoutSidebar(props: StackProps) {
   );
 }
 
-function SidebarLink(props: { to: LinkProps["to"] } & ButtonProps) {
+function SidebarLinkButton(props: { to: LinkProps["to"] } & ButtonProps) {
   const { children, to, ...buttonProps } = props;
   return (
     <NavLink to={to}>
@@ -158,7 +149,7 @@ function SidebarLink(props: { to: LinkProps["to"] } & ButtonProps) {
           variant="ghost"
           width="full"
           justifyContent="start"
-          gap="3"
+          gap={styles.inline}
           color="fg.muted"
           _hover={{
             bg: "colorPalette.subtle",
@@ -168,6 +159,8 @@ function SidebarLink(props: { to: LinkProps["to"] } & ButtonProps) {
             color: "colorPalette.fg",
           }}
           aria-current={linkProps.isActive ? "page" : undefined}
+          size={{ base: "sm", xl: "md" }}
+          fontSize={{ base: "sm", xl: "" }}
           {...buttonProps}
         >
           {children}
@@ -177,15 +170,7 @@ function SidebarLink(props: { to: LinkProps["to"] } & ButtonProps) {
   );
 }
 
-function SidebarLinkGroup(props: {
-  to: LinkProps["to"];
-  label: string;
-  icon: ComponentType;
-  children: ReadonlyArray<{
-    to: LinkProps["to"];
-    label: string;
-  }>;
-}) {
+function SidebarLinkGroup(props: SidebarLink) {
   const location = useLocation();
   const isInNamespace = location.pathname.startsWith(String(props.to));
 
@@ -218,11 +203,11 @@ function SidebarLinkGroup(props: {
       </HStack>
 
       <Collapsible.Content>
-        <Stack gap="1" py="1">
-          {props.children.map(link => (
-            <SidebarLink key={link.to.toString()} to={link.to} ps="12">
+        <Stack gap="gap.xs" py="gap.xs">
+          {props.children?.map(link => (
+            <SidebarLinkButton key={link.to.toString()} to={link.to} ps="12">
               {link.label}
-            </SidebarLink>
+            </SidebarLinkButton>
           ))}
         </Stack>
       </Collapsible.Content>
@@ -248,7 +233,7 @@ export function UserProfile() {
 
   if (!user) {
     return (
-      <HStack gap="3" justify="space-between">
+      <HStack gap={styles.inline} justify="space-between">
         <NavLink to={urls.login}>
           <Button variant="outline" width="full">
             <LuLogIn />
