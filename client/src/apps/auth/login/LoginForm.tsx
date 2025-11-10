@@ -54,7 +54,7 @@ export function LoginForm() {
                   { isResetAndRefetchAll: true },
                 );
                 if (result.data?.login?.success) {
-                  navigate(urls.reviews.list);
+                  navigate(urls.home);
                 } else {
                   state.mutable.error = result.data?.login.error ?? "Login failed";
                 }

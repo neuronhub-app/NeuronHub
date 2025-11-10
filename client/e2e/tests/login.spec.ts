@@ -30,7 +30,7 @@ test.describe("Login", () => {
     await play.fill(ids.auth.login.password, config.user.password);
     await play.click(ids.auth.login.submit);
 
-    await page.waitForURL(urls.reviews.list);
+    await page.waitForURL(urls.home);
     await expect(play.get(ids.auth.logout.btn)).toBeVisible();
   });
 });
