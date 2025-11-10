@@ -37,9 +37,7 @@ export const PostReviewDetailFragment = graphql(
   [PostReviewFragment, CommentFieldsFragment],
 );
 export type PostReviewDetailFragmentType = FragmentOf<typeof PostReviewDetailFragment>;
-export type PostReviewFragmentType = FragmentOf<typeof PostReviewFragment> & {
-  parent: PostFragmentType;
-};
+export type PostReviewFragmentType = FragmentOf<typeof PostReviewFragment>;
 
 export const PostReviewEditFragment = graphql(
   `
@@ -62,8 +60,11 @@ export function isEditMode(
   return Boolean(review);
 }
 
+// we filter out .parent=null in [[PostReviewList.tsx]] #95
 export function isReview(
   post: PostFragmentType | PostReviewFragmentType,
-): post is PostReviewFragmentType {
-  return post.__typename === "PostReviewType";
+): post is PostReviewFragmentType & {
+  parent: PostFragmentType;
+} {
+  return post.__typename === "PostReviewType" && post.parent !== null;
 }

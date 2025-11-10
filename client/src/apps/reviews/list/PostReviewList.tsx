@@ -1,6 +1,6 @@
 import { ListContainer } from "@/components/posts/ListContainer";
 import { graphql } from "@/gql-tada";
-import { PostReviewFragment } from "@/graphql/fragments/reviews";
+import { PostReviewFragment, type PostReviewFragmentType } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 export function PostReviewList() {
@@ -19,10 +19,26 @@ export function PostReviewList() {
   return (
     <ListContainer
       title="Reviews"
-      items={data?.post_reviews ?? []}
+      items={filterOutReviewsOfPrivateTools(data?.post_reviews ?? [])}
       urlNamespace="reviews"
       isLoadingFirstTime={isLoadingFirstTime}
       error={error}
     />
   );
+}
+
+/**
+ * Such case means the User has no access to the Tool, but can see its Review, so we hide both.
+ *
+ * Ref #95
+ *
+ * todo refac: must move to backend, once Strawberry has a decent API
+ */
+function filterOutReviewsOfPrivateTools(
+  reviews?: PostReviewFragmentType[],
+): PostReviewFragmentType[] {
+  if (!reviews?.length) {
+    return [];
+  }
+  return reviews.filter(review => review.parent !== null);
 }

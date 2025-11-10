@@ -179,7 +179,7 @@ class PostsGen:
         parent_root: Post,
         parent: Post = None,
         author: User = None,
-        content_polite: str | None = None,
+        content_polite: str = "",
         visibility: Visibility = Visibility.PUBLIC,
         visible_to_users: list[User] = None,
     ) -> Post:
@@ -198,15 +198,17 @@ class PostsGen:
             )
         )
 
-    async def tool(self, author: User = None) -> Post:
-        return await self.create(self.Params(type=Post.Type.Tool, author=author or self.user))
+    async def tool(self, author: User = None, visibility=Visibility.PUBLIC) -> Post:
+        return await self.create(
+            self.Params(type=Post.Type.Tool, author=author or self.user, visibility=visibility)
+        )
 
-    async def review(self, author: User = None) -> Post:
+    async def review(self, tool: Post = None, author: User = None) -> Post:
         return await self.create(
             self.Params(
                 type=Post.Type.Review,
                 author=author or self.user,
-                parent=await self.create(self.Params(type=Post.Type.Tool)),
+                parent=tool or await self.tool(),
             )
         )
 

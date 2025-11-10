@@ -1,13 +1,13 @@
 import asyncio
 
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import sync_to_async, async_to_sync
 
 from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
 
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
-class GraphqlTypesOptimizerTest(NeuronTestCase):
+class PostGraphqlTypesTest(NeuronTestCase):
     async def test_post_reviews_requires_below_23_SQL_queries(self):
         await db_stubs_repopulate()
         reviews = await asyncio.gather(*[self.gen.posts.review() for _ in range(5)])
@@ -16,6 +16,7 @@ class GraphqlTypesOptimizerTest(NeuronTestCase):
         await sync_to_async(self._assert_num_queries)(number=23)
 
     def _assert_num_queries(self, number: int):
+        # async_to_sync as assertNumQueries is PITA
         with self.assertNumQueries(number):
             async_to_sync(self.graphql_query)(
                 # this is a core snap of urls.reviews.list query

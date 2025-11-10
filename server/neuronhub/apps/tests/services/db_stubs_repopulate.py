@@ -328,6 +328,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
             title="Ghostty",
             type=Post.Type.Tool,
             tool_type=Post.ToolType.Program,
+            visibility=Visibility.INTERNAL,
             github_url="github.com/ghostty-org/ghostty",
             content_polite="Ghostty is a terminal emulator that differentiates itself by being fast, feature-rich, "
             "and native.Performance is a category where people start getting really argumentative, "

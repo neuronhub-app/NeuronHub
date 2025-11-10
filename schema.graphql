@@ -268,7 +268,7 @@ type PostReviewType implements PostTypeI {
   id: ID!
   author: UserType
   seen_by_users: [DjangoModelType!]!
-  parent: PostToolType!
+  parent: PostToolType
   parent_root: PostTypeI
   children: [PostTypeI!]!
   type: PostTypeEnum!

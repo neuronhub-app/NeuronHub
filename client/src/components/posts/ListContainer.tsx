@@ -14,6 +14,7 @@ import { FaComments, FaHackerNewsSquare } from "react-icons/fa";
 import { FaGithub, FaPlus } from "react-icons/fa6";
 import { SiCrunchbase } from "react-icons/si";
 import { NavLink } from "react-router";
+
 import { ReviewListSidebar } from "@/apps/reviews/list/ReviewListSidebar";
 import { PostCard } from "@/components/posts/PostCard";
 import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
@@ -67,7 +68,7 @@ export function ListContainer(props: {
         <Stack gap="gap.xl">
           <For
             each={props.items}
-            fallback={<Heading>No reviews yet</Heading>}
+            fallback={<Heading>No posts yet</Heading>}
             {...ids.set(ids.post.list)}
           >
             {post => (

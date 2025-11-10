@@ -100,7 +100,7 @@ class PostTypeI:
         comments_ordered = comments_filtered.order_by(
             F("post_source__rank").desc(nulls_first=None)
         )
-        return await sync_to_async(list)(comments_ordered)
+        return await sync_to_async(list)(comments_ordered)  # type: ignore # mypy is broken
 
     @strawberry_django.field
     async def comments_count(self: Post) -> int:
@@ -131,7 +131,7 @@ class PostReviewOrder:
 class PostReviewType(PostTypeI):
     TYPE = Post.Type.Review
 
-    parent: PostToolType
+    parent: PostToolType | None  # None when User has no access to it
 
     review_usage_status: auto
     review_rating: auto
