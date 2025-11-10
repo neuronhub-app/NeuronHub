@@ -33,6 +33,8 @@ export namespace highlighter {
           state.mutable.text_postfix = text_postfix;
           state.mutable.isSavable = isSavable;
         } else {
+          // reset
+          state.mutable.isSavable = false;
           state.mutable.text = "";
           state.mutable.text_prefix = "";
           state.mutable.text_postfix = "";
