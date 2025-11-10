@@ -47,9 +47,12 @@
 
     E2E_DB_NAME = "test_neuronhub_e2e"
 
+    S3_STORAGE_BUCKET_NAME = "media"
     S3_PORT = 8333
 
 
+# Dev servers
+# -----------------------------------------------------
 
 [tasks."dev"]
     depends = ["dev:db", "dev:s3", "dev:server", "dev:client"]
@@ -68,7 +71,7 @@
     [tasks."dev:s3"]
         dir = "server"
         run = [
-            "mkdir -p media",
+            "mkdir -p {{ env.S3_STORAGE_BUCKET_NAME }}",
             "rclone serve s3 . --addr :{{ env.S3_PORT }}",
         ]
 
@@ -113,6 +116,8 @@
         run = "killport --signal=SIGTERM {{ env.SERVER_PORT }} {{ env.CLIENT_PORT }} {{ env.S3_PORT }}"
 
 
+# Tests
+# -----------------------------------------------------
 
 [tasks."test"]
     dir = "server"
@@ -136,6 +141,9 @@
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}" # duplicate with `dev:server:e2e`, as Playwright resets env when starts Mise from [[playwright.config.ts]]
 
 
+# Django
+# -----------------------------------------------------
+
 [tasks."django:migrate"]
     dir = "server"
     run = [
@@ -155,6 +163,9 @@
     dir = "server"
     run = "uv run manage.py import_hn"
 
+
+# Lint & format
+# -----------------------------------------------------
 
 [tasks."typegen"]
     depends = "typegen:server"
@@ -189,7 +200,6 @@
         dir = "client"
         run = "bunx @chakra-ui/cli typegen src/theme/theme.ts"
         sources = ["src/theme/**/*.ts"]
-
 
 [tasks."format"]
     depends = ["format:server", "format:client"]
