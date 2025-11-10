@@ -2,7 +2,7 @@ import { test } from "@playwright/test";
 import { highlighter } from "@/apps/highlighter/highlighter";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 
 test.describe("Library", () => {
   let play: PlaywrightHelper;

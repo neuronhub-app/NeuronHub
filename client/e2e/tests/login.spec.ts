@@ -1,10 +1,9 @@
 import { test } from "@playwright/test";
-
 import { config } from "@/e2e/config";
 import { expect } from "@/e2e/helpers/expect";
 import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 
 // will stay unused for a while, mb until v0.3
 test.describe("Login", () => {

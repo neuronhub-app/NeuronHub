@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateDeleteAndResetStore } from "@/graphql/mutateAndRefetchMountedQueries";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {

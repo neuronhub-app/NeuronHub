@@ -8,7 +8,7 @@ import { ids, type TestId } from "@/e2e/ids";
 import { env } from "@/env";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
-import type { urls } from "@/routes";
+import type { urls } from "@/urls";
 
 export type LocatorMap = Record<TestId, Locator>;
 

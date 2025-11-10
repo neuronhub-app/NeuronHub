@@ -2,7 +2,7 @@ import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
 import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids, type TestId } from "@/e2e/ids";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 
 test.describe("Post - action button", () => {
   let play: PlaywrightHelper;

@@ -3,7 +3,7 @@ import { highlighter } from "@/apps/highlighter/highlighter";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 import { Visibility } from "~/graphql/enums";
 
 test.describe("Comments", () => {

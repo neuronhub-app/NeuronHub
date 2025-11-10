@@ -10,7 +10,7 @@ import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { graphql, type ID, type ResultOf } from "@/gql-tada";
 import { CommentFieldsFragment, PostFragment } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 const UserHighlightsQuery = graphql(

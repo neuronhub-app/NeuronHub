@@ -5,7 +5,7 @@ import { useNavigate } from "react-router";
 import { Button } from "@/components/ui/button";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateDeleteAndResetStore } from "@/graphql/mutateAndRefetchMountedQueries";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 import { useIsLoading } from "@/utils/useIsLoading";
 
 export function PostDeleteButton(props: { id: ID; title: string }) {

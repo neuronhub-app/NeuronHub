@@ -25,7 +25,7 @@ import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { isEditMode, type PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 import { markedConfigured } from "@/utils/marked-configured";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";

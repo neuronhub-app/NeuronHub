@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
 import { PostTypeEnum } from "~/graphql/enums";
 

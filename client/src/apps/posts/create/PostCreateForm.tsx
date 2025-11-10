@@ -12,7 +12,7 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
 import { PostTypeEnum, Visibility } from "~/graphql/enums";
 

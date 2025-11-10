@@ -1,6 +1,6 @@
 import { defineConfig } from "@playwright/test";
 import { env } from "@/env";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 
 const clientUrl = `http://localhost:${env.CLIENT_PORT_E2E}`;
 

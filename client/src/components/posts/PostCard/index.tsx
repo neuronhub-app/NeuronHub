@@ -24,7 +24,7 @@ import { ReviewTags } from "@/components/posts/PostReviewCard/ReviewTags";
 import { UsageStatusBlock } from "@/components/posts/PostReviewCard/UsageStatus";
 import { ids } from "@/e2e/ids";
 import { isReview } from "@/graphql/fragments/reviews";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 
 // todo refac-name: file to PostCard.tsx
 export function PostCard(props: { post: PostListItemType; isDetailPage?: boolean }) {
