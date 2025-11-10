@@ -20,14 +20,13 @@ import { GoCommentDiscussion } from "react-icons/go";
 import { LuLayoutDashboard, LuLibrary, LuLogIn, LuLogOut, LuSettings } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink, useLocation } from "react-router";
-
 import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
 
 const groups = [
   {
@@ -58,7 +57,7 @@ const groups = [
   },
 ];
 
-export function Sidebar(props: StackProps) {
+export function LayoutSidebar(props: StackProps) {
   const styles = {
     inline: 3,
   };

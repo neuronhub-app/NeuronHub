@@ -1,17 +1,8 @@
-import {
-  Container,
-  type ContainerProps,
-  Flex,
-  HStack,
-  IconButton,
-  Link,
-  Stack,
-} from "@chakra-ui/react";
+import { Container, Flex, HStack, IconButton, Link, Stack } from "@chakra-ui/react";
 import type { SVGProps } from "react";
 import { LuAlignRight } from "react-icons/lu";
 import { NavLink, Outlet } from "react-router";
-import { highlighter } from "@/apps/highlighter/highlighter";
-import { Sidebar } from "@/components/layout/Sidebar";
+import { LayoutSidebar } from "@/components/LayoutSidebar";
 import {
   DrawerBackdrop,
   DrawerCloseTrigger,
@@ -19,44 +10,42 @@ import {
   DrawerRoot,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { urls } from "@/routes";
+import { urls } from "@/urls";
+import {highlighter} from "@/apps/highlighter/highlighter";
 
-export default function RootLayout() {
-  const highlighterHook = highlighter.useHook();
+const style = {
+  breakpoint: "md",
+} as const;
 
+export function LayoutContainer(props: { paddingBottom?: string | number }) {
+  const highlight = highlighter.useHook()
   return (
     <>
-      <Navbar hideFrom="md" />
+      <Navbar />
 
       <Flex flex="1" pos="relative" h="full">
-        <Sidebar hideBelow="md" maxH="100vh" minH="100vh" pos="sticky" top={0} />
+        <LayoutSidebar
+          hideBelow={style.breakpoint}
+          maxH="100vh"
+          minH="100vh"
+          pos="sticky"
+          top={0}
+        />
 
         <Stack flex="1" alignItems="stretch" bg="bg.subtle">
-          <Container maxW="7xl" mt={6} h="full">
+          <Container maxW="7xl" mt={6} h="full" pb={props?.paddingBottom}>
             {<Outlet />}
+            <highlight.component />
           </Container>
         </Stack>
       </Flex>
-
-      <highlighterHook.component />
     </>
   );
 }
 
-export function links() {
-  const faviconLinks = [
-    { rel: "icon", type: "image/svg+xml", href: "/favicon/favicon.svg" },
-    { rel: "icon", type: "image/png", href: "/favicon/favicon-96x96.png", sizes: "96x96" },
-    { rel: "shortcut icon", href: "/favicon/favicon.ico" },
-    { rel: "apple-touch-icon", href: "/favicon/apple-touch-icon.png", sizes: "180x180" },
-    { rel: "manifest", href: "/favicon/site.webmanifest" },
-  ];
-  return faviconLinks;
-}
-
-function Navbar(props: ContainerProps) {
+function Navbar() {
   return (
-    <Container py="2.5" borderBottomWidth="1px" {...props}>
+    <Container py="2.5" borderBottomWidth="1px" hideFrom={style.breakpoint}>
       <HStack justify="space-between">
         <Link asChild w="fit-content">
           <NavLink to={urls.posts.list}>
@@ -70,10 +59,12 @@ function Navbar(props: ContainerProps) {
               <LuAlignRight />
             </IconButton>
           </DrawerTrigger>
+
           <DrawerBackdrop />
+
           <DrawerContent>
             <DrawerCloseTrigger colorPalette="gray" />
-            <Sidebar />
+            <LayoutSidebar />
           </DrawerContent>
         </DrawerRoot>
       </HStack>
