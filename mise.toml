@@ -3,6 +3,7 @@
     uv = "latest"
     biome = "latest"
     rclone = "latest"
+    killport = "latest"
 
 [settings]
     python.uv_venv_auto = true
@@ -104,6 +105,12 @@
 
     [tasks."dev:e2e"]
         depends = ["dev:server:e2e", "dev:client:e2e"]
+
+    [tasks."dev:e2e:stop"]
+        run = "killport --signal=SIGTERM {{ env.SERVER_PORT_E2E }} {{ env.CLIENT_PORT_E2E }} {{ env.S3_PORT }}"
+
+    [tasks."dev:stop"]
+        run = "killport --signal=SIGTERM {{ env.SERVER_PORT }} {{ env.CLIENT_PORT }} {{ env.S3_PORT }}"
 
 
 
