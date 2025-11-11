@@ -27,8 +27,8 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import {
-  PostEditFragment,
   type PostDetailFragmentType,
+  PostEditFragment,
   type PostEditFragmentType,
 } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
@@ -42,7 +42,7 @@ const styleGlobal = {
   zIndex: {
     avatar: 3,
     leftLine: 2,
-    leftLineConnection: -1,
+    leftLineConnection: 0,
   },
 } as const;
 
@@ -99,17 +99,20 @@ export function CommentThread(props: {
   return (
     <Box as="section" pos="relative" ref={refs.container}>
       <Flex ref={refs.content} as="article" gap="gap.sm" tabIndex={-1}>
-        <VStack pos="relative" flexShrink={0} alignItems="center" gap={0}>
-          <Avatar.Root
-            size="2xs"
-            colorPalette={getAvatarColorForUsername(username)}
-            ref={refs.avatar}
-            zIndex={styleGlobal.zIndex.avatar}
-          >
-            <Avatar.Fallback name={username} />
-            <Avatar.Image src={props.comment.author?.avatar?.url} />
+        <VStack aria-label="Comment Left Side Box" pos="relative" gap={0}>
+          <Box aria-label="Comment Avatar Box" pos="relative">
+            <Avatar.Root
+              size="2xs"
+              colorPalette={getAvatarColorForUsername(username)}
+              ref={refs.avatar}
+              zIndex={styleGlobal.zIndex.avatar}
+            >
+              <Avatar.Fallback name={username} />
+              <Avatar.Image src={props.comment.author?.avatar?.url} />
+            </Avatar.Root>
+
             <threadGuide.LineVerticalLeftConnection />
-          </Avatar.Root>
+          </Box>
 
           <threadGuide.LineVerticalLeft />
           <threadGuide.CommentCollapsedStub />
@@ -351,15 +354,40 @@ function useCommentLeftLine(
           cursor="pointer"
           zIndex={styleGlobal.zIndex.leftLine}
           _hover={{ bg: style.line.hover.bg }}
+          borderRadius="md"
+          transitionDuration="fast"
           {...ids.set(ids.comment.thread.line)}
         >
           <Box
             w={style.line.width}
             h="full"
-            bg={style.line.color}
             mx="auto"
             _groupHover={{ bg: style.line.hover.color }}
+            bg={style.line.color}
+            borderRadius="md"
+            transitionDuration="fast"
           />
+          {/*<Box*/}
+          {/*  data-id="bottom-cap"*/}
+          {/*  pos="absolute"*/}
+          {/*  h={style.line.width}*/}
+          {/*  bottom={0}*/}
+          {/*  right={0}*/}
+          {/*  w="50%"*/}
+          {/*  transitionDuration="fast"*/}
+          {/*>*/}
+          {/*  <Box*/}
+          {/*    pos="absolute"*/}
+          {/*    h="full"*/}
+          {/*    w="full"*/}
+          {/*    borderBottomWidth={style.line.width}*/}
+          {/*    borderLeftWidth={style.line.width}*/}
+          {/*    roundedBottomLeft="md"*/}
+          {/*    zIndex={styleGlobal.zIndex.leftLineConnection}*/}
+          {/*    _groupHover={{ borderColor: style.line.hover.color }}*/}
+          {/*    transitionDuration="fast"*/}
+          {/*  />*/}
+          {/*</Box>*/}
         </Box>
       );
     },
@@ -376,7 +404,8 @@ function useCommentLeftLine(
             width={styleGlobal.indent}
             ml={-styleGlobal.indent}
             mr={style.line.width}
-            transform="translateY(-50%)"
+            // bad intuitiveness, but i tested it
+            transform="translateY(-150%) translateX(30%)"
             zIndex={styleGlobal.zIndex.leftLineConnection}
           >
             <Box
