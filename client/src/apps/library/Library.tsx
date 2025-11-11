@@ -25,9 +25,9 @@ const UserHighlightsQuery = graphql(
 
         post {
           ...CommentFieldsFragment
-        }
-        root_post {
-          ...PostFragment
+          parent_root {
+            ...PostFragment
+          }
         }
       }
     }
@@ -36,7 +36,7 @@ const UserHighlightsQuery = graphql(
 );
 
 type HighlightGroup = {
-  root_post: HighlightType["root_post"];
+  parent_root: NonNullable<HighlightType["post"]["parent_root"]>;
   highlights: Array<{
     id: ID;
     text: HighlightType["text"];
@@ -50,18 +50,18 @@ function groupHighlightsByPost(highlights: HighlightType[]): HighlightGroup[] {
   const groups = new Map<ID, HighlightGroup>();
 
   for (const highlight of highlights) {
-    if (!highlight.root_post) {
+    if (!highlight.post.parent_root) {
       continue;
     }
 
-    if (!groups.has(highlight.root_post.id)) {
-      groups.set(highlight.root_post.id, {
-        root_post: highlight.root_post,
+    if (!groups.has(highlight.post.parent_root.id)) {
+      groups.set(highlight.post.parent_root.id, {
+        parent_root: highlight.post.parent_root,
         highlights: [],
       });
     }
 
-    const postHighlights = groups.get(highlight.root_post.id)!.highlights;
+    const postHighlights = groups.get(highlight.post.parent_root.id)!.highlights;
     const isHighlightUnique = !postHighlights.find(h => h.post.id === highlight.post.id);
     if (isHighlightUnique) {
       postHighlights.push({
@@ -105,19 +105,19 @@ export function Library() {
       <Stack gap="gap.lg">
         {groupedHighlights.map(group => (
           <Stack
-            key={group.root_post.id}
+            key={group.parent_root.id}
             gap="gap.sm"
             bg="bg.subtle"
             p="gap.lg"
             borderRadius="lg"
             {...getOutlineContrastStyle({ variant: "subtle" })}
           >
-            <PostCard post={group.root_post} />
+            <PostCard post={group.parent_root} />
 
             <Flex gap="gap.lg">
-              <PostAuthor post={group.root_post} />
+              <PostAuthor post={group.parent_root} />
               <NavLink
-                to={urls.getPostUrls(group.root_post).detail}
+                to={urls.getPostUrls(group.parent_root).detail}
                 style={{ width: "min-content" }}
               >
                 <IconButton
@@ -129,7 +129,7 @@ export function Library() {
                   size="sm"
                   h="auto"
                 >
-                  <FaComments /> <Text color="gray.400">{group.root_post.comments_count}</Text>
+                  <FaComments /> <Text color="gray.400">{group.parent_root.comments_count}</Text>
                 </IconButton>
               </NavLink>
             </Flex>

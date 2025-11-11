@@ -12,7 +12,6 @@ from strawberry_django.permissions import IsAuthenticated
 from neuronhub.apps.highlighter.models import PostHighlight
 from neuronhub.apps.posts.graphql.mutations import DjangoModelInput
 from neuronhub.apps.posts.graphql.types import PostTypeI
-from neuronhub.apps.posts.models import Post
 from neuronhub.apps.users.models import User
 
 
@@ -32,41 +31,6 @@ class PostHighlightType:
     text_prefix: auto
     text_postfix: auto
     created_at: auto
-
-    # todo !(fix) #AI-slop: add a field to Post<Comment> eg as `parent_root`, and just set it on all Post instances
-    @strawberry_django.field(
-        select_related=[
-            # depth = 8
-            "parent__parent__parent__parent__parent__parent__parent__parent__user",
-        ]
-    )
-    def root_post(self) -> PostTypeI:
-        """
-        HackerNews has no depth limit.
-
-        From LLM (Opus):
-        > HN drops CSS indents after depth > 5-6.
-        > Stats:
-        > - median ≈ 3-4
-        > - 99.0%  < 8
-        > - 99.9%  < 12
-        > - max    ≳ 15-20
-        """
-        post_current = self.post
-        depth = 0
-        while depth < 20:
-            if post_current.parent:
-                is_root = post_current.parent.type is not Post.Type.Comment
-                if is_root:
-                    return post_current
-
-            if not post_current.parent:
-                return post_current
-
-            # recurse deeper
-            depth += 1
-            post_current = post_current.parent
-        return post_current
 
 
 @strawberry_django.input(PostHighlight)

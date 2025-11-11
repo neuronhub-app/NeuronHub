@@ -93,7 +93,7 @@ class PostTypeI:
             queryset = queryset.filter(type=cls.TYPE)
         return filter_posts_by_user(user, posts=queryset)
 
-    @strawberry_django.field
+    @strawberry_django.field()
     async def comments(self: Post, info: Info) -> list[PostCommentType]:
         comments_qs = Post.objects.filter(parent_root=self, type=Post.Type.Comment)
         comments_filtered = filter_posts_by_user(user=get_current_user(info), posts=comments_qs)
@@ -102,7 +102,7 @@ class PostTypeI:
         )
         return await sync_to_async(list)(comments_ordered)  # type: ignore # mypy is broken
 
-    @strawberry_django.field
+    @strawberry_django.field()
     async def comments_count(self: Post) -> int:
         return await Post.objects.filter(parent_root=self, type=Post.Type.Comment).acount()
 

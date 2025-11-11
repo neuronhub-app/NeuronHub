@@ -9,7 +9,7 @@ import { schemas } from "@/components/posts/form/schemas";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
-import type { PostCommentType } from "@/graphql/fragments/posts";
+import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { toast } from "@/utils/toast";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
@@ -24,7 +24,7 @@ export function CommentForm(
       }
     | {
         mode: "edit";
-        comment: PostCommentType;
+        comment: PostEditFragmentType;
         onEditFinish: () => void;
       },
 ) {

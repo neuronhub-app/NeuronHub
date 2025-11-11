@@ -239,7 +239,6 @@ type PostHighlightType {
   text_prefix: String!
   text_postfix: String!
   created_at: DateTime!
-  root_post: PostTypeI!
 }
 
 input PostHighlightTypeInput {

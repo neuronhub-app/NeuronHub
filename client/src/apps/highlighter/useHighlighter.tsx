@@ -101,24 +101,22 @@ export function useHighlighter(props: UseHighlighterProps) {
 }
 
 const PostHighlightsQuery = graphql(
-  `
-    query GetPostHighlights($ids: [ID!]!) {
-      post_highlights(post_ids: $ids) {
-        id
-        text
-        text_prefix
-        text_postfix
-        created_at
-  
-        post {
-          ...CommentFieldsFragment
-        }
-        root_post {
+  `query GetPostHighlights($ids: [ID!]!) {
+    post_highlights(post_ids: $ids) {
+      id
+      text
+      text_prefix
+      text_postfix
+      created_at
+
+      post {
+        ...CommentFieldsFragment
+        parent_root {
           ...PostFragment
         }
       }
     }
-  `,
+  }`,
   [PostFragment, CommentFieldsFragment],
 );
 type PostHighlights = ResultOf<typeof PostHighlightsQuery>;

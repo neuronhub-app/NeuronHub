@@ -115,30 +115,6 @@ export const CommentFieldsFragment = graphql(
   `,
 );
 
-export const CommentSharableFragment = graphql(
-  `
-    fragment CommentSharableFragment on PostTypeI {
-      visibility
-      recommended_to_users {
-        id
-        username
-      }
-      recommended_to_groups {
-        id
-        name
-      }
-      visible_to_groups {
-        id
-        name
-      }
-      visible_to_users {
-        id
-        username
-      }
-    }
-  `,
-);
-
 export const PostDetailFragment = graphql(
   `
     fragment PostDetailFragment on PostTypeI {
