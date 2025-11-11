@@ -4,6 +4,7 @@ import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
 import { PostDetailFragment } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { ErrorNotFound } from "@/root";
 import type { Route } from "~/react-router/posts/detail/+types/index";
 
 export default function PostDetailRoute(props: Route.ComponentProps) {
@@ -17,6 +18,10 @@ export default function PostDetailRoute(props: Route.ComponentProps) {
   if (error) {
     toast.error("Post load failed");
     captureException(error);
+  }
+
+  if (data?.post === null) {
+    throw new ErrorNotFound();
   }
 
   return (

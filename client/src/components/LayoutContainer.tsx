@@ -1,5 +1,5 @@
 import { Container, Flex, HStack, IconButton, Link, Stack } from "@chakra-ui/react";
-import type { SVGProps } from "react";
+import type { ReactNode, SVGProps } from "react";
 import { LuAlignRight } from "react-icons/lu";
 import { NavLink, Outlet } from "react-router";
 import { highlighter } from "@/apps/highlighter/highlighter";
@@ -17,7 +17,7 @@ const style = {
   breakpoint: "md",
 } as const;
 
-export function LayoutContainer() {
+export function LayoutContainer(props?: { children?: ReactNode }) {
   const highlight = highlighter.useHook();
   return (
     <>
@@ -34,7 +34,7 @@ export function LayoutContainer() {
 
         <Stack as="main" flex="1" alignItems="stretch" bg="bg.subtle">
           <Container maxW="7xl" mt={6} h="full" pb="gap.xl">
-            {<Outlet />}
+            {props?.children ?? <Outlet />}
             <highlight.component />
           </Container>
         </Stack>
