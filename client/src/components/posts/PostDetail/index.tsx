@@ -34,20 +34,18 @@ export function PostDetail(props: {
   const highlighter = useHighlighter({ comments: commentTree });
 
   useInit({
-    isBlocked: !(user && props.post?.id),
+    isReady: user && props.post?.id,
     onInit: async () => {
       const res = await client.query({
         query: graphql(
-          `
-            query UserCollapsedComments($parent_root_id: ID!) {
-              user_current {
-                id
-                posts_collapsed(filters: { parent_root_id: { exact: $parent_root_id } }) {
-                  id
-                }
-              }
-            }
-          `,
+          `query UserCollapsedComments($parent_root_id: ID!) {
+             user_current {
+               id
+               posts_collapsed(filters: { parent_root_id: { exact: $parent_root_id } }) {
+                 id
+               }
+             }
+           }`,
         ),
         variables: { parent_root_id: props.post!.id },
       });

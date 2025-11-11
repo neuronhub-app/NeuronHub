@@ -8,17 +8,18 @@ import { type DependencyList, useEffect } from "react";
 export function useInit(options: {
   onInit: () => void | Promise<void>;
   deps?: DependencyList;
-  isBlocked?: boolean;
+  isReady?: string | boolean | number | null;
 }) {
+  const deps = options.deps ?? [];
   return useEffect(() => {
-    if (options.isBlocked) {
+    if (!options.isReady) {
       return;
     }
     const initOutput = options.onInit();
     if (initOutput instanceof Promise) {
-      initOutput.catch(captureException);
+      initOutput.catch(captureException); // todo UI: add .error() toast
     } else {
       return initOutput;
     }
-  }, [options.deps, options.isBlocked]);
+  }, [...deps, options.isReady]);
 }

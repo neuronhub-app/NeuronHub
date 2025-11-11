@@ -28,7 +28,7 @@ export function usePostVoting(props: {
       const userVote = user?.post_votes.find(vote => props.postId === vote.post.id);
       state.mutable.isVotePositive = userVote?.is_vote_positive ?? null;
     },
-    isBlocked: isLoading,
+    isReady: !isLoading,
     deps: [props.postId, user?.post_votes],
   });
 

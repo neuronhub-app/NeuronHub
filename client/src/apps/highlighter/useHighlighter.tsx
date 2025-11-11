@@ -1,11 +1,12 @@
 import type { ResultOf } from "gql.tada";
-import { useEffect } from "react";
 import { highlighter } from "@/apps/highlighter/highlighter";
 import type { PostCommentTree } from "@/components/posts/PostDetail";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
+import { client } from "@/graphql/client";
 import { CommentFieldsFragment, PostFragment } from "@/graphql/fragments/posts";
 import { isQueryDataComplete } from "@/graphql/useApolloQuery";
+import { useInit } from "@/utils/useInit";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 interface UseHighlighterProps {
@@ -19,38 +20,50 @@ export function useHighlighter(props: UseHighlighterProps) {
     highlights: {} as Record<ID, PostHighlight[]>,
   });
 
-  useEffect(() => {
-    if (props.comments) {
-      state.mutable.postIds = collectIdsRecursively(props.comments);
-    } else if (props.posts) {
-      // Collect IDs from any posts, not just comments
-      const ids: ID[] = [];
-      for (const post of props.posts) {
-        ids.push(post.id);
-        if (post.comments) {
-          ids.push(...collectIdsFromPosts(post.comments));
-        }
-      }
-      state.mutable.postIds = ids;
-    }
-  }, [props.comments, props.posts]);
-
-  const { data } = useApolloQuery(PostHighlightsQuery, { ids: state.snap.postIds });
-
-  useEffect(() => {
-    if (isQueryDataComplete(data) && data.post_highlights) {
-      const highlights: Record<ID, PostHighlight[]> = {};
-      for (const highlight of data.post_highlights) {
-        if (isQueryDataComplete(highlight) && highlight?.post?.id) {
-          if (!highlights[highlight.post.id]) {
-            highlights[highlight.post.id] = [];
+  // this works for CommentThreads and PostList
+  useInit({
+    isReady: Boolean(props.comments?.length || props.posts?.length),
+    deps: [props.comments, props.posts],
+    onInit: async () => {
+      if (props.comments) {
+        state.mutable.postIds = collectIdsRecursively(props.comments);
+      } else if (props.posts) {
+        // Collect IDs from any posts, not just Comments
+        const ids: ID[] = [];
+        for (const post of props.posts) {
+          ids.push(post.id);
+          if (post.comments) {
+            ids.push(...collectIdsFromPosts(post.comments));
           }
-          highlights[highlight.post.id].push(highlight);
         }
+        state.mutable.postIds = ids;
       }
-      state.mutable.highlights = highlights;
-    }
-  }, [data]);
+    },
+  });
+
+  useInit({
+    isReady: state.snap.postIds.length,
+    deps: [state.snap.postIds],
+    onInit: async () => {
+      const res = await client.query({
+        query: PostHighlightsQuery,
+        variables: { ids: state.snap.postIds },
+      });
+      const data = res.data!;
+      if (isQueryDataComplete(data) && data.post_highlights) {
+        const highlights: Record<ID, PostHighlight[]> = {};
+        for (const highlight of data.post_highlights) {
+          if (isQueryDataComplete(highlight) && highlight?.post?.id) {
+            if (!highlights[highlight.post.id]) {
+              highlights[highlight.post.id] = [];
+            }
+            highlights[highlight.post.id].push(highlight);
+          }
+        }
+        state.mutable.highlights = highlights;
+      }
+    },
+  });
 
   function highlight<T extends { id: ID; content_polite: string; comments?: T[] }>(post: T): T {
     if (!state.snap.highlights || !state.snap.highlights[post.id]) {
