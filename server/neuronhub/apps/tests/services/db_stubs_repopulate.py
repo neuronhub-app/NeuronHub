@@ -29,10 +29,15 @@ from neuronhub.apps.users.models import User, UserConnectionGroup
 logger = logging.getLogger(__name__)
 
 
+post_HN_id = 45487476
+
+
 async def db_stubs_repopulate(
     is_delete_posts: bool = True,
     is_delete_users_extra: bool = True,
     is_delete_user_default: bool = False,
+    is_create_single_review: bool | None = False,
+    is_import_HN_post: bool | None = True,
 ) -> Gen:
     """
     Populates the db with Posts, Tools, Reviews, tags, votes, etc.
@@ -69,16 +74,21 @@ async def db_stubs_repopulate(
         await _create_users(gen)
 
     await _create_review_pycharm(user, gen=gen)
+
     tool_iterm = await _create_review_iterm(user, gen=gen)
-    await _create_review_ghostly(user, alternatives=[tool_iterm], gen=gen)
-    await _create_tool_and_post_unifi_network(user, gen=gen)
-    await _create_tool_and_post_aider(user, gen=gen)
+
     await _create_post_news(user, gen=gen)
 
-    # todo refac: do only on request, as it adds +3s
-    post_with_90_comments_and_idents = 45487476
-    importer = ImporterHackerNews(is_use_cache=True, is_logs_enabled=False)
-    await importer.import_post(post_with_90_comments_and_idents)
+    if not is_create_single_review:
+        await _create_review_ghostly(user, alternatives=[tool_iterm], gen=gen)
+        await _create_tool_and_post_unifi_network(user, gen=gen)
+        await _create_tool_and_post_aider(user, gen=gen)
+
+    if is_import_HN_post:
+        # todo refac: do only on request, as it adds +3s
+        post_with_90_comments_and_idents = post_HN_id
+        importer = ImporterHackerNews(is_use_cache=True, is_logs_enabled=False)
+        await importer.import_post(post_with_90_comments_and_idents)
 
     return gen
 

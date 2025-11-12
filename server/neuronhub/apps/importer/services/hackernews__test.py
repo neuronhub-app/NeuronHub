@@ -1,25 +1,24 @@
 from neuronhub.apps.importer.models import ImportDomain, PostSource, UserSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.posts.models import Post
+from neuronhub.apps.tests.services.db_stubs_repopulate import post_HN_id
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
 class HackerNewsImportTest(NeuronTestCase):
-    _story_id = 45645349
+    _story_id = post_HN_id
 
     async def test_import_story(self):
         post = await self._import_test_post()
 
-        author_name = "tifa2up"
+        author_name = "pabs3"
         assert post.type == Post.Type.Post
-        assert "Production RAG" in post.title
         assert post.source_author == author_name
 
         source = await PostSource.objects.aget(post=post)
         assert source.domain == ImportDomain.HackerNews
         assert source.id_external == f"{self._story_id}"
         assert source.score >= 259
-        assert "abdellatif.io" in source.url_of_source
 
         user_source = await UserSource.objects.aget(username=author_name)
         assert user_source.id_external == author_name

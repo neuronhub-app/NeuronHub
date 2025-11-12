@@ -9,11 +9,11 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 class PostGraphqlTypesTest(NeuronTestCase):
     async def test_post_reviews_requires_below_23_SQL_queries(self):
-        await db_stubs_repopulate()
+        await db_stubs_repopulate(is_import_HN_post=False, is_create_single_review=True)
         reviews = await asyncio.gather(*[self.gen.posts.review() for _ in range(5)])
         await asyncio.gather(*[self.gen.posts.tag(post=review) for review in reviews])
 
-        await sync_to_async(self._assert_num_queries)(number=23)
+        await sync_to_async(self._assert_num_queries)(number=22)
 
     def _assert_num_queries(self, number: int):
         # async_to_sync as assertNumQueries is PITA

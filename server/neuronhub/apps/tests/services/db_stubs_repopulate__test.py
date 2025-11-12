@@ -10,7 +10,7 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 class DbStubsRepopulateTest(NeuronTestCase):
     async def test_db_stubs_repopulate(self):
-        await db_stubs_repopulate()
+        await db_stubs_repopulate(is_import_HN_post=False, is_create_single_review=True)
         assert await Post.reviews.all().afirst()
 
     async def test_review_tags_creation(self):

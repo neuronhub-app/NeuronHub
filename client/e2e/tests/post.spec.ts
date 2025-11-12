@@ -11,7 +11,10 @@ test.describe("Post", () => {
 
   test.beforeEach(async ({ page }) => {
     play = new PlaywrightHelper(page);
-    await play.dbStubsRepopulateAndLogin();
+    await play.dbStubsRepopulateAndLogin({
+      is_import_HN_post: false,
+      is_create_single_review: true,
+    });
     $ = play.locator();
   });
 

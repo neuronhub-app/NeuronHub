@@ -9,7 +9,10 @@ test.describe("HN Comments", () => {
 
   test.beforeEach(async ({ page }) => {
     play = new PlaywrightHelper(page);
-    await play.dbStubsRepopulateAndLogin();
+    await play.dbStubsRepopulateAndLogin({
+      is_import_HN_post: true,
+      is_create_single_review: true,
+    });
     $ = play.locator();
   });
 

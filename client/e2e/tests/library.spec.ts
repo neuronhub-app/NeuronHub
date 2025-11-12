@@ -11,7 +11,10 @@ test.describe("Library", () => {
   test.beforeEach(async ({ page }) => {
     const timeoutExtra = 7000;
     play = new PlaywrightHelper(page, timeoutExtra);
-    await play.dbStubsRepopulateAndLogin();
+    await play.dbStubsRepopulateAndLogin({
+      is_import_HN_post: false,
+      is_create_single_review: true,
+    });
     $ = play.locator();
   });
 

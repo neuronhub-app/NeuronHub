@@ -26,8 +26,11 @@ export class PlaywrightHelper {
     this.$ = this.locator();
   }
 
-  async dbStubsRepopulateAndLogin() {
-    await this.dbStubsRepopulate();
+  async dbStubsRepopulateAndLogin(options?: {
+    is_import_HN_post?: boolean;
+    is_create_single_review?: boolean;
+  }) {
+    await this.dbStubsRepopulate(options);
     await this.login();
   }
 
@@ -93,9 +96,17 @@ export class PlaywrightHelper {
     return this.page.waitForResponse(response => response.url().includes(operationName));
   }
 
-  async dbStubsRepopulate() {
+  async dbStubsRepopulate(options?: {
+    is_import_HN_post?: boolean;
+    is_create_single_review?: boolean;
+  }) {
     return client.mutate({
-      mutation: graphql(`mutation db_stubs_repopulate { test_db_stubs_repopulate }`),
+      mutation: graphql(`
+        mutation db_stubs_repopulate($is_import_HN_post: Boolean, $is_create_single_review: Boolean) {
+          test_db_stubs_repopulate(is_import_HN_post: $is_import_HN_post, is_create_single_review: $is_create_single_review)
+        }
+      `),
+      variables: options,
     });
   }
 

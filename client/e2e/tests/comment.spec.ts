@@ -13,7 +13,10 @@ test.describe("Comments", () => {
   test.beforeEach(async ({ page }) => {
     const timeoutExtra = 7000; // the first E2E test (alphabetically this one) hits the cold Postgres cache & fails on timeout=4.5s
     play = new PlaywrightHelper(page, timeoutExtra);
-    await play.dbStubsRepopulateAndLogin();
+    await play.dbStubsRepopulateAndLogin({
+      is_import_HN_post: false,
+      is_create_single_review: true,
+    });
     $ = play.locator();
   });
 
