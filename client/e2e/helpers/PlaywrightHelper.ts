@@ -166,6 +166,12 @@ export class PlaywrightHelper {
   }
 
   private async login() {
+    const cookies = await this.page.context().cookies();
+    const isHasDjangoSession = cookies.some(cookie => cookie.name === "sessionid");
+    if (isHasDjangoSession) {
+      return;
+    }
+
     await this.page.goto(`${env.VITE_SERVER_URL}/admin/login/`);
     await this.page.fill('input[name="username"]', config.user.username);
     await this.page.fill('input[name="password"]', config.user.password);
