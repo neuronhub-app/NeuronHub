@@ -11,7 +11,7 @@ import { client } from "@/graphql/client";
 import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { useInit } from "@/utils/useInit";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtioSet } from "@/utils/useValtioProxyRef";
 import { PostTypeEnum } from "~/graphql/enums";
 
 export function PostDetail(props: {
@@ -22,9 +22,7 @@ export function PostDetail(props: {
 }) {
   const user = useUser();
 
-  const state = useValtioProxyRef({
-    idsCollapsed: new Set<ID>(),
-  });
+  const state = useStateValtioSet(new Set<ID>());
 
   const commentTree = useMemo(
     () => (props.post?.comments ? buildCommentTree(props.post.comments) : []),
@@ -49,9 +47,12 @@ export function PostDetail(props: {
         ),
         variables: { parent_root_id: props.post!.id },
       });
-      state.mutable.idsCollapsed = new Set(
-        res.data!.user_current!.posts_collapsed.map(post => post.id),
-      );
+      state.mutable.clear();
+      res
+        .data!.user_current!.posts_collapsed.map(post => post.id)
+        .forEach(id => {
+          state.mutable.add(id);
+        });
     },
   });
 

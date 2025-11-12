@@ -13,7 +13,6 @@ import {
 } from "@chakra-ui/react";
 import { type ComponentProps, type JSX, useEffect, useRef } from "react";
 import { GoPencil } from "react-icons/go";
-
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { getAvatarColorForUsername } from "@/components/posts/PostCard/PostAuthor";
@@ -32,7 +31,7 @@ import {
 } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { toast } from "@/utils/toast";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { type useStateValtioSet, useValtioProxyRef } from "@/utils/useValtioProxyRef";
 import { UserListName } from "~/graphql/enums";
 
 const styleGlobal = {
@@ -48,7 +47,7 @@ const styleGlobal = {
 export function CommentThread(props: {
   post: PostDetailFragmentType | PostReviewDetailFragmentType;
   comment: PostCommentTree;
-  commentsCollapsed: ReturnType<typeof useValtioProxyRef<{ idsCollapsed: Set<ID> }>>;
+  commentsCollapsed: ReturnType<typeof useStateValtioSet<ID>>;
   depth: number;
   isFirstChild: boolean;
   isLastChild: boolean;
@@ -91,7 +90,7 @@ export function CommentThread(props: {
     if (refs.container.current && refs.content.current) {
       state.mutable.parentHeightPx = refs.container.current.offsetHeight; // todo UI: get the latest child's h -> subtract it from refs.container
     }
-  }, [refs.container.current, refs.content.current]);
+  }, [refs.container.current, refs.content.current, props.commentsCollapsed.snap]);
 
   const isCommentUnfolded = !threadGuide.isCollapsed;
   const username = (props.comment.source_author || props.comment.author?.username) ?? "";
@@ -280,13 +279,12 @@ function useCommentLeftLine(
   const user = useUser();
 
   const state = useValtioProxyRef({
-    isCommentCollapsed: props.commentsCollapsed.snap.idsCollapsed.has(props.comment.id),
+    isCommentCollapsed: props.commentsCollapsed.snap.has(props.comment.id),
   });
+
   useEffect(() => {
-    state.mutable.isCommentCollapsed = props.commentsCollapsed.snap.idsCollapsed.has(
-      props.comment.id,
-    );
-  }, [props.commentsCollapsed.snap.idsCollapsed]);
+    state.mutable.isCommentCollapsed = props.commentsCollapsed.snap.has(props.comment.id);
+  }, [props.commentsCollapsed.snap]);
 
   const [childrenGap] = useToken("spacing", styleGlobal.childrenGap);
   const style = {
@@ -307,9 +305,9 @@ function useCommentLeftLine(
     state.mutable.isCommentCollapsed = !state.mutable.isCommentCollapsed;
 
     if (state.mutable.isCommentCollapsed) {
-      props.commentsCollapsed.mutable.idsCollapsed.add(props.comment.id);
+      props.commentsCollapsed.mutable.add(props.comment.id);
     } else {
-      props.commentsCollapsed.mutable.idsCollapsed.delete(props.comment.id);
+      props.commentsCollapsed.mutable.delete(props.comment.id);
     }
     // save to db
     if (user) {
@@ -336,17 +334,18 @@ function useCommentLeftLine(
       if (state.snap.isCommentCollapsed) {
         return null;
       }
+
+      const height = props.height.parent
+        ? `calc(${props.height.parent}px - ${style.childrenGap} - ${props.height.toolbar}px)` // subtract - as parentHeightPx > Comment exactly by `stylesGlobal.childrenGap`
+        : "full";
+
       return (
         <Box
+          className="group"
           onClick={toggleCollapse}
           pos="absolute"
-          className="group"
           top={`${props.height.avatar / 2}px`}
-          height={
-            props.height.parent
-              ? `calc(${props.height.parent}px - ${style.childrenGap} - ${props.height.toolbar}px)` // subtract - as parentHeightPx > Comment exactly by `stylesGlobal.childrenGap`
-              : "full"
-          }
+          height={height}
           left="50%"
           transform="translateX(-50%)"
           w={style.line.widthClickable}
