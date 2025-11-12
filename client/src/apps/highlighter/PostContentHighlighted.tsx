@@ -23,14 +23,13 @@ export function PostContentHighlighted(props: {
     content_rant: string;
   };
 }) {
-  const state = useValtioProxyRef<{
-    activeHighlightId: string | null;
-  }>({
-    activeHighlightId: null,
+  const state = useValtioProxyRef({
+    activeHighlightId: null as string | null,
   });
 
-  const focusedElementRef = useRef<HTMLElement | null>(null);
   const loading = useIsLoading();
+
+  const focusedElementRef = useRef<HTMLElement | null>(null);
 
   function handleProseClick(event: React.MouseEvent) {
     if (isHTMLElement(event.target)) {

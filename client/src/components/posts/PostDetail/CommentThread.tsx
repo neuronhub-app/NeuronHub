@@ -13,18 +13,17 @@ import {
 } from "@chakra-ui/react";
 import { type ComponentProps, type JSX, useEffect, useRef } from "react";
 import { GoPencil } from "react-icons/go";
-import { useSnapshot } from "valtio/react";
 
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { getAvatarColorForUsername } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
-import { collapsedCommentsState, type PostCommentTree } from "@/components/posts/PostDetail";
+import type { PostCommentTree } from "@/components/posts/PostDetail";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentVoteBar } from "@/components/posts/PostDetail/CommentVoteBar";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
-import { graphql } from "@/gql-tada";
+import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import {
   type PostDetailFragmentType,
@@ -49,6 +48,7 @@ const styleGlobal = {
 export function CommentThread(props: {
   post: PostDetailFragmentType | PostReviewDetailFragmentType;
   comment: PostCommentTree;
+  commentsCollapsed: ReturnType<typeof useValtioProxyRef<{ idsCollapsed: Set<ID> }>>;
   depth: number;
   isFirstChild: boolean;
   isLastChild: boolean;
@@ -236,6 +236,7 @@ export function CommentThread(props: {
               key={comment.id}
               post={props.post}
               comment={comment}
+              commentsCollapsed={props.commentsCollapsed}
               depth={props.depth + 1}
               isFirstChild={index === 0}
               isLastChild={index === props.comment.comments.length - 1}
@@ -277,16 +278,15 @@ function useCommentLeftLine(
   props: ComponentProps<typeof CommentThread> & { isHasChildren: boolean },
 ) {
   const user = useUser();
-  const collapsedStateSnapshot = useSnapshot(collapsedCommentsState);
 
   const state = useValtioProxyRef({
-    isCommentCollapsed: collapsedStateSnapshot.collapsedCommentIds.has(props.comment.id),
+    isCommentCollapsed: props.commentsCollapsed.snap.idsCollapsed.has(props.comment.id),
   });
   useEffect(() => {
-    state.mutable.isCommentCollapsed = collapsedStateSnapshot.collapsedCommentIds.has(
+    state.mutable.isCommentCollapsed = props.commentsCollapsed.snap.idsCollapsed.has(
       props.comment.id,
     );
-  }, [collapsedStateSnapshot.collapsedCommentIds]);
+  }, [props.commentsCollapsed.snap.idsCollapsed]);
 
   const [childrenGap] = useToken("spacing", styleGlobal.childrenGap);
   const style = {
@@ -304,13 +304,12 @@ function useCommentLeftLine(
   } as const;
 
   async function toggleCollapse() {
-    const newCollapsedState = !state.mutable.isCommentCollapsed;
-    state.mutable.isCommentCollapsed = newCollapsedState;
+    state.mutable.isCommentCollapsed = !state.mutable.isCommentCollapsed;
 
     if (state.mutable.isCommentCollapsed) {
-      collapsedCommentsState.collapsedCommentIds.add(props.comment.id);
+      props.commentsCollapsed.mutable.idsCollapsed.add(props.comment.id);
     } else {
-      collapsedCommentsState.collapsedCommentIds.delete(props.comment.id);
+      props.commentsCollapsed.mutable.idsCollapsed.delete(props.comment.id);
     }
     // save to db
     if (user) {

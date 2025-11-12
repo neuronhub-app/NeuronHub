@@ -10,12 +10,10 @@ import { isQueryDataComplete } from "@/graphql/useApolloQuery";
 import { useInit } from "@/utils/useInit";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-interface UseHighlighterProps {
-  comments?: PostCommentTree[];
+export function useHighlighter(props: {
+  commentTree?: PostCommentTree[];
   posts?: Array<{ id: ID; comments?: Array<{ id: ID }> }>;
-}
-
-export function useHighlighter(props: UseHighlighterProps) {
+}) {
   const state = useValtioProxyRef({
     postIds: [] as ID[],
     highlights: {} as Record<ID, PostHighlight[]>,
@@ -23,11 +21,11 @@ export function useHighlighter(props: UseHighlighterProps) {
 
   // this works for CommentThreads and PostList
   useInit({
-    isReady: Boolean(props.comments?.length || props.posts?.length),
-    deps: [props.comments, props.posts],
+    isReady: Boolean(props.commentTree?.length || props.posts?.length),
+    deps: [props.commentTree, props.posts],
     onInit: async () => {
-      if (props.comments) {
-        state.mutable.postIds = collectIdsRecursively(props.comments);
+      if (props.commentTree) {
+        state.mutable.postIds = collectIdsRecursively(props.commentTree);
       } else if (props.posts) {
         // Collect IDs from any posts, not just Comments
         const ids: ID[] = [];
