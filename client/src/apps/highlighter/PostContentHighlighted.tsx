@@ -4,11 +4,10 @@ import { useRef } from "react";
 import { FaTrashCan } from "react-icons/fa6";
 
 import { highlighter, isHTMLElement } from "@/apps/highlighter/highlighter";
+import { removeHighlight } from "@/apps/highlighter/useHighlighter";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
-import { graphql } from "@/gql-tada";
-import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { markedConfigured } from "@/utils/marked-configured";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
@@ -60,13 +59,7 @@ export function PostContentHighlighted(props: {
       return;
     }
     await loading.track(async () => {
-      await mutateAndRefetchMountedQueries(
-        graphql(`
-          mutation HighlighterDelete($id: ID!) { post_highlight_delete(data: { id: $id }) }
-        `),
-        // @ts-expect-error #bad-infer
-        { id: state.snap.activeHighlightId },
-      );
+      await removeHighlight(state.snap.activeHighlightId!);
     });
     state.mutable.activeHighlightId = null;
   }

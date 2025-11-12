@@ -1,3 +1,4 @@
+import { useQuery } from "@apollo/client/react";
 import type { ResultOf } from "gql.tada";
 import { highlighter } from "@/apps/highlighter/highlighter";
 import type { PostCommentTree } from "@/components/posts/PostDetail";
@@ -41,15 +42,15 @@ export function useHighlighter(props: UseHighlighterProps) {
     },
   });
 
+  const { data } = useQuery(PostHighlightsQuery, {
+    variables: { ids: state.snap.postIds },
+    skip: !state.snap.postIds.length,
+  });
+
   useInit({
-    isReady: state.snap.postIds.length,
-    deps: [state.snap.postIds],
+    isReady: Boolean(data),
+    deps: [data],
     onInit: async () => {
-      const res = await client.query({
-        query: PostHighlightsQuery,
-        variables: { ids: state.snap.postIds },
-      });
-      const data = res.data!;
       if (isQueryDataComplete(data) && data.post_highlights) {
         const highlights: Record<ID, PostHighlight[]> = {};
         for (const highlight of data.post_highlights) {
@@ -109,8 +110,52 @@ export function useHighlighter(props: UseHighlighterProps) {
   }
 
   return {
-    highlight: highlight,
+    highlight,
   };
+}
+
+export async function saveHighlight(args: {
+  id: ID;
+  text: string;
+  text_prefix: string;
+  text_postfix: string;
+}) {
+  await client.mutate({
+    mutation: graphql(`
+      mutation HighlighterCreate(
+        $id: ID!,
+        $text: String!,
+        $text_prefix: String,
+        $text_postfix: String,
+      ) {
+        post_highlight_create(data: {
+          post: { set: $id }
+          text: $text
+          text_postfix: $text_postfix
+          text_prefix: $text_prefix
+        })
+      }
+    `),
+    variables: {
+      id: args.id,
+      text: args.text,
+      text_prefix: args.text_prefix,
+      text_postfix: args.text_postfix,
+    },
+  });
+  await client.refetchQueries({ include: [PostHighlightsQuery] });
+}
+
+export async function removeHighlight(id: ID) {
+  await client.mutate({
+    mutation: graphql(`
+      mutation HighlighterDelete($id: ID!) {
+        post_highlight_delete(data: { id: $id })
+      }
+    `),
+    variables: { id },
+  });
+  await client.refetchQueries({ include: [PostHighlightsQuery] });
 }
 
 const PostHighlightsQuery = graphql(

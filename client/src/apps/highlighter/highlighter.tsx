@@ -1,8 +1,8 @@
 import { ActionBar, Button, Kbd } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
+import { saveHighlight } from "@/apps/highlighter/useHighlighter";
 import { ids } from "@/e2e/ids";
-import { graphql, type ID } from "@/gql-tada";
-import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import type { ID } from "@/gql-tada";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
@@ -238,39 +238,6 @@ export namespace highlighter {
       }
     }
     return textContext;
-  }
-
-  async function saveHighlight(args: {
-    id: ID;
-    text: string;
-    text_prefix: string;
-    text_postfix: string;
-  }) {
-    console.log(attrs.flag, args);
-
-    await mutateAndRefetchMountedQueries(
-      graphql(`
-        mutation HighlighterCreate(
-          $id: ID!,
-          $text: String!,
-          $text_prefix: String,
-          $text_postfix: String,
-        ) {
-          post_highlight_create(data: {
-            post: { set: $id }
-            text: $text
-            text_postfix: $text_postfix
-            text_prefix: $text_prefix
-          })
-        }
-      `),
-      {
-        id: args.id,
-        text: args.text,
-        text_prefix: args.text_prefix,
-        text_postfix: args.text_postfix,
-      },
-    );
   }
 
   export type ModelType = "comment" | "post" | "review";
