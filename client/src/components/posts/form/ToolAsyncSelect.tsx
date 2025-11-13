@@ -114,7 +114,9 @@ type ToolOption = {
   [key: string]: unknown;
 };
 
-const ToolQuery = graphql(`
+const ToolQuery = graphql.persisted(
+  "SearchToolsForSelection",
+  graphql(`
   query SearchToolsForSelection($title: String) {
     post_tools(filters: { title: { i_contains: $title } }) {
       id
@@ -135,4 +137,5 @@ const ToolQuery = graphql(`
       }
     }
   }
-`);
+`),
+);

@@ -13,13 +13,16 @@ export function PostReimportButton(props: { idExternal: string }) {
   async function refreshPost() {
     await loading.track(async () => {
       const response = await mutateAndRefetchMountedQueries(
-        graphql(`
-          mutation PostImportRefresh($idExternal: String!) {
-            post_import_refresh(id_external: $idExternal) {
-              comments_added
+        graphql.persisted(
+          "PostImportRefresh",
+          graphql(`
+            mutation PostImportRefresh($idExternal: String!) {
+              post_import_refresh(id_external: $idExternal) {
+                comments_added
+              }
             }
-          }
-        `),
+          `),
+        ),
         { idExternal: props.idExternal },
       );
 

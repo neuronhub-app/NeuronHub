@@ -8,9 +8,12 @@ import type { Route } from "~/react-router/posts/edit/+types/index";
 
 export default function PostEditRoute(props: Route.ComponentProps) {
   const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(`query PostEdit($id: ID!) { post(pk: $id) { ...PostEditFragment } }`, [
-      PostEditFragment,
-    ]),
+    graphql.persisted(
+      "PostEdit",
+      graphql(`query PostEdit($id: ID!) { post(pk: $id) { ...PostEditFragment } }`, [
+        PostEditFragment,
+      ]),
+    ),
     { id: props.params.id },
   );
 

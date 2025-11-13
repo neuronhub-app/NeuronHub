@@ -9,9 +9,13 @@ import type { Route } from "~/react-router/tools/detail/+types";
 
 export default function PostToolDetailRoute(props: Route.ComponentProps) {
   const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(`query PostToolDetail($pk: ID!) { post_tool(pk: $pk) { ...PostDetailFragment } }`, [
-      PostDetailFragment,
-    ]),
+    graphql.persisted(
+      "PostToolDetail",
+      graphql(
+        `query PostToolDetail($pk: ID!) { post_tool(pk: $pk) { ...PostDetailFragment } }`,
+        [PostDetailFragment],
+      ),
+    ),
     { pk: props.params.id },
   );
   if (error) {

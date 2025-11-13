@@ -16,7 +16,10 @@ export function PostDeleteButton(props: { id: ID; title: string }) {
   async function deletePost() {
     await loading.track(async () => {
       const response = await mutateDeleteAndResetStore(
-        graphql(`mutation PostDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
+        graphql.persisted(
+          "PostDelete",
+          graphql(`mutation PostDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
+        ),
         { id: props.id },
       );
       if (response.success) {

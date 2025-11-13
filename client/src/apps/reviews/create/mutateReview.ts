@@ -9,11 +9,14 @@ export async function mutateReview(values: schemas.Review & { parent?: { id: ID 
   const isEditMode = Boolean(values.id);
 
   const response = await mutateAndRefetchMountedQueries(
-    graphql(`
-      mutation ReviewUpdateOrCreate($input: PostTypeInput!) { 
-        post_update_or_create(data: $input) { id parent { id } } 
+    graphql.persisted(
+      "ReviewUpdateOrCreate",
+      graphql(`
+      mutation ReviewUpdateOrCreate($input: PostTypeInput!) {
+        post_update_or_create(data: $input) { id parent { id } }
       }
     `),
+    ),
     {
       input: {
         ...(isEditMode ? {} : { parent }),

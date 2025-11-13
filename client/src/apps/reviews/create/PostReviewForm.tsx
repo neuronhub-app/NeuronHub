@@ -154,11 +154,14 @@ export namespace PostReviewForm {
       // todo ! fix: creates a Tool duplicate if Review submit fails and user tries again
       const { tags, alternatives, ...toolFields } = values;
       const response = await mutateAndRefetchMountedQueries(
-        graphql(`
-					mutation ToolCreate($input: PostTypeInput!) {
-						post_update_or_create(data: $input) { id }
-					}
-				`),
+        graphql.persisted(
+          "ToolCreate",
+          graphql(`
+            mutation ToolCreate($input: PostTypeInput!) {
+              post_update_or_create(data: $input) { id }
+            }
+          `),
+        ),
         {
           input: {
             ...toolFields,

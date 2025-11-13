@@ -74,21 +74,7 @@ export async function saveHighlight(args: {
   text_postfix: string;
 }) {
   await client.mutate({
-    mutation: graphql(`
-      mutation HighlighterCreate(
-        $id: ID!,
-        $text: String!,
-        $text_prefix: String,
-        $text_postfix: String,
-      ) {
-        post_highlight_create(data: {
-          post: { set: $id }
-          text: $text
-          text_postfix: $text_postfix
-          text_prefix: $text_prefix
-        })
-      }
-    `),
+    mutation: HighlightCreate,
     variables: {
       id: args.id,
       text: args.text,
@@ -99,38 +85,63 @@ export async function saveHighlight(args: {
     awaitRefetchQueries: true,
   });
 }
+const HighlightCreate = graphql.persisted(
+  "HighlighterCreate",
+  graphql(`
+    mutation HighlighterCreate(
+      $id: ID!,
+      $text: String!,
+      $text_prefix: String,
+      $text_postfix: String,
+    ) {
+      post_highlight_create(data: {
+        post: { set: $id }
+        text: $text
+        text_postfix: $text_postfix
+        text_prefix: $text_prefix
+      })
+    }
+  `),
+);
 
 export async function removeHighlight(id: ID) {
   await client.mutate({
-    mutation: graphql(`
-      mutation HighlighterDelete($id: ID!) {
-        post_highlight_delete(data: { id: $id })
-      }
-    `),
+    mutation: HighlightDelete,
     variables: { id },
     refetchQueries: [PostHighlightsQuery],
     awaitRefetchQueries: true,
   });
 }
+const HighlightDelete = graphql.persisted(
+  "HighlighterDelete",
+  graphql(`
+    mutation HighlighterDelete($id: ID!) {
+      post_highlight_delete(data: { id: $id })
+    }
+  `),
+);
 
-const PostHighlightsQuery = graphql(
-  `query GetPostHighlights($ids: [ID!]!) {
-    post_highlights(post_ids: $ids) {
-      id
-      text
-      text_prefix
-      text_postfix
-      created_at
-
-      post {
-        ...CommentFieldsFragment
-        parent_root {
-          ...PostFragment
+const PostHighlightsQuery = graphql.persisted(
+  "GetPostHighlights",
+  graphql(
+    `query GetPostHighlights($ids: [ID!]!) {
+      post_highlights(post_ids: $ids) {
+        id
+        text
+        text_prefix
+        text_postfix
+        created_at
+  
+        post {
+          ...CommentFieldsFragment
+          parent_root {
+            ...PostFragment
+          }
         }
       }
-    }
-  }`,
-  [PostFragment, CommentFieldsFragment],
+    }`,
+    [PostFragment, CommentFieldsFragment],
+  ),
 );
 
 type PostHighlights = ResultOf<typeof PostHighlightsQuery>;

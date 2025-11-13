@@ -23,7 +23,7 @@
     "noImplicitOverride": true, // for LLMs mistakes
 
     "rootDirs": [".", "./.react-router/types"], // from react-router docs
-    "noErrorTruncation": true,
+    "noErrorTruncation": false,
 
     "paths": {
       "@/e2e/*": ["./e2e/*"],
@@ -40,6 +40,7 @@
         "schema": "./../schema.graphql",
         "tadaOutputLocation": "./graphql/gql-tada/graphql-env.d.ts",
         "shouldCheckForColocatedFragments": false, // see [[docs/caveats/client-caveats.md]]
+        "tadaPersistedLocation": "./persisted.json",
       },
     ],
   },

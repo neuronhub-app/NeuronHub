@@ -16,7 +16,10 @@ export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
   async function deleteReview() {
     state.mutable.isLoading = true;
     const response = await mutateDeleteAndResetStore(
-      graphql(`mutation ReviewDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
+      graphql.persisted(
+        "ReviewDelete",
+        graphql(`mutation ReviewDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
+      ),
       { id: props.id },
     );
     state.mutable.isLoading = false;

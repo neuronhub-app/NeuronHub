@@ -220,7 +220,7 @@ export function UserProfile() {
 
   async function handleLogout() {
     const res = await mutateAndRefetch(
-      graphql(`mutation Logout { logout }`),
+      graphql.persisted("Logout", graphql(`mutation Logout { logout }`)),
       {},
       { isResetAndRefetchAll: true },
     );

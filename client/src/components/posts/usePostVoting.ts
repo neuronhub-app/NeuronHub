@@ -53,11 +53,14 @@ export function usePostVoting(props: {
     }
 
     const res = await mutateAndRefetchMountedQueries(
-      graphql(`
+      graphql.persisted(
+        "PostVoteUpdateOrCreateOrUpdate",
+        graphql(`
         mutation PostVoteUpdateOrCreateOrUpdate($id: ID!, $isVotePositive: Boolean) {
           post_vote_update_or_create(id: $id, is_vote_positive: $isVotePositive)
         }
       `),
+      ),
       { id: props.postId, isVotePositive: newVoteValue },
     );
     if (!res.success) {

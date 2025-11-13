@@ -128,7 +128,9 @@ export function SelectVotable(
           loadOptions={async (input: string) => {
             // todo perf(UX): throttle
             const response = await client.query({
-              query: graphql(`
+              query: graphql.persisted(
+                "ToolTagsQuery",
+                graphql(`
 								query ToolTagsQuery($name: String, $is_review_tag: Boolean!) {
 									tags(filters: {
 										is_review_tag: { exact: $is_review_tag }
@@ -147,6 +149,7 @@ export function SelectVotable(
 									}
 								}
 							`),
+              ),
               variables: {
                 name: input,
                 is_review_tag: props.isReviewTags ?? false,
@@ -352,7 +355,9 @@ export function OptionButton(props: {
 
 async function mutatePostTagVote(opts: { postId: ID; optionNew: SelectVotableOption }) {
   const response = await mutateAndRefetchMountedQueries(
-    graphql(`
+    graphql.persisted(
+      "CreateOrUpdatePostTagVote",
+      graphql(`
 			mutation CreateOrUpdatePostTagVote( $post_id: ID! $tag_id: ID! $is_vote_positive: Boolean ) {
 				post_tag_vote_create_or_update(
 					post_id: $post_id
@@ -361,6 +366,7 @@ async function mutatePostTagVote(opts: { postId: ID; optionNew: SelectVotableOpt
 				)
 			}
 		`),
+    ),
     {
       post_id: opts.postId,
       tag_id: opts.optionNew.id,

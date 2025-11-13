@@ -199,6 +199,7 @@
     depends = "typegen:server"
     run = [
         "mise run typegen:client:graphql",
+        "mise run typegen:client:gql-tada",
         "mise run typegen:client:react",
         "mise run typegen:client:chakra",
     ]
@@ -215,8 +216,13 @@
         run = [
             "bun run graphql-codegen --errors-only --silent --config src/codegen.ts",
             "bun run gql-tada generate output",
+            "bun run gql-tada generate persisted",
         ]
         sources = ["../schema.graphql"]
+
+    [tasks."typegen:client:gql-tada"]
+        dir = "client"
+        run = "bun run gql-tada generate persisted"
 
     [tasks."typegen:client:react"]
         dir = "client"

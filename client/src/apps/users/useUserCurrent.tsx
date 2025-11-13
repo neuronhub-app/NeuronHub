@@ -45,7 +45,9 @@ export function useUser() {
   return snap.current;
 }
 
-export const UserQueryDoc = graphql(`
+export const UserQueryDoc = graphql.persisted(
+  "UserCurrent",
+  graphql(`
   query UserCurrent {
     user_current {
       id
@@ -53,9 +55,9 @@ export const UserQueryDoc = graphql(`
       name: username
       email
       is_superuser
-      
+
       library { pk }
-      
+
       read_later { pk }
 
       post_votes {
@@ -90,7 +92,8 @@ export const UserQueryDoc = graphql(`
       }
     }
   }
-`);
+`),
+);
 
 type UserQuery = ResultOf<typeof UserQueryDoc>;
 export type User = NonNullable<UserQuery["user_current"]>;

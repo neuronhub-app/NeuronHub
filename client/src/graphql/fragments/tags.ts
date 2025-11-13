@@ -21,7 +21,7 @@ export const PostTagFragment = graphql(`
     description
     is_important
     is_review_tag
-    
+
     tag_parent {
       id
       name

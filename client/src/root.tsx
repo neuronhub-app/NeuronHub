@@ -86,6 +86,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       }
     }
   }
+  console.error(error);
 
   return (
     <AppProviders>
