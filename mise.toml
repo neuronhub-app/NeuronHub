@@ -57,6 +57,14 @@
 [tasks."dev"]
     depends = ["dev:db", "dev:s3", "dev:server", "dev:client"]
 
+[tasks."dev:hatchet"]
+    depends = ["dev:db-full", "dev:server", "dev:client", "dev:hatchet-worker"]
+
+    [tasks."dev:hatchet-worker"]
+        depends = "dev:db-full"
+        dir = "server"
+        run = "uv run python neuronhub/apps/importer/hatchet_worker.py"
+
     [tasks."dev:server"]
         depends = "dev:db"
         dir = "server"
@@ -86,9 +94,26 @@
             fi
         """
         silent = true
+
+    [tasks."dev:db-full"]
+        dir = "devops"
+        run = """
+            #!/usr/bin/env bash
+            if [[ "$IS_DB_EXTERNAL" = "true" || "$GITHUB_ACTIONS" = "true" ]]; then
+                echo "Using external PostgreSQL"
+            else
+                sudo docker compose up db hatchet-postgres hatchet-lite --detach
+            fi
+        """
+        silent = true
+
     [tasks."dev:db-stop"]
         dir = "devops"
         run = "sudo docker compose down db"
+
+    [tasks."dev:db-full-stop"]
+        dir = "devops"
+        run = "sudo docker compose down db hatchet-postgres hatchet-lite"
 
     [tasks."dev:server:e2e"]
         depends = ["dev:db", "dev:db:setup-e2e"]
@@ -163,6 +188,9 @@
     dir = "server"
     run = "uv run manage.py import_hn"
 
+[tasks."django:import-hn-scheduled"]
+    dir = "server"
+    run = "uv run manage.py import_hn_scheduled"
 
 # Lint & format
 # -----------------------------------------------------

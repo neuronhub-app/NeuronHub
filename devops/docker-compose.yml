@@ -4,16 +4,20 @@ name: neuronhub
 
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     command: >
       postgres -c max_connections=200
-               -c shared_buffers=1GB
+               -c shared_buffers=3GB
+               -c max_worker_processes=16
+               -c max_parallel_workers=8
+               -c max_parallel_workers_per_gather=8
+               -c max_parallel_maintenance_workers=4
     environment:
       POSTGRES_DB: neuronhub
       POSTGRES_USER: neuronhub
-      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_PASSWORD: neuronhub
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready --username neuronhub"]
       interval: 5s
@@ -21,52 +25,5 @@ services:
     ports:
       - "5432:5432"
 
-  # Hatchet.run
-
-  hatchet-postgres:
-    image: postgres:15.6
-    command: postgres -c 'max_connections=200'
-    restart: always
-    environment:
-      - POSTGRES_USER=hatchet
-      - POSTGRES_PASSWORD=hatchet
-      - POSTGRES_DB=hatchet
-    volumes:
-      - hatchet_postgres_data:/var/lib/postgresql/data
-    ports:
-      - "54323:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d hatchet -U hatchet"]
-      interval: 2s
-      timeout: 2s
-      retries: 3
-      start_period: 3s
-  hatchet-lite:
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:latest
-    ports:
-      - "8888:8888"
-      - "7077:7077"
-    depends_on:
-      hatchet-postgres:
-        condition: service_healthy
-    environment:
-      # Refer to https://docs.hatchet.run/self-hosting/configuration-options
-      # for a list of all supported environment variables
-      DATABASE_URL: "postgresql://hatchet:hatchet@hatchet-postgres:5432/hatchet?sslmode=disable"
-      SERVER_AUTH_COOKIE_DOMAIN: localhost
-      SERVER_AUTH_COOKIE_INSECURE: "t"
-      SERVER_GRPC_BIND_ADDRESS: "0.0.0.0"
-      SERVER_GRPC_INSECURE: "t"
-      SERVER_GRPC_BROADCAST_ADDRESS: localhost:7077
-      SERVER_GRPC_PORT: "7077"
-      SERVER_URL: http://0.0.0.0:8888
-      SERVER_AUTH_SET_EMAIL_VERIFIED: "t"
-      SERVER_DEFAULT_ENGINE_VERSION: "V1"
-      SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: localhost:7077
-    volumes:
-      - "hatchet_config:/config"
-
 volumes:
   postgres_data:
-  hatchet_postgres_data:
-  hatchet_config:

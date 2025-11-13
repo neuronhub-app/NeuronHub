@@ -55,7 +55,6 @@ dependencies = [
     "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - his `marshmallow` used by Microsoft, AWS, etc
     "requests == 2.*",
 
-    "hatchet-sdk == 1.*", # [i=norm, rep=norm, GH=high, 6.2k] - hatchet.run
     "beautifulsoup4[lxml] == 4.*",
 ]
 
@@ -139,4 +138,7 @@ dependencies = [
     ]
     filterwarnings = [
         "ignore::DeprecationWarning:functools",
+    ]
+    markers = [
+        "slow: tests external HTTP queries"
     ]

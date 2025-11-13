@@ -10,7 +10,7 @@ from markdownify import markdownify
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.importer.models import ImportDomain, PostSource, UserSource
-from neuronhub.apps.importer.services.import_html_meta import import_html_meta, ImportMetaInput
+from neuronhub.apps.importer.services.import_html_meta import import_html_meta
 from neuronhub.apps.importer.services.request_json import request_json
 from neuronhub.apps.posts.models import Post, PostTypeEnum
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
@@ -75,6 +75,7 @@ class CategoryHackerNews(Enum):
 class ImporterHackerNews:
     is_logs_enabled: bool = True
     is_use_cache: bool = False
+    skip_comment_ranks: bool = False
 
     def __post_init__(self):
         self._api_algolia = "https://hn.algolia.com/api/v1"
@@ -169,7 +170,7 @@ class ImporterHackerNews:
         if is_root:
             parent_root = post
 
-            meta = await import_html_meta(ImportMetaInput(url=source.url_of_source))
+            meta = await import_html_meta(url=source.url_of_source)
             post.content_polite = meta.content
             await post.asave()
 
@@ -178,10 +179,10 @@ class ImporterHackerNews:
                 self._comments_total = self._count_total_comments_recursively(comments)
                 self._comments_imported = 0
 
-            # For top-level posts, compute all comment ranks recursively
-            if is_post:
+            # For top-level posts, compute all comment ranks recursively (unless skipped)
+            if is_post and not self.skip_comment_ranks:
                 comment_ranks = await self._derive_comment_ranks(data)
-            # For nested comments, use the ranks passed from parent
+            # For nested comments, use the ranks passed from parent (or empty dict if skipped)
             else:
                 comment_ranks = comment_ranks or {}
 
@@ -192,7 +193,9 @@ class ImporterHackerNews:
                         is_post=False,
                         parent=post,
                         parent_root=parent_root,
-                        rank=comment_ranks.get(comment["id"]),
+                        rank=comment_ranks.get(comment["id"])
+                        if not self.skip_comment_ranks
+                        else None,
                         comment_ranks=comment_ranks,  # Pass the full ranks dict to nested imports
                     )
                     for comment in comments

@@ -1,6 +1,6 @@
 ### v0.3.0.0
 
-- [!!] Meilisearch fuzzy match
+- Algolia fuzzy match
 - [!!] User.aliases #54
 	- User profile .avatar
 	- Post.content_direct and polite Visibility settings
@@ -8,7 +8,7 @@
 - Tag by `.is_important`
 	- author "stars" `.is_important` in UI
     - extend by author & user votes
-- [!!] Meilisearch tags facets
+- Algolia tags facets
 - Post.alternatives votes
 - [!] recurring export
 - [!!] Security review
