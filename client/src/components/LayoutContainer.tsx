@@ -2,7 +2,7 @@ import { Container, Flex, HStack, IconButton, Link, Stack } from "@chakra-ui/rea
 import type { ReactNode, SVGProps } from "react";
 import { LuAlignRight } from "react-icons/lu";
 import { NavLink, Outlet } from "react-router";
-import { highlighter } from "@/apps/highlighter/highlighter";
+import { HighlightActionBar } from "@/apps/highlighter/HighlightActionBar";
 import { LayoutSidebar } from "@/components/LayoutSidebar";
 import {
   DrawerBackdrop,
@@ -18,7 +18,6 @@ const style = {
 } as const;
 
 export function LayoutContainer(props?: { children?: ReactNode }) {
-  const highlight = highlighter.useHook();
   return (
     <>
       <Navbar />
@@ -35,7 +34,7 @@ export function LayoutContainer(props?: { children?: ReactNode }) {
         <Stack as="main" flex="1" alignItems="stretch" bg="bg.subtle">
           <Container maxW="7xl" mt={6} h="full" pb="gap.xl">
             {props?.children ?? <Outlet />}
-            <highlight.component />
+            <HighlightActionBar />
           </Container>
         </Stack>
       </Flex>

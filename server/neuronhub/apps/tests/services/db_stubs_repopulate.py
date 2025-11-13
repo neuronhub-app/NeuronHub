@@ -247,6 +247,8 @@ async def _create_review_pycharm(user: User, gen: Gen):
         text_postfix=" for Python",
     )
 
+    await nested_comment.collapsed_by_users.aadd(user)
+
 
 async def _create_review_iterm(user: User, gen: Gen):
     tool = await gen.posts.create(

@@ -14,6 +14,7 @@ import {
 import { type ComponentProps, type JSX, useEffect, useRef } from "react";
 import { GoPencil } from "react-icons/go";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
+import type { PostHighlight } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { getAvatarColorForUsername } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
@@ -31,8 +32,7 @@ import {
 } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { toast } from "@/utils/toast";
-import { type useStateValtioSet, useValtioProxyRef } from "@/utils/useValtioProxyRef";
-import { UserListName } from "~/graphql/enums";
+import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 const styleGlobal = {
   indent: 9,
@@ -47,7 +47,9 @@ const styleGlobal = {
 export function CommentThread(props: {
   post: PostDetailFragmentType | PostReviewDetailFragmentType;
   comment: PostCommentTree;
-  commentsCollapsed: ReturnType<typeof useStateValtioSet<ID>>;
+  highlights: Record<ID, PostHighlight[]>;
+  collapsedIds: Set<ID>;
+  toggleCollapse: (id: ID) => void;
   depth: number;
   isFirstChild: boolean;
   isLastChild: boolean;
@@ -90,7 +92,7 @@ export function CommentThread(props: {
     if (refs.container.current && refs.content.current) {
       state.mutable.parentHeightPx = refs.container.current.offsetHeight; // todo UI: get the latest child's h -> subtract it from refs.container
     }
-  }, [refs.container.current, refs.content.current, props.commentsCollapsed.snap]);
+  }, [refs.container.current, refs.content.current, threadGuide.isCollapsed]);
 
   const isCommentUnfolded = !threadGuide.isCollapsed;
   const username = (props.comment.source_author || props.comment.author?.username) ?? "";
@@ -160,7 +162,7 @@ export function CommentThread(props: {
                   />
                 ) : null
               ) : (
-                <PostContentHighlighted post={props.comment} />
+                <PostContentHighlighted post={props.comment} highlights={props.highlights} />
               ))}
           </Box>
 
@@ -235,7 +237,9 @@ export function CommentThread(props: {
               key={comment.id}
               post={props.post}
               comment={comment}
-              commentsCollapsed={props.commentsCollapsed}
+              highlights={props.highlights}
+              collapsedIds={props.collapsedIds}
+              toggleCollapse={props.toggleCollapse}
               depth={props.depth + 1}
               isFirstChild={index === 0}
               isLastChild={index === props.comment.comments.length - 1}
@@ -276,15 +280,7 @@ function CommentToolbarButton(props: {
 function useCommentLeftLine(
   props: ComponentProps<typeof CommentThread> & { isHasChildren: boolean },
 ) {
-  const user = useUser();
-
-  const state = useValtioProxyRef({
-    isCommentCollapsed: props.commentsCollapsed.snap.has(props.comment.id),
-  });
-
-  useEffect(() => {
-    state.mutable.isCommentCollapsed = props.commentsCollapsed.snap.has(props.comment.id);
-  }, [props.commentsCollapsed.snap]);
+  const isCommentCollapsed = props.collapsedIds.has(props.comment.id);
 
   const [childrenGap] = useToken("spacing", styleGlobal.childrenGap);
   const style = {
@@ -301,37 +297,16 @@ function useCommentLeftLine(
     },
   } as const;
 
-  async function toggleCollapse() {
-    state.mutable.isCommentCollapsed = !state.mutable.isCommentCollapsed;
-
-    if (state.mutable.isCommentCollapsed) {
-      props.commentsCollapsed.mutable.add(props.comment.id);
-    } else {
-      props.commentsCollapsed.mutable.delete(props.comment.id);
-    }
-    // save to db
-    if (user) {
-      await client.mutate({
-        mutation: graphql(`
-          mutation UpdateCollapsedComments($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
-            update_user_list(id: $id, list_field_name: $list_field_name, is_added: $is_added)
-          }
-        `),
-        variables: {
-          id: props.comment.id,
-          list_field_name: UserListName.PostsCollapsed,
-          is_added: state.mutable.isCommentCollapsed,
-        },
-      });
-    }
+  function toggleCollapse() {
+    props.toggleCollapse(props.comment.id);
   }
 
   return {
-    isChildrenVisible: props.isHasChildren && !state.snap.isCommentCollapsed,
-    isCollapsed: state.snap.isCommentCollapsed,
+    isChildrenVisible: props.isHasChildren && !isCommentCollapsed,
+    isCollapsed: isCommentCollapsed,
 
     LineVerticalLeft: () => {
-      if (state.snap.isCommentCollapsed) {
+      if (isCommentCollapsed) {
         return null;
       }
 
@@ -420,7 +395,7 @@ function useCommentLeftLine(
       }
     },
     CommentCollapsedStub: () => {
-      if (state.snap.isCommentCollapsed) {
+      if (isCommentCollapsed) {
         const childrenCount = props.comment.comments?.length;
         return (
           <VStack

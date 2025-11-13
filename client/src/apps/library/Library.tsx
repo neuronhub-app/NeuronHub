@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import { FaComments } from "react-icons/fa";
 import { NavLink } from "react-router";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
-import { useHighlighter } from "@/apps/highlighter/useHighlighter";
+import type { PostHighlight } from "@/apps/highlighter/useHighlighter";
 import { PostCard } from "@/components/posts/PostCard";
 import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
@@ -14,24 +14,22 @@ import { urls } from "@/urls";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 const UserHighlightsQuery = graphql(
-  `
-    query UserHighlights {
-      user_highlights {
-        id
-        text
-        text_prefix
-        text_postfix
-        created_at
+  `query UserHighlights {
+    user_highlights {
+      id
+      text
+      text_prefix
+      text_postfix
+      created_at
 
-        post {
-          ...CommentFieldsFragment
-          parent_root {
-            ...PostFragment
-          }
+      post {
+        ...CommentFieldsFragment
+        parent_root {
+          ...PostFragment
         }
       }
     }
-  `,
+  }`,
   [CommentFieldsFragment, PostFragment],
 );
 
@@ -83,17 +81,25 @@ export function Library() {
     [data?.user_highlights],
   );
 
-  const postsFromGroups = useMemo(() => {
-    const posts: Array<HighlightType["post"]> = [];
-    for (const group of groupedHighlights) {
-      for (const highlight of group.highlights) {
-        posts.push(highlight.post);
+  const highlightsMap = useMemo(() => {
+    // todo fix by using a shared Fragment for PostHighlight -> remove Partial<>
+    const map: Record<ID, Array<Partial<PostHighlight>>> = {};
+    if (data?.user_highlights) {
+      for (const highlight of data.user_highlights.filter(h => h.post?.id)) {
+        const postId = highlight.post.id;
+        if (!map[postId]) {
+          map[postId] = [];
+        }
+        map[postId].push({
+          id: highlight.id,
+          text: highlight.text,
+          text_prefix: highlight.text_prefix,
+          text_postfix: highlight.text_postfix,
+        });
       }
     }
-    return posts;
-  }, [groupedHighlights]);
-
-  const highlighter = useHighlighter({ posts: postsFromGroups });
+    return map;
+  }, [data?.user_highlights]);
 
   return (
     <Stack gap="gap.lg">
@@ -165,7 +171,8 @@ export function Library() {
                       </HStack>
                     </Stack>
 
-                    <PostContentHighlighted post={highlighter.highlight(highlight.post)} />
+                    {/* @ts-expect-error #bad-infer and #AI-slop graphql query that should use a shared Fragment */}
+                    <PostContentHighlighted post={highlight.post} highlights={highlightsMap} />
                   </Box>
                 </Stack>
               ))}

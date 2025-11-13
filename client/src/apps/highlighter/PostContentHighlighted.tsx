@@ -1,20 +1,32 @@
-import { Icon, Menu, Portal, Spinner } from "@chakra-ui/react";
 import type * as React from "react";
-import { useRef } from "react";
-import { FaTrashCan } from "react-icons/fa6";
-
-import { highlighter, isHTMLElement } from "@/apps/highlighter/highlighter";
-import { removeHighlight } from "@/apps/highlighter/useHighlighter";
+import { isHTMLElement } from "@/apps/highlighter/HighlightActionBar";
+import { PostContentHighlightMenu } from "@/apps/highlighter/PostContentHighlightMenu";
+import { type PostHighlight, removeHighlight } from "@/apps/highlighter/useHighlighter";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import { markedConfigured } from "@/utils/marked-configured";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useValtioProxyRef";
 
-/**
- * Shows highlights & deletion UI.
- */
+export const highlight_attrs = {
+  flag: "highlightable",
+  id: "id",
+  highlightId: "highlight-id",
+  type: "type",
+  highlightActive: "highlight-active",
+} as const;
+
+export type HighlightedModelType = "comment" | "post" | "review";
+
+export function setHighlighterModelData(id: ID, type: HighlightedModelType) {
+  return {
+    [`data-${highlight_attrs.flag}`]: true,
+    [`data-${highlight_attrs.id}`]: id,
+    [`data-${highlight_attrs.type}`]: type,
+  };
+}
+
 export function PostContentHighlighted(props: {
   post: {
     id: ID;
@@ -22,99 +34,98 @@ export function PostContentHighlighted(props: {
     content_direct: string;
     content_rant: string;
   };
+  highlights: Record<ID, PostHighlight[]>;
 }) {
-  const state = useValtioProxyRef({
-    activeHighlightId: null as string | null,
+  const state = useStateValtio({
+    highlightActiveId: null as ID | null,
   });
 
   const loading = useIsLoading();
 
-  const focusedElementRef = useRef<HTMLElement | null>(null);
-
-  function handleProseClick(event: React.MouseEvent) {
+  function handlePostHighlightClick(event: React.MouseEvent) {
     if (isHTMLElement(event.target)) {
-      const isClickedHighlight =
-        event.target.dataset.highlightId && event.target?.tagName === "MARK";
+      const isHighlightClicked =
+        event.target.dataset[highlight_attrs.highlightId] && event.target?.tagName === "MARK";
 
-      if (isClickedHighlight) {
+      if (isHighlightClicked) {
         const isClickWithSelection = document.getSelection()?.toString();
         if (isClickWithSelection) {
-          state.mutable.activeHighlightId = null;
+          state.mutable.highlightActiveId = null;
           return;
         }
-        state.mutable.activeHighlightId = event.target.dataset.highlightId ?? null;
-        focusedElementRef.current = event.target;
+        state.mutable.highlightActiveId =
+          event.target.dataset[highlight_attrs.highlightId] ?? null;
         return;
       }
     }
-    state.mutable.activeHighlightId = null;
+    state.mutable.highlightActiveId = null;
   }
 
   async function handleDeleteHighlight() {
-    if (!state.snap.activeHighlightId) {
-      return;
-    }
-    if (loading.isActive) {
-      return;
-    }
+    if (!state.snap.highlightActiveId || loading.isActive) return;
+
     await loading.track(async () => {
-      await removeHighlight(state.snap.activeHighlightId!);
+      await removeHighlight(state.snap.highlightActiveId!);
     });
-    state.mutable.activeHighlightId = null;
+    state.mutable.highlightActiveId = null;
   }
+
   return (
-    <Menu.Root
-      positioning={{
-        getAnchorRect: () => {
-          const elem = document.querySelector(
-            `[data-${highlighter.attrs.highlightId}="${state.snap.activeHighlightId}"]`,
-          )!;
-          return elem.getBoundingClientRect();
-        },
-        placement: "bottom",
+    <PostContentHighlightMenu
+      activeHighlightId={state.snap.highlightActiveId}
+      onDelete={handleDeleteHighlight}
+      onClose={() => {
+        state.mutable.highlightActiveId = null;
       }}
-      open={Boolean(state.snap.activeHighlightId)}
-      onPointerDownOutside={() => {
-        state.mutable.activeHighlightId = null;
-      }}
+      loading={loading.isActive}
     >
       <Prose
-        onClick={handleProseClick}
+        onClick={handlePostHighlightClick}
         // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
         dangerouslySetInnerHTML={{
           __html: markedConfigured.parse(
-            props.post.content_polite || props.post.content_direct || props.post.content_rant,
+            highlightPostContentByMarks({
+              content:
+                props.post.content_polite ||
+                props.post.content_direct ||
+                props.post.content_rant,
+              highlights: props.highlights[props.post.id] ?? [],
+            }),
           ),
         }}
         size="sm"
         maxW="3xl"
-        {...highlighter.setModelData(props.post.id, "comment")}
+        {...setHighlighterModelData(props.post.id, "comment")}
       />
-
-      <Portal>
-        <Menu.Positioner>
-          {/* @chakra-ui forgot to define its var()s, so it's a 0x0 square. For now. Adding css={{ --arrow-size=<> }} makes it worse - its CSS written to break <Arrow /> */}
-          <Menu.Arrow />
-
-          <Menu.Content minW="auto" p={0}>
-            <Menu.Item
-              value="remove"
-              onClick={handleDeleteHighlight}
-              disabled={loading.isActive}
-              {...ids.set(ids.highlighter.btn.delete)}
-            >
-              {loading.isActive ? (
-                <Spinner size="sm" />
-              ) : (
-                <Icon boxSize={4}>
-                  <FaTrashCan />
-                </Icon>
-              )}
-              Remove
-            </Menu.Item>
-          </Menu.Content>
-        </Menu.Positioner>
-      </Portal>
-    </Menu.Root>
+    </PostContentHighlightMenu>
   );
+}
+
+function highlightPostContentByMarks(args: {
+  highlights: PostHighlight[];
+  content: string;
+}): string {
+  let contentNew = args.content;
+
+  for (const highlight of args.highlights) {
+    if (!contentNew.includes(highlight.text)) {
+      continue;
+    }
+
+    const textHighlighted = `<mark data-testid="${ids.highlighter.span}" data-${highlight_attrs.highlightId}="${highlight.id}">${highlight.text}</mark>`;
+
+    // Try context matching first, fallback to simple replace
+    if (highlight.text_prefix || highlight.text_postfix) {
+      const pattern = `${highlight.text_prefix}${highlight.text}${highlight.text_postfix}`;
+      if (contentNew.includes(pattern)) {
+        contentNew = contentNew.replace(
+          pattern,
+          `${highlight.text_prefix}${textHighlighted}${highlight.text_postfix}`,
+        );
+        continue;
+      }
+    }
+    contentNew = contentNew.replace(highlight.text, textHighlighted);
+  }
+  return contentNew;
 }

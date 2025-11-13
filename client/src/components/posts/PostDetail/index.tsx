@@ -11,8 +11,8 @@ import { client } from "@/graphql/client";
 import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { useInit } from "@/utils/useInit";
-import { useStateValtioSet } from "@/utils/useValtioProxyRef";
-import { PostTypeEnum } from "~/graphql/enums";
+import { useStateValtioSet, useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { PostTypeEnum, UserListName } from "~/graphql/enums";
 
 export function PostDetail(props: {
   post?: PostDetailFragmentType | PostReviewDetailFragmentType;
@@ -22,7 +22,8 @@ export function PostDetail(props: {
 }) {
   const user = useUser();
 
-  const state = useStateValtioSet(new Set<ID>());
+  const collapsedIds = useStateValtioSet(new Set<ID>());
+  const isCollapsedIdsLoaded = useValtioProxyRef({ value: false });
 
   const commentTree = useMemo(
     () => (props.post?.comments ? buildCommentTree(props.post.comments) : []),
@@ -32,29 +33,51 @@ export function PostDetail(props: {
   const highlighter = useHighlighter({ commentTree });
 
   useInit({
-    isReady: user && props.post?.id,
+    isReady: Boolean(user && props.post?.id),
     onInit: async () => {
       const res = await client.query({
         query: graphql(
           `query UserCollapsedComments($parent_root_id: ID!) {
-             user_current {
-               id
-               posts_collapsed(filters: { parent_root_id: { exact: $parent_root_id } }) {
-                 id
-               }
-             }
-           }`,
+            user_current {
+              id
+              posts_collapsed(filters: { parent_root_id: { exact: $parent_root_id } }) {
+                id
+              }
+            }
+          }`,
         ),
         variables: { parent_root_id: props.post!.id },
       });
-      state.mutable.clear();
-      res
-        .data!.user_current!.posts_collapsed.map(post => post.id)
-        .forEach(id => {
-          state.mutable.add(id);
-        });
+      collapsedIds.mutable.clear();
+      res.data!.user_current!.posts_collapsed.forEach(post => {
+        collapsedIds.mutable.add(post.id);
+      });
+      isCollapsedIdsLoaded.mutable.value = true;
     },
   });
+
+  async function toggleCollapse(id: ID) {
+    if (collapsedIds.snap.has(id)) {
+      collapsedIds.mutable.delete(id);
+    } else {
+      collapsedIds.mutable.add(id);
+    }
+
+    if (user) {
+      await client.mutate({
+        mutation: graphql(`
+          mutation UpdateCollapsedComments($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
+            update_user_list(id: $id, list_field_name: $list_field_name, is_added: $is_added)
+          }
+        `),
+        variables: {
+          id,
+          list_field_name: UserListName.PostsCollapsed,
+          is_added: collapsedIds.snap.has(id),
+        },
+      });
+    }
+  }
 
   return (
     <Stack>
@@ -70,15 +93,17 @@ export function PostDetail(props: {
               Comments <Text color="fg.subtle">{props.post.comments_count}</Text>
             </Heading>
 
-            <Show when={commentTree.length > 0}>
+            <Show when={commentTree.length > 0 && (!user || isCollapsedIdsLoaded.snap.value)}>
               <VStack px={0} align="flex-start" gap="gap.md">
                 {/* Render top-level comments from the tree */}
                 <For each={commentTree}>
                   {(comment, index) => (
                     <CommentThread
                       key={comment.id}
-                      comment={highlighter.highlight(comment)}
-                      commentsCollapsed={state}
+                      comment={comment}
+                      highlights={highlighter.highlights}
+                      collapsedIds={collapsedIds.snap}
+                      toggleCollapse={toggleCollapse}
                       post={props.post!}
                       depth={0}
                       isLastChild={index === commentTree.length - 1}
