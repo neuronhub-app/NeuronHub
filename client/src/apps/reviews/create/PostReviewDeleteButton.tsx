@@ -15,13 +15,7 @@ export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
 
   async function deleteReview() {
     state.mutable.isLoading = true;
-    const response = await mutateDeleteAndResetStore(
-      graphql.persisted(
-        "ReviewDelete",
-        graphql(`mutation ReviewDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
-      ),
-      { id: props.id },
-    );
+    const response = await mutateDeleteAndResetStore(ReviewDeleteMutation, { id: props.id });
     state.mutable.isLoading = false;
     if (response.success) {
       return onDeleteSuccess();
@@ -74,3 +68,7 @@ export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
     </Popover.Root>
   );
 }
+const ReviewDeleteMutation = graphql.persisted(
+  "ReviewDelete",
+  graphql(`mutation ReviewDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
+);

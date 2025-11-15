@@ -15,13 +15,7 @@ export function PostDeleteButton(props: { id: ID; title: string }) {
 
   async function deletePost() {
     await loading.track(async () => {
-      const response = await mutateDeleteAndResetStore(
-        graphql.persisted(
-          "PostDelete",
-          graphql(`mutation PostDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
-        ),
-        { id: props.id },
-      );
+      const response = await mutateDeleteAndResetStore(PostDeleteMutation, { id: props.id });
       if (response.success) {
         toast.success(`Post "${props.title.slice(0, 30)}..." deleted`);
         return navigate(urls.posts.list);
@@ -66,3 +60,7 @@ export function PostDeleteButton(props: { id: ID; title: string }) {
     </Popover.Root>
   );
 }
+const PostDeleteMutation = graphql.persisted(
+  "PostDelete",
+  graphql(`mutation PostDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
+);

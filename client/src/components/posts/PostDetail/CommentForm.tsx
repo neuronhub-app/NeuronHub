@@ -167,37 +167,33 @@ export function CommentForm(
 async function commentCreate(
   input: { parentId: ID; content_polite: string } & schemas.sharable.Schema,
 ) {
-  return mutateAndRefetchMountedQueries(
-    graphql(
-      `mutation CommentUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
-    ),
-    {
-      data: {
-        parent: { id: input.parentId },
-        type: PostTypeEnum.Comment,
-        content_polite: input.content_polite,
-        tags: [],
-        ...schemas.sharable.serialize(input),
-      },
+  return mutateAndRefetchMountedQueries(CommentUpdateMutation, {
+    data: {
+      parent: { id: input.parentId },
+      type: PostTypeEnum.Comment,
+      content_polite: input.content_polite,
+      tags: [],
+      ...schemas.sharable.serialize(input),
     },
-  );
+  });
 }
 
 async function commentUpdate(
   input: { id: ID; content_polite: string } & schemas.sharable.Schema,
 ) {
-  return mutateAndRefetchMountedQueries(
-    graphql(
-      `mutation CommentUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
-    ),
-    {
-      data: {
-        id: input.id,
-        type: PostTypeEnum.Comment,
-        content_polite: input.content_polite,
-        tags: [],
-        ...schemas.sharable.serialize(input),
-      },
+  return mutateAndRefetchMountedQueries(CommentUpdateMutation, {
+    data: {
+      id: input.id,
+      type: PostTypeEnum.Comment,
+      content_polite: input.content_polite,
+      tags: [],
+      ...schemas.sharable.serialize(input),
     },
-  );
+  });
 }
+const CommentUpdateMutation = graphql.persisted(
+  "CommentUpdate",
+  graphql(
+    `mutation CommentUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
+  ),
+);

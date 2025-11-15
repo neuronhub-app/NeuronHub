@@ -128,28 +128,7 @@ export function SelectVotable(
           loadOptions={async (input: string) => {
             // todo perf(UX): throttle
             const response = await client.query({
-              query: graphql.persisted(
-                "ToolTagsQuery",
-                graphql(`
-								query ToolTagsQuery($name: String, $is_review_tag: Boolean!) {
-									tags(filters: {
-										is_review_tag: { exact: $is_review_tag }
-										name: { i_contains: $name }
-
-										OR: {
-											is_review_tag: { exact: $is_review_tag }
-											description: { i_contains: $name }
-										}
-									}) {
-										id
-										name
-										label
-										is_review_tag
-										tag_parent { id name }
-									}
-								}
-							`),
-              ),
+              query: ToolTagsQuery,
               variables: {
                 name: input,
                 is_review_tag: props.isReviewTags ?? false,
@@ -354,26 +333,46 @@ export function OptionButton(props: {
 }
 
 async function mutatePostTagVote(opts: { postId: ID; optionNew: SelectVotableOption }) {
-  const response = await mutateAndRefetchMountedQueries(
-    graphql.persisted(
-      "CreateOrUpdatePostTagVote",
-      graphql(`
-			mutation CreateOrUpdatePostTagVote( $post_id: ID! $tag_id: ID! $is_vote_positive: Boolean ) {
-				post_tag_vote_create_or_update(
-					post_id: $post_id
-					tag_id: $tag_id
-					is_vote_positive: $is_vote_positive
-				)
-			}
-		`),
-    ),
-    {
-      post_id: opts.postId,
-      tag_id: opts.optionNew.id,
-      is_vote_positive: opts.optionNew.is_vote_positive,
-    },
-  );
+  const response = await mutateAndRefetchMountedQueries(CreateOrUpdatePostTagVote, {
+    post_id: opts.postId,
+    tag_id: opts.optionNew.id,
+    is_vote_positive: opts.optionNew.is_vote_positive,
+  });
   if (!response.success) {
     toast.error(`Vote failed: ${response.errorMessage}`);
   }
 }
+const ToolTagsQuery = graphql.persisted(
+  "ToolTagsQuery",
+  graphql(`
+    query ToolTagsQuery($name: String, $is_review_tag: Boolean!) {
+      tags(filters: {
+        is_review_tag: { exact: $is_review_tag }
+        name: { i_contains: $name }
+
+        OR: {
+          is_review_tag: { exact: $is_review_tag }
+          description: { i_contains: $name }
+        }
+      }) {
+        id
+        name
+        label
+        is_review_tag
+        tag_parent { id name }
+      }
+    }
+  `),
+);
+const CreateOrUpdatePostTagVote = graphql.persisted(
+  "CreateOrUpdatePostTagVote",
+  graphql(`
+    mutation CreateOrUpdatePostTagVote($post_id: ID!, $tag_id: ID!, $is_vote_positive: Boolean) {
+      post_tag_vote_create_or_update(
+        post_id: $post_id
+        tag_id: $tag_id
+        is_vote_positive: $is_vote_positive
+      )
+    }
+  `),
+);

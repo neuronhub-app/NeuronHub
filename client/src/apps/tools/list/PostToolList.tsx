@@ -4,18 +4,7 @@ import { PostFragment } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 export function PostToolList() {
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(
-      `
-        query ToolList {
-          post_tools(filters: {}) {
-            ...PostFragment
-          }
-        }
-      `,
-      [PostFragment],
-    ),
-  );
+  const { data, error, isLoadingFirstTime } = useApolloQuery(ToolListQuery);
   return (
     <ListContainer
       title="Tools"
@@ -26,3 +15,15 @@ export function PostToolList() {
     />
   );
 }
+const ToolListQuery = graphql.persisted(
+  "ToolList",
+  graphql(
+    `query ToolList {
+        post_tools(filters: {}) {
+          ...PostFragment
+        }
+      }
+    `,
+    [PostFragment],
+  ),
+);

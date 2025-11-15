@@ -33,18 +33,13 @@ export namespace PostToolForm {
     async function handleSubmit(values: schemas.Tool) {
       const { alternatives, ...rest } = values;
 
-      const response = await mutateAndRefetchMountedQueries(
-        graphql(
-          `mutation ToolCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }`,
-        ),
-        {
-          input: {
-            ...rest,
-            type: PostTypeEnum.Tool,
-            alternatives: alternatives ? { set: alternatives.map(alt => alt.id) } : undefined,
-          },
+      const response = await mutateAndRefetchMountedQueries(ToolCreate, {
+        input: {
+          ...rest,
+          type: PostTypeEnum.Tool,
+          alternatives: alternatives ? { set: alternatives.map(alt => alt.id) } : undefined,
         },
-      );
+      });
 
       if (response.success) {
         toast.success("Tool created");
@@ -81,3 +76,9 @@ export namespace PostToolForm {
     );
   }
 }
+const ToolCreate = graphql.persisted(
+  "ToolCreate",
+  graphql(
+    `mutation ToolCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }`,
+  ),
+);

@@ -36,19 +36,7 @@ export function PostDetail(props: {
     isReady: Boolean(user && props.post?.id),
     onInit: async () => {
       const res = await client.query({
-        query: graphql.persisted(
-          "UserCollapsedComments",
-          graphql(
-            `query UserCollapsedComments($parent_root_id: ID!) {
-            user_current {
-              id
-              posts_collapsed(filters: { parent_root_id: { exact: $parent_root_id } }) {
-                id
-              }
-            }
-          }`,
-          ),
-        ),
+        query: UserCollapsedCommentsQuery,
         variables: { parent_root_id: props.post!.id },
       });
       collapsedIds.mutable.clear();
@@ -68,14 +56,7 @@ export function PostDetail(props: {
 
     if (user) {
       await client.mutate({
-        mutation: graphql.persisted(
-          "UpdateCollapsedComments",
-          graphql(`
-          mutation UpdateCollapsedComments($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
-            update_user_list(id: $id, list_field_name: $list_field_name, is_added: $is_added)
-          }
-        `),
-        ),
+        mutation: UpdateCollapsedCommentsMutation,
         variables: {
           id,
           list_field_name: UserListName.PostsCollapsed,
@@ -130,6 +111,27 @@ export function PostDetail(props: {
     </Stack>
   );
 }
+const UserCollapsedCommentsQuery = graphql.persisted(
+  "UserCollapsedComments",
+  graphql(`
+    query UserCollapsedComments($parent_root_id: ID!) {
+      user_current {
+        id
+        posts_collapsed(filters: { parent_root_id: { exact: $parent_root_id } }) {
+          id
+        }
+      }
+    }
+  `),
+);
+const UpdateCollapsedCommentsMutation = graphql.persisted(
+  "UpdateCollapsedComments",
+  graphql(`
+    mutation UpdateCollapsedComments($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
+      update_user_list(id: $id, list_field_name: $list_field_name, is_added: $is_added)
+    }
+  `),
+);
 
 export type PostCommentTree = PostDetailFragmentType["comments"][number] & {
   comments: PostCommentTree[];

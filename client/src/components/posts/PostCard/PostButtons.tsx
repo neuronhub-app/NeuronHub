@@ -88,24 +88,11 @@ function ReviewButton(props: {
             return;
           }
           state.mutable.isLoading = true;
-          const res = await mutateAndRefetchMountedQueries(
-            graphql(
-              `
-                mutation update_user_list($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
-                  update_user_list(
-                    id: $id
-                    list_field_name: $list_field_name
-                    is_added: $is_added
-                  )
-                }
-              `,
-            ),
-            {
-              id: props.id,
-              list_field_name: props.fieldName,
-              is_added: !state.snap.isAdded,
-            },
-          );
+          const res = await mutateAndRefetchMountedQueries(UpdateUserListMutation, {
+            id: props.id,
+            list_field_name: props.fieldName,
+            is_added: !state.snap.isAdded,
+          });
           if (!res.success) {
             toast.error(`Failed to update your ${props.fieldName}: ${res.errorMessage}`);
           }
@@ -127,3 +114,15 @@ function ReviewButton(props: {
     </Tooltip>
   );
 }
+const UpdateUserListMutation = graphql.persisted(
+  "UpdateUserList",
+  graphql(`
+    mutation UpdateUserList($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
+      update_user_list(
+        id: $id
+        list_field_name: $list_field_name
+        is_added: $is_added
+      )
+    }
+  `),
+);

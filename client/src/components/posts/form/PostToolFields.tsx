@@ -111,14 +111,7 @@ export function PostToolFields(props: { isToolSelectAllowed?: boolean }) {
           fieldName={fieldName("alternatives")}
           loadOptions={async (inputValue: string) => {
             const res = await client.query({
-              query: graphql(`
-                  query PostToolAlternativesQuery($title: String) {
-                    post_tools( filters: {title: { contains: $title } } ) {
-                      id
-                      title
-                    }
-                  }
-                `),
+              query: PostToolAlternativesQuery,
               variables: { title: inputValue },
             });
             if (!res.data) {
@@ -139,3 +132,15 @@ export function PostToolFields(props: { isToolSelectAllowed?: boolean }) {
 function getToolTypeName(tool_type?: string) {
   return tool_type === "Other" ? "Tool" : tool_type;
 }
+
+// const PostToolAlternativesQuery = graphql.persisted(
+//   "PostToolAlternativesQuery",
+//   graphql(`
+//     query PostToolAlternativesQuery($title: String) {
+//       post_tools(filters: { title: { contains: $title } }) {
+//         id
+//         title
+//       }
+//     }
+//   `),
+// );

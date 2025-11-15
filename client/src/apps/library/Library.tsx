@@ -13,26 +13,6 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
-const UserHighlightsQuery = graphql(
-  `query UserHighlights {
-    user_highlights {
-      id
-      text
-      text_prefix
-      text_postfix
-      created_at
-
-      post {
-        ...CommentFieldsFragment
-        parent_root {
-          ...PostFragment
-        }
-      }
-    }
-  }`,
-  [CommentFieldsFragment, PostFragment],
-);
-
 type HighlightGroup = {
   parent_root: NonNullable<HighlightType["post"]["parent_root"]>;
   highlights: Array<{
@@ -183,3 +163,25 @@ export function Library() {
     </Stack>
   );
 }
+const UserHighlightsQuery = graphql.persisted(
+  "UserHighlights",
+  graphql(
+    `query UserHighlights {
+      user_highlights {
+        id
+        text
+        text_prefix
+        text_postfix
+        created_at
+  
+        post {
+          ...CommentFieldsFragment
+          parent_root {
+            ...PostFragment
+          }
+        }
+      }
+    }`,
+    [CommentFieldsFragment, PostFragment],
+  ),
+);

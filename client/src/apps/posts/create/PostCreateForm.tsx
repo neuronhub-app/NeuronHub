@@ -37,12 +37,9 @@ export namespace PostCreateForm {
 
     async function handleSubmit(values: schemas.Post) {
       if (isEditMode(post)) {
-        const response = await mutateAndRefetchMountedQueries(
-          graphql(
-            `mutation PostUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
-          ),
-          { data: schemas.post.serialize(values) },
-        );
+        const response = await mutateAndRefetchMountedQueries(PostUpdateMutation, {
+          data: schemas.post.serialize(values),
+        });
 
         if (response.success) {
           toast.success("Post updated");
@@ -51,14 +48,9 @@ export namespace PostCreateForm {
           toast.error("Failed to update post");
         }
       } else {
-        const response = await mutateAndRefetchMountedQueries(
-          graphql(
-            `mutation PostCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }`,
-          ),
-          {
-            input: { type: PostTypeEnum.Post, ...schemas.post.serialize(values) },
-          },
-        );
+        const response = await mutateAndRefetchMountedQueries(PostCreateMutation, {
+          input: { type: PostTypeEnum.Post, ...schemas.post.serialize(values) },
+        });
 
         if (response.success) {
           toast.success("Post created");
@@ -110,3 +102,15 @@ export namespace PostCreateForm {
 export function isEditMode(post?: PostEditFragmentType): post is PostEditFragmentType {
   return Boolean(post);
 }
+const PostUpdateMutation = graphql.persisted(
+  "PostUpdate",
+  graphql(
+    `mutation PostUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
+  ),
+);
+const PostCreateMutation = graphql.persisted(
+  "PostCreate",
+  graphql(
+    `mutation PostCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }`,
+  ),
+);

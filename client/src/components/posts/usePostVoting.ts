@@ -52,17 +52,10 @@ export function usePostVoting(props: {
       newVoteValue = args.isPositive;
     }
 
-    const res = await mutateAndRefetchMountedQueries(
-      graphql.persisted(
-        "PostVoteUpdateOrCreateOrUpdate",
-        graphql(`
-        mutation PostVoteUpdateOrCreateOrUpdate($id: ID!, $isVotePositive: Boolean) {
-          post_vote_update_or_create(id: $id, is_vote_positive: $isVotePositive)
-        }
-      `),
-      ),
-      { id: props.postId, isVotePositive: newVoteValue },
-    );
+    const res = await mutateAndRefetchMountedQueries(PostVoteUpdateOrCreateMutation, {
+      id: props.postId,
+      isVotePositive: newVoteValue,
+    });
     if (!res.success) {
       toast.error(res.errorMessage);
     }
@@ -87,3 +80,11 @@ export function usePostVoting(props: {
     }, 0),
   };
 }
+const PostVoteUpdateOrCreateMutation = graphql.persisted(
+  "PostVoteUpdateOrCreateOrUpdate",
+  graphql(`
+    mutation PostVoteUpdateOrCreateOrUpdate($id: ID!, $isVotePositive: Boolean) {
+      post_vote_update_or_create(id: $id, is_vote_positive: $isVotePositive)
+    }
+  `),
+);

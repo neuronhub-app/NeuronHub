@@ -47,9 +47,7 @@ export function LoginForm() {
             <form
               onSubmit={form.handleSubmit(async data => {
                 const result = await mutateAndRefetch(
-                  graphql(
-                    `mutation Login($data: LoginInput!) { login(data: $data) { success error } }`,
-                  ),
+                  LoginMutation,
                   { data },
                   { isResetAndRefetchAll: true },
                 );
@@ -109,3 +107,7 @@ export function LoginForm() {
     </Center>
   );
 }
+const LoginMutation = graphql.persisted(
+  "Login",
+  graphql(`mutation Login($data: LoginInput!) { login(data: $data) { success error } }`),
+);

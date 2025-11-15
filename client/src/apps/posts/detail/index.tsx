@@ -8,15 +8,9 @@ import { ErrorNotFound } from "@/root";
 import type { Route } from "~/react-router/posts/detail/+types/index";
 
 export default function PostDetailRoute(props: Route.ComponentProps) {
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql.persisted(
-      "PostDetail",
-      graphql(`query PostDetail($pk: ID!) { post(pk: $pk) { ...PostDetailFragment } }`, [
-        PostDetailFragment,
-      ]),
-    ),
-    { pk: props.params.id },
-  );
+  const { data, error, isLoadingFirstTime } = useApolloQuery(PostDetailQuery, {
+    pk: props.params.id,
+  });
 
   if (error) {
     toast.error("Post load failed");
@@ -31,3 +25,9 @@ export default function PostDetailRoute(props: Route.ComponentProps) {
     <PostDetail post={data?.post ?? undefined} isLoading={isLoadingFirstTime} error={error} />
   );
 }
+const PostDetailQuery = graphql.persisted(
+  "PostDetail",
+  graphql(`query PostDetail($pk: ID!) { post(pk: $pk) { ...PostDetailFragment } }`, [
+    PostDetailFragment,
+  ]),
+);

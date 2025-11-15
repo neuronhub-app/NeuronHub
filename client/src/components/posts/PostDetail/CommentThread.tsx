@@ -189,14 +189,7 @@ export function CommentThread(props: {
 
                     // Fetch comment with visibility fields before editing
                     const { data } = await client.query({
-                      query: graphql(
-                        `query CommentEdit($id: ID!) {
-                          post_comment(pk: $id) {
-                            ...PostEditFragment
-                          }
-                        }`,
-                        [PostEditFragment],
-                      ),
+                      query: CommentEditQuery,
                       variables: { id: props.comment.id },
                     });
 
@@ -445,3 +438,14 @@ function useCommentLeftLine(
     },
   };
 }
+const CommentEditQuery = graphql.persisted(
+  "CommentEdit",
+  graphql(
+    `query CommentEdit($id: ID!) {
+      post_comment(pk: $id) {
+        ...PostEditFragment
+      }
+    }`,
+    [PostEditFragment],
+  ),
+);

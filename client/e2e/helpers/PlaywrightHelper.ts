@@ -100,14 +100,7 @@ export class PlaywrightHelper {
     is_import_HN_post?: boolean;
     is_create_single_review?: boolean;
   }) {
-    return client.mutate({
-      mutation: graphql(`
-        mutation db_stubs_repopulate($is_import_HN_post: Boolean, $is_create_single_review: Boolean) {
-          test_db_stubs_repopulate(is_import_HN_post: $is_import_HN_post, is_create_single_review: $is_create_single_review)
-        }
-      `),
-      variables: options,
-    });
+    return client.mutate({ mutation: DbStubsRepopulateMutate, variables: options });
   }
 
   async navigate(
@@ -179,3 +172,12 @@ export class PlaywrightHelper {
     await this.page.waitForSelector('text="Site administration"');
   }
 }
+
+const DbStubsRepopulateMutate = graphql.persisted(
+  "db_stubs_repopulate",
+  graphql(`
+    mutation db_stubs_repopulate($is_import_HN_post: Boolean, $is_create_single_review: Boolean) {
+      test_db_stubs_repopulate(is_import_HN_post: $is_import_HN_post, is_create_single_review: $is_create_single_review)
+    }
+  `),
+);

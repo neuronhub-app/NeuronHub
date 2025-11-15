@@ -7,13 +7,9 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/reviews/edit/+types/index";
 
 export default function PostReviewEditRoute(props: Route.ComponentProps) {
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(
-      `query PostReviewEdit($pk: ID!) { post_review(pk: $pk) { ...PostReviewEditFragment } }`,
-      [PostReviewEditFragment],
-    ),
-    { pk: props.params.id },
-  );
+  const { data, error, isLoadingFirstTime } = useApolloQuery(PostReviewEditQuery, {
+    pk: props.params.id,
+  });
 
   if (error) {
     toast.error("Review load failed");
@@ -29,3 +25,10 @@ export default function PostReviewEditRoute(props: Route.ComponentProps) {
   }
   return <PostReviewForm.Comp review={data?.post_review ?? undefined} />;
 }
+const PostReviewEditQuery = graphql.persisted(
+  "PostReviewEdit",
+  graphql(
+    `query PostReviewEdit($pk: ID!) { post_review(pk: $pk) { ...PostReviewEditFragment } }`,
+    [PostReviewEditFragment],
+  ),
+);

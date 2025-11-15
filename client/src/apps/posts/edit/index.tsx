@@ -7,15 +7,9 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/posts/edit/+types/index";
 
 export default function PostEditRoute(props: Route.ComponentProps) {
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql.persisted(
-      "PostEdit",
-      graphql(`query PostEdit($id: ID!) { post(pk: $id) { ...PostEditFragment } }`, [
-        PostEditFragment,
-      ]),
-    ),
-    { id: props.params.id },
-  );
+  const { data, error, isLoadingFirstTime } = useApolloQuery(PostEditQuery, {
+    id: props.params.id,
+  });
 
   if (error) {
     toast.error("Load error");
@@ -29,3 +23,9 @@ export default function PostEditRoute(props: Route.ComponentProps) {
   }
   return <PostCreateForm.Comp post={data?.post ?? undefined} />;
 }
+const PostEditQuery = graphql.persisted(
+  "PostEdit",
+  graphql(`query PostEdit($id: ID!) { post(pk: $id) { ...PostEditFragment } }`, [
+    PostEditFragment,
+  ]),
+);

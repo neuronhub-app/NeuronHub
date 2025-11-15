@@ -8,19 +8,9 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/reviews/detail/+types";
 
 export default function PostReviewDetailRoute(props: Route.ComponentProps) {
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(
-      `
-      query PostReviewDetail($pk: ID!) {
-        post_review(pk: $pk) {
-          ...PostReviewDetailFragment
-        }
-      }
-    `,
-      [PostReviewDetailFragment],
-    ),
-    { pk: props.params.id },
-  );
+  const { data, error, isLoadingFirstTime } = useApolloQuery(PostReviewDetailQuery, {
+    pk: props.params.id,
+  });
   if (error) {
     toast.error("Review load failed");
     captureException(error);
@@ -34,3 +24,16 @@ export default function PostReviewDetailRoute(props: Route.ComponentProps) {
     />
   );
 }
+const PostReviewDetailQuery = graphql.persisted(
+  "PostReviewDetail",
+  graphql(
+    `
+      query PostReviewDetail($pk: ID!) {
+        post_review(pk: $pk) {
+          ...PostReviewDetailFragment
+        }
+      }
+    `,
+    [PostReviewDetailFragment],
+  ),
+);

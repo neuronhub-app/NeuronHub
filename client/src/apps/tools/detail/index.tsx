@@ -8,16 +8,9 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { Route } from "~/react-router/tools/detail/+types";
 
 export default function PostToolDetailRoute(props: Route.ComponentProps) {
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql.persisted(
-      "PostToolDetail",
-      graphql(
-        `query PostToolDetail($pk: ID!) { post_tool(pk: $pk) { ...PostDetailFragment } }`,
-        [PostDetailFragment],
-      ),
-    ),
-    { pk: props.params.id },
-  );
+  const { data, error, isLoadingFirstTime } = useApolloQuery(PostToolDetailQuery, {
+    pk: props.params.id,
+  });
   if (error) {
     toast.error("Tool load failed");
     captureException(error);
@@ -30,3 +23,9 @@ export default function PostToolDetailRoute(props: Route.ComponentProps) {
     />
   );
 }
+const PostToolDetailQuery = graphql.persisted(
+  "PostToolDetail",
+  graphql(`query PostToolDetail($pk: ID!) { post_tool(pk: $pk) { ...PostDetailFragment } }`, [
+    PostDetailFragment,
+  ]),
+);

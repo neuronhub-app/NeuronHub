@@ -12,19 +12,9 @@ export function PostReimportButton(props: { idExternal: string }) {
 
   async function refreshPost() {
     await loading.track(async () => {
-      const response = await mutateAndRefetchMountedQueries(
-        graphql.persisted(
-          "PostImportRefresh",
-          graphql(`
-            mutation PostImportRefresh($idExternal: String!) {
-              post_import_refresh(id_external: $idExternal) {
-                comments_added
-              }
-            }
-          `),
-        ),
-        { idExternal: props.idExternal },
-      );
+      const response = await mutateAndRefetchMountedQueries(PostImportRefreshMutation, {
+        idExternal: props.idExternal,
+      });
 
       if (response.success) {
         await client.refetchQueries({ include: "all" });
@@ -60,3 +50,13 @@ export function PostReimportButton(props: { idExternal: string }) {
     </Button>
   );
 }
+const PostImportRefreshMutation = graphql.persisted(
+  "PostImportRefresh",
+  graphql(`
+    mutation PostImportRefresh($idExternal: String!) {
+      post_import_refresh(id_external: $idExternal) {
+        comments_added
+      }
+    }
+  `),
+);

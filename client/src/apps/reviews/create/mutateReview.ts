@@ -8,32 +8,22 @@ export async function mutateReview(values: schemas.Review & { parent?: { id: ID 
 
   const isEditMode = Boolean(values.id);
 
-  const response = await mutateAndRefetchMountedQueries(
-    graphql.persisted(
-      "ReviewUpdateOrCreate",
-      graphql(`
-      mutation ReviewUpdateOrCreate($input: PostTypeInput!) {
-        post_update_or_create(data: $input) { id parent { id } }
-      }
-    `),
-    ),
-    {
-      input: {
-        ...(isEditMode ? {} : { parent }),
-        type: PostTypeEnum.Review,
-        tags: tags.map(tag => {
-          const { label, ...tagValues } = tag;
-          return tagValues;
-        }),
-        review_tags: review_tags?.map(tag => {
-          const { label, ...tagValues } = tag;
-          return tagValues;
-        }),
-        ...schemas.sharable.serialize(values),
-        ...valuesRest,
-      },
+  const response = await mutateAndRefetchMountedQueries(ReviewUpdateOrCreateMutation, {
+    input: {
+      ...(isEditMode ? {} : { parent }),
+      type: PostTypeEnum.Review,
+      tags: tags.map(tag => {
+        const { label, ...tagValues } = tag;
+        return tagValues;
+      }),
+      review_tags: review_tags?.map(tag => {
+        const { label, ...tagValues } = tag;
+        return tagValues;
+      }),
+      ...schemas.sharable.serialize(values),
+      ...valuesRest,
     },
-  );
+  });
 
   if (response.success) {
     return {
@@ -43,3 +33,11 @@ export async function mutateReview(values: schemas.Review & { parent?: { id: ID 
   }
   return response;
 }
+const ReviewUpdateOrCreateMutation = graphql.persisted(
+  "ReviewUpdateOrCreate",
+  graphql(`
+    mutation ReviewUpdateOrCreate($input: PostTypeInput!) {
+      post_update_or_create(data: $input) { id parent { id } }
+    }
+  `),
+);

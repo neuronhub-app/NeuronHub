@@ -5,19 +5,9 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { PostCategory } from "~/graphql/enums";
 
 export function PostList(props: { category?: PostCategory }) {
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(
-      `
-				query PostList($category: PostCategory) {
-					posts(filters: { type: { exact: Post }, category: { exact: $category } }) {
-						...PostFragment
-					}
-				}
-			`,
-      [PostFragment],
-    ),
-    { category: props.category },
-  );
+  const { data, error, isLoadingFirstTime } = useApolloQuery(PostListQuery, {
+    category: props.category,
+  });
   return (
     <ListContainer
       title={props.category ? `${props.category} Posts` : "Posts"}
@@ -28,3 +18,16 @@ export function PostList(props: { category?: PostCategory }) {
     />
   );
 }
+const PostListQuery = graphql.persisted(
+  "PostList",
+  graphql(
+    `
+      query PostList($category: PostCategory) {
+        posts(filters: { type: { exact: Post }, category: { exact: $category } }) {
+          ...PostFragment
+        }
+      }
+    `,
+    [PostFragment],
+  ),
+);

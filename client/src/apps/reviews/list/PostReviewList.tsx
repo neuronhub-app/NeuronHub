@@ -4,18 +4,7 @@ import { PostReviewFragment, type PostReviewFragmentType } from "@/graphql/fragm
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 export function PostReviewList() {
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(
-      `
-        query ReviewList {
-          post_reviews(ordering: { reviewed_at: DESC }) {
-            ...PostReviewFragment
-          }
-        }
-      `,
-      [PostReviewFragment],
-    ),
-  );
+  const { data, error, isLoadingFirstTime } = useApolloQuery(ReviewListQuery);
   return (
     <ListContainer
       title="Reviews"
@@ -26,9 +15,21 @@ export function PostReviewList() {
     />
   );
 }
+const ReviewListQuery = graphql.persisted(
+  "ReviewList",
+  graphql(
+    `query ReviewList {
+      post_reviews(ordering: { reviewed_at: DESC }) {
+        ...PostReviewFragment
+      }
+    }`,
+    [PostReviewFragment],
+  ),
+);
 
 /**
- * Such case means the User has no access to the Tool, but can see its Review, so we hide both.
+ * Such case means the User has no access to the Tool,
+ * but has access to its Review, so we hide both.
  *
  * Ref #95
  *

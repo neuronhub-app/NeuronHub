@@ -153,23 +153,13 @@ export namespace PostReviewForm {
 
       // todo ! fix: creates a Tool duplicate if Review submit fails and user tries again
       const { tags, alternatives, ...toolFields } = values;
-      const response = await mutateAndRefetchMountedQueries(
-        graphql.persisted(
-          "ToolCreate",
-          graphql(`
-            mutation ToolCreate($input: PostTypeInput!) {
-              post_update_or_create(data: $input) { id }
-            }
-          `),
-        ),
-        {
-          input: {
-            ...toolFields,
-            type: PostTypeEnum.Tool,
-            tags: schemas.post.serializeTags(tags),
-          },
+      const response = await mutateAndRefetchMountedQueries(ToolCreateMutation, {
+        input: {
+          ...toolFields,
+          type: PostTypeEnum.Tool,
+          tags: schemas.post.serializeTags(tags),
         },
-      );
+      });
       if (!response.success) {
         toast.error(`Tool creation failed: ${response.errorMessage}`);
         throw new Error("Tool creation failed");
@@ -381,3 +371,11 @@ export namespace PostReviewForm {
     );
   }
 }
+const ToolCreateMutation = graphql.persisted(
+  "ToolCreate",
+  graphql(`
+    mutation ToolCreate($input: PostTypeInput!) {
+      post_update_or_create(data: $input) { id }
+    }
+  `),
+);

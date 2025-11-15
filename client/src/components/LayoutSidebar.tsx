@@ -219,11 +219,7 @@ export function UserProfile() {
   const user = useUser();
 
   async function handleLogout() {
-    const res = await mutateAndRefetch(
-      graphql.persisted("Logout", graphql(`mutation Logout { logout }`)),
-      {},
-      { isResetAndRefetchAll: true },
-    );
+    const res = await mutateAndRefetch(LogoutMutation, {}, { isResetAndRefetchAll: true });
     if (res.success) {
       window.location.reload();
     } else {
@@ -274,3 +270,4 @@ export function UserProfile() {
     </Stack>
   );
 }
+const LogoutMutation = graphql.persisted("Logout", graphql(`mutation Logout { logout }`));
