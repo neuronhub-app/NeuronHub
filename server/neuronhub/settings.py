@@ -14,9 +14,9 @@ from environs import Env
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import strawberry_django_settings
 
+
 django_stubs_ext.monkeypatch()
 
-BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = Env()
 env.read_env()
@@ -41,14 +41,10 @@ class DjangoEnv(Enum):
 
 DJANGO_ENV = DjangoEnv(env.str("DJANGO_ENV", DjangoEnv.DEV.value))  # todo ! default to PROD
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 if DJANGO_ENV.is_dev():
     load_dotenv(os.path.join(BASE_DIR, ".env.local"), override=True)
-
-SECRET_KEY = env.str(
-    "SECRET_KEY", "django-insecure-u_nt^p$$c611a&(jd*wbs58ziu4=o3%ps%@4zpv9=(8ix&8k7i"
-)
-
-DEBUG = env.bool("DJANGO_DEBUG", DJANGO_ENV.is_dev())
 
 INSTALLED_APPS = [
     "daphne",
@@ -164,39 +160,30 @@ CACHES = {
     }
 }
 
+SITE_ID = 1
+
+SECRET_KEY = env.str(
+    "SECRET_KEY", "django-insecure-u_nt^p$$c611a&(jd*wbs58ziu4=o3%ps%@4zpv9=(8ix&8k7i"
+)
+
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+DEBUG = env.bool("DJANGO_DEBUG", DJANGO_ENV.is_dev())
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/Los_Angeles"
-USE_L10N = False  # to make admin dates readable
+USE_L10N = False  # for django.admin
 USE_I18N = True
 USE_TZ = True
 DATETIME_FORMAT = "Y.m.d H:i"
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-SITE_ID = 1
-
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# SeaweedFS S3 #AI
-AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "any")
-AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "any")
-S3_STORAGE_BUCKET_NAME = env.str("S3_STORAGE_BUCKET_NAME", "media")
-AWS_STORAGE_BUCKET_NAME = S3_STORAGE_BUCKET_NAME
-AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", "http://localhost:8333")
-AWS_S3_USE_SSL = False
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = "public-read"
-AWS_QUERYSTRING_AUTH = False
-AWS_S3_ADDRESSING_STYLE = "path"
-STORAGES = {
-    "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
-}
-MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
-
 ROOT_URLCONF = "neuronhub.urls"
+
+
+# ALLOWED_HOSTS & django-cors-headers
+# ---------------------------------------------------------------------------------------------------------
 
 SERVER_PORT = env.int("SERVER_PORT", 8000)
 SERVER_URL = env.str("SERVER_URL", f"http://localhost:{SERVER_PORT}")
@@ -214,11 +201,6 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 CORS_URLS_REGEX = r"^/api/.*$"
 CORS_EXPOSE_HEADERS = ["X-CSRFToken"]
-
-SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN", None)
-# SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", False) # todo !! [auth] enable
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_AGE = 3600 * 24 * 30  # 1 month
 
 # for Sentry traces
 CORS_ALLOW_HEADERS = (
@@ -239,11 +221,45 @@ RENDER_EXTERNAL_HOSTNAME = env.str("RENDER_EXTERNAL_HOSTNAME", "")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+
+# Storage
+# ---------------------------------------------------------------------------------------------------------
+
+AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "any")
+AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "any")
+S3_STORAGE_BUCKET_NAME = env.str("S3_STORAGE_BUCKET_NAME", "media")
+AWS_STORAGE_BUCKET_NAME = S3_STORAGE_BUCKET_NAME
+AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", "http://localhost:8333")
+AWS_S3_USE_SSL = False
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = "public-read"
+AWS_QUERYSTRING_AUTH = False
+AWS_S3_ADDRESSING_STYLE = "path"
+STORAGES = {
+    "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
+
+
+# Email
+# ---------------------------------------------------------------------------------------------------------
+
 EMAIL_BACKEND = env.str("EMAIL_BACKEND", "anymail.backends.postmark.EmailBackend")
 EMAIL_USE_TLS = True
 ANYMAIL = {
     "POSTMARK_SERVER_TOKEN": env.str("POSTMARK_SERVER_TOKEN", ""),
 }
+
+
+DEFAULT_DJANGO_SETTINGS = strawberry_django_settings()
+DEFAULT_DJANGO_SETTINGS["GENERATE_ENUMS_FROM_CHOICES"] = True  # no reason atm, can remove
+# "pk" by default is a nice idea, but bad implementation - "id" is soft-required in Django
+DEFAULT_DJANGO_SETTINGS["DEFAULT_PK_FIELD_NAME"] = "id"
+
+
+# django.auth + django-allauth
+# ---------------------------------------------------------------------------------------------------------
 
 AUTH_USER_MODEL = "users.User"
 AUTH_PASSWORD_VALIDATORS = [
@@ -251,13 +267,17 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 LOGIN_REDIRECT_URL = CLIENT_URL
 
+SESSION_COOKIE_DOMAIN = env.str("SESSION_COOKIE_DOMAIN", None)
+# SESSION_COOKIE_SECURE = env.bool("SESSION_COOKIE_SECURE", False) # todo !! [auth] enable
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_AGE = 3600 * 24 * 30  # 1 month
+
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
-    # "guardian.backends.ObjectPermissionBackend", todo feat: django-guardian breaks aauthenticate(), as they don't support async
+    # "guardian.backends.ObjectPermissionBackend", todo mb: they lacks async support - see django-guardian#808 (planned for v3.3)
 ]
 
-# django-allauth
 # todo ! [auth] enable 2FA
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["username*", "password1*", "email"]  #: asterisk means required
@@ -294,7 +314,6 @@ if IS_SENTRY_ENABLED:
         ],
         release=env.str("VITE_RELEASE_NAME", ""),
     )
-
 
 LOGGING = {
     "version": 1,
@@ -340,8 +359,3 @@ rich.traceback.install(
     locals_max_string=_line_width,
     suppress=[django, asyncio],  # too verbose
 )
-
-DEFAULT_DJANGO_SETTINGS = strawberry_django_settings()
-DEFAULT_DJANGO_SETTINGS["GENERATE_ENUMS_FROM_CHOICES"] = True  # no reason atm, can remove
-# "pk" by default is a nice idea, but bad implementation - "id" is soft-required in django
-DEFAULT_DJANGO_SETTINGS["DEFAULT_PK_FIELD_NAME"] = "id"
