@@ -140,15 +140,15 @@ else:
     db_host = env.str("DATABASE_HOST", "host.docker.internal")
     db_name = env.str("DATABASE_NAME", "neuronhub")
     db_user = env.str("DATABASE_USER", db_name)
+    db_pass = env.str("DATABASE_PASSWORD", db_name)
     if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
         db_name = env.str("E2E_DB_NAME")
-        db_user = env.str("E2E_DB_NAME")
     DATABASES = {
         "default": dj_database_url.config(
             conn_max_age=600,
             default=env.str(
                 "DATABASE_URL",
-                f"postgres://{db_user}:{db_user}@{db_host}:5432/{db_name}",
+                f"postgres://{db_user}:{db_pass}@{db_host}:5432/{db_name}",
             ),
         )
     }

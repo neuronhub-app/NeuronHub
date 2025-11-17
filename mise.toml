@@ -6,6 +6,11 @@
     killport = "latest"
 
 [settings]
+    # use Nushell for everything
+    unix_default_file_shell_args = "nu"
+    unix_default_inline_shell_args = "nu --commands"
+    use_file_shell_for_executable_tasks = true
+
     python.uv_venv_auto = true
 
 [task_config]
@@ -50,6 +55,9 @@
     S3_STORAGE_BUCKET_NAME = "media"
     S3_PORT = 8333
 
+    IS_POSTGRES_EXTERNAL = false
+    POSTGRES_EXTERNAL_SHELL_MSG = "Skipping because using non-Mise PostgreSQL (ie we're in GitHub CI or MacOS)"
+
 
 # Dev servers
 # -----------------------------------------------------
@@ -78,32 +86,30 @@
 
     [tasks."dev:s3"]
         dir = "server"
-        run = [
-            "mkdir -p {{ env.S3_STORAGE_BUCKET_NAME }}",
-            "rclone serve s3 . --addr :{{ env.S3_PORT }}",
-        ]
+        run = """
+            mkdir {{ env.S3_STORAGE_BUCKET_NAME }}
+            rclone serve s3 . --addr :{{ env.S3_PORT }} | complete
+        """
 
     [tasks."dev:db"]
         dir = "devops"
         run = """
-            #!/usr/bin/env bash
-            if [[ "$IS_DB_EXTERNAL" = "true" || "$GITHUB_ACTIONS" = "true" ]]; then
-                echo "Using external PostgreSQL"
-            else
+            if "IS_POSTGRES_EXTERNAL" in $env {
+                print $env.POSTGRES_EXTERNAL_SHELL_MSG
+            } else {
                 sudo docker compose up db --detach
-            fi
+            }
         """
         silent = true
 
     [tasks."dev:db-full"]
         dir = "devops"
         run = """
-            #!/usr/bin/env bash
-            if [[ "$IS_DB_EXTERNAL" = "true" || "$GITHUB_ACTIONS" = "true" ]]; then
-                echo "Using external PostgreSQL"
-            else
+            if "IS_POSTGRES_EXTERNAL" in $env {
+                print $env.POSTGRES_EXTERNAL_SHELL_MSG
+            } else {
                 sudo docker compose up db hatchet-postgres hatchet-lite --detach
-            fi
+            }
         """
         silent = true
 
@@ -116,7 +122,7 @@
         run = "sudo docker compose down db hatchet-postgres hatchet-lite"
 
     [tasks."dev:server:e2e"]
-        depends = ["dev:db", "dev:db:setup-e2e"]
+        depends = ["dev:db", "dev:s3", "dev:db:setup-e2e"]
         dir = "server"
         run = [
             "mise django:migrate",
@@ -191,6 +197,7 @@
 [tasks."django:import-hn-scheduled"]
     dir = "server"
     run = "uv run manage.py import_hn_scheduled"
+
 
 # Lint & format
 # -----------------------------------------------------

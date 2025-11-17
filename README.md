@@ -5,10 +5,11 @@ Development Setup
 
 ### Linux & Docker
 
-1. Install [Mise](https://mise.jdx.dev/getting-started.html)
-2. `git clone {url}`
-3. `cd neuronhub`
-4. ```shell
+1. Install [Mise](mise.jdx.dev/getting-started), eg `curl https://mise.run | sh`
+2. Install [Nushell](nushell.sh), eg `brew install nushell`
+3. `git clone {url}`
+4. `cd neuronhub`
+5. ```shell
 	mise trust
 	mise install
 	mise run install-deps

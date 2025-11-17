@@ -1,5 +1,5 @@
 [env]
-    IS_DB_EXTERNAL = true
+    IS_POSTGRES_EXTERNAL = true
     DATABASE_HOST = "localhost"
     DATABASE_NAME = "neuronhub"
 

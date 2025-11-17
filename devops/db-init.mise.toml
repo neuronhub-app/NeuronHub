@@ -1,20 +1,19 @@
 ["dev:db-init"]
     run = """
-        #!/usr/bin/env bash
-
-        if [ "$IS_DB_EXTERNAL" = "true" ]; then
+        if "IS_POSTGRES_EXTERNAL" in $env {
             brew install postgresql@17
             brew services start postgresql@17
             createdb-17 $DATABASE_NAME
-            psql-17 $DATABASE_NAME << SQL
-              CREATE USER ${DATABASE_NAME};
-              ALTER ROLE ${DATABASE_NAME} PASSWORD '${DATABASE_NAME}';
-              GRANT ALL ON SCHEMA public TO ${DATABASE_NAME};
-              ALTER USER ${DATABASE_NAME} CREATEDB;
-SQL
-        else
-            echo "Using docker-compose db."
-        fi
+            let sql = $'
+              CREATE USER ($env.DATABASE_NAME);
+              ALTER ROLE ($env.DATABASE_NAME) PASSWORD '($env.DATABASE_NAME)';
+              GRANT ALL ON SCHEMA public TO ($env.DATABASE_NAME);
+              ALTER USER ($env.DATABASE_NAME) CREATEDB;
+            '
+            $sql | psql-17 $env.DATABASE_NAME
+        } else {
+            print $env.POSTGRES_EXTERNAL_SHELL_MSG
+        }
 
         mise run django:migrate
         mise run django:db-stubs-repopulate
