@@ -33,6 +33,8 @@ from neuronhub.apps.highlighter.graphql import HighlighterMutation
 
 from neuronhub.apps.importer.graphql.mutations import ImporterMutation
 
+from neuronhub.apps.graphql.persisted_query_extension import PersistedQueryExtension
+
 
 Query = merge_types(
     "Query",
@@ -51,6 +53,7 @@ schema = strawberry.Schema(
     query=Query,
     mutation=Mutation,
     extensions=[
+        PersistedQueryExtension,
         ParserCache(maxsize=128),  # 128 MB; it clogs RAM indefinitely by default
         DjangoOptimizerExtension,
     ],

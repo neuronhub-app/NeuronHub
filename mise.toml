@@ -123,7 +123,7 @@
             "uv run manage.py runserver {{ env.SERVER_PORT_E2E }}",
         ]
         env.SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
-        env.E2E_TEST = "true"
+        env.DJANGO_ENV = "dev_test_e2e"
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
 
     [tasks."dev:client:e2e"]

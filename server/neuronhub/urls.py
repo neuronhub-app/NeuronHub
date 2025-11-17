@@ -13,7 +13,7 @@ from neuronhub.settings import DjangoEnv
 
 graphql_view = AsyncGraphQLView.as_view(
     schema=schema,
-    graphql_ide="graphiql" if settings.DJANGO_ENV == DjangoEnv.LOCAL else None,
+    graphql_ide="graphiql" if settings.DJANGO_ENV.is_dev() else None,
     multipart_uploads_enabled=True,  # required for File upload (according to the docs)
 )
 
@@ -51,7 +51,7 @@ if settings.IS_DEBUG_TOOLBAR_ENABLED:
     urlpatterns += debug_toolbar_urls()
 
 
-if settings.DJANGO_ENV in (DjangoEnv.LOCAL, DjangoEnv.BUILD):
+if settings.DJANGO_ENV in (DjangoEnv.DEV, DjangoEnv.BUILD):
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
     urlpatterns += staticfiles_urlpatterns()

@@ -23,22 +23,32 @@ env.read_env()
 
 
 class DjangoEnv(Enum):
-    BUILD = "build"
-    LOCAL = "local"
     STAGE = "stage"
     PROD = "prod"
+    BUILD = "build"
+
+    DEV = "dev"
+    DEV_TEST_UNIT = "dev_test_unit"
+    DEV_TEST_E2E = "dev_test_e2e"
+
+    def is_dev(self) -> bool:
+        return self in {
+            DjangoEnv.DEV,
+            DjangoEnv.DEV_TEST_UNIT,
+            DjangoEnv.DEV_TEST_E2E,
+        }
 
 
-DJANGO_ENV = DjangoEnv(env.str("DJANGO_ENV", DjangoEnv.LOCAL.value))  # todo ! default to PROD
+DJANGO_ENV = DjangoEnv(env.str("DJANGO_ENV", DjangoEnv.DEV.value))  # todo ! default to PROD
 
-if DJANGO_ENV is DjangoEnv.LOCAL:
+if DJANGO_ENV.is_dev():
     load_dotenv(os.path.join(BASE_DIR, ".env.local"), override=True)
 
 SECRET_KEY = env.str(
     "SECRET_KEY", "django-insecure-u_nt^p$$c611a&(jd*wbs58ziu4=o3%ps%@4zpv9=(8ix&8k7i"
 )
 
-DEBUG = env.bool("DJANGO_DEBUG", DJANGO_ENV not in (DjangoEnv.STAGE, DjangoEnv.PROD))
+DEBUG = env.bool("DJANGO_DEBUG", DJANGO_ENV.is_dev())
 
 INSTALLED_APPS = [
     "daphne",
@@ -119,9 +129,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "neuronhub.wsgi.application"
 ASGI_APPLICATION = "neuronhub.asgi.application"
 
-E2E_TEST = env.bool("E2E_TEST", False)
-
-if DJANGO_ENV == DjangoEnv.BUILD:
+if DJANGO_ENV is DjangoEnv.BUILD:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -132,7 +140,7 @@ else:
     db_host = env.str("DATABASE_HOST", "host.docker.internal")
     db_name = env.str("DATABASE_NAME", "neuronhub")
     db_user = env.str("DATABASE_USER", db_name)
-    if E2E_TEST:
+    if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
         db_name = env.str("E2E_DB_NAME")
         db_user = env.str("E2E_DB_NAME")
     DATABASES = {
@@ -265,12 +273,14 @@ ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # todo ! [auth] disable (≈ok, but we d
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # todo ! [auth] disable
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 ACCOUNT_SESSION_REMEMBER = True
-if DJANGO_ENV == DjangoEnv.LOCAL:
+if DJANGO_ENV.is_dev():
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
 
-IS_SENTRY_ENABLED = env.bool(
-    "IS_SENTRY_ENABLED", DJANGO_ENV in (DjangoEnv.PROD, DjangoEnv.STAGE)
-)
+
+# Logging
+# ---------------------------------------------------------------------------------------------------------
+
+IS_SENTRY_ENABLED = env.bool("IS_SENTRY_ENABLED", not DJANGO_ENV.is_dev())
 if IS_SENTRY_ENABLED:
     sentry_sdk.init(
         dsn=env.str("SENTRY_DSN_BACKEND", ""),
@@ -299,7 +309,7 @@ LOGGING = {
         "level": "INFO",
     },
 }
-if E2E_TEST:
+if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
     # Mise's `--quite` doesn't work on `runserver`, and `--silent` drops all stderr - so we set django to WARNING instead of INFO
     LOGGING["loggers"] = {
         "django": {

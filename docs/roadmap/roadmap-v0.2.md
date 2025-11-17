@@ -6,6 +6,7 @@
 
 ### v0.2.4.0
 
+- [x] fix: secure API with GraphQL whitelist
 - [ ] Comment singular collapse (ie "mask as read")
 - [ ] Algolia
 - [ ] HN sync by Hatchet
