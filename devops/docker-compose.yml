@@ -13,13 +13,13 @@ services:
                -c max_parallel_workers_per_gather=8
                -c max_parallel_maintenance_workers=4
     environment:
-      POSTGRES_DB: neuronhub
-      POSTGRES_USER: neuronhub
-      POSTGRES_PASSWORD: neuronhub
+      POSTGRES_DB: ${PROJECT_NAME}
+      POSTGRES_USER: ${PROJECT_NAME}
+      POSTGRES_PASSWORD: ${PROJECT_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready --username neuronhub"]
+      test: ["CMD-SHELL", "pg_isready --username ${PROJECT_NAME}"]
       interval: 5s
       timeout: 5s
     ports:

@@ -15,19 +15,19 @@
 
 [task_config]
     includes = [
-        "devops/install-deps.mise.toml",
-        "devops/upgrade-deps.mise.toml",
-        "devops/db-init.mise.toml",
+        "devops/dependencies.mise.toml",
+        "devops/db.mise.toml",
+        "devops/deploy.mise.toml",
+        "devops/e2e.mise.toml",
         "devops/claude.mise.toml",
-        "devops/docker.mise.toml",
-        "devops/dev-env-darwin.mise.toml",
-        "client/e2e/e2e.mise.toml",
     ]
 
 [env]
+    # Global
+
     PROJECT_NAME = "neuronhub"
 
-    VITE_RELEASE_VERSION = "0.2.3.0" # used globally, eg in GitHub, Docker, Sentry
+    VITE_RELEASE_VERSION = "0.2.4.0" # used in GitHub and Sentry
 
     DOMAIN_NAME = "neuronhub.app"
 
@@ -42,11 +42,10 @@
     SENTRY_DSN_BACKEND = "https://417078bf385cad9c59d41a020892e689@o4507887634284544.ingest.us.sentry.io/4510305221869575"
     VITE_RELEASE_NAME = "{{ env.PROJECT_NAME }}@{{ env.VITE_RELEASE_VERSION }}"
 
-    # Dev env
+    # Dev
 
     SERVER_PORT = 8000
     SERVER_PORT_E2E = 8001
-
     CLIENT_PORT = 3000
     CLIENT_PORT_E2E = 3001
 
@@ -55,23 +54,15 @@
     S3_STORAGE_BUCKET_NAME = "media"
     S3_PORT = 8333
 
-    IS_POSTGRES_EXTERNAL = false
-    POSTGRES_EXTERNAL_SHELL_MSG = "Skipping because using non-Mise PostgreSQL (ie we're in GitHub CI or MacOS)"
+    IS_POSTGRES_EXTERNAL = "false"
+    POSTGRES_EXTERNAL_SHELL_MSG = "Skipping as using non-Mise PostgreSQL (ie we're in GitHub CI or MacOS)"
 
 
 # Dev servers
 # -----------------------------------------------------
 
 [tasks."dev"]
-    depends = ["dev:db", "dev:s3", "dev:server", "dev:client"]
-
-[tasks."dev:hatchet"]
-    depends = ["dev:db-full", "dev:server", "dev:client", "dev:hatchet-worker"]
-
-    [tasks."dev:hatchet-worker"]
-        depends = "dev:db-full"
-        dir = "server"
-        run = "uv run python neuronhub/apps/importer/hatchet_worker.py"
+    depends = ["dev:server", "dev:client", "dev:db", "dev:s3"]
 
     [tasks."dev:server"]
         depends = "dev:db"
@@ -88,63 +79,25 @@
         dir = "server"
         run = """
             mkdir {{ env.S3_STORAGE_BUCKET_NAME }}
-            rclone serve s3 . --addr :{{ env.S3_PORT }} | complete
+            try { rclone serve s3 . --addr :{{ env.S3_PORT }} }
         """
 
     [tasks."dev:db"]
         dir = "devops"
         run = """
-            if "IS_POSTGRES_EXTERNAL" in $env {
+            if $env.IS_POSTGRES_EXTERNAL == "true" {
                 print $env.POSTGRES_EXTERNAL_SHELL_MSG
             } else {
-                sudo docker compose up db --detach
+                sudo -E docker compose up db --detach
             }
         """
-        silent = true
-
-    [tasks."dev:db-full"]
-        dir = "devops"
-        run = """
-            if "IS_POSTGRES_EXTERNAL" in $env {
-                print $env.POSTGRES_EXTERNAL_SHELL_MSG
-            } else {
-                sudo docker compose up db hatchet-postgres hatchet-lite --detach
-            }
-        """
-        silent = true
-
-    [tasks."dev:db-stop"]
-        dir = "devops"
-        run = "sudo docker compose down db"
-
-    [tasks."dev:db-full-stop"]
-        dir = "devops"
-        run = "sudo docker compose down db hatchet-postgres hatchet-lite"
-
-    [tasks."dev:server:e2e"]
-        depends = ["dev:db", "dev:s3", "dev:db:setup-e2e"]
-        dir = "server"
-        run = [
-            "mise django:migrate",
-            "uv run manage.py runserver {{ env.SERVER_PORT_E2E }}",
-        ]
-        env.SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
-        env.DJANGO_ENV = "dev_test_e2e"
-        env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
-
-    [tasks."dev:client:e2e"]
-        dir = "client"
-        run = "bun run react-router dev --host --port={{ env.CLIENT_PORT_E2E }}"
-        env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
-
-    [tasks."dev:e2e"]
-        depends = ["dev:server:e2e", "dev:client:e2e"]
-
-    [tasks."dev:e2e:stop"]
-        run = "killport --signal=SIGTERM {{ env.SERVER_PORT_E2E }} {{ env.CLIENT_PORT_E2E }} {{ env.S3_PORT }}"
 
     [tasks."dev:stop"]
-        run = "killport --signal=SIGTERM {{ env.SERVER_PORT }} {{ env.CLIENT_PORT }} {{ env.S3_PORT }}"
+        dir = "devops"
+        run = [
+            "killport --signal=SIGTERM {{ env.SERVER_PORT }} {{ env.CLIENT_PORT }} {{ env.S3_PORT }}",
+            "sudo -E docker compose down db",
+        ]
 
 
 # Tests
@@ -154,13 +107,13 @@
     dir = "server"
     depends = "dev:db"
     run = [
-        "mise run test:pytest",
-        "mise run test:e2e",
+        "mise test:pytest",
+        "mise test:e2e",
     ]
 
     [tasks."test:pytest"]
         dir = "server"
-        depends = "dev:db"
+        depends = ["dev:db", "dev:s3"]
         run = "uv run pytest"
         alias = "pytest"
 
@@ -168,8 +121,9 @@
         dir = "client"
         run = "bun run playwright test --config=e2e/playwright.config.ts"
         alias = "e2e"
+        # duplicate with `dev:e2e:server`, as Playwright resets env when starts Mise from [[playwright.config.ts]]
         env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
-        env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}" # duplicate with `dev:server:e2e`, as Playwright resets env when starts Mise from [[playwright.config.ts]]
+        env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
 
 
 # Django
@@ -177,10 +131,7 @@
 
 [tasks."django:migrate"]
     dir = "server"
-    run = [
-        "uv run manage.py migrate",
-        "uv run manage.py createcachetable",
-    ]
+    run = "uv run manage.py migrate"
 
 [tasks."django:makemigrations"]
     dir = "server"
@@ -199,76 +150,90 @@
     run = "uv run manage.py import_hn_scheduled"
 
 
-# Lint & format
+# typegen → format → lint
 # -----------------------------------------------------
 
 [tasks."typegen"]
     depends = "typegen:server"
-    run = [
-        "mise run typegen:client:graphql",
-        "mise run typegen:client:gql-tada",
-        "mise run typegen:client:react",
-        "mise run typegen:client:chakra",
-    ]
-    description = "Strawberry → schema.graphql → TypeScript enums; and @chakra-ui"
+    run = "mise typegen:client"
+    description = "Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries; @chakra-ui; etc"
 
     [tasks."typegen:server"]
         dir = "server"
         run = "uv run manage.py export_schema neuronhub.graphql --path=../schema.graphql"
         sources = ["neuronhub/**/*.py"]
         outputs = ["../schema.graphql"]
+        quiet = true
 
-    [tasks."typegen:client:graphql"]
-        dir = "client"
-        run = [
-            "bun run graphql-codegen --errors-only --silent --config src/codegen.ts",
-            "bun run gql-tada generate output",
-            "bun run gql-tada generate persisted",
+    [tasks."typegen:client"]
+        depends = [
+            "typegen:client:graphql-codegen",
+            "typegen:client:gql-tada",
+            "typegen:client:react-router",
+            "typegen:client:chakra",
         ]
+        quiet = true
+
+    [tasks."typegen:client:graphql-codegen"]
+        dir = "client"
+        run = "bun run graphql-codegen --errors-only --silent --config src/codegen.ts"
         sources = ["../schema.graphql"]
+        quiet = true
 
     [tasks."typegen:client:gql-tada"]
         dir = "client"
-        run = "bun run gql-tada generate persisted"
+        run = [
+            "bun run gql-tada generate output",
+            "bun run gql-tada generate persisted",
+        ]
+        sources = ["src/**/*", "e2e/**/*"]
+        quiet = true
 
-    [tasks."typegen:client:react"]
+    [tasks."typegen:client:react-router"]
         dir = "client"
         run = "bun run react-router typegen"
         sources = ["src/apps/**/index.tsx", "src/routes.ts"]
-        silent = true
+        quiet = true
 
     [tasks."typegen:client:chakra"]
         dir = "client"
         run = "bunx @chakra-ui/cli typegen src/theme/theme.ts"
         sources = ["src/theme/**/*.ts"]
+        quiet = true
+
 
 [tasks."format"]
     depends = ["format:server", "format:client"]
+    quiet = true
 
     [tasks."format:server"]
         dir = "server"
         run = "uv run ruff format"
         sources = ["neuronhub/**/*.py"]
+        quiet = true
 
     [tasks."format:client"]
         dir = "client"
         run = "bun run biome format --write"
         sources = ["src/**/*", "e2e/**/*"]
+        quiet = true
+
 
 [tasks."lint"]
     depends = [
         "typegen --output=silent",
         "format --output=silent",
     ]
-    run = [
-        "mise lint:server",
-        "mise lint:client",
+    depends_post = [
+        "lint:server",
+        "lint:client",
     ]
 
     [tasks."lint:server"]
         dir = "server"
         run = "uv run mypy neuronhub"
         sources = ["neuronhub/**/*.py"]
+        quiet = true
 
     [tasks."lint:client"]
         dir = "client"
@@ -277,3 +242,4 @@
             "bun run biome lint --write --unsafe",
         ]
         sources = ["src/**/*", "e2e/**/*"]
+        quiet = true

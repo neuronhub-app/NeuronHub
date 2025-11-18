@@ -86,6 +86,7 @@ test.describe("Comments", () => {
     await play.click(ids.comment.form.cancelBtn);
   });
 
+  // todo: flaky due to PW async issues
   test("highlight", async ({ page }) => {
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);

@@ -1,6 +1,6 @@
-["dev:db-init"]
+["dev:db:setup"]
     run = """
-        if "IS_POSTGRES_EXTERNAL" in $env {
+        if $env.IS_POSTGRES_EXTERNAL == "true" {
             brew install postgresql@17
             brew services start postgresql@17
             createdb-17 $DATABASE_NAME

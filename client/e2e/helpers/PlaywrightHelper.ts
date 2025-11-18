@@ -72,7 +72,7 @@ export class PlaywrightHelper {
 
   async click(id: string, options = { wait: true }) {
     if (options.wait) {
-      await this.get(id).waitFor({ state: "attached" }); // "attached" added by #AI. It isn't bad. Probably. Playwright is a mess
+      await this.get(id).waitFor({ state: "attached" }); // "attached" added by #AI. It isn't bad, prob. Playwright is a mess
     }
     return this.get(id).click();
   }

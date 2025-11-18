@@ -11,13 +11,13 @@ export default defineConfig({
   webServer: [
     {
       name: "Server",
-      command: "mise run dev:server:e2e",
+      command: "mise run dev:e2e:server",
       reuseExistingServer: true,
       url: `${env.VITE_SERVER_URL}/admin/login/`,
     },
     {
       name: "Client",
-      command: "mise run dev:client:e2e",
+      command: "mise run dev:e2e:client",
       reuseExistingServer: true,
       url: clientUrl,
     },

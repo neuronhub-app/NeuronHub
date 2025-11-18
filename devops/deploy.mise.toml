@@ -18,7 +18,7 @@
         flag "--app <name>" { choices "server" "client" "coder" }
         flag "--version <version>" env="VITE_RELEASE_VERSION"
     """
-    run = "sudo docker rmi ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:${usage_version?}"
+    run = "sudo -E docker rmi ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:${usage_version?}"
 
 
 ["docker:build"]
@@ -91,7 +91,7 @@ EOF
           CACHE_FLAG="--no-cache"
         fi
 
-        sudo docker compose --progress=plain build $CACHE_FLAG
+        sudo -E docker compose --progress=plain build $CACHE_FLAG
 
         rm $COMPOSE_FILE
     """
