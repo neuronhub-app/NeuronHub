@@ -25,11 +25,11 @@ jobs:
 
     services:
       db:
-        image: postgres:17-alpine
+        image: postgres:18-alpine
         env:
           POSTGRES_DB: neuronhub
           POSTGRES_USER: neuronhub
-          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_PASSWORD: neuronhub
         options: >-
           --health-cmd "pg_isready --username neuronhub"
           --health-interval 10s
