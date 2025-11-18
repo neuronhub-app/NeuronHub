@@ -57,7 +57,7 @@ class UserSource(TimeStampedModel):
 
 class ApiSource(models.TextChoices):
     HackerNews = "HackerNews"
-    HackerNewsAlgolia = "HackerNewsAlgolia"
+    Algolia = "Algolia"
 
 
 class ApiHourlyLimit(TimeStampedModel):

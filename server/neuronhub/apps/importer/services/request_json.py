@@ -49,7 +49,10 @@ async def _is_api_limit_exceeded(url: str) -> bool:
         count_current=F("count_current") + 1
     )
     api_limit = await _get_api_limit(url)
-    if api_limit.count_current >= api_limit.count_max_per_hour:
+    if (
+        api_limit.source is ApiSource.Algolia
+        and api_limit.count_current >= api_limit.count_max_per_hour
+    ):
         return True
     return False
 
@@ -75,7 +78,7 @@ def _get_api_source(url: str) -> ApiSource:
     source = ApiSource.HackerNews
     match url:
         case s if "hn.algolia.com" in s:
-            source = ApiSource.HackerNewsAlgolia
+            source = ApiSource.Algolia
         case s if "hacker-news.firebaseio.com" in s:
             source = ApiSource.HackerNews
         case _:

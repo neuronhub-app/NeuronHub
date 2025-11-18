@@ -1,3 +1,5 @@
+import pytest
+
 from neuronhub.apps.importer.models import ImportDomain, PostSource, UserSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.posts.models import Post
@@ -8,6 +10,7 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 class HackerNewsImportTest(NeuronTestCase):
     _story_id = post_HN_id
 
+    @pytest.mark.slow
     async def test_import_story(self):
         post = await self._import_test_post()
 
@@ -23,6 +26,7 @@ class HackerNewsImportTest(NeuronTestCase):
         user_source = await UserSource.objects.aget(username=author_name)
         assert user_source.id_external == author_name
 
+    @pytest.mark.slow
     async def test_import_story_with_comment_ranks(self):
         await self._import_test_post()
 
