@@ -12,17 +12,27 @@ logger = logging.getLogger(__name__)
 
 class Options(TypedDict):
     category: Literal[CategoryHackerNews.Top, CategoryHackerNews.Best]
-    limit: int | None
+    limit: int
+    is_use_cache: bool
 
 
 class Command(BaseCommand):
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--category", type=CategoryHackerNews, required=True, default=CategoryHackerNews.Top
+        )
+        parser.add_argument("--limit", type=int, required=False, default=30)
+        parser.add_argument("--is_use_cache", type=bool, required=False, default=False)
+
     def handle(self, *args, **options: Unpack[Options]):
         try:
-            limit = options.get("limit", None)
             category = options["category"]
+            limit = options["limit"]
+            is_use_cache = options["is_use_cache"]
+
             logger.info(f"Import HN: starting ${category}, limit={limit}")
 
-            importer = ImporterHackerNews(is_use_cache=True)
+            importer = ImporterHackerNews(is_use_cache=is_use_cache)
             asyncio.run(importer.import_posts(category=category, posts_limit=limit))
 
             logger.info(f"Import HN: completed ${category}")
