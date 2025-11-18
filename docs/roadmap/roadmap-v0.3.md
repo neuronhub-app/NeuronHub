@@ -1,17 +1,11 @@
 ### v0.3.0.0
 
-- Algolia fuzzy match
-- [!!] User.aliases #54
+- User.aliases #54
 	- User profile .avatar
-	- Post.content_direct and polite Visibility settings
-- Post.tags voting on list page
-- Tag by `.is_important`
-	- author "stars" `.is_important` in UI
-    - extend by author & user votes
-- Algolia tags facets
-- Post.alternatives votes
-- [!] recurring export
-- [!!] Security review
+- User settings for Post.content_direct and _polite Visibility
+- Post.tags voting on list pages
+- Recurring exports
+- Security review
 	- extra tests for `filter_posts_by_user`
 	- drop .history fields? good for debug, bad for privacy
 
@@ -21,7 +15,6 @@
 
 ### TBD
 
-- notifications
 - Add Review.review_experience field
 - Add Vote.is_changed_my_mind field
 - LLM moderation
@@ -31,3 +24,4 @@
 - `Post.alternatives` comments
 - `Tag.is_show_parent_name` field
 - "expire" content
+- Post.alternatives votes
