@@ -1,5 +1,5 @@
 import { Box, Flex, Heading, HStack, IconButton, Stack, Text } from "@chakra-ui/react";
-import { useMemo } from "react";
+import { type ComponentProps, useMemo } from "react";
 import { FaComments } from "react-icons/fa";
 import { NavLink } from "react-router";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
@@ -8,7 +8,8 @@ import { PostCard } from "@/components/posts/PostCard";
 import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { graphql, type ID, type ResultOf } from "@/gql-tada";
-import { CommentFieldsFragment, PostFragment } from "@/graphql/fragments/posts";
+import { CommentFieldsFragment, isTool, PostFragment } from "@/graphql/fragments/posts";
+import { isReview } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
@@ -81,6 +82,18 @@ export function Library() {
     return map;
   }, [data?.user_highlights]);
 
+  function getPostNamespace(
+    post: HighlightGroup["parent_root"],
+  ): ComponentProps<typeof PostCard>["urlNamespace"] {
+    if (isReview(post)) {
+      return "reviews";
+    }
+    if (isTool(post)) {
+      return "tools";
+    }
+    return "posts";
+  }
+
   return (
     <Stack gap="gap.lg">
       <Heading size="2xl">Library</Heading>
@@ -92,33 +105,18 @@ export function Library() {
         {groupedHighlights.map(group => (
           <Stack
             key={group.parent_root.id}
-            gap="gap.sm"
-            bg="bg.subtle"
+            gap="gap.md"
+            bg="bg.panel"
             p="gap.lg"
             borderRadius="lg"
             {...getOutlineContrastStyle({ variant: "subtle" })}
           >
-            <PostCard post={group.parent_root} />
+            <PostCard
+              post={group.parent_root}
+              urlNamespace={getPostNamespace(group.parent_root)}
+            />
 
-            <Flex gap="gap.lg">
-              <PostAuthor post={group.parent_root} />
-              <NavLink
-                to={urls.getPostUrls(group.parent_root).detail}
-                style={{ width: "min-content" }}
-              >
-                <IconButton
-                  variant="plain"
-                  colorPalette="gray"
-                  aria-label="Comments"
-                  color="gray.300"
-                  _hover={{ color: "slate.400" }}
-                  size="sm"
-                  h="auto"
-                >
-                  <FaComments /> <Text color="gray.400">{group.parent_root.comments_count}</Text>
-                </IconButton>
-              </NavLink>
-            </Flex>
+            <PostAuthor post={group.parent_root} />
 
             <Stack aria-label="author & date" gap="gap.md">
               {group.highlights.map(highlight => (

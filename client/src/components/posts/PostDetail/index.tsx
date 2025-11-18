@@ -73,7 +73,7 @@ export function PostDetail(props: {
 
       {props.post && (
         <Stack gap="gap.xl">
-          <PostCard post={props.post} isDetailPage />
+          <PostCard post={props.post} isDetailPage urlNamespace="posts" />
 
           <Stack gap={commentTree.length ? "gap.lg" : "0"}>
             <Heading fontSize="lg" display="flex" gap="gap.sm" alignItems="center">
