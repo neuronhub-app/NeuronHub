@@ -151,13 +151,13 @@ else:
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
-        "LOCATION": "django_cache_table",
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": "/tmp/django_cache",
         "OPTIONS": {
-            "TIMEOUT": None,  # only used in E2E tests atm, no need to expire
-            "MAX_ENTRIES": 2000,
+            "MAX_ENTRIES": 10000,
+            "TIMEOUT": None,  # only for tests atm, no need to expire
         },
-    }
+    },
 }
 
 SITE_ID = 1
