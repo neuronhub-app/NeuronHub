@@ -27,47 +27,39 @@
         flag "--version <version>" env="VITE_RELEASE_VERSION"
         flag "--no_cache" default=#false
     """
-    # Found no other sane way to pass `mise env` to `docker build`,
-    # will burn it and move to Podman later.
-    # todo move to a Python script
     run = """
-        #!/usr/bin/env bash
-
         # Set working dir
         # ------------------------------
 
-        CWD="${usage_app?}"
-        if [ "${usage_app?}" = "coder" ]; then
-          CWD="devops/coder"
-        fi
-
-        cd $CWD
-
+        let app = $env.usage_app
+        if $app == "coder" {
+          cd devops/coder
+        } else {
+          cd $app
+        }
 
         # Sentry PROJECT_NAME mapping
         # ------------------------------
 
-        SENTRY_PROJECT=""
-        if [ "${usage_app?}" = "client" ]; then
-          SENTRY_PROJECT={{ env.PROJECT_NAME }}-frontend
-        fi
-        if [ "${usage_app?}" = "server" ]; then
-          SENTRY_PROJECT={{ env.PROJECT_NAME }}-backend
-        fi
-
+        let sentry_project = if $app == "client" {
+          "{{ env.PROJECT_NAME }}-frontend"
+        } else if $app == "server" {
+          "{{ env.PROJECT_NAME }}-backend"
+        }
 
         # Force-pass Mise env & tag the docker build
         # ------------------------------
 
-        COMPOSE_FILE=docker-compose.yaml
-        cat > $COMPOSE_FILE <<EOF
+        let version = $env.usage_version
+        let compose_file = "docker-compose.yaml"
+        let compose_content = $"
             services:
-              ${usage_app?}:
-                image: ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:${usage_version?}
+              ($app):
+                image: ghcr.io/{{ env.GITHUB_PATH }}/($app):($version)
                 build:
                   context: .
                   args:
-                    VITE_RELEASE_VERSION: ${usage_version?}
+                    VITE_RELEASE_VERSION: ($version)
 
                     # for React Router build
                     VITE_SERVER_URL: https://backend.{{ env.DOMAIN_NAME }}
@@ -75,23 +67,24 @@
                     # for Sentry
                     SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN }}
                     SENTRY_ORG: {{ env.SENTRY_ORG }}
-                    SENTRY_PROJECT: $SENTRY_PROJECT
+                    SENTRY_PROJECT: ($sentry_project)
                     SENTRY_DSN_FRONTEND: {{ env.SENTRY_DSN_FRONTEND }}
                     SENTRY_DSN_BACKEND: {{ env.SENTRY_DSN_BACKEND }}
                     VITE_RELEASE_NAME: {{ env.VITE_RELEASE_NAME }}
                     PROJECT_NAME: {{ env.PROJECT_NAME }}
+"
 
-EOF
+        $compose_content | save --force $compose_file
 
         # Build
         # ------------------------------
 
-        CACHE_FLAG=""
-        if [ "${usage_no_cache}" = "true" ]; then
-          CACHE_FLAG="--no-cache"
-        fi
+        let no_cache = $env.usage_no_cache
+        if $no_cache == "true" {
+          ^sudo -E docker compose --progress=plain build --no-cache
+        } else {
+          ^sudo -E docker compose --progress=plain build
+        }
 
-        sudo -E docker compose --progress=plain build $CACHE_FLAG
-
-        rm $COMPOSE_FILE
+        rm $compose_file
     """
