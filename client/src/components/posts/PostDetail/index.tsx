@@ -6,6 +6,8 @@ import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
+import { useMetaTitle } from "@/components/useMetaTitle";
+import { env } from "@/env";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
@@ -32,9 +34,13 @@ export function PostDetail(props: {
 
   const highlighter = useHighlighter({ commentTree });
 
+  const title = useMetaTitle({ isLoading: true });
+
   useInit({
     isReady: Boolean(user && props.post?.id),
     onInit: async () => {
+      title.set(props.post!.title);
+
       const res = await client.query({
         query: UserCollapsedCommentsQuery,
         variables: { parent_root_id: props.post!.id },

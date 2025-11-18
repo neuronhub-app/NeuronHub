@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { Scripts, ScrollRestoration } from "react-router";
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { ColorModeProvider } from "@/components/ui/color-mode";
+import { useMetaTitle } from "@/components/useMetaTitle";
 import { env } from "@/env";
 import { client } from "@/graphql/client";
 import { system } from "@/theme/theme";
@@ -34,10 +35,12 @@ function AppProviders(props: { children: ReactNode }) {
 }
 
 export function Layout(props: { children: ReactNode }) {
+  const title = useMetaTitle();
+
   return (
     <html lang="en">
       <head>
-        <title>NeuronHub</title>
+        <title>{title.value}</title>
         <LayoutHead />
       </head>
 

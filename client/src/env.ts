@@ -20,6 +20,8 @@ import { cleanEnv, port, str, url } from "envalid";
 const envRaw = typeof process === "undefined" ? import.meta.env : process.env;
 
 const envCleaned = cleanEnv(envRaw, {
+  VITE_PROJECT_NAME: str({ default: "NeuronHub" }),
+
   NODE_ENV: str({
     choices: ["development", "staging", "production"],
     default: "development",
