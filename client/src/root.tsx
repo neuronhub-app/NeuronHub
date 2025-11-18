@@ -78,7 +78,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let stack: string | undefined;
 
   if (error instanceof Error) {
-    if (error.message === ErrorNotFound.message) {
+    if (error.name === ErrorNotFound.name) {
       message = "404";
       details = "Page not found.";
     } else {
@@ -89,7 +89,6 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       }
     }
   }
-  console.error(error);
 
   return (
     <AppProviders>
@@ -108,4 +107,8 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
 export class ErrorNotFound extends Error {
   static message = "Page not found";
+  constructor(name = "ErrorNotFound") {
+    super();
+    this.name = name;
+  }
 }

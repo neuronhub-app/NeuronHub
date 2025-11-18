@@ -16,7 +16,7 @@ import { GoPencil } from "react-icons/go";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import type { PostHighlight } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
-import { getAvatarColorForUsername } from "@/components/posts/PostCard/PostAuthor";
+import { getAvatarColorForUsername, PostAuthor } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import type { PostCommentTree } from "@/components/posts/PostDetail";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
@@ -95,7 +95,8 @@ export function CommentThread(props: {
   }, [refs.container.current, refs.content.current, threadGuide.isCollapsed]);
 
   const isCommentUnfolded = !threadGuide.isCollapsed;
-  const username = (props.comment.source_author || props.comment.author?.username) ?? "";
+  const username =
+    (props.comment?.post_source?.user_source?.username || props.comment.author?.username) ?? "";
 
   return (
     <Box as="section" pos="relative" ref={refs.container}>
@@ -125,10 +126,11 @@ export function CommentThread(props: {
               {/* Header: Name, Date, Tags */}
               <HStack gap="gap.sm">
                 <Text fontSize="sm" fontWeight="semibold">
-                  {username}
+                  <PostAuthor post={props.comment} isHideAvatar />
                 </Text>
 
-                {props.comment.source_author === props.post.source_author && (
+                {props.comment?.post_source?.user_source?.username ===
+                  props.post?.post_source?.user_source?.username && (
                   <Tooltip content="Original Poster" positioning={{ placement: "top" }}>
                     <Badge size="xs" variant="solid">
                       OP

@@ -320,6 +320,7 @@ input PostSourceOrder @oneOf {
 }
 
 type PostSourceType {
+  user_source: UserSourceType
   id: ID!
   post: DjangoModelType!
   domain: ImportDomain
@@ -684,6 +685,15 @@ enum UserListName {
   read_later
   library
   posts_collapsed
+}
+
+type UserSourceType {
+  id: ID!
+  id_external: String!
+  username: String!
+  score: Int!
+  about: String!
+  created_at_external: DateTime
 }
 
 type UserType {

@@ -6,7 +6,6 @@ import asyncio
 import re
 from datetime import timedelta
 from json import JSONDecodeError
-from pathlib import Path
 from typing import Any
 
 import requests
@@ -19,7 +18,9 @@ from django.utils import timezone
 from neuronhub.apps.importer.models import ApiHourlyLimit, ApiSource
 
 
-async def request_json(url: str, is_use_cache: bool = False) -> Any:
+async def request_json(
+    url: str, is_use_cache: bool = False, cache_expiry_days: int | None = None
+) -> Any:
     if is_use_cache:
         if response := await cache.aget(_get_cache_key(url)):
             return response
@@ -34,7 +35,10 @@ async def request_json(url: str, is_use_cache: bool = False) -> Any:
             response.raise_for_status()
             response_json = response.json()
             if is_use_cache:
-                await cache.aset(_get_cache_key(url), response_json)
+                timeout_sec = None
+                if cache_expiry_days:
+                    timeout_sec = cache_expiry_days * 24 * 60
+                await cache.aset(_get_cache_key(url), value=response_json, timeout=timeout_sec)
             return response_json
         except (requests.RequestException, JSONDecodeError):
             if retry_current >= retries_max:
@@ -65,13 +69,10 @@ async def _get_api_limit(url: str) -> ApiHourlyLimit:
     return limit
 
 
-def _get_cache_key(url: str) -> Path:
-    cache_dir = Path(__file__).parent / "cache"
+def _get_cache_key(url: str) -> str:
     if match := re.search(r"/items?/(?P<item_id>\d+)", url):
-        return (
-            cache_dir / f"post-{_get_api_source(url).value}-{match.group('item_id')}.cache.json"
-        )
-    return cache_dir / "list.cache.json"
+        return f"post-{_get_api_source(url).value}-{match.group('item_id')}.json"
+    return url
 
 
 def _get_api_source(url: str) -> ApiSource:

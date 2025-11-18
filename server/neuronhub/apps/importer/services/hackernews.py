@@ -4,9 +4,10 @@ from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Any, NotRequired, TypedDict, cast
+from zoneinfo import ZoneInfo
 
+from django.conf import settings
 from markdownify import markdownify
-
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.importer.models import ImportDomain, PostSource, UserSource
@@ -21,6 +22,7 @@ logger = logging.getLogger(__name__)
 type ID = int
 type Username = str
 type DateISO = str
+type DateUnix = int
 type Rank = int
 
 
@@ -51,9 +53,16 @@ class firebase:
         kids: list[ID]
         url: str
         score: int
-        time: int
+        time: DateUnix
         text: NotRequired[str]
         descendants: int
+
+    class User(TypedDict):
+        id: Username
+        created: DateUnix
+        submitted: list[ID]
+        karma: int
+        about: str | None
 
     class Comment(TypedDict):
         id: ID
@@ -80,6 +89,8 @@ class ImporterHackerNews:
     def __post_init__(self):
         self._api_algolia = "https://hn.algolia.com/api/v1"
         self._api_firebase = "https://hacker-news.firebaseio.com/v0"
+        self._refetch_user_after_days = 15
+
         self._comments_total = 0
         self._comments_imported = 0
 
@@ -87,8 +98,8 @@ class ImporterHackerNews:
         self,
         category: CategoryHackerNews = CategoryHackerNews.Top,
         posts_limit: int | None = None,
-    ) -> list[Post]:
-        post_ids: list[ID] = await self._request_json(
+    ) -> list[Post | BaseException]:
+        post_ids: list[ID] = await self._request(
             f"{self._api_firebase}/{category.value}stories.json"
         )
         if posts_limit:
@@ -97,20 +108,21 @@ class ImporterHackerNews:
         self._log_import(f"Importing {len(post_ids)} from {category.value}")
 
         post_jsons = await asyncio.gather(
-            *[self._request_json(f"{self._api_algolia}/items/{post_id}") for post_id in post_ids]
+            *[self._request(f"{self._api_algolia}/items/{post_id}") for post_id in post_ids]
         )
         posts_imported = await asyncio.gather(
             *[
                 self._import_item(data=post_json, is_post=True, is_root=True)
                 for post_json in post_jsons
-            ]
+            ],
+            return_exceptions=True,
         )
 
         self._log_import("Completed")
         return posts_imported
 
     async def import_post(self, id_ext: ID) -> Post:
-        post_json = await self._request_json(f"{self._api_algolia}/items/{id_ext}")
+        post_json = await self._request(f"{self._api_algolia}/items/{id_ext}")
         return await self._import_item(data=post_json, is_root=True, is_post=True)
 
     async def _import_item(
@@ -128,13 +140,12 @@ class ImporterHackerNews:
 
         self._log_progress(data["id"], Post.Type.Post if is_post else Post.Type.Comment)
 
-        author_name = None
-        if author := data.get("author"):
-            author_name = await self._user_source_get_or_create(author)
+        user_source = await self._get_or_create_user_source(username=data["author"])
+        author_name = user_source.username
 
         post_defaults = {
             "visibility": Visibility.PUBLIC,
-            "source_author": author_name,
+            "source_author": author_name,  # todo refac: drop
         }
         if is_post:
             post_data = cast(algolia.Post, data)
@@ -144,7 +155,7 @@ class ImporterHackerNews:
                 defaults=dict(
                     **post_defaults,
                     title=post_data["title"],
-                    content_direct=markdownify(post_data.get("text") or ""),
+                    content_polite=markdownify(post_data.get("text") or ""),
                     source=self._build_HN_item_url(post_data["id"]),
                 ),
             )
@@ -164,14 +175,18 @@ class ImporterHackerNews:
                 ),
             )
 
-        source = await self._source_update_or_create(
-            post=post, data=data, is_post=is_post, rank=rank
+        post_source = await self._update_or_create_post_source(
+            post=post,
+            data=data,
+            is_post=is_post,
+            rank=rank,
+            user_source=user_source,
         )
 
         if is_root:
             parent_root = post
 
-            meta = await import_html_meta(url=source.url_of_source)
+            meta = await import_html_meta(url=post_source.url_of_source)
             post.content_polite = meta.content
             await post.asave()
 
@@ -205,12 +220,13 @@ class ImporterHackerNews:
 
         return post
 
-    async def _source_update_or_create(
+    async def _update_or_create_post_source(
         self,
         post: Post,
         data: algolia.Post | algolia.Comment,
         is_post: bool,
         rank: int | None = None,
+        user_source: UserSource | None = None,
     ) -> PostSource:
         post_data: algolia.Post | algolia.Comment
         if is_post:
@@ -219,12 +235,14 @@ class ImporterHackerNews:
                 "json": post_data,
                 "url_of_source": post_data.get("url", ""),
                 "score": post_data.get("points", 0),
+                "user_source": user_source,
             }
         else:
             post_data = cast(algolia.Comment, data)
             defaults = {
                 "json": self._clean_HN_json(post_data),
                 "rank": rank,
+                "user_source": user_source,
             }
         post_source, _ = await PostSource.objects.aupdate_or_create(
             post=post,
@@ -233,7 +251,7 @@ class ImporterHackerNews:
             defaults={
                 **defaults,
                 "created_at_external": datetime.fromisoformat(
-                    post_data["created_at"].replace("Z", "+00:00")
+                    post_data["created_at"].replace("Z", "+00:00")  # todo fix: #AI, seems wrong
                 ),
             },
         )
@@ -251,7 +269,7 @@ class ImporterHackerNews:
     ) -> dict[ID, Rank]:
         if not parent["children"]:
             return {}
-        item_json: firebase.Post | firebase.Comment = await self._request_json(
+        item_json: firebase.Post | firebase.Comment = await self._request(
             f"{self._api_firebase}/item/{parent['id']}.json"
         )
         comment_ids = item_json.get("kids", [])
@@ -275,7 +293,7 @@ class ImporterHackerNews:
         return comment_ranks
 
     async def _get_nested_comment_ranks(self, comment_id: ID) -> dict[ID, Rank]:
-        item_json: firebase.Comment = await self._request_json(
+        item_json: firebase.Comment = await self._request(
             f"{self._api_firebase}/item/{comment_id}.json"
         )
         nested_comment_ids = item_json.get("kids", [])
@@ -299,19 +317,40 @@ class ImporterHackerNews:
         if self.is_logs_enabled:
             logger.info(f"Importing: {text}")
 
-    async def _user_source_get_or_create(self, username: str) -> Username:
+    async def _get_or_create_user_source(self, username: str) -> UserSource:
         user, is_created = await UserSource.objects.aget_or_create(
             id_external=username,
-            defaults={"username": username, "score": 0},
+            defaults={"username": username, "json": dict()},
         )
         if is_created:
-            # todo prob: fetch karma and profile
-            pass
+            user_json: firebase.User = await self._request(
+                f"{self._api_firebase}/user/{username}.json",
+                cache_expiry_days=15,
+            )
+            user.about = user_json.get("about") or ""
+            user.score = user_json["karma"]
+            user.created_at_external = datetime.fromtimestamp(
+                user_json["created"], tz=ZoneInfo(settings.TIME_ZONE)
+            )
+            user.json = user_json
+            await user.asave()
 
-        return user.username
+        return user
 
-    async def _request_json(self, url: str) -> Any:
-        return await request_json(url, is_use_cache=self.is_use_cache)
+    async def _request(
+        self,
+        url: str,
+        is_use_cache: bool | None = None,
+        cache_expiry_days: int | None = None,
+    ) -> Any:
+        if is_use_cache is None:
+            return await request_json(
+                url, is_use_cache=self.is_use_cache, cache_expiry_days=cache_expiry_days
+            )
+        else:
+            return await request_json(
+                url, is_use_cache=is_use_cache, cache_expiry_days=cache_expiry_days
+            )
 
     @staticmethod
     def _clean_HN_json(comment: algolia.Comment) -> algolia.Comment:

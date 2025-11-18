@@ -292,6 +292,9 @@ export const Prose = chakra("div", {
       },
     },
     size: {
+      xs: {
+        fontSize: "xs",
+      },
       sm: {
         fontSize: "sm",
       },

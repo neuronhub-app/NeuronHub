@@ -7,7 +7,6 @@ import { PostCard } from "@/components/posts/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
 import { useMetaTitle } from "@/components/useMetaTitle";
-import { env } from "@/env";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import type { PostDetailFragmentType } from "@/graphql/fragments/posts";

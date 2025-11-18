@@ -15,7 +15,7 @@ export namespace datetime {
     const tz = new TZDate(date).timeZone;
     const tzNameShort = tz ? tzName(tz, date, "shortGeneric") : "";
 
-    return `${format(date, "MMM d, yyyy kk:mm")} ${tzNameShort}`.trim();
+    return `${format(date, "yyyy MMM eo, kk:mm")} ${tzNameShort}`.trim();
   }
 
   export function relative(dateRaw: Date | string | unknown) {
@@ -36,9 +36,9 @@ export namespace datetime {
 
     if (isMoreThan30Days) {
       if (isSameYear(date, new Date())) {
-        dateStr = format(date, "MMM d, kk:mm");
+        dateStr = format(date, "MMM eo, kk:mm");
       } else {
-        dateStr = format(date, "MMM d, yyyy kk:mm");
+        dateStr = format(date, "yyyy MMM eo, kk:mm");
       }
     }
     return dateStr;

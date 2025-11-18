@@ -1,7 +1,5 @@
-import { Box, Flex, Heading, HStack, IconButton, Stack, Text } from "@chakra-ui/react";
+import { Box, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { type ComponentProps, useMemo } from "react";
-import { FaComments } from "react-icons/fa";
-import { NavLink } from "react-router";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import type { PostHighlight } from "@/apps/highlighter/useHighlighter";
 import { PostCard } from "@/components/posts/PostCard";
@@ -11,7 +9,6 @@ import { graphql, type ID, type ResultOf } from "@/gql-tada";
 import { CommentFieldsFragment, isTool, PostFragment } from "@/graphql/fragments/posts";
 import { isReview } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { urls } from "@/urls";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 type HighlightGroup = {

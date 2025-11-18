@@ -21,6 +21,14 @@ export const PostFragment = graphql(
 				score
 				rank
 				url_of_source
+
+				user_source {
+					id
+					username
+					score
+					about
+					created_at_external
+				}
       }
       image {
         url
@@ -103,6 +111,14 @@ export const CommentFieldsFragment = graphql(
         id_external
         created_at_external
         json
+
+				user_source {
+					id
+					username
+					score
+					about
+					created_at_external
+				}
       }
       votes {
         id

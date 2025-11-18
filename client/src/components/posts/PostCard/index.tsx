@@ -91,6 +91,7 @@ export function PostCard(props: {
         <HStack justify="space-between" align="flex-end">
           <Flex gap="gap.lg">
             <PostAuthor post={post} />
+
             {!props.isDetailPage && (
               <PostCommentsLink post={post} urlNamespace={props.urlNamespace} />
             )}
