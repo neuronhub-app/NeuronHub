@@ -60,6 +60,8 @@ jobs:
           enable-cache: true
           working-directory: ${{ github.workspace }}/server
 
+      - run: npm install -g nushell
+
       - run: mise run install-deps:server
 
       - name: Pytest
@@ -67,7 +69,7 @@ jobs:
 
       - run: mise run install-deps:client
 
-      # Playwright isn't stable yet - always fails first tests with timeouts (cold db cache), but even a 15s timeout is useless
+      # Playwright isn't stable yet - always fails first tests with timeouts (cold db cache), but even a 15+ sec timeout is useless in GitHub CI
       #- run: mise run test:e2e
       #  env:
       #    E2E_DB_NAME: neuronhub # override default, as calling `psql "CREATE DATABASE ..."` in Playwright image is PITA
