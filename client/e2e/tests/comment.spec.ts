@@ -86,7 +86,6 @@ test.describe("Comments", () => {
     await play.click(ids.comment.form.cancelBtn);
   });
 
-  // todo: flaky due to PW async issues
   test("highlight", async ({ page }) => {
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
@@ -166,7 +165,7 @@ test.describe("Comments", () => {
 
     // test PostHighlight delete
     await $[ids.highlighter.span].click();
-    await expect($[ids.highlighter.btn.delete]).toBeVisible();
+    await expect($[ids.highlighter.btn.delete]).toBeVisible(); // todo: flaky due to PW async issues, fails here
     await $[ids.highlighter.btn.delete].click();
     await play.reload({ idleWait: true });
     await expect($[ids.highlighter.span]).not.toBeAttached();

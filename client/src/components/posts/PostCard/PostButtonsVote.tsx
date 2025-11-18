@@ -7,7 +7,11 @@ import { ids } from "@/e2e/ids";
 // todo refac-name: PostActionsVoting
 // todo refac: dedup using better code from [[CommentVoteBar.tsx]]
 export function PostButtonsVote(props: { post: PostListItemType }) {
-  const voting = usePostVoting({ postId: props.post.id, votes: props.post.votes });
+  const voting = usePostVoting({
+    postId: props.post.id,
+    votes: props.post.votes,
+    score_external: props.post.post_source?.score,
+  });
 
   return (
     <Stack align="center" color="slate.muted">

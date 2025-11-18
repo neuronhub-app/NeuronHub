@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
 import { useUser } from "@/apps/users/useUserCurrent";
+import type { PostListItemType } from "@/components/posts/ListContainer";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useInit } from "@/utils/useInit";
@@ -7,11 +8,8 @@ import { useStateValtio } from "@/utils/useValtioProxyRef";
 
 export function usePostVoting(props: {
   postId: ID;
-  votes: Array<{
-    id: ID;
-    is_vote_positive: boolean | null;
-    author: { id: ID };
-  }>;
+  votes: PostListItemType["votes"];
+  score_external?: number | null;
 }) {
   const user = useUser();
 
@@ -77,7 +75,7 @@ export function usePostVoting(props: {
         return sum - 1;
       }
       return sum;
-    }, 0),
+    }, props.score_external ?? 0),
   };
 }
 const PostVoteUpdateOrCreateMutation = graphql.persisted(

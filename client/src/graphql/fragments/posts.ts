@@ -18,6 +18,9 @@ export const PostFragment = graphql(
         id
         id_external
         created_at_external
+				score
+				rank
+				url_of_source
       }
       image {
         url
@@ -40,9 +43,6 @@ export const PostFragment = graphql(
       votes {
         id
         is_vote_positive
-        author {
-          id
-        }
       }
       parent {
         id

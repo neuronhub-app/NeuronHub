@@ -20,8 +20,10 @@ class PostSource(TimeStampedModel):
     domain = TextChoicesField(ImportDomain, blank=True, null=True, default=None)
 
     id_external = models.CharField(blank=True)
-    rank = models.PositiveIntegerField(
-        null=True, blank=True, help_text="Eg from HN Firebase API"
+    rank = models.PositiveIntegerField(  # todo refac-name: hn_rank_deriver
+        null=True,
+        blank=True,
+        help_text="As HackerNews hides the Comment scores, we derive it from the Firebase API response order and save here",
     )
     url = models.CharField(max_length=255, blank=True)
     url_of_source = models.CharField(
