@@ -138,7 +138,7 @@ class ImporterHackerNews:
         }
         if is_post:
             post_data = cast(algolia.Post, data)
-            post, _ = await Post.objects.aupdate_or_create(
+            post, is_created = await Post.objects.aupdate_or_create(
                 type=Post.Type.Post,
                 post_source__id_external=data["id"],
                 defaults=dict(
@@ -148,8 +148,9 @@ class ImporterHackerNews:
                     source=self._build_HN_item_url(post_data["id"]),
                 ),
             )
-            tag = await tag_create_or_update(tags.hacker_news, post=post, is_important=True)
-            await post.tags.aadd(tag)
+            if is_created:
+                tag = await tag_create_or_update(tags.hacker_news, post=post, is_important=True)
+                await post.tags.aadd(tag)
         else:  # type = comment
             assert parent
             post, _ = await Post.objects.aupdate_or_create(
