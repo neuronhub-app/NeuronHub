@@ -170,7 +170,7 @@ class ImporterHackerNews:
                 post_source__id_external=data["id"],
                 defaults=dict(
                     **post_defaults,
-                    content_polite=markdownify(data["text"]),
+                    content_polite=markdownify(data["text"] or ""),
                     parent_root=parent_root,
                 ),
             )

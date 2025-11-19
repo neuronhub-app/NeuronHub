@@ -2,6 +2,7 @@ import asyncio
 import os
 from enum import Enum
 from pathlib import Path
+import warnings
 
 import dj_database_url
 import django
@@ -329,6 +330,11 @@ LOGGING = {
         "level": "INFO",
     },
 }
+# supress warn from strawberry-django
+warnings.filterwarnings(
+    "ignore", category=UserWarning, module="strawberry.utils.deprecations", lineno=26
+)
+
 if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
     # Mise's `--quite` doesn't work on `runserver`, and `--silent` drops all stderr - so we set django to WARNING instead of INFO
     LOGGING["loggers"] = {

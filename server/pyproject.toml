@@ -17,7 +17,7 @@ dependencies = [
     "django-rich == 2.*", # [i=norm, rep=highest, @adamchainz] Django Sec Team
     "django-extensions == 4.*",
         "ipython == 9.*",
-    "strawberry-graphql ~= 0.284.1",
+    "strawberry-graphql ~= 0.286.0",
         "strawberry-graphql-django ~= 0.67.0",
     "django-stubs[compatible-mypy] == 5.*",
     "django-health-check == 3.*", # [i=low, rep=norm, GH=norm, @revsys, 1.3k] US dev agency
