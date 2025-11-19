@@ -77,7 +77,7 @@
     [tasks."dev:s3"]
         dir = "server"
         run = """
-            if $env.CI != "true" {
+            if $env.CI? != "true" {
                 mkdir {{ env.S3_STORAGE_BUCKET_NAME }}
                 try { rclone serve s3 . --addr :{{ env.S3_PORT }} }
             }
