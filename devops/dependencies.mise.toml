@@ -34,7 +34,7 @@
 ["upgrade-deps:client"]
     dir = "client"
     run = [
-        "bun run ncu --upgrade --packageManager bun",
+        "bun run ncu --upgrade --packageManager bun --reject=graphql", # freeze "graphql" due to "gql.tada" bugs (#103)
         "bun install"
     ]
 
