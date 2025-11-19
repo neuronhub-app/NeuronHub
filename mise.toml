@@ -60,8 +60,6 @@
 
 # Dev servers
 # -----------------------------------------------------
-[tasks.test-env]
-    run = "print $env"
 [tasks."dev"]
     depends = ["dev:server", "dev:client", "dev:db", "dev:s3"]
 
@@ -79,8 +77,10 @@
     [tasks."dev:s3"]
         dir = "server"
         run = """
-            mkdir {{ env.S3_STORAGE_BUCKET_NAME }}
-            try { rclone serve s3 . --addr :{{ env.S3_PORT }} }
+            if $env.CI != "true" {
+                mkdir {{ env.S3_STORAGE_BUCKET_NAME }}
+                try { rclone serve s3 . --addr :{{ env.S3_PORT }} }
+            }
         """
 
     [tasks."dev:db"]
