@@ -27,7 +27,7 @@
 
     PROJECT_NAME = "neuronhub"
     VITE_PROJECT_NAME = "NeuronHub"
-    VITE_RELEASE_VERSION = "0.2.4.2" # used in GitHub and Sentry
+    VITE_RELEASE_VERSION = "0.2.4.3" # used in GitHub and Sentry
 
     DOMAIN_NAME = "neuronhub.app"
 

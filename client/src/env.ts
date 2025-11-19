@@ -19,20 +19,18 @@ import { cleanEnv, port, str, url } from "envalid";
  */
 const envRaw = typeof process === "undefined" ? import.meta.env : process.env;
 
+const serverEnv = str({
+  choices: ["development", "staging", "production"],
+  default: "development",
+});
+
 const envCleaned = cleanEnv(envRaw, {
   VITE_PROJECT_NAME: str({ default: "NeuronHub" }),
 
-  NODE_ENV: str({
-    choices: ["development", "staging", "production"],
-    default: "development",
-  }),
-  // alias to NODE_ENV, that for some reason is used by the `react-router build`
-  MODE: str({
-    choices: ["development", "staging", "production"],
-    default: "development",
-  }),
+  NODE_ENV: serverEnv,
+  MODE: serverEnv, // used by the Vite instead of NODE_ENV as a hack. We don't care re historical difference - hence the merge.
 
-  SENTRY_DSN_FRONTEND: str({ default: "" }),
+  VITE_SENTRY_DSN_FRONTEND: str({ default: "" }),
 
   VITE_SERVER_URL: url({ default: "http://localhost:8000" }),
 
@@ -45,5 +43,8 @@ export const env = {
   ...envCleaned,
   get VITE_SERVER_URL_API(): string {
     return `${this.VITE_SERVER_URL}/api/graphql`;
+  },
+  get isProd(): boolean {
+    return this.MODE === "production" || this.NODE_ENV === "production";
   },
 };

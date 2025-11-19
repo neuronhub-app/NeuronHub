@@ -6,7 +6,7 @@ import { env } from "@/env";
 
 Sentry.init({
   enabled: env.isProd,
-  dsn: env.SENTRY_DSN_FRONTEND,
+  dsn: env.VITE_SENTRY_DSN_FRONTEND,
   integrations: [
     Sentry.reactRouterTracingIntegration(),
     Sentry.replayIntegration(),

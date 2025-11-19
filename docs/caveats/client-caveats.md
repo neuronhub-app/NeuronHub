@@ -4,7 +4,7 @@
 - `react-hook-form`: `onChange` breaks if you pass `ref` to `<input>` - see [docs](https://www.react-hook-form.com/faqs/#Howtosharerefusage)
 - `react-router` v7: HMR force-reloads when `export default` Route component file changes
 
-### Do not trust react-router Component Lifecycle
+### Don't trust react-router Component Lifecycle
 
 Don't expect there to be a mount and un-mount. Components are suspended instead. Occasionally.
 
@@ -17,3 +17,11 @@ In v7 on navigation `window.location` changes immediately, while components are 
 4. Loaders re-run instead of using cached state
 
 [Issue #12790](https://github.com/remix-run/react-router/issues/12790) - closed with the reply akin "you should use our `window` wrapper, and hope your every NPM package does".
+
+### Vite env.NODE_ENV & env.MODE
+
+Vite devs use them simultaneously, the diff:
+- `NODE_ENV`: **optimization level** - eg minified builds for prod vs dev
+- `MODE`: **config selector** - which `.env.[mode]` file loads
+
+This is overcomplicated, hence we equal `env.NODE_ENV = env.MODE` in [[client/src/env.ts]].

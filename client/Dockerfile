@@ -13,7 +13,7 @@ ARG SENTRY_AUTH_TOKEN
 ARG SENTRY_ORG=neuronhub
 ARG SENTRY_PROJECT=neuronhub-frontend
 ARG PROJECT_NAME
-ARG SENTRY_DSN_FRONTEND
+ARG VITE_SENTRY_DSN_FRONTEND
 
 WORKDIR /app
 
@@ -37,10 +37,6 @@ FROM nginx:alpine
 # after the FROM need to re-declare ARGs:
 ARG VITE_RELEASE_VERSION
 ARG GITHUB_PATH
-ARG NODE_ENV="production"
-
-ENV VITE_RELEASE_VERSION=$VITE_RELEASE_VERSION
-ENV NODE_ENV=$NODE_ENV
 
 LABEL org.opencontainers.image.description="Nginx serving React Router static index.html"
 LABEL org.opencontainers.image.source="https://github.com/${GITHUB_PATH}/blob/${VITE_RELEASE_VERSION}/client/Dockerfile"

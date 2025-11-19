@@ -68,8 +68,8 @@
                     SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN }}
                     SENTRY_ORG: {{ env.SENTRY_ORG }}
                     SENTRY_PROJECT: ($sentry_project)
-                    SENTRY_DSN_FRONTEND: {{ env.SENTRY_DSN_FRONTEND }}
                     SENTRY_DSN_BACKEND: {{ env.SENTRY_DSN_BACKEND }}
+                    VITE_SENTRY_DSN_FRONTEND: {{ env.SENTRY_DSN_FRONTEND }}
                     VITE_RELEASE_NAME: {{ env.VITE_RELEASE_NAME }}
                     PROJECT_NAME: {{ env.PROJECT_NAME }}
 "
