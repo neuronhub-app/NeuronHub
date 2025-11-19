@@ -27,7 +27,7 @@ COPY . ./
 
 RUN apt-get update && apt-get install ca-certificates --yes # for Sentry Source Maps upload
 
-RUN npx react-router build
+RUN npx react-router build --mode=$NODE_ENV --sourcemapClient
 
 
 # Nginx
