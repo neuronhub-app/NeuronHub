@@ -1,6 +1,7 @@
 The annotations (`//`) specs are in [[pyproject.toml]]
 
 - use-debounce [i=norm, rep=norm, GH=norm, @xnimorz, 3.3k] an SWE at Meta
+- react-error-boundary [i=high, rep=high, GH=high, @bvaughn, 7.8k] React core at Meta
 - valtio [i=norm, rep=high, GH=high, @dai-shi, 10k]
 - shiki [i=none, rep=high, GH=high, @octref | @antfu, 12k] Nuxt & Vercel member
 
