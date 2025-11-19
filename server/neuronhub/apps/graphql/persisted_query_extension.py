@@ -47,7 +47,7 @@ def _get_operation_name(doc: DocumentNode) -> str | None:
     return None
 
 
-_persisted_file_name = "persisted.json"
+_persisted_file_name = "persisted-queries.json"
 _persisted_file_cache: dict[str, str] | None = None
 _persisted_file_cache_timestamp: datetime | None = None
 
@@ -55,7 +55,7 @@ _persisted_file_cache_timestamp: datetime | None = None
 def _load_client_persisted_queries_json() -> dict[str, str]:
     global _persisted_file_cache, _persisted_file_cache_timestamp
 
-    persisted_path = settings.BASE_DIR.parent / "client" / _persisted_file_name
+    persisted_path = settings.BASE_DIR / _persisted_file_name
     assert persisted_path.exists()
 
     file_timestamp = datetime.fromtimestamp(persisted_path.stat().st_mtime)

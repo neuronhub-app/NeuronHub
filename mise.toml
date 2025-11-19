@@ -27,7 +27,7 @@
 
     PROJECT_NAME = "neuronhub"
     VITE_PROJECT_NAME = "NeuronHub"
-    VITE_RELEASE_VERSION = "0.2.4.0" # used in GitHub and Sentry
+    VITE_RELEASE_VERSION = "0.2.4.1" # used in GitHub and Sentry
 
     DOMAIN_NAME = "neuronhub.app"
 
@@ -185,7 +185,7 @@
         dir = "client"
         run = [
             "bun run gql-tada generate output",
-            "bun run gql-tada generate persisted",
+            "bun run gql-tada generate persisted --output ../server/persisted-queries.json",
         ]
         sources = ["src/**/*", "e2e/**/*"]
         quiet = true
