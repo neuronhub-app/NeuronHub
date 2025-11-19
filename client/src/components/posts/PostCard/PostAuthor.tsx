@@ -57,16 +57,13 @@ function PostAuthorUsername(props: {
 }) {
   const username = props.post.author?.username ?? props.post?.post_source?.user_source?.username;
   return (
-    <Flex
-      align="center"
-      gap="gap.sm"
-      _hover={props.isPopover ? { cursor: "pointer", textDecoration: "underline" } : {}}
-    >
+    <Flex align="center" gap="gap.sm">
       {!props.isHideAvatar && (
         <Avatar.Root
           size="2xs"
           variant="subtle"
-          colorPalette={getAvatarColorForUsername(username!)}
+          colorPalette={getAvatarColorForUsername(username)}
+          _hover={props.isPopover ? { cursor: "pointer" } : {}}
         >
           <Avatar.Fallback name={username} />
           <Avatar.Image
@@ -78,14 +75,18 @@ function PostAuthorUsername(props: {
           />
         </Avatar.Root>
       )}
-      <Text fontSize="sm" color="fg.muted">
+      <Text
+        fontSize="sm"
+        color="fg.muted"
+        _hover={props.isPopover ? { textDecoration: "underline" } : {}}
+      >
         {username}
       </Text>
     </Flex>
   );
 }
 
-export function getAvatarColorForUsername(username: string) {
+export function getAvatarColorForUsername(username?: string) {
   const colorPalette = [
     "gray",
     "slate",
@@ -99,6 +100,6 @@ export function getAvatarColorForUsername(username: string) {
     "yellow",
     "orange",
   ];
-  const index = username.charCodeAt(0) % colorPalette.length;
+  const index = (username?.charCodeAt(0) ?? 0) % colorPalette.length;
   return colorPalette[index];
 }
