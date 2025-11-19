@@ -54,13 +54,14 @@
     S3_STORAGE_BUCKET_NAME = "media"
     S3_PORT = 8333
 
-    IS_POSTGRES_EXTERNAL = "false"
+    IS_POSTGRES_EXTERNAL = "{{ env.IS_POSTGRES_EXTERNAL | default(value = env.CI | default(value = false)) }}"
     POSTGRES_EXTERNAL_SHELL_MSG = "Skipping as using non-Mise PostgreSQL (ie we're in GitHub CI or MacOS)"
 
 
 # Dev servers
 # -----------------------------------------------------
-
+[tasks.test-env]
+    run = "print $env"
 [tasks."dev"]
     depends = ["dev:server", "dev:client", "dev:db", "dev:s3"]
 
