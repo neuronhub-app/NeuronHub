@@ -17,7 +17,7 @@
     includes = [
         "devops/dependencies.mise.toml",
         "devops/db.mise.toml",
-        "devops/deploy.mise.toml",
+        "devops/docker.mise.toml",
         "devops/e2e.mise.toml",
         "devops/claude.mise.toml",
     ]

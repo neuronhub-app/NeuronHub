@@ -8,7 +8,7 @@
     dir = "devops/"
     run = """
         python3 docker_tag_and_push.py \
-            --app=${usage_app?} \
+            --app=($env.usage_app) \
             --github-path="{{ env.GITHUB_PATH }}" \
             --version="{{ env.VITE_RELEASE_VERSION }}"
     """
@@ -18,7 +18,7 @@
         flag "--app <name>" { choices "server" "client" "coder" }
         flag "--version <version>" env="VITE_RELEASE_VERSION"
     """
-    run = "sudo -E docker rmi ghcr.io/{{ env.GITHUB_PATH }}/${usage_app?}:${usage_version?}"
+    run = "sudo -E docker rmi ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)"
 
 
 ["docker:build"]
