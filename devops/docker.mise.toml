@@ -1,17 +1,19 @@
 # $schema: https://mise.jdx.dev/schema/mise-task.json
 
-
-["docker:push"]
+["docker:tag-and-push"]
     usage = """
         flag "--app <name>" { choices "server" "client" "coder" }
+        flag "--tag_only"
     """
     dir = "devops/"
     run = """
         python3 docker_tag_and_push.py \
             --app=($env.usage_app) \
-            --github-path="{{ env.GITHUB_PATH }}" \
-            --version="{{ env.VITE_RELEASE_VERSION }}"
+            --github_path="{{ env.GITHUB_PATH }}" \
+            --version="{{ env.VITE_RELEASE_VERSION }}" \
+            ...(if $env.usage_tag_only? == "true" { ["--tag_only"] } else { [] })
     """
+    alias = "docker:push"
 
 ["docker:rm"]
     usage = """
@@ -19,7 +21,6 @@
         flag "--version <version>" env="VITE_RELEASE_VERSION"
     """
     run = "sudo -E docker rmi ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)"
-
 
 ["docker:build"]
     usage = """

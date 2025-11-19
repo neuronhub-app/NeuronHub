@@ -4,27 +4,48 @@
 # ///
 
 """
-Tag & push version full, major, and latest. Eg for 1.1.1.0 push:
-- 1.1.1.0
-- 1.1
-- latest
+For example output eg run `mise docker:push --tag_only --app=client`
 """
 
-import sys
+import argparse
 import subprocess
-import getopt
+from argparse import Namespace
+from typing import Literal
 
-opts_tuple, _ = getopt.getopt(sys.argv[1:], "", ["app=", "github-path=", "version="])
-opts = dict(opts_tuple)
+parser = argparse.ArgumentParser()
+parser.add_argument("--app", default="server", choices=["server", "client", "coder"])
+parser.add_argument("--github_path")
+parser.add_argument("--version")
+parser.add_argument("--tag_only", action="store_true")
 
-version_parts = opts["--version"].split(".")
-version_major = f"{version_parts[0]}.{version_parts[1]}"
 
-tag_base = f"ghcr.io/{opts['--github-path']}/{opts['--app']}"
-tag_full = f"{tag_base}:{opts['--version']}"
+class NamespaceOpts(Namespace):
+    app: Literal["server", "client", "coder"]
+    version: str
+    github_path: str
+    tag_only: bool
 
-subprocess.run(["sudo", "docker", "push", tag_full])
 
-for version in [version_major, "latest"]:
-    subprocess.run(["sudo", "docker", "tag", tag_full, f"{tag_base}:{version}"])
-    subprocess.run(["sudo", "docker", "push", f"{tag_base}:{version}"])
+def main(opts: NamespaceOpts):
+    is_push_to_registry = not opts.tag_only
+
+    version_splits = opts.version.split(".")
+    version_major = f"{version_splits[0]}.{version_splits[1]}"  # eg "0.2"
+
+    for version in [opts.version, version_major, "latest"]:
+        container_path = f"ghcr.io/{opts.github_path}/{opts.app}"
+        tag_existing = f"{container_path}:{opts.version}"
+        _docker_run("tag", tag_existing, f"{container_path}:{version}")
+        if is_push_to_registry:
+            _docker_run("push", f"{container_path}:{version}")
+
+
+def _docker_run(*args: str):
+    docker = ["sudo", "-E", "docker"]
+    print("docker", *args)
+    subprocess.run([*docker, *args])
+
+
+if __name__ == "__main__":
+    # noinspection PyTypeChecker
+    main(opts=parser.parse_args())
