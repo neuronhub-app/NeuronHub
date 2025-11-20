@@ -25,16 +25,16 @@ def _is_query_allowed(query: str) -> bool:
     query_doc = parse(query)
 
     op_name = _get_operation_name(query_doc)
-    assert op_name, f"no OP name: {query}"
+    assert op_name, _error_msg(query, "no OP name")
 
     queries_persisted = _load_client_persisted_queries_json()
-    assert op_name in queries_persisted, f"not persisted: {op_name}"
+    assert op_name in queries_persisted, _error_msg(query)
 
     query_normalized = _normalize_query(query)
     query_persisted_normalized = _normalize_query(queries_persisted[op_name])
 
-    assert print_ast(query_normalized) == print_ast(query_persisted_normalized), (
-        f"not matched: {op_name}"
+    assert print_ast(query_normalized) == print_ast(query_persisted_normalized), _error_msg(
+        query
     )
     return True
 
@@ -50,6 +50,13 @@ def _get_operation_name(doc: DocumentNode) -> str | None:
 _persisted_file_name = "persisted-queries.json"
 _persisted_file_cache: dict[str, str] | None = None
 _persisted_file_cache_timestamp: datetime | None = None
+
+
+def _error_msg(query_name: str, error: str = "") -> str:
+    msg_base = f"query '{query_name}' not in {_persisted_file_name}"
+    if error:
+        return f"{msg_base}: error '{error}'"
+    return msg_base
 
 
 def _load_client_persisted_queries_json() -> dict[str, str]:
