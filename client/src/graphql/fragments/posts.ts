@@ -85,6 +85,22 @@ export const CommentFieldsFragment = graphql(
       id
       type
       __typename
+
+      content_polite
+
+      created_at
+      updated_at
+
+      parent {
+        id
+      }
+      parent_root {
+        id
+      }
+      votes {
+        id
+        is_vote_positive
+      }
       author {
         id
         username
@@ -92,44 +108,38 @@ export const CommentFieldsFragment = graphql(
           url
         }
       }
-      parent {
-        id
-        type
-      }
-      parent_root {
-        id
-      }
-      content_polite
-      content_direct
-      content_rant
-      created_at
-      updated_at
-      source_author
-
       post_source {
         id
         id_external
         created_at_external
-        json
-
-				user_source {
-					id
-					username
-					score
-					about
-					created_at_external
-				}
-      }
-      votes {
-        id
-        is_vote_positive
-        author {
+  
+        user_source {
           id
+          username
         }
       }
     }
   `,
 );
+
+export const PostAuthorFragment = graphql(`
+  fragment PostAuthorFragment on PostTypeI {
+    post_source {
+      id
+      id_external
+      created_at_external
+
+      user_source {
+        id
+        username
+        score
+        about
+        created_at_external
+      }
+    }
+  }
+`);
+export type PostAuthorFragmentType = FragmentOf<typeof PostAuthorFragment>;
 
 export const PostDetailFragment = graphql(
   `

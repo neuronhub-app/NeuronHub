@@ -9,6 +9,7 @@ from neuronhub.apps.posts.graphql.types import PostReviewType
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.posts.graphql.types import PostToolType
 from neuronhub.apps.posts.graphql.types import PostType
+from neuronhub.apps.posts.graphql.types import PostTypeI
 
 
 if typing.TYPE_CHECKING:
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 @strawberry.type(name="Query")
 class PostsQuery:
+    post_generic: PostTypeI | None = strawberry_django.field()
     post: PostType | None = strawberry_django.field()
     post_tool: PostToolType | None = strawberry_django.field()
     post_review: PostReviewType | None = strawberry_django.field()

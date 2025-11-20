@@ -31,8 +31,8 @@ export function PostContentHighlighted(props: {
   post: {
     id: ID;
     content_polite: string;
-    content_direct: string;
-    content_rant: string;
+    content_direct?: string;
+    content_rant?: string;
   };
   highlights: Record<ID, PostHighlight[]>;
 }) {
@@ -86,9 +86,9 @@ export function PostContentHighlighted(props: {
           __html: markedConfigured.parse(
             highlightPostContentByMarks({
               content:
-                props.post.content_polite ||
-                props.post.content_direct ||
-                props.post.content_rant,
+                props.post.content_rant ??
+                props.post.content_direct ??
+                props.post.content_polite,
               highlights: props.highlights[props.post.id] ?? [],
             }),
           ),

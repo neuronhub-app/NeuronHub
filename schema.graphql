@@ -594,6 +594,7 @@ type PostVoteType {
 
 type Query {
   user_current: UserType
+  post_generic(pk: ID!): PostTypeI
   post(pk: ID!): PostType
   post_tool(pk: ID!): PostToolType
   post_review(pk: ID!): PostReviewType

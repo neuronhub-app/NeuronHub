@@ -125,9 +125,9 @@ export function CommentThread(props: {
             <HStack justify="space-between">
               {/* Header: Name, Date, Tags */}
               <HStack gap="gap.sm">
-                <Text fontSize="sm" fontWeight="semibold">
+                <Flex fontSize="sm" fontWeight="semibold">
                   <PostAuthor post={props.comment} isHideAvatar />
-                </Text>
+                </Flex>
 
                 {props.comment?.post_source?.user_source?.username ===
                   props.post?.post_source?.user_source?.username && (

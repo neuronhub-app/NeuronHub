@@ -133,7 +133,8 @@ export function Library() {
                     <Stack aria-label="author & date" gap="gap.xs" mb="gap.sm">
                       <HStack gap="gap.sm">
                         <Text fontSize="sm" color="fg.muted">
-                          {highlight.post.source_author || highlight.post.author?.username}
+                          {highlight.post.post_source?.user_source?.username ??
+                            highlight.post.author?.username}
                         </Text>
 
                         <PostDatetime

@@ -13,7 +13,7 @@ import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { useInit } from "@/utils/useInit";
 import { useStateValtioSet, useValtioProxyRef } from "@/utils/useValtioProxyRef";
-import { PostTypeEnum, UserListName } from "~/graphql/enums";
+import { UserListName } from "~/graphql/enums";
 
 export function PostDetail(props: {
   post?: PostDetailFragmentType | PostReviewDetailFragmentType;
@@ -154,7 +154,7 @@ function buildCommentTree(commentsFlat: PostDetailFragmentType["comments"]) {
   for (const comment of commentsFlat) {
     const commentWithChildren = commentMap.get(comment.id)!;
 
-    const isTopLevel = !comment.parent || comment.parent.type !== PostTypeEnum.Comment;
+    const isTopLevel = comment.parent?.id === comment.parent_root?.id;
     if (isTopLevel) {
       commentTree.push(commentWithChildren);
     } else if (comment.parent && commentMap.has(comment.parent.id)) {
