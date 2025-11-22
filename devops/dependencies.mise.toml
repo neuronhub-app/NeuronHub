@@ -11,6 +11,10 @@
     dir = "client"
     run = "bun install --frozen-lockfile"
 
+["install-deps:client:new"]
+    dir = "client"
+    run = "bun install"
+
 ["install-deps:playwright"]
     dir = "client"
     run = [
@@ -29,18 +33,29 @@
 
 ["upgrade-deps:server"]
     dir = "server"
-    run = "uv lock --upgrade"
+    run = """
+        # use env.DEPENDENCY_COOLDOWN_DAYS
+
+        let days_cooldown = {{ env.DEPENDENCY_COOLDOWN_DAYS }}day;
+        let date_cutoff = (date now) - $days_cooldown | format date "%+"
+
+        uv lock --upgrade --dry-run $"--exclude-newer=($date_cutoff)"
+    """
 
 ["upgrade-deps:client"]
     dir = "client"
     run = [
-        "bun run ncu --upgrade --packageManager bun --reject=graphql", # freeze "graphql" due to "gql.tada" bugs (#103)
+        # freeze "graphql" due to "gql.tada" bugs (see #103)
+        "bun run ncu --upgrade --packageManager bun --reject=graphql --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }}",
         "bun install"
     ]
 
 ["upgrade-deps:client:dry"]
     dir = "client"
-    run = "bun run ncu --packageManager bun"
+    run = [
+        "bun run ncu --packageManager bun --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} ",
+        "bun run ncu --packageManager bun --cooldown=0",
+    ]
 
 ["upgrade-deps:playwright"]
     dir = "client"
