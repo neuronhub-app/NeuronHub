@@ -156,6 +156,12 @@ class Visibility(models.TextChoices):
     PUBLIC
 ```
 
+##### Security
+
+Given that GraphQL is a security clusterfuck, we save all `client/` queries to the whitelist file `server/persisted-queries.json` with gql.tada CLI. It happens within the `mise lint` (typegen) task.
+
+Hence the Strawberry server rejects everything not hardcoded in this JSON file.
+
 #### Frontend `client/`
 - `e2e/` - Playwright with its `e2e/tests`
 - `src/routes.ts` - has react-router `RouteConfig`, and `export const urls = { ... }` for usage as `urls.reviews.list`.
