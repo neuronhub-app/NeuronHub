@@ -4,11 +4,11 @@
 
 - `mise lint` - is cached to be used all the time. It runs:
   - `mise format` - Ruff, Biome
-  - `mise typegen` - Strawberry Django → schema.graphql → TypeScript enums, gql.tada, react-router
+  - `mise typegen` - Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries; @chakra-ui; etc
   - `mise lint:server` - mypy
-  - `mise lint:client` - Biome and tsc
-- `mise pytest` - server/ only
-- `mise e2e` - Playwright. Starts its own Django and Vite servers.
+  - `mise lint:client` - Biome and tsgo
+- `mise pytest` - server/ pytest only
+- `mise e2e` - Playwright. Starts its own Django and Vite servers. YOu can only pass test cases to run, never add flags as `headless`.
 - `mise django:migrate`
 - `mise django:makemigrations`
 - `mise django:db-stubs-repopulate`
