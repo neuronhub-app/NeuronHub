@@ -1,7 +1,6 @@
 from typing import cast
 
 import strawberry
-from asgiref.sync import sync_to_async
 from strawberry import Info
 from strawberry_django import mutations
 from strawberry_django.auth.utils import aget_current_user
@@ -20,13 +19,12 @@ class DjangoModelInput:
     id: strawberry.ID
 
 
-# todo ! fix(auth): permissions
 @strawberry.type
 class PostsMutation:
+    # todo ! fix(auth): permissions
     post_update: PostType = mutations.update(PostTypeInput, extensions=[IsAuthenticated()])
     post_delete: PostType = mutations.delete(DjangoModelInput, extensions=[IsAuthenticated()])
 
-    # todo ! fix(auth): "accidental" .parent access
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def post_update_or_create(self, data: PostTypeInput, info: Info) -> PostType:
         user = await aget_current_user(info)
@@ -75,5 +73,5 @@ class PostsMutation:
     async def update_post_seen_status(self, id: strawberry.ID, info: Info) -> bool:
         user = await aget_current_user(info)
         post = await Post.objects.aget(id=id)
-        await sync_to_async(post.seen_by_users.add)(cast(User, user).id)
+        await post.seen_by_users.aadd(user.id)
         return True

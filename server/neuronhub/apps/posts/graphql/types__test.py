@@ -16,9 +16,8 @@ class PostGraphqlTypesTest(NeuronTestCase):
         await sync_to_async(self._assert_num_queries)(number=22)
 
     def _assert_num_queries(self, number: int):
-        # async_to_sync as assertNumQueries is PITA
         with self.assertNumQueries(number):
-            async_to_sync(self.graphql_query)(
+            async_to_sync(self.graphql_query)(  # FYI async_to_sync in assertNumQueries() is PITA
                 # this is a core snap of urls.reviews.list query
                 """
                     query ReviewList {
