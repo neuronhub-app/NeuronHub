@@ -116,7 +116,7 @@
 
     [tasks."test:pytest"]
         dir = "server"
-        depends = ["dev:db", "dev:s3"]
+        depends = ["dev:db"]
         run = "uv run pytest"
         alias = "pytest"
 
