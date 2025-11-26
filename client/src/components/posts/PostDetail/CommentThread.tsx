@@ -58,6 +58,7 @@ export function CommentThread(props: {
     toolbar: number;
     avatar: number;
   };
+  refetchComments?: () => void;
 }) {
   const user = useUser();
 
@@ -162,9 +163,10 @@ export function CommentThread(props: {
                   <CommentForm
                     mode="edit"
                     comment={state.snap.commentForEdit}
-                    onEditFinish={() => {
+                    onClose={async () => {
                       state.mutable.isEditing = false;
                       state.mutable.commentForEdit = null;
+                      await props.refetchComments?.();
                     }}
                   />
                 ) : null
@@ -221,8 +223,9 @@ export function CommentThread(props: {
               <CommentForm
                 mode="create"
                 parentId={props.comment.id}
-                onCancel={() => {
+                onClose={async () => {
                   state.mutable.isShowReplyForm = false;
+                  await props.refetchComments?.();
                 }}
               />
             </Box>
@@ -249,6 +252,7 @@ export function CommentThread(props: {
                 toolbar: refs.toolbar.current?.offsetHeight ?? 0,
                 avatar: refs.avatar.current?.offsetHeight ?? 0,
               }}
+              refetchComments={props.refetchComments}
             />
           ))}
         </Stack>

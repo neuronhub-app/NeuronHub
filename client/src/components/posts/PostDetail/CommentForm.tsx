@@ -20,12 +20,12 @@ export function CommentForm(
     | {
         mode: "create";
         parentId: ID;
-        onCancel?: () => void;
+        onClose?: () => Promise<void> | void;
       }
     | {
         mode: "edit";
         comment: PostEditFragmentType;
-        onEditFinish: () => void;
+        onClose: () => Promise<void> | void;
       },
 ) {
   const isEditMode = props.mode === "edit";
@@ -59,7 +59,7 @@ export function CommentForm(
       });
       if (response.success) {
         toast.success("Comment updated");
-        props.onEditFinish();
+        await props.onClose();
       } else {
         showError(response.errorMessage);
       }
@@ -72,9 +72,7 @@ export function CommentForm(
         toast.success("Comment posted");
         form.reset();
         state.mutable.isShowVisibilityField = false;
-        if (props.onCancel) {
-          props.onCancel();
-        }
+        await props.onClose?.();
       } else {
         showError(response.errorMessage);
       }
@@ -109,55 +107,29 @@ export function CommentForm(
 
           {state.snap.isShowVisibilityField && <PostSharableFields isShowRecommendTo={false} />}
 
-          {!isEditMode && (
-            <HStack>
-              {props.onCancel && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={() => props.onCancel?.()}
-                  {...ids.set(ids.comment.form.cancelBtn)}
-                >
-                  Cancel
-                </Button>
-              )}
-
-              <Button
-                type="submit"
-                variant="subtle"
-                size="xs"
-                loading={form.formState.isSubmitting}
-                {...ids.set(ids.post.form.btn.submit)}
-              >
-                Post
-              </Button>
-            </HStack>
-          )}
-
-          {isEditMode && (
-            <HStack>
+          <HStack>
+            {props.onClose && (
               <Button
                 type="button"
                 variant="ghost"
                 size="xs"
-                onClick={() => props.onEditFinish()}
+                onClick={() => props.onClose?.()}
                 {...ids.set(ids.comment.form.cancelBtn)}
               >
                 Cancel
               </Button>
+            )}
 
-              <Button
-                type="submit"
-                variant="subtle"
-                size="xs"
-                loading={form.formState.isSubmitting}
-                {...ids.set(ids.post.form.btn.submit)}
-              >
-                Save
-              </Button>
-            </HStack>
-          )}
+            <Button
+              type="submit"
+              variant="subtle"
+              size="xs"
+              loading={form.formState.isSubmitting}
+              {...ids.set(ids.post.form.btn.submit)}
+            >
+              {isEditMode ? "Save" : "Post"}
+            </Button>
+          </HStack>
         </Stack>
       </form>
     </FormProvider>

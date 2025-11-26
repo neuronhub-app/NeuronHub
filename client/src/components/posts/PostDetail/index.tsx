@@ -13,7 +13,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { type ReactNode, useMemo, useRef } from "react";
+import { type ReactNode, useMemo } from "react";
 import { useHighlighter } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard";
@@ -58,8 +58,6 @@ export function PostDetail(props: {
     comments: null as PostCommentType[] | null,
   });
 
-  const commentNodeFinal = useRef(null);
-
   const commentTree = useMemo(
     () => (state.snap.comments ? buildCommentTree(state.snap.comments) : []),
     [state.snap.comments],
@@ -69,15 +67,18 @@ export function PostDetail(props: {
 
   const title = useMetaTitle({ isLoading: true });
 
-  const commentsInit = useInit({
+  async function refetchComments() {
+    const res = await client.query({
+      query: PostCommentsQuery,
+      variables: { parent_root_id: props.post!.id },
+      fetchPolicy: "network-only",
+    });
+    state.mutable.comments = res.data?.post_comments ?? [];
+  }
+
+  useInit({
     isReady: Boolean(props.post?.id),
-    onInit: async () => {
-      const res = await client.query({
-        query: PostCommentsQuery,
-        variables: { parent_root_id: props.post!.id },
-      });
-      state.mutable.comments = res.data?.post_comments ?? [];
-    },
+    onInit: refetchComments,
   });
 
   useInit({
@@ -132,36 +133,10 @@ export function PostDetail(props: {
             </Heading>
 
             <VStack px={0} align="flex-start" gap="gap.md">
-              {/* Render top-level comments from the tree */}
-
               <For
                 each={commentTree}
                 fallback={[1, 2, 3, 4, 5, 6, 7, 8].map(index => (
-                  <Box w="full" mt="gap.md" key={index}>
-                    <Flex gap="gap.sm">
-                      <VStack gap={0}>
-                        <SkeletonCircle w={6} h={6} />
-                      </VStack>
-
-                      <VStack align="flex-start" gap="gap.sm" w="full">
-                        <VStack align="flex-start" px="1" rounded="l3" w="full" gap="3">
-                          <HStack>
-                            <Skeleton w={16} h={5} />
-                            <Skeleton w={16} h={5} />
-                          </HStack>
-                          <SkeletonText noOfLines={3} />
-                        </VStack>
-
-                        <Spacer w="1.5" h="full" />
-
-                        <Flex gap="gap.sm" px="1">
-                          <Skeleton w={5} h={5} />
-                          <Skeleton w={5} h={5} />
-                          <Skeleton w={10} h={5} />
-                        </Flex>
-                      </VStack>
-                    </Flex>
-                  </Box>
+                  <CommentThreadSkeleton key={index} />
                 ))}
               >
                 {(comment, index) => (
@@ -176,13 +151,14 @@ export function PostDetail(props: {
                     isLastChild={index === commentTree.length - 1}
                     isFirstChild={true}
                     height={{ parent: 0, toolbar: 0, avatar: 0 }} // init values
+                    refetchComments={refetchComments}
                   />
                 )}
               </For>
             </VStack>
 
             <Show when={user}>
-              <CommentForm mode="create" parentId={post.id} />
+              <CommentForm mode="create" parentId={post.id} onClose={refetchComments} />
             </Show>
           </Stack>
         </Stack>
@@ -190,6 +166,37 @@ export function PostDetail(props: {
     </Stack>
   );
 }
+
+function CommentThreadSkeleton() {
+  return (
+    <Box w="full" mt="gap.md">
+      <Flex gap="gap.sm">
+        <VStack gap={0}>
+          <SkeletonCircle w={6} h={6} />
+        </VStack>
+
+        <VStack align="flex-start" gap="gap.sm" w="full">
+          <VStack align="flex-start" px="1" rounded="l3" w="full" gap="3">
+            <HStack>
+              <Skeleton w={16} h={5} />
+              <Skeleton w={16} h={5} />
+            </HStack>
+            <SkeletonText noOfLines={3} maxW="3xl" />
+          </VStack>
+
+          <Spacer w="1.5" h="full" />
+
+          <Flex gap="gap.sm" px="1">
+            <Skeleton w={5} h={5} />
+            <Skeleton w={5} h={5} />
+            <Skeleton w={10} h={5} />
+          </Flex>
+        </VStack>
+      </Flex>
+    </Box>
+  );
+}
+
 const UserCollapsedCommentsQuery = graphql.persisted(
   "UserCollapsedComments",
   graphql(`
@@ -203,6 +210,7 @@ const UserCollapsedCommentsQuery = graphql.persisted(
     }
   `),
 );
+
 const UpdateCollapsedCommentsMutation = graphql.persisted(
   "UpdateCollapsedComments",
   graphql(`

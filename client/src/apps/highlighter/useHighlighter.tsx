@@ -38,7 +38,7 @@ export function useHighlighter(props: {
     },
   });
 
-  const [debouncedPostIds] = useDebounce(state.snap.postIds, 1000);
+  const [debouncedPostIds] = useDebounce(state.snap.postIds, 100);
 
   const { data } = useQuery(PostHighlightsQuery, {
     variables: { ids: debouncedPostIds },
