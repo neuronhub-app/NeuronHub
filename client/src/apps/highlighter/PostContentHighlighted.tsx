@@ -45,7 +45,7 @@ export function PostContentHighlighted(props: {
   function handlePostHighlightClick(event: React.MouseEvent) {
     if (isHTMLElement(event.target)) {
       const isHighlightClicked =
-        event.target.dataset[highlight_attrs.highlightId] && event.target?.tagName === "MARK";
+        event.target.dataset.highlightId && event.target?.tagName === "MARK";
 
       if (isHighlightClicked) {
         const isClickWithSelection = document.getSelection()?.toString();
@@ -53,8 +53,7 @@ export function PostContentHighlighted(props: {
           state.mutable.highlightActiveId = null;
           return;
         }
-        state.mutable.highlightActiveId =
-          event.target.dataset[highlight_attrs.highlightId] ?? null;
+        state.mutable.highlightActiveId = event.target.dataset.highlightId ?? null;
         return;
       }
     }
