@@ -23,17 +23,10 @@ async def _update_or_create(data: PostTypeInput, author: User):
     data_parsed = _parse_data(data)
     is_edit_mode = bool(data.id)
     if is_edit_mode:
-        is_allow_edit_imports = author.is_superuser
-        if is_allow_edit_imports:
-            post = await Post.objects.select_related("parent").aget(
-                id=data.id,
-                post_source__isnull=False,
-            )
+        if author.is_superuser:
+            post = await Post.objects.select_related("parent").aget(id=data.id)
         else:
-            post = await Post.objects.select_related("parent").aget(
-                author=author,
-                id=data.id,
-            )
+            post = await Post.objects.select_related("parent").aget(author=author, id=data.id)
         for field, value in data_parsed.items():
             setattr(post, field, value)
         await post.asave()
