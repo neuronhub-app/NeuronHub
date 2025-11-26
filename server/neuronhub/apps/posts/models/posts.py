@@ -141,9 +141,11 @@ class Post(AnonimazableTimeStampedModel):
     history = HistoricalRecords(
         cascade_delete_history=True,
         excluded_fields=[
+            "parent_root",
             "users_read_later",
             "users_library",
             "seen_by_users",
+            "collapsed_by_users",
         ],
     )
 
