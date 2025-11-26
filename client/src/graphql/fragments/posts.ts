@@ -145,12 +145,9 @@ export const PostDetailFragment = graphql(
   `
     fragment PostDetailFragment on PostTypeI {
       ...PostFragment
-      comments {
-        ...CommentFieldsFragment
-      }
     }
   `,
-  [PostFragment, CommentFieldsFragment],
+  [PostFragment],
 );
 
 // #AI it was redefined by AI during #91 and #94, in an idiotic way - review later #prob-redundant
