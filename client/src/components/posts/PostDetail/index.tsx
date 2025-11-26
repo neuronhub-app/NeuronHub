@@ -71,18 +71,20 @@ export function PostDetail(props: {
     }
   }
 
+  const post = props.post;
+
   return (
     <Stack>
       {props.isLoading && <p>Loading...</p>}
       {props.error && <p>Error: {props.error.message}</p>}
 
-      {props.post && (
+      {post && (
         <Stack gap="gap.xl">
-          <PostCard post={props.post} isDetailPage urlNamespace="posts" />
+          <PostCard post={post} isDetailPage urlNamespace="posts" />
 
           <Stack gap={commentTree.length ? "gap.lg" : "0"}>
             <Heading fontSize="lg" display="flex" gap="gap.sm" alignItems="center">
-              Comments <Text color="fg.subtle">{props.post.comments_count}</Text>
+              Comments <Text color="fg.subtle">{post.comments_count}</Text>
             </Heading>
 
             <Show when={commentTree.length > 0 && (!user || isCollapsedIdsLoaded.snap.value)}>
@@ -96,7 +98,7 @@ export function PostDetail(props: {
                       highlights={highlighter.highlights}
                       collapsedIds={collapsedIds.snap}
                       toggleCollapse={toggleCollapse}
-                      post={props.post!}
+                      post={post}
                       depth={0}
                       isLastChild={index === commentTree.length - 1}
                       isFirstChild={true}
@@ -108,7 +110,7 @@ export function PostDetail(props: {
             </Show>
 
             <Show when={user}>
-              <CommentForm mode="create" parentId={props.post.id} />
+              <CommentForm mode="create" parentId={post.id} />
             </Show>
           </Stack>
         </Stack>
