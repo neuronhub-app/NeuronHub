@@ -11,6 +11,7 @@ from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models.posts import PostVote, PostTagVote
 from neuronhub.apps.posts.services.post_update_or_create import post_update_or_create
+from neuronhub.apps.users.graphql.resolvers import get_user
 from neuronhub.apps.users.models import User
 
 
@@ -71,7 +72,7 @@ class PostsMutation:
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def update_post_seen_status(self, id: strawberry.ID, info: Info) -> bool:
-        user = await aget_current_user(info)
+        user = await get_user(info)
         post = await Post.objects.aget(id=id)
         await post.seen_by_users.aadd(user.id)
         return True

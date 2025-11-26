@@ -6,13 +6,12 @@ from django.db.models import QuerySet
 from strawberry import ID
 from strawberry import Info
 from strawberry import auto
-from strawberry_django.auth.utils import aget_current_user
 from strawberry_django.permissions import IsAuthenticated
 
 from neuronhub.apps.highlighter.models import PostHighlight
 from neuronhub.apps.posts.graphql.mutations import DjangoModelInput
 from neuronhub.apps.posts.graphql.types import PostTypeI
-from neuronhub.apps.users.models import User
+from neuronhub.apps.users.graphql.resolvers import get_user
 
 
 @strawberry_django.order_type(PostHighlight)
@@ -94,8 +93,3 @@ class HighlighterMutation:
         user = await get_user(info)
         await PostHighlight.objects.filter(id=data.id, user=user).adelete()
         return True
-
-
-async def get_user(info: Info) -> User:
-    user = await aget_current_user(info=info)
-    return cast(User, user)
