@@ -40,7 +40,6 @@ class PostOrder:
     post_source: PostSourceOrder
 
 
-# seems as a bug in PyCharm re PyDataclass
 @strawberry_django.interface(Post)
 class PostTypeI:
     TYPE: PostTypeEnum
@@ -219,9 +218,7 @@ class PostTagFilter:
 class PostTagType:
     id: auto
     posts: list[PostType]
-    tag_parent: PostTagType | None = strawberry_django.field(
-        disable_optimization=True,  # it's good on avg, but here it calls prefetch_related() for PostTag.label, missing up the SQL
-    )
+    tag_parent: PostTagType | None
     tag_children: list[PostTagType]
     votes: list[PostTagVoteType]
     author: UserType | None

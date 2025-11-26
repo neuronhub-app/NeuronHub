@@ -1,9 +1,9 @@
 import { useQuery } from "@apollo/client/react";
 import type { ResultOf } from "gql.tada";
+import { useDebounce } from "use-debounce";
 import type { PostCommentTree } from "@/components/posts/PostDetail";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
-import { CommentFieldsFragment, PostFragment } from "@/graphql/fragments/posts";
 import { isQueryDataComplete } from "@/graphql/useApolloQuery";
 import { useInit } from "@/utils/useInit";
 import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
@@ -38,9 +38,11 @@ export function useHighlighter(props: {
     },
   });
 
+  const [debouncedPostIds] = useDebounce(state.snap.postIds, 1000);
+
   const { data } = useQuery(PostHighlightsQuery, {
-    variables: { ids: state.snap.postIds },
-    skip: !state.snap.postIds.length,
+    variables: { ids: debouncedPostIds },
+    skip: !debouncedPostIds.length,
   });
 
   useInit({
@@ -133,14 +135,10 @@ const PostHighlightsQuery = graphql.persisted(
         created_at
   
         post {
-          ...CommentFieldsFragment
-          parent_root {
-            ...PostFragment
-          }
+          id
         }
       }
     }`,
-    [PostFragment, CommentFieldsFragment],
   ),
 );
 
