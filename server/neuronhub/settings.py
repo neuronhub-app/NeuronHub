@@ -100,11 +100,7 @@ if IS_DEBUG_TOOLBAR_ENABLED:
     INSTALLED_APPS.append("debug_toolbar")
     MIDDLEWARE.insert(0, "strawberry_django.middlewares.debug_toolbar.DebugToolbarMiddleware")
     DEBUG_TOOLBAR_CONFIG = {
-        "DISABLE_PANELS": {
-            "debug_toolbar.panels.redirects.RedirectsPanel",
-            "debug_toolbar.panels.alerts.AlertsPanel",
-        },
-        "RENDER_PANELS": True,
+        "UPDATE_ON_FETCH": True,
     }
     INTERNAL_IPS = ["127.0.0.1"]
 
