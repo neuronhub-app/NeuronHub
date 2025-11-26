@@ -110,6 +110,7 @@ export namespace ids {
     thread: {
       line: "comment.thread.line",
       toggleButton: "comment.thread.toggle-button",
+      container: "comment.thread.container",
     },
   } as const;
 

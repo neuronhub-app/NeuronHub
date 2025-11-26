@@ -1,4 +1,5 @@
 import { test } from "@playwright/test";
+import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { urls } from "@/urls";
@@ -8,6 +9,13 @@ test.describe("HN Comments", () => {
   let $: LocatorMap;
 
   test.beforeEach(async ({ page }) => {
+    page.on("console", msg => {
+      const text = msg.text();
+      if (text.includes("[PostDetail]")) {
+        console.log(`[BROWSER] ${text}`);
+      }
+    });
+
     play = new PlaywrightHelper(page);
     await play.dbStubsRepopulateAndLogin({
       is_import_HN_post: true,
@@ -16,41 +24,21 @@ test.describe("HN Comments", () => {
     $ = play.locator();
   });
 
-  // #AI-slop
-  test.skip("view imported HN post with comments", async () => {
+  // #AI
+  test("view imported HN post with tree-structured comments", async () => {
     await play.navigate(urls.posts.list, { idleWait: true });
     await play.click(ids.post.card.link.detail); // the Post imported from HN
     await play.waitForNetworkIdle();
 
+    // Wait for comments to load (dynamic batch loading)
+    const threadContainers = play.getAll(ids.comment.thread.container);
+    await expect(threadContainers.first()).toBeVisible();
+
+    const containerCount = await threadContainers.count();
+    expect(containerCount).toBeGreaterThan(0);
+    console.log(`Thread containers: ${containerCount}`);
+
     const allThreadLines = play.getAll(ids.comment.thread.line);
-
-    // Test hover on comment with children (depth 1)
-    const lineWithChildren = allThreadLines.nth(0);
-    await lineWithChildren.hover();
-    await play.page.waitForTimeout(200);
-    await play.screenshot("hover-depth1-with-children", { fullPage: false });
-
-    // Test hover on childless comment
-    const childlessLine = allThreadLines.nth(1);
-    await childlessLine.hover();
-    await play.page.waitForTimeout(200);
-    await play.screenshot("hover-childless", { fullPage: false });
-
-    // Test hover on depth=3 comment
-    const depth3Line = allThreadLines.nth(3);
-    await depth3Line.hover();
-    await play.page.waitForTimeout(200);
-    await play.screenshot("hover-depth3", { fullPage: false });
-
-    // Test collapsing functionality
-    await lineWithChildren.click();
-    await play.page.waitForTimeout(500);
-    await play.screenshot("comment-collapsed", { fullPage: false });
-
-    // Test hover on collapsed state (unfolding)
-    const collapsedLine = allThreadLines.nth(0);
-    await collapsedLine.hover();
-    await play.page.waitForTimeout(200);
-    await play.screenshot("hover-collapsed-unfolding", { fullPage: false });
+    await expect(allThreadLines.first()).toBeVisible();
   });
 });

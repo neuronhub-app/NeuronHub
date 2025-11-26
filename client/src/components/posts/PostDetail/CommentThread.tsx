@@ -99,7 +99,12 @@ export function CommentThread(props: {
     (props.comment?.post_source?.user_source?.username || props.comment.author?.username) ?? "";
 
   return (
-    <Box as="section" pos="relative" ref={refs.container}>
+    <Box
+      as="section"
+      pos="relative"
+      ref={refs.container}
+      {...ids.set(ids.comment.thread.container)}
+    >
       <Flex ref={refs.content} as="article" gap="gap.sm" tabIndex={-1}>
         <VStack aria-label="Comment Left Side Box" pos="relative" gap={0}>
           <Box aria-label="Comment Avatar Box" pos="relative">
