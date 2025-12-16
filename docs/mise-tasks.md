@@ -12,3 +12,4 @@
 - `mise django:migrate`
 - `mise django:makemigrations`
 - `mise django:db-stubs-repopulate`
+- `mise algolia-reindex`

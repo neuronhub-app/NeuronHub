@@ -39,7 +39,7 @@ export const PostFragment = graphql(
       url
       domain
         
-      comments_count
+      comment_count
       
       author {
         id
@@ -69,6 +69,7 @@ export const PostFragment = graphql(
           ...PostTagFragment
         }
       }
+      created_at
       updated_at
 
       tags {

@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Model
 from django.urls import reverse
+from django.utils import timezone
 
 
 class NeuronModel(Model):
@@ -19,7 +20,7 @@ class NeuronModel(Model):
 
 
 class TimeStampedModel(NeuronModel):
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:

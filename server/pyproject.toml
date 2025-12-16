@@ -11,14 +11,15 @@ dependencies = [
     # django
     "django == 5.2.*",
         "pillow == 12.*", # [i=high, rep=high, GH=high, @hugovk, 13.1k] for ImageField. @hugovk is an ex-Python release manager; used by Django
+    "django-tasks == 0.9.0", # @RealOrangeOne, Django Security member
     "django-allauth == 65.*",
     "django-anymail == 13.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, KLOC +84/-40
     "django-cors-headers == 4.*", # [i=high, rep=highest, @adamchainz] Django Sec Team
     "django-rich == 2.*", # [i=norm, rep=highest, @adamchainz] Django Sec Team
     "django-extensions == 4.*",
         "ipython == 9.*",
-    "strawberry-graphql ~= 0.286.0",
-        "strawberry-graphql-django ~= 0.67.0",
+    "strawberry-graphql ~= 0.287.0",
+        "strawberry-graphql-django ~= 0.67.2",
     "django-stubs[compatible-mypy] == 5.*",
     "django-health-check == 3.*", # [i=low, rep=norm, GH=norm, @revsys, 1.3k] US dev agency
     "django-simple-history == 3.*", # [i=high, rep=norm, GH=norm, @django-commons, 2.4k]
@@ -26,6 +27,10 @@ dependencies = [
     "django-fieldsignals == 0.*", # [i=low, rep=norm, GH=norm, @craigds]
     "django-storages[boto3] == 1.14.6", # [i=norm, rep=low, GH=high, @jschneier, 2.8k] for S3, author dropped it in 2011, maintainer is a no-name - single project
     "dj-database-url == 3.*", # [i=low, rep=norm, GH=norm, @mattseymour]
+
+    "algoliasearch-django >= 4.0.0",
+    "algoliasearch >= 4.0.0",
+        "pydantic < 2.12.4", # 2.12.4-5 are broken for Python 3.14
 
     # django fields
     "django-timezone-field == 7.*", # [i=low, rep=high, GH=high, @mfogel] rich presence on SO (#103909), AirBnB, Yelp, etc
@@ -86,18 +91,18 @@ dependencies = [
     implicit_optional = true
     show_error_codes = true
     show_column_numbers = true # helps LLMs
-    show_absolute_path = true # enables TUI links
+    show_absolute_path = true # enables TUI links in IDEA
 
     [[tool.mypy.overrides]]
         module = [
             "allauth.*",
             "faker.*",
-            "wat.*", # non-lintable magic
+            "wat.*", # it's a non-lintable magic
 
             # project
             "*.migrations.*",
             "*.settings",
-            "neuronhub.apps.tests.utils", # because it uses `wat`
+            "neuronhub.apps.tests.utils", # because it uses "wat"
         ]
         ignore_errors = true
 
@@ -112,14 +117,14 @@ dependencies = [
 
     [tool.ruff.lint]
         extend-select = [
-            "UP",  # pyupgrade: enforce modern python syntax
+            "UP",  # "pyupgrade" - enforces modern python syntax
         ]
         ignore = [
-            # drops unused vars - ignore as they're used as links/docs
+            # drops "unused-variable"s - off as we use them as docs and links
             "F841",
 
-            # 2 rules below for multi-line string indent - sounds useless.
-            # Use textwrap.dedent(). It's flake8's fault for not detecting dedent().
+            # disable 2 multi-line string indent rules - they sound useless.
+            # Use textwrap.dedent() - which flake8 is unaware of.
             "W291",
             "W293",
         ]
@@ -130,7 +135,7 @@ dependencies = [
     python_files = ["*__test.py"]
     addopts = [
         "--no-migrations",
-        "--capture=no", # show print() stdout
+        "--capture=no", # "no" streams print() to stdout
         "--color=yes",
         "--code-highlight=yes",
         "--no-header",

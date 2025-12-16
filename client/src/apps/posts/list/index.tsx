@@ -1,5 +1,5 @@
-import { PostList } from "@/apps/posts/list/PostList";
+import { PostListAlgolia } from "@/apps/posts/list/PostListAlgolia";
 
 export default function PostListRoute() {
-  return <PostList />;
+  return <PostListAlgolia />;
 }

@@ -15,7 +15,7 @@ class PostGraphqlResolversTest(NeuronTestCase):
                     post_reviews {
                         parent { id }
                         author { id }
-                        comments_count
+                        comment_count
                     }
                 }
             """,

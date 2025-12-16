@@ -91,6 +91,7 @@ export function PostDetail(props: {
         variables: { parent_root_id: props.post!.id },
       });
       collapsedIds.mutable.clear();
+      // biome-ignore lint/suspicious/noExtraNonNullAssertion: biome bug #bad-infer
       res.data!.user_current!.posts_collapsed.forEach(post => {
         collapsedIds.mutable.add(post.id);
       });
@@ -129,32 +130,34 @@ export function PostDetail(props: {
 
           <Stack gap={commentTree.length ? "gap.lg" : "0"}>
             <Heading fontSize="lg" display="flex" gap="gap.sm" alignItems="center">
-              Comments <Text color="fg.subtle">{post.comments_count}</Text>
+              Comments <Text color="fg.subtle">{post.comment_count}</Text>
             </Heading>
 
             <VStack px={0} align="flex-start" gap="gap.md">
-              <For
-                each={commentTree}
-                fallback={[1, 2, 3, 4, 5, 6, 7, 8].map(index => (
-                  <CommentThreadSkeleton key={index} />
-                ))}
-              >
-                {(comment, index) => (
-                  <CommentThread
-                    key={comment.id}
-                    comment={comment}
-                    highlights={highlighter.highlights}
-                    collapsedIds={collapsedIds.snap}
-                    toggleCollapse={toggleCollapse}
-                    post={post}
-                    depth={0}
-                    isLastChild={index === commentTree.length - 1}
-                    isFirstChild={true}
-                    height={{ parent: 0, toolbar: 0, avatar: 0 }} // init values
-                    refetchComments={refetchComments}
-                  />
-                )}
-              </For>
+              {post.comment_count > 0 && (
+                <For
+                  each={commentTree}
+                  fallback={[1, 2, 3, 4, 5, 6, 7, 8].map(index => (
+                    <CommentThreadSkeleton key={index} />
+                  ))}
+                >
+                  {(comment, index) => (
+                    <CommentThread
+                      key={comment.id}
+                      comment={comment}
+                      highlights={highlighter.highlights}
+                      collapsedIds={collapsedIds.snap}
+                      toggleCollapse={toggleCollapse}
+                      post={post}
+                      depth={0}
+                      isLastChild={index === commentTree.length - 1}
+                      isFirstChild={true}
+                      height={{ parent: 0, toolbar: 0, avatar: 0 }} // init values
+                      refetchComments={refetchComments}
+                    />
+                  )}
+                </For>
+              )}
             </VStack>
 
             <Show when={user}>

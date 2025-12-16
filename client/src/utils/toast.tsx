@@ -9,11 +9,12 @@ export const toast = {
       <Text {...ids.set(ids.form.notification.success)}>{message}</Text>
     ));
   },
-  error: (message: string, opts?: { addTryAgain: boolean }) => {
-    captureException(new Error(message));
+  error: (message?: string, opts?: { askToTryAgain: boolean }) => {
+    const msg = message ?? "An error occurred";
+    captureException(new Error(msg));
 
-    const isAddTryAgain = opts?.addTryAgain ?? true;
-    const messageFull = isAddTryAgain ? `${message}, please try again` : message;
+    const isAddTryAgain = opts?.askToTryAgain ?? true;
+    const messageFull = isAddTryAgain ? `${msg}, please try again` : msg;
     toastLib.error(messageFull);
   },
 };

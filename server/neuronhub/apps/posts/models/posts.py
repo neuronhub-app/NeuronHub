@@ -1,18 +1,20 @@
 import textwrap
+from typing import Any
 
+from asgiref.sync import async_to_sync
+from django.contrib.auth.models import AnonymousUser
 from django.db import models
 from django.db.models import CharField
+from django.db.models import ManyToManyField
+from django.test import RequestFactory
 from django.utils import timezone
 from django_choices_field import TextChoicesField
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
-
-from django.db.models import ManyToManyField
 from strawberry_django.descriptors import model_cached_property
+from strawberry_django.descriptors import model_property
 
-from neuronhub.apps.admin.utils.convert_md_to_html_for_admin import (
-    convert_md_to_html_for_admin,
-)
+from neuronhub.apps.admin.utils.convert_md_to_html_for_admin import convert_md_to_html_for_admin
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable
@@ -228,6 +230,129 @@ class Post(AnonimazableTimeStampedModel):
     class Perms:
         owner = "post_owner"
 
+    @model_property(cached=True, prefetch_related="root_children")
+    def comment_count(self) -> int:
+        return self.root_children.count()
+
+    # Algolia
+
+    def is_in_algolia_index(self) -> bool:
+        return self.type is not self.Type.Comment
+
+    def get_tag_values(self) -> list[str]:
+        tags = [tag.name for tag in self.tags.all()]
+        if self.type is self.Type.Review:
+            assert self.parent
+            tags.extend([tag.name for tag in self.parent.tags.all()])
+
+        return tags
+
+    def get_image_json(self) -> dict | None:
+        if self.image:
+            return {"url": self.image.url, "name": self.image.name}
+        return None
+
+    def get_visible_to(self) -> list[str]:
+        if self.visibility is Visibility.PRIVATE:
+            assert self.author
+            return [self.author.username]
+
+        if self.visibility in [Visibility.INTERNAL, Visibility.PUBLIC]:
+            return [f"group/{self.visibility.value}"]
+
+        visible_to: list[str] = []
+
+        if self.visibility in [Visibility.USERS_SELECTED, Visibility.CONNECTIONS]:
+            # `list()` are only for Mypy #bad-infer
+            visible_to.extend(list(*self.visible_to_users.all().values_list("username")))
+
+        if self.visibility is Visibility.USERS_SELECTED:
+            for group in self.visible_to_groups.all():
+                visible_to.extend(list(*group.connections.all().values_list("username")))
+
+        if self.visibility is Visibility.CONNECTIONS:
+            assert self.author
+            for group in self.author.connection_groups.all():
+                visible_to.extend(list(*group.connections.all().values_list("username")))
+
+        return visible_to
+
+    def _get_graphql_field(self, field: str) -> Any | None:
+        """
+        To supply the expected TS object to FE from Algolia, we re-use "PostsByIds" Query.
+        """
+        from neuronhub.apps.graphql.persisted_query_extension import (
+            _load_client_persisted_queries_json,
+        )
+        from neuronhub.apps.tests.test_cases import StrawberryContext
+        from neuronhub.graphql import schema
+
+        if not self.is_in_algolia_index():  # should be redundant, but isn't.
+            return None
+
+        request = RequestFactory().get("/graphql")
+        request.user = self.author or AnonymousUser()
+
+        res = async_to_sync(schema.execute)(
+            query=_load_client_persisted_queries_json()["PostsByIds"],
+            variable_values={"ids": [self.pk]},
+            context_value=StrawberryContext(request=request),
+        )
+        assert res.data
+        if posts := res.data["posts"]:
+            return posts[0].get(field)
+
+        return None
+
+    def get_id_as_str(self) -> str:
+        return str(self.id)
+
+    def get_iso_created_at(self) -> str:
+        return self.created_at.isoformat()
+
+    def get_iso_updated_at(self) -> str:
+        return self.updated_at.isoformat()
+
+    def get_iso_reviewed_at(self) -> str | None:
+        return self.reviewed_at.isoformat() if self.reviewed_at else None
+
+    # Algolia needs Unix for sorting/filtering
+
+    def get_unix_created_at(self) -> float:
+        return self.created_at.timestamp()
+
+    def get_unix_updated_at(self) -> float:
+        return self.updated_at.timestamp()
+
+    def get_unix_reviewed_at(self) -> float | None:
+        return self.reviewed_at.timestamp() if self.reviewed_at else None
+
+    def get_tags_json(self):
+        return self._get_graphql_field("tags") or []
+
+    def get_votes_json(self):
+        return [
+            {"id": str(v.id), "is_vote_positive": v.is_vote_positive} for v in self.votes.all()
+        ]
+
+    def get_graphql_typename(self) -> str:
+        if self.type is self.Type.Post:
+            return f"{self.type.value.capitalize()}Type"
+        else:
+            return f"Post{self.type.value.capitalize()}Type"
+
+    def get_review_tags_json(self):
+        return self._get_graphql_field("review_tags") or []
+
+    def get_post_source_json(self) -> dict | None:
+        return self._get_graphql_field("post_source")
+
+    def get_author_json(self) -> dict | None:
+        return self._get_graphql_field("author")
+
+    def get_parent_json(self) -> dict | None:
+        return self._get_graphql_field("parent")
+
     def __str__(self):
         match self.type:
             case Post.Type.Post | Post.Type.Tool:
@@ -304,7 +429,8 @@ class PostTag(AnonimazableTimeStampedModel):
         unique_together = ["tag_parent", "name"]
 
     @model_cached_property(
-        only=["name", "tag_parent", "is_review_tag"], prefetch_related=["tag_parent"]
+        only=["name", "tag_parent", "is_review_tag"],
+        select_related=["tag_parent"],
     )
     def label(self) -> str:
         """
@@ -330,7 +456,9 @@ class PostTag(AnonimazableTimeStampedModel):
                 return ReviewTagName(self.name).label
             except ValueError:
                 pass
-        return self.__str__()
+        if self.tag_parent:
+            return f"{self.tag_parent.name} / {self.name}"
+        return self.name
 
     def __str__(self):
         if self.tag_parent:

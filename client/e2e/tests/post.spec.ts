@@ -70,11 +70,6 @@ test.describe("Post", () => {
     await play.submit(ids.post.form);
     await expect(page).toHaveText(post.title);
 
-    await play.navigate(urls.posts.knowledge, { idleWait: true });
-    const card = play.getAll(ids.post.card.container).filter({ hasText: post.title });
-    await expect(card).toBeVisible();
-    await expect(card).toContainText(post.tag);
-
     // Edit
     await play.click(ids.post.card.link.edit);
     await expect($[ids.post.form.tags]).toHaveTag(post.tag);

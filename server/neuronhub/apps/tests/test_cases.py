@@ -4,19 +4,29 @@ from asgiref.sync import async_to_sync
 from django.contrib.auth.models import AnonymousUser
 from django.http import HttpRequest
 from django.test import RequestFactory
-from django.test import override_settings
 from django.test import TestCase
+from django.test import override_settings
 from strawberry.types import ExecutionResult
 
-from neuronhub.apps.users.models import User
 from neuronhub.apps.tests.test_gen import Gen
+from neuronhub.apps.users.models import User
 from neuronhub.graphql import schema
+from neuronhub.settings import AlgoliaConfig
 from neuronhub.settings import DjangoEnv
 
 
+# Note: INSTALLED_APPS are already loaded when this is read, so the override is only ~50% effective
 @override_settings(
     DJANGO_ENV=DjangoEnv.DEV_TEST_UNIT,
     SIMPLE_HISTORY_ENABLED=False,
+    ALGOLIA=AlgoliaConfig(
+        IS_ENABLED=False,
+        AUTO_INDEXING=False,
+        APPLICATION_ID="",
+        API_KEY="",
+        SEARCH_API_KEY="",
+        INDEX_SUFFIX="",
+    ),
 )
 class NeuronTestCase(TestCase):
     gen: Gen
@@ -40,10 +50,10 @@ class NeuronTestCase(TestCase):
         return await schema.execute(
             query,
             variable_values=variables,
-            context_value=Context(request=request),
+            context_value=StrawberryContext(request=request),
         )
 
 
 @dataclass
-class Context:
+class StrawberryContext:
     request: HttpRequest

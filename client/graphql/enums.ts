@@ -50,7 +50,6 @@ export enum UserListName {
 
 export enum Visibility {
   Connections = 'CONNECTIONS',
-  ConnectionGroupsSelected = 'CONNECTION_GROUPS_SELECTED',
   Internal = 'INTERNAL',
   Private = 'PRIVATE',
   Public = 'PUBLIC',

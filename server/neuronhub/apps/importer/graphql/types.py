@@ -1,15 +1,21 @@
+import strawberry
 import strawberry_django
 from strawberry import auto
 
-from neuronhub.apps.importer.models import PostSource, UserSource
+from neuronhub.apps.importer.models import PostSource
+from neuronhub.apps.importer.models import UserSource
+
+
+@strawberry.type
+class UserSourceTypeBase:
+    id: int
+    username: str
+    score: int
 
 
 @strawberry_django.type(UserSource)
-class UserSourceType:
-    id: auto
+class UserSourceType(UserSourceTypeBase):
     id_external: auto
-    username: auto
-    score: auto
     about: auto
     created_at_external: auto
 
@@ -24,18 +30,22 @@ class PostSourceOrder:
 
 
 @strawberry_django.type(PostSource)
-class PostSourceType:
-    user_source: UserSourceType | None
-
+class PostSourceTypeBase:
     id: auto
+    user_source: UserSourceTypeBase | None
+    id_external: auto
+    score: auto
+    rank: auto
+    url_of_source: auto
+    created_at_external: auto
+
+
+@strawberry_django.type(PostSource)
+class PostSourceType(PostSourceTypeBase):
+    user_source: UserSourceType | None
     post: auto
     domain: auto
-    id_external: auto
-    rank: auto
     url: auto
-    url_of_source: auto
-    score: auto
     json: auto
-    created_at_external: auto
     created_at: auto
     updated_at: auto

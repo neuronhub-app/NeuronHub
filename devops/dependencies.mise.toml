@@ -1,6 +1,8 @@
 [install-deps]
     depends = [
-        "install-deps:*",
+        "install-deps:server",
+        "install-deps:client",
+        "install-deps:playwright",
     ]
 
 ["install-deps:server"]
@@ -11,16 +13,16 @@
     dir = "client"
     run = "bun install --frozen-lockfile"
 
-["install-deps:client:new"]
-    dir = "client"
-    run = "bun install"
-
 ["install-deps:playwright"]
     dir = "client"
     run = [
         "bunx playwright install",
         "bunx playwright install chromium --with-deps",
     ]
+
+["install-deps:client:new"]
+    dir = "client"
+    run = "bun install"
 
 
 # Upgrades

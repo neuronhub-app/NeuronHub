@@ -33,13 +33,6 @@ def filter_posts_by_user(
                 pk=OuterRef("pk"), visibility=Visibility.USERS_SELECTED, visible_to_users=user
             )
         )
-        is_allowed_as_a_connection_group_selected = Exists(
-            Post.objects.filter(
-                pk=OuterRef("pk"),
-                visibility=Visibility.CONNECTION_GROUPS_SELECTED,
-                visible_to_groups__connections=user,
-            )
-        )
         is_allowed_as_a_connection = Exists(
             Post.objects.filter(
                 pk=OuterRef("pk"),
@@ -52,7 +45,6 @@ def filter_posts_by_user(
         posts = posts.filter(
             is_own_post
             | is_allowed_as_a_user_selected
-            | is_allowed_as_a_connection_group_selected
             | is_allowed_as_a_connection
             | is_publicly_visible
         )

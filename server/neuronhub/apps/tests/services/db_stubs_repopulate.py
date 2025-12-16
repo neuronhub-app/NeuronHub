@@ -4,6 +4,10 @@ import logging
 import textwrap
 from dataclasses import dataclass
 
+from algoliasearch_django import reindex_all
+from algoliasearch_django.decorators import disable_auto_indexing
+from asgiref.sync import sync_to_async
+from django.conf import settings
 from django.utils import timezone
 
 from neuronhub.apps.anonymizer.fields import Visibility
@@ -13,17 +17,20 @@ from neuronhub.apps.importer.models import UserSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
-from neuronhub.apps.posts.models import PostRelated, PostCategory
+from neuronhub.apps.posts.models import PostCategory
+from neuronhub.apps.posts.models import PostRelated
 from neuronhub.apps.posts.models import UsageStatus
 from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
-from neuronhub.apps.tests.test_gen import Gen, UsersGen
 from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
-from neuronhub.apps.users.models import User, UserConnectionGroup
+from neuronhub.apps.tests.test_gen import Gen
+from neuronhub.apps.tests.test_gen import UsersGen
+from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import UserConnectionGroup
 
 
 logger = logging.getLogger(__name__)
@@ -34,6 +41,7 @@ post_HN_id = 45487476
 
 async def db_stubs_repopulate(
     is_delete_posts: bool = True,
+    is_delete_posts_extra: bool = True,
     is_delete_users_extra: bool = True,
     is_delete_user_default: bool = False,
     is_create_single_review: bool | None = False,
@@ -44,53 +52,68 @@ async def db_stubs_repopulate(
 
     E2E tests run on it, so it includes edge cases.
     """
-    if is_delete_posts:
-        for model in [
-            PostHighlight,
-            PostTagVote,
-            PostTag,
-            PostVote,
-            Post,
-            PostRelated,
-            ToolCompany,
-            ToolCompanyOwnership,
-            PostSource,
-            UserSource,
-        ]:
-            await model._default_manager.all().adelete()
 
-    if is_delete_user_default:
-        await User.objects.all().adelete()
-        await Org.objects.all().adelete()
+    with disable_auto_indexing():
+        if is_delete_posts_extra:
+            for model in [
+                PostHighlight,
+                PostRelated,
+                ToolCompany,
+                ToolCompanyOwnership,
+            ]:
+                await model._default_manager.all().adelete()
 
-    if is_delete_users_extra:
-        await UserConnectionGroup.objects.all().adelete()
-        await User.objects.exclude(username=UsersGen._user_username).adelete()
+        if is_delete_posts:
+            # for E2E keep others to preserve IDs for Algolia
+            for model in [
+                PostTagVote,
+                PostTag,
+                PostVote,
+                Post,
+                PostSource,
+                UserSource,
+            ]:
+                await model._default_manager.all().adelete()
 
-    gen = await Gen.create(is_user_default_superuser=True)
-    user = gen.users.user_default
+        if is_delete_user_default:
+            await User.objects.all().adelete()
+            await Org.objects.all().adelete()
 
-    if is_delete_users_extra:
-        await _create_users(gen)
+        if is_delete_users_extra:
+            await UserConnectionGroup.objects.all().adelete()
+            await User.objects.exclude(username=UsersGen._user_username).adelete()
 
-    await _create_review_pycharm(user, gen=gen)
+        gen = await Gen.create(is_user_default_superuser=True)
+        user = gen.users.user_default
 
-    tool_iterm = await _create_review_iterm(user, gen=gen)
+        if is_delete_users_extra:
+            await _create_users(gen)
 
-    await _create_post_news(user, gen=gen)
+        await _create_review_pycharm(user, gen=gen)
 
-    if not is_create_single_review:
-        await _create_review_ghostly(user, alternatives=[tool_iterm], gen=gen)
-        await _create_tool_and_post_unifi_network(user, gen=gen)
-        await _create_tool_and_post_aider(user, gen=gen)
+        tool_iterm = await _create_review_iterm(user, gen=gen)
 
-    if is_import_HN_post:
-        # todo refac: do only on request, as it adds +3s
-        post_with_90_comments_and_idents = post_HN_id
-        importer = ImporterHackerNews(is_use_cache=True, is_logs_enabled=False)
-        await importer.import_post(post_with_90_comments_and_idents)
+        await _create_post_news(user, gen=gen)
+
+        if not is_create_single_review:
+            await _create_review_ghostly(user, alternatives=[tool_iterm], gen=gen)
+            await _create_tool_and_post_unifi_network(user, gen=gen)
+            await _create_tool_and_post_aider(user, gen=gen)
+
+        if is_import_HN_post:
+            # todo refac: do only on request, as it adds +3s
+            post_with_90_comments_and_idents = post_HN_id
+            importer = ImporterHackerNews(is_use_cache=True, is_logs_enabled=False)
+            await importer.import_post(post_with_90_comments_and_idents)
+
+    if settings.ALGOLIA["IS_ENABLED"]:
+        await _algolia_reindex()
 
     return gen
+
+
+async def _algolia_reindex():
+    await sync_to_async(reindex_all)(Post)
 
 
 async def _create_users(gen: Gen):
@@ -126,13 +149,13 @@ async def _create_users(gen: Gen):
 
 @dataclass
 class users:
-    connected_1 = "john_connected_1"
-    connected_2 = "max_connected_2"
-    engineer_1 = "david_engineer_1"
-    engineer_2 = "dane_engineer_2"
-    engineer_3 = "dove_engineer_3"
-    random_1 = "mark_random_1"
-    random_2 = "mole_random_2"
+    connected_1 = "john_connected"
+    connected_2 = "max_connected"
+    engineer_1 = "david_swe"
+    engineer_2 = "dane_swe"
+    engineer_3 = "dove_swe"
+    random_1 = "mark_random"
+    random_2 = "mole_random"
 
 
 async def _create_review_pycharm(user: User, gen: Gen):
@@ -157,36 +180,38 @@ async def _create_review_pycharm(user: User, gen: Gen):
         )
     )
 
-    review = await Post.objects.acreate(
-        type=Post.Type.Review,
-        parent=pycharm,
-        author=user,
+    review, _ = await Post.objects.aupdate_or_create(
         title="Fine, haven't seen better for Python or Django",
-        content_polite=textwrap.dedent(
-            """
-            - Better than VS Code for Python
-            - Python/Django stubs and completions
-            - Debugger
-            - Git UI and shortcuts
-            - JS/TS integration performance has been improving, but still not as good as VS Code
-            - Bugs are frequent. Less than in VS Code, but still a lot
-            """
+        type=Post.Type.Review,
+        defaults=dict(
+            parent=pycharm,
+            author=user,
+            content_polite=textwrap.dedent(
+                """
+                - Better than VS Code for Python
+                - Python/Django stubs and completions
+                - Debugger
+                - Git UI and shortcuts
+                - JS/TS integration performance has been improving, but still not as good as VS Code
+                - Bugs are frequent. Less than in VS Code, but still a lot
+                """
+            ),
+            content_direct=textwrap.dedent(
+                """
+                - Best IDE for Python/Django. Period.
+                - Debugger works, VS Code's doesn't
+                - JS/TS support still meh, bugs in every release
+                """
+            ),
+            review_usage_status=UsageStatus.USING,
+            review_rating=67,
+            review_importance=83,
+            review_experience_hours=17_000,
+            reviewed_at=timezone.now(),
+            visibility=Visibility.PUBLIC,
         ),
-        content_direct=textwrap.dedent(
-            """
-            - Best IDE for Python/Django. Period.
-            - Debugger works, VS Code's doesn't
-            - JS/TS support still meh, bugs in every release
-            """
-        ),
-        review_usage_status=UsageStatus.USING,
-        review_rating=67,
-        review_importance=83,
-        review_experience_hours=17_000,
-        reviewed_at=timezone.now(),
-        visibility=Visibility.PUBLIC,
     )
-    await _create_tags(
+    await _tags_create_or_update(
         post=pycharm,
         author=await gen.users.user(username=users.random_1, is_get_or_create=True),
         params=[
@@ -204,14 +229,14 @@ async def _create_review_pycharm(user: User, gen: Gen):
             TagParams("Business / Free Trial"),
         ],
     )
-    await _create_tags(
+    await _tags_create_or_update(
         post=pycharm,
         author=user,
         params=[
             TagParams(tags.kotlin, is_vote_pos=True),
         ],
     )
-    await _create_tags(
+    await _tags_create_or_update(
         post=review,
         author=user,
         params=[
@@ -222,7 +247,7 @@ async def _create_review_pycharm(user: User, gen: Gen):
             TagParams(tags.python, is_vote_pos=True),
         ],
     )
-    await _create_review_tags(
+    await _review_tags_create_or_update(
         review=review,
         params=[
             ReviewTagParams(ReviewTagName.stability, is_vote_pos=False),
@@ -268,7 +293,7 @@ async def _create_review_iterm(user: User, gen: Gen):
         )
     )
 
-    await _create_tags(
+    await _tags_create_or_update(
         post=tool,
         author=user,
         params=[
@@ -280,30 +305,32 @@ async def _create_review_iterm(user: User, gen: Gen):
         ],
     )
 
-    review = await Post.objects.acreate(
-        type=Post.Type.Review,
-        parent=tool,
-        author=user,
+    review, _ = await Post.objects.aupdate_or_create(
         title="Good shortcuts and render config, actively maintained",
-        content_polite=textwrap.dedent(
-            """
-            - Fast native render (Objective-C/Swift)
-            - no extra features, like history/fish/llm/etc
-            """
+        type=Post.Type.Review,
+        defaults=dict(
+            parent=tool,
+            author=user,
+            content_polite=textwrap.dedent(
+                """
+                - Fast native render (Objective-C/Swift)
+                - no extra features, like history/fish/llm/etc
+                """
+            ),
+            content_rant=textwrap.dedent(
+                """
+                - Stop adding AI/LLM bullshit to terminals
+                """
+            ),
+            review_usage_status=UsageStatus.USING,
+            review_rating=75,
+            review_importance=51,
+            review_experience_hours=7_000,
+            reviewed_at=timezone.now() - datetime.timedelta(days=10),
+            visibility=Visibility.PUBLIC,
         ),
-        content_rant=textwrap.dedent(
-            """
-            - Stop adding AI/LLM bullshit to terminals
-            """
-        ),
-        review_usage_status=UsageStatus.USING,
-        review_rating=75,
-        review_importance=51,
-        review_experience_hours=7_000,
-        reviewed_at=timezone.now() - datetime.timedelta(days=10),
-        visibility=Visibility.PUBLIC,
     )
-    await _create_tags(
+    await _tags_create_or_update(
         post=review,
         author=user,
         params=[TagParams(tags.macos, is_vote_pos=True)],
@@ -323,7 +350,7 @@ async def _create_review_iterm(user: User, gen: Gen):
         text_postfix="? It makes",
     )
 
-    await _create_review_tags(
+    await _review_tags_create_or_update(
         review=review,
         params=[
             ReviewTagParams(ReviewTagName.open_source, is_vote_pos=True),
@@ -352,7 +379,7 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
     if alternatives:
         await tool.alternatives.aadd(*alternatives)
 
-    await _create_tags(
+    await _tags_create_or_update(
         post=tool,
         author=user,
         params=[
@@ -365,18 +392,20 @@ async def _create_review_ghostly(user: User, gen: Gen, alternatives: list[Post] 
         ],
     )
 
-    review = await Post.objects.acreate(
-        type=Post.Type.Review,
-        parent=tool,
-        author=user,
+    review, _ = await Post.objects.aupdate_or_create(
         title="Haven't tried, heard good things from HN - embeddable, Zig-based",
-        review_usage_status=UsageStatus.INTERESTED,
-        reviewed_at=timezone.now() - datetime.timedelta(days=35),
-        visibility=Visibility.PUBLIC,
+        type=Post.Type.Review,
+        defaults=dict(
+            parent=tool,
+            author=user,
+            review_usage_status=UsageStatus.INTERESTED,
+            reviewed_at=timezone.now() - datetime.timedelta(days=35),
+            visibility=Visibility.PUBLIC,
+        ),
     )
     comment = await gen.posts.comment(review, author=user)
     await gen.posts.comment(review, parent=comment, author=user)
-    await _create_review_tags(
+    await _review_tags_create_or_update(
         review=review,
         params=[
             ReviewTagParams(ReviewTagName.expectations, is_vote_pos=True),
@@ -399,7 +428,7 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
             visibility=Visibility.INTERNAL,
         )
     )
-    await _create_tags(
+    await _tags_create_or_update(
         post=tool,
         author=user,
         params=[
@@ -425,7 +454,7 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
             visibility=Visibility.INTERNAL,
         )
     )
-    await _create_tags(
+    await _tags_create_or_update(
         post=post,
         author=user,
         params=[
@@ -457,7 +486,7 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
             company_ownership_name="Private",
         )
     )
-    await _create_tags(
+    await _tags_create_or_update(
         post=tool,
         author=user,
         params=[
@@ -477,13 +506,13 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
             visibility=Visibility.INTERNAL,
         )
     )
-    await _create_tags(
+    await _tags_create_or_update(
         post=post,
         author=user,
         params=[
             TagParams("Dev / AI", is_vote_pos=True),
             TagParams("Dev / Benchmarks"),
-            TagParams("Community / Hacker News", is_vote_pos=True),
+            TagParams("Community / HackerNews", is_vote_pos=True),
         ],
     )
     await PostVote.objects.acreate(
@@ -523,7 +552,7 @@ async def _create_post_news(user: User, gen: Gen) -> Post:
             visibility=Visibility.PUBLIC,
         )
     )
-    await _create_tags(
+    await _tags_create_or_update(
         post=post,
         author=user,
         params=[
@@ -553,7 +582,7 @@ class TagParams:
     is_important: bool | None = None
 
 
-async def _create_tags(post: Post, author: User, params: list[TagParams]):
+async def _tags_create_or_update(post: Post, author: User, params: list[TagParams]):
     tags_new = await asyncio.gather(
         *[
             tag_create_or_update(
@@ -575,7 +604,7 @@ class ReviewTagParams:
     is_vote_pos: bool
 
 
-async def _create_review_tags(review: Post, params: list[ReviewTagParams]):
+async def _review_tags_create_or_update(review: Post, params: list[ReviewTagParams]):
     tags = await asyncio.gather(
         *[
             tag_create_or_update(

@@ -7,12 +7,17 @@ import { useRef } from "react";
 export function useApolloQuery<
   TData = unknown,
   TVariables extends OperationVariables = OperationVariables,
->(query: TadaDocumentNode<TData, TVariables>, variables?: NoInfer<TVariables>) {
+>(
+  query: TadaDocumentNode<TData, TVariables>,
+  variables?: NoInfer<TVariables>,
+  options?: { skip: boolean },
+) {
   // Apollo bug: non-saved `query` loops React re-render
   const queryRef = useRef<TadaDocumentNode<TData, TVariables>>(query);
 
   const queryResult = useQuery(queryRef.current, {
     variables: variables ?? ({} as unknown as NoInfer<TVariables>),
+    skip: options?.skip,
   });
   return {
     ...queryResult,

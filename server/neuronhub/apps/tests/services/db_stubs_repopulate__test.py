@@ -1,10 +1,8 @@
-from neuronhub.apps.tests.services.db_stubs_repopulate import (
-    db_stubs_repopulate,
-    _create_review_tags,
-    ReviewTagParams,
-)
-from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
+from neuronhub.apps.posts.models import Post
+from neuronhub.apps.tests.services.db_stubs_repopulate import ReviewTagParams
+from neuronhub.apps.tests.services.db_stubs_repopulate import _review_tags_create_or_update
+from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
@@ -15,7 +13,7 @@ class DbStubsRepopulateTest(NeuronTestCase):
 
     async def test_review_tags_creation(self):
         review = await self.gen.posts.review()
-        await _create_review_tags(
+        await _review_tags_create_or_update(
             review,
             [
                 ReviewTagParams(name=ReviewTagName.ease_of_use, is_vote_pos=True),

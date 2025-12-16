@@ -20,6 +20,7 @@
         "devops/docker.mise.toml",
         "devops/e2e.mise.toml",
         "devops/claude.mise.toml",
+        "devops/algolia.mise.toml",
     ]
 
 [env]
@@ -29,7 +30,7 @@
     VITE_PROJECT_NAME = "NeuronHub"
     VITE_RELEASE_VERSION = "0.2.5.0" # used in GitHub and Sentry
 
-    DEPENDENCY_COOLDOWN_DAYS = 10
+    DEPENDENCY_COOLDOWN_DAYS = 4
 
     DOMAIN_NAME = "neuronhub.app"
 
@@ -43,6 +44,13 @@
     SENTRY_DSN_FRONTEND = "https://97d9ce8ba2e7102f6ccfed17dd2e25aa@o4507887634284544.ingest.us.sentry.io/4510303776145408"
     SENTRY_DSN_BACKEND = "https://417078bf385cad9c59d41a020892e689@o4507887634284544.ingest.us.sentry.io/4510305221869575"
     VITE_RELEASE_NAME = "{{ env.PROJECT_NAME }}@{{ env.VITE_RELEASE_VERSION }}"
+
+    # Algolia
+
+    ALGOLIA_APPLICATION_ID = ""
+    ALGOLIA_API_KEY = ""
+    ALGOLIA_SEARCH_API_KEY = "73e0fded909b86d55105cac456370c53"
+    ALGOLIA_IS_ENABLED = "false"
 
     # Dev
 
@@ -119,6 +127,7 @@
         depends = ["dev:db"]
         run = "uv run pytest"
         alias = "pytest"
+        env.DJANGO_ENV = "dev_test_unit"
 
     [tasks."test:e2e"]
         dir = "client"
@@ -190,7 +199,7 @@
             "bun run gql-tada generate persisted --output ../server/persisted-queries.json",
         ]
         sources = ["src/**/*", "e2e/**/*"]
-        quiet = true
+        silent = true
 
     [tasks."typegen:client:react-router"]
         dir = "client"
@@ -202,7 +211,7 @@
         dir = "client"
         run = "bunx @chakra-ui/cli typegen src/theme/theme.ts"
         sources = ["src/theme/**/*.ts"]
-        quiet = true
+        silent = true
 
 
 [tasks."format"]

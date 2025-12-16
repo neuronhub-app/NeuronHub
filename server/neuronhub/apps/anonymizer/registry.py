@@ -21,6 +21,7 @@ from datetime import timedelta
 from django.conf import settings
 from django.db import models
 from django.db.models import Field
+from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.db.models_abstract import TimeStampedModel
@@ -76,7 +77,7 @@ def anonymizable[F: Field](field: F) -> F:
 
 
 class AnonimazableTimeStampedModel(TimeStampedModel):
-    created_at = anonymizable(models.DateTimeField(auto_now_add=True))
+    created_at = anonymizable(models.DateTimeField(default=timezone.now))
     updated_at = anonymizable(models.DateTimeField(auto_now=True))
 
     author: User | None

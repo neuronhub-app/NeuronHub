@@ -154,7 +154,7 @@ function PostHeader(props: { post: PostListItemType; isDetailPage?: boolean }) {
               {/* todo UX: show .parent_root.title */}
               {post.title ? post.title : `${post.type}`}
             </Heading>
-            {!isReview(post) && <PostDatetime datetimeStr={post.updated_at} />}
+            {!isReview(post) && <PostDatetime datetimeStr={post.created_at} />}
           </Flex>
         </Stack>
       </PostHeaderLink>
@@ -230,7 +230,7 @@ function PostCommentsLink(props: {
         size="sm"
         h="auto"
       >
-        <FaComments /> <Text color="gray.400">{post.comments_count}</Text>
+        <FaComments /> <Text color="gray.400">{post.comment_count}</Text>
       </IconButton>
     </NavLink>
   );

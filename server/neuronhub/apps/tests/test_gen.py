@@ -7,10 +7,10 @@ from faker import Faker
 from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
 
 from neuronhub.apps.anonymizer.fields import Visibility
-
-from neuronhub.apps.users.models import User
-from neuronhub.apps.posts.models import Post, PostCategory
+from neuronhub.apps.posts.models import Post
+from neuronhub.apps.posts.models import PostCategory
 from neuronhub.apps.posts.models.types import PostTypeEnum
+from neuronhub.apps.users.models import User
 
 
 class Gen:
@@ -188,7 +188,7 @@ class PostsGen:
 
         return await self.create(
             self.Params(
-                parent=parent,
+                parent=parent or parent_root,
                 parent_root=parent_root,
                 type=Post.Type.Comment,
                 author=author or self.user,
@@ -220,11 +220,12 @@ class PostsGen:
     ):
         from neuronhub.apps.posts.models import PostVote
 
-        return await PostVote.objects.acreate(
+        vote, _ = await PostVote.objects.aupdate_or_create(
             post=post,
             author=author or self.user,
-            is_vote_positive=is_vote_positive,
+            defaults=dict(is_vote_positive=is_vote_positive),
         )
+        return vote
 
     async def tag(
         self,
@@ -235,10 +236,9 @@ class PostsGen:
     ):
         from neuronhub.apps.posts.models import PostTag
 
-        tag = await PostTag.objects.acreate(
+        tag, _ = await PostTag.objects.aupdate_or_create(
             name=name or self.faker.word(),
-            author=author or self.user,
-            is_important=is_important,
+            defaults=dict(author=author or self.user, is_important=is_important),
         )
         if post:
             await post.tags.aadd(tag)
@@ -247,7 +247,7 @@ class PostsGen:
     async def post(self, params: Params = Params()) -> Post:
         return await self.create(params)
 
-    # todo refac-rename: `_create`
+    # todo refac-rename: `_update_or_create`
     async def create(self, params: Params = Params()) -> Post:
         from neuronhub.apps.posts.models import Post
         from neuronhub.apps.posts.models import ToolCompany
@@ -266,23 +266,28 @@ class PostsGen:
                 ),
             )
 
-        post = await Post.objects.acreate(
+        title = params.title or self.faker.sentence()
+
+        # Use aupdate_or_create to keep IDs stable for Algolia index
+        post, _ = await Post.objects.aupdate_or_create(
+            title=title,
             type=params.type,
-            parent=params.parent,
-            parent_root=params.parent_root,
-            title=params.title or self.faker.sentence(),
-            content_polite=params.content_polite or self.faker.text(max_nb_chars=500),
-            content_direct=params.content_direct,
-            content_rant=params.content_rant,
-            author=params.author or self.user,
-            visibility=params.visibility,
-            # tools
-            # ------
-            tool_type=params.tool_type,
-            company=company,
-            url=params.url or (self.faker.url() if params.type == Post.Type.Tool else ""),
-            crunchbase_url=params.crunchbase_url,
-            github_url=params.github_url,
+            defaults=dict(
+                parent=params.parent,
+                parent_root=params.parent_root,
+                content_polite=params.content_polite or self.faker.text(max_nb_chars=500),
+                content_direct=params.content_direct,
+                content_rant=params.content_rant,
+                author=params.author or self.user,
+                visibility=params.visibility,
+                # tools
+                # ------
+                tool_type=params.tool_type,
+                company=company,
+                url=params.url or (self.faker.url() if params.type == Post.Type.Tool else ""),
+                crunchbase_url=params.crunchbase_url,
+                github_url=params.github_url,
+            ),
         )
 
         if params.visible_to_users:

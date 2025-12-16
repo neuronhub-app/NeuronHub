@@ -31,9 +31,11 @@ export function ListContainer(props: {
   return (
     <Stack gap="gap.lg">
       <HStack justify="space-between">
-        <Heading size="2xl">
-          {props.title ? props.title : (getPostCategoryName(props.category) ?? "Posts")}
-        </Heading>
+        <HStack gap="gap.md">
+          <Heading size="2xl">
+            {props.title ? props.title : (getPostCategoryName(props.category) ?? "Posts")}
+          </Heading>
+        </HStack>
 
         <NavLink to={`/${props.urlNamespace}/create`}>
           <Button size="md" variant="subtle">

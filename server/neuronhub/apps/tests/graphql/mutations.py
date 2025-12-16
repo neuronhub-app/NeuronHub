@@ -1,8 +1,9 @@
 import strawberry
-from strawberry import Info
 from django.conf import settings
+from strawberry import Info
 
 from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
+from neuronhub.settings import DjangoEnv
 
 
 @strawberry.type
@@ -15,9 +16,11 @@ class TestsMutation:
         is_create_single_review: bool | None = False,
     ) -> str:
         assert settings.DEBUG
+        assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
 
         gen = await db_stubs_repopulate(
             is_delete_posts=True,
+            is_delete_posts_extra=True,
             is_delete_user_default=True,
             is_delete_users_extra=True,
             is_import_HN_post=is_import_HN_post,

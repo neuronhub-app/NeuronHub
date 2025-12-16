@@ -6,17 +6,19 @@ import strawberry
 import strawberry_django
 from asgiref.sync import sync_to_async
 from django.core.files.uploadedfile import UploadedFile
-from django.db.models import QuerySet, F
+from django.db.models import F
+from django.db.models import QuerySet
 from strawberry import Info
 from strawberry import auto
 from strawberry_django.auth.utils import get_current_user
 
+from neuronhub.apps.importer.graphql.types import PostSourceOrder
+from neuronhub.apps.importer.graphql.types import PostSourceType
 from neuronhub.apps.posts.models import PostTypeEnum
 from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
-from neuronhub.apps.importer.graphql.types import PostSourceType, PostSourceOrder
 from neuronhub.apps.posts.services.filter_posts_by_user import filter_posts_by_user
 from neuronhub.apps.users.graphql.types import UserConnectionGroupType
 from neuronhub.apps.users.graphql.types import UserType
@@ -27,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 @strawberry_django.filter_type(Post, lookups=True)
 class PostFilter:
+    id: auto
     parent_root_id: auto
     type: auto
     category: auto
@@ -61,10 +64,11 @@ class PostTypeI:
     content_rant: auto
     content_private: auto
     image: auto
+    comment_count: auto
 
     source: auto
     source_author: auto
-    post_source: PostSourceType | None = strawberry_django.field()
+    post_source: PostSourceType | None
 
     visibility: auto
     visible_to_users: list[UserType]
@@ -72,10 +76,12 @@ class PostTypeI:
     recommended_to_users: list[UserType]
     recommended_to_groups: list[UserConnectionGroupType]
 
-    tags: list[PostTagType] = strawberry_django.field()
-    votes: list[PostVoteType] = strawberry_django.field()
-    tag_votes: list[PostTagVoteType] = strawberry_django.field()
+    tags: list[PostTagType]  # type: ignore[assignment]
+    votes: list[PostVoteType]
+    tag_votes: list[PostTagVoteType]
 
+    # Tool fields
+    tool_type: auto
     company: auto
     domain: auto
     url: auto
@@ -100,10 +106,6 @@ class PostTypeI:
             F("post_source__rank").desc(nulls_first=None)
         )
         return await sync_to_async(list)(comments_ordered)  # type: ignore # mypy is broken
-
-    @strawberry_django.field()
-    async def comments_count(self: Post) -> int:
-        return await Post.objects.filter(parent_root=self, type=Post.Type.Comment).acount()
 
 
 @strawberry_django.type(Post, filters=PostFilter, ordering=PostOrder)
@@ -136,7 +138,7 @@ class PostReviewType(PostTypeI):
     review_rating: auto
     review_importance: auto
     review_experience_hours: auto
-    review_tags: list[PostTagType] = strawberry_django.field()
+    review_tags: list[PostTagType]
     reviewed_at: auto
     is_review_later: auto
 
@@ -201,9 +203,9 @@ class PostTypeInput:
     url: auto
 
 
-# ---------------------
+# ---------------------------------------------------------------
 # PostTag
-# ---------------------
+# ---------------------------------------------------------------
 
 
 @strawberry_django.filter_type(PostTag, lookups=True)
@@ -217,26 +219,27 @@ class PostTagFilter:
 @strawberry_django.type(PostTag, filters=PostTagFilter)
 class PostTagType:
     id: auto
+    name: auto
+    label: auto
+    description: auto
+    is_important: auto
+    is_review_tag: auto
+
     posts: list[PostType]
     tag_parent: PostTagType | None
     tag_children: list[PostTagType]
     votes: list[PostTagVoteType]
     author: UserType | None
 
-    name: auto
-    description: auto
-    is_important: auto
-    is_review_tag: auto
-    label: auto
-
 
 @strawberry_django.type(Post)
 class PostSimpleType:
     """
-    Using PostTypeI on PostTagVoteType.post breaks with the error below.
-    Prob the Strawberry optimizer + [[PostTypeI#get_queryset]] clash.
+    Created because using PostTypeI directly in PostTagVoteType.post breaks with the error below.
 
     > ValueError: Tried to prefetch 2 queries with different filters to the same attribute
+
+    Prob the Strawberry optimizer + [[PostTypeI#get_queryset]] clash.
     """
 
     id: auto
@@ -245,9 +248,9 @@ class PostSimpleType:
 @strawberry_django.type(PostTagVote)
 class PostTagVoteType:
     id: auto
-    post: PostSimpleType
     tag: PostTagType
     author: UserType | None
+    post: PostSimpleType
 
     is_vote_positive: auto
     is_changed_my_mind: auto

@@ -12,6 +12,12 @@ directive @IsAuthenticated repeatable on FIELD_DEFINITION
 
 directive @oneOf on INPUT_OBJECT
 
+type AlgoliaSearchKeyType {
+  api_key: String!
+  app_id: String!
+  index_name: String!
+}
+
 input BoolBaseFilterLookup {
   """Exact match. Filter will be skipped on `null` value"""
   exact: Boolean
@@ -185,6 +191,7 @@ input PostCategoryFilterLookup {
 type PostCommentType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
+  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
@@ -192,12 +199,12 @@ type PostCommentType implements PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
-  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
   content_private: String!
   image: DjangoImageType
+  comment_count: Int!
   source: String!
   source_author: String!
   post_source: PostSourceType
@@ -209,6 +216,7 @@ type PostCommentType implements PostTypeI {
   tags(filters: PostTagFilter): [PostTagType!]!
   votes: [PostVoteType!]!
   tag_votes: [PostTagVoteType!]!
+  tool_type: ToolType
   company: DjangoModelType
   domain: String!
   url: String!
@@ -217,10 +225,10 @@ type PostCommentType implements PostTypeI {
   created_at: DateTime!
   updated_at: DateTime!
   comments: [PostCommentType!]!
-  comments_count: Int!
 }
 
 input PostFilter {
+  id: IDBaseFilterLookup
   parent_root_id: IDBaseFilterLookup
   type: PostTypeEnumFilterLookup
   category: PostCategoryFilterLookup
@@ -265,6 +273,7 @@ input PostReviewOrder @oneOf {
 type PostReviewType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
+  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostToolType
@@ -272,12 +281,12 @@ type PostReviewType implements PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
-  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
   content_private: String!
   image: DjangoImageType
+  comment_count: Int!
   source: String!
   source_author: String!
   post_source: PostSourceType
@@ -289,6 +298,7 @@ type PostReviewType implements PostTypeI {
   tags(filters: PostTagFilter): [PostTagType!]!
   votes: [PostVoteType!]!
   tag_votes: [PostTagVoteType!]!
+  tool_type: ToolType
   company: DjangoModelType
   domain: String!
   url: String!
@@ -297,7 +307,6 @@ type PostReviewType implements PostTypeI {
   created_at: DateTime!
   updated_at: DateTime!
   comments: [PostCommentType!]!
-  comments_count: Int!
   review_usage_status: UsageStatus
   review_rating: Int
   review_importance: Int
@@ -320,17 +329,17 @@ input PostSourceOrder @oneOf {
 }
 
 type PostSourceType {
-  user_source: UserSourceType
   id: ID!
+  user_source: UserSourceType
+  id_external: String!
+  score: Int
+  rank: Int
+  url_of_source: String!
+  created_at_external: DateTime
   post: DjangoModelType!
   domain: ImportDomain
-  id_external: String!
-  rank: Int
   url: String!
-  url_of_source: String!
-  score: Int
   json: JSON!
-  created_at_external: DateTime
   created_at: DateTime!
   updated_at: DateTime!
 }
@@ -348,16 +357,16 @@ input PostTagFilter {
 
 type PostTagType {
   id: ID!
+  name: String!
+  label: String!
+  description: String!
+  is_important: Boolean
+  is_review_tag: Boolean!
   posts(filters: PostFilter, ordering: [PostOrder!]! = []): [PostType!]!
   tag_parent: PostTagType
   tag_children(filters: PostTagFilter): [PostTagType!]!
   votes: [PostTagVoteType!]!
   author: UserType
-  name: String!
-  description: String!
-  is_important: Boolean
-  is_review_tag: Boolean!
-  label: String!
 }
 
 input PostTagTypeInput {
@@ -372,9 +381,9 @@ input PostTagTypeInput {
 
 type PostTagVoteType {
   id: ID!
-  post: PostSimpleType!
   tag: PostTagType!
   author: UserType
+  post: PostSimpleType!
   is_vote_positive: Boolean
   is_changed_my_mind: Boolean!
 }
@@ -382,6 +391,7 @@ type PostTagVoteType {
 type PostToolType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
+  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
@@ -389,12 +399,12 @@ type PostToolType implements PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
-  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
   content_private: String!
   image: DjangoImageType
+  comment_count: Int!
   source: String!
   source_author: String!
   post_source: PostSourceType
@@ -406,6 +416,7 @@ type PostToolType implements PostTypeI {
   tags(filters: PostTagFilter): [PostTagType!]!
   votes: [PostVoteType!]!
   tag_votes: [PostTagVoteType!]!
+  tool_type: ToolType
   company: DjangoModelType
   domain: String!
   url: String!
@@ -414,14 +425,13 @@ type PostToolType implements PostTypeI {
   created_at: DateTime!
   updated_at: DateTime!
   comments: [PostCommentType!]!
-  comments_count: Int!
-  tool_type: ToolType
   alternatives(filters: PostFilter): [PostToolType!]!
 }
 
 type PostType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
+  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
@@ -429,12 +439,12 @@ type PostType implements PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
-  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
   content_private: String!
   image: DjangoImageType
+  comment_count: Int!
   source: String!
   source_author: String!
   post_source: PostSourceType
@@ -446,6 +456,7 @@ type PostType implements PostTypeI {
   tags(filters: PostTagFilter): [PostTagType!]!
   votes: [PostVoteType!]!
   tag_votes: [PostTagVoteType!]!
+  tool_type: ToolType
   company: DjangoModelType
   domain: String!
   url: String!
@@ -454,7 +465,6 @@ type PostType implements PostTypeI {
   created_at: DateTime!
   updated_at: DateTime!
   comments: [PostCommentType!]!
-  comments_count: Int!
 }
 
 enum PostTypeEnum {
@@ -515,6 +525,7 @@ input PostTypeEnumFilterLookup {
 interface PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
+  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
@@ -522,12 +533,12 @@ interface PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
-  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
   content_private: String!
   image: DjangoImageType
+  comment_count: Int!
   source: String!
   source_author: String!
   post_source: PostSourceType
@@ -539,6 +550,7 @@ interface PostTypeI {
   tags(filters: PostTagFilter): [PostTagType!]!
   votes: [PostVoteType!]!
   tag_votes: [PostTagVoteType!]!
+  tool_type: ToolType
   company: DjangoModelType
   domain: String!
   url: String!
@@ -547,7 +559,6 @@ interface PostTypeI {
   created_at: DateTime!
   updated_at: DateTime!
   comments: [PostCommentType!]!
-  comments_count: Int!
 }
 
 input PostTypeInput {
@@ -594,6 +605,7 @@ type PostVoteType {
 
 type Query {
   user_current: UserType
+  algolia_search_key: AlgoliaSearchKeyType
   post_generic(pk: ID!): PostTypeI
   post(pk: ID!): PostType
   post_tool(pk: ID!): PostToolType
@@ -689,10 +701,10 @@ enum UserListName {
 }
 
 type UserSourceType {
-  id: ID!
-  id_external: String!
+  id: Int!
   username: String!
   score: Int!
+  id_external: String!
   about: String!
   created_at_external: DateTime
 }
@@ -700,12 +712,12 @@ type UserSourceType {
 type UserType {
   id: ID!
   username: String!
+  avatar: DjangoFileType
   is_superuser: Boolean!
   first_name: String!
   last_name: String!
   email: String!
   connection_groups: [UserConnectionGroupType!]!
-  avatar: DjangoFileType
   post_votes: [PostVoteType!]!
   post_tag_votes: [PostTagVoteType!]!
   read_later: [DjangoModelType!]!
@@ -727,7 +739,6 @@ input UserTypeInput {
 enum Visibility {
   PRIVATE
   USERS_SELECTED
-  CONNECTION_GROUPS_SELECTED
   CONNECTIONS
   SUBSCRIBERS_PAID
   SUBSCRIBERS

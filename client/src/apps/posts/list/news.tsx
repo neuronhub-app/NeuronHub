@@ -1,6 +1,6 @@
-import { PostList } from "@/apps/posts/list/PostList";
+import { PostListAlgolia } from "@/apps/posts/list/PostListAlgolia";
 import { PostCategory } from "~/graphql/enums";
 
 export default function PostListNewsRoute() {
-  return <PostList category={PostCategory.News} />;
+  return <PostListAlgolia category={PostCategory.News} />;
 }

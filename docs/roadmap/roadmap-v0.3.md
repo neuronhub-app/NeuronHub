@@ -3,18 +3,20 @@
 - User.aliases #54
 	- User profile .avatar
 - User settings for Post.content_direct and _polite Visibility
-- Post.tags voting on list pages
-- Recurring exports
+- Notifications
 - Security review
 	- extra tests for `filter_posts_by_user`
 	- drop .history fields? good for debug, bad for privacy
 
 ### v0.3.1.0
 
+- Recurring exports
 - OAuth Apple/Google
 
 ### TBD
 
+- [refactor-pending](/docs/refactor-pending.md)
+- Post.tags voting on list pages
 - Add Review.review_experience field
 - Add Vote.is_changed_my_mind field
 - LLM moderation

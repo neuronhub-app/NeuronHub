@@ -1,4 +1,4 @@
-For project intro see [docs/architecture.md](/docs/architecture.md).
+For project intro see [docs/architecture/readme.md](/docs/architecture/readme.md).
 
 Development Setup
 --------------------------------
@@ -33,7 +33,7 @@ The [mise.toml](/mise.toml) has all tasks and scripts.
 Documentation
 --------------------------------
 
-- [testing setup](/docs/testing-setup.md)
+- [testing setup](/docs/architecture/tests.md)
 - [code style](/docs/code-style.md)
 
 For more see the [docs/](/docs/) dir.

@@ -58,7 +58,6 @@ export function PostSharableFields(props: {
           new Set([
             Visibility.UsersSelected,
             Visibility.Connections,
-            Visibility.ConnectionGroupsSelected,
             Visibility.Subscribers,
           ]).has(state.visibility as Visibility) && (
             <UserMultiSelect

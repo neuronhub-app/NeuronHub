@@ -30,6 +30,12 @@ test.describe("HN Comments", () => {
     await play.click(ids.post.card.link.detail); // the Post imported from HN
     await play.waitForNetworkIdle();
 
+    const hnPostCard = play.page.getByTestId(ids.post.card.container).filter({
+      hasText: "HackerNews",
+    });
+    await hnPostCard.getByTestId(ids.post.card.link.detail).click();
+    await play.waitForNetworkIdle();
+
     // Wait for comments to load (dynamic batch loading)
     const threadContainers = play.getAll(ids.comment.thread.container);
     await expect(threadContainers.first()).toBeVisible();

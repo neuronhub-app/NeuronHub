@@ -18,7 +18,6 @@ from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_upd
 
 logger = logging.getLogger(__name__)
 
-
 type ID = int
 type Username = str
 type DateISO = str
@@ -143,9 +142,14 @@ class ImporterHackerNews:
         user_source = await self._get_or_create_user_source(username=data["author"])
         author_name = user_source.username
 
+        created_at_ext = datetime.fromisoformat(
+            data["created_at"].replace("Z", "+00:00")  # todo fix: #AI, prob wrong
+        )
+
         post_defaults = {
             "visibility": Visibility.PUBLIC,
             "source_author": author_name,  # todo refac: drop
+            "created_at": created_at_ext,
         }
         if is_post:
             post_data = cast(algolia.Post, data)
@@ -181,6 +185,7 @@ class ImporterHackerNews:
             is_post=is_post,
             rank=rank,
             user_source=user_source,
+            created_at_external=created_at_ext,
         )
 
         if is_root:
@@ -227,6 +232,7 @@ class ImporterHackerNews:
         is_post: bool,
         rank: int | None = None,
         user_source: UserSource | None = None,
+        created_at_external: datetime | None = None,
     ) -> PostSource:
         post_data: algolia.Post | algolia.Comment
         if is_post:
@@ -250,9 +256,7 @@ class ImporterHackerNews:
             id_external=data["id"],
             defaults={
                 **defaults,
-                "created_at_external": datetime.fromisoformat(
-                    post_data["created_at"].replace("Z", "+00:00")  # todo fix: #AI, seems wrong
-                ),
+                "created_at_external": created_at_external,
             },
         )
         return post_source

@@ -22,11 +22,11 @@ export function usePostVoting(props: {
   const isLoading = state.snap.isLoadingUpvote || state.snap.isLoadingDownvote;
 
   useInit({
+    isReady: !isLoading,
     onInit: () => {
       const userVote = user?.post_votes.find(vote => props.postId === vote.post.id);
       state.mutable.isVotePositive = userVote?.is_vote_positive ?? null;
     },
-    isReady: !isLoading,
     deps: [props.postId, user?.post_votes],
   });
 

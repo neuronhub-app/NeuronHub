@@ -1,17 +1,22 @@
 import { Checkbox, CheckboxGroup, Fieldset, For, Stack, Text } from "@chakra-ui/react";
 
-import { Radio, RadioGroup } from "@/components/ui/radio";
 import { gap } from "@/theme/theme";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
 // todo refac-name: PostListSidebar
 export function ReviewListSidebar() {
   return (
-    <Stack p={{ base: gap.md, md: gap.lg }} bg="bg.panel" align="flex-start" w="fit-content">
-      <Text>Filters</Text>
+    <Stack
+      p={{ base: gap.md, md: gap.lg }}
+      bg="bg.panel"
+      align="flex-start"
+      w="fit-content"
+      gap="gap.lg"
+    >
+      <Text fontWeight="medium">Filters</Text>
+
       <Fieldset.Root>
         <CheckboxGroup name="framework">
-          <Fieldset.Content>
+          <Fieldset.Content gap="gap.sm">
             <For each={["Upvoted", "Reading list", "Library"]}>
               {value => (
                 <Checkbox.Root key={value} value={value}>
@@ -25,19 +30,5 @@ export function ReviewListSidebar() {
         </CheckboxGroup>
       </Fieldset.Root>
     </Stack>
-  );
-}
-
-function ReviewUserListFilter() {
-  const state = useValtioProxyRef({
-    isLoading: false,
-    isAdded: false,
-  });
-
-  return (
-    <RadioGroup>
-      <Radio value="starred">Starred</Radio>
-      <Radio value="read_later">Read later</Radio>
-    </RadioGroup>
   );
 }

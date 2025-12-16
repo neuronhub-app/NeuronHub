@@ -1,24 +1,21 @@
-## NeuronHub
-
 <doc-architecture>
 
-@./docs/architecture.md
+@./docs/architecture/README.md
 
 </doc-architecture>
 
-
-<doc-roadmap-current>
+<doc-roadmap>
 
 @./docs/roadmap/roadmap-v0.2.md
 
-</doc-roadmap-current>
+</doc-roadmap>
 
 ### Workflow
 
 <mise-tasks>
 
-@./docs/mise-tasks.md
+You must only use Mise config to run Tasks - native shell will break.
 
-You're never going to be able to run Django or Vite dev servers. Only Mise config is capable of it.
+@./docs/mise-tasks.md
 
 </mise-tasks>

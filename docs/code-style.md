@@ -8,8 +8,8 @@
 - Extract explanatory variables and functions
 
 Comments
-- Comments are a terrible sing, and are only for unusual cases - tell why, not what
-- Every comment is a tech debt - it'll fuck up devs once outdated
+- Comments are a terrible sign, and used only for unusual cases - tell why, not what.
+- Every comment is a tech debt - it'll fuck you up once outdated.
 
 ### Manage complexity
 
@@ -18,7 +18,7 @@ You're working on a pre-MVP pre-PMF codebase:
 - Extreme complexity engineering is a must for survival
 - We must avoid the hell of "*cheaper to rewrite from 0 than comprehend*"
 
-#### Defensive code is tech debt
+#### Defensive code in an MVP is tech debt
 
 - Write clean code instead handling potential library issues
 - Fail fast - use `assert` or `!` instead of complex error handling
@@ -34,62 +34,6 @@ You're working on a pre-MVP pre-PMF codebase:
 - In functions accept objects over primitives: `update(user: User)` not `update(id: string)`
 - Avoid "smart" constructs as `reduce` or list comprehensions 
 - Create wrappers to declutter bad syntax from third-parties
-
-## React
-
-### Components
-
-A demo of typical hierarchy and imports:
-```tsx
-import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { ID, graphql } from "@/gql-tada";
-import { useUser } from "@/apps/users/useUserCurrent";
-import { useInit } from "@/utils/useInit";
-
-export function Card(props: { id: ID; className?: string }) {
-  // 1. Hooks usage
-
-  const user = useUser();
-
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(`query Post($id: ID!) { post(id: $id) { ... } }`),
-    { id: props.id },
-  );
-
-  // 2. State
-
-  const state = useValtioProxyRef({ isDialogOpen: false });
-
-  // 3. Functions, init (mounting), handlers
-
-  useInit({
-    isBlocked: isLoadingFirstTime,
-    init: () => { ... },
-    deps: [],
-  });
-
-  async function hidePost() {
-    const response = await mutateAndRefetchMountedQueries({ ... });
-    // ...
-  }
-
-  // 4. JSX and its variables
-
-  const className = props.className ?? "default";
-  const name = user.name ?? "Anonymous";
-
-  return (
-    <DialogRoot
-      open={state.snap.isDialogOpen}
-      onOpenChange={event => {
-        state.mutable.isDialogOpen = event.open
-      }}
-    >
-    </DialogRoot>
-  );
-}
-```
 
 ## Tags
 

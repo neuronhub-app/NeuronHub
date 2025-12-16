@@ -53,6 +53,7 @@ Some `Scope`s are bound to a single `Type`, eg `build(AI)`.
 - `build(Mise)` - eg `mise.toml`
 - `build(Docker)`
 - `build(Coder)` - mostly `devops/` dir changes for Coder.com
+- `Algol` - Algolia's integration
 - `monitor` - eg Sentry
 - `types` - TypeScript or Python typings
 - `admin` - Django Admin, ie no impact on the user-facing logic

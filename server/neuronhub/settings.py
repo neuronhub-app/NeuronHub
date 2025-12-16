@@ -1,8 +1,10 @@
 import asyncio
 import os
+import warnings
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-import warnings
+from typing import TypedDict
 
 import dj_database_url
 import django
@@ -17,7 +19,6 @@ from strawberry_django.settings import strawberry_django_settings
 
 
 django_stubs_ext.monkeypatch()
-
 
 env = Env()
 env.read_env()
@@ -60,6 +61,9 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.headless",
+    "algoliasearch_django",
+    "django_tasks",
+    "django_tasks.backends.database",
     "django_object_actions",
     "django_countries",
     "django_rich",
@@ -94,15 +98,6 @@ MIDDLEWARE = [
     "simple_history.middleware.HistoryRequestMiddleware",
     "hijack.middleware.HijackUserMiddleware",
 ]
-
-IS_DEBUG_TOOLBAR_ENABLED = env.bool("IS_DEBUG_TOOLBAR_ENABLED", False)
-if IS_DEBUG_TOOLBAR_ENABLED:
-    INSTALLED_APPS.append("debug_toolbar")
-    MIDDLEWARE.insert(0, "strawberry_django.middlewares.debug_toolbar.DebugToolbarMiddleware")
-    DEBUG_TOOLBAR_CONFIG = {
-        "UPDATE_ON_FETCH": True,
-    }
-    INTERNAL_IPS = ["127.0.0.1"]
 
 TEMPLATES = [
     {
@@ -159,9 +154,7 @@ CACHES = {
 
 SITE_ID = 1
 
-SECRET_KEY = env.str(
-    "SECRET_KEY", "django-insecure-u_nt^p$$c611a&(jd*wbs58ziu4=o3%ps%@4zpv9=(8ix&8k7i"
-)
+SECRET_KEY = env.str("SECRET_KEY", "django-insecure-c611a&dwbs58ziu4=o3ps@4zpv9=8ix&8k7i")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
@@ -178,6 +171,7 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 ROOT_URLCONF = "neuronhub.urls"
 
+TASKS = {"default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"}}
 
 # ALLOWED_HOSTS & django-cors-headers
 # ---------------------------------------------------------------------------------------------------------
@@ -249,7 +243,6 @@ ANYMAIL = {
     "POSTMARK_SERVER_TOKEN": env.str("POSTMARK_SERVER_TOKEN", ""),
 }
 
-
 DEFAULT_DJANGO_SETTINGS = strawberry_django_settings()
 DEFAULT_DJANGO_SETTINGS["GENERATE_ENUMS_FROM_CHOICES"] = True  # no reason atm, can remove
 # "pk" by default is a nice idea, but bad implementation - "id" is soft-required in Django
@@ -293,6 +286,43 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 ACCOUNT_SESSION_REMEMBER = True
 if DJANGO_ENV.is_dev():
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
+
+
+# Algolia
+# ---------------------------------------------------------------------------------------------------------
+class AlgoliaConfig(TypedDict):
+    APPLICATION_ID: str
+    API_KEY: str
+    SEARCH_API_KEY: str
+    INDEX_SUFFIX: str
+    AUTO_INDEXING: bool
+    IS_ENABLED: bool
+
+
+is_unit_tests = DJANGO_ENV is DjangoEnv.DEV_TEST_UNIT
+is_algolia_enabled = not is_unit_tests and env.bool("ALGOLIA_IS_ENABLED", False)
+ALGOLIA = AlgoliaConfig(
+    APPLICATION_ID=env.str("ALGOLIA_APPLICATION_ID", ""),
+    API_KEY=env.str("ALGOLIA_API_KEY", ""),
+    SEARCH_API_KEY=env.str("ALGOLIA_SEARCH_API_KEY", ""),
+    AUTO_INDEXING=DJANGO_ENV is not DjangoEnv.DEV_TEST_UNIT,
+    INDEX_SUFFIX=DJANGO_ENV.value,  # eg `posts_{suffix}`
+    # BE will work wo/ it. FE only partially.
+    IS_ENABLED=is_algolia_enabled,
+)
+
+
+# django-debug-toolbar
+# ---------------------------------------------------------------------------------------------------------
+
+IS_DEBUG_TOOLBAR_ENABLED = env.bool("IS_DEBUG_TOOLBAR_ENABLED", False)
+if IS_DEBUG_TOOLBAR_ENABLED:
+    INSTALLED_APPS.append("debug_toolbar")
+    MIDDLEWARE.insert(0, "strawberry_django.middlewares.debug_toolbar.DebugToolbarMiddleware")
+    DEBUG_TOOLBAR_CONFIG = {
+        "UPDATE_ON_FETCH": True,
+    }
+    INTERNAL_IPS = ["127.0.0.1"]
 
 
 # Logging
@@ -339,6 +369,11 @@ if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
             "level": "WARNING",
             "propagate": True,
         },
+        "algoliasearch_django": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
     }
     # supress asyncio.CancelledError: it's raised by Strawberry historically for no reason. See their github for details
     LOGGING.setdefault("filters", {})
@@ -350,7 +385,6 @@ if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
     }
     # noinspection PyTypeChecker
     LOGGING["handlers"]["console"]["filters"] = ["suppress_cancelled"]
-
 
 TEST_RUNNER = "django_rich.test.RichRunner"
 _line_width = 120
