@@ -1,6 +1,6 @@
 ## Docker Compose
 
-Replace all the ${{}}` placeholders below.
+Replace all the `${{}}` placeholders below.
 
 ### App
 
@@ -39,7 +39,7 @@ CLIENT_URL=https://${{domain}}
 
 # S3
 # --------------------------------------------
-AWS_S3_ENDPOINT_URL=${{host}}:${{port}}
+AWS_S3_ENDPOINT_URL=${{host}}:${{s3_port}}
 AWS_ACCESS_KEY_ID=${{key_id}}
 AWS_SECRET_ACCESS_KEY=${{key_secret}}
 
@@ -61,24 +61,26 @@ SENTRY_DSN_FRONTEND=${{dsn_frontend}}
 
 At your discretion.
 
-### S3 Rclone server
+### Rclone S3 server
 
-Create a dir for s3 like `mkdir -p /srv/neuronhub/storage/` - the `storage` name is hardcoded in Django.
+To create Rclone "S3 bucket" you need to create a dir, eg `mkdir -p /srv/neuronhub/media/data/media`.
+
+Note: `media` is the bucket name expected by Django's settings.py `env.str("S3_STORAGE_BUCKET_NAME", "media")`.
 
 ```yaml
 services:
   rclone:
     image: rclone/rclone
     volumes:
-      - /srv/neuronhub/storage/config:/config/rclone
-      - /srv/neuronhub/storage/data/storage/data:/data
+      - /srv/neuronhub/media/config:/config/rclone
+      - /srv/neuronhub/media/data:/data
     env_file:
       - path: .env
-    command: serve s3 --auth-key ${ACCESS_KEY_ID},${SECRET_ACCESS_KEY} /data --addr :${{port}}
+    command: serve s3 --auth-key ${ACCESS_KEY_ID},${SECRET_ACCESS_KEY} /data --addr :${{s3_port}}
     ports:
-      - "${{port}}:${{port}}"
+      - "${{s3_port}}:${{s3_port}}"
     expose:
-      - "${{port}}"
+      - "${{s3_port}}"
 ```
 
 `.env` file
@@ -86,59 +88,6 @@ services:
 ACCESS_KEY_ID=${{key_id}}
 SECRET_ACCESS_KEY=${{key_secret}}
 ```
-
-### Hatchet.run (background jobs)
-
-```yaml
-  hatchet-postgres:
-    image: postgres:15.6
-    command: postgres -c 'max_connections=200'
-    restart: always
-    env_file:
-      - path: .env
-    environment:
-      - POSTGRES_USER=hatchet
-      - POSTGRES_DB=hatchet
-    volumes:
-      - hatchet_postgres_data:/var/lib/postgresql/data
-    ports:
-      - "${{db_port_hatchet}}:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d hatchet -U hatchet"]
-      interval: 2s
-      timeout: 2s
-      retries: 3
-      start_period: 3s
-  hatchet-lite:
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:latest
-    ports:
-      - "8888:8888" # web panel
-      - "7077:7077" # worker
-    depends_on:
-      hatchet-postgres:
-        condition: service_healthy
-    environment:
-      # see https://docs.hatchet.run/self-hosting/configuration-options
-      SERVER_AUTH_COOKIE_DOMAIN: localhost
-      SERVER_AUTH_COOKIE_INSECURE: "t"
-      SERVER_GRPC_BIND_ADDRESS: "0.0.0.0"
-      SERVER_GRPC_INSECURE: "t"
-      SERVER_GRPC_BROADCAST_ADDRESS: localhost:7077
-      SERVER_GRPC_PORT: "7077"
-      SERVER_URL: http://0.0.0.0:8888
-      SERVER_AUTH_SET_EMAIL_VERIFIED: "t"
-      SERVER_DEFAULT_ENGINE_VERSION: "V1"
-      SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: localhost:7077
-    volumes:
-      - "hatchet_config:/config"
-```
-
-`.env` file
-```shell
-POSTGRES_PASSWORD=${{db_password_hatchet}}
-DATABASE_URL="postgresql://hatchet:hatchet@${{db_password_hatchet}}:${{db_port_hatchet}}/hatchet?sslmode=disable"
-```
-
 
 ## Upgrades
 
