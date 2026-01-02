@@ -1,9 +1,8 @@
 .DS_Store
 
+.local/
 .idea/
 .run/
-
-docs/private/
 
 # caches
 __pycache__

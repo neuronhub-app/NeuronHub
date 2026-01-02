@@ -1,9 +1,9 @@
-[submodule "docs/private"]
-	path = docs/private
+[submodule "docs"]
+	path = .local/docs
 	url = http://nas.strix:3000/neuronhub/neuronhub-docs.git
 	branch = master
 
 [submodule "issues"]
-	path = .claude/issues
+	path = .local/issues
 	url = http://nas.strix:3000/neuronhub/issues.git
 	branch = master
