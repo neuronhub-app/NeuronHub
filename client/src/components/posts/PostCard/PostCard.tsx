@@ -35,7 +35,6 @@ import { isReview } from "@/graphql/fragments/reviews";
 import { urls } from "@/urls";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
-// todo refac-name: file to PostCard.tsx
 export function PostCard(props: {
   post: PostListItemType;
   isDetailPage?: boolean;

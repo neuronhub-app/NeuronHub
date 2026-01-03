@@ -2,8 +2,7 @@ import { Box, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { type ComponentProps, useMemo } from "react";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import type { PostHighlight } from "@/apps/highlighter/useHighlighter";
-import { PostCard } from "@/components/posts/PostCard";
-import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
+import { PostCard } from "@/components/posts/PostCard/PostCard";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { graphql, type ID, type ResultOf } from "@/gql-tada";
 import { CommentFieldsFragment, isTool, PostFragment } from "@/graphql/fragments/posts";
@@ -112,8 +111,6 @@ export function Library() {
               post={group.parent_root}
               urlNamespace={getPostNamespace(group.parent_root)}
             />
-
-            <PostAuthor post={group.parent_root} />
 
             <Stack aria-label="author & date" gap="gap.md">
               {group.highlights.map(highlight => (

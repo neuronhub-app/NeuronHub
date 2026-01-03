@@ -4,7 +4,7 @@ import { FaPlus } from "react-icons/fa6";
 import { NavLink } from "react-router";
 
 import { ReviewListSidebar } from "@/apps/reviews/list/ReviewListSidebar";
-import { PostCard } from "@/components/posts/PostCard";
+import { PostCard } from "@/components/posts/PostCard/PostCard";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
 import type { PostFragmentType } from "@/graphql/fragments/posts";

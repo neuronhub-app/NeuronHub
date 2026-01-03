@@ -16,7 +16,7 @@ import {
 import { type ReactNode, useMemo } from "react";
 import { useHighlighter } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
-import { PostCard } from "@/components/posts/PostCard";
+import { PostCard } from "@/components/posts/PostCard/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
 import { useMetaTitle } from "@/components/useMetaTitle";

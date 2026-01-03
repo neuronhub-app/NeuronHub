@@ -10,7 +10,7 @@ import {
 } from "react-instantsearch";
 import { NavLink } from "react-router";
 import { useAlgoliaPostsEnrichmentByGraphql } from "@/apps/posts/list/useAlgoliaPostsEnrichmentByGraphql";
-import { PostCard } from "@/components/posts/PostCard";
+import { PostCard } from "@/components/posts/PostCard/PostCard";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
 import type { PostFragmentType } from "@/graphql/fragments/posts";
