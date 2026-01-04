@@ -1,9 +1,9 @@
 ### v0.3.0.0
 
-- User.aliases #54
-	- User profile .avatar
-- User settings for Post.content_direct and _polite Visibility
+- Sharing: content, highlights, library, upvotes, ...
 - Notifications
+- User.aliases
+- User.avatar
 - Security review
 	- extra tests for `filter_posts_by_user`
 	- drop .history fields? good for debug, bad for privacy
@@ -17,13 +17,12 @@
 
 - [refactor-pending](/docs/refactor-pending.md)
 - Post.tags voting on list pages
-- Add Review.review_experience field
-- Add Vote.is_changed_my_mind field
+- field `Review.review_experience`
+- field `Vote.is_changed_my_mind`
 - LLM moderation
+- field `Tag.is_show_parent_name`
+- expire Posts
+- `Post.alternatives` votes & comments
 - `Post.Type.Quote`
 	- show "Quotes" under "Posts" in left menu, default is "All"
 	- eg HN comments
-- `Post.alternatives` comments
-- `Tag.is_show_parent_name` field
-- "expire" content
-- Post.alternatives votes

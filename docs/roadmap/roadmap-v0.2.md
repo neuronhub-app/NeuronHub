@@ -3,8 +3,7 @@
 
 ### v0.2.5
 
-- [ ] Algolia <PostList/> & facets
-- [ ] Allow to mark a Comment as "read"
-- [ ] User signup
+- [ ] Algolia: facets, sort, date filter
+- [ ] Mark a Comment as "read"
 
 [v0.3](/docs/roadmap/roadmap-v0.3.md)
