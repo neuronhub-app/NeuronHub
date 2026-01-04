@@ -1,3 +1,8 @@
+---
+paths:
+  - "**/*.py"
+---
+
 ## Structure
 
 - `schema.graphql` - the single GraphQL schema from Strawberry
@@ -42,4 +47,4 @@ We save all `client/` queries to the whitelist at `server/persisted-queries.json
 - [How to use GraphQL](./GraphQL.md)
 - [How to structure a React Component](./React-component-structure.md)
 - [How to use Playwright](./Playwright.md)
-- [How to use Chakra UI](./Chakra-UI.md)
+- [How to use Chakra UI](Chakra-UI-Semantic-Tokens.md)

@@ -126,7 +126,7 @@ classDiagram
     }
 ```
 
-## Task-specific MUST-read docs
+## Specific docs
 
 You must read each top-level doc before its children.
 
@@ -134,8 +134,8 @@ You must read each top-level doc before its children.
 - [./frontend](./frontend/README.md)
 	- [How to structure a React Component](./frontend/React-component-structure.md)
 	- [How to use GraphQL](./frontend/GraphQL.md)
-	- [How to use Chakra UI](./frontend/Chakra-UI.md)
+	- [How to use Chakra UI](frontend/Chakra-UI-Semantic-Tokens.md)
 - [./tests](./tests.md)
 	- [How to use pytest](./backend/pytest.md)
 	- [How to use Playwright](./frontend/Playwright.md)
-- [Algolia integration](./algolia.md) - used on all FE /posts list pages for its Facets, Pagination, and InstantSearch.
+- [Algolia integration](./Algolia.md) - used on all FE /posts list pages for its Facets, Pagination, and InstantSearch.

@@ -1,3 +1,10 @@
+---
+paths:
+  - "**/*__test.py"
+  - "**/test_*.py"
+  - "client/e2e/**/*"
+---
+
 We use `pytest` for unit tests, and `playwright` in `client/e2e`.
 
 The biggest issues are:

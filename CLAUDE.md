@@ -1,21 +1,11 @@
-<doc-architecture>
+<doc_architecture>
+@docs/architecture/README.md
+</doc_architecture>
 
-@./docs/architecture/README.md
+<mise_tasks>
+@docs/mise-tasks.md
+</mise_tasks>
 
-</doc-architecture>
-
-<doc-roadmap>
-
-@./docs/roadmap/roadmap-v0.2.md
-
-</doc-roadmap>
-
-### Workflow
-
-<mise-tasks>
-
-You must only use Mise config to run Tasks - native shell will break.
-
-@./docs/mise-tasks.md
-
-</mise-tasks>
+<doc_roadmap>
+@docs/roadmap/roadmap-v0.2.md
+</doc_roadmap>

@@ -1,3 +1,9 @@
+---
+paths:
+  - "**/*.tsx"
+  - "**/client/src/theme/*"
+---
+
 ### Semantic Tokens
 
 Always use semantic tokens when available. Create new tokens if helps in `client/src/theme/*`.

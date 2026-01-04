@@ -1,3 +1,9 @@
+---
+paths:
+  - server/neuronhub/apps/posts/index.py
+  - client/src/apps/posts/list/PostListAlgolia.tsx
+---
+
 We use Algolia `posts.Post` model index as the list view on FE, with its Search, Facets, and
 Pagination.
 

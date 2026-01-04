@@ -1,3 +1,8 @@
+---
+paths:
+  - "**/*.tsx"
+---
+
 ### Persisted Queries
 
 You must define queries on the module top level for gql-tada CLI to put it in the whitelist, eg:

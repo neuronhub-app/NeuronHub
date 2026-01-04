@@ -1,4 +1,9 @@
-### Typical hierarchy and imports
+---
+paths:
+  - "**/*.tsx"
+---
+
+### React Component hierarchy and imports
 
 ```tsx
 import { useApolloQuery } from "@/graphql/useApolloQuery";

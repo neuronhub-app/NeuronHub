@@ -1,3 +1,7 @@
+---
+paths: **/*.py
+---
+
 ## Constraints
 
 - Django core is mostly untyped tech debt.
@@ -44,7 +48,6 @@ For privacy we override `PostTypeI.get_queryset` (Strawberry `interface` for eac
 Files:
 - [[server/neuronhub/apps/posts/graphql/types.py]]
 - [[server/neuronhub/apps/posts/services/filter_posts_by_user.py]]
-
 
 ## Mandatory task-specific docs
 

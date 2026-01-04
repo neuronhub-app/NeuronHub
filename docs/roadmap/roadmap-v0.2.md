@@ -4,7 +4,7 @@
 ### v0.2.5
 
 - [ ] Algolia <PostList/> & facets
-- [ ] Allow to fold a single Comment (ie "mask as read")
+- [ ] Allow to mark a Comment as "read"
 - [ ] User signup
 
 [v0.3](/docs/roadmap/roadmap-v0.3.md)

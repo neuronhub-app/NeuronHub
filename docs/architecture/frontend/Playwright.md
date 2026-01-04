@@ -1,3 +1,8 @@
+---
+paths:
+  - "e2e/**/*"
+---
+
 ## Playwright
 
 In E2E we test only the critical user journeys. Or the cases with the lowest possible maintenance cost. Everything else is stupid time waste.

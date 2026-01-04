@@ -1,4 +1,5 @@
 ---
+description: How to interpret our TODO comments syntax.
 reviewed_at: 2025.09.03
 ---
 

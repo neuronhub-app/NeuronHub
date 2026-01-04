@@ -1,5 +1,7 @@
 ---
-paths: **/*__test.py, test_*.py
+paths:
+- "**/*__test.py"
+- "**/test_*.py"
 ---
 
 ## Pytest
