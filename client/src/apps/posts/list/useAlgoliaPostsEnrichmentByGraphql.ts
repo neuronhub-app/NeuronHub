@@ -4,7 +4,7 @@ import { PostFragment, type PostFragmentType } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 /**
- * If we store eg `.votes` in Algolia, then voting `mutateAndRefetchMountedQueries` won't trigger GraphQL refetch.
+ * If we store eg `.votes` in Algolia, then voting with `mutateAndRefetchMountedQueries` won't refetch `.votes` from BE.
  */
 export function useAlgoliaPostsEnrichmentByGraphql(postsAlgolia: PostFragmentType[]) {
   const postIds = useMemo(() => postsAlgolia.map(post => post.id), [postsAlgolia]);

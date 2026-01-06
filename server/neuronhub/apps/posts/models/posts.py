@@ -151,8 +151,8 @@ class Post(AnonimazableTimeStampedModel):
         ],
     )
 
-    # permissions
-    # ---------------------
+    # Sharing fields
+    # ----------------------------------------------------------------------
 
     recommended_to_users = anonymizable(  # type: ignore[var-annotated]
         models.ManyToManyField(User, related_name="posts_recommended", blank=True),
@@ -170,8 +170,8 @@ class Post(AnonimazableTimeStampedModel):
     )
     visibility = TextChoicesField(Visibility, default=Visibility.PRIVATE)
 
-    # content
-    # ---------------------
+    # Content fields
+    # ----------------------------------------------------------------------
 
     slug = AutoSlugField(populate_from="title", allow_duplicates=True)
     title = anonymizable(models.CharField(max_length=255, blank=True))
@@ -183,8 +183,8 @@ class Post(AnonimazableTimeStampedModel):
     source_author = CharField(max_length=500, blank=True)
     image = models.ImageField(upload_to="posts/images/", blank=True, null=True)
 
-    # tool fields
-    # ---------------------
+    # Tool fields
+    # ----------------------------------------------------------------------
 
     class ToolType(models.TextChoices):
         Program = "program"
@@ -201,8 +201,8 @@ class Post(AnonimazableTimeStampedModel):
     crunchbase_url = models.URLField(blank=True)
     github_url = models.URLField(blank=True)
 
-    # review fields
-    # ---------------------
+    # Review fields
+    # ----------------------------------------------------------------------
 
     review_tags = ManyToManyField("posts.PostTag", related_name="post_reviews", blank=True)
     review_rating = models.PositiveIntegerField(
@@ -235,6 +235,7 @@ class Post(AnonimazableTimeStampedModel):
         return self.root_children.count()
 
     # Algolia
+    # ----------------------------------------------------------------------
 
     def is_in_algolia_index(self) -> bool:
         return self.type is not self.Type.Comment
@@ -279,7 +280,7 @@ class Post(AnonimazableTimeStampedModel):
 
     def _get_graphql_field(self, field: str) -> Any | None:
         """
-        To supply the expected TS object to FE from Algolia, we re-use "PostsByIds" Query.
+        We re-use the "PostsByIds" query to supply the identical JSON schema to FE from both Algolia and GraphQL.
         """
         from neuronhub.apps.graphql.persisted_query_extension import (
             _load_client_persisted_queries_json,
@@ -287,7 +288,7 @@ class Post(AnonimazableTimeStampedModel):
         from neuronhub.apps.tests.test_cases import StrawberryContext
         from neuronhub.graphql import schema
 
-        if not self.is_in_algolia_index():  # should be redundant, but isn't.
+        if not self.is_in_algolia_index():  # should be redundant, but isn't
             return None
 
         request = RequestFactory().get("/graphql")
