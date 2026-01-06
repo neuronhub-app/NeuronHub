@@ -191,7 +191,6 @@ input PostCategoryFilterLookup {
 type PostCommentType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
@@ -199,6 +198,7 @@ type PostCommentType implements PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
+  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
@@ -273,7 +273,6 @@ input PostReviewOrder @oneOf {
 type PostReviewType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostToolType
@@ -281,6 +280,7 @@ type PostReviewType implements PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
+  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
@@ -391,7 +391,6 @@ type PostTagVoteType {
 type PostToolType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
@@ -399,6 +398,7 @@ type PostToolType implements PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
+  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
@@ -431,7 +431,6 @@ type PostToolType implements PostTypeI {
 type PostType implements PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
@@ -439,6 +438,7 @@ type PostType implements PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
+  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
@@ -525,7 +525,6 @@ input PostTypeEnumFilterLookup {
 interface PostTypeI {
   TYPE: PostTypeEnum!
   id: ID!
-  title: String!
   author: UserType
   seen_by_users: [DjangoModelType!]!
   parent: PostTypeI
@@ -533,6 +532,7 @@ interface PostTypeI {
   children: [PostTypeI!]!
   type: PostTypeEnum!
   category: PostCategory
+  title: String!
   content_polite: String!
   content_direct: String!
   content_rant: String!
@@ -678,6 +678,7 @@ enum ToolType {
   Other
 }
 
+"""Represents a file upload."""
 scalar Upload
 
 enum UsageStatus {

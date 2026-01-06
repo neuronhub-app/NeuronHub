@@ -2,13 +2,15 @@ import strawberry
 from django.core.files.uploadedfile import UploadedFile
 from django_extensions.db.fields import AutoSlugField
 from strawberry.extensions import ParserCache
+from strawberry.file_uploads import Upload
 from strawberry.schema.config import StrawberryConfig
+from strawberry.schema.types.scalar import DEFAULT_SCALAR_REGISTRY
 from strawberry.tools import merge_types
 from strawberry_django.fields.types import field_type_map
 from strawberry_django.optimizer import DjangoOptimizerExtension
-from strawberry.file_uploads import Upload
 
 from neuronhub.apps.db.fields import MarkdownField
+
 
 # Add missing types:
 field_type_map.update(
@@ -20,20 +22,15 @@ field_type_map.update(
 
 # imports that rely on [[field_type_map]] we modify above
 
-from neuronhub.apps.users.graphql.resolvers import UsersQuery
-from neuronhub.apps.users.graphql.mutations import UserMutation
-
-from neuronhub.apps.posts.graphql.resolvers import PostsQuery
-from neuronhub.apps.posts.graphql.mutations import PostsMutation
-
-from neuronhub.apps.tests.graphql.mutations import TestsMutation
-
-from neuronhub.apps.highlighter.graphql import HighlighterQuery
-from neuronhub.apps.highlighter.graphql import HighlighterMutation
-
-from neuronhub.apps.importer.graphql.mutations import ImporterMutation
-
 from neuronhub.apps.graphql.persisted_query_extension import PersistedQueryExtension
+from neuronhub.apps.highlighter.graphql import HighlighterMutation
+from neuronhub.apps.highlighter.graphql import HighlighterQuery
+from neuronhub.apps.importer.graphql.mutations import ImporterMutation
+from neuronhub.apps.posts.graphql.mutations import PostsMutation
+from neuronhub.apps.posts.graphql.resolvers import PostsQuery
+from neuronhub.apps.tests.graphql.mutations import TestsMutation
+from neuronhub.apps.users.graphql.mutations import UserMutation
+from neuronhub.apps.users.graphql.resolvers import UsersQuery
 
 
 Query = merge_types(
@@ -58,5 +55,5 @@ schema = strawberry.Schema(
         DjangoOptimizerExtension,
     ],
     config=StrawberryConfig(auto_camel_case=False),
-    scalar_overrides={UploadedFile: Upload},  # optional, for typing
+    scalar_overrides={UploadedFile: DEFAULT_SCALAR_REGISTRY[Upload]},
 )

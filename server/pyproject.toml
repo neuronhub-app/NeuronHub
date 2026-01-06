@@ -11,15 +11,15 @@ dependencies = [
     # django
     "django == 5.2.*",
         "pillow == 12.*", # [i=high, rep=high, GH=high, @hugovk, 13.1k] for ImageField. @hugovk is an ex-Python release manager; used by Django
-    "django-tasks == 0.9.0", # @RealOrangeOne, Django Security member
+    "django-tasks == 0.10.0", # @RealOrangeOne, Django Security member
     "django-allauth == 65.*",
     "django-anymail == 13.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, KLOC +84/-40
     "django-cors-headers == 4.*", # [i=high, rep=highest, @adamchainz] Django Sec Team
     "django-rich == 2.*", # [i=norm, rep=highest, @adamchainz] Django Sec Team
     "django-extensions == 4.*",
         "ipython == 9.*",
-    "strawberry-graphql ~= 0.287.0",
-        "strawberry-graphql-django ~= 0.67.2",
+    "strawberry-graphql ~= 0.288.2",
+        "strawberry-graphql-django ~= 0.73.0",
     "django-stubs[compatible-mypy] == 5.*",
     "django-health-check == 3.*", # [i=low, rep=norm, GH=norm, @revsys, 1.3k] US dev agency
     "django-simple-history == 3.*", # [i=high, rep=norm, GH=norm, @django-commons, 2.4k]
