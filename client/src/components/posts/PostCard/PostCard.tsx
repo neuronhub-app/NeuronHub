@@ -7,6 +7,7 @@ import {
   IconButton,
   Image,
   Link,
+  Skeleton,
   Stack,
   Text,
   VStack,
@@ -102,6 +103,15 @@ export function PostCard(props: {
         </HStack>
       </Stack>
     </HStack>
+  );
+}
+
+export function PostCardSkeleton() {
+  return (
+    <Flex gap="gap.md" direction="row">
+      <Skeleton w="9" h="40" />
+      <Skeleton w="full" h="56" flexShrink="initial" />
+    </Flex>
   );
 }
 

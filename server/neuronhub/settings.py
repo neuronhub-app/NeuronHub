@@ -299,16 +299,15 @@ class AlgoliaConfig(TypedDict):
     IS_ENABLED: bool
 
 
-is_unit_tests = DJANGO_ENV is DjangoEnv.DEV_TEST_UNIT
-is_algolia_enabled = not is_unit_tests and env.bool("ALGOLIA_IS_ENABLED", False)
+is_not_unit_tests = DJANGO_ENV is not DjangoEnv.DEV_TEST_UNIT
 ALGOLIA = AlgoliaConfig(
+    # BE will work wo/ it. FE only partially.
+    IS_ENABLED=env.bool("ALGOLIA_IS_ENABLED", False) and is_not_unit_tests,
     APPLICATION_ID=env.str("ALGOLIA_APPLICATION_ID", ""),
     API_KEY=env.str("ALGOLIA_API_KEY", ""),
     SEARCH_API_KEY=env.str("ALGOLIA_SEARCH_API_KEY", ""),
     AUTO_INDEXING=DJANGO_ENV is not DjangoEnv.DEV_TEST_UNIT,
     INDEX_SUFFIX=DJANGO_ENV.value,  # eg `posts_{suffix}`
-    # BE will work wo/ it. FE only partially.
-    IS_ENABLED=is_algolia_enabled,
 )
 
 

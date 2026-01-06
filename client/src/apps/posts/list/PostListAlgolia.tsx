@@ -14,13 +14,12 @@ import {
   Configure,
   InstantSearch,
   useHits,
-  useInstantSearch,
   usePagination,
   useRefinementList,
 } from "react-instantsearch";
 import { NavLink } from "react-router";
 import { useAlgoliaPostsEnrichmentByGraphql } from "@/apps/posts/list/useAlgoliaPostsEnrichmentByGraphql";
-import { PostCard } from "@/components/posts/PostCard/PostCard";
+import { PostCard, PostCardSkeleton } from "@/components/posts/PostCard/PostCard";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
 import type { PostFragmentType } from "@/graphql/fragments/posts";
@@ -68,7 +67,8 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
         </HStack>
 
         <Flex flex="1" pos="relative" gap="gap.xl">
-          <PostListResults />
+          <PostListHits />
+
           <FacetsTags />
         </Flex>
       </Stack>
@@ -76,21 +76,26 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
   );
 }
 
-function PostListResults() {
-  const search = useInstantSearch();
-  const searchState = useHits<PostFragmentType>();
+function PostListHits() {
+  const hits = useHits<PostFragmentType>();
   const pagination = usePagination();
 
-  const postsEnriched = useAlgoliaPostsEnrichmentByGraphql(searchState.items);
-
-  if (search.status === "loading" || search.status === "stalled") {
-    return <p>Loading...</p>;
-  }
+  const postsEnriched = useAlgoliaPostsEnrichmentByGraphql(hits.items);
 
   return (
     <Stack gap="gap.xl" w="full">
       <Stack gap="gap.xl" {...ids.set(ids.post.list)}>
-        <For each={postsEnriched} fallback={<Heading>No posts yet</Heading>}>
+        <For
+          each={postsEnriched}
+          fallback={
+            <>
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+            </>
+          }
+        >
           {post => <PostCard key={post.id} post={post} urlNamespace="posts" />}
         </For>
       </Stack>
