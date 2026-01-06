@@ -1,11 +1,21 @@
-import { Checkbox, Flex, For, Heading, HStack, Icon, Stack, Text } from "@chakra-ui/react";
+import {
+  Checkbox,
+  Flex,
+  For,
+  Heading,
+  HStack,
+  Icon,
+  Pagination,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa6";
 import {
   Configure,
   InstantSearch,
-  Pagination,
   useHits,
   useInstantSearch,
+  usePagination,
   useRefinementList,
 } from "react-instantsearch";
 import { NavLink } from "react-router";
@@ -58,17 +68,18 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
         </HStack>
 
         <Flex flex="1" pos="relative" gap="gap.xl">
-          <SearchResults />
-          <TagFacets />
+          <PostListResults />
+          <FacetsTags />
         </Flex>
       </Stack>
     </InstantSearch>
   );
 }
 
-function SearchResults() {
+function PostListResults() {
   const search = useInstantSearch();
   const searchState = useHits<PostFragmentType>();
+  const pagination = usePagination();
 
   const postsEnriched = useAlgoliaPostsEnrichmentByGraphql(searchState.items);
 
@@ -77,50 +88,63 @@ function SearchResults() {
   }
 
   return (
-    <Stack gap="gap.xl">
+    <Stack gap="gap.xl" w="full">
       <Stack gap="gap.xl" {...ids.set(ids.post.list)}>
         <For each={postsEnriched} fallback={<Heading>No posts yet</Heading>}>
           {post => <PostCard key={post.id} post={post} urlNamespace="posts" />}
         </For>
       </Stack>
-      <Pagination />
+
+      <Pagination.Root
+        count={pagination.nbHits}
+        pageSize={1}
+        page={pagination.currentRefinement + 1}
+        onPageChange={details => {
+          const pageNew = details.page - 1;
+          pagination.refine(pageNew);
+        }}
+        siblingCount={5}
+      >
+        <Pagination.PrevTrigger />
+        <Pagination.Items render={page => <Pagination.Item key={page.value} {...page} />} />
+        <Pagination.NextTrigger />
+      </Pagination.Root>
     </Stack>
   );
 }
 
-function TagFacets() {
-  const { items, refine } = useRefinementList({
+function FacetsTags() {
+  const refinements = useRefinementList({
     attribute: "tag_names",
     limit: 10,
     showMore: true,
   });
 
-  if (items.length === 0) {
+  if (refinements.items.length === 0) {
     return null;
   }
 
   return (
     <Stack
-      p={{ base: gap.md, md: gap.lg }}
-      bg="bg.panel"
-      align="flex-start"
-      gap="gap.lg"
-      flexShrink={0}
       pos="sticky"
-      top="gap.lg"
+      hideBelow="lg"
+      p={{ base: gap.md, md: gap.lg }}
+      gap="gap.sm"
       alignSelf="flex-start"
       borderRadius="md"
-      minW="180px"
-      hideBelow="lg"
+      bg="bg.panel"
     >
-      <Text fontWeight="medium">Tags</Text>
+      <Text>Tags</Text>
+
       <Stack gap="gap.sm">
-        <For each={items}>
+        <For each={refinements.items}>
           {item => (
             <Checkbox.Root
               key={item.value}
               checked={item.isRefined}
-              onCheckedChange={() => refine(item.value)}
+              onCheckedChange={() => {
+                refinements.refine(item.value);
+              }}
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
