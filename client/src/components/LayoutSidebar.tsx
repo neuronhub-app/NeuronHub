@@ -15,7 +15,6 @@ import {
 } from "@chakra-ui/react";
 import { MessageSquareText } from "lucide-react";
 import type { ComponentType } from "react";
-import toast from "react-hot-toast";
 import { FaRegBookmark } from "react-icons/fa6";
 import { GoCommentDiscussion } from "react-icons/go";
 import { LuLayoutDashboard, LuLibrary, LuLogIn, LuLogOut, LuSettings } from "react-icons/lu";
@@ -28,6 +27,7 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
+import { toast } from "@/utils/toast";
 
 const links: Array<SidebarLink> = [
   {
@@ -57,6 +57,7 @@ type SidebarLink = {
 
 const styles = {
   inline: 3,
+  breakpoint: "xl",
 };
 
 export function LayoutSidebar(props: StackProps) {
@@ -64,8 +65,7 @@ export function LayoutSidebar(props: StackProps) {
     <Stack
       as="aside"
       aria-label="Sidebar"
-      flex={{ base: "", xl: "1" }}
-      p={{ base: "gap.sm", md: "gap.md" }}
+      p="gap.md"
       bg="bg.panel"
       borderRightWidth="1px"
       justifyContent="space-between"
@@ -133,7 +133,7 @@ export function NeuronLogo() {
         gap="gap.sm"
         block="gap.sm"
         inline="gap.sm"
-        p="gap.sm"
+        p={{ base: "1px", [styles.breakpoint]: "gap.sm" }}
         _hover={{
           bgColor: "colorPalette.subtle",
         }}
@@ -143,44 +143,15 @@ export function NeuronLogo() {
           <Icon color="primary" size="xl">
             <PiGraph />
           </Icon>
-          <Text fontSize={{ base: "lg", xl: "1.4rem" }} fontWeight="bold">
+          <Text fontSize={{ base: "lg", [styles.breakpoint]: "1.4rem" }} fontWeight="bold">
             NeuronHub
           </Text>
         </Flex>
+
         <Badge h="fit-content" size="xs" textTransform="uppercase">
           Beta
         </Badge>
       </Bleed>
-    </NavLink>
-  );
-}
-
-function SidebarLinkButton(props: { to: LinkProps["to"] } & ButtonProps) {
-  const { children, to, ...buttonProps } = props;
-  return (
-    <NavLink to={to}>
-      {linkProps => (
-        <Button
-          variant="ghost"
-          width="full"
-          justifyContent="start"
-          gap={styles.inline}
-          color="fg.muted"
-          _hover={{
-            bg: "colorPalette.subtle",
-            color: "colorPalette.fg",
-          }}
-          _currentPage={{
-            color: "colorPalette.fg",
-          }}
-          aria-current={linkProps.isActive ? "page" : undefined}
-          size={{ base: "sm", xl: "md" }}
-          fontSize={{ base: "sm", xl: "" }}
-          {...buttonProps}
-        >
-          {children}
-        </Button>
-      )}
     </NavLink>
   );
 }
@@ -191,30 +162,11 @@ function SidebarLinkGroup(props: SidebarLink) {
 
   return (
     <Collapsible.Root open={isInNamespace}>
-      <HStack width="full" position="relative">
-        <NavLink to={props.to} style={{ flex: 1 }}>
-          {linkProps => (
-            <Button
-              variant="ghost"
-              width="full"
-              justifyContent="start"
-              gap="3"
-              color="fg.muted"
-              _hover={{
-                bg: "colorPalette.subtle",
-                color: "colorPalette.fg",
-              }}
-              _currentPage={{
-                color: "colorPalette.fg",
-              }}
-              aria-current={linkProps.isActive ? "page" : undefined}
-              pr="10"
-            >
-              <props.icon />
-              {props.label}
-            </Button>
-          )}
-        </NavLink>
+      <HStack w="full">
+        <SidebarLinkButton to={props.to}>
+          <props.icon />
+          {props.label}
+        </SidebarLinkButton>
       </HStack>
 
       <Collapsible.Content>
@@ -230,6 +182,34 @@ function SidebarLinkGroup(props: SidebarLink) {
   );
 }
 
+function SidebarLinkButton(props: { to: LinkProps["to"] } & ButtonProps) {
+  const { children, to, ...buttonProps } = props;
+  return (
+    <NavLink to={to}>
+      {linkProps => (
+        <Button
+          variant="ghost"
+          w="full"
+          justifyContent="start"
+          gap={styles.inline}
+          color="fg.muted"
+          _hover={{
+            bg: "colorPalette.subtle",
+            color: "colorPalette.fg",
+          }}
+          _currentPage={{
+            color: "colorPalette.fg",
+          }}
+          aria-current={linkProps.isActive ? "page" : undefined}
+          size={{ base: "xs", [styles.breakpoint]: "md" }}
+          {...buttonProps}
+        >
+          {children}
+        </Button>
+      )}
+    </NavLink>
+  );
+}
 export function UserProfile() {
   const user = useUser();
 
@@ -251,30 +231,33 @@ export function UserProfile() {
             Login
           </Button>
         </NavLink>
+
         <ColorModeButton />
       </HStack>
     );
   }
 
   return (
-    <Stack gap="3">
-      <HStack gap="3" justify="space-between">
-        <HStack gap="3">
-          <Avatar name={user.username} />
-          <Box>
-            <Text textStyle="sm" fontWeight="medium">
+    <Stack gap="gap.sm">
+      <HStack gap="gap.sm" justify="space-between">
+        <HStack gap={{ base: "2", [styles.breakpoint]: "gap.md" }}>
+          <Avatar name={user.username} size={{ base: "xs", [styles.breakpoint]: "sm" }} />
+
+          <Box mt="-2px">
+            <Text textStyle={{ base: "xs", [styles.breakpoint]: "sm" }} fontWeight="medium">
               {user.username}
             </Text>
-            <Text textStyle="sm" color="fg.muted">
+            <Text textStyle={{ base: "2xs", [styles.breakpoint]: "sm" }} color="fg.muted">
               {user.email}
             </Text>
           </Box>
         </HStack>
+
         <ColorModeButton />
       </HStack>
       <Button
         variant="ghost"
-        size="sm"
+        size={{ base: "xs", [styles.breakpoint]: "sm" }}
         onClick={handleLogout}
         colorPalette="gray"
         {...ids.set(ids.auth.logout.btn)}
