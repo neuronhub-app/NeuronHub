@@ -1,4 +1,5 @@
 import {
+  Badge,
   Bleed,
   Box,
   Button,
@@ -73,26 +74,7 @@ export function LayoutSidebar(props: StackProps) {
       {...props}
     >
       <Stack as="nav" gap="gap.md">
-        <NavLink aria-label="Logo Link" to={urls.posts.list}>
-          <Bleed
-            block="gap.sm"
-            inline="gap.sm"
-            p="gap.sm"
-            _hover={{
-              bgColor: "colorPalette.subtle",
-            }}
-            borderRadius="sm"
-          >
-            <Flex alignSelf="start" align="center" gap="3" w="fit-content">
-              <Icon color="primary" size="xl">
-                <PiGraph />
-              </Icon>
-              <Text fontSize={{ base: "sm", md: "md", xl: "1.4rem" }} fontWeight="bold">
-                NeuronHub
-              </Text>
-            </Flex>
-          </Bleed>
-        </NavLink>
+        <NeuronLogo />
 
         <Stack as="ul" aria-label="Nav Menu" gap="gap.md">
           <Stack gap="gap.sm">
@@ -137,6 +119,39 @@ export function LayoutSidebar(props: StackProps) {
         <UserProfile />
       </Stack>
     </Stack>
+  );
+}
+
+/**
+ * Also used in another mobile layout in [[LayoutContainer.tsx]]
+ */
+export function NeuronLogo() {
+  return (
+    <NavLink aria-label="Logo Link" to={urls.posts.list}>
+      <Bleed
+        display="flex"
+        gap="gap.sm"
+        block="gap.sm"
+        inline="gap.sm"
+        p="gap.sm"
+        _hover={{
+          bgColor: "colorPalette.subtle",
+        }}
+        borderRadius="sm"
+      >
+        <Flex alignSelf="start" align="center" gap="3" w="fit-content">
+          <Icon color="primary" size="xl">
+            <PiGraph />
+          </Icon>
+          <Text fontSize={{ base: "lg", xl: "1.4rem" }} fontWeight="bold">
+            NeuronHub
+          </Text>
+        </Flex>
+        <Badge h="fit-content" size="xs" textTransform="uppercase">
+          Beta
+        </Badge>
+      </Bleed>
+    </NavLink>
   );
 }
 
