@@ -32,9 +32,10 @@
     run = "killport --signal=SIGTERM {{ env.SERVER_PORT_E2E }} {{ env.CLIENT_PORT_E2E }} {{ env.S3_PORT }}"
 
 ["dev:e2e:server"]
-    depends = ["dev:db", "dev:s3", "dev:e2e:db:setup"]
+    depends = ["dev:db", "dev:e2e:db:setup"]
     dir = "server"
     run = [
+        "job spawn { mise dev:s3 }",
         "mise django:migrate",
         "uv run manage.py runserver {{ env.SERVER_PORT_E2E }}",
     ]

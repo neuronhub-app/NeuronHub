@@ -124,7 +124,7 @@
 
     [tasks."test:pytest"]
         dir = "server"
-        depends = ["dev:db"]
+        depends = "dev:db"
         run = "uv run pytest"
         alias = "pytest"
         env.DJANGO_ENV = "dev_test_unit"
