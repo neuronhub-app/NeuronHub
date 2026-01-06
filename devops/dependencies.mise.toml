@@ -41,7 +41,7 @@
         let days_cooldown = {{ env.DEPENDENCY_COOLDOWN_DAYS }}day;
         let date_cutoff = (date now) - $days_cooldown | format date "%+"
 
-        uv lock --upgrade --dry-run $"--exclude-newer=($date_cutoff)"
+        uv lock --upgrade $"--exclude-newer=($date_cutoff)"
     """
 
 ["upgrade-deps:client"]
