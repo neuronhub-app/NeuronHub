@@ -13,10 +13,12 @@ import {
   VStack,
   Wrap,
 } from "@chakra-ui/react";
+import type { BaseHit, Hit } from "instantsearch.js";
 import type { ReactElement } from "react";
 import { FaComments, FaHackerNewsSquare } from "react-icons/fa";
 import { FaGithub, FaPenToSquare } from "react-icons/fa6";
 import { SiCrunchbase } from "react-icons/si";
+import { Highlight } from "react-instantsearch";
 import { NavLink } from "react-router";
 import { useUser } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
@@ -131,6 +133,11 @@ function PostHeader(props: { post: PostListItemType; isDetailPage?: boolean }) {
 
   const idExternal = props.post?.post_source?.id_external;
 
+  let postTitle = post.title;
+  if (!postTitle) {
+    postTitle = post.type;
+  }
+
   return (
     <HStack align="flex-start" justify="space-between">
       <PostHeaderLink post={post} isDetailPage={props.isDetailPage}>
@@ -160,9 +167,13 @@ function PostHeader(props: { post: PostListItemType; isDetailPage?: boolean }) {
               gap="gap.sm"
               alignItems="center"
             >
-              {/* todo UX: show .parent_root.title */}
-              {post.title ? post.title : `${post.type}`}
+              {"_highlightResult" in post ? (
+                <Highlight attribute="title" hit={post as unknown as Hit<BaseHit>} />
+              ) : (
+                postTitle
+              )}
             </Heading>
+
             {!isReview(post) && <PostDatetime datetimeStr={post.created_at} />}
           </Flex>
         </Stack>

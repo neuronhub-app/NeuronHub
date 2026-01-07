@@ -5,6 +5,7 @@ import {
   Heading,
   HStack,
   Icon,
+  Input,
   Pagination,
   Stack,
   Text,
@@ -16,6 +17,7 @@ import {
   useHits,
   usePagination,
   useRefinementList,
+  useSearchBox,
 } from "react-instantsearch";
 import { NavLink } from "react-router";
 import { useAlgoliaPostsEnrichmentByGraphql } from "@/apps/posts/list/useAlgoliaPostsEnrichmentByGraphql";
@@ -66,6 +68,8 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
           </NavLink>
         </HStack>
 
+        <SearchInput />
+
         <Flex flex="1" pos="relative" gap="gap.xl">
           <PostListHits />
 
@@ -73,6 +77,20 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
         </Flex>
       </Stack>
     </InstantSearch>
+  );
+}
+
+function SearchInput() {
+  const search = useSearchBox();
+
+  return (
+    <Input
+      value={search.query}
+      onChange={event => search.refine(event.target.value)}
+      type="search"
+      placeholder="Search"
+      maxW="lg"
+    />
   );
 }
 
@@ -102,7 +120,7 @@ function PostListHits() {
 
       <Pagination.Root
         count={pagination.nbHits}
-        pageSize={1}
+        pageSize={20}
         page={pagination.currentRefinement + 1}
         onPageChange={details => {
           const pageNew = details.page - 1;

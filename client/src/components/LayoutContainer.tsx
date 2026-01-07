@@ -1,10 +1,4 @@
-import {
-  Container,
-  Flex,
-  HStack,
-  IconButton,
-  Stack,
-} from "@chakra-ui/react";
+import { Container, Flex, HStack, IconButton, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { LuAlignRight } from "react-icons/lu";
 import { Outlet } from "react-router";

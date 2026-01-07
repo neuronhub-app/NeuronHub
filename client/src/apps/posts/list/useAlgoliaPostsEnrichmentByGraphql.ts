@@ -29,7 +29,15 @@ export function useAlgoliaPostsEnrichmentByGraphql(postsAlgolia: PostFragmentTyp
   }, [data?.posts]);
 
   const postsEnriched = useMemo(
-    () => postsAlgolia.map(post => postsFromGraphql.get(post.id) ?? post),
+    () =>
+      postsAlgolia.map(post => {
+        const graphqlPost = postsFromGraphql.get(post.id);
+        if (!graphqlPost) {
+          return post;
+        }
+        // Merge GraphQL data into Algolia post to preserve Algolia metadata (_highlightResult, __position, etc)
+        return { ...post, ...graphqlPost };
+      }),
     [postsAlgolia, postsFromGraphql],
   );
   return postsEnriched;

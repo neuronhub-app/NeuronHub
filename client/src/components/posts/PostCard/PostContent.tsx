@@ -8,35 +8,34 @@ import { markedConfigured } from "@/utils/marked-configured";
 
 // todo refac-name: PostCardContent
 export function PostContent(props: { post: PostListItemType }) {
-  const items: Array<{ field: PostContentField; label: string; id: string; content: string }> =
-    [];
+  const fields: Array<{ name: PostContentField; label: string; id: string; value: string }> = [];
 
-  if (props.post.content_polite) {
-    items.push({
-      field: "content_polite",
-      label: "Polite",
-      id: ids.post.card.content_polite,
-      content: props.post.content_polite,
-    });
-  }
   if (props.post.content_direct) {
-    items.push({
-      field: "content_direct",
+    fields.push({
+      name: "content_direct",
       label: "Direct",
       id: ids.post.card.content_direct,
-      content: props.post.content_direct,
+      value: props.post.content_direct,
     });
   }
   if (props.post.content_rant) {
-    items.push({
-      field: "content_rant",
+    fields.push({
+      name: "content_rant",
       label: "Rant",
       id: ids.post.card.content_rant,
-      content: props.post.content_rant,
+      value: props.post.content_rant,
+    });
+  }
+  if (props.post.content_polite) {
+    fields.push({
+      name: "content_polite",
+      label: "Polite",
+      id: ids.post.card.content_polite,
+      value: props.post.content_polite,
     });
   }
 
-  if (items.length === 0) {
+  if (fields.length === 0) {
     return null;
   }
 
@@ -46,25 +45,27 @@ export function PostContent(props: { post: PostListItemType }) {
     size: "sm",
   } as const;
 
-  if (items.length === 1) {
-    const item = items[0];
+  if (fields.length === 1) {
+    const field = fields[0];
 
     const prose = (
       <Prose
         // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-        dangerouslySetInnerHTML={{ __html: markedConfigured.parse(item.content) }}
+        dangerouslySetInnerHTML={{
+          __html: getAlgoliaContentHTML(props.post, field.name, field.value),
+        }}
         {...style}
-        {...ids.set(item.id)}
+        {...ids.set(field.id)}
       />
     );
-    if (item.field === "content_polite") {
+    if (field.name === "content_polite") {
       return prose;
     }
     return (
       <>
         <Tooltip content="Not a standard politically-correct post, the author decides who can view it">
           <Tag w="fit-content" size="lg">
-            {item.label}
+            {field.label}
           </Tag>
         </Tooltip>
         {prose}
@@ -75,27 +76,44 @@ export function PostContent(props: { post: PostListItemType }) {
   // Multiple content fields - show all with tags
   return (
     <Stack gap="gap.md">
-      {items.map(item => (
-        <Stack key={item.field} gap="gap.xs">
+      {fields.map(field => (
+        <Stack key={field.name} gap="gap.xs">
           <Tooltip
             content={
-              item.field === "content_polite"
+              field.name === "content_polite"
                 ? "Standard politically-correct content"
                 : "Not a standard politically-correct post, the author decides who can view it"
             }
           >
             <Tag w="fit-content" size="lg">
-              {item.label}
+              {field.label}
             </Tag>
           </Tooltip>
           <Prose
             // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-            dangerouslySetInnerHTML={{ __html: markedConfigured.parse(item.content) }}
+            dangerouslySetInnerHTML={{
+              __html: getAlgoliaContentHTML(props.post, field.name, field.value),
+            }}
             {...style}
-            {...ids.set(item.id)}
+            {...ids.set(field.id)}
           />
         </Stack>
       ))}
     </Stack>
   );
 }
+
+function getAlgoliaContentHTML(post: PostListItemType, field: PostContentField, value: string) {
+  if (hasAlgoliaHighlight(post) && post._highlightResult[field]?.matchedWords.length > 0) {
+    return markedConfigured.parse(post._highlightResult[field].value);
+  }
+  return markedConfigured.parse(value);
+}
+
+function hasAlgoliaHighlight(post: PostListItemType): post is PostListItemAlgolia {
+  return "_highlightResult" in post;
+}
+
+type PostListItemAlgolia = PostListItemType & {
+  _highlightResult: Record<string, { value: string; matchedWords: string[] }>;
+};

@@ -185,7 +185,7 @@ function SidebarLinkGroup(props: SidebarLink) {
 function SidebarLinkButton(props: { to: LinkProps["to"] } & ButtonProps) {
   const { children, to, ...buttonProps } = props;
   return (
-    <NavLink to={to}>
+    <NavLink to={to} style={{ width: "100%" }}>
       {linkProps => (
         <Button
           variant="ghost"
