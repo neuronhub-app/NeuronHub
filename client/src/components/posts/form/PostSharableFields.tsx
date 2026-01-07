@@ -10,19 +10,13 @@ import { Visibility } from "~/graphql/enums";
 export function PostSharableFields(props: {
   isShowContentPrivate?: boolean;
   isShowRecommendTo?: boolean;
-  size?: "sm" | "md";
+  isShowTitle?: boolean;
 }) {
   const isShowRecommendTo = props.isShowRecommendTo ?? true;
-  const size = props.size ?? "md";
+  const isShowTitle = props.isShowTitle ?? true;
 
   const form = schemas.sharable.useFormContext();
   const state = form.watch();
-
-  const style = {
-    visibility: {
-      size: size === "md" ? "sm" : "xs",
-    },
-  };
 
   return (
     <>
@@ -39,7 +33,7 @@ export function PostSharableFields(props: {
         <FormChakraSegmentControl
           control={form.control}
           name="visibility"
-          label="Visibility"
+          label={isShowTitle ? "Visibility" : ""}
           items={[
             { value: Visibility.Private, icon: <HiLockClosed /> },
             { value: Visibility.UsersSelected, icon: <FaUsersGear />, label: "Users selected" },
@@ -66,7 +60,7 @@ export function PostSharableFields(props: {
               placeholder={
                 state.visibility === Visibility.UsersSelected
                   ? "Select users"
-                  : "Show to more users (if desired)"
+                  : "Show to extra users (optional)"
               }
             />
           )}

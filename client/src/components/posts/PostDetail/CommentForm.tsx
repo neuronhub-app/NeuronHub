@@ -105,7 +105,9 @@ export function CommentForm(
             Visilibity options
           </Checkbox>
 
-          {state.snap.isShowVisibilityField && <PostSharableFields isShowRecommendTo={false} />}
+          {state.snap.isShowVisibilityField && (
+            <PostSharableFields isShowRecommendTo={false} isShowTitle={false} />
+          )}
 
           <HStack>
             {props.onClose && (
