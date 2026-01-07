@@ -281,6 +281,9 @@ class Post(AnonimazableTimeStampedModel):
     def _get_graphql_field(self, field: str) -> Any | None:
         """
         We re-use the "PostsByIds" query to supply the identical JSON schema to FE from both Algolia and GraphQL.
+        See [[Algolia.md]].
+
+        Bad performance, but reliable.
         """
         from neuronhub.apps.graphql.persisted_query_extension import (
             _load_client_persisted_queries_json,

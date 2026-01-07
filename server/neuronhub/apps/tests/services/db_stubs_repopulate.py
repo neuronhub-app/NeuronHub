@@ -2,10 +2,9 @@ import asyncio
 import datetime
 import logging
 import textwrap
+from contextlib import ContextDecorator
 from dataclasses import dataclass
 
-from algoliasearch_django import reindex_all
-from algoliasearch_django.decorators import disable_auto_indexing
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.utils import timezone
@@ -53,7 +52,7 @@ async def db_stubs_repopulate(
     E2E tests run on it, so it includes edge cases.
     """
 
-    with disable_auto_indexing():
+    with _disable_auto_indexing():
         if is_delete_posts_extra:
             for model in [
                 PostHighlight,
@@ -113,7 +112,28 @@ async def db_stubs_repopulate(
 
 
 async def _algolia_reindex():
+    from algoliasearch_django import reindex_all
+
     await sync_to_async(reindex_all)(Post)
+
+
+class _disable_auto_indexing(ContextDecorator):
+    """
+    Lazy import, as algoliasearch_django crashes if settings.ALGOLIA_API_KEY is missing.
+    """
+
+    decorator: ContextDecorator
+
+    def __enter__(self):
+        if settings.ALGOLIA["IS_ENABLED"]:
+            from algoliasearch_django.decorators import disable_auto_indexing
+
+            self.decorator = disable_auto_indexing()
+            self.decorator.__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if settings.ALGOLIA["IS_ENABLED"]:
+            self.decorator.__exit__(exc_type, exc_value, traceback)
 
 
 async def _create_users(gen: Gen):

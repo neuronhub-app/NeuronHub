@@ -1,0 +1,10 @@
+[env]
+    ALGOLIA_IS_ENABLED = "true"
+    ALGOLIA_APPLICATION_ID = "VN4ESP6QTP"
+    ALGOLIA_API_KEY = ""
+    ALGOLIA_SEARCH_API_KEY = "73e0fded909b86d55105cac456370c53"
+    ALGOLIA_INDEX_POSTFIX_USER = "{{ env.USER }}"
+
+[tools]
+    claude = "latest"
+    node = "24"

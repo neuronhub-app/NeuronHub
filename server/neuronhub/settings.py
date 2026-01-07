@@ -1,7 +1,6 @@
 import asyncio
 import os
 import warnings
-from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import TypedDict
@@ -61,7 +60,6 @@ INSTALLED_APPS = [
     "allauth.account",
     "allauth.socialaccount",
     "allauth.headless",
-    "algoliasearch_django",
     "django_tasks",
     "django_tasks.backends.database",
     "django_object_actions",
@@ -300,14 +298,23 @@ class AlgoliaConfig(TypedDict):
 
 
 is_not_unit_tests = DJANGO_ENV is not DjangoEnv.DEV_TEST_UNIT
+is_algolia_enabled = env.bool("ALGOLIA_IS_ENABLED", False) and is_not_unit_tests
+if is_algolia_enabled:
+    INSTALLED_APPS.append("algoliasearch_django")
+
+if DJANGO_ENV in [DjangoEnv.PROD, DjangoEnv.STAGE]:
+    index_suffix = DJANGO_ENV.value  # eg `posts_prod`
+else:
+    index_suffix = f"{DJANGO_ENV.value}_{env.str('ALGOLIA_INDEX_POSTFIX_USER', env.str('USER'))}"
+
 ALGOLIA = AlgoliaConfig(
     # BE will work wo/ it. FE only partially.
-    IS_ENABLED=env.bool("ALGOLIA_IS_ENABLED", False) and is_not_unit_tests,
+    IS_ENABLED=is_algolia_enabled,
+    INDEX_SUFFIX=index_suffix,
     APPLICATION_ID=env.str("ALGOLIA_APPLICATION_ID", ""),
     API_KEY=env.str("ALGOLIA_API_KEY", ""),
     SEARCH_API_KEY=env.str("ALGOLIA_SEARCH_API_KEY", ""),
-    AUTO_INDEXING=DJANGO_ENV is not DjangoEnv.DEV_TEST_UNIT,
-    INDEX_SUFFIX=DJANGO_ENV.value,  # eg `posts_{suffix}`
+    AUTO_INDEXING=True,
 )
 
 

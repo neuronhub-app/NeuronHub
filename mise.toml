@@ -47,10 +47,11 @@
 
     # Algolia
 
-    ALGOLIA_APPLICATION_ID = ""
-    ALGOLIA_API_KEY = ""
+    ALGOLIA_APPLICATION_ID = "VN4ESP6QTP"
     ALGOLIA_SEARCH_API_KEY = "73e0fded909b86d55105cac456370c53"
+    ALGOLIA_API_KEY = ""
     ALGOLIA_IS_ENABLED = "false"
+    ALGOLIA_INDEX_POSTFIX_USER = "{{ env.USER }}" # to not clash dev indexes between users
 
     # Dev
 
