@@ -138,7 +138,8 @@ export function CommentThread(props: {
                 {props.comment?.post_source?.user_source?.username ===
                   props.post?.post_source?.user_source?.username && (
                   <Tooltip content="Original Poster" positioning={{ placement: "top" }}>
-                    <Badge size="xs" variant="solid">
+                    <Badge size="xs" variant="subtle" colorPalette="teal">
+                      {" "}
                       OP
                     </Badge>
                   </Tooltip>
