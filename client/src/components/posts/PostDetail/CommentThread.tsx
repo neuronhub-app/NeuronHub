@@ -314,9 +314,7 @@ function useCommentLeftLine(
         return null;
       }
 
-      const height = props.height.parent
-        ? `calc(${props.height.parent}px - ${style.childrenGap} - ${props.height.toolbar}px)` // subtract - as parentHeightPx > Comment exactly by `stylesGlobal.childrenGap`
-        : "full";
+      const height = `calc(${props.height.parent}px - ${style.childrenGap} - ${props.height.toolbar}px)`;
 
       return (
         <Box
