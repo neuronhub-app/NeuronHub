@@ -6,11 +6,11 @@ from neuronhub.apps.importer.models import PostSource
 from neuronhub.apps.importer.models import UserSource
 
 
-@strawberry.type
+@strawberry_django.type(UserSource)
 class UserSourceTypeBase:
-    id: int
-    username: str
-    score: int
+    id: auto
+    username: auto
+    score: auto
 
 
 @strawberry_django.type(UserSource)

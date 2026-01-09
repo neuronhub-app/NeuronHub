@@ -302,6 +302,7 @@ type Mutation {
   test_create_failed_task: Boolean!
   post_highlight_create(data: PostHighlightTypeInput!): Boolean! @IsAuthenticated
   post_highlight_delete(data: DjangoModelInput!): Boolean! @IsAuthenticated
+  toggle_follow_user_source(user_source_id: ID!): Boolean! @IsAuthenticated
   post_import_refresh(id_external: Int!): Boolean! @IsAuthenticated
   posts_import(auth_token: String!, category: String!, limit: Int! = 60, is_use_cache: Boolean! = false): Boolean!
   profile_send_dm(profile_id: ID!, message: String!): Boolean! @IsAuthenticated
@@ -1165,7 +1166,7 @@ enum UserListName {
 }
 
 type UserSourceType {
-  id: Int!
+  id: ID!
   username: String!
   score: Int!
   id_external: String!
@@ -1188,6 +1189,7 @@ type UserType {
   read_later: [DjangoModelType!]!
   library: [DjangoModelType!]!
   posts_collapsed(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
+  users_followed_sources: [UserSourceType!]!
   has_profile_groups: Boolean!
 }
 

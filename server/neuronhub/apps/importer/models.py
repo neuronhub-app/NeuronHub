@@ -19,6 +19,13 @@ class UserSource(TimeStampedModel):
     created_at_external = models.DateTimeField(blank=True, null=True)
     json = models.JSONField(blank=True, help_text="Raw JSON from the import")
 
+    followed_by_users = models.ManyToManyField(
+        "users.User",
+        related_name="users_followed_sources",
+        related_query_name="users_followed_source",
+        blank=True,
+    )
+
 
 class PostSource(TimeStampedModel):
     post = models.OneToOneField(

@@ -103,7 +103,7 @@ class UserMutation:
         assert getattr(user, field_name), f"Check User.{field_name} field existence"
 
         if is_added:
-            await sync_to_async(getattr(user, field_name).add)(id)
+            await getattr(user, field_name).aadd(id)
         else:
-            await sync_to_async(getattr(user, field_name).remove)(id)
+            await getattr(user, field_name).aremove(id)
         return True

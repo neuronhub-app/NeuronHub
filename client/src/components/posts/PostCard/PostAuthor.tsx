@@ -1,19 +1,25 @@
 import {
   Avatar,
+  Button,
   Flex,
+  FormatNumber,
+  HStack,
   type JsxStyleProps,
   Popover,
   Portal,
   SkeletonText,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import { type ComponentProps, useMemo } from "react";
+import { useSnapshot } from "valtio/react";
 
 import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
+import { user, UserQueryDoc } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import type { PostCommentTree } from "@/components/posts/PostDetail/useCommentTree";
 import { graphql } from "@/gql-tada";
@@ -21,6 +27,7 @@ import { client } from "@/graphql/client";
 import { PostAuthorFragment, type PostAuthorFragmentType } from "@/graphql/fragments/posts";
 import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
+import { useIsLoading } from "@/utils/useIsLoading";
 
 // todo ? refac-name: indicate it can load UserSource profile, eg as `PostAuthor{Clickable|Popover}`
 export function PostAuthor(props: {
@@ -32,6 +39,8 @@ export function PostAuthor(props: {
   prefixColor?: JsxStyleProps["color"];
   prefixGap?: JsxStyleProps["gap"];
 }) {
+  const loadingFollow = useIsLoading();
+
   const state = useStateValtio({
     post: null as null | PostAuthorFragmentType, // todo ! refac-name: postSource
     isClicked: false,
@@ -39,6 +48,11 @@ export function PostAuthor(props: {
   });
 
   const isImportedAuthor = Boolean(props.post.post_source?.id);
+
+  const userSnap = useSnapshot(user.state);
+
+  const authorId = props.post.post_source?.user_source?.id;
+  const isFollowed = Boolean(authorId) && userSnap.followedImporterUserSourceIds.has(authorId!);
 
   const init = useInit({
     isReady: isImportedAuthor && !state.snap.post && state.snap.isClicked,
@@ -55,6 +69,22 @@ export function PostAuthor(props: {
     },
   });
 
+  async function handleFollowClick() {
+    if (!authorId) return;
+
+    await loadingFollow.track(async () => {
+      const res = await client.mutate({
+        mutation: ToggleFollowUserSourceMutation,
+        variables: { user_source_id: authorId },
+        refetchQueries: [UserQueryDoc],
+      });
+
+      if (res.error) {
+        toast.error("Failed to update");
+      }
+    });
+  }
+
   if (isImportedAuthor) {
     if (!state.snap.isMouseHoveredAndMustMount) {
       return (
@@ -63,7 +93,7 @@ export function PostAuthor(props: {
             state.mutable.isMouseHoveredAndMustMount = true;
           }}
         >
-          <PostAuthorUsername {...props} isPopover />
+          <PostAuthorUsername {...props} isPopover isFollowed={isFollowed} />
         </Flex>
       );
     }
@@ -78,14 +108,14 @@ export function PostAuthor(props: {
         }}
       >
         <Popover.Trigger>
-          <PostAuthorUsername {...props} isPopover />
+          <PostAuthorUsername {...props} isPopover isFollowed={isFollowed} />
         </Popover.Trigger>
 
         <Portal>
           <Popover.Positioner>
-            <Popover.Content>
+            <Popover.Content minWidth="fit-content">
               <Popover.Arrow />
-              <Popover.Body gap="gap.sm" display="flex" flexDirection="column">
+              <Popover.Body gap="gap.sm" display="flex" flexDirection="column" maxW="345px">
                 {init.isLoading ? (
                   <>
                     <Flex>
@@ -98,14 +128,30 @@ export function PostAuthor(props: {
                 ) : (
                   author && (
                     <>
-                      <Flex>
-                        <Text fontWeight="bold">Created</Text>:{" "}
-                        {datetime.relative(author.created_at_external)}
-                      </Flex>
-                      <Flex>
-                        <Text fontWeight="bold">Karma</Text>:{" "}
-                        {new Intl.NumberFormat().format(author.score)}
-                      </Flex>
+                      <HStack gap="gap.md">
+                        <VStack gap="gap.sm" alignItems="left" flexGrow="1">
+                          <HStack whiteSpace="nowrap">
+                            <Text fontWeight="bold">Created:</Text>
+                            {datetime.relative(author.created_at_external)}
+                          </HStack>
+                          <HStack>
+                            <Text fontWeight="bold">Karma:</Text>
+                            <FormatNumber value={author.score} />
+                          </HStack>
+                        </VStack>
+
+                        <VStack gap="gap.sm">
+                          <Button
+                            size="sm"
+                            minW="24"
+                            variant="outline"
+                            loading={loadingFollow.isActive}
+                            onClick={handleFollowClick}
+                          >
+                            {isFollowed ? "Unfollow" : "Follow"}
+                          </Button>
+                        </VStack>
+                      </HStack>
                       {author.about && (
                         <Prose
                           size="xs"
@@ -128,8 +174,11 @@ export function PostAuthor(props: {
 }
 
 // todo ? refac: drop isPopover - only tell it "you're a link" to add _hover={}
-function PostAuthorUsername(props: ComponentProps<typeof PostAuthor> & { isPopover?: boolean }) {
-  const username = props.post.author?.username ?? props.post?.post_source?.user_source?.username;
+function PostAuthorUsername(
+  props: ComponentProps<typeof PostAuthor> & { isPopover?: boolean; isFollowed?: boolean },
+) {
+  const username = props.post.author?.username ?? props.post.post_source?.user_source?.username;
+
   const colorPalette = useMemo(() => {
     return getAvatarColorForUsername(username);
   }, [username]);
@@ -161,7 +210,10 @@ function PostAuthorUsername(props: ComponentProps<typeof PostAuthor> & { isPopov
 
       <Text
         fontSize={props.size ?? "sm"}
-        color={props.color ?? "fg.subtle"}
+        fontWeight={props.isFollowed ? "bold" : "semibold"}
+        color={props.color ?? (props.isFollowed ? "sky.600" : "fg.subtle")}
+        transitionProperty="color, font-weight"
+        transitionDuration="fast"
         _hover={props.isPopover ? { textDecoration: "underline", cursor: "pointer" } : {}}
       >
         {username}
@@ -206,4 +258,13 @@ const PostAuthorQuery = graphql.persisted(
     `,
     [PostAuthorFragment],
   ),
+);
+
+const ToggleFollowUserSourceMutation = graphql.persisted(
+  "ToggleFollowUserSource",
+  graphql(`
+    mutation ToggleFollowUserSource($user_source_id: ID!) {
+      toggle_follow_user_source(user_source_id: $user_source_id)
+    }
+  `),
 );

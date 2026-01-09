@@ -3,8 +3,9 @@ import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { proxy } from "valtio";
 import { useSnapshot } from "valtio/react";
+import { proxySet } from "valtio/utils";
 
-import { graphql } from "@/gql-tada";
+import { graphql, type ID } from "@/gql-tada";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { track } from "@/utils/track";
 
@@ -13,6 +14,7 @@ export namespace user {
     current: null as User | null,
     connections: [] as UserConnection[],
     postsCollapsed: [],
+    followedImporterUserSourceIds: proxySet<ID>(),
   });
 }
 
@@ -35,6 +37,11 @@ export function useUser() {
           connections.map(conn => [`${conn.id}-${conn.username}`, conn]),
         );
         user.state.connections = Array.from(connectionsUniqueMap.values());
+      }
+
+      user.state.followedImporterUserSourceIds.clear();
+      for (const item of data.user_current.users_followed_sources) {
+        user.state.followedImporterUserSourceIds.add(item.id);
       }
     } else if (data) {
       track.setUser(); // wo args uses UUID
@@ -77,6 +84,10 @@ export const UserQueryDoc = graphql.persisted(
 
         read_later {
           pk
+        }
+
+        users_followed_sources {
+          id
         }
 
         post_votes {

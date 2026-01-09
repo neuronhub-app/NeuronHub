@@ -2,6 +2,7 @@ import strawberry
 import strawberry_django
 from strawberry import auto
 
+from neuronhub.apps.importer.graphql.types_lazy import UserSourceTypeLazy
 from neuronhub.apps.posts.graphql.types_lazy import PostCommentTypeLazy
 from neuronhub.apps.posts.graphql.types_lazy import PostTagVoteTypeLazy
 from neuronhub.apps.posts.graphql.types_lazy import PostVoteTypeLazy
@@ -38,6 +39,8 @@ class UserType:
     library: auto
 
     posts_collapsed: list[PostCommentTypeLazy]
+
+    users_followed_sources: list[UserSourceTypeLazy] = strawberry_django.field()
 
     @strawberry.field
     async def has_profile_groups(self) -> bool:

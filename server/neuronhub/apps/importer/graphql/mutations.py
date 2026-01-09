@@ -13,6 +13,23 @@ from neuronhub.apps.users.graphql.resolvers import get_user
 @strawberry.type
 class ImporterMutation:
     @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def toggle_follow_user_source(
+        self,
+        user_source_id: strawberry.ID,
+        info: strawberry.Info,
+    ) -> bool:
+        from neuronhub.apps.users.models import User
+
+        user: User = info.context.request.user
+        is_following = await user.users_followed_sources.filter(id=user_source_id).aexists()
+
+        if is_following:
+            await user.users_followed_sources.aremove(user_source_id)  # type: ignore[arg-type] #bad-infer
+        else:
+            await user.users_followed_sources.aadd(user_source_id)  # type: ignore[arg-type] #bad-infer
+        return True
+
+    @strawberry.mutation(extensions=[IsAuthenticated()])
     async def post_import_refresh(self, id_external: int, info: strawberry.Info) -> bool:
         user = await get_user(info)
         assert user.is_superuser
