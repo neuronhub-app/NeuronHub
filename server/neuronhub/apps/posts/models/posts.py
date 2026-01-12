@@ -11,6 +11,7 @@ from django.utils import timezone
 from django_choices_field import TextChoicesField
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
+from solo.models import SingletonModel
 from strawberry_django.descriptors import model_cached_property
 from strawberry_django.descriptors import model_property
 
@@ -331,6 +332,16 @@ class Post(AnonimazableTimeStampedModel):
     def get_unix_reviewed_at(self) -> float | None:
         return self.reviewed_at.timestamp() if self.reviewed_at else None
 
+    def get_votes_aggregated(self) -> int:
+        votes_hn_count = 0
+        if hasattr(self, "post_source"):
+            votes_hn_count = self.post_source.score or 0
+        config = PostConfig.get_solo()
+        votes_adjusted = (
+            config.votes_multiplier * self.votes.filter(is_vote_positive=True).count()
+        )
+        return votes_hn_count + votes_adjusted
+
     def get_tags_json(self):
         return self._get_graphql_field("tags") or []
 
@@ -367,6 +378,19 @@ class Post(AnonimazableTimeStampedModel):
                 return f"[{self.type}] {self.content_polite[:30]}"
 
         return f"{self.title}"
+
+
+class PostConfig(SingletonModel):
+    votes_multiplier = models.PositiveIntegerField(
+        default=1,
+        help_text="Since FE sort uses HackerNews votes (avg 100-800 per Post) - we multiply NHA Post votes by it to make them discoverable.",
+    )
+
+    class Meta:
+        verbose_name = "Posts Config"
+
+    def __str__(self):
+        return "Posts Config"
 
 
 @anonymizer.register

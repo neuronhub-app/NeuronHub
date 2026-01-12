@@ -25,22 +25,20 @@ dependencies = [
     "django-simple-history == 3.*", # [i=high, rep=norm, GH=norm, @django-commons, 2.4k]
     "django-countries == 7.*", # [i=low, rep=norm, GH=norm, @SmileyChris]
     "django-fieldsignals == 0.*", # [i=low, rep=norm, GH=norm, @craigds]
-    "django-storages[boto3] == 1.14.6", # [i=norm, rep=low, GH=high, @jschneier, 2.8k] for S3, author dropped it in 2011, maintainer is a no-name - single project
     "dj-database-url == 3.*", # [i=low, rep=norm, GH=norm, @mattseymour]
-
     "algoliasearch-django >= 4.0.0",
     "algoliasearch >= 4.0.0",
         "pydantic < 2.12.4", # 2.12.4-5 are broken for Python 3.14
-
-    # django fields
     "django-timezone-field == 7.*", # [i=low, rep=high, GH=high, @mfogel] rich presence on SO (#103909), AirBnB, Yelp, etc
     "django-choices-field == 3.*", # [i=norm, rep=high, @bellini666] Strawberry maintainer
-
-    # django admin
     "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] i personally worked with the author
     "django-select2 == 8.*", # [i=low, rep=high, GH=high, @codingjoe, 0.8k] public CV
     "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe, 1.6k] public CV
     "django-debug-toolbar == 6.*", # [i=low, rep=high, GH=high, @matthiask] 406.ch
+
+    # rep=low/norm - be careful
+    "django-storages[boto3] == 1.14.6", # [i=norm, rep=low, GH=high, @jschneier, 2.8k] for S3, author dropped it in 2011, maintainer is a no-name - single project
+    "django-solo == 2.*", # [i=low, rep=low, GH=norm, @lazybird, 1k] used it for 8y. Originally by @johnthagen (who did min-sized-rust 10k stars), but handed over to @lazybird (member of a Canadian company, low activity)
     "django-object-actions == 5.*", # [i=none, rep=norm, GH=low, @crccheck, 0.7k] crccheck.com/blog since 2008, 100 posts
     "django-guardian == 3.2.*", # [i=high, rep=norm, GH=high, @thclark, 3.8k] upgrade carefully; integrated by Strawberry; changed owners few times, atm @thclark UK founder
     "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no urls, member of LiberTEM (wat?) - keep frozen
