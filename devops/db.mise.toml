@@ -3,7 +3,7 @@
         if $env.IS_POSTGRES_EXTERNAL == "true" {
             brew install postgresql@17
             brew services start postgresql@17
-            createdb-17 $DATABASE_NAME
+            createdb-17 $env.DATABASE_NAME
             let sql = $'
               CREATE USER ($env.DATABASE_NAME);
               ALTER ROLE ($env.DATABASE_NAME) PASSWORD '($env.DATABASE_NAME)';
@@ -12,9 +12,29 @@
             '
             $sql | psql-17 $env.DATABASE_NAME
         } else {
-            print $env.POSTGRES_EXTERNAL_SHELL_MSG
+            mise run dev:db
         }
 
         mise run django:migrate
         mise run django:db-stubs-repopulate
+    """
+
+["dev:db:rm"]
+    dir = "devops/"
+    run = """
+        if $env.IS_POSTGRES_EXTERNAL == "true" {
+            dropdb-17 $env.DATABASE_NAME
+        } else {
+            sudo docker compose rm db
+        }
+    """
+
+["dev:db:stop"]
+    dir = "devops/"
+    run = """
+        if $env.IS_POSTGRES_EXTERNAL == "true" {
+            brew services stop postgresql@17
+        } else {
+            sudo docker compose stop db
+        }
     """
