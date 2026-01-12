@@ -57,6 +57,7 @@
             services:
               ($app):
                 image: ghcr.io/{{ env.GITHUB_PATH }}/($app):($version)
+                pull_policy: always
                 build:
                   context: .
                   args:

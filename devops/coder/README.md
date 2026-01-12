@@ -1,3 +1,9 @@
+## Build & Publish
+
+See [docker.mise.toml](/devops/docker.mise.toml).
+- `mise docker:build --app=coder --no_cache`
+- `mise docker:tag-and-push --app=coder`
+
 ## Terraform Template
 
 On start it:
@@ -5,7 +11,7 @@ On start it:
 - Runs `mise install-deps` and `mise django:migrate`
 
 Notes:
-- (!) Uses `/var/run/docker.sock`
+- Uses `root` through `/var/run/docker.sock`
 - Only `/home/coder/` is persisted
 
 Prerequisites (from Coder docs):

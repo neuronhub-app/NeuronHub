@@ -34,7 +34,7 @@ RUN mkdir -p $XDG_BIN_HOME
 ENV HOMEBRE_NO_ANALYTICS=1
 ENV NONINTERACTIVE=1
 
-# Linux keeps failing in dirs besides linuxbrew. But on MacOS it's fine.
+# On Linux it fails if not in /home/linuxbrew/. But ok on MacOS. -_-
 ENV BREW_DIR=linuxbrew
 RUN sudo mkdir -p /home/$BREW_DIR/.$BREW_DIR
 RUN sudo chown -R $USER:$USER /home/$BREW_DIR/.$BREW_DIR
@@ -49,7 +49,10 @@ RUN echo "eval (brew shellenv)" >> $XDG_CONFIG_HOME/fish/config.fish
 
 # CLI tools
 # -----------------------------------
-RUN brew install --force-bottle nushell chezmoi fd bat micro eza delta btop zoxide atuin fzf jq ripgrep zellij
+RUN brew install --force-bottle nushell chezmoi ripgrep
+
+# Optional
+RUN brew install --force-bottle fd bat micro eza delta btop zoxide atuin fzf jq zellij
 ENV EDITOR=micro
 
 
@@ -71,8 +74,13 @@ RUN mise install uv bun biome node claude
 RUN mise exec node --command "npx playwright install-deps"
 RUN mise exec node --command "npx playwright install chromium --with-deps"
 
+# Optional
+
 # MCP Context7
 ENV CONTEXT7_CACHE_DIR=$XDG_DATA_HOME/context7/cache
 ENV CONTEXT7_DOCS_DIR=$XDG_DATA_HOME/context7/docs
 RUN mkdir -p $XDG_DATA_HOME/context7/{cache,docs}
 RUN mise exec bun --command "bun install --global @upstash/context7-mcp@latest"
+
+# For tweakcc
+RUN sudo apt install --yes xdg-utils

@@ -1,10 +1,8 @@
-# version 0.3.2.2
-
 terraform {
   required_providers {
     coder = {
       source = "coder/coder"
-
+      version = ">=2.4.0"
     }
     docker = {
       source = "kreuzwerker/docker"
@@ -34,10 +32,12 @@ data "coder_parameter" "git_host" {
   mutable     = true
 }
 data "coder_parameter" "git_protocol" {
-  name    = "git_protocol"
-  type    = "string"
-  mutable = true
-  default = "https"
+  name        = "git_protocol"
+  type        = "string"
+  form_type   = "radio"
+  mutable     = true
+  default     = "https"
+  description = "For Git Dotfiles and main repo."
   option {
     name  = "HTTPS"
     value = "https"
@@ -58,11 +58,11 @@ data "coder_parameter" "git_repo" {
 }
 data "coder_parameter" "git_dotfiles_repo" {
   name         = "git_dotfiles_repo"
+  type         = "string"
+  mutable      = true
   default      = ""
   display_name = "Dotfiles repository"
   description  = "namespace/repo"
-  type         = "string"
-  mutable      = true
   icon         = "/icon/dotfiles.svg"
 }
 data "coder_parameter" "project_name" {
@@ -79,8 +79,8 @@ data "coder_parameter" "git_user" {
 }
 
 locals {
-  username = data.coder_workspace_owner.me.name
-  git_url  = "${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${var.git_token}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_repo.value}.git"
+  git_url_base  = "${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${var.git_token}@${data.coder_parameter.git_host.value}"
+  git_url  = "${local.git_url_base}/${data.coder_parameter.git_repo.value}.git"
 }
 
 data "coder_provisioner" "me" {}
@@ -90,7 +90,11 @@ data "coder_workspace_owner" "me" {}
 resource "coder_agent" "main" {
   arch = data.coder_provisioner.me.arch
   os = "linux"
-  env = { TZ = var.timezone }
+  env = {
+    TZ = var.timezone
+    SHELL = "/usr/bin/fish"
+  }
+  dir = "/home/coder/projects/${data.coder_parameter.project_name.value}"
 
   # language=fish
   startup_script = <<-EOT
@@ -102,7 +106,7 @@ resource "coder_agent" "main" {
 
       sudo usermod --shell (which fish) (whoami)
 
-      chezmoi init --apply ${data.coder_parameter.git_protocol.value}://${data.coder_parameter.git_user.value}:${var.git_token}@${data.coder_parameter.git_host.value}/${data.coder_parameter.git_dotfiles_repo.value}.git
+      chezmoi init --apply ${local.git_url_base}/${data.coder_parameter.git_dotfiles_repo.value}.git
 
       touch ~/.init_done
     end
@@ -228,7 +232,7 @@ resource "docker_container" "workspace" {
     read_only      = false
   }
 
-  # (!) full docker.sock access
+  # (!) root docker.sock access
   volumes {
     host_path      = "/var/run/docker.sock"
     container_path = "/var/run/docker.sock"
@@ -253,25 +257,16 @@ resource "docker_container" "workspace" {
   }
 }
 
-# See https://registry.coder.com/modules/coder/code-server
-module "code-server" {
-  count    = data.coder_workspace.me.start_count
-  source   = "registry.coder.com/coder/code-server/coder"
-  version  = "~> 1.0"
-  agent_id = coder_agent.main.id
-  order    = 1
-}
 # See https://registry.coder.com/modules/coder/jetbrains-gateway
 module "jetbrains_gateway" {
   count      = data.coder_workspace.me.start_count
   source     = "registry.coder.com/coder/jetbrains-gateway/coder"
-  version    = "~> 1.0"
+  version    = "~> 1.2"
   agent_id   = coder_agent.main.id
-  order      = 2
   agent_name = "main"
 
-  jetbrains_ides = ["IU", "WS", "PY"] # IDEs selectable
+  jetbrains_ides = ["PY"] # IDEs selectable
   default = "PY"
-  folder  = "/home/coder/${data.coder_parameter.project_name.value}"
+  folder  = "/home/coder/projects/${data.coder_parameter.project_name.value}"
   latest  = true # IDEA version
 }
