@@ -5,6 +5,8 @@
 
 """
 For example output eg run `mise docker:push --tag_only --app=client`
+
+FYI: I'm not often testing py3.11, mostly 3.14.
 """
 
 import argparse
@@ -19,25 +21,29 @@ parser.add_argument("--version")
 parser.add_argument("--tag_only", action="store_true")
 
 
-class NamespaceOpts(Namespace):
+class NamespaceKwargs(Namespace):
     app: Literal["server", "client", "coder"]
     version: str
     github_path: str
     tag_only: bool
 
 
-def main(opts: NamespaceOpts):
-    is_push_to_registry = not opts.tag_only
+def main(kwargs: NamespaceKwargs):
+    version_splits = kwargs.version.split(".")
 
-    version_splits = opts.version.split(".")
-    version_major = f"{version_splits[0]}.{version_splits[1]}"  # eg "0.2"
+    for tag_version in [
+        kwargs.version,
+        f"{version_splits[0]}.{version_splits[1]}",  # eg "0.2"
+        f"{version_splits[0]}.{version_splits[1]}.{version_splits[2]}",
+        "latest",
+    ]:
+        container_path = f"ghcr.io/{kwargs.github_path}/{kwargs.app}"
+        tag_existing = f"{container_path}:{kwargs.version}"
+        _docker_run("tag", tag_existing, f"{container_path}:{tag_version}")
 
-    for version in [opts.version, version_major, "latest"]:
-        container_path = f"ghcr.io/{opts.github_path}/{opts.app}"
-        tag_existing = f"{container_path}:{opts.version}"
-        _docker_run("tag", tag_existing, f"{container_path}:{version}")
+        is_push_to_registry = not kwargs.tag_only
         if is_push_to_registry:
-            _docker_run("push", f"{container_path}:{version}")
+            _docker_run("push", f"{container_path}:{tag_version}")
 
 
 def _docker_run(*args: str):
@@ -47,5 +53,4 @@ def _docker_run(*args: str):
 
 
 if __name__ == "__main__":
-    # noinspection PyTypeChecker
-    main(opts=parser.parse_args())
+    main(kwargs=parser.parse_args())  # type: ignore[arg-type] #bad-infer
