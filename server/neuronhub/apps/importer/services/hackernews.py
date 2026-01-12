@@ -111,8 +111,13 @@ class ImporterHackerNews:
         )
         posts_imported = await asyncio.gather(
             *[
-                self._import_item(data=post_json, is_post=True, is_root=True)
-                for post_json in post_jsons
+                self._import_item(
+                    data=post_json,
+                    is_post=True,
+                    is_root=True,
+                    rank=len(post_jsons) - position,
+                )
+                for position, post_json in enumerate(post_jsons)
             ],
             return_exceptions=True,
         )
@@ -241,6 +246,7 @@ class ImporterHackerNews:
                 "json": post_data,
                 "url_of_source": post_data.get("url", ""),
                 "score": post_data.get("points", 0),
+                "rank": rank,
                 "user_source": user_source,
             }
         else:
