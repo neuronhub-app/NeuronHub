@@ -10,6 +10,7 @@ export const urls = {
   home: "/",
   login: "/login",
   library: "/library",
+  readingList: "/reading-list",
   reviews: {
     list: "/reviews",
     get create() {

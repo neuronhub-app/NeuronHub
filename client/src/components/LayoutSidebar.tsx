@@ -29,38 +29,37 @@ import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
 
-const links: Array<SidebarLink> = [
-  {
-    to: urls.posts.list,
-    icon: GoCommentDiscussion,
-    label: "Posts",
-    children: [
-      { label: "All", to: urls.posts.list },
-      { label: "Knowledge", to: urls.posts.knowledge },
-      { label: "Opinion", to: urls.posts.opinion },
-      { label: "News", to: urls.posts.news },
-      { label: "Question", to: urls.posts.question },
-    ] as const,
-  },
-  { to: urls.tools.list, icon: LuLayoutDashboard, label: "Tools" },
-  { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },
-  { to: "/reading-list", icon: FaRegBookmark, label: "Reading list" },
-  { to: "/library", icon: LuLibrary, label: "Library" },
-];
-
-type SidebarLink = {
-  to: LinkProps["to"];
-  icon: ComponentType;
-  label: string;
-  children?: ReadonlyArray<{ label: string; to: LinkProps["to"] }>;
-};
-
 const styles = {
-  inline: 3,
+  inline: "gap.sm",
   breakpoint: "xl",
 };
 
 export function LayoutSidebar(props: StackProps) {
+  const user = useUser();
+
+  const links: Array<SidebarLink> = [
+    {
+      to: urls.posts.list,
+      icon: GoCommentDiscussion,
+      label: "Posts",
+      children: [
+        { label: "All", to: urls.posts.list },
+        { label: "Knowledge", to: urls.posts.knowledge },
+        { label: "Opinion", to: urls.posts.opinion },
+        { label: "News", to: urls.posts.news },
+        { label: "Question", to: urls.posts.question },
+      ] as const,
+    },
+    { to: urls.tools.list, icon: LuLayoutDashboard, label: "Tools" },
+    { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },
+  ];
+  if (user) {
+    links.push(
+      { to: urls.readingList, icon: FaRegBookmark, label: "Reading list" },
+      { to: urls.library, icon: LuLibrary, label: "Library" },
+    );
+  }
+
   return (
     <Stack
       as="aside"
@@ -79,12 +78,11 @@ export function LayoutSidebar(props: StackProps) {
         <Stack as="ul" aria-label="Nav Menu" gap="gap.md">
           <Stack gap="gap.sm">
             <Stack gap="gap.xs">
-              {links.map((link, index) => (
+              {links.map(link => (
                 <Bleed
                   as="li"
                   aria-label="Nav Menu Item"
-                  // biome-ignore lint/suspicious/noArrayIndexKey: wrong
-                  key={index}
+                  key={link.label}
                   inline={styles.inline}
                 >
                   {link.children ? (
@@ -121,6 +119,13 @@ export function LayoutSidebar(props: StackProps) {
     </Stack>
   );
 }
+
+type SidebarLink = {
+  to: LinkProps["to"];
+  icon: ComponentType;
+  label: string;
+  children?: ReadonlyArray<{ label: string; to: LinkProps["to"] }>;
+};
 
 /**
  * Also used in another mobile layout in [[LayoutContainer.tsx]]
@@ -191,7 +196,7 @@ function SidebarLinkButton(props: { to: LinkProps["to"] } & ButtonProps) {
           variant="ghost"
           w="full"
           justifyContent="start"
-          gap={styles.inline}
+          gap="3"
           color="fg.muted"
           _hover={{
             bg: "colorPalette.subtle",
