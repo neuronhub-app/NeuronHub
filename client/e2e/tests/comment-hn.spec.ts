@@ -27,7 +27,9 @@ test.describe("HN Comments", () => {
   // #AI
   test("view imported HN post with tree-structured comments", async () => {
     await play.navigate(urls.posts.list, { idleWait: true });
-    await play.click(ids.post.card.link.detail); // the Post imported from HN
+
+    // unhide HN Post which has old .created_at_external
+    await play.get(ids.post.listControls.dateRange).getByText("All").click();
     await play.waitForNetworkIdle();
 
     const hnPostCard = play.page.getByTestId(ids.post.card.container).filter({

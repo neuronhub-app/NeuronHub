@@ -6,7 +6,7 @@ import {
   mergeConfigs,
 } from "@chakra-ui/react";
 import { theme } from "@/theme/colors";
-import { recipes } from "@/theme/recipes";
+import { recipes, slotRecipes } from "@/theme/recipes";
 
 const tokens = defineTokens({
   assets: {
@@ -66,6 +66,7 @@ export const system = createSystem(
 
       theme: {
         recipes,
+        slotRecipes,
         tokens,
         semanticTokens: {
           colors: theme.colors,

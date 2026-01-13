@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
+import { useDebounce } from "use-debounce";
 import { graphql, type ID } from "@/gql-tada";
 import { PostFragment, type PostFragmentType } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
@@ -9,7 +10,7 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 export function useAlgoliaPostsEnrichmentByGraphql(postsAlgolia: PostFragmentType[]) {
   const postIds = useMemo(() => postsAlgolia.map(post => post.id), [postsAlgolia]);
 
-  const postIdsDebounced = useDebouncedValue(postIds, 500);
+  const [postIdsDebounced] = useDebounce(postIds, 500, { leading: true });
 
   const { data } = useApolloQuery(
     PostsByIdsQuery,
@@ -41,29 +42,6 @@ export function useAlgoliaPostsEnrichmentByGraphql(postsAlgolia: PostFragmentTyp
     [postsAlgolia, postsFromGraphql],
   );
   return postsEnriched;
-}
-
-// #AI - use `use-debounce` package
-function useDebouncedValue<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  const isFirstRender = useRef(true);
-
-  useEffect(() => {
-    // Skip debounce on first render to show initial results immediately
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      setDebouncedValue(value);
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => clearTimeout(timeout);
-  }, [value, delay]);
-
-  return debouncedValue;
 }
 
 const PostsByIdsQuery = graphql.persisted(

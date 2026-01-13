@@ -16,6 +16,7 @@ type AlgoliaSearchKeyType {
   api_key: String!
   app_id: String!
   index_name: String!
+  index_name_sorted_by_votes: String!
 }
 
 input BoolBaseFilterLookup {

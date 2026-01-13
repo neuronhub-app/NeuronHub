@@ -9,6 +9,7 @@ from strawberry.types import Info
 from strawberry_django.auth.utils import aget_current_user
 from strawberry_django.auth.utils import get_current_user
 
+from neuronhub.apps.posts.index import algolia_replica_sorted_by_votes
 from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.models import User
 
@@ -26,6 +27,7 @@ class AlgoliaSearchKeyType:
     api_key: str
     app_id: str
     index_name: str
+    index_name_sorted_by_votes: str
 
 
 @strawberry.type(name="Query")
@@ -58,6 +60,7 @@ class UsersQuery:
             api_key=key_with_perms,
             app_id=app_id,
             index_name=f"posts_{index_suffix}",
+            index_name_sorted_by_votes=algolia_replica_sorted_by_votes,
         )
 
 

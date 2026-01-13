@@ -12,7 +12,7 @@ import type { urls } from "@/urls";
 
 export type LocatorMap = Record<TestId, Locator>;
 
-const timeoutDefault: number = 4500;
+const actionTimeoutMsDefault: number = 6500;
 
 export class PlaywrightHelper {
   $: LocatorMap;
@@ -20,9 +20,9 @@ export class PlaywrightHelper {
 
   constructor(
     public page: Page,
-    public timeout = timeoutDefault,
+    public actionTimeoutMs = actionTimeoutMsDefault,
   ) {
-    this.page.setDefaultTimeout(this.timeout);
+    this.page.setDefaultTimeout(this.actionTimeoutMs);
     this.$ = this.locator();
   }
 
@@ -118,7 +118,9 @@ export class PlaywrightHelper {
     await this.page.goto(path);
 
     if (opts?.idleWait) {
-      await this.waitForNetworkIdle({ idleWaitTimeout: opts.idleWaitTimeout ?? this.timeout });
+      await this.waitForNetworkIdle({
+        idleWaitTimeout: opts.idleWaitTimeout ?? this.actionTimeoutMs,
+      });
     }
   }
 
@@ -144,7 +146,7 @@ export class PlaywrightHelper {
     };
   }
 
-  async waitForNetworkIdle(opts = { idleWaitTimeout: timeoutDefault }) {
+  async waitForNetworkIdle(opts = { idleWaitTimeout: actionTimeoutMsDefault }) {
     return this.page.waitForLoadState("networkidle", { timeout: opts.idleWaitTimeout });
   }
 

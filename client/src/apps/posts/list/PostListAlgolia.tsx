@@ -1,16 +1,19 @@
 import {
+  ButtonGroup,
   Checkbox,
   Flex,
   For,
-  Heading,
   HStack,
-  Icon,
+  IconButton,
   Input,
   Pagination,
+  SegmentGroup,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { FaPlus } from "react-icons/fa6";
+import { getUnixTime, subDays } from "date-fns";
+import { useState } from "react";
+import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import {
   Configure,
   InstantSearch,
@@ -18,65 +21,142 @@ import {
   usePagination,
   useRefinementList,
   useSearchBox,
+  useSortBy,
 } from "react-instantsearch";
 import { NavLink } from "react-router";
 import { useAlgoliaPostsEnrichmentByGraphql } from "@/apps/posts/list/useAlgoliaPostsEnrichmentByGraphql";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard, PostCardSkeleton } from "@/components/posts/PostCard/PostCard";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
 import type { PostFragmentType } from "@/graphql/fragments/posts";
 import { gap } from "@/theme/theme";
+import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 import type { PostCategory } from "~/graphql/enums";
 
 export function PostListAlgolia(props: { category?: PostCategory }) {
   const algolia = useAlgoliaSearchClient();
+  const user = useUser();
 
   if (algolia.loading) {
     return <p>Loading Algolia...</p>;
   }
-  if (!algolia.client) {
+  if (!isAlgoliaLoaded(algolia)) {
     return <p>Search not available</p>;
   }
-
-  const filters = props.category ? `type:Post AND category:${props.category}` : "type:Post";
 
   return (
     <InstantSearch
       searchClient={algolia.client}
       indexName={algolia.indexName}
       routing
-      future={{
-        preserveSharedStateOnUnmount: true,
-      }}
+      future={{ preserveSharedStateOnUnmount: true }}
     >
-      <Configure filters={filters} hitsPerPage={20} />
-
       <Stack gap="gap.lg">
-        <HStack justify="space-between">
-          <HStack gap="gap.md">
-            <Heading size="2xl">{props.category ? `${props.category} Posts` : "Posts"}</Heading>
-          </HStack>
+        <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
+          <FilterAndSort algolia={algolia} category={props.category} />
 
-          <NavLink to="/posts/create">
-            <Button size="md" variant="subtle">
-              <Icon boxSize={3}>
-                <FaPlus />
-              </Icon>
-              Create
-            </Button>
-          </NavLink>
+          <Flex gap="gap.md">
+            <SearchInput />
+
+            {user?.id && (
+              <NavLink to={urls.posts.create}>
+                <Button variant="subtle">Create Post</Button>
+              </NavLink>
+            )}
+          </Flex>
         </HStack>
-
-        <SearchInput />
 
         <Flex flex="1" pos="relative" gap="gap.xl">
           <PostListHits />
 
-          <FacetsTags />
+          <Stack
+            pos="sticky"
+            hideBelow="lg"
+            p={{ base: gap.md, md: gap.md }}
+            px={{ base: gap.md, md: gap.md }}
+            minW={{ base: "", md: "3xs" }}
+            gap="gap.md"
+            borderRadius="md"
+            bg="bg.panel"
+          >
+            <FacetFilter name="tags.name" label="Tags" isSearchEnabled />
+            <FacetFilter name="tool_type" label="Tool Type" />
+          </Stack>
         </Flex>
       </Stack>
     </InstantSearch>
+  );
+}
+
+type AlgoliaState = ReturnType<typeof useAlgoliaSearchClient>;
+type WithNonNullable<T, Key extends keyof T> = Omit<T, Key> & {
+  [key in Key]-?: NonNullable<T[key]>;
+};
+type AlgoliaStateLoaded = WithNonNullable<
+  AlgoliaState,
+  "client" | "indexName" | "indexNameSortedByVotes"
+>;
+
+function isAlgoliaLoaded(algolia: AlgoliaState): algolia is AlgoliaStateLoaded {
+  return Boolean(algolia.client && algolia.indexName && algolia.indexNameSortedByVotes);
+}
+
+function FilterAndSort(props: { algolia: AlgoliaStateLoaded; category?: PostCategory }) {
+  const sort = useSortBy({
+    items: [
+      { value: props.algolia.indexName, label: "Newest" },
+      { value: props.algolia.indexNameSortedByVotes, label: "Best" },
+    ],
+  });
+
+  type DateGteDays = "1" | "2" | "7" | "all";
+  const [dateGteDays, setDateGteDays] = useState<DateGteDays>("7");
+
+  let dateGte = null;
+  if (dateGteDays !== "all") {
+    dateGte = getUnixTime(subDays(new Date(), Number(dateGteDays)));
+  }
+  const filters = {
+    category: props.category ? `type:Post AND category:${props.category}` : "type:Post",
+    date: dateGte ? `created_at_unix_aggregated >= ${dateGte}` : "",
+  };
+  return (
+    <Flex gap="gap.md">
+      <Configure
+        filters={[filters.category, filters.date].filter(Boolean).join(" AND ")}
+        hitsPerPage={20}
+      />
+
+      <SegmentGroup.Root
+        value={sort.currentRefinement}
+        onValueChange={event => sort.refine(event.value!)}
+        size="sm"
+        {...ids.set(ids.post.listControls.sort)}
+      >
+        <SegmentGroup.Indicator />
+        <SegmentGroup.Items items={sort.options} />
+      </SegmentGroup.Root>
+
+      <SegmentGroup.Root
+        value={dateGteDays}
+        onValueChange={event => setDateGteDays(event.value as unknown as DateGteDays)}
+        size="sm"
+        {...ids.set(ids.post.listControls.dateRange)}
+      >
+        <SegmentGroup.Indicator />
+        <SegmentGroup.Items
+          items={[
+            { value: "1", label: "1d" },
+            { value: "2", label: "2d" },
+            { value: "7", label: "7d" },
+            { value: "30", label: "30d" },
+            { value: "all", label: "All" },
+          ]}
+        />
+      </SegmentGroup.Root>
+    </Flex>
   );
 }
 
@@ -96,6 +176,7 @@ function SearchInput() {
 
 function PostListHits() {
   const hits = useHits<PostFragmentType>();
+
   const pagination = usePagination();
 
   const postsEnriched = useAlgoliaPostsEnrichmentByGraphql(hits.items);
@@ -103,42 +184,75 @@ function PostListHits() {
   return (
     <Stack gap="gap.xl" w="full">
       <Stack gap="gap.xl" {...ids.set(ids.post.list)}>
-        <For
-          each={postsEnriched}
-          fallback={
-            <>
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-            </>
-          }
-        >
-          {post => <PostCard key={post.id} post={post} urlNamespace="posts" />}
-        </For>
+        {hits.results?.nbHits ? (
+          <For
+            each={postsEnriched}
+            fallback={
+              <>
+                <PostCardSkeleton />
+                <PostCardSkeleton />
+                <PostCardSkeleton />
+                <PostCardSkeleton />
+              </>
+            }
+          >
+            {post => <PostCard key={post.id} post={post} urlNamespace="posts" />}
+          </For>
+        ) : (
+          <HStack align="center">
+            <Text>No matches found.</Text>
+            <Button variant="ghost" size="sm">
+              Reset filters
+            </Button>
+          </HStack>
+        )}
       </Stack>
 
-      <Pagination.Root
-        count={pagination.nbHits}
-        pageSize={20}
-        page={pagination.currentRefinement + 1}
-        onPageChange={details => {
-          const pageNew = details.page - 1;
-          pagination.refine(pageNew);
-        }}
-        siblingCount={5}
-      >
-        <Pagination.PrevTrigger />
-        <Pagination.Items render={page => <Pagination.Item key={page.value} {...page} />} />
-        <Pagination.NextTrigger />
-      </Pagination.Root>
+      {pagination.nbHits > 0 && (
+        <Pagination.Root
+          count={pagination.nbHits}
+          pageSize={hits.results?.hitsPerPage}
+          page={pagination.currentRefinement + 1}
+          onPageChange={details => {
+            const pageNew = details.page - 1;
+            pagination.refine(pageNew);
+          }}
+          siblingCount={2}
+        >
+          <ButtonGroup variant="ghost" size="sm" colorPalette="gray">
+            <Pagination.PrevTrigger asChild>
+              <IconButton>
+                <HiChevronLeft />
+              </IconButton>
+            </Pagination.PrevTrigger>
+
+            <Pagination.Items
+              render={page => (
+                <IconButton key={page.value} variant={{ base: "ghost", _selected: "outline" }}>
+                  {page.value}
+                </IconButton>
+              )}
+            />
+
+            <Pagination.NextTrigger asChild>
+              <IconButton>
+                <HiChevronRight />
+              </IconButton>
+            </Pagination.NextTrigger>
+          </ButtonGroup>
+        </Pagination.Root>
+      )}
     </Stack>
   );
 }
 
-function FacetsTags() {
+function FacetFilter(props: {
+  name: "tags.name" | "tool_type";
+  label: string;
+  isSearchEnabled?: boolean;
+}) {
   const refinements = useRefinementList({
-    attribute: "tag_names",
+    attribute: props.name,
     limit: 10,
     showMore: true,
   });
@@ -148,16 +262,17 @@ function FacetsTags() {
   }
 
   return (
-    <Stack
-      pos="sticky"
-      hideBelow="lg"
-      p={{ base: gap.md, md: gap.lg }}
-      gap="gap.sm"
-      alignSelf="flex-start"
-      borderRadius="md"
-      bg="bg.panel"
-    >
-      <Text>Tags</Text>
+    <Stack align="flex-start">
+      <Text>{props.label}</Text>
+
+      {props.isSearchEnabled && (
+        <Input
+          onChange={event => refinements.searchForItems(event.target.value)}
+          type="search"
+          placeholder="Search..."
+          size="xs"
+        />
+      )}
 
       <Stack gap="gap.sm">
         <For each={refinements.items}>
@@ -171,13 +286,31 @@ function FacetsTags() {
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
-              <Checkbox.Label textWrap="nowrap">
-                {item.label} ({item.count})
+              <Checkbox.Label textWrap="nowrap" display="flex" gap="gap.sm" color="fg.muted">
+                <Text
+                  // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
+                  dangerouslySetInnerHTML={{ __html: item.highlighted! }}
+                  as="span"
+                />{" "}
+                <Text as="span" color="fg.subtle" fontSize="xs">
+                  {item.count}
+                </Text>
               </Checkbox.Label>
             </Checkbox.Root>
           )}
         </For>
       </Stack>
+
+      {refinements.canToggleShowMore && (
+        <Button
+          onClick={() => refinements.toggleShowMore()}
+          variant="subtle-ghost-v2"
+          size="2xs"
+          colorPalette="gray"
+        >
+          {refinements.hasExhaustiveItems ? "Collapse" : "Show more"}
+        </Button>
+      )}
     </Stack>
   );
 }

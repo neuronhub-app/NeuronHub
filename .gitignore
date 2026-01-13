@@ -10,12 +10,11 @@ server/.*_cache/
 server/.venv/
 .*_cache/
 
-# env
+# .env
 mise.local.toml
 **/.env*
 
 # s3
 server/media/
 
-server/**/stubs/*.json
-server/**/cache/*.json
+*.sql

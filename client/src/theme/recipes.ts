@@ -1,4 +1,6 @@
-import { defineRecipe } from "@chakra-ui/react";
+import { checkboxAnatomy } from "@ark-ui/react/checkbox";
+import { segmentGroupAnatomy } from "@ark-ui/react/segment-group";
+import { defineRecipe, defineSlotRecipe } from "@chakra-ui/react";
 
 export const recipes = {
   button: defineRecipe({
@@ -29,11 +31,49 @@ export const recipes = {
           colorPalette: "slate",
           bg: "bg.transparent",
           borderRadius: "lg",
-          color: { _light: "slate.400/70", _dark: "slate.500" },
+          color: { _light: "slate.400", _dark: "slate.500" },
           _hover: {
             color: { _light: "slate.500", _dark: "slate.200" },
-            bg: { _light: "slate.200", _dark: "slate.500" },
+            borderColor: { _light: "slate.500", _dark: "slate.200" },
+            border: "sm",
           },
+        },
+      },
+    },
+  }),
+  input: defineRecipe({
+    base: {
+      _hover: {
+        borderColor: "fg.subtle",
+      },
+    },
+  }),
+};
+
+export const slotRecipes = {
+  segmentGroup: defineSlotRecipe({
+    slots: segmentGroupAnatomy.keys(),
+    base: {
+      item: {
+        _hover: {
+          cursor: "pointer",
+          boxShadow: "inset",
+        },
+      },
+    },
+  }),
+  checkbox: defineSlotRecipe({
+    slots: checkboxAnatomy.keys(),
+    base: {
+      root: {
+        _hover: {
+          cursor: "pointer",
+          borderColor: "fg.subtle",
+        },
+      },
+      control: {
+        _hover: {
+          borderColor: "fg.subtle",
         },
       },
     },

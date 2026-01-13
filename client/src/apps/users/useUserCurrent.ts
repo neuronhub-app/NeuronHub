@@ -1,5 +1,5 @@
 import { captureException } from "@sentry/react";
-import { setUser } from "@sentry/react-router";
+import * as Sentry from "@sentry/react-router";
 import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { proxy } from "valtio";
@@ -35,7 +35,7 @@ export function useUser() {
       }
     }
 
-    setUser(user.state.current);
+    Sentry.setUser(user.state.current);
 
     if (error) {
       captureException(error);

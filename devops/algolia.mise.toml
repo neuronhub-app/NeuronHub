@@ -1,3 +1,0 @@
-[algolia-reindex]
-    dir = "server/"
-    run = "uv run manage.py algolia_reindex"

@@ -1,14 +1,15 @@
-### v0.3.0.0
+### v0.3.0
 
-- Sharing: content, highlights, library, upvotes, ...
+- Sharing: content, Highlights, library, upvotes, ...
 - Notifications
+	- Connection Highlights
 - User.aliases
 - User.avatar
 - Security review
 	- extra tests for `filter_posts_by_user`
 	- drop .history fields? good for debug, bad for privacy
 
-### v0.3.1.0
+### v0.3.1
 
 - Recurring exports
 - OAuth Apple/Google
@@ -20,9 +21,10 @@
 - field `Review.review_experience`
 - field `Vote.is_changed_my_mind`
 - LLM moderation
+	- Post .category, .tool, .tags, ...
 - field `Tag.is_show_parent_name`
 - expire Posts
 - `Post.alternatives` votes & comments
 - `Post.Type.Quote`
-	- show "Quotes" under "Posts" in left menu, default is "All"
-	- eg HN comments
+    - show "Quotes" under "Posts" in left menu, default is "All"
+    - eg HN comments

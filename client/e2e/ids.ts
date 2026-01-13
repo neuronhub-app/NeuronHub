@@ -4,6 +4,10 @@ export type TestId = string;
 export namespace ids {
   export const post = {
     list: "post.list",
+    listControls: {
+      sort: "post.list.controls.sort",
+      dateRange: "post.list.controls.date-range",
+    },
     vote: {
       up: "post.vote.up",
       down: "post.vote.down",

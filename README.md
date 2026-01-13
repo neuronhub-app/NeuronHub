@@ -1,4 +1,4 @@
-For project intro see [docs/architecture/readme.md](/docs/architecture/README.md).
+For project intro see [docs/architecture/README.md](/docs/architecture/README.md).
 
 Development Setup
 --------------------------------
@@ -19,7 +19,10 @@ Development Setup
 
 dev URLs:
 - http://localhost:8000/admin
+    - login/pass: admin/admin
 - http://localhost:3000
+
+The [mise.toml](/mise.toml) has all tasks and scripts.
 
 ### Algolia
 
@@ -27,19 +30,17 @@ FE will work only partially without an Algolia app.
 
 - <a href="https://dashboard.algolia.com/users/sign_upsh" rel="nofollow">Create a free account</a>
 - `cp mise.local.toml.example mise.local.toml`
-- In this file populate app id, api key, search api key, and your index postfix
-- `mise run algolia-reindex`
+- In this file populate App ID, API key, and Search API key
+- `mise run django:algolia-reindex`
 
 ### MacOS
 
 To run without Docker, after `git clone`:
 - `cp devops/env-examples/mise.macos.toml.example mise.local.toml`
 
-The rest of steps are the same as for Linux.
-
-The [mise.toml](/mise.toml) has all tasks and scripts.
+The rest is same as for Linux.
 
 Documentation
 --------------------------------
 
-See the [docs/](/docs/) dir.
+See the [docs/ dir](/docs/).

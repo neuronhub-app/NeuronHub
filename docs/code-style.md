@@ -43,6 +43,7 @@ Code blocks can be marked with:
 - `#bad-infer` - broken TS type inference - over time check if they fixed it
 - `#prob-redundant` - may not be useful, but removing will require extra testing
 - `#draft` - not working or not ready for prod
+- `#E2E-fails` - can be added to Git commit body (until we setup CI)
 
 ## Extra
 

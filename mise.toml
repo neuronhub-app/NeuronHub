@@ -5,6 +5,9 @@
     rclone = "latest"
     killport = "latest"
 
+    claude = "2.1.4" # freeze for cctweak
+        node = "24"
+
 [settings]
     # use Nushell for everything
     unix_default_file_shell_args = "nu"
@@ -20,7 +23,6 @@
         "devops/docker.mise.toml",
         "devops/e2e.mise.toml",
         "devops/claude.mise.toml",
-        "devops/algolia.mise.toml",
     ]
 
 [env]
@@ -66,7 +68,7 @@
     S3_PORT = 8333
 
     IS_POSTGRES_EXTERNAL = "{{ env.IS_POSTGRES_EXTERNAL | default(value = env.CI | default(value = false)) }}"
-    POSTGRES_EXTERNAL_SHELL_MSG = "Skipping as using non-Mise PostgreSQL (ie we're in GitHub CI or MacOS)"
+    POSTGRES_EXTERNAL_SHELL_MSG = "Skipping Postgres operation, as using non-Mise db (ie on GitHub CI or MacOS)"
 
 
 # Dev servers
@@ -161,6 +163,10 @@
 [tasks."django:import-hn-scheduled"]
     dir = "server"
     run = "uv run manage.py import_hn_scheduled"
+
+[tasks."django:algolia-reindex"]
+    dir = "server/"
+    run = "uv run manage.py algolia_reindex_with_replica"
 
 
 # typegen → format → lint

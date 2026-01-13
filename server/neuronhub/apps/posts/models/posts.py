@@ -21,6 +21,7 @@ from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable
 from neuronhub.apps.anonymizer.registry import anonymizer
 from neuronhub.apps.db.fields import MarkdownField
+from neuronhub.apps.graphql.persisted_query_extension import _load_client_persisted_queries_json
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.types import PostTypeEnum
@@ -249,11 +250,6 @@ class Post(AnonimazableTimeStampedModel):
 
         return tags
 
-    def get_image_json(self) -> dict | None:
-        if self.image:
-            return {"url": self.image.url, "name": self.image.name}
-        return None
-
     def get_visible_to(self) -> list[str]:
         if self.visibility is Visibility.PRIVATE:
             assert self.author
@@ -279,36 +275,6 @@ class Post(AnonimazableTimeStampedModel):
 
         return visible_to
 
-    def _get_graphql_field(self, field: str) -> Any | None:
-        """
-        We re-use the "PostsByIds" query to supply the identical JSON schema to FE from both Algolia and GraphQL.
-        See [[Algolia.md]].
-
-        Bad performance, but reliable.
-        """
-        from neuronhub.apps.graphql.persisted_query_extension import (
-            _load_client_persisted_queries_json,
-        )
-        from neuronhub.apps.tests.test_cases import StrawberryContext
-        from neuronhub.graphql import schema
-
-        if not self.is_in_algolia_index():  # should be redundant, but isn't
-            return None
-
-        request = RequestFactory().get("/graphql")
-        request.user = self.author or AnonymousUser()
-
-        res = async_to_sync(schema.execute)(
-            query=_load_client_persisted_queries_json()["PostsByIds"],
-            variable_values={"ids": [self.pk]},
-            context_value=StrawberryContext(request=request),
-        )
-        assert res.data
-        if posts := res.data["posts"]:
-            return posts[0].get(field)
-
-        return None
-
     def get_id_as_str(self) -> str:
         return str(self.id)
 
@@ -332,29 +298,68 @@ class Post(AnonimazableTimeStampedModel):
     def get_unix_reviewed_at(self) -> float | None:
         return self.reviewed_at.timestamp() if self.reviewed_at else None
 
+    def get_created_at_unix_aggregated(self) -> float:
+        if hasattr(self, "post_source") and self.post_source.created_at_external:
+            return self.post_source.created_at_external.timestamp()
+        return self.created_at.timestamp()
+
     def get_votes_aggregated(self) -> int:
         votes_hn_count = 0
         if hasattr(self, "post_source"):
             votes_hn_count = self.post_source.score or 0
+
         config = PostConfig.get_solo()
-        votes_adjusted = (
-            config.votes_multiplier * self.votes.filter(is_vote_positive=True).count()
-        )
+        votes_pos = self.votes.filter(is_vote_positive=True).count()
+        votes_neg = self.votes.filter(is_vote_positive=False).count()
+        votes_adjusted = config.votes_multiplier * (votes_pos - votes_neg)
+
         return votes_hn_count + votes_adjusted
-
-    def get_tags_json(self):
-        return self._get_graphql_field("tags") or []
-
-    def get_votes_json(self):
-        return [
-            {"id": str(v.id), "is_vote_positive": v.is_vote_positive} for v in self.votes.all()
-        ]
 
     def get_graphql_typename(self) -> str:
         if self.type is self.Type.Post:
             return f"{self.type.value.capitalize()}Type"
         else:
             return f"Post{self.type.value.capitalize()}Type"
+
+    _algolia_graphql_cache: dict[str, Any] | None = {}
+
+    def _get_graphql_field(self, field: str) -> Any | None:
+        """
+        We re-use the "PostsByIds" query to supply the identical JSON schema to FE from both Algolia and GraphQL.
+        See [[Algolia.md]].
+
+        Caches GraphQL to avoid N+1 in Algolia indexing.
+        """
+        from neuronhub.apps.tests.test_cases import StrawberryContext
+        from neuronhub.graphql import schema
+
+        if not self.is_in_algolia_index():  # should be redundant, but isn't
+            return None
+
+        if not self._algolia_graphql_cache:
+            self._algolia_graphql_cache = {}
+
+            request = RequestFactory().get("/graphql")
+            request.user = self.author or AnonymousUser()
+            response = async_to_sync(schema.execute)(
+                query=_load_client_persisted_queries_json()["PostsByIds"],
+                variable_values={"ids": [self.pk]},
+                context_value=StrawberryContext(request=request),
+            )
+            assert response.data
+            if posts := response.data["posts"]:
+                self._algolia_graphql_cache = posts[0]
+
+        return self._algolia_graphql_cache.get(field)
+
+    def get_image_json(self) -> dict | None:
+        return self._get_graphql_field("image")
+
+    def get_tags_json(self):
+        return self._get_graphql_field("tags") or []
+
+    def get_votes_json(self):
+        return self._get_graphql_field("votes") or []
 
     def get_review_tags_json(self):
         return self._get_graphql_field("review_tags") or []

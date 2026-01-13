@@ -114,7 +114,11 @@ async def db_stubs_repopulate(
 async def _algolia_reindex():
     from algoliasearch_django import reindex_all
 
+    from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
+
+    # todo refac: replace with a [[index.py]] method
     await sync_to_async(reindex_all)(Post)
+    await sync_to_async(setup_virtual_replica_sorted_by_votes)()
 
 
 class _disable_auto_indexing(ContextDecorator):
