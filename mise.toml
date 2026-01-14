@@ -128,15 +128,19 @@
 [tasks."test"]
     dir = "server"
     depends = "dev:db"
-    run = [
-        "mise test:pytest",
-        "mise test:e2e",
-    ]
+    run = """
+        job spawn { mise dev:s3 }
+        mise test:pytest
+        mise test:e2e
+    """
 
     [tasks."test:pytest"]
         dir = "server"
         depends = "dev:db"
-        run = "uv run pytest"
+        run = """
+            job spawn { mise dev:s3 }
+            uv run pytest
+        """
         alias = "pytest"
         env.DJANGO_ENV = "dev_test_unit"
 
@@ -144,7 +148,7 @@
         dir = "client"
         alias = "e2e"
         run = "bun run playwright test --config=e2e/playwright.config.ts"
-        # duplicate with `dev:e2e:server`, as Playwright resets $env when starts Mise from [[playwright.config.ts]]
+        # duplicate $env with `dev:e2e:server`, as Playwright resets $env when it starts Mise from [[playwright.config.ts]]
         env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
 
@@ -164,16 +168,8 @@
     dir = "server"
     run = "uv run manage.py db_stubs_repopulate"
 
-[tasks."django:import-hn"]
-    dir = "server"
-    run = "uv run manage.py import_hn"
-
-[tasks."django:import-hn-scheduled"]
-    dir = "server"
-    run = "uv run manage.py import_hn_scheduled"
-
 [tasks."django:algolia-reindex"]
-    dir = "server/"
+    dir = "server"
     run = "uv run manage.py algolia_reindex_with_replica"
 
 

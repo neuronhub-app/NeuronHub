@@ -10,10 +10,10 @@
 ["dev:e2e:server"]
     depends = ["dev:db", "dev:db:e2e:setup"]
     dir = "server"
-    run = [
-        "job spawn { mise dev:s3 }",
-        "uv run manage.py runserver {{ env.SERVER_PORT_E2E }}",
-    ]
+    run = """
+        job spawn { mise dev:s3 }
+        uv run manage.py runserver {{ env.SERVER_PORT_E2E }}
+    """
     env.SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
     env.DJANGO_ENV = "dev_test_e2e"
     env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
