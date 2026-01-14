@@ -102,7 +102,7 @@ async def db_stubs_repopulate(
         if is_import_HN_post:
             # todo refac: do only on request, as it adds +3s
             post_with_90_comments_and_idents = post_HN_id
-            importer = ImporterHackerNews(is_use_cache=True, is_logs_enabled=False)
+            importer = ImporterHackerNews(is_use_cache=True, is_logging_enabled=False)
             await importer.import_post(post_with_90_comments_and_idents)
 
     if settings.ALGOLIA["IS_ENABLED"]:

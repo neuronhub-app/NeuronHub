@@ -1,5 +1,5 @@
 """
-todo refac: api limit should be a class or a namespace
+todo refac: api limit should be a class or namespace
 """
 
 import asyncio
@@ -9,13 +9,13 @@ from json import JSONDecodeError
 from typing import Any
 
 import requests
-from django.core.cache import cache
-
 from asgiref.sync import sync_to_async
+from django.core.cache import cache
 from django.db.models import F
 from django.utils import timezone
 
-from neuronhub.apps.importer.models import ApiHourlyLimit, ApiSource
+from neuronhub.apps.importer.models import ApiHourlyLimit
+from neuronhub.apps.importer.models import ApiSource
 
 
 async def request_json(

@@ -20,7 +20,7 @@ class ImporterMutation:
 
         comments_before = await Post.objects.filter(parent=post, type=Post.Type.Comment).acount()
 
-        importer = ImporterHackerNews(is_logs_enabled=False, is_use_cache=False)
+        importer = ImporterHackerNews(is_logging_enabled=False, is_use_cache=False)
         await importer.import_post(id_ext=int(id_external))
 
         comments_after = await Post.objects.filter(parent=post, type=Post.Type.Comment).acount()

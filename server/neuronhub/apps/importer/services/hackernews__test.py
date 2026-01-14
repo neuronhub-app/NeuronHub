@@ -1,6 +1,8 @@
 import pytest
 
-from neuronhub.apps.importer.models import ImportDomain, PostSource, UserSource
+from neuronhub.apps.importer.models import ImportDomain
+from neuronhub.apps.importer.models import PostSource
+from neuronhub.apps.importer.models import UserSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.tests.services.db_stubs_repopulate import post_HN_id
@@ -55,5 +57,5 @@ class HackerNewsImportTest(NeuronTestCase):
         assert comments_with_parent == comment_count
 
     async def _import_test_post(self):
-        importer = ImporterHackerNews(is_use_cache=True, is_logs_enabled=False)
+        importer = ImporterHackerNews(is_use_cache=True, is_logging_enabled=False)
         return await importer.import_post(self._story_id)
