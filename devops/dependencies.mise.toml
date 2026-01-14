@@ -47,7 +47,8 @@
 ["upgrade-deps:client"]
     dir = "client"
     run = [
-        # freeze "graphql" due to "gql.tada" bugs (see #103)
+        # We freeze "graphql", due to "gql.tada" bugs with 16.12,
+        # See [[package.json.md]] and [[.local/issues/closed/103-gql-tada-Persisted-Queries.md]]
         "bun run ncu --upgrade --packageManager bun --reject=graphql --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }}",
         "bun install"
     ]
@@ -56,6 +57,8 @@
     dir = "client"
     run = [
         "bun run ncu --packageManager bun --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} ",
+
+        "echo 'Without the cooldown'",
         "bun run ncu --packageManager bun --cooldown=0",
     ]
 

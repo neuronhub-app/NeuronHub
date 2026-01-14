@@ -62,13 +62,19 @@
     CLIENT_PORT = 3000
     CLIENT_PORT_E2E = 3001
 
+    DB_USER = "{{ env.PROJECT_NAME }}"
+    DB_NAME = "{{ env.PROJECT_NAME }}"
+    DB_PASS = "{{ env.PROJECT_NAME }}"
+    DB_VER = "17" # psql-17 (18 also works)
+
     E2E_DB_NAME = "test_neuronhub_e2e"
 
     S3_STORAGE_BUCKET_NAME = "media"
     S3_PORT = 8333
 
     IS_POSTGRES_EXTERNAL = "{{ env.IS_POSTGRES_EXTERNAL | default(value = env.CI | default(value = false)) }}"
-    POSTGRES_EXTERNAL_SHELL_MSG = "Skipping Postgres operation, as using non-Mise db (ie on GitHub CI or MacOS)"
+    IS_POSTGRES_MACOS = "{{ env.IS_POSTGRES_EXTERNAL }}"
+    POSTGRES_EXTERNAL_SHELL_MSG = "Skipping Postgres operation, as using non-Mise db (ie on GitHub CI)"
 
 
 # Dev servers
@@ -101,6 +107,8 @@
         run = """
             if $env.IS_POSTGRES_EXTERNAL == "true" {
                 print $env.POSTGRES_EXTERNAL_SHELL_MSG
+            } else if $env.IS_POSTGRES_MACOS == "true" {
+                brew services start postgresql@{{ env.DB_VER}}
             } else {
                 sudo -E docker compose up db --detach
             }
@@ -134,9 +142,9 @@
 
     [tasks."test:e2e"]
         dir = "client"
-        run = "bun run playwright test --config=e2e/playwright.config.ts"
         alias = "e2e"
-        # duplicate with `dev:e2e:server`, as Playwright resets env when starts Mise from [[playwright.config.ts]]
+        run = "bun run playwright test --config=e2e/playwright.config.ts"
+        # duplicate with `dev:e2e:server`, as Playwright resets $env when starts Mise from [[playwright.config.ts]]
         env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
 

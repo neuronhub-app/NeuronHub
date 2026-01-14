@@ -123,10 +123,10 @@ if DJANGO_ENV is DjangoEnv.BUILD:
         },
     }
 else:
-    db_host = env.str("DATABASE_HOST", "host.docker.internal")
-    db_name = env.str("DATABASE_NAME", "neuronhub")
-    db_user = env.str("DATABASE_USER", db_name)
-    db_pass = env.str("DATABASE_PASSWORD", db_name)
+    db_host = env.str("DB_HOST", "host.docker.internal")
+    db_name = env.str("DB_NAME", "neuronhub")
+    db_user = env.str("DB_USER", db_name)
+    db_pass = env.str("DB_PASS", db_name)
     if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
         db_name = env.str("E2E_DB_NAME")
     DATABASES = {

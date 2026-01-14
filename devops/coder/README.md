@@ -8,7 +8,7 @@ See [docker.mise.toml](/devops/docker.mise.toml).
 
 On start it:
 - Clones/pulls Git repo
-- Runs `mise install-deps` and `mise django:migrate`
+- Runs `mise install-deps`, `mise dev:db`, `mise django:migrate`
 
 Notes:
 - Uses `root` through `/var/run/docker.sock`

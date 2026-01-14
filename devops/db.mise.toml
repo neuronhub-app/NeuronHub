@@ -1,16 +1,13 @@
 ["dev:db:setup"]
     run = """
-        if $env.IS_POSTGRES_EXTERNAL == "true" {
-            brew install postgresql@17
-            brew services start postgresql@17
-            createdb-17 $env.DATABASE_NAME
-            let sql = $'
-              CREATE USER ($env.DATABASE_NAME);
-              ALTER ROLE ($env.DATABASE_NAME) PASSWORD '($env.DATABASE_NAME)';
-              GRANT ALL ON SCHEMA public TO ($env.DATABASE_NAME);
-              ALTER USER ($env.DATABASE_NAME) CREATEDB;
-            '
-            $sql | psql-17 $env.DATABASE_NAME
+        if $env.IS_POSTGRES_MACOS == "true" {
+            brew install postgresql@{{ env.DB_VER }}
+            brew services start postgresql@{{ env.DB_VER}}
+
+            createuser-{{ env.DB_VER}} --superuser --pwprompt={{ env.DB_USER }} {{ env.DB_USER }}
+
+            let db_name = "{{ env.DB_USER }}"
+            createdb-{{ env.DB_VER}} --owner={{ env.DB_USER }} $db_name
         } else {
             mise run dev:db
         }
@@ -22,8 +19,8 @@
 ["dev:db:rm"]
     dir = "devops/"
     run = """
-        if $env.IS_POSTGRES_EXTERNAL == "true" {
-            dropdb-17 $env.DATABASE_NAME
+        if $env.IS_POSTGRES_MACOS == "true" {
+            dropdb-{{ env.DB_VER }} {{ env.DB_NAME }}
         } else {
             sudo docker compose rm db
         }
@@ -32,9 +29,39 @@
 ["dev:db:stop"]
     dir = "devops/"
     run = """
-        if $env.IS_POSTGRES_EXTERNAL == "true" {
-            brew services stop postgresql@17
+        if $env.IS_POSTGRES_MACOS == "true" {
+            brew services stop postgresql@{{ env.DB_VER }}
         } else {
             sudo docker compose stop db
+        }
+    """
+
+# E2E
+
+["dev:db:e2e:setup"]
+    dir = "devops"
+    run = """
+        if $env.IS_POSTGRES_MACOS == "true" {
+            createdb-{{ env.DB_VER }} --owner={{ env.DB_USER }} {{ env.E2E_DB_NAME }} | complete
+        } else {
+            let res = ( sudo -E docker compose exec db bash -c "createdb --owner={{ env.DB_USER }} {{ env.E2E_DB_NAME }}" | complete )
+            if $res.exit_code > 0 {
+                if ($res.stderr | str contains "already exists") {
+                    print "db already exists"
+                } else {
+                    print $res.stderr
+                }
+            }
+        }
+        mise run django:migrate
+    """
+
+["dev:db:e2e:rm"]
+    dir = "devops"
+    run = """
+        if $env.IS_POSTGRES_MACOS == "true" {
+            dropdb-{{ env.DB_VER }} {{ env.E2E_DB_NAME }}
+        } else {
+            sudo -E docker compose exec db bash -c "dropdb --user={{ env.DB_USER }} {{ env.E2E_DB_NAME }}"
         }
     """

@@ -1,7 +1,7 @@
 [env]
-    IS_POSTGRES_EXTERNAL = "true"
-    DATABASE_HOST = "localhost"
-    DATABASE_NAME = "neuronhub"
+    IS_POSTGRES_EXTERNAL = "false"
+    IS_POSTGRES_MACOS = "true"
+    DB_HOST = "localhost"
 
 # optional
 [tools]

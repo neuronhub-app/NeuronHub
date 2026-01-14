@@ -13,7 +13,8 @@ Development Setup
 	mise trust
 	mise install
 	mise run install-deps
-	mise run dev:db:setup # FYI its db_stubs_repopulate takes few minutes 
+	mise run dev:db:setup # FYI slow due to db_stubs_repopulate 
+	mise run dev:db:e2e:setup 
 	mise run dev
 	```
 
@@ -28,7 +29,7 @@ The [mise.toml](/mise.toml) has all tasks and scripts.
 
 FE will work only partially without an Algolia app.
 
-- <a href="https://dashboard.algolia.com/users/sign_upsh" rel="nofollow">Create a free account</a>
+- <a href="https://dashboard.algolia.com/users/sign_in" rel="nofollow">Create a free account</a>
 - `cp mise.local.toml.example mise.local.toml`
 - In this file populate App ID, API key, and Search API key
 - `mise run django:algolia-reindex`

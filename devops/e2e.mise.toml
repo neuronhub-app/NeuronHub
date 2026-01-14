@@ -1,27 +1,3 @@
-["dev:e2e:db:setup"]
-    dir = "devops"
-    run = """
-        if $env.IS_POSTGRES_EXTERNAL == "true" {
-            createdb-17 {{ env.E2E_DB_NAME }} | complete
-        } else {
-            let res = ( sudo -E docker compose exec db bash -c "createdb --user={{ env.PROJECT_NAME }} {{ env.E2E_DB_NAME }}" | complete )
-            if $res.exit_code > 0 {
-                if ($res.stderr | str contains "already exists") {
-                    print "db already exists"
-                } else {
-                    print $res.stderr
-                }
-            }
-        }
-    """
-
-["dev:e2e:db:rm"]
-    dir = "devops"
-    run = """
-        sudo -E docker compose exec db bash -c "dropdb --user={{ env.PROJECT_NAME }} {{ env.E2E_DB_NAME }}"
-    """
-
-
 # Dev servers to speed up `mise e2e` command cold start
 # -----------------------------------------------------
 
@@ -29,14 +5,13 @@
     depends = ["dev:e2e:server", "dev:e2e:client"]
 
 ["dev:e2e:stop"]
-    run = "killport --signal=SIGTERM {{ env.SERVER_PORT_E2E }} {{ env.CLIENT_PORT_E2E }} {{ env.S3_PORT }}"
+    run = "killport --signal=SIGTERM {{ env.SERVER_PORT_E2E }} {{ env.CLIENT_PORT_E2E }}"
 
 ["dev:e2e:server"]
-    depends = ["dev:db", "dev:e2e:db:setup"]
+    depends = ["dev:db", "dev:db:e2e:setup"]
     dir = "server"
     run = [
         "job spawn { mise dev:s3 }",
-        "mise django:migrate",
         "uv run manage.py runserver {{ env.SERVER_PORT_E2E }}",
     ]
     env.SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
