@@ -1,6 +1,7 @@
 # $schema: https://mise.jdx.dev/schema/mise-task.json
 
 ["docker:tag-and-push"]
+    alias = "docker:push"
     usage = """
         flag "--app <name>" { choices "server" "client" "coder" }
         flag "--tag_only"
@@ -13,7 +14,6 @@
             --version="{{ env.VITE_RELEASE_VERSION }}" \
             ...(if $env.usage_tag_only? == "true" { ["--tag_only"] } else { [] })
     """
-    alias = "docker:push"
 
 ["docker:rm"]
     usage = """
@@ -28,40 +28,40 @@
         flag "--version <version>" env="VITE_RELEASE_VERSION"
         flag "--no_cache" default=#false
     """
+
     run = """
         # Set working dir
         # ------------------------------
 
         let app = $env.usage_app
-        if $app == "coder" {
-          cd devops/coder
+        if $env.usage_app == "coder" {
+          cd devops/$env.usage_app
         } else {
-          cd $app
+          cd $env.usage_app
         }
 
         # Sentry PROJECT_NAME mapping
         # ------------------------------
 
-        let sentry_project = if $app == "client" {
+        let sentry_project = if $env.usage_app == "client" {
           "{{ env.PROJECT_NAME }}-frontend"
-        } else if $app == "server" {
+        } else if $env.usage_app == "server" {
           "{{ env.PROJECT_NAME }}-backend"
         }
 
-        # Force-pass Mise env & tag the docker build
+        # Force-pass Mise env & tag to the Docker build
         # ------------------------------
 
-        let version = $env.usage_version
         let compose_file = "docker-compose.yaml"
         let compose_content = $"
             services:
-              ($app):
-                image: ghcr.io/{{ env.GITHUB_PATH }}/($app):($version)
+              ($env.usage_app):
+                image: ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)
                 pull_policy: always
                 build:
                   context: .
                   args:
-                    VITE_RELEASE_VERSION: ($version)
+                    VITE_RELEASE_VERSION: ($env.usage_version)
 
                     # for React Router build
                     VITE_SERVER_URL: https://backend.{{ env.DOMAIN_NAME }}
@@ -81,8 +81,7 @@
         # Build
         # ------------------------------
 
-        let no_cache = $env.usage_no_cache
-        if $no_cache == "true" {
+        if $env.usage_no_cache == "true" {
           ^sudo -E docker compose --progress=plain build --no-cache
         } else {
           ^sudo -E docker compose --progress=plain build
