@@ -8,7 +8,6 @@ from django.views.static import serve
 from strawberry.django.views import AsyncGraphQLView
 
 from neuronhub.graphql import schema
-from neuronhub.settings import DjangoEnv
 
 
 graphql_view = AsyncGraphQLView.as_view(
@@ -51,7 +50,7 @@ if settings.IS_DEBUG_TOOLBAR_ENABLED:
     urlpatterns += debug_toolbar_urls()
 
 
-if settings.DJANGO_ENV in (DjangoEnv.DEV, DjangoEnv.BUILD):
+if settings.DJANGO_ENV.is_dev():
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
     urlpatterns += staticfiles_urlpatterns()

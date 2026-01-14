@@ -302,10 +302,10 @@ is_algolia_enabled = env.bool("ALGOLIA_IS_ENABLED", False) and is_not_unit_tests
 if is_algolia_enabled:
     INSTALLED_APPS.append("algoliasearch_django")
 
-if DJANGO_ENV in [DjangoEnv.PROD, DjangoEnv.STAGE]:
-    index_suffix = DJANGO_ENV.value  # eg `posts_prod`
-else:
+if DJANGO_ENV.is_dev():
     index_suffix = f"{DJANGO_ENV.value}_{env.str('ALGOLIA_INDEX_POSTFIX_USER', env.str('USER'))}"
+else:
+    index_suffix = DJANGO_ENV.value  # eg `posts_prod`
 
 ALGOLIA = AlgoliaConfig(
     # BE will work wo/ it. FE only partially.
