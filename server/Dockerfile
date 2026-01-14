@@ -28,6 +28,6 @@ RUN uv sync --frozen --no-cache
 
 COPY . ./
 
-RUN uv run manage.py collectstatic
+RUN DJANGO_ENV=collectstatic uv run manage.py collectstatic
 
 CMD ["uv", "run", "daphne", "--bind", "0.0.0.0", "--port", "$SERVER_PORT", "neuronhub.asgi:application"]

@@ -24,13 +24,14 @@ env.read_env()
 
 
 class DjangoEnv(Enum):
-    STAGE = "stage"
     PROD = "prod"
-    BUILD = "build"
+    STAGE = "stage"
 
     DEV = "dev"
     DEV_TEST_UNIT = "dev_test_unit"
     DEV_TEST_E2E = "dev_test_e2e"
+
+    COLLECTSTATIC = "collectstatic"  # for Dockerfile
 
     def is_dev(self) -> bool:
         return self in {
@@ -115,41 +116,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "neuronhub.wsgi.application"
 ASGI_APPLICATION = "neuronhub.asgi.application"
 
-if DJANGO_ENV is DjangoEnv.BUILD:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": ":memory:",
-        },
-    }
-else:
-    db_host = env.str("DB_HOST", "host.docker.internal")
-    db_name = env.str("DB_NAME", "neuronhub")
-    db_user = env.str("DB_USER", db_name)
-    db_pass = env.str("DB_PASS", db_name)
-    if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
-        db_name = env.str("E2E_DB_NAME")
-    DATABASES = {
-        "default": dj_database_url.config(
-            conn_max_age=600,
-            default=env.str(
-                "DATABASE_URL",
-                f"postgres://{db_user}:{db_pass}@{db_host}:5432/{db_name}",
-            ),
-        )
-    }
-
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
-        "LOCATION": "/tmp/django_cache",
-        "OPTIONS": {
-            "MAX_ENTRIES": 10000,
-            "TIMEOUT": None,  # only for tests atm, no need to expire
-        },
-    },
-}
-
 SITE_ID = 1
 
 SECRET_KEY = env.str("SECRET_KEY", "django-insecure-c611a&dwbs58ziu4=o3ps@4zpv9=8ix&8k7i")
@@ -157,6 +123,7 @@ SECRET_KEY = env.str("SECRET_KEY", "django-insecure-c611a&dwbs58ziu4=o3ps@4zpv9=
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DEBUG = env.bool("DJANGO_DEBUG", DJANGO_ENV.is_dev())
+
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/Los_Angeles"
@@ -168,6 +135,41 @@ DATETIME_FORMAT = "Y.m.d H:i"
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 ROOT_URLCONF = "neuronhub.urls"
+
+
+db_host = env.str("DB_HOST", "host.docker.internal")
+db_name = env.str("DB_NAME", "neuronhub")
+db_user = env.str("DB_USER", db_name)
+db_pass = env.str("DB_PASS", db_name)
+if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
+    db_name = env.str("E2E_DB_NAME")
+DATABASES = {
+    "default": dj_database_url.config(
+        conn_max_age=600,
+        default=env.str(
+            "DATABASE_URL",
+            f"postgres://{db_user}:{db_pass}@{db_host}:5432/{db_name}",
+        ),
+    )
+}
+
+if DJANGO_ENV is DjangoEnv.COLLECTSTATIC:
+    DATABASES["default"] = {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": ":memory:",
+    }
+
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": "/tmp/django_cache",
+        "OPTIONS": {
+            "MAX_ENTRIES": 10000,
+            "TIMEOUT": None,  # only for tests atm, no need to expire
+        },
+    },
+}
 
 TASKS = {"default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"}}
 
