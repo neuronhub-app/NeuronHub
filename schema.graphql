@@ -118,7 +118,8 @@ type Mutation {
   test_db_stubs_repopulate(is_import_HN_post: Boolean = true, is_create_single_review: Boolean = false): String!
   post_highlight_create(data: PostHighlightTypeInput!): Boolean! @IsAuthenticated
   post_highlight_delete(data: DjangoModelInput!): Boolean! @IsAuthenticated
-  post_import_refresh(id_external: String!): PostImportRefreshResult!
+  post_import_refresh(id_external: Int!): Boolean! @IsAuthenticated
+  posts_import(auth_token: String!, category: String!, limit: Int! = 60, is_use_cache: Boolean! = false): Boolean!
 }
 
 input OneToManyInput {
@@ -255,10 +256,6 @@ input PostHighlightTypeInput {
   text: String!
   text_prefix: String
   text_postfix: String
-}
-
-type PostImportRefreshResult {
-  comments_added: Int!
 }
 
 input PostOrder @oneOf {

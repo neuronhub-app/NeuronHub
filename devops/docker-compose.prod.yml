@@ -1,18 +1,24 @@
 name: neuronhub
 
 services:
-  server:
-    image: ghcr.io/neuronhub-app/neuronhub/server:0.2
-    env_file:
-      - path: .env
-    ports:
-      - "8000:8000"
-    command: bash -c "uv run manage.py migrate && uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application"
-    pull_policy: always
   client:
     image: ghcr.io/neuronhub-app/neuronhub/client:0.2
-    env_file:
-      - path: .env
     ports:
       - "3000:3000"
     pull_policy: always
+    env_file:
+      - path: .env
+  server:
+    image: ghcr.io/neuronhub-app/neuronhub/server:0.2
+    command: bash -c "uv run manage.py migrate && uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application"
+    ports:
+      - "8000:8000"
+    pull_policy: always
+    env_file:
+      - path: .env
+  server_background_tasks:
+    image: ghcr.io/neuronhub-app/neuronhub/server:0.2
+    command: bash -c "uv run manage.py db_worker"
+    pull_policy: always
+    env_file:
+      - path: .env

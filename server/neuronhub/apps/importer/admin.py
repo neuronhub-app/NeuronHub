@@ -1,6 +1,8 @@
 from django.contrib import admin
 
-from neuronhub.apps.importer.models import PostSource, UserSource
+from neuronhub.apps.importer.models import ImportTaskCronAuthToken
+from neuronhub.apps.importer.models import PostSource
+from neuronhub.apps.importer.models import UserSource
 
 
 @admin.register(PostSource)
@@ -31,3 +33,12 @@ class UserSourceAdmin(admin.ModelAdmin):
         "about",
     ]
     search_fields = ["username"]
+
+
+@admin.register(ImportTaskCronAuthToken)
+class ImportTaskCronAuthTokenAdmin(admin.ModelAdmin):
+    list_display = [
+        "token",
+        "created_at",
+        "updated_at",
+    ]

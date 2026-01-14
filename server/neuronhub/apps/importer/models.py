@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from django_choices_field import TextChoicesField
 
@@ -68,3 +70,7 @@ class ApiHourlyLimit(TimeStampedModel):
     count_current = models.PositiveIntegerField(default=0)
     count_max_per_hour = models.PositiveIntegerField(default=10_000)
     query_at_first = models.DateTimeField(auto_now_add=True)
+
+
+class ImportTaskCronAuthToken(TimeStampedModel):
+    token = models.CharField(max_length=1024, default=uuid.uuid4)

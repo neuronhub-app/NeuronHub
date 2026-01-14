@@ -98,23 +98,13 @@ MIDDLEWARE = [
     "hijack.middleware.HijackUserMiddleware",
 ]
 
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "APP_DIRS": True,
-        "DIRS": [BASE_DIR / "neuronhub/templates"],
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
 
 WSGI_APPLICATION = "neuronhub.wsgi.application"
 ASGI_APPLICATION = "neuronhub.asgi.application"
+
+ROOT_URLCONF = "neuronhub.urls"
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 SITE_ID = 1
 
@@ -124,7 +114,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 DEBUG = env.bool("DJANGO_DEBUG", DJANGO_ENV.is_dev())
 
-
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "America/Los_Angeles"
 USE_L10N = False  # for django.admin
@@ -132,9 +121,13 @@ USE_I18N = True
 USE_TZ = True
 DATETIME_FORMAT = "Y.m.d H:i"
 
-STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-ROOT_URLCONF = "neuronhub.urls"
+
+TASKS = {
+    "default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"},
+}
+is_tasks_backend_immediate = env.bool("IS_TASKS_BACKEND_IMMEDIATE", DJANGO_ENV.is_dev())
+if is_tasks_backend_immediate:
+    TASKS["default"]["BACKEND"] = "django_tasks.backends.immediate.ImmediateBackend"
 
 
 db_host = env.str("DB_HOST", "host.docker.internal")
@@ -171,7 +164,20 @@ CACHES = {
     },
 }
 
-TASKS = {"default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"}}
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "APP_DIRS": True,
+        "DIRS": [BASE_DIR / "neuronhub/templates"],
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
 
 # ALLOWED_HOSTS & django-cors-headers
 # ---------------------------------------------------------------------------------------------------------
@@ -370,7 +376,7 @@ warnings.filterwarnings(
 )
 
 if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
-    # Mise's `--quite` doesn't work on `runserver`, and `--silent` drops all stderr - so we set django to WARNING instead of INFO
+    # LLM needs clean logs, but Mise's `--quite` doesn't work on `runserver`, and `--silent` drops all stderr - so we drop Django's logs below "WARNING"
     LOGGING["loggers"] = {
         "django": {
             "handlers": ["console"],

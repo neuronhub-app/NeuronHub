@@ -1,28 +1,59 @@
 import strawberry
 from strawberry import Info
+from strawberry_django.permissions import IsAuthenticated
 
-from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
+from neuronhub.apps.graphql.persisted_query_extension import GraphqlQuery
+from neuronhub.apps.graphql.persisted_query_extension import graphql_whitelist_BE
+from neuronhub.apps.importer.models import ImportTaskCronAuthToken
+from neuronhub.apps.importer.tasks import import_hn_post
+from neuronhub.apps.importer.tasks import import_hn_posts
 from neuronhub.apps.posts.models import Post
-
-
-@strawberry.type
-class PostImportRefreshResult:
-    comments_added: int
+from neuronhub.apps.users.graphql.resolvers import get_user
 
 
 @strawberry.type
 class ImporterMutation:
-    @strawberry.mutation
-    async def post_import_refresh(self, id_external: str, info: Info) -> PostImportRefreshResult:
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def post_import_refresh(self, id_external: int, info: Info) -> bool:
+        user = await get_user(info)
+        assert user.is_superuser
+
         post = await Post.objects.filter(post_source__id_external=id_external).afirst()
         if not post:
-            return PostImportRefreshResult(comments_added=0)
+            return False
 
-        comments_before = await Post.objects.filter(parent=post, type=Post.Type.Comment).acount()
+        await import_hn_post.aenqueue(id_external=id_external)
+        return True
 
-        importer = ImporterHackerNews(is_logging_enabled=False, is_use_cache=False)
-        await importer.import_post(id_ext=int(id_external))
+    @strawberry.mutation
+    async def posts_import(
+        self,
+        auth_token: str,
+        category: str,
+        limit: int = 60,
+        is_use_cache: bool = False,
+    ) -> bool:
+        assert await ImportTaskCronAuthToken.objects.aget(token=auth_token)
 
-        comments_after = await Post.objects.filter(parent=post, type=Post.Type.Comment).acount()
+        await import_hn_posts.aenqueue(category=category, limit=limit, is_use_cache=is_use_cache)
+        return True
 
-        return PostImportRefreshResult(comments_added=comments_after - comments_before)
+
+graphql_whitelist_BE.register(
+    GraphqlQuery(
+        op_name="posts_import",
+        query="""
+            mutation posts_import(
+                $auth_token: String!
+                $category: String!
+                $limit: Int!
+            ) {
+                posts_import(
+                    auth_token: $auth_token
+                    category: $category
+                    limit: $limit
+                )
+            }
+        """,
+    )
+)

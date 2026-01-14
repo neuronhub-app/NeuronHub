@@ -24,7 +24,7 @@ Examples:
 - `docs(git-commits): add scopes`
 - `build(monitor): add Sentry`
 
-### Type
+### Types
 
 - `fix`
 - `feat`
@@ -45,13 +45,13 @@ If you're unsure which `Type` to use - use the highest, as they're sorted by imp
 - `comment` - re create, edit, vote, etc
 - `upgrade[<uv|Bun>]` - pyproject.toml, package.json, lock files, or related changes
 - `API` - API layers: Apollo GraphQL, Strawberry resolvers, etc
-- `auth` - `apps.users`, permissions, etc
+- `auth` - `apps.users`, models, permissions, etc
+- `sec` - security, unrelated to `apps.users`
 - `Algol` - Algolia's integration
 - `monitor` - eg Sentry
 - `types` - TypeScript or Python typings
 - `admin` - Django Admin, ie no impact on the user-facing logic
 - `perf` - performance of SQL, UI, etc
-- `sec` - security
 
 `Scope`s only for Type `build` (as they shouldn't affect runtime):
 - `build(CI)` - GitHub CI

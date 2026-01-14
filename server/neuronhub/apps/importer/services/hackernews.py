@@ -9,6 +9,7 @@ from typing import TypedDict
 from typing import cast
 from zoneinfo import ZoneInfo
 
+import strawberry
 from django.conf import settings
 from markdownify import markdownify
 
@@ -78,6 +79,7 @@ class firebase:
         time: int
 
 
+@strawberry.enum
 class CategoryHackerNews(Enum):
     Best = "best"
     Top = "top"
@@ -89,7 +91,7 @@ class CategoryHackerNews(Enum):
 @dataclass
 class ImporterHackerNews:
     """
-    Order:
+    Workflow:
     1. gets `post_ids` from Firebase API
     2. gets JSON from Algolia API by `post_ids`
     3. saves to db with [[ImporterHackerNews#_update_or_create_post]]

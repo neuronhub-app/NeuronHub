@@ -1,16 +1,45 @@
 import json
 import logging
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
 from django.conf import settings
-from graphql import DocumentNode, FieldNode, OperationDefinitionNode, parse, visit, print_ast
-from graphql import Visitor, REMOVE, FragmentDefinitionNode
+from graphql import REMOVE
+from graphql import DocumentNode
+from graphql import FieldNode
+from graphql import FragmentDefinitionNode
+from graphql import OperationDefinitionNode
+from graphql import Visitor
+from graphql import parse
+from graphql import print_ast
+from graphql import visit
 from strawberry.extensions import SchemaExtension
 
 from neuronhub.settings import DjangoEnv
 
+
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class GraphqlQuery:
+    op_name: str
+    query: str
+
+
+class BackendGraphqlWhitelist:
+    """
+    Eg mutations for cron triggering.
+    """
+
+    queries: dict[str, str] = {}
+
+    def register(self, query: GraphqlQuery):
+        self.queries[query.op_name] = query.query
+
+
+graphql_whitelist_BE = BackendGraphqlWhitelist()
 
 
 class PersistedQueryExtension(SchemaExtension):
@@ -27,13 +56,13 @@ def _is_query_allowed(query: str) -> bool:
     op_name = _get_operation_name(query_doc)
     assert op_name, _error_msg(query, "no OP name")
 
-    queries_persisted = _load_client_persisted_queries_json()
-    assert op_name in queries_persisted, _error_msg(query)
+    graphql_whitelist_FE = _load_client_persisted_queries_json()
+    graphql_whitelist = {**graphql_whitelist_FE, **graphql_whitelist_BE.queries}
+    assert op_name in graphql_whitelist, f"wrong OP name, {_error_msg(query)}"
 
     query_normalized = _normalize_query(query)
-    query_persisted_normalized = _normalize_query(queries_persisted[op_name])
-
-    assert print_ast(query_normalized) == print_ast(query_persisted_normalized), _error_msg(
+    query_whitelisted_normalized = _normalize_query(graphql_whitelist[op_name])
+    assert print_ast(query_normalized) == print_ast(query_whitelisted_normalized), _error_msg(
         query
     )
     return True
@@ -53,7 +82,7 @@ _persisted_file_cache_timestamp: datetime | None = None
 
 
 def _error_msg(query_name: str, error: str = "") -> str:
-    msg_base = f"query '{query_name}' not in {_persisted_file_name}"
+    msg_base = f"query not in {_persisted_file_name} or `graphql_whitelist_BE`: `{query_name}`"
     if error:
         return f"{msg_base}: error '{error}'"
     return msg_base
@@ -82,7 +111,8 @@ def _load_client_persisted_queries_json() -> dict[str, str]:
 
 def _normalize_query(query_string: str) -> DocumentNode:
     """
-    #AI, though reviewed, i didn't do a deep dive in "graphql" fragments. But it's hard to fuck up str check.
+    #AI, though reviewed, i didn't do a deep dive in "graphql" fragments. Though it's hard to fuck up a string check.
+    # todo !! fix(sec): audit & pentest
     """
     doc = parse(query_string)
 
