@@ -5,7 +5,7 @@
     rclone = "latest"
     killport = "latest"
 
-    claude = "2.1.4" # freeze for cctweak
+    claude = "latest"
         node = "24"
 
 [settings]

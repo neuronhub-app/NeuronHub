@@ -10,38 +10,38 @@ requires-python = "~=3.14.0"
 dependencies = [
     # django
     "django == 5.2.*",
-        "pillow == 12.*", # [i=high, rep=high, GH=high, @hugovk, 13.1k] for ImageField. @hugovk is an ex-Python release manager; used by Django
-    "django-tasks == 0.10.0", # @RealOrangeOne, Django Security member
+        "pillow == 12.*", # [i=high, rep=high, GH=high, @hugovk, 13.1k] for ImageField, by CPython core dev; used by Django
+    "django-tasks == 0.10.*", # @RealOrangeOne, Django Security Team
     "django-allauth == 65.*",
-    "django-anymail == 13.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, KLOC +84/-40
-    "django-cors-headers == 4.*", # [i=high, rep=highest, @adamchainz] Django Sec Team
-    "django-rich == 2.*", # [i=norm, rep=highest, @adamchainz] Django Sec Team
+    "django-anymail == 13.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, weird KLOC: +84/-40
+    "django-cors-headers == 4.*", # [i=high, rep=highest, @adamchainz] Django Security Team
+    "django-rich == 2.*", # [i=norm, rep=highest, @adamchainz] Django Security Team
     "django-extensions == 4.*",
         "ipython == 9.*",
     "strawberry-graphql ~= 0.288.2",
         "strawberry-graphql-django ~= 0.73.0",
+        "django-choices-field == 3.*", # [i=norm, rep=high, GH=high, @bellini666] Strawberry maintainer
     "django-stubs[compatible-mypy] == 5.*",
-    "django-health-check == 3.*", # [i=low, rep=norm, GH=norm, @revsys, 1.3k] US dev agency
+    "django-health-check == 3.*", # [i=low, rep=norm, GH=norm, @revsys, 1.3k] a US dev agency
     "django-simple-history == 3.*", # [i=high, rep=norm, GH=norm, @django-commons, 2.4k]
     "django-countries == 7.*", # [i=low, rep=norm, GH=norm, @SmileyChris]
     "django-fieldsignals == 0.*", # [i=low, rep=norm, GH=norm, @craigds]
     "dj-database-url == 3.*", # [i=low, rep=norm, GH=norm, @mattseymour]
     "algoliasearch-django >= 4.0.0",
-    "algoliasearch >= 4.0.0",
-        "pydantic < 2.12.4", # 2.12.4-5 are broken for Python 3.14
+        "algoliasearch >= 4.0.0",
+        "pydantic < 2.12.4", # 2.12.4-5 are broken for Python 3.14. Prob was Strawberry bug fixed lately.
     "django-timezone-field == 7.*", # [i=low, rep=high, GH=high, @mfogel] rich presence on SO (#103909), AirBnB, Yelp, etc
-    "django-choices-field == 3.*", # [i=norm, rep=high, @bellini666] Strawberry maintainer
-    "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] i personally worked with the author
-    "django-select2 == 8.*", # [i=low, rep=high, GH=high, @codingjoe, 0.8k] public CV
-    "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe, 1.6k] public CV
+    "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] I know @jrief
+    "django-select2 == 8.*", # [i=low, rep=high, GH=high, @codingjoe, 0.8k] has a public CV
+    "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe, 1.6k] has a public CV
     "django-debug-toolbar == 6.*", # [i=low, rep=high, GH=high, @matthiask] 406.ch
 
     # rep=low/norm - be careful
-    "django-storages[boto3] == 1.14.6", # [i=norm, rep=low, GH=high, @jschneier, 2.8k] for S3, author dropped it in 2011, maintainer is a no-name - single project
-    "django-solo == 2.*", # [i=low, rep=low, GH=norm, @lazybird, 1k] used it for 8y. Originally by @johnthagen (who did min-sized-rust 10k stars), but handed over to @lazybird (member of a Canadian company, low activity)
+    "django-storages[boto3] == 1.14.6", # [i=norm, rep=low, GH=high, @jschneier, 2.8k] author dropped it in 2011, maintainer is a no-name with only this repo
+    "django-solo == 2.*", # [i=low, rep=low, GH=norm, @lazybird, 1k] used it for 8y. Originally by @johnthagen who did min-sized-rust 10k stars, but given to @lazybird (member of a Canadian company, low activity)
     "django-object-actions == 5.*", # [i=none, rep=norm, GH=low, @crccheck, 0.7k] crccheck.com/blog since 2008, 100 posts
-    "django-guardian == 3.2.*", # [i=high, rep=norm, GH=high, @thclark, 3.8k] upgrade carefully; integrated by Strawberry; changed owners few times, atm @thclark UK founder
-    "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no urls, member of LiberTEM (wat?) - keep frozen
+    "django-guardian == 3.2.*", # [i=high, rep=norm, GH=high, @thclark, 3.8k] upgrade carefully; integrated by Strawberry; changed owners few times, atm @thclark, a founder from UK
+    "django-codemirror2 == 0.2", # [i=low, rep=low, GH=norm, @sk1p, 0.03k] no info, team, or urls #freeze
 
     # server
     "daphne == 4.*",
@@ -49,14 +49,14 @@ dependencies = [
 
     # utils
     "psycopg[binary] == 3.*",
+    "sentry-sdk[django] == 2.*",
+    "requests == 2.*",
     "rich == 14.*", # [i=norm, rep=high, GH=high, @willmcgugan, 55k]
     "python-dateutil == 2.*", # [i=norm rep=high, GH=high, @pganssle, 2.5k] ganssle.io, lots of publications and articles
-    "sentry-sdk[django] == 2.*",
-    "humanize == 4.*", # [i=low, rep=norm, GH=norm, @jmoiron]
-    "markdownify == 1.*", # [i=norm, rep=norm, GH=norm, @matthewwithanm, 1.7k] another project 2.3k stars. Other MD packages suck.
-    "python-dotenv == 1.*", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few posts on saurabh-kumar.com/blog/
-    "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - his `marshmallow` used by Microsoft, AWS, etc
-    "requests == 2.*",
+    "humanize == 4.*", # [i=low, rep=high, GH=high, @hugovk, 0.7k] CPython core dev
+    "markdownify == 1.*", # [i=norm, rep=norm, GH=norm, @matthewwithanm, 1.7k] has a 2.3k stars project. Other MD packages I tried suck.
+    "python-dotenv == 1.2.1", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few posts on saurabh-kumar.com/blog/ #freeze
+    "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - his `marshmallow` pypi used by Microsoft, AWS, etc
 
     "beautifulsoup4[lxml] == 4.*",
 ]
@@ -71,7 +71,7 @@ dependencies = [
         "wat == 0.7.*",
         "pytest == 8.*",
         "pytest-django == 4.*",
-        "pytest-pspec ~= 0.0.4", # ~dead, mostly useless
+        "pytest-pspec == 0.0.4", # ~dead, mostly useless, #freeze
         "pytest-rich == 0.*",
         "types-requests == 2.*",
     ]
