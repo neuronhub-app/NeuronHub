@@ -31,15 +31,20 @@ class PostSource(TimeStampedModel):
     domain = TextChoicesField(ImportDomain, blank=True, null=True, default=None)
 
     id_external = models.CharField(blank=True)
-    rank = models.PositiveIntegerField(  # todo refac-name: hn_rank_derived
+    # todo ? refac-name: hn_rank_derived
+    rank = models.PositiveIntegerField(
         null=True,
         blank=True,
         help_text="As HackerNews hides the Comment scores, we derive it from the Firebase API response order and save in .rank",
     )
     url = models.CharField(max_length=255, blank=True)
+
+    # todo ? refac-name: source_url or similar
     url_of_source = models.CharField(
         max_length=255, blank=True, help_text="Eg a blog url imported from HN"
     )
+    source_html_meta = models.TextField(blank=True)
+
     score = models.PositiveIntegerField(
         null=True, blank=True, help_text="To be integrated with our reputation system"
     )

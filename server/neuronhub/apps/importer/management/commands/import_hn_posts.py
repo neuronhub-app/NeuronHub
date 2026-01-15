@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class Options(TypedDict):
-    category: Literal[CategoryHackerNews.Top, CategoryHackerNews.Best]
+    category: Literal["top", "best"]
     limit: int
     is_use_cache: bool
 
@@ -30,7 +30,11 @@ class Command(BaseCommand):
         try:
             logger.info("Import HN: starting")
 
-            import_hn_posts.call(**options)  # type: ignore[unused-coroutine] #bad-infer
+            import_hn_posts.call(  # type: ignore[unused-coroutine] #bad-infer
+                category=options["category"],
+                limit=options["limit"],
+                is_use_cache=options["is_use_cache"],
+            )
 
             logger.info("Import HN: completed")
         except KeyboardInterrupt:

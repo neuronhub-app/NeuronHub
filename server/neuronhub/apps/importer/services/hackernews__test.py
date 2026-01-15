@@ -18,7 +18,6 @@ class HackerNewsImportTest(NeuronTestCase):
 
         author_name = "pabs3"
         assert post.type == Post.Type.Post
-        assert post.source_author == author_name
 
         source = await PostSource.objects.aget(post=post)
         assert source.domain == ImportDomain.HackerNews
