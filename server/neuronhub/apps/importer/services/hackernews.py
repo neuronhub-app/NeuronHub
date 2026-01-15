@@ -1,8 +1,11 @@
 import asyncio
 import logging
+from asyncio import sleep
+from collections.abc import Awaitable
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from itertools import batched
 from typing import Any
 from typing import NotRequired
 from typing import TypedDict
@@ -95,13 +98,17 @@ class ImporterHackerNews:
     1. gets `post_ids` from Firebase API
     2. gets JSON from Algolia API by `post_ids`
     3. saves to db with [[ImporterHackerNews#_update_or_create_post]]
-    4. ranks Comments with [[ImporterHackerNews#_derive_comment_ranks_from_API_order_recursively]]
+    4. ranks Comments with [[ImporterHackerNews#_derive_comment_ranks_recursively_from_firebase]]
        by querying Firebase API recursively for each thread level
     """
 
     is_derive_comment_ranks_recursively_from_API: bool = True
     is_use_cache: bool = False
     is_logging_enabled: bool = True
+
+    api_batch_size_algolia: int = 20
+    api_batch_size_firebase: int = 5  # more sensitive
+    api_batch_timeout_sec: int = 1
 
     class _api:
         algolia = "https://hn.algolia.com/api/v1"
@@ -119,7 +126,7 @@ class ImporterHackerNews:
         self,
         category: CategoryHackerNews = CategoryHackerNews.Top,
         limit: int | None = None,
-    ) -> list[Post | BaseException]:
+    ) -> list[Post]:
         post_ids: list[ID] = await self._request(
             f"{self._api.firebase}/{category.value}stories.json"
         )
@@ -130,11 +137,12 @@ class ImporterHackerNews:
             f"{len(post_ids)} from {category.value}, cache={self.is_use_cache}, comment_ranks={self.is_derive_comment_ranks_recursively_from_API}"
         )
 
-        post_jsons = await asyncio.gather(
-            *[self._request(f"{self._api.algolia}/items/{post_id}") for post_id in post_ids]
+        post_jsons = await self._asyncio_gather_batched(
+            [self._request(f"{self._api.algolia}/items/{post_id}") for post_id in post_ids],
+            batch_size=self.api_batch_size_algolia,
         )
-        posts_imported = await asyncio.gather(
-            *[
+        posts_imported = await self._asyncio_gather_batched(
+            [
                 self._update_or_create_post(
                     data=post_json,
                     is_post=True,
@@ -143,11 +151,26 @@ class ImporterHackerNews:
                 )
                 for position, post_json in enumerate(post_jsons)
             ],
-            return_exceptions=True,
+            batch_size=self.api_batch_size_firebase,
         )
         self._log_import("Completed")
 
         return posts_imported
+
+    async def _asyncio_gather_batched[T](
+        self,
+        awaitables: list[Awaitable[T]],
+        batch_size: int | None = None,
+        batch_timeout_sec: int | None = None,
+    ) -> list[T]:
+        """
+        Officially API limit is 10k/h, but HN throttles at 20+/sec.
+        """
+        results: list[T] = []
+        for batch in batched(awaitables, batch_size or self.api_batch_size_firebase):
+            results.extend(await asyncio.gather(*batch))
+            await sleep(batch_timeout_sec or self.api_batch_timeout_sec)
+        return results
 
     async def import_post(self, id_ext: ID) -> Post:
         post_json = await self._request(f"{self._api.algolia}/items/{id_ext}")
@@ -171,7 +194,7 @@ class ImporterHackerNews:
             post_type=Post.Type.Post if is_post else Post.Type.Comment,
         )
 
-        user_source = await self._get_or_create_user_source(username=data["author"])
+        user_source = await self._get_or_create_user_source_from_algolia(username=data["author"])
         author_name = user_source.username
 
         created_at_external = datetime.fromisoformat(
@@ -237,12 +260,12 @@ class ImporterHackerNews:
                 is_can_collect_comments_from_post_root
                 and self.is_derive_comment_ranks_recursively_from_API
             ):
-                comment_ranks = await self._derive_comment_ranks_from_API_order_recursively(data)
+                comment_ranks = await self._derive_comment_ranks_recursively_from_firebase(data)
             else:
                 comment_ranks = comment_ranks or {}
 
-            await asyncio.gather(
-                *[
+            await self._asyncio_gather_batched(
+                [
                     self._update_or_create_post(
                         data=comment,
                         is_post=False,
@@ -252,7 +275,8 @@ class ImporterHackerNews:
                         rank=comment_ranks.get(comment["id"]),
                     )
                     for comment in comments
-                ]
+                ],
+                batch_size=self.api_batch_size_firebase,
             )
 
         return post
@@ -304,16 +328,20 @@ class ImporterHackerNews:
                 count_total += self._count_total_comments_recursively(children)
         return count_total
 
-    async def _derive_comment_ranks_from_API_order_recursively(
+    async def _derive_comment_ranks_recursively_from_firebase(
         self, parent: algolia.Comment | algolia.Post
     ) -> dict[ID, Rank]:
+        """
+        Here we should check if any of the algolia.Comment have children, as Algolia returns a full tree.
+        If not, no point in doing a sensitive HTTP Firebase query.
+        """
         if not parent["children"]:
             return {}
         item_json: firebase.Post | firebase.Comment = await self._request(
             f"{self._api.firebase}/item/{parent['id']}.json"
         )
         self._comment_threads_ranked += 1
-        self._log_import(f"ranked thread #{self._comment_threads_ranked}")
+        self._log_import(f"ranked thread #{self._comment_threads_ranked} of {parent['id']}")
 
         comment_ids = item_json.get("kids", [])
         if not comment_ids:
@@ -327,8 +355,9 @@ class ImporterHackerNews:
         for comment_id_position, comment_id in enumerate(comment_ids):
             comment_ranks[comment_id] = len(comment_ids) - comment_id_position
 
-        children_ranks = await asyncio.gather(
-            *[self._query_nested_comment_ranks(comment_id) for comment_id in comment_ids]
+        children_ranks = await self._asyncio_gather_batched(
+            [self._query_nested_comment_ranks(comment_id) for comment_id in comment_ids],
+            batch_size=self.api_batch_size_firebase,
         )
         for child_ranks in children_ranks:
             comment_ranks.update(child_ranks)
@@ -345,7 +374,7 @@ class ImporterHackerNews:
 
         return await self._derive_ranks_by_ids_recursively(nested_comment_ids)
 
-    async def _get_or_create_user_source(self, username: str) -> UserSource:
+    async def _get_or_create_user_source_from_algolia(self, username: str) -> UserSource:
         user, is_created = await UserSource.objects.aget_or_create(
             id_external=username,
             defaults={"username": username, "json": dict()},
