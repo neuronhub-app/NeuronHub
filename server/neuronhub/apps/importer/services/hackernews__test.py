@@ -9,9 +9,8 @@ from neuronhub.apps.tests.services.db_stubs_repopulate import post_HN_id
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
+# uses FS caching, ie hits API only on the first run
 class HackerNewsImportTest(NeuronTestCase):
-    _story_id = post_HN_id
-
     @pytest.mark.slow
     async def test_import_story(self):
         post = await self._import_test_post()
@@ -21,7 +20,7 @@ class HackerNewsImportTest(NeuronTestCase):
 
         source = await PostSource.objects.aget(post=post)
         assert source.domain == ImportDomain.HackerNews
-        assert source.id_external == f"{self._story_id}"
+        assert source.id_external == f"{post_HN_id}"
         assert source.score >= 259
         assert source.created_at_external == post.created_at
         user_source = await UserSource.objects.aget(username=author_name)
@@ -31,7 +30,7 @@ class HackerNewsImportTest(NeuronTestCase):
     async def test_import_story_with_comment_ranks(self):
         await self._import_test_post()
 
-        comment_sources_all: list[dict[str, int]] = []  # type: ignore # weird mypy, prob will work later
+        comment_sources_all: list[dict[str, int]] = []  # type: ignore #bad-infer
         async for source in (
             PostSource.objects.filter(post__type=Post.Type.Comment)
             .select_related("post")
@@ -57,4 +56,4 @@ class HackerNewsImportTest(NeuronTestCase):
 
     async def _import_test_post(self):
         importer = ImporterHackerNews(is_use_cache=True, is_logging_enabled=False)
-        return await importer.import_post(self._story_id)
+        return await importer.import_post(post_HN_id)
