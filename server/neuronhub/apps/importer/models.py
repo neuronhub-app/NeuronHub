@@ -72,9 +72,23 @@ class ApiSource(models.TextChoices):
 
 class ApiHourlyLimit(TimeStampedModel):
     source = TextChoicesField(ApiSource)
-    count_current = models.PositiveIntegerField(default=0)
+
     count_max_per_hour = models.PositiveIntegerField(default=10_000)
-    query_at_first = models.DateTimeField(auto_now_add=True)
+    count_current = models.PositiveIntegerField(default=0)
+
+    query_date = models.DateField()
+    query_hour = models.PositiveSmallIntegerField()
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source", "query_date", "query_hour"],
+                name="api_limit_unique_per_hour",
+            )
+        ]
+
+    def is_limit_exceeded(self) -> bool:
+        return self.count_current >= self.count_max_per_hour
 
 
 class ImportTaskCronAuthToken(TimeStampedModel):
