@@ -266,7 +266,7 @@ AUTHENTICATION_BACKENDS = [
     # "guardian.backends.ObjectPermissionBackend", todo mb: they lacks async support - see django-guardian#808 (planned for v3.3)
 ]
 
-# todo ! [auth] enable 2FA
+# todo ! feat(auth) enable 2FA
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["username*", "password1*", "email"]  #: asterisk means required
 ACCOUNT_EMAIL_VERIFICATION = "optional"

@@ -1,29 +1,27 @@
 ---
 description: How to interpret our TODO comments syntax.
-reviewed_at: 2025.09.03
+reviewed_at: 2026.01.14
 ---
 
-## How to write TODO comments
+The classic `todo <task>` leads to over-saturation and perceptual blindness.
 
-The plaintext format `todo <explanation>` leads to over-saturation and eventual ignore by everybody.
-
-Specify as `todo <prio>(<scope>)<:?> <explanation>`
+Our format: `todo <prio> <type><(scope)?>: <task?> <tags?>`
 
 Examples
-- `todo refac(auth): access to other users`
-- `todo ! drop #AI-slop`
+- `todo !!! fix(sec): access to other users`
+- `todo ? refac: #AI-slop`
 
 `<prio>` values:
-- `!!` - a must for commits on `master`
-- `!` - a must, once the edge case becomes feasible in prod
-- `feat` - feature
-- `fix`
-- `refac` - significant, not urgent
-- `refac-name` - renaming, specifically postponed as Git sucks at renaming history, ie to batch the history fuck-up to a chosen moment. 
-- `perf` - performance, low to avoid premature optimizations
-- `prob` - a nice-to-have, ie "maybe", ie might never be needed
+- `!!!` - a must for prod or `master`
+- `!!` - a must once it becomes relevant in prod
+- `!` - needed, but not now
+- `?` - a nice-to-have, might never be needed
 
-`<scope>` values see in the [git commit Scopes](/docs/git-commits.md#Scopes), eg:
+`<type>` see the [Git commit Types](/docs/git-commits.md#types)
+
+`<scope>` see the [Git commit Scopes](/docs/git-commits.md#scopes). For `todo` we have few extras:
+- `refac-name` - renaming, postponed as Git log lacks file diff, ie to do separate commits.
 - `UX` - an annoyance, real or potential
-- `UI` - visual improvements
 - `review`
+
+`<tags>` see the [code-style.md Tags](/docs/code-style.md#tags).
