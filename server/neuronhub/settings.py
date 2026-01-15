@@ -1,5 +1,4 @@
 import asyncio
-import os
 import warnings
 from enum import Enum
 from pathlib import Path
@@ -11,7 +10,6 @@ import django_stubs_ext
 import rich.traceback
 import sentry_sdk
 from corsheaders.defaults import default_headers
-from dotenv import load_dotenv
 from environs import Env
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import strawberry_django_settings
@@ -44,9 +42,6 @@ class DjangoEnv(Enum):
 DJANGO_ENV = DjangoEnv(env.str("DJANGO_ENV", DjangoEnv.DEV.value))  # todo ! default to PROD
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-if DJANGO_ENV.is_dev():
-    load_dotenv(os.path.join(BASE_DIR, ".env.local"), override=True)
 
 INSTALLED_APPS = [
     "daphne",
@@ -209,14 +204,10 @@ CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 ALLOWED_HOSTS = env.list(
     "ALLOWED_HOSTS",
-    default=[
-        ".localhost",
-        SERVER_URL.replace("http://", "").replace("https://", ""),
-    ],
+    default=[SERVER_URL.replace("https://", "").replace("http://", "")],
 )
-RENDER_EXTERNAL_HOSTNAME = env.str("RENDER_EXTERNAL_HOSTNAME", "")
-if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+if DJANGO_ENV.is_dev():
+    ALLOWED_HOSTS.append(".localhost")
 
 
 # Storage
