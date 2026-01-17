@@ -12,6 +12,7 @@
     dir = "server"
     run = """
         job spawn { mise dev:s3 }
+        mise django:migrate
         uv run manage.py runserver {{ env.SERVER_PORT_E2E }}
     """
     env.SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
