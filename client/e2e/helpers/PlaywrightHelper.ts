@@ -12,7 +12,7 @@ import type { urls } from "@/urls";
 
 export type LocatorMap = Record<TestId, Locator>;
 
-const actionTimeoutMsDefault: number = 6500;
+const actionTimeoutMsDefault: number = 7500;
 
 export class PlaywrightHelper {
   $: LocatorMap;

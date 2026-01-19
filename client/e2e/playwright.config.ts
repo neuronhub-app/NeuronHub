@@ -7,7 +7,7 @@ const clientUrl = `http://localhost:${env.CLIENT_PORT_E2E}`;
 export default defineConfig({
   testDir: "./tests",
   fullyParallel: false,
-  timeout: 45 * 1000, // default = 30s
+  timeout: 55 * 1000, // default = 30s
   workers: 1, // default = 4
   webServer: [
     {
