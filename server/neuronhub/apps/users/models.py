@@ -31,7 +31,7 @@ class User(AbstractUser):
         null=True,
         blank=True,
     )
-    email = models.EmailField(unique=True, blank=True)  # overriding super().email(unique=False)
+    email = models.EmailField(unique=True, blank=True, null=True)  # type: ignore[assignment] #bad-infer # overriding super().email(unique=False)
 
     avatar = models.FileField(
         upload_to="avatars/",

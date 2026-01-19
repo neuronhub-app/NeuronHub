@@ -55,7 +55,7 @@ export function PostCardSmall(props: {
                   align="center"
                   gap="gap.md"
                   _hover={{ color: "fg.primary-muted" }}
-                  transition="colors"
+                  transitionProperty="colors"
                   transitionDuration="fast"
                 >
                   <PostHeading post={post} fontWeight="normal" />

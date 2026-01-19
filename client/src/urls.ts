@@ -11,6 +11,7 @@ export const urls = {
   absolute: (path: string) => `${env.VITE_CLIENT_URL}${path}` as const,
   home: "/",
   login: "/login",
+  signup: "/signup",
   library: "/library",
   readingList: "/reading-list",
   reviews: {

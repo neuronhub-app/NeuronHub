@@ -5,6 +5,7 @@ export const routes = [
   layout("./sites/neuronhub/NeuronLayout.tsx", [
     route("/", "./apps/home/index.tsx"),
     route("/login", "./apps/auth/login/index.tsx"),
+    route("/signup", "./apps/auth/signup/index.tsx"),
     route("/library", "./apps/library/index.tsx"),
     ...prefix("/reviews", [
       route("/", "./apps/reviews/list/index.tsx"),

@@ -3,6 +3,7 @@ from typing import cast
 import strawberry
 from asgiref.sync import sync_to_async
 from django.contrib.auth import aauthenticate, alogin
+from django.contrib.auth.password_validation import validate_password
 from strawberry_django import auth
 from strawberry_django.permissions import IsAuthenticated
 
@@ -21,6 +22,19 @@ class LoginInput:
 
 @strawberry.type
 class LoginResponse:
+    success: bool
+    user: UserType | None = None
+    error: str | None = None
+
+
+@strawberry.input
+class SignupInput:
+    username: str
+    password: str
+
+
+@strawberry.type
+class SignupResponse:
     success: bool
     user: UserType | None = None
     error: str | None = None
@@ -46,6 +60,15 @@ class UserMutation:
             return LoginResponse(success=True, user=cast(UserType, user))
 
         return LoginResponse(success=False, error="Invalid credentials")
+
+    @strawberry.mutation()
+    async def signup(self, data: SignupInput, info: strawberry.Info) -> SignupResponse:
+        await sync_to_async(validate_password)(data.password)
+
+        user = await User.objects.acreate_user(username=data.username, password=data.password)
+
+        await alogin(info.context.request, user)
+        return SignupResponse(success=True, user=cast(UserType, user))
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def update_user(

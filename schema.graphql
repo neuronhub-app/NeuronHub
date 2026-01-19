@@ -288,6 +288,7 @@ input ManyToOneInput {
 type Mutation {
   logout: Boolean!
   login(data: LoginInput!): LoginResponse!
+  signup(data: SignupInput!): SignupResponse!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
   gen_anon_name_from_email(email: String!): String!
   update_user_list(id: ID!, list_field_name: UserListName!, is_added: Boolean!): Boolean! @IsAuthenticated
@@ -993,6 +994,17 @@ type Query {
   site: SiteConfigType!
 }
 
+input SignupInput {
+  username: String!
+  password: String!
+}
+
+type SignupResponse {
+  success: Boolean!
+  user: UserType
+  error: String
+}
+
 type SiteConfigType {
   name: String!
   domain: String!
@@ -1169,7 +1181,7 @@ type UserType {
   is_staff: Boolean!
   first_name: String!
   last_name: String!
-  email: String!
+  email: String
   connection_groups: [UserConnectionGroupType!]!
   post_votes: [PostVoteType!]!
   post_tag_votes: [PostTagVoteType!]!

@@ -10,7 +10,6 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { z } from "zod";
@@ -18,34 +17,33 @@ import { z } from "zod";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
-import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
 
-export function LoginForm() {
+const signupSchema = z.object({
+  username: z
+    .string()
+    .min(3, "Username must be at least 3 characters")
+    .max(150, "Username must be less than 150 characters")
+    .regex(/^[\w.@+-]+$/, "Username can only contain letters, digits, @/./+/-/_"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+export function SignupForm() {
   const navigate = useNavigate();
 
   const state = useStateValtio({
     error: null as string | null,
   });
 
-  const form = useForm({
-    resolver: zodResolver(
-      z.object({
-        username_or_email: z.string().min(1, "Username or email is required"),
-        password: z.string().min(1, "Password is required"),
-      }),
-    ),
+  const form = useForm<z.infer<typeof signupSchema>>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
-      username_or_email: "",
+      username: "",
       password: "",
     },
   });
-
-  useEffect(() => {
-    form.setFocus("username_or_email");
-  }, [form.setFocus]);
 
   return (
     <Center minH="full">
@@ -53,20 +51,23 @@ export function LoginForm() {
         <Card.Root p="gap.xl">
           <Stack gap="gap.lg">
             <Heading size="2xl" textAlign="center">
-              Login to NeuronHub
+              Sign up for NeuronHub
             </Heading>
 
             <form
               onSubmit={form.handleSubmit(async data => {
+                state.mutable.error = null;
+
                 const result = await mutateAndRefetch(
-                  LoginMutation,
+                  SignupMutation,
                   { data },
                   { isResetAndRefetchAll: true },
                 );
-                if (result.data?.login?.success) {
+
+                if (result.data?.signup?.success) {
                   navigate(urls.home);
                 } else {
-                  state.mutable.error = result.data?.login.error ?? "Login failed";
+                  state.mutable.error = "Failed to sign up";
                 }
               })}
             >
@@ -75,11 +76,10 @@ export function LoginForm() {
                   <Fieldset.Content>
                     <FormChakraInput
                       control={form.control}
-                      name="username_or_email"
-                      label="Username or Email"
+                      name="username"
+                      label="Username"
                       inputProps={{
                         autoComplete: "username",
-                        ...ids.set(ids.auth.login.username),
                         autoFocus: true,
                       }}
                     />
@@ -90,29 +90,22 @@ export function LoginForm() {
                       label="Password"
                       inputProps={{
                         type: "password",
-                        autoComplete: "current-password",
-                        ...ids.set(ids.auth.login.password),
+                        autoComplete: "new-password",
                       }}
                     />
 
                     {state.snap.error && (
-                      <Fieldset.ErrorText {...ids.set(ids.auth.login.error)}>
-                        {state.snap.error}
-                      </Fieldset.ErrorText>
+                      <Fieldset.ErrorText>{state.snap.error}</Fieldset.ErrorText>
                     )}
 
-                    <Button
-                      type="submit"
-                      loading={form.formState.isSubmitting}
-                      {...ids.set(ids.auth.login.submit)}
-                    >
-                      Login
+                    <Button type="submit" loading={form.formState.isSubmitting}>
+                      Sign up
                     </Button>
 
                     <Text textAlign="center" fontSize="sm" color="fg.muted">
-                      Don't have an account?{" "}
-                      <Link href={urls.signup} color="fg.primary">
-                        Sign up
+                      Already have an account?{" "}
+                      <Link href={urls.login} color="fg.primary">
+                        Login
                       </Link>
                     </Text>
                   </Fieldset.Content>
@@ -125,13 +118,13 @@ export function LoginForm() {
     </Center>
   );
 }
-const LoginMutation = graphql.persisted(
-  "Login",
+
+const SignupMutation = graphql.persisted(
+  "Signup",
   graphql(`
-    mutation Login($data: LoginInput!) {
-      login(data: $data) {
+    mutation Signup($data: SignupInput!) {
+      signup(data: $data) {
         success
-        error
       }
     }
   `),
