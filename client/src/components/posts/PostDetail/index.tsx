@@ -28,6 +28,7 @@ import {
   type PostDetailFragmentType,
 } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
+import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
 import { useStateValtio, useStateValtioSet } from "@/utils/useValtioProxyRef";
 import { UserListName } from "~/graphql/enums";
@@ -90,6 +91,9 @@ export function PostDetail(props: {
         query: UserCollapsedCommentsQuery,
         variables: { parent_root_id: props.post!.id },
       });
+      if (res.error) {
+        return toast.error(res.error);
+      }
       collapsedIds.mutable.clear();
       // biome-ignore lint/suspicious/noExtraNonNullAssertion: biome bug #bad-infer
       res.data!.user_current!.posts_collapsed.forEach(post => {
