@@ -70,6 +70,8 @@
       "@vitejs/plugin-react": "^5.1.2",
       "@rollup/plugin-replace": "^6.0.3",
       "vite-tsconfig-paths": "^6.0.3",
-      "vite-plugin-devtools-json": "^1.0.0"
+      "vite-plugin-devtools-json": "^1.0.0",
+      "babel-plugin-react-compiler": "^1.0.0",
+        "vite-plugin-babel": "^1.4.1"
   }
 }
