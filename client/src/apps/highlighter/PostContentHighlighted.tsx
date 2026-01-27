@@ -19,7 +19,7 @@ export const highlight_attrs = {
 
 export type HighlightedModelType = "comment" | "post" | "review";
 
-export function setHighlighterModelData(id: ID, type: HighlightedModelType) {
+function setHighlighterModelData(id: ID, type: HighlightedModelType) {
   return {
     [`data-${highlight_attrs.flag}`]: true,
     [`data-${highlight_attrs.id}`]: id,
@@ -33,6 +33,7 @@ export function PostContentHighlighted(props: {
     content_polite: string;
     content_direct?: string;
     content_rant?: string;
+    content_polite_html_ssr?: string;
   };
   highlights: Record<ID, PostHighlight[]>;
 }) {
@@ -42,7 +43,24 @@ export function PostContentHighlighted(props: {
 
   const loading = useIsLoading();
 
-  function handlePostHighlightClick(event: React.MouseEvent) {
+  let contentHTML: string;
+  if (props.post.content_polite_html_ssr) {
+    contentHTML = highlightPostContentByMarks({
+      content: props.post.content_polite_html_ssr,
+      highlights: props.highlights[props.post.id] ?? [],
+    });
+  } else {
+    contentHTML = markedConfigured.parse(
+      highlightPostContentByMarks({
+        content:
+          props.post.content_rant ?? props.post.content_direct ?? props.post.content_polite,
+        highlights: props.highlights[props.post.id] ?? [],
+      }),
+      { async: false },
+    );
+  }
+
+  function onHighlightClick(event: React.MouseEvent) {
     if (isHTMLElement(event.target)) {
       const isHighlightClicked =
         event.target.dataset.highlightId && event.target?.tagName === "MARK";
@@ -60,8 +78,10 @@ export function PostContentHighlighted(props: {
     state.mutable.highlightActiveId = null;
   }
 
-  async function handleDeleteHighlight() {
-    if (!state.snap.highlightActiveId || loading.isActive) return;
+  async function onHighlightDelete() {
+    if (!state.snap.highlightActiveId || loading.isActive) {
+      return;
+    }
 
     await loading.track(async () => {
       await removeHighlight(state.snap.highlightActiveId!);
@@ -72,26 +92,16 @@ export function PostContentHighlighted(props: {
   return (
     <PostContentHighlightMenu
       activeHighlightId={state.snap.highlightActiveId}
-      onDelete={handleDeleteHighlight}
+      onDelete={onHighlightDelete}
       onClose={() => {
         state.mutable.highlightActiveId = null;
       }}
       loading={loading.isActive}
     >
       <Prose
-        onClick={handlePostHighlightClick}
+        onClick={onHighlightClick}
         // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-        dangerouslySetInnerHTML={{
-          __html: markedConfigured.parse(
-            highlightPostContentByMarks({
-              content:
-                props.post.content_rant ??
-                props.post.content_direct ??
-                props.post.content_polite,
-              highlights: props.highlights[props.post.id] ?? [],
-            }),
-          ),
-        }}
+        dangerouslySetInnerHTML={{ __html: contentHTML }}
         size="sm"
         maxW="3xl"
         {...setHighlighterModelData(props.post.id, "comment")}

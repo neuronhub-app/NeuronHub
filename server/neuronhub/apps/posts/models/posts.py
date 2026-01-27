@@ -142,17 +142,6 @@ class Post(AnonimazableTimeStampedModel):
         help_text="Collapsed in the UI, eg CommentThread",
     )
 
-    history = HistoricalRecords(
-        cascade_delete_history=True,
-        excluded_fields=[
-            "parent_root",
-            "users_read_later",
-            "users_library",
-            "seen_by_users",
-            "collapsed_by_users",
-        ],
-    )
-
     # Sharing fields
     # ----------------------------------------------------------------------
 
@@ -177,10 +166,14 @@ class Post(AnonimazableTimeStampedModel):
 
     slug = AutoSlugField(populate_from="title", allow_duplicates=True)
     title = anonymizable(models.CharField(max_length=255, blank=True))
-    content_polite = anonymizable(MarkdownField(blank=True))
     content_direct = anonymizable(MarkdownField(blank=True))
     content_rant = anonymizable(MarkdownField(blank=True))
     content_private = anonymizable(MarkdownField(blank=True, help_text="Only for author"))
+    # todo ? refac-name: content_default (considering HackerNews imports)
+    content_polite = anonymizable(MarkdownField(blank=True))
+    content_polite_html_ssr = anonymizable(
+        models.TextField(blank=True, help_text="Used by FE to SSR 1000+ comments")
+    )
     source = CharField(max_length=255, blank=True)
     source_author = CharField(max_length=500, blank=True)
     image = models.ImageField(upload_to="posts/images/", blank=True, null=True)
@@ -231,6 +224,18 @@ class Post(AnonimazableTimeStampedModel):
 
     class Perms:
         owner = "post_owner"
+
+    history = HistoricalRecords(
+        cascade_delete_history=True,
+        excluded_fields=[
+            "parent_root",
+            "users_read_later",
+            "users_library",
+            "seen_by_users",
+            "collapsed_by_users",
+            "content_polite_html_ssr",
+        ],
+    )
 
     @model_property(cached=True, prefetch_related="root_children")
     def comment_count(self) -> int:

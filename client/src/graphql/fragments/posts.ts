@@ -12,6 +12,7 @@ export const PostFragment = graphql(
       content_polite
       content_direct
       content_rant
+      content_polite_html_ssr
       source
       source_author
       post_source {

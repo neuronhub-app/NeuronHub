@@ -63,6 +63,7 @@ class PostTypeI:
     content_direct: auto
     content_rant: auto
     content_private: auto
+    content_polite_html_ssr: auto
     image: auto
     comment_count: auto
 

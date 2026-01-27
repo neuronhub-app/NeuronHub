@@ -1011,6 +1011,15 @@ wheels = [
 ]
 
 [[package]]
+name = "markdown"
+version = "3.10.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/b7/b1/af95bcae8549f1f3fd70faacb29075826a0d689a27f232e8cee315efa053/markdown-3.10.1.tar.gz", hash = "sha256:1c19c10bd5c14ac948c53d0d762a04e2fa35a6d58a6b7b1e6bfcbe6fefc0001a", size = 365402, upload-time = "2026-01-21T18:09:28.206Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/59/1b/6ef961f543593969d25b2afe57a3564200280528caa9bd1082eecdd7b3bc/markdown-3.10.1-py3-none-any.whl", hash = "sha256:867d788939fe33e4b736426f5b9f651ad0c0ae0ecf89df0ca5d1176c70812fe3", size = 107684, upload-time = "2026-01-21T18:09:27.203Z" },
+]
+
+[[package]]
 name = "markdown-it-py"
 version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1202,6 +1211,7 @@ dependencies = [
     { name = "environs" },
     { name = "humanize" },
     { name = "ipython" },
+    { name = "markdown" },
     { name = "markdownify" },
     { name = "pillow" },
     { name = "psycopg", extra = ["binary"] },
@@ -1258,17 +1268,18 @@ requires-dist = [
     { name = "django-solo", specifier = "==2.*" },
     { name = "django-storages", extras = ["boto3"], specifier = "==1.14.6" },
     { name = "django-stubs", extras = ["compatible-mypy"], specifier = "==5.*" },
-    { name = "django-tasks", specifier = "==0.10.0" },
+    { name = "django-tasks", specifier = "==0.10.*" },
     { name = "django-timezone-field", specifier = "==7.*" },
     { name = "environs", specifier = "==14.*" },
     { name = "humanize", specifier = "==4.*" },
     { name = "ipython", specifier = "==9.*" },
+    { name = "markdown", specifier = "==3.10.1" },
     { name = "markdownify", specifier = "==1.*" },
     { name = "pillow", specifier = "==12.*" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.*" },
     { name = "pydantic", specifier = "<2.12.4" },
     { name = "python-dateutil", specifier = "==2.*" },
-    { name = "python-dotenv", specifier = "==1.*" },
+    { name = "python-dotenv", specifier = "==1.2.1" },
     { name = "requests", specifier = "==2.*" },
     { name = "rich", specifier = "==14.*" },
     { name = "sentry-sdk", extras = ["django"], specifier = "==2.*" },
@@ -1284,7 +1295,7 @@ dev = [
     { name = "pip", specifier = "==25.*" },
     { name = "pytest", specifier = "==8.*" },
     { name = "pytest-django", specifier = "==4.*" },
-    { name = "pytest-pspec", specifier = "~=0.0.4" },
+    { name = "pytest-pspec", specifier = "==0.0.4" },
     { name = "pytest-rich", specifier = "==0.*" },
     { name = "ruff", specifier = "==0.14.*" },
     { name = "types-requests", specifier = "==2.*" },

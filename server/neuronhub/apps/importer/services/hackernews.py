@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 import strawberry
 from django.conf import settings
+from markdown import markdown
 from markdownify import markdownify
 
 from neuronhub.apps.anonymizer.fields import Visibility
@@ -189,7 +190,6 @@ class ImporterHackerNews:
                     visibility=Visibility.PUBLIC,
                     created_at=created_at_external,
                     title=post_data["title"],
-                    # oddly, it converts into clean MD
                     content_polite=markdownify(post_data.get("text") or ""),
                     source=f"https://news.ycombinator.com/item?id={post_data['id']}",
                 ),
@@ -203,6 +203,10 @@ class ImporterHackerNews:
 
         else:  # data: algolia.Comment
             assert parent
+            # oddly, this HTML converts into a cleaner MD than the source
+            content_md = markdownify(data["text"] or "")
+            content_polite_html_ssr = markdown(content_md)
+
             post, _ = await Post.objects.aupdate_or_create(
                 type=Post.Type.Comment,
                 parent=parent,
@@ -210,7 +214,8 @@ class ImporterHackerNews:
                 defaults=dict(
                     visibility=Visibility.PUBLIC,
                     created_at=created_at_external,
-                    content_polite=markdownify(data["text"] or ""),
+                    content_polite=content_md,
+                    content_polite_html_ssr=content_polite_html_ssr,
                     parent_root=parent_root,
                 ),
             )

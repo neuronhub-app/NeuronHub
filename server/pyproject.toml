@@ -55,6 +55,7 @@ dependencies = [
     "python-dateutil == 2.*", # [i=norm rep=high, GH=high, @pganssle, 2.5k] ganssle.io, lots of publications and articles
     "humanize == 4.*", # [i=low, rep=high, GH=high, @hugovk, 0.7k] CPython core dev
     "markdownify == 1.*", # [i=norm, rep=norm, GH=norm, @matthewwithanm, 1.7k] has a 2.3k stars project. Other MD packages I tried suck.
+    "markdown == 3.10.1", # [i=norm, rep=norm, GH=high, @waylan, 4.1k] member of MkDocs. His site lacks HTTPS, and has dead urls: http://waylan.limberg.name. Contributor since 2015. Public CV. So... tolerable, half-#freeze
     "python-dotenv == 1.2.1", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few posts on saurabh-kumar.com/blog/ #freeze
     "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - his `marshmallow` pypi used by Microsoft, AWS, etc
 
@@ -90,6 +91,9 @@ dependencies = [
     show_error_codes = true
     show_column_numbers = true # helps LLMs
     show_absolute_path = true # enables TUI links in IDEA
+    disable_error_code = [
+        "import-untyped", # errors if the package has required type stub, but it's wrong. (The name sounds unrelated, but docs confirm it)
+    ]
 
     [[tool.mypy.overrides]]
         module = [
