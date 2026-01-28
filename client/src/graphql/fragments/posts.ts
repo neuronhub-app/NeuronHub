@@ -114,6 +114,7 @@ export const CommentFieldsFragment = graphql(
         id
         id_external
         created_at_external
+        rank
   
         user_source {
           id

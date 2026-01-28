@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 import logging
+from typing import cast
 
 import strawberry
 import strawberry_django
-from asgiref.sync import sync_to_async
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import F
 from django.db.models import QuerySet
@@ -104,9 +104,9 @@ class PostTypeI:
         comments_qs = Post.objects.filter(parent_root=self, type=Post.Type.Comment)
         comments_filtered = filter_posts_by_user(user=get_current_user(info), posts=comments_qs)
         comments_ordered = comments_filtered.order_by(
-            F("post_source__rank").desc(nulls_first=None)
+            F("post_source__rank").desc(nulls_first=True)
         )
-        return await sync_to_async(list)(comments_ordered)  # type: ignore # mypy is broken
+        return cast(list[PostCommentType], comments_ordered)
 
 
 @strawberry_django.type(Post, filters=PostFilter, ordering=PostOrder)

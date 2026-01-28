@@ -146,7 +146,32 @@ function buildCommentTree(commentsFlat: PostCommentType[]) {
     }
   }
 
+  sortRecursive(commentTree);
+
+  function sortRecursive(comments: PostCommentTree[]) {
+    comments.sort(sortByRank);
+    for (const comment of comments) {
+      sortRecursive(comment.comments);
+    }
+  }
+
   return commentTree;
+}
+
+// #AI sort descending: higher rank = top; null rank = first. I didn't review it, just tested.
+function sortByRank(a: PostCommentTree, b: PostCommentTree) {
+  const rankA = a.post_source?.rank;
+  const rankB = b.post_source?.rank;
+  if (rankA == null && rankB == null) {
+    return 0;
+  }
+  if (rankA == null) {
+    return -1;
+  }
+  if (rankB == null) {
+    return 1;
+  }
+  return rankB - rankA;
 }
 
 function sliceThreadsByLimit(
