@@ -1,5 +1,5 @@
 import { TZDate, tzName } from "@date-fns/tz";
-import { differenceInDays, format, formatDistanceToNowStrict, isSameYear } from "date-fns";
+import { format, formatDistanceToNowStrict } from "date-fns";
 
 export namespace datetime {
   export function full(dateRaw: Date | string | unknown) {
@@ -29,18 +29,6 @@ export namespace datetime {
       return "";
     }
 
-    let dateStr = `${formatDistanceToNowStrict(date)} ago`;
-
-    const daysAgo = differenceInDays(new Date(), date);
-    const isMoreThan30Days = 30 < daysAgo;
-
-    if (isMoreThan30Days) {
-      if (isSameYear(date, new Date())) {
-        dateStr = format(date, "MMM eo, kk:mm");
-      } else {
-        dateStr = format(date, "yyyy-MM-dd kk:mm");
-      }
-    }
-    return dateStr;
+    return `${formatDistanceToNowStrict(date)} ago`;
   }
 }
