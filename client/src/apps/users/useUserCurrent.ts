@@ -45,6 +45,15 @@ export function useUser() {
   return snap.current;
 }
 
+export function useAuth() {
+  const snap = useSnapshot(user.state);
+
+  return {
+    isLoggedIn: Boolean(snap.current?.id),
+    userId: snap.current?.id,
+  };
+}
+
 export const UserQueryDoc = graphql.persisted(
   "UserCurrent",
   graphql(`

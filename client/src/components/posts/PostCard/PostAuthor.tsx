@@ -1,6 +1,7 @@
 import { Avatar, Flex, Popover, Portal, SkeletonText, Text } from "@chakra-ui/react";
+import { useMemo } from "react";
 import type { PostListItemType } from "@/components/posts/ListContainer";
-import type { PostCommentTree } from "@/components/posts/PostDetail";
+import type { PostCommentTree } from "@/components/posts/PostDetail/useCommentTree";
 import { Prose } from "@/components/ui/prose";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
@@ -9,52 +10,67 @@ import { datetime } from "@/utils/date-fns";
 import { markedConfigured } from "@/utils/marked-configured";
 import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
-import { useIsLoading } from "@/utils/useIsLoading";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
 
 export function PostAuthor(props: {
   post: PostListItemType | PostCommentTree;
-  isHideAvatar?: boolean;
+  isRenderAvatar?: boolean;
 }) {
-  const loading = useIsLoading();
-
   const state = useStateValtio({
     post: null as null | PostAuthorFragmentType,
     isClicked: false,
+    isMouseHoveredAndMustMount: false,
   });
 
   const isImportedAuthor = Boolean(props.post.post_source?.id);
 
-  useInit({
+  const init = useInit({
     isReady: isImportedAuthor && !state.snap.post && state.snap.isClicked,
     onInit: async () => {
-      await loading.track(async () => {
-        const res = await client.query({
-          query: PostAuthorQuery,
-          variables: { id: props.post.id },
-        });
-        if (res.data) {
-          state.mutable.post = res.data.post_generic;
-        } else {
-          toast.error("Author loading failed");
-        }
+      const res = await client.query({
+        query: PostAuthorQuery,
+        variables: { id: props.post.id },
       });
+      if (res.data) {
+        state.mutable.post = res.data.post_generic;
+      } else {
+        toast.error("Author loading failed");
+      }
     },
   });
 
   if (isImportedAuthor) {
+    if (!state.snap.isMouseHoveredAndMustMount) {
+      return (
+        <Flex
+          onMouseEnter={() => {
+            state.mutable.isMouseHoveredAndMustMount = true;
+          }}
+        >
+          <PostAuthorUsername
+            post={props.post}
+            isPopover
+            isRenderAvatar={props.isRenderAvatar}
+          />
+        </Flex>
+      );
+    }
+
     const author = state.snap.post?.post_source?.user_source;
 
     return (
       <Popover.Root
-        lazyMount
         unmountOnExit
         onOpenChange={_ => {
           state.mutable.isClicked = true;
         }}
       >
         <Popover.Trigger>
-          <PostAuthorUsername post={props.post} isPopover isHideAvatar={props.isHideAvatar} />
+          <PostAuthorUsername
+            post={props.post}
+            isPopover
+            isRenderAvatar={props.isRenderAvatar}
+          />
         </Popover.Trigger>
 
         <Portal>
@@ -62,7 +78,7 @@ export function PostAuthor(props: {
             <Popover.Content>
               <Popover.Arrow />
               <Popover.Body gap="gap.sm" display="flex" flexDirection="column">
-                {loading.isActive ? (
+                {init.isLoading ? (
                   <>
                     <Flex>
                       <SkeletonText noOfLines={1} />
@@ -101,7 +117,7 @@ export function PostAuthor(props: {
       </Popover.Root>
     );
   }
-  return <PostAuthorUsername post={props.post} isHideAvatar={props.isHideAvatar} />;
+  return <PostAuthorUsername post={props.post} isRenderAvatar={props.isRenderAvatar} />;
 }
 
 const PostAuthorQuery = graphql.persisted(
@@ -111,19 +127,23 @@ const PostAuthorQuery = graphql.persisted(
   ]),
 );
 
+// todo ? refac: drop isPopover - only tell it "you're a link" to add _hover={}
 function PostAuthorUsername(props: {
   post: PostListItemType | PostCommentTree;
   isPopover?: boolean;
-  isHideAvatar?: boolean;
+  isRenderAvatar?: boolean;
 }) {
   const username = props.post.author?.username ?? props.post?.post_source?.user_source?.username;
+  const colorPalette = useMemo(() => {
+    return getAvatarColorForUsername(username);
+  }, [username]);
   return (
     <Flex align="center" gap="gap.sm">
-      {!props.isHideAvatar && (
+      {props.isRenderAvatar && (
         <Avatar.Root
           size="2xs"
           variant="subtle"
-          colorPalette={getAvatarColorForUsername(username)}
+          colorPalette={colorPalette}
           _hover={props.isPopover ? { cursor: "pointer" } : {}}
         >
           <Avatar.Fallback name={username} />
@@ -149,6 +169,7 @@ function PostAuthorUsername(props: {
 
 export function getAvatarColorForUsername(username?: string) {
   const colorPalette = [
+    "blue",
     "gray",
     "slate",
     "red",
@@ -161,6 +182,10 @@ export function getAvatarColorForUsername(username?: string) {
     "yellow",
     "orange",
   ];
-  const index = (username?.charCodeAt(0) ?? 0) % colorPalette.length;
+  if (!username) {
+    return colorPalette[0];
+  }
+
+  const index = (username.charCodeAt(0) + username.charCodeAt(1)) % colorPalette.length;
   return colorPalette[index];
 }

@@ -5,25 +5,29 @@ import {
   Button,
   Flex,
   HStack,
+  Show,
   Spacer,
   Stack,
   Text,
   useToken,
   VStack,
 } from "@chakra-ui/react";
-import { type ComponentProps, type JSX, useEffect, useRef } from "react";
+import { type ComponentProps, type JSX, useEffect, useMemo, useRef } from "react";
 import { GoPencil } from "react-icons/go";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
-import type { PostHighlight } from "@/apps/highlighter/useHighlighter";
-import { useUser } from "@/apps/users/useUserCurrent";
+import { useAuth } from "@/apps/users/useUserCurrent";
 import { getAvatarColorForUsername, PostAuthor } from "@/components/posts/PostCard/PostAuthor";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
-import type { PostCommentTree } from "@/components/posts/PostDetail";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentVoteBar } from "@/components/posts/PostDetail/CommentVoteBar";
+import { useCommentCollapse } from "@/components/posts/PostDetail/useCommentCollapse";
+import {
+  type PostCommentTree,
+  useCommentTree,
+} from "@/components/posts/PostDetail/useCommentTree";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
-import { graphql, type ID } from "@/gql-tada";
+import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import {
   type PostDetailFragmentType,
@@ -32,7 +36,7 @@ import {
 } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { toast } from "@/utils/toast";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useValtioProxyRef";
 
 const styleGlobal = {
   indent: 9,
@@ -47,9 +51,6 @@ const styleGlobal = {
 export function CommentThread(props: {
   post: PostDetailFragmentType | PostReviewDetailFragmentType;
   comment: PostCommentTree;
-  highlights: Record<ID, PostHighlight[]>;
-  collapsedIds: Set<ID>;
-  toggleCollapse: (id: ID) => void;
   depth: number;
   isFirstChild: boolean;
   isLastChild: boolean;
@@ -60,9 +61,9 @@ export function CommentThread(props: {
   };
   refetchComments?: () => void;
 }) {
-  const user = useUser();
+  const auth = useAuth();
 
-  const state = useValtioProxyRef({
+  const state = useStateValtio({
     isEditing: false,
     isLoadingEdit: false,
     isShowReplyForm: false,
@@ -77,11 +78,10 @@ export function CommentThread(props: {
     avatar: useRef<HTMLDivElement | null>(null),
   };
 
-  const isHasChildren = Boolean(props.comment.comments?.length);
+  const comments = useCommentTree({ postId: props.post.id });
+
   const threadGuide = useCommentLeftLine({
     ...props,
-
-    isHasChildren,
     height: {
       parent: state.snap.parentHeightPx,
       toolbar: refs.toolbar.current?.offsetHeight ?? 0,
@@ -95,9 +95,12 @@ export function CommentThread(props: {
     }
   }, [refs.container.current, refs.content.current, threadGuide.isCollapsed]);
 
-  const isCommentUnfolded = !threadGuide.isCollapsed;
   const username =
     (props.comment?.post_source?.user_source?.username || props.comment.author?.username) ?? "";
+
+  const avatarColorPalette = useMemo(() => {
+    return getAvatarColorForUsername(username);
+  }, [username]);
 
   return (
     <Box
@@ -109,21 +112,33 @@ export function CommentThread(props: {
       <Flex ref={refs.content} as="article" gap="gap.sm" tabIndex={-1}>
         <VStack aria-label="Comment Left Side Box" pos="relative" gap={0}>
           <Box aria-label="Comment Avatar Box" pos="relative">
-            <Avatar.Root
-              size="2xs"
-              colorPalette={getAvatarColorForUsername(username)}
-              ref={refs.avatar}
-              zIndex={styleGlobal.zIndex.avatar}
-            >
-              <Avatar.Fallback name={username} />
-              <Avatar.Image src={props.comment.author?.avatar?.url} />
-            </Avatar.Root>
-
+            {comments.isRenderLowPrioAvatars ? (
+              <Avatar.Root
+                ref={refs.avatar}
+                colorPalette={avatarColorPalette}
+                size="2xs"
+                zIndex={styleGlobal.zIndex.avatar}
+              >
+                <Avatar.Fallback name={username} />
+                <Avatar.Image src={props.comment.author?.avatar?.url} />
+              </Avatar.Root>
+            ) : (
+              <Box
+                ref={refs.avatar}
+                colorPalette={avatarColorPalette}
+                pos="relative"
+                boxSize="6"
+                bg="colorPalette.muted"
+                borderRadius="full"
+                zIndex={styleGlobal.zIndex.avatar}
+              />
+            )}
             <threadGuide.LineVerticalLeftConnection />
           </Box>
 
           <threadGuide.LineVerticalLeft />
-          <threadGuide.CommentCollapsedStub />
+
+          {threadGuide.isCollapsed && <threadGuide.CommentCollapsedStub />}
         </VStack>
 
         <VStack align="flex-start" gap={0} w="full">
@@ -132,7 +147,7 @@ export function CommentThread(props: {
               {/* Header: Name, Date, Tags */}
               <HStack gap="gap.sm">
                 <Flex fontSize="sm" fontWeight="semibold">
-                  <PostAuthor post={props.comment} isHideAvatar />
+                  <PostAuthor post={props.comment} isRenderAvatar={false} />
                 </Flex>
 
                 {props.comment?.post_source?.user_source?.username ===
@@ -154,63 +169,66 @@ export function CommentThread(props: {
               </HStack>
             </HStack>
 
-            {isCommentUnfolded &&
-              (state.snap.isEditing ? (
-                state.snap.isLoadingEdit ? (
-                  <Text fontSize="sm" color="fg.subtle">
-                    Loading...
-                  </Text>
-                ) : state.snap.commentForEdit ? (
-                  <CommentForm
-                    mode="edit"
-                    comment={state.snap.commentForEdit}
-                    onClose={async () => {
-                      state.mutable.isEditing = false;
-                      state.mutable.commentForEdit = null;
-                      await props.refetchComments?.();
-                    }}
-                  />
-                ) : null
+            <Show when={!threadGuide.isCollapsed}>
+              {state.snap.isEditing && state.snap.commentForEdit ? (
+                <CommentForm
+                  mode="edit"
+                  comment={state.snap.commentForEdit}
+                  onClose={async () => {
+                    state.mutable.isEditing = false;
+                    state.mutable.commentForEdit = null;
+                    props.refetchComments?.();
+                  }}
+                />
               ) : (
-                <PostContentHighlighted post={props.comment} highlights={props.highlights} />
-              ))}
+                <PostContentHighlighted post={props.comment} />
+              )}
+
+              <Spacer w="1.5" />
+            </Show>
+
+            {state.snap.isLoadingEdit && (
+              <Text fontSize="sm" color="fg.subtle">
+                Loading...
+              </Text>
+            )}
           </Box>
 
-          {isCommentUnfolded && <Spacer w="1.5" />}
-
-          {isCommentUnfolded && user && (
+          {auth.isLoggedIn && !threadGuide.isCollapsed && (
             <Flex role="toolbar" ref={refs.toolbar}>
               <CommentVoteBar comment={props.comment} />
 
-              <CommentToolbarButton
-                label="Reply"
-                onClick={() => {
-                  state.mutable.isShowReplyForm = !state.snap.isShowReplyForm;
-                }}
-                id={ids.comment.btn.reply}
-              />
+              {comments.isRenderLowPrioReplyButtons && (
+                <CommentToolbarButton
+                  label="Reply"
+                  onClick={() => {
+                    state.mutable.isShowReplyForm = !state.snap.isShowReplyForm;
+                  }}
+                  id={ids.comment.btn.reply}
+                />
+              )}
 
-              {user.id === props.comment.author?.id && !state.snap.isEditing && (
+              {auth.userId === props.comment.author?.id && !state.snap.isEditing && (
                 <CommentToolbarButton
                   label="Edit"
                   onClick={async () => {
                     state.mutable.isLoadingEdit = true;
                     state.mutable.isEditing = true;
 
-                    // Fetch comment with visibility fields before editing
+                    // Fetch Comment with `.visibility_*` fields before editing
                     const { data } = await client.query({
                       query: CommentEditQuery,
                       variables: { id: props.comment.id },
+                      fetchPolicy: "network-only",
                     });
 
                     if (data?.post_comment) {
                       state.mutable.commentForEdit = data.post_comment;
-                      state.mutable.isLoadingEdit = false;
                     } else {
                       toast.error("Failed to load comment for editing");
                       state.mutable.isEditing = false;
-                      state.mutable.isLoadingEdit = false;
                     }
+                    state.mutable.isLoadingEdit = false;
                   }}
                   icon={<GoPencil />}
                   id={ids.comment.btn.edit}
@@ -226,7 +244,7 @@ export function CommentThread(props: {
                 parentId={props.comment.id}
                 onClose={async () => {
                   state.mutable.isShowReplyForm = false;
-                  await props.refetchComments?.();
+                  props.refetchComments?.();
                 }}
               />
             </Box>
@@ -241,9 +259,6 @@ export function CommentThread(props: {
               key={comment.id}
               post={props.post}
               comment={comment}
-              highlights={props.highlights}
-              collapsedIds={props.collapsedIds}
-              toggleCollapse={props.toggleCollapse}
               depth={props.depth + 1}
               isFirstChild={index === 0}
               isLastChild={index === props.comment.comments.length - 1}
@@ -253,7 +268,6 @@ export function CommentThread(props: {
                 toolbar: refs.toolbar.current?.offsetHeight ?? 0,
                 avatar: refs.avatar.current?.offsetHeight ?? 0,
               }}
-              refetchComments={props.refetchComments}
             />
           ))}
         </Stack>
@@ -282,12 +296,11 @@ function CommentToolbarButton(props: {
   );
 }
 
-function useCommentLeftLine(
-  props: ComponentProps<typeof CommentThread> & { isHasChildren: boolean },
-) {
-  const isCommentCollapsed = props.collapsedIds.has(props.comment.id);
-
+function useCommentLeftLine(props: ComponentProps<typeof CommentThread>) {
   const [childrenGap] = useToken("spacing", styleGlobal.childrenGap);
+
+  const collapse = useCommentCollapse({ postId: props.post.id });
+
   const style = {
     indent: styleGlobal.indent,
     childrenGap: childrenGap,
@@ -302,16 +315,15 @@ function useCommentLeftLine(
     },
   } as const;
 
-  function toggleCollapse() {
-    props.toggleCollapse(props.comment.id);
-  }
+  const isCollapsed = collapse.isCollapsed(props.comment.id);
+  const isHasChildren = Boolean(props.comment.comments?.length);
 
   return {
-    isChildrenVisible: props.isHasChildren && !isCommentCollapsed,
-    isCollapsed: isCommentCollapsed,
+    isChildrenVisible: isHasChildren && !isCollapsed,
+    isCollapsed: isCollapsed,
 
     LineVerticalLeft: () => {
-      if (isCommentCollapsed) {
+      if (isCollapsed) {
         return null;
       }
 
@@ -320,7 +332,7 @@ function useCommentLeftLine(
       return (
         <Box
           className="group"
-          onClick={toggleCollapse}
+          onClick={() => collapse.toggle(props.comment.id)}
           pos="absolute"
           top={`${props.height.avatar / 2}px`}
           height={height}
@@ -368,8 +380,8 @@ function useCommentLeftLine(
       );
     },
     LineVerticalLeftConnection: () => {
-      const isTopNode = props.depth === 0;
-      if (isTopNode) {
+      const isTopComment = props.depth === 0;
+      if (isTopComment) {
         return null;
       }
       if (props.isFirstChild || props.isLastChild) {
@@ -398,63 +410,60 @@ function useCommentLeftLine(
       }
     },
     CommentCollapsedStub: () => {
-      if (isCommentCollapsed) {
-        const childrenCount = props.comment.comments?.length;
-        return (
-          <VStack
-            minH={styleGlobal.indent}
-            mb="gap.md"
+      const childrenCount = props.comment.comments?.length;
+      return (
+        <VStack
+          minH={styleGlobal.indent}
+          mb="gap.md"
+          pos="relative"
+          align="center"
+          zIndex={0}
+          gap={0}
+        >
+          <Box
+            className="group"
+            onClick={() => collapse.toggle(props.comment.id)}
             pos="relative"
-            align="center"
-            zIndex={0}
-            gap={0}
+            top={`-${props.height.avatar / 2}px`}
+            w={style.line.widthClickable}
+            h="50px"
+            cursor="pointer"
+            _hover={{ bg: style.line.hover.bg }}
+            {...ids.set(ids.comment.thread.line)}
           >
             <Box
-              className="group"
-              onClick={toggleCollapse}
-              pos="relative"
-              top={`-${props.height.avatar / 2}px`}
-              w={style.line.widthClickable}
-              h="50px"
-              cursor="pointer"
-              _hover={{ bg: style.line.hover.bg }}
-              {...ids.set(ids.comment.thread.line)}
+              w={style.line.width}
+              h="full"
+              mx="auto"
+              bg={style.line.color}
+              _groupHover={{ bg: style.line.hover.color }}
+            />
+            <Button
+              position="absolute"
+              bottom={0}
+              left="50%"
+              transform="translateX(-50%)"
+              size="2xs"
+              variant="subtle"
+              colorPalette="gray"
+              _groupHover={{ bg: "bg.emphasized" }}
             >
-              <Box
-                w={style.line.width}
-                h="full"
-                mx="auto"
-                bg={style.line.color}
-                _groupHover={{ bg: style.line.hover.color }}
-              />
-              <Button
-                position="absolute"
-                bottom={0}
-                left="50%"
-                transform="translateX(-50%)"
-                size="2xs"
-                variant="subtle"
-                colorPalette="gray"
-                _groupHover={{ bg: "bg.emphasized" }}
-              >
-                {childrenCount ? `+ ${childrenCount}` : "Show"}
-                {/* todo UX: also show unseen comments count */}
-                {/* todo UX: show recursive count, not only direct chil */}
-              </Button>
-            </Box>
-          </VStack>
-        );
-      }
+              {childrenCount ? `+ ${childrenCount}` : "Show"}
+              {/* todo UX: also show unseen comments count */}
+              {/* todo UX: show recursive count, not only direct chil */}
+            </Button>
+          </Box>
+        </VStack>
+      );
     },
   };
 }
+
 const CommentEditQuery = graphql.persisted(
   "CommentEdit",
   graphql(
     `query CommentEdit($id: ID!) {
-      post_comment(pk: $id) {
-        ...PostEditFragment
-      }
+      post_comment(pk: $id) { ...PostEditFragment }
     }`,
     [PostEditFragment],
   ),
