@@ -1,72 +1,58 @@
-import { useQuery } from "@apollo/client/react";
 import type { ResultOf } from "gql.tada";
-import { useDebounce } from "use-debounce";
-import type { PostCommentTree } from "@/components/posts/PostDetail";
+import { useTransition } from "react";
+import { proxyMap } from "valtio/utils";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { isQueryDataComplete } from "@/graphql/useApolloQuery";
+import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 
-export function useHighlighter(props: {
-  commentTree?: PostCommentTree[];
-  posts?: Array<{ id: ID; comments?: Array<{ id: ID }> }>;
-}) {
-  const state = useValtioProxyRef({
-    postIds: [] as ID[],
-    highlights: {} as Record<ID, PostHighlight[]>,
-  });
+type CommentID = ID;
 
-  // this works for CommentThreads and PostList
-  useInit({
-    isReady: Boolean(props.commentTree?.length || props.posts?.length),
-    deps: [props.commentTree, props.posts],
-    onInit: async () => {
-      if (props.commentTree) {
-        state.mutable.postIds = collectIdsRecursively(props.commentTree);
-      } else if (props.posts) {
-        // Collect IDs from any posts, not just Comments
-        const ids: ID[] = [];
-        for (const post of props.posts) {
-          ids.push(post.id);
-          if (post.comments) {
-            ids.push(...collectIdsFromPosts(post.comments));
-          }
-        }
-        state.mutable.postIds = ids;
-      }
-    },
-  });
+/**
+ * Global state for subscribe() in [[PostContentHighlighted.tsx]] and others.
+ */
+export const highlightsMap = proxyMap<CommentID, PostHighlight[]>();
 
-  const [debouncedPostIds] = useDebounce(state.snap.postIds, 100);
-
-  const { data } = useQuery(PostHighlightsQuery, {
-    variables: { ids: debouncedPostIds },
-    skip: !debouncedPostIds.length,
-  });
+/**
+ * Loads PostHighlight[] into global Valtio state.
+ *
+ * Uses optimistic mutations.
+ *
+ * Note: it's only mounted once in <PostDetail/> - so it's easy to miss bad React code.
+ */
+export function useHighlighter(props: { commentIds: CommentID[] }) {
+  const [, startTransition] = useTransition();
 
   useInit({
-    isReady: Boolean(data),
-    deps: [data],
-    onInit: async () => {
-      if (isQueryDataComplete(data) && data.post_highlights) {
-        const highlights: Record<ID, PostHighlight[]> = {};
+    isReady: props.commentIds?.length,
+    deps: [props.commentIds],
+    onInit: loadHighlights,
+  });
+
+  async function loadHighlights() {
+    startTransition(async () => {
+      const { data } = await client.query({
+        query: PostHighlightsQuery,
+        variables: { ids: props.commentIds },
+        fetchPolicy: "network-only",
+      });
+
+      if (isQueryDataComplete(data)) {
+        const mapNew = new Map<CommentID, PostHighlight[]>();
+
         for (const highlight of data.post_highlights) {
-          if (isQueryDataComplete(highlight) && highlight?.post?.id) {
-            if (!highlights[highlight.post.id]) {
-              highlights[highlight.post.id] = [];
-            }
-            highlights[highlight.post.id].push(highlight);
-          }
-        }
-        state.mutable.highlights = highlights;
-      }
-    },
-  });
+          const id = highlight.post.id;
+          const highlights = mapNew.get(id) ?? [];
 
-  return {
-    highlights: state.snap.highlights,
-  };
+          mapNew.set(id, [...highlights, highlight]);
+        }
+        for (const id of props.commentIds) {
+          highlightsMap.set(id, mapNew.get(id) ?? []);
+        }
+      }
+    });
+  }
 }
 
 export async function saveHighlight(args: {
@@ -74,8 +60,13 @@ export async function saveHighlight(args: {
   text: string;
   text_prefix: string;
   text_postfix: string;
+  post: { id: CommentID };
 }) {
-  await client.mutate({
+  // Optimistic update
+  const highlightsOld = highlightsMap.get(args.post.id)!;
+  highlightsMap.set(args.post.id, [...highlightsOld, args]);
+
+  const res = client.mutate({
     mutation: HighlightCreate,
     variables: {
       id: args.id,
@@ -83,10 +74,30 @@ export async function saveHighlight(args: {
       text_prefix: args.text_prefix,
       text_postfix: args.text_postfix,
     },
-    refetchQueries: [PostHighlightsQuery],
-    awaitRefetchQueries: true,
+    optimisticResponse: { post_highlight_create: true },
+  });
+  res.catch(error => {
+    toast.error(error);
+
+    highlightsMap.set(args.post.id, highlightsOld);
   });
 }
+
+export async function removeHighlight(id: ID, commentId: CommentID) {
+  // Optimistic update
+  highlightsMap.set(
+    commentId,
+    highlightsMap.get(commentId)!.filter(highlight => highlight.id !== id),
+  );
+
+  const res = client.mutate({
+    mutation: HighlightDelete,
+    variables: { id },
+    optimisticResponse: { post_highlight_delete: true },
+  });
+  res.catch(error => toast.error(error));
+}
+
 const HighlightCreate = graphql.persisted(
   "HighlighterCreate",
   graphql(`
@@ -106,37 +117,21 @@ const HighlightCreate = graphql.persisted(
   `),
 );
 
-export async function removeHighlight(id: ID) {
-  await client.mutate({
-    mutation: HighlightDelete,
-    variables: { id },
-    refetchQueries: [PostHighlightsQuery],
-    awaitRefetchQueries: true,
-  });
-}
 const HighlightDelete = graphql.persisted(
   "HighlighterDelete",
-  graphql(`
-    mutation HighlighterDelete($id: ID!) {
-      post_highlight_delete(data: { id: $id })
-    }
-  `),
+  graphql(`mutation HighlighterDelete($id: ID!) { post_highlight_delete(data: { id: $id }) }`),
 );
 
 const PostHighlightsQuery = graphql.persisted(
-  "GetPostHighlights",
+  "PostHighlightsQuery",
   graphql(
-    `query GetPostHighlights($ids: [ID!]!) {
+    `query PostHighlightsQuery($ids: [ID!]!) {
       post_highlights(post_ids: $ids) {
         id
+        post { id }
         text
         text_prefix
         text_postfix
-        created_at
-  
-        post {
-          id
-        }
       }
     }`,
   ),
@@ -144,18 +139,3 @@ const PostHighlightsQuery = graphql.persisted(
 
 type PostHighlights = ResultOf<typeof PostHighlightsQuery>;
 export type PostHighlight = NonNullable<PostHighlights["post_highlights"]>[number];
-
-function collectIdsRecursively(comments: PostCommentTree[]): ID[] {
-  const ids: ID[] = [];
-  for (const comment of comments) {
-    ids.push(comment.id);
-    if (comment.comments && comment.comments.length > 0) {
-      ids.push(...collectIdsRecursively(comment.comments));
-    }
-  }
-  return ids;
-}
-
-function collectIdsFromPosts(posts: Array<{ id: ID }>): ID[] {
-  return posts.map(p => p.id);
-}

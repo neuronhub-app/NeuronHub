@@ -46,10 +46,11 @@ class HighlighterQuery:
     @strawberry.field(extensions=[IsAuthenticated()])
     async def post_highlights(self, post_ids: list[ID], info: Info) -> list[PostHighlightType]:
         user = await get_user(info)
-        highlights = await _async_query_queryset(
-            queryset=PostHighlight.objects.filter(post_id__in=post_ids, user=user)
-        )
-        return cast(list[PostHighlightType], cast(object, highlights))
+        highlights = [
+            highlight
+            async for highlight in PostHighlight.objects.filter(post_id__in=post_ids, user=user)
+        ]
+        return cast(list[PostHighlightType], highlights)
 
     @strawberry.field(extensions=[IsAuthenticated()])
     async def post_highlight(self, post_id: ID, info: Info) -> PostHighlightType:
@@ -61,16 +62,13 @@ class HighlighterQuery:
     @strawberry.field(extensions=[IsAuthenticated()])
     async def user_highlights(self, info: Info) -> list[PostHighlightType]:
         user = await get_user(info)
-        highlights = await _async_query_queryset(
-            queryset=PostHighlight.objects.filter(user=user)
+        highlights = [
+            highlight
+            async for highlight in PostHighlight.objects.filter(user=user, post__isnull=False)
             .select_related("post", "post__parent", "post__parent__parent")
             .order_by("-created_at")
-        )
-        return cast(list[PostHighlightType], cast(object, highlights))
-
-
-async def _async_query_queryset(queryset: QuerySet[PostHighlight]) -> list[PostHighlight]:
-    return [highlight async for highlight in queryset]
+        ]
+        return cast(list[PostHighlightType], highlights)
 
 
 @strawberry.type
@@ -78,7 +76,8 @@ class HighlighterMutation:
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def post_highlight_create(self, data: PostHighlightTypeInput, info: Info) -> bool:
         user = await get_user(info)
-        # todo !(sec): clean HTML
+        # todo !(sec): clean HTML. But atm PostHighlight has no sharing.
+        # FE can't send HTML, but a bot/human will.
         await PostHighlight.objects.acreate(
             post_id=data.post.set,
             user=user,

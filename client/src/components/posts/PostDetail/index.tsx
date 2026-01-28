@@ -14,6 +14,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import type { ReactNode } from "react";
+import { useHighlighter } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
@@ -34,6 +35,8 @@ export function PostDetail(props: {
 
   const comments = useCommentTree({ postId: props.post?.id });
 
+  useHighlighter({ commentIds: comments.ids });
+
   const title = useMetaTitle({ isLoading: true });
 
   useInit({
@@ -43,37 +46,36 @@ export function PostDetail(props: {
     },
   });
 
-  const post = props.post;
-
   return (
     <Stack>
       {props.isLoading && <p>Loading...</p>}
       {props.error && <p>Error: {props.error.message}</p>}
 
-      {post && (
+      {props.post && (
         <Stack gap="gap.xl">
-          <PostCard post={post} isDetailPage urlNamespace="posts" />
+          <PostCard post={props.post} isDetailPage urlNamespace="posts" />
 
-          <Stack gap={post.comment_count > 0 ? "gap.lg" : "0"}>
+          <Stack gap={props.post.comment_count > 0 ? "gap.lg" : "0"}>
             <Flex gap="gap.md" align="center">
               <Heading fontSize="lg" display="flex" gap="gap.sm" alignItems="center">
-                Comments <Text color="fg.subtle">{post.comment_count}</Text>
+                Comments <Text color="fg.subtle">{props.post.comment_count}</Text>
               </Heading>
+
               {!comments.isRenderCompleted && <Spinner size="sm" />}
             </Flex>
 
             <VStack px={0} align="flex-start" gap="gap.md">
-              {post.comment_count > 0 && (
+              {props.post.comment_count > 0 && (
                 <>
                   {comments.tree.map((comment, index) => (
                     <CommentThread
                       key={comment.id}
                       comment={comment}
-                      post={post}
+                      post={props.post!} // #bad-infer
                       depth={0}
                       isLastChild={index === comments.tree.length - 1}
                       isFirstChild={true}
-                      height={{ parent: 0, toolbar: 0, avatar: 0 }} // init values
+                      height={{ parent: 0, toolbar: 0, avatar: 0 }} // init, 0 is fine.
                     />
                   ))}
                   <Show when={comments.isRendering}>
@@ -88,8 +90,8 @@ export function PostDetail(props: {
             <Show when={user}>
               <CommentForm
                 mode="create"
-                parentId={post.id}
-                onClose={async () => comments.reload({ isForceReload: true })}
+                parentId={props.post.id}
+                onClose={comments.refetchGraphql}
               />
             </Show>
           </Stack>

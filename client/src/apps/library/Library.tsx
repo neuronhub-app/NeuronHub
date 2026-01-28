@@ -1,7 +1,7 @@
 import { Box, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { type ComponentProps, useMemo } from "react";
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
-import type { PostHighlight } from "@/apps/highlighter/useHighlighter";
+import { highlightsMap } from "@/apps/highlighter/useHighlighter";
 import { PostCard } from "@/components/posts/PostCard/PostCard";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
 import { graphql, type ID, type ResultOf } from "@/gql-tada";
@@ -9,6 +9,7 @@ import { CommentFieldsFragment, isTool, PostFragment } from "@/graphql/fragments
 import { isReview } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
+import { useInit } from "@/utils/useInit";
 
 type HighlightGroup = {
   parent_root: NonNullable<HighlightType["post"]["parent_root"]>;
@@ -58,25 +59,33 @@ export function Library() {
     [data?.user_highlights],
   );
 
-  const highlightsMap = useMemo(() => {
-    // todo fix by using a shared Fragment for PostHighlight -> remove Partial<>
-    const map: Record<ID, Array<Partial<PostHighlight>>> = {};
-    if (data?.user_highlights) {
-      for (const highlight of data.user_highlights.filter(h => h.post?.id)) {
-        const postId = highlight.post.id;
-        if (!map[postId]) {
-          map[postId] = [];
-        }
-        map[postId].push({
-          id: highlight.id,
-          text: highlight.text,
-          text_prefix: highlight.text_prefix,
-          text_postfix: highlight.text_postfix,
-        });
+  const initHighlights = useInit({
+    isReady: Boolean(data?.user_highlights?.length),
+    deps: [data?.user_highlights],
+    onInit: () => {
+      const mapNew = new Map<ID, UserPostHighlight[]>();
+
+      for (const highlight of data!.user_highlights) {
+        mapNew.set(highlight.post.id, []);
       }
-    }
-    return map;
-  }, [data?.user_highlights]);
+      for (const highlight of data!.user_highlights) {
+        mapNew.get(highlight.post.id)!.push(highlight);
+      }
+
+      for (const [postId, userHighlights] of mapNew) {
+        highlightsMap.set(
+          postId,
+          userHighlights.map(h => ({
+            id: h.id,
+            text: h.text,
+            text_prefix: h.text_prefix,
+            text_postfix: h.text_postfix,
+            post: { id: postId },
+          })),
+        );
+      }
+    },
+  });
 
   function getPostNamespace(
     post: HighlightGroup["parent_root"],
@@ -94,7 +103,7 @@ export function Library() {
     <Stack gap="gap.lg">
       <Heading size="2xl">Library</Heading>
 
-      {isLoadingFirstTime && <Text>Loading highlights...</Text>}
+      {(isLoadingFirstTime || initHighlights.isLoading) && <Text>Loading highlights...</Text>}
       {error && <Text color="fg.error">Error: {error.message}</Text>}
 
       <Stack gap="gap.lg">
@@ -144,8 +153,7 @@ export function Library() {
                       </HStack>
                     </Stack>
 
-                    {/* @ts-expect-error #bad-infer and #AI-slop graphql query that should use a shared Fragment */}
-                    <PostContentHighlighted post={highlight.post} highlights={highlightsMap} />
+                    <PostContentHighlighted post={highlight.post} />
                   </Box>
                 </Stack>
               ))}
@@ -178,3 +186,6 @@ const UserHighlightsQuery = graphql.persisted(
     [CommentFieldsFragment, PostFragment],
   ),
 );
+
+type UserPostHighlightsRes = ResultOf<typeof UserHighlightsQuery>;
+type UserPostHighlight = NonNullable<UserPostHighlightsRes["user_highlights"]>[number];

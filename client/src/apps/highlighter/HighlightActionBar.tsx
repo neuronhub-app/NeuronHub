@@ -10,13 +10,15 @@ import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useValtioProxyRef";
 
+// todo ! refac: move out into a hook, as this much logic in a "Component" is idiotic
 export function HighlightActionBar() {
-  const state = useValtioProxyRef({
+  const state = useStateValtio({
     text: "",
     text_prefix: "",
     text_postfix: "",
+    postId: "",
     isSavable: false,
     isPressedKey: {
       B: false,
@@ -31,13 +33,16 @@ export function HighlightActionBar() {
     function handleSelection() {
       const selection = document.getSelection();
       if (selection?.toString() && selection.rangeCount > 0) {
+        const { text_prefix, text_postfix, isSavable, postId } = getSelectionContext(selection);
+        state.mutable.isSavable = isSavable;
+        state.mutable.postId = postId;
         state.mutable.text = selection.toString();
-        const { text_prefix, text_postfix, isSavable } = getSelectionContext(selection);
         state.mutable.text_prefix = text_prefix;
         state.mutable.text_postfix = text_postfix;
-        state.mutable.isSavable = isSavable;
       } else {
+        // todo ? refac: remove
         state.mutable.isSavable = false;
+        state.mutable.postId = "";
         state.mutable.text = "";
         state.mutable.text_prefix = "";
         state.mutable.text_postfix = "";
@@ -109,6 +114,7 @@ export function HighlightActionBar() {
           text: state.mutable.text,
           text_prefix: state.mutable.text_prefix,
           text_postfix: state.mutable.text_postfix,
+          post: { id: state.mutable.postId },
         });
       }
     });
@@ -164,25 +170,29 @@ export function HighlightActionBar() {
 function getSelectionContext(selection: Selection): {
   text_prefix: string;
   text_postfix: string;
+  postId: ID;
   isSavable: boolean;
 } {
   const selectionRange = selection.getRangeAt(0);
 
-  const selectionElem = isHTMLElement(selectionRange.commonAncestorContainer)
+  const selectionEl = isHTMLElement(selectionRange.commonAncestorContainer)
     ? selectionRange.commonAncestorContainer
     : selectionRange.commonAncestorContainer.parentElement;
 
-  if (!selectionElem) {
-    return { text_prefix: "", text_postfix: "", isSavable: false };
+  if (!selectionEl) {
+    return { text_prefix: "", text_postfix: "", isSavable: false, postId: "" };
   }
 
-  const highlightableElem = selectionElem.closest(`[data-${highlight_attrs.flag}]`);
-  if (!highlightableElem) {
-    return { text_prefix: "", text_postfix: "", isSavable: false };
+  const highlightableEl = selectionEl.closest(`[data-${highlight_attrs.flag}]`);
+  if (!highlightableEl) {
+    return { text_prefix: "", text_postfix: "", isSavable: false, postId: "" };
   }
+
+  const postContentEl: HTMLElement = selectionEl.closest(`[data-${highlight_attrs.id}]`)!;
   return {
-    text_prefix: getRangeContext(selectionRange, highlightableElem, "prefix"),
-    text_postfix: getRangeContext(selectionRange, highlightableElem, "postfix"),
+    text_prefix: getRangeContext(selectionRange, highlightableEl, "prefix"),
+    text_postfix: getRangeContext(selectionRange, highlightableEl, "postfix"),
+    postId: postContentEl.dataset.id!,
     isSavable: true,
   };
 }

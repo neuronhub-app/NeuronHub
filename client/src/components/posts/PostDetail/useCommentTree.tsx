@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useTransition } from "react";
 import { useSnapshot } from "valtio/react";
 import { proxy } from "valtio/vanilla";
+import { subscribeKey } from "valtio/vanilla/utils";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { CommentFieldsFragment, type PostCommentType } from "@/graphql/fragments/posts";
@@ -10,13 +11,19 @@ import { useInit } from "@/utils/useInit";
 const state = proxy({
   commentTree: [] as PostCommentTree[],
 
+  ids: [] as ID[], // to give other React Components an optimized subscription
+
   isRenderLowPrioAvatars: false,
   isRenderLowPrioReplyButtons: false,
 
   local: {
     commentThreadsTotal: 0,
-    isCommentsLoaded: false,
+    isCommentsLoaded: false, // #prod-redundant
   },
+});
+
+subscribeKey(state, "commentTree", () => {
+  state.ids = collectCommentIdsRecursively(state.commentTree);
 });
 
 export function useCommentTree(props: { postId?: ID }) {
@@ -25,11 +32,11 @@ export function useCommentTree(props: { postId?: ID }) {
   const [isTransitionPending, startTransition] = useTransition();
 
   const loadCommentTree = useCallback(
-    async (opts?: { isForceReload: boolean }) => {
+    async (opts?: { isForceGraphqlRefetch: boolean }) => {
       if (!props.postId) {
         return;
       }
-      if (state.local.isCommentsLoaded && !opts?.isForceReload) {
+      if (!opts?.isForceGraphqlRefetch && state.local.isCommentsLoaded) {
         return;
       }
 
@@ -87,14 +94,18 @@ export function useCommentTree(props: { postId?: ID }) {
 
   return {
     tree: snap.commentTree,
-    isRendering: init.isLoading || isTransitionPending,
+    ids: snap.ids,
+
     isRenderLowPrioAvatars: snap.isRenderLowPrioAvatars,
     isRenderLowPrioReplyButtons: snap.isRenderLowPrioReplyButtons,
+
+    isRendering: init.isLoading || isTransitionPending,
     isRenderCompleted:
       (!init.isLoading && snap.isRenderLowPrioAvatars && snap.isRenderLowPrioReplyButtons) ||
       (!init.isLoading && snap.ids.length === 0),
+
     startTransition,
-    reload: loadCommentTree,
+    refetchGraphql: () => loadCommentTree({ isForceGraphqlRefetch: true }),
   };
 }
 
@@ -170,4 +181,13 @@ function countCommentsRecursive(node: PostCommentTree): number {
     count += countCommentsRecursive(child);
   }
   return count;
+}
+
+function collectCommentIdsRecursively(comments: PostCommentTree[]): ID[] {
+  const ids: ID[] = [];
+  for (const comment of comments) {
+    ids.push(comment.id);
+    ids.push(...collectCommentIdsRecursively(comment.comments));
+  }
+  return ids;
 }

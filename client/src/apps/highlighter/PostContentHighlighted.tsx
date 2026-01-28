@@ -1,7 +1,13 @@
 import type * as React from "react";
+import { useEffect } from "react";
+import { subscribe } from "valtio/vanilla";
 import { isHTMLElement } from "@/apps/highlighter/HighlightActionBar";
 import { PostContentHighlightMenu } from "@/apps/highlighter/PostContentHighlightMenu";
-import { type PostHighlight, removeHighlight } from "@/apps/highlighter/useHighlighter";
+import {
+  highlightsMap,
+  type PostHighlight,
+  removeHighlight,
+} from "@/apps/highlighter/useHighlighter";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
@@ -35,11 +41,19 @@ export function PostContentHighlighted(props: {
     content_rant?: string;
     content_polite_html_ssr?: string;
   };
-  highlights: Record<ID, PostHighlight[]>;
 }) {
   const state = useStateValtio({
     highlightActiveId: null as ID | null,
+    highlights: [] as PostHighlight[],
   });
+
+  useEffect(() => {
+    state.mutable.highlights = highlightsMap.get(props.post.id) ?? [];
+    const unsubscribe = subscribe(highlightsMap, () => {
+      state.mutable.highlights = highlightsMap.get(props.post.id) ?? [];
+    });
+    return unsubscribe;
+  }, [props.post.id]);
 
   const loading = useIsLoading();
 
@@ -47,14 +61,14 @@ export function PostContentHighlighted(props: {
   if (props.post.content_polite_html_ssr) {
     contentHTML = highlightPostContentByMarks({
       content: props.post.content_polite_html_ssr,
-      highlights: props.highlights[props.post.id] ?? [],
+      highlights: state.snap.highlights,
     });
   } else {
     contentHTML = markedConfigured.parse(
       highlightPostContentByMarks({
         content:
           props.post.content_rant ?? props.post.content_direct ?? props.post.content_polite,
-        highlights: props.highlights[props.post.id] ?? [],
+        highlights: state.snap.highlights,
       }),
       { async: false },
     );
@@ -84,7 +98,7 @@ export function PostContentHighlighted(props: {
     }
 
     await loading.track(async () => {
-      await removeHighlight(state.snap.highlightActiveId!);
+      await removeHighlight(state.snap.highlightActiveId!, props.post.id);
     });
     state.mutable.highlightActiveId = null;
   }
@@ -110,6 +124,8 @@ export function PostContentHighlighted(props: {
   );
 }
 
+// #AI. I tried few versions, this one is idiotic (no .strip() or regex, goto "continue" shit, etc), but this ~works for now.
+// todo ! refac: move to [[HighlightActionBar.tsx]], as PostHighlight is built there from DOM Selection.
 function highlightPostContentByMarks(args: {
   highlights: PostHighlight[];
   content: string;
