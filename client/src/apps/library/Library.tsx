@@ -61,7 +61,7 @@ export function Library() {
 
   const initHighlights = useInit({
     isReady: Boolean(data?.user_highlights?.length),
-    deps: [data?.user_highlights],
+    dependencies: [data?.user_highlights],
     onInit: () => {
       const mapNew = new Map<ID, UserPostHighlight[]>();
 

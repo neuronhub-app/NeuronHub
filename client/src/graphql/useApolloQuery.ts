@@ -33,5 +33,5 @@ export function isQueryDataComplete<T extends object>(
   return data !== undefined;
 }
 
-// copy-paste the Apollo type it doesn't export:
+// This is a copy-pasted type that Apollo doesn't export:
 type DeepPartialObject<T extends object> = { [K in keyof T]?: DeepPartial<T[K]> };

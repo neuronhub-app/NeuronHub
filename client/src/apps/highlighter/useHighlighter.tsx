@@ -26,7 +26,7 @@ export function useHighlighter(props: { commentIds: CommentID[] }) {
 
   useInit({
     isReady: props.commentIds?.length,
-    deps: [props.commentIds],
+    dependencies: [props.commentIds],
     onInit: loadHighlights,
   });
 
