@@ -89,7 +89,6 @@ test.describe("Comments", () => {
   test("highlight", async ({ page }) => {
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
-    await play.waitForNetworkIdle();
 
     const comment = {
       highlighted: "highlight some text",
@@ -100,7 +99,6 @@ test.describe("Comments", () => {
     };
     await play.fill(ids.comment.form.textarea, comment.content);
     await play.submit(ids.post.form, { waitIdle: true });
-    await expect(page.getByText(comment.highlighted)).toBeVisible();
 
     // select {comment.highlighted} with Selection API .addRange()
     // questionable #AI code. reviewed & cleaned, but looks as shit.

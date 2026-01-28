@@ -11,7 +11,7 @@ test.describe("Login", () => {
 
   test.beforeEach(async ({ page }) => {
     play = new PlaywrightHelper(page);
-    await play.dbStubsRepopulate({ is_import_HN_post: false, is_create_single_review: true });
+    await play.dbStubsRepopulate({ is_import_HN_post: false, is_create_single_review: false });
   });
 
   test("with invalid credentials", async ({ page }) => {
