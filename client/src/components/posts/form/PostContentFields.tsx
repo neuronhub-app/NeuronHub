@@ -1,5 +1,5 @@
 import { Accordion } from "@chakra-ui/react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import type { schemas } from "@/components/posts/form/schemas";
 import type { PostContentField } from "@/components/posts/ListContainer";
@@ -7,6 +7,12 @@ import { ids } from "@/e2e/ids";
 
 export function PostContentFields(props: { isReadOnly?: boolean }) {
   const form = useFormContext<schemas.PostAbstract>();
+
+  const isOnlyOneContentField =
+    [
+      useWatch({ control: form.control, name: "content_direct" }),
+      useWatch({ control: form.control, name: "content_rant" }),
+    ].filter(Boolean).length === 0;
 
   const fields = [
     {
@@ -32,9 +38,7 @@ export function PostContentFields(props: { isReadOnly?: boolean }) {
     },
   ] satisfies Array<{ value: PostContentField; [key: string]: string }>;
 
-  const isOneField =
-    [form.watch("content_direct"), form.watch("content_rant")].filter(Boolean).length === 0;
-  if (props?.isReadOnly && isOneField) {
+  if (props?.isReadOnly && isOnlyOneContentField) {
     return (
       <FormChakraTextarea
         field={{ control: form.control, name: "content_polite" }}

@@ -154,7 +154,7 @@ export function NeuronLogo() {
         </Flex>
 
         <Badge h="fit-content" size="xs" textTransform="uppercase">
-          Beta
+          Alpha
         </Badge>
       </Bleed>
     </NavLink>

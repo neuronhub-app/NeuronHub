@@ -1,12 +1,12 @@
 import { Field } from "@chakra-ui/react";
 import { AsyncCreatableSelect } from "chakra-react-select";
-import { useMemo } from "react";
+import { useWatch } from "react-hook-form";
 import { schemas } from "@/components/posts/form/schemas";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { useInit } from "@/utils/useInit";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useValtioProxyRef";
 
 /**
  * Note: in the future consider @chakra-ui Combobox with render of .image & .content. But atm we can't as it lacks the `create` mode.
@@ -18,28 +18,32 @@ import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
 export function ToolAsyncSelect(props: { form: schemas.ToolForm }) {
   const form = props.form;
 
-  const state = useValtioProxyRef({
+  const state = useStateValtio({
     inputValue: "",
     defaultOptions: [] as ToolOption[],
   });
 
+  const field = {
+    id: useWatch({ control: form.control, name: "id" }),
+    title: useWatch({ control: form.control, name: "title" }),
+  };
+
   useInit({
     onInit: async () => {
-      const res = await client.query({ query: ToolQuery, variables: { title: null } });
+      const res = await client.query({ query: ToolQuery, variables: { filterBy: null } });
       if (res.data?.post_tools) {
         state.mutable.defaultOptions = res.data.post_tools;
       }
     },
   });
 
-  const valueCurrent = useMemo((): ToolOption | null => {
-    const title = form.watch("title");
-
-    if (!title) {
-      return null;
-    }
-    return { value: title, title, id: form.watch("id") ?? "" };
-  }, [form.watch("id"), form.watch("title")]);
+  const optionCurrent: ToolOption | null = field.title
+    ? {
+        id: field.id ?? "",
+        value: field.title,
+        title: field.title,
+      }
+    : null;
 
   return (
     <Field.Root {...ids.set(ids.post.form.title)}>
@@ -51,27 +55,27 @@ export function ToolAsyncSelect(props: { form: schemas.ToolForm }) {
         formatCreateLabel={inputValue => `Create a new Tool: "${inputValue}"`}
         isClearable
         inputValue={state.snap.inputValue}
-        value={valueCurrent}
+        onInputChange={(newValue: string, _) => {
+          state.mutable.inputValue = newValue;
+        }}
+        value={optionCurrent}
         loadOptions={async (inputValue: string) => {
           if (!inputValue) {
             return state.snap.defaultOptions;
           }
           const res = await client.query({
             query: ToolQuery,
-            variables: { title: inputValue },
+            variables: { filterBy: inputValue },
           });
           return res.data?.post_tools ?? [];
         }}
         onCreateOption={(inputValue: string) => {
-          const isChoosingAnotherTool = form.watch("id");
-          if (isChoosingAnotherTool) {
+          const isSelectedExistingTool = Boolean(field.id);
+          if (isSelectedExistingTool) {
             form.reset();
           }
           form.setValue("id", null);
           form.setValue("title", inputValue);
-        }}
-        onInputChange={(newValue: string, _) => {
-          state.mutable.inputValue = newValue;
         }}
         onChange={(toolNew: ToolOption | null, actionMeta) => {
           if (actionMeta.action === "clear") {
@@ -117,8 +121,8 @@ type ToolOption = {
 const ToolQuery = graphql.persisted(
   "SearchToolsForSelection",
   graphql(`
-  query SearchToolsForSelection($title: String) {
-    post_tools(filters: { title: { i_contains: $title } }) {
+  query SearchToolsForSelection($filterBy: String) {
+    post_tools(filters: { title: { i_contains: $filterBy } }) {
       id
       title
       tool_type

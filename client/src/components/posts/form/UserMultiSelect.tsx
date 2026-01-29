@@ -1,6 +1,7 @@
 import { DialogBackdrop, Field, HStack } from "@chakra-ui/react";
 import { AsyncCreatableSelect, components } from "chakra-react-select";
 import { useEffect, useRef } from "react";
+import { useWatch } from "react-hook-form";
 import { subscribe } from "valtio/vanilla";
 import { user } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
@@ -15,45 +16,42 @@ import {
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useValtioProxyRef";
 
 export type UserSelectOption =
   | NonNullable<schemas.sharable.Schema["recommend_to"]>[number]
   | NonNullable<schemas.sharable.Schema["visible_to"]>[number];
 
-// todo refac-name: PostFormSelectSharable
+// todo ? refac-name: PostFormSelectSharable
 export function UserMultiSelect(props: {
   form: schemas.sharable.Form;
   fieldName: "recommend_to" | "visible_to";
   placeholder?: string;
 }) {
-  const options = props.form.watch(props.fieldName)!;
-
   const fieldError = props.form.formState.errors[props.fieldName];
 
-  const state = useValtioProxyRef({
+  const state = useStateValtio({
     isOptionDialogOpen: false,
     userSelected: null as SelectVotableOption | null,
     options: [] as UserSelectOption[],
   });
+
   const dialogInputRef = useRef<HTMLInputElement | null>(null);
 
+  const options = useWatch({ control: props.form.control, name: props.fieldName }) ?? [];
+
   useEffect(() => {
-    if (user.state?.current?.connection_groups) {
-      state.mutable.options = getOptionsAndFilter();
+    if (user.state?.current) {
+      state.mutable.options = getOptionsFiltered({ filterBy: "" });
     }
 
-    subscribe(user.state, () => {
-      state.mutable.options = getOptionsAndFilter();
+    return subscribe(user.state, () => {
+      state.mutable.options = getOptionsFiltered({ filterBy: "" });
     });
   }, []);
 
-  function getOptionNumber(optionId: string): number {
-    return options!.findIndex(option => option.id === optionId);
-  }
-
-  function getOptionMessage(option: UserSelectOption): string {
-    return options![getOptionNumber(option.id)].message ?? "";
+  function getOptionIndex(optionId: string): number {
+    return options.findIndex(option => option.id === optionId);
   }
 
   return (
@@ -75,7 +73,7 @@ export function UserMultiSelect(props: {
             }),
           );
         }}
-        loadOptions={async (inputValue: string) => getOptionsAndFilter(inputValue)}
+        loadOptions={async (input: string) => getOptionsFiltered({ filterBy: input })}
         getOptionLabel={option => option.label ?? option.id}
         getOptionValue={option => {
           // `getOptionValue` is a bad name, it's only used for comparison
@@ -112,7 +110,7 @@ export function UserMultiSelect(props: {
             {state.snap.isOptionDialogOpen && state.snap.userSelected && (
               <FormChakraInput
                 key={state.snap.userSelected.id}
-                name={`${props.fieldName}.${getOptionNumber(state.snap.userSelected.id)}.message`}
+                name={`${props.fieldName}.${getOptionIndex(state.snap.userSelected.id)}.message`}
                 control={props.form.control}
                 label="Message"
                 inputProps={{
@@ -129,13 +127,8 @@ export function UserMultiSelect(props: {
   );
 }
 
-function getOptionsAndFilter(filterInputValue?: string): UserSelectOption[] {
-  function isFilterMatched(optionName: string) {
-    const isNothingTyped = !filterInputValue || filterInputValue === "";
-    return isNothingTyped || optionName.toLowerCase().includes(filterInputValue.toLowerCase());
-  }
-
-  const optionsUsers = user.state.connections
+function getOptionsFiltered(opts?: { filterBy: string }): UserSelectOption[] {
+  const optionUsers = user.state.connections
     .filter(user => isFilterMatched(user.username))
     .map(user => ({
       id: user.id,
@@ -145,7 +138,7 @@ function getOptionsAndFilter(filterInputValue?: string): UserSelectOption[] {
       message: null,
     }));
 
-  const optionsGroups =
+  const optionUserGroups =
     user.state
       .current!.connection_groups.filter(group => isFilterMatched(group.name))
       .map(group => ({
@@ -158,5 +151,13 @@ function getOptionsAndFilter(filterInputValue?: string): UserSelectOption[] {
         message: null,
       })) ?? [];
 
-  return [...optionsGroups, ...optionsUsers];
+  function isFilterMatched(optionName: string): boolean {
+    const isFilterEmpty = opts?.filterBy === "" || !opts?.filterBy;
+    if (isFilterEmpty) {
+      return true;
+    }
+    return optionName.toLowerCase().includes(opts.filterBy.toLowerCase());
+  }
+
+  return [...optionUserGroups, ...optionUsers];
 }

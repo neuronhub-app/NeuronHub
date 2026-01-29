@@ -21,6 +21,7 @@ export default defineConfig(config => ({
       babelConfig: {
         presets: ["@babel/preset-typescript"],
         plugins: [["babel-plugin-react-compiler"]],
+        compact: false, // removes whitespaces, ie redundant and pollutes E2E logs
       },
     }),
     tsconfigPaths(),

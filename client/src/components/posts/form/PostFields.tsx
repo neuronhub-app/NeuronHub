@@ -1,5 +1,5 @@
 import { HStack, Show } from "@chakra-ui/react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import { FaLightbulb, FaNewspaper, FaQuestion, FaThumbsUp } from "react-icons/fa";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -19,6 +19,7 @@ export function PostFields(props: {
   isHideTitle?: boolean;
 }) {
   const form = useFormContext<schemas.PostAbstract>();
+  const postId = useWatch({ control: form.control, name: "id" });
 
   return (
     <>
@@ -84,7 +85,7 @@ export function PostFields(props: {
 
       <SelectVotable
         fieldName="tags"
-        postId={form.watch("id") ?? undefined}
+        postId={postId ?? undefined}
         isReadOnly={props.isReadOnly}
         {...ids.set(ids.post.form.tags)}
       />

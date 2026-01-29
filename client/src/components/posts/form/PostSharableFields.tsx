@@ -1,4 +1,5 @@
 import { Text, VStack } from "@chakra-ui/react";
+import { useWatch } from "react-hook-form";
 import { FaGlobe, FaShieldHalved, FaUsers, FaUsersGear } from "react-icons/fa6";
 import { HiLockClosed } from "react-icons/hi2";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
@@ -16,7 +17,7 @@ export function PostSharableFields(props: {
   const isShowTitle = props.isShowTitle ?? true;
 
   const form = schemas.sharable.useFormContext();
-  const state = form.watch();
+  const visibility = useWatch({ control: form.control, name: "visibility" });
 
   return (
     <>
@@ -48,17 +49,17 @@ export function PostSharableFields(props: {
           ]}
           segmentGroupProps={{ size: "sm" }}
         />
-        {state.visibility &&
+        {visibility &&
           new Set([
             Visibility.UsersSelected,
             Visibility.Connections,
             Visibility.Subscribers,
-          ]).has(state.visibility as Visibility) && (
+          ]).has(visibility as Visibility) && (
             <UserMultiSelect
               form={form}
               fieldName="visible_to"
               placeholder={
-                state.visibility === Visibility.UsersSelected
+                visibility === Visibility.UsersSelected
                   ? "Select users"
                   : "Show to extra users (optional)"
               }

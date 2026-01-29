@@ -36,7 +36,7 @@
 ["upgrade-deps:server"]
     dir = "server"
     run = """
-        # use env.DEPENDENCY_COOLDOWN_DAYS
+        # uv lock & env.DEPENDENCY_COOLDOWN_DAYS
 
         let days_cooldown = {{ env.DEPENDENCY_COOLDOWN_DAYS }}day;
         let date_cutoff = (date now) - $days_cooldown | format date "%+"

@@ -11,7 +11,7 @@ import {
 import { AsyncCreatableSelect, components } from "chakra-react-select";
 import type { MessageSquarePlus } from "lucide-react";
 import { type ReactNode, useRef } from "react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FaMessage, FaRegMessage } from "react-icons/fa6";
 import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
@@ -54,7 +54,7 @@ export function SelectVotable(
     fieldName: SelectVotableField;
     label?: string;
     helpText?: string;
-    isReviewTags?: boolean; // see docs [[PostTag#is_review_tag]]
+    isReviewTags?: boolean; // see [[PostTag#is_review_tag]] docs
     optionIdsHidden?: ID[];
     onChange?: (options: SelectVotableOption[]) => void;
     isReadOnly?: boolean;
@@ -64,12 +64,13 @@ export function SelectVotable(
     | { postId: ID; isSelectReadOnlyInReviewForm: true }
   ),
 ) {
-  // todo refac(types): assertion
+  // todo ? refac(types): assertion
   // const form = schemas.useFormContextAbstract([props.fieldName]);
   const form: schemas.ReviewForm = useFormContext();
 
-  const optionIdsHidden = props.optionIdsHidden ?? [];
-  const options = form.watch(props.fieldName).filter(opt => !optionIdsHidden.includes(opt.id));
+  const options = useWatch({ control: form.control, name: props.fieldName }).filter(
+    opt => false === (props.optionIdsHidden ?? []).includes(opt.id),
+  );
 
   const commentInputRef = useRef<HTMLInputElement>(null);
 
@@ -110,7 +111,7 @@ export function SelectVotable(
           isSearchable={!isSelectReadOnlyInReviewForm}
           openMenuOnClick={!isSelectReadOnlyInReviewForm}
           closeMenuOnSelect={false}
-          value={options.filter(option => !optionIdsHidden.includes(option.id))}
+          value={options}
           onChange={(optionsNew, _) => {
             // @ts-expect-error #bad-infer + ReadOnly<T> error makes no sense
             props.onChange?.(optionsNew);
@@ -118,7 +119,7 @@ export function SelectVotable(
             form.setValue(
               props.fieldName,
               optionsNew.map(optionNew => {
-                // stop react-select from re-creating `Option` and loosing [[SelectVotableOption]] attrs
+                // stop react-select from re-creating `Option` and loosing [[SelectVotableOption]] properties
                 const option = options?.find(opt => opt.id === optionNew.id);
                 return option ?? optionNew;
               }),
@@ -134,16 +135,18 @@ export function SelectVotable(
                 is_review_tag: props.isReviewTags ?? false,
               },
             });
-            return response.data!.tags.filter(option => !optionIdsHidden.includes(option.id));
+            return response.data!.tags.filter(
+              option => false === (props.optionIdsHidden ?? []).includes(option.id),
+            );
           }}
           getOptionLabel={option => option.label ?? option.name}
           getOptionValue={option => option.name}
           components={{
             MultiValueRemove: isSelectReadOnlyInReviewForm
               ? () => null
-              : propsRemove => (
+              : propsReactSelect => (
                   <components.MultiValueRemove
-                    {...propsRemove}
+                    {...propsReactSelect}
                     data-testid={ids.post.form.tag.remove}
                   />
                 ),

@@ -1,7 +1,7 @@
 import { Fieldset, Flex, Heading, HStack, Show, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatISO } from "date-fns";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, useWatch } from "react-hook-form";
 import { FaStar } from "react-icons/fa";
 import { FaBookmark, FaCircleXmark, FaClockRotateLeft, FaHeartPulse } from "react-icons/fa6";
 import { FiSave } from "react-icons/fi";
@@ -86,6 +86,8 @@ export namespace PostReviewForm {
       }),
     };
 
+    const reviewTags = useWatch({ control: forms.review.control, name: "tags" });
+
     function loadTags(tags?: schemas.PostAbstract["tags"], opts?: { isReviewTags: true }) {
       if (!tags) {
         return [];
@@ -167,11 +169,6 @@ export namespace PostReviewForm {
       return response.data.post_update_or_create.id;
     }
 
-    const state = {
-      review: forms.review.watch(),
-      tool: forms.tool.watch(),
-    };
-
     return (
       <VStack alignItems="flex-start" w="100%" gap="gap.lg">
         <Heading fontSize="2xl">
@@ -222,7 +219,7 @@ export namespace PostReviewForm {
                         fieldName="tags"
                         isSelectReadOnlyInReviewForm={true}
                         postId={props.review?.parent?.id}
-                        optionIdsHidden={state.review.tags.map(tag => tag.id)}
+                        optionIdsHidden={reviewTags.map(tag => tag.id)}
                         {...ids.set(ids.post.form.tags)}
                       />
                     </>
@@ -364,9 +361,6 @@ export namespace PostReviewForm {
             </FormProvider>
           </form>
         </VStack>
-
-        {/*<FormStateCodeBlock title="review" state={state.review} />*/}
-        {/*<FormStateCodeBlock title="tool" state={state.tool} />*/}
       </VStack>
     );
   }

@@ -1,6 +1,6 @@
 import { HStack, Show, Text } from "@chakra-ui/react";
 import { Webhook } from "lucide-react";
-import { useFormContext } from "react-hook-form";
+import { useFormContext, useWatch } from "react-hook-form";
 import { FaAppStoreIos, FaBook, FaCode, FaServer, FaShoppingCart } from "react-icons/fa";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
@@ -13,9 +13,13 @@ import { ToolType } from "~/graphql/enums";
 
 export function PostToolFields(props: { isToolSelectAllowed?: boolean }) {
   const form = useFormContext<schemas.Tool>();
-  const state = form.watch();
 
-  const isToolSelected = props.isToolSelectAllowed && Boolean(state.id);
+  const tool = {
+    id: useWatch({ control: form.control, name: "id" }),
+    tool_type: useWatch({ control: form.control, name: "tool_type" }),
+  };
+
+  const isToolSelected = props.isToolSelectAllowed && Boolean(tool.id);
 
   return (
     <>
@@ -39,32 +43,32 @@ export function PostToolFields(props: { isToolSelectAllowed?: boolean }) {
       </Show>
 
       <Show when={!isToolSelected}>
-        <Show when={state.tool_type === "Program"}>
+        <Show when={tool.tool_type === "Program"}>
           <Text color="fg.muted" fontSize="xs">
             A Git repository, with statistics that can be pulled from it
           </Text>
         </Show>
-        <Show when={state.tool_type === "SaaS"}>
+        <Show when={tool.tool_type === "SaaS"}>
           <Text color="fg.muted" fontSize="xs">
             An online service, eg Notion, Claude, Claude API, AWS, GCP, etc
           </Text>
         </Show>
-        <Show when={state.tool_type === "App"}>
+        <Show when={tool.tool_type === "App"}>
           <Text color="fg.muted" fontSize="xs">
             Desktop app, mobile, etc
           </Text>
         </Show>
-        <Show when={state.tool_type === "Material"}>
+        <Show when={tool.tool_type === "Material"}>
           <Text color="fg.muted" fontSize="xs">
             Blog article, publication, book, etc
           </Text>
         </Show>
-        <Show when={state.tool_type === "Product"}>
+        <Show when={tool.tool_type === "Product"}>
           <Text color="fg.muted" fontSize="xs">
             A physical product or a parent
           </Text>
         </Show>
-        <Show when={state.tool_type === "Other"}>
+        <Show when={tool.tool_type === "Other"}>
           <Text color="fg.muted" fontSize="xs">
             A parent that doesn't fit any other category
           </Text>
@@ -72,8 +76,8 @@ export function PostToolFields(props: { isToolSelectAllowed?: boolean }) {
       </Show>
 
       <PostFields
-        titleLabel={`${getToolTypeName(state.tool_type)} name`}
-        contentLabel={`${getToolTypeName(state.tool_type)} description`}
+        titleLabel={`${getToolTypeName(tool.tool_type)} name`}
+        contentLabel={`${getToolTypeName(tool.tool_type)} description`}
         isHideTitle={props.isToolSelectAllowed}
         isReadOnly={isToolSelected}
       />
@@ -101,7 +105,7 @@ export function PostToolFields(props: { isToolSelectAllowed?: boolean }) {
         />
       </HStack>
 
-      {/* TODO: Fix alternatives field type issues
+      {/* todo ? feat: fix alternatives field type issues
       <VStack align="flex-start" w="full" gap="gap.sm">
         <Text fontSize="sm" fontWeight="semibold">
           Alternatives
