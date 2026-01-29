@@ -1,6 +1,5 @@
 import { Button, HStack, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { JSX } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
@@ -12,31 +11,31 @@ import { graphql, type ID } from "@/gql-tada";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { toast } from "@/utils/toast";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useValtioProxyRef";
 import { PostTypeEnum, Visibility } from "~/graphql/enums";
 
+const schema = z
+  .object({ content_polite: z.string().min(1).max(5000) })
+  .extend(schemas.sharable.Schema.shape);
+
 export function CommentForm(
-  props:
+  props: {
+    onClose: () => Promise<void>;
+    isHideCancelButton?: boolean;
+  } & (
     | {
         mode: "create";
         parentId: ID;
-        onClose?: () => Promise<void> | void;
       }
     | {
         mode: "edit";
         comment: PostEditFragmentType;
-        onClose: () => Promise<void> | void;
-      },
+      }
+  ),
 ) {
   const isEditMode = props.mode === "edit";
 
-  const state = useValtioProxyRef({ isShowVisibilityField: isEditMode });
-
-  const schema = z
-    .object({
-      content_polite: z.string().min(1).max(5000),
-    })
-    .extend(schemas.sharable.Schema.shape);
+  const state = useStateValtio({ isShowVisibilityField: isEditMode });
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -53,33 +52,23 @@ export function CommentForm(
 
   async function handleSubmit(data: z.infer<typeof schema>) {
     if (isEditMode) {
-      const response = await commentUpdate({
-        id: props.comment.id,
-        ...data,
-      });
-      if (response.success) {
+      const res = await commentUpdate({ id: props.comment.id, ...data });
+      if (res.success) {
         toast.success("Comment updated");
         await props.onClose();
       } else {
-        showError(response.errorMessage);
+        toast.error(res.error);
       }
     } else {
-      const response = await commentCreate({
-        parentId: props.parentId,
-        ...data,
-      });
-      if (response.success) {
+      const res = await commentCreate({ parentId: props.parentId, ...data });
+      if (res.success) {
         toast.success("Comment posted");
         form.reset();
         state.mutable.isShowVisibilityField = false;
-        await props.onClose?.();
+        await props.onClose();
       } else {
-        showError(response.errorMessage);
+        toast.error(res.error);
       }
-    }
-
-    function showError(error: string | JSX.Element) {
-      toast.error(`Failed comment ${isEditMode ? "update" : "creation"}: ${error}`);
     }
   }
 
@@ -110,12 +99,12 @@ export function CommentForm(
           )}
 
           <HStack>
-            {props.onClose && (
+            {!props.isHideCancelButton && (
               <Button
                 type="button"
                 variant="ghost"
                 size="xs"
-                onClick={() => props.onClose?.()}
+                onClick={props.onClose}
                 {...ids.set(ids.comment.form.cancelBtn)}
               >
                 Cancel

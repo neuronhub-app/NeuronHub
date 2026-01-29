@@ -36,7 +36,9 @@ export function useCommentTree(props: { postId?: ID }) {
       if (!props.postId) {
         return;
       }
-      if (!opts?.isForceGraphqlRefetch && state.local.isCommentsLoaded) {
+
+      const isLoadedAndNotForced = state.local.isCommentsLoaded && !opts?.isForceGraphqlRefetch;
+      if (isLoadedAndNotForced) {
         return;
       }
 

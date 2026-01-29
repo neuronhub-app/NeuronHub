@@ -76,6 +76,7 @@ export function PostDetail(props: {
                       isLastChild={index === comments.tree.length - 1}
                       isFirstChild={true}
                       height={{ parent: 0, toolbar: 0, avatar: 0 }} // init, 0 is fine.
+                      refetchComments={comments.refetchGraphql}
                     />
                   ))}
                   <Show when={comments.isRendering}>
@@ -92,6 +93,7 @@ export function PostDetail(props: {
                 mode="create"
                 parentId={props.post.id}
                 onClose={comments.refetchGraphql}
+                isHideCancelButton={true}
               />
             </Show>
           </Stack>

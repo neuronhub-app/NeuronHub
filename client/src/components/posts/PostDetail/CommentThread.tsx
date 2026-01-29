@@ -59,7 +59,7 @@ export function CommentThread(props: {
     toolbar: number;
     avatar: number;
   };
-  refetchComments?: () => void;
+  refetchComments: () => Promise<void>;
 }) {
   const auth = useAuth();
 
@@ -177,7 +177,7 @@ export function CommentThread(props: {
                   onClose={async () => {
                     state.mutable.isEditing = false;
                     state.mutable.commentForEdit = null;
-                    props.refetchComments?.();
+                    await props.refetchComments();
                   }}
                 />
               ) : (
@@ -195,14 +195,14 @@ export function CommentThread(props: {
           </Box>
 
           {auth.isLoggedIn && !threadGuide.isCollapsed && (
-            <Flex role="toolbar" ref={refs.toolbar}>
+            <Flex ref={refs.toolbar} role="toolbar">
               <CommentVoteBar comment={props.comment} />
 
               {comments.isRenderLowPrioReplyButtons && (
                 <CommentToolbarButton
                   label="Reply"
                   onClick={() => {
-                    state.mutable.isShowReplyForm = !state.snap.isShowReplyForm;
+                    state.mutable.isShowReplyForm = true;
                   }}
                   id={ids.comment.btn.reply}
                 />
@@ -244,7 +244,7 @@ export function CommentThread(props: {
                 parentId={props.comment.id}
                 onClose={async () => {
                   state.mutable.isShowReplyForm = false;
-                  props.refetchComments?.();
+                  await props.refetchComments();
                 }}
               />
             </Box>
@@ -259,6 +259,7 @@ export function CommentThread(props: {
               key={comment.id}
               post={props.post}
               comment={comment}
+              refetchComments={props.refetchComments}
               depth={props.depth + 1}
               isFirstChild={index === 0}
               isLastChild={index === props.comment.comments.length - 1}
