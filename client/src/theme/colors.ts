@@ -23,7 +23,7 @@ export namespace theme {
       "primary-muted": {
         value: {
           _light: `{colors.${colorPrimary}.400}`,
-          _dark: `{colors.${colorPrimary}.400}`,
+          _dark: `{colors.${colorPrimary}.500}`,
         },
       },
       secondary: {

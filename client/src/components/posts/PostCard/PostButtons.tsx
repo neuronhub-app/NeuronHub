@@ -3,11 +3,9 @@ import { ErrorBoundary } from "@sentry/react";
 import { type ComponentProps, type ReactNode, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
-import { LuLibrary } from "react-icons/lu";
 import { useSnapshot } from "valtio/react";
 import { user } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
-import { PostButtonShare } from "@/components/posts/PostCard/PostButtonShare";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
@@ -26,13 +24,14 @@ export function PostButtons(props: { post: PostListItemType }) {
       id: props.post.id,
       label: "Reading list",
     },
-    {
-      fieldName: UserListName.Library,
-      iconPresent: <LuLibrary />,
-      iconNotPresent: <LuLibrary />,
-      id: props.post.id,
-      label: "Library",
-    },
+    // todo ? UI: hide it behind a "..." element
+    // {
+    //   fieldName: UserListName.Library,
+    //   iconPresent: <LuLibrary />,
+    //   iconNotPresent: <LuLibrary />,
+    //   id: props.post.id,
+    //   label: "Library",
+    // },
   ];
 
   return (
@@ -44,7 +43,8 @@ export function PostButtons(props: { post: PostListItemType }) {
           </ErrorBoundary>
         )}
       </For>
-      <PostButtonShare id={props.post.id} fieldName={UserListName.Library} />
+      {/* todo ? UI: hide it behind a "..." element */}
+      {/*<PostButtonShare id={props.post.id} fieldName={UserListName.Library} />*/}
     </Stack>
   );
 }

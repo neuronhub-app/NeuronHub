@@ -53,7 +53,7 @@ export function PostDetail(props: {
 
       {props.post && (
         <Stack gap="gap.xl">
-          <PostCard post={props.post} isDetailPage urlNamespace="posts" />
+          <PostCard post={props.post} isPageDetail urlNamespace="posts" />
 
           <Stack gap={props.post.comment_count > 0 ? "gap.lg" : "0"}>
             <Flex gap="gap.md" align="center">

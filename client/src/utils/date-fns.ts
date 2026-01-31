@@ -2,33 +2,52 @@ import { TZDate, tzName } from "@date-fns/tz";
 import { format, formatDistanceToNowStrict } from "date-fns";
 
 export namespace datetime {
-  export function full(dateRaw: Date | string | unknown) {
-    if (!dateRaw) {
-      return "";
-    }
-    const date = new Date(String(dateRaw));
+  type DateRaw = Date | number | string | unknown;
 
-    // #AI, related to #77
-    if (Number.isNaN(date.getTime())) {
+  export function full(dateRaw: DateRaw): string {
+    const date = parseRaw(dateRaw);
+    if (!date) {
       return "";
     }
     const tz = new TZDate(date).timeZone;
     const tzNameShort = tz ? tzName(tz, date, "shortGeneric") : "";
 
-    return `${format(date, "yyyy-MM-dd kk:mm")} ${tzNameShort}`.trim();
+    return `${format(date, "yyyy-MM-dd kk:mm")} ${tzNameShort}`;
   }
 
-  export function relative(dateRaw: Date | string | unknown) {
+  export function relative(dateRaw: DateRaw): string {
+    const date = parseRaw(dateRaw);
+    if (!date) {
+      return "";
+    }
+    const distanceVerbose = formatDistanceToNowStrict(date);
+    const distance = distanceVerbose
+      .replace(" seconds", "s")
+      .replace(" minutes", "min")
+      .replace(" hours", "h")
+      .replace(" days", "d")
+      .replace(" months", "m")
+      .replace(" years", "y");
+
+    return `${distance} ago`;
+  }
+
+  function parseRaw(dateRaw: DateRaw): Date | undefined {
     if (!dateRaw) {
-      return "";
+      return;
     }
+
+    if (isDateValid(dateRaw)) {
+      return dateRaw;
+    }
+
     const date = new Date(String(dateRaw));
-
-    // #AI, related to #77
-    if (Number.isNaN(date.getTime())) {
-      return "";
+    if (isDateValid(date)) {
+      return date;
     }
+  }
 
-    return `${formatDistanceToNowStrict(date)} ago`;
+  function isDateValid(date: Date | unknown): date is Date {
+    return date instanceof Date && !Number.isNaN(date.getTime());
   }
 }

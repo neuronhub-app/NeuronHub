@@ -125,6 +125,7 @@ export const CommentFieldsFragment = graphql(
   `,
 );
 
+// todo ! refac-name: PostSourceAuthorFragment
 export const PostAuthorFragment = graphql(`
   fragment PostAuthorFragment on PostTypeI {
     post_source {

@@ -12,7 +12,6 @@ import { useUser } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
-import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
 
 // todo feat(UI): after tag.is_important, make ensure still sorted by votes
 // todo refac-name: PostCardTags
@@ -20,15 +19,21 @@ export function PostTags(props: {
   tags: PostTagFragmentType[];
   postId: ID;
   tagsExcluded?: ID[];
+  tagsNameExcluded?: string[];
   isRenderInline?: boolean;
+  isHideIcons?: boolean;
 }) {
   const isInlineRender = props.isRenderInline ?? true;
 
   const user = useUser();
 
-  const tagsFiltered = props.tagsExcluded
+  let tagsFiltered = props.tagsExcluded
     ? props.tags.filter(tag => !props.tagsExcluded?.includes(tag.id))
     : props.tags;
+
+  if (props.tagsNameExcluded) {
+    tagsFiltered = tagsFiltered.filter(tag => !props.tagsNameExcluded?.includes(tag.name));
+  }
 
   const tagsSorted = [...tagsFiltered].sort((a, b) => {
     // Secondly sort by votes
@@ -66,6 +71,7 @@ export function PostTags(props: {
         tag={tag}
         postId={props.postId}
         isUserOrAuthorVotedPositive={userVote?.is_vote_positive}
+        isHideIcons={props.isHideIcons}
       />
     );
   });
@@ -83,6 +89,7 @@ export function PostTag(props: {
   postId: ID;
   isUserOrAuthorVotedPositive?: boolean | null;
   voteTooltip?: string;
+  isHideIcons?: boolean;
 }) {
   let votesSum = 0;
   const tagVotes = props.tag.votes.filter(vote => vote.post.id === props.postId);
@@ -93,16 +100,15 @@ export function PostTag(props: {
   const isUserOrAuthorVoted =
     props.isUserOrAuthorVotedPositive !== null &&
     props.isUserOrAuthorVotedPositive !== undefined;
-  const isVotedOrImportant = props.tag.is_important || isUserOrAuthorVoted;
-  const tagIconParams = isVotedOrImportant ? getTagIconParams(props.tag) : null;
+  const isShowIcon = (props.tag.is_important || isUserOrAuthorVoted) && !props.isHideIcons;
+  const tagIconParams = isShowIcon ? getTagIconParams(props.tag) : null;
 
   return (
     <Tag.Root
       key={props.tag.id}
       colorPalette="gray"
       variant="subtle"
-      size="lg"
-      {...getOutlineContrastStyle({ variant: "subtle" })}
+      size="sm"
       opacity={0.9}
       bg={{ _light: "bg.subtle" }}
     >

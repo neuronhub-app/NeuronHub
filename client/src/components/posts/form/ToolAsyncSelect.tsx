@@ -9,7 +9,9 @@ import { useInit } from "@/utils/useInit";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
 
 /**
- * Note: in the future consider @chakra-ui Combobox with render of .image & .content. But atm we can't as it lacks the `create` mode.
+ * Note: in the future replace with @chakra-ui Combobox with render of .image & .content.
+ * Beware <Combobox/> `creatable` is shitton of custom code instead of a clean function.
+ * Also still no inline multiple options in 2025.01.
  * - https://www.chakra-ui.com/docs/components/combobox#hook-form
  * - https://www.chakra-ui.com/docs/components/combobox#custom-item - to render .image and .content
  * - https://www.chakra-ui.com/docs/components/combobox#links - link can be to urls.tools.detail

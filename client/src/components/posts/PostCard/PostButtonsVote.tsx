@@ -5,7 +5,6 @@ import { usePostVoting } from "@/components/posts/usePostVoting";
 import { ids } from "@/e2e/ids";
 
 // todo refac-name: PostActionsVoting
-// todo refac: dedup using better code from [[CommentVoteBar.tsx]]
 export function PostButtonsVote(props: { post: PostListItemType }) {
   const voting = usePostVoting({
     postId: props.post.id,
@@ -18,7 +17,7 @@ export function PostButtonsVote(props: { post: PostListItemType }) {
       <IconButton
         loading={voting.isLoadingUpvote}
         onClick={() => voting.vote({ isPositive: true })}
-        data-state={voting.isVotePositive === true ? "checked" : "unchecked"}
+        data-state={voting.isVotePositive ? "checked" : "unchecked"}
         variant="subtle-ghost"
         borderRadius="lg"
         size="sm"

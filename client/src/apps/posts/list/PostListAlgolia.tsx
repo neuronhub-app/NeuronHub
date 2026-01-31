@@ -183,21 +183,25 @@ function PostListHits() {
 
   return (
     <Stack gap="gap.xl" w="full">
-      <Stack gap="gap.xl" {...ids.set(ids.post.list)}>
+      <Stack {...ids.set(ids.post.list)}>
         {hits.results?.nbHits ? (
-          <For
-            each={postsEnriched}
-            fallback={
-              <>
-                <PostCardSkeleton />
-                <PostCardSkeleton />
-                <PostCardSkeleton />
-                <PostCardSkeleton />
-              </>
-            }
-          >
-            {post => <PostCard key={post.id} post={post} urlNamespace="posts" />}
-          </For>
+          postsEnriched.length ? (
+            postsEnriched.map(post => (
+              <PostCard
+                key={post.id}
+                post={post}
+                urlNamespace="posts"
+                isPageListCompact={true}
+              />
+            ))
+          ) : (
+            <>
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+              <PostCardSkeleton />
+            </>
+          )
         ) : (
           <HStack align="center">
             <Text>No matches found.</Text>

@@ -62,26 +62,30 @@ export function usePostVoting(props: {
     state.mutable.isLoadingDownvote = false;
   }
 
+  const sumInitial = props.score_external ?? 0;
+  const sum = props.votes.reduce((sum, vote) => {
+    if (vote.is_vote_positive === true) {
+      return sum + 1;
+    }
+    if (vote.is_vote_positive === false) {
+      return sum - 1;
+    }
+    return sum;
+  }, sumInitial);
+
   return {
+    vote,
+    sum,
     isVotePositive: state.snap.isVotePositive,
     isLoadingUpvote: state.snap.isLoadingUpvote,
     isLoadingDownvote: state.snap.isLoadingDownvote,
-    vote,
-    sum: props.votes.reduce((sum, vote) => {
-      if (vote.is_vote_positive === true) {
-        return sum + 1;
-      }
-      if (vote.is_vote_positive === false) {
-        return sum - 1;
-      }
-      return sum;
-    }, props.score_external ?? 0),
   };
 }
+
 const PostVoteUpdateOrCreateMutation = graphql.persisted(
-  "PostVoteUpdateOrCreateOrUpdate",
+  "PostVoteUpdateOrCreate",
   graphql(`
-    mutation PostVoteUpdateOrCreateOrUpdate($id: ID!, $isVotePositive: Boolean) {
+    mutation PostVoteUpdateOrCreate($id: ID!, $isVotePositive: Boolean) {
       post_vote_update_or_create(id: $id, is_vote_positive: $isVotePositive)
     }
   `),

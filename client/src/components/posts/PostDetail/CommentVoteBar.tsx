@@ -5,7 +5,6 @@ import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import type { PostCommentType } from "@/graphql/fragments/posts";
 
-// todo refac: dedup with [[PostButtonsVote.tsx]]
 export function CommentVoteBar(props: { comment: { id: ID; votes: PostCommentType["votes"] } }) {
   const voting = usePostVoting({ postId: props.comment.id, votes: props.comment.votes });
 

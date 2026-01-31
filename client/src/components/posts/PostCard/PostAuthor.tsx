@@ -1,5 +1,13 @@
-import { Avatar, Flex, Popover, Portal, SkeletonText, Text } from "@chakra-ui/react";
-import { useMemo } from "react";
+import {
+  Avatar,
+  Flex,
+  type JsxStyleProps,
+  Popover,
+  Portal,
+  SkeletonText,
+  Text,
+} from "@chakra-ui/react";
+import { type ComponentProps, useMemo } from "react";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import type { PostCommentTree } from "@/components/posts/PostDetail/useCommentTree";
 import { Prose } from "@/components/ui/prose";
@@ -12,12 +20,17 @@ import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
 
+// todo ? refac-name: indicate it can load UserSource profile, eg as `PostAuthor{Clickable|Popover}`
 export function PostAuthor(props: {
   post: PostListItemType | PostCommentTree;
   isRenderAvatar?: boolean;
+  color?: JsxStyleProps["color"];
+  prefix?: "avatar" | "by";
+  prefixColor?: JsxStyleProps["color"];
+  prefixGap?: JsxStyleProps["gap"];
 }) {
   const state = useStateValtio({
-    post: null as null | PostAuthorFragmentType,
+    post: null as null | PostAuthorFragmentType, // todo ! refac-name: postSource
     isClicked: false,
     isMouseHoveredAndMustMount: false,
   });
@@ -47,11 +60,7 @@ export function PostAuthor(props: {
             state.mutable.isMouseHoveredAndMustMount = true;
           }}
         >
-          <PostAuthorUsername
-            post={props.post}
-            isPopover
-            isRenderAvatar={props.isRenderAvatar}
-          />
+          <PostAuthorUsername {...props} isPopover />
         </Flex>
       );
     }
@@ -66,11 +75,7 @@ export function PostAuthor(props: {
         }}
       >
         <Popover.Trigger>
-          <PostAuthorUsername
-            post={props.post}
-            isPopover
-            isRenderAvatar={props.isRenderAvatar}
-          />
+          <PostAuthorUsername {...props} isPopover />
         </Popover.Trigger>
 
         <Portal>
@@ -101,7 +106,7 @@ export function PostAuthor(props: {
                       {author.about && (
                         <Prose
                           size="xs"
-                          // biome-ignore lint/security/noDangerouslySetInnerHtml: imported
+                          // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
                           dangerouslySetInnerHTML={{
                             __html: markedConfigured.parse(author.about),
                           }}
@@ -117,28 +122,18 @@ export function PostAuthor(props: {
       </Popover.Root>
     );
   }
-  return <PostAuthorUsername post={props.post} isRenderAvatar={props.isRenderAvatar} />;
+  return <PostAuthorUsername {...props} />;
 }
 
-const PostAuthorQuery = graphql.persisted(
-  "PostAuthor",
-  graphql(`query PostAuthor($id: ID!) { post_generic(pk: $id) { id ...PostAuthorFragment } }`, [
-    PostAuthorFragment,
-  ]),
-);
-
 // todo ? refac: drop isPopover - only tell it "you're a link" to add _hover={}
-function PostAuthorUsername(props: {
-  post: PostListItemType | PostCommentTree;
-  isPopover?: boolean;
-  isRenderAvatar?: boolean;
-}) {
+function PostAuthorUsername(props: ComponentProps<typeof PostAuthor> & { isPopover?: boolean }) {
   const username = props.post.author?.username ?? props.post?.post_source?.user_source?.username;
   const colorPalette = useMemo(() => {
     return getAvatarColorForUsername(username);
   }, [username]);
+
   return (
-    <Flex align="center" gap="gap.sm">
+    <Flex align="center" gap={props.prefixGap ?? "gap.sm"}>
       {props.isRenderAvatar && (
         <Avatar.Root
           size="2xs"
@@ -156,10 +151,16 @@ function PostAuthorUsername(props: {
           />
         </Avatar.Root>
       )}
+      {props.prefix === "by" && (
+        <Text fontSize="sm" color={props.prefixColor}>
+          by
+        </Text>
+      )}
+
       <Text
         fontSize="sm"
-        color="fg.muted"
-        _hover={props.isPopover ? { textDecoration: "underline" } : {}}
+        color={props.color ?? "fg.subtle"}
+        _hover={props.isPopover ? { textDecoration: "underline", cursor: "pointer" } : {}}
       >
         {username}
       </Text>
@@ -189,3 +190,10 @@ export function getAvatarColorForUsername(username?: string) {
   const index = (username.charCodeAt(0) + username.charCodeAt(1)) % colorPalette.length;
   return colorPalette[index];
 }
+
+const PostAuthorQuery = graphql.persisted(
+  "PostAuthor",
+  graphql(`query PostAuthor($id: ID!) { post_generic(pk: $id) { id ...PostAuthorFragment } }`, [
+    PostAuthorFragment,
+  ]),
+);

@@ -18,7 +18,7 @@ const tokens = defineTokens({
       },
     },
   },
-  // seems to be broken either on MacOS or Chakra. I don't believe this need specification. But it barer works, and only if i use _hover.
+  // seems to be broken either on MacOS or Chakra. I don't believe this need specification. But it barely works, and only if i use _hover.
   // todo maybe: remove
   cursor: {
     button: { value: "pointer" },
@@ -29,10 +29,12 @@ export const gap = {
   label: "{spacing.1.5}",
 
   xs: "{spacing.0.5}",
-  sm: "{spacing.1.5}",
-  md: "{spacing.4}",
+  sm: "{spacing.1.5}", // todo ? refac: replace with gap.sm2 & gap.xs - AFAIK gap.xs isn't used anyway
+  sm2: "{spacing.3}",
+  md: "{spacing.4}", // todo ? refac: replace with gap.md2
+  md2: "{spacing.5}",
   lg: "{spacing.7}",
-  xl: "{spacing.10}",
+  xl: "{spacing.10}", // todo maybe: set to Sidebar's Content padding (ie alias?)
 };
 
 // docs propose to use `createSystem(defaultBaseConfig, customConfig)`, but it doesn't work. Few other methods don't work either.
@@ -71,14 +73,9 @@ export const system = createSystem(
         semanticTokens: {
           colors: theme.colors,
           spacing: {
-            gap: {
-              label: { value: gap.label },
-              xs: { value: gap.xs },
-              sm: { value: gap.sm },
-              md: { value: gap.md },
-              lg: { value: gap.lg },
-              xl: { value: gap.xl }, // todo maybe: set to Sidebar's Content padding
-            },
+            gap: Object.fromEntries(
+              Object.entries(gap).map(([key, value]) => [key, { value: value }]),
+            ),
           },
         },
         // breakpoints: {
