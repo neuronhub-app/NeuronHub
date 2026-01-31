@@ -70,8 +70,8 @@ class CommentRanksDeriver:
     async def _derive_ranks_recursively(self, comment_ids: list[ID]) -> dict[ID, Rank]:
         comment_ranks: dict[ID, Rank] = {}
 
-        for position, comment_id in enumerate(comment_ids):
-            comment_ranks[comment_id] = len(comment_ids) - position
+        for comment_index, comment_id in enumerate(comment_ids):
+            comment_ranks[comment_id] = len(comment_ids) - comment_index
 
         children_ranks = await asyncio_gather_batched(
             [self._query_nested_ranks(comment_id) for comment_id in comment_ids],

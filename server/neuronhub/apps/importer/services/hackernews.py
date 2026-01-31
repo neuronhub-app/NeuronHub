@@ -13,6 +13,7 @@ import strawberry
 from django.conf import settings
 from markdown import markdown
 from markdownify import markdownify
+from sentry_sdk import capture_exception
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.importer.models import ImportDomain
@@ -147,9 +148,9 @@ class ImporterHackerNews:
                 self._update_or_create_post_or_comment(
                     data=post_json,
                     is_parent_root_post=True,
-                    rank=len(post_jsons) - position,
+                    rank=len(post_jsons) - post_index,
                 )
-                for position, post_json in enumerate(post_jsons)
+                for post_index, post_json in enumerate(post_jsons)
             ],
             batch_size=self.api_batch_size_firebase,
             batch_timeout_sec=self.api_batch_timeout_sec,
@@ -300,9 +301,12 @@ class ImporterHackerNews:
             },
         )
         if is_parent_root_post and post_source.url_of_source:
-            source_html_meta = await import_html_meta(url=post_source.url_of_source)
-            post_source.source_html_meta = source_html_meta.content
-            await post_source.asave()
+            try:
+                source_html_meta = await import_html_meta(url=post_source.url_of_source)
+                post_source.source_html_meta = source_html_meta.content
+                await post_source.asave()
+            except Exception as exc:
+                capture_exception(exc)
 
         return post_source
 
@@ -319,17 +323,20 @@ class ImporterHackerNews:
             defaults={"username": username, "json": dict()},
         )
         if is_created:
-            user_json: firebase.User = await self._request(
-                f"{self._api.firebase}/user/{username}.json",
-                cache_expiry_days=self._cache_for_days.user,
-            )
-            user.about = user_json.get("about") or ""
-            user.score = user_json["karma"]
-            user.created_at_external = datetime.fromtimestamp(
-                user_json["created"], tz=ZoneInfo(settings.TIME_ZONE)
-            )
-            user.json = user_json
-            await user.asave()
+            try:
+                user_json: firebase.User = await self._request(
+                    f"{self._api.firebase}/user/{username}.json",
+                    cache_expiry_days=self._cache_for_days.user,
+                )
+                user.about = user_json.get("about") or ""
+                user.score = user_json["karma"]
+                user.created_at_external = datetime.fromtimestamp(
+                    user_json["created"], tz=ZoneInfo(settings.TIME_ZONE)
+                )
+                user.json = user_json
+                await user.asave()
+            except Exception as exc:
+                capture_exception(exc)
 
         return user
 
