@@ -2,7 +2,7 @@ import { Box, Flex, For, HStack, Icon, type JsxStyleProps, Stack, Text } from "@
 import { FaStar, FaUserClock } from "react-icons/fa6";
 import { GoAlertFill } from "react-icons/go";
 import { Tooltip } from "@/components/ui/tooltip";
-import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 type RatingType = "rating" | "importance" | "experience";
 
@@ -85,7 +85,7 @@ export function RatingBars(props: {
                       {colors.bg.secondary.light} 100%
                     )
                   `}
-                  {...getOutlineContrastStyle()}
+                  {...getOutlineBleedingProps()}
                 />
               )}
             </For>

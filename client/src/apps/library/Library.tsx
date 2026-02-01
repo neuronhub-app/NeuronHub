@@ -8,7 +8,7 @@ import { graphql, type ID, type ResultOf } from "@/gql-tada";
 import { CommentFieldsFragment, isTool, PostFragment } from "@/graphql/fragments/posts";
 import { isReview } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { useInit } from "@/utils/useInit";
 
 type HighlightGroup = {
@@ -114,7 +114,7 @@ export function Library() {
             bg="bg.panel"
             p="gap.lg"
             borderRadius="lg"
-            {...getOutlineContrastStyle({ variant: "subtle" })}
+            {...getOutlineBleedingProps("muted")}
           >
             <PostCard
               post={group.parent_root}

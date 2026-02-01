@@ -3,7 +3,7 @@ import { HiMinus, HiPlus } from "react-icons/hi2";
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
-import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 export function ReviewTags(props: { tags: PostTagFragmentType[]; authorId: ID }) {
   const reviewTags = props.tags.filter(tag => tag.is_review_tag);
@@ -43,7 +43,7 @@ function ReviewTagElem(props: { tag: PostTagFragmentType; authorId: ID }) {
       size="lg"
       opacity={0.8}
       fontWeight={props.tag.is_important ? "bold" : "normal"}
-      {...getOutlineContrastStyle({ variant: "subtle" })}
+      {...getOutlineBleedingProps("muted")}
       {...ids.set(ids.review.tag.item)}
     >
       <Tag.Label>{props.tag.label || props.tag.name}</Tag.Label>

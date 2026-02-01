@@ -43,7 +43,7 @@ import { usePostVoting } from "@/components/posts/usePostVoting";
 import { ids } from "@/e2e/ids";
 import { isReview } from "@/graphql/fragments/reviews";
 import { urls } from "@/urls";
-import { getOutlineContrastStyle } from "@/utils/getOutlineContrastStyle";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 const style = {
   color: {
@@ -83,7 +83,7 @@ export function PostCard(props: {
         bg={props.isPageListCompact ? "" : "bg.light"}
         p={props.isPageListCompact ? "1" : "gap.md"}
         borderRadius={props.isPageListCompact ? 0 : "lg"}
-        {...(props.isPageListCompact ? {} : getOutlineContrastStyle({ variant: "subtle" }))}
+        {...(props.isPageListCompact ? {} : getOutlineBleedingProps("muted"))}
       >
         <Stack
           gap={props.isPageListCompact ? "gap.sm" : "gap.md"}

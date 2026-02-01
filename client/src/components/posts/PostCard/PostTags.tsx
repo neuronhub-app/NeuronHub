@@ -12,6 +12,7 @@ import { useUser } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 // todo feat(UI): after tag.is_important, make ensure still sorted by votes
 // todo refac-name: PostCardTags
@@ -109,8 +110,9 @@ export function PostTag(props: {
       colorPalette="gray"
       variant="subtle"
       size="sm"
-      opacity={0.9}
-      bg={{ _light: "bg.subtle" }}
+      bg={{ _light: "gray.50", _dark: "gray.900" }}
+      {...getOutlineBleedingProps("subtle")}
+      border="0"
     >
       {tagIconParams && (
         <Tag.StartElement {...tagIconParams.props}>
