@@ -11,13 +11,7 @@ export function PostDatetime(props: { datetimeStr: string | unknown; size?: "xs"
       closeOnPointerDown={false}
       positioning={{ placement: "bottom" }}
     >
-      <Text
-        display="flex"
-        color="fg.subtle"
-        flex="1"
-        fontSize={props.size ?? "sm"}
-        w="fit-content"
-      >
+      <Text display="flex" color="fg.subtle" fontSize={props.size ?? "sm"} w="fit-content">
         <time dateTime={props.datetimeStr as string}>
           {datetime.relative(props.datetimeStr)}
         </time>

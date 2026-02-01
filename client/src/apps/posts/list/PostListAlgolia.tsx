@@ -8,6 +8,7 @@ import {
   Input,
   Pagination,
   SegmentGroup,
+  Skeleton,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -26,7 +27,7 @@ import {
 import { NavLink } from "react-router";
 import { useAlgoliaPostsEnrichmentByGraphql } from "@/apps/posts/list/useAlgoliaPostsEnrichmentByGraphql";
 import { useUser } from "@/apps/users/useUserCurrent";
-import { PostCard, PostCardSkeleton } from "@/components/posts/PostCard/PostCard";
+import { PostCardSmall } from "@/components/posts/PostCard/PostCardSmall";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
 import type { PostFragmentType } from "@/graphql/fragments/posts";
@@ -190,19 +191,14 @@ function PostListHits() {
         {hits.results?.nbHits ? (
           postsEnriched.length ? (
             postsEnriched.map(post => (
-              <PostCard
-                key={post.id}
-                post={post}
-                urlNamespace="posts"
-                isPageListCompact={true}
-              />
+              <PostCardSmall key={post.id} post={post} urlNamespace="posts" />
             ))
           ) : (
             <>
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
-              <PostCardSkeleton />
+              <Skeleton h="10" />
+              <Skeleton h="10" />
+              <Skeleton h="10" />
+              <Skeleton h="10" />
             </>
           )
         ) : (
