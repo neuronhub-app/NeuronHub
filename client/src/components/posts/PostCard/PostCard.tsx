@@ -17,11 +17,7 @@ import {
 import type { BaseHit, Hit } from "instantsearch.js";
 import type { ReactElement } from "react";
 import { FaHackerNewsSquare } from "react-icons/fa";
-import {
-  FaComment,
-  FaGithub,
-  FaPenToSquare,
-} from "react-icons/fa6";
+import { FaComment, FaGithub, FaPenToSquare } from "react-icons/fa6";
 import { SiCrunchbase } from "react-icons/si";
 import { TbTriangleFilled } from "react-icons/tb";
 import { Highlight } from "react-instantsearch";
@@ -56,8 +52,12 @@ const style = {
     } satisfies { [key: string]: JsxStyleProps["color"] },
   },
   gap: {
-    icon: "gap.sm",
+    icon: "1",
   } satisfies { [key: string]: JsxStyleProps["gap"] },
+  fontSize: {
+    data: "xs",
+    help: "xs",
+  } satisfies { [key: string]: JsxStyleProps["fontSize"] },
 } as const;
 
 export function PostCard(props: {
@@ -69,7 +69,12 @@ export function PostCard(props: {
   const post = props.post;
 
   return (
-    <HStack as="article" key={post?.id} gap="gap.md" align="flex-start">
+    <HStack
+      as="article"
+      key={post?.id}
+      gap={props.isPageListCompact ? "2.5" : "gap.md"}
+      align="flex-start"
+    >
       {!props.isPageListCompact && (
         <Stack>
           <PostButtonsVote post={post} />
@@ -79,9 +84,9 @@ export function PostCard(props: {
 
       <Stack
         w="full"
-        gap={props.isPageListCompact ? "2px" : "gap.md"}
+        gap={props.isPageListCompact ? "3px" : "gap.md"}
         bg={props.isPageListCompact ? "" : "bg.light"}
-        p={props.isPageListCompact ? "1" : "gap.md"}
+        p={props.isPageListCompact ? "" : "gap.md"}
         borderRadius={props.isPageListCompact ? 0 : "lg"}
         {...(props.isPageListCompact ? {} : getOutlineBleedingProps("muted"))}
       >
@@ -169,11 +174,14 @@ export function PostCard(props: {
               <PostCommentsLink post={post} urlNamespace={props.urlNamespace} />
             )}
 
-            {!isReview(post) && <PostDatetime datetimeStr={post.created_at} />}
+            {!isReview(post) && (
+              <PostDatetime datetimeStr={post.created_at} size={style.fontSize.data} />
+            )}
 
             <PostAuthor
               post={post}
               color={style.color.fg.data}
+              size={style.fontSize.data}
               prefix="by"
               prefixColor={style.color.fg.help}
               prefixGap={style.gap.icon}
@@ -237,7 +245,11 @@ function PostVotes(props: { post: PostListItemType }) {
         </Icon>
       </IconButton>
 
-      <Flex {...ids.set(ids.post.vote.count)} color={style.color.fg.data}>
+      <Flex
+        {...ids.set(ids.post.vote.count)}
+        color={style.color.fg.data}
+        fontSize={style.fontSize.data}
+      >
         {voting.sum}
       </Flex>
     </HStack>
@@ -321,6 +333,9 @@ function PostHeader(props: {
             fontSize="sm"
             target="_blank"
             rel="nofollow"
+            transitionProperty="color"
+            transitionDuration="fast"
+            _hover={{ color: "fg" }}
           >
             {sourceDomain}
           </Link>
@@ -368,12 +383,14 @@ function PostCommentsLink(props: {
         gap={style.gap.icon}
         aria-label="Comments"
       >
-        <Icon boxSize="13px" mb="-1px">
-          {/*<BsChatSquareText />*/}
-          {/*<FaRegComment />*/}
+        <Icon boxSize="12px" mb="-1px">
           <FaComment />
         </Icon>{" "}
-        <Flex fontVariantNumeric="tabular-nums" fontSize="small" color={style.color.fg.data}>
+        <Flex
+          fontVariantNumeric="tabular-nums"
+          fontSize={style.fontSize.data}
+          color={style.color.fg.data}
+        >
           {post.comment_count}
         </Flex>
       </IconButton>

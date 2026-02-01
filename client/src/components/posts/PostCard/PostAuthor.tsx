@@ -25,6 +25,7 @@ export function PostAuthor(props: {
   post: PostListItemType | PostCommentTree;
   isRenderAvatar?: boolean;
   color?: JsxStyleProps["color"];
+  size?: "xs" | "sm";
   prefix?: "avatar" | "by";
   prefixColor?: JsxStyleProps["color"];
   prefixGap?: JsxStyleProps["gap"];
@@ -152,13 +153,13 @@ function PostAuthorUsername(props: ComponentProps<typeof PostAuthor> & { isPopov
         </Avatar.Root>
       )}
       {props.prefix === "by" && (
-        <Text fontSize="sm" color={props.prefixColor}>
+        <Text fontSize={props.size ?? "sm"} color={props.prefixColor}>
           by
         </Text>
       )}
 
       <Text
-        fontSize="sm"
+        fontSize={props.size ?? "sm"}
         color={props.color ?? "fg.subtle"}
         _hover={props.isPopover ? { textDecoration: "underline", cursor: "pointer" } : {}}
       >

@@ -55,7 +55,7 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
     >
       <Stack gap="gap.lg">
         <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
-          <FilterAndSort algolia={algolia} category={props.category} />
+          <TopSegmentSort algolia={algolia} category={props.category} />
 
           <Flex gap="gap.md">
             <SearchInput />
@@ -106,7 +106,7 @@ function isAlgoliaLoaded(algolia: AlgoliaState): algolia is AlgoliaStateLoaded {
   return Boolean(algolia.client && algolia.indexName && algolia.indexNameSortedByVotes);
 }
 
-function FilterAndSort(props: { algolia: AlgoliaStateLoaded; category?: PostCategory }) {
+function TopSegmentSort(props: { algolia: AlgoliaStateLoaded; category?: PostCategory }) {
   const sort = useSortBy({
     items: [
       { value: props.algolia.indexName, label: "Newest" },
