@@ -1,5 +1,5 @@
 // @ts-expect-error
-import type { SemanticTokenDefinition } from "@chakra-ui/react/dist/types/styled-system/types";
+import type { SemanticTokenDefinition } from "@chakra-ui/react";
 
 export namespace theme {
   const colorPrimary = "blue";
@@ -32,17 +32,11 @@ export namespace theme {
           _dark: `{colors.${colorSecondary}.500}`,
         },
       },
-      muted: {
-        value: { _light: "{colors.slate.700}", _dark: "{colors.slate.200}" },
-      },
     },
 
     bg: {
       light: {
         value: { _light: "{colors.white}", _dark: "{colors.black}" },
-      },
-      subtle: {
-        value: { _light: "{colors.slate.50}", _dark: "{colors.slate.950}" },
       },
       medium: {
         value: {

@@ -19,7 +19,7 @@ const style = {
 export function LayoutContainer(props?: { children?: ReactNode }) {
   return (
     <>
-      <Navbar />
+      <NavbarMobile />
 
       <Flex flex="1" pos="relative" h="full">
         <LayoutSidebar
@@ -30,7 +30,7 @@ export function LayoutContainer(props?: { children?: ReactNode }) {
           top={0}
         />
 
-        <Stack as="main" flex="1" alignItems="stretch" bg="bg.subtle">
+        <Stack as="main" flex="1" alignItems="stretch">
           <Container maxW="7xl" mt={6} h="full" pb="gap.xl">
             {props?.children ?? <Outlet />}
             <HighlightActionBar />
@@ -41,7 +41,7 @@ export function LayoutContainer(props?: { children?: ReactNode }) {
   );
 }
 
-function Navbar() {
+function NavbarMobile() {
   return (
     <Container py="2.5" borderBottomWidth="1px" hideFrom={style.breakpoint}>
       <HStack justify="space-between">

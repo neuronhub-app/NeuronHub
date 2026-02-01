@@ -73,13 +73,16 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
 
           <Stack
             pos="sticky"
+            h="min"
             hideBelow="lg"
             p={{ base: gap.md, md: gap.md }}
             px={{ base: gap.md, md: gap.md }}
             minW={{ base: "", md: "3xs" }}
             gap="gap.md"
             borderRadius="md"
-            bg="bg.panel"
+            border="1px solid"
+            borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
+            bg={{ _light: "bg.subtle/30", _dark: "bg.subtle" }}
           >
             <FacetFilter name="tags.name" label="Tags" isSearchEnabled />
             <FacetFilter name="tool_type" label="Tool Type" />
