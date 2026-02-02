@@ -33,6 +33,7 @@ export function LayoutContainer(props?: { children?: ReactNode }) {
         <Stack as="main" flex="1" alignItems="stretch">
           <Container maxW="7xl" mt={6} h="full" pb="gap.xl">
             {props?.children ?? <Outlet />}
+
             <HighlightActionBar />
           </Container>
         </Stack>
