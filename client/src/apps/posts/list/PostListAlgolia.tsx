@@ -50,7 +50,7 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
   return (
     <InstantSearch
       searchClient={algolia.client}
-      indexName={algolia.indexName}
+      indexName={algolia.indexNameSortedByVotes}
       routing
       future={{ preserveSharedStateOnUnmount: true }}
     >
@@ -73,6 +73,8 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
           <PostListHits />
 
           <Stack
+            as="aside"
+            aria-label="sidebar"
             pos="sticky"
             h="min"
             hideBelow="lg"
@@ -85,7 +87,7 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
             borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
             bg={{ _light: "bg.subtle/30", _dark: "bg.subtle" }}
           >
-            <FacetFilter name="tags.name" label="Tags" isSearchEnabled />
+            <FacetFilter name="tags.name" label="Tags" isSearchEnabled isShowEmpty />
             <FacetFilter name="tool_type" label="Tool Type" />
           </Stack>
         </Flex>
@@ -110,8 +112,8 @@ function isAlgoliaLoaded(algolia: AlgoliaState): algolia is AlgoliaStateLoaded {
 function TopSegmentSort(props: { algolia: AlgoliaStateLoaded; category?: PostCategory }) {
   const sort = useSortBy({
     items: [
-      { value: props.algolia.indexName, label: "Newest" },
       { value: props.algolia.indexNameSortedByVotes, label: "Best" },
+      { value: props.algolia.indexName, label: "Newest" },
     ],
   });
 
@@ -130,7 +132,7 @@ function TopSegmentSort(props: { algolia: AlgoliaStateLoaded; category?: PostCat
     <Flex gap="gap.md">
       <Configure
         filters={[filters.category, filters.date].filter(Boolean).join(" AND ")}
-        hitsPerPage={20}
+        hitsPerPage={35}
       />
 
       <SegmentGroup.Root
@@ -253,6 +255,7 @@ function FacetFilter(props: {
   name: "tags.name" | "tool_type";
   label: string;
   isSearchEnabled?: boolean;
+  isShowEmpty?: boolean;
 }) {
   const refinements = useRefinementList({
     attribute: props.name,
@@ -260,7 +263,9 @@ function FacetFilter(props: {
     showMore: true,
   });
 
-  if (refinements.items.length === 0) {
+  const isEmpty = refinements.items.length === 0;
+
+  if (isEmpty && !props.isShowEmpty) {
     return null;
   }
 
@@ -268,13 +273,19 @@ function FacetFilter(props: {
     <Stack align="flex-start">
       <Text>{props.label}</Text>
 
-      {props.isSearchEnabled && (
+      {props.isSearchEnabled && !isEmpty && (
         <Input
           onChange={event => refinements.searchForItems(event.target.value)}
           type="search"
           placeholder="Search..."
           size="xs"
         />
+      )}
+
+      {isEmpty && (
+        <Text color="fg.subtle" fontSize="sm">
+          No results
+        </Text>
       )}
 
       <Stack gap="gap.sm">
