@@ -302,7 +302,9 @@ if is_algolia_enabled:
     INSTALLED_APPS.append("algoliasearch_django")
 
 if DJANGO_ENV.is_dev():
-    index_suffix = f"{DJANGO_ENV.value}_{env.str('ALGOLIA_INDEX_POSTFIX_USER', env.str('USER'))}"
+    is_github_ci_needs_env_user = env.bool("GITHUB_ACTIONS", False)
+    user = env.str("USER", default="runner" if is_github_ci_needs_env_user else "")
+    index_suffix = f"{DJANGO_ENV.value}_{env.str('ALGOLIA_INDEX_POSTFIX_USER', user)}"
 else:
     index_suffix = DJANGO_ENV.value  # eg `posts_prod`
 
