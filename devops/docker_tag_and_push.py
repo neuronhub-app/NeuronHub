@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#!# /// script
+# !# /// script
 # requires-python = ">=3.11"
 # ///
 
@@ -10,6 +10,7 @@ FYI: I'm not often testing py3.11, mostly 3.14.
 """
 
 import argparse
+import os
 import subprocess
 from argparse import Namespace
 from typing import Literal
@@ -47,9 +48,13 @@ def main(kwargs: NamespaceKwargs):
 
 
 def _docker_run(*args: str):
-    docker = ["sudo", "-E", "docker"]
+    if os.environ.get("CI") == "true":
+        docker_bin = ["docker"]
+    else:
+        # local sudo
+        docker_bin = ["sudo", "-E", "docker"]
     print("docker", *args)
-    subprocess.run([*docker, *args])
+    subprocess.run([*docker_bin, *args], check=True)
 
 
 if __name__ == "__main__":

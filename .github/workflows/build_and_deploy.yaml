@@ -1,0 +1,72 @@
+name: "Deploy"
+run-name: "Deploy ${{ github.event.inputs.target_deploy_env }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_deploy_env:
+        description: "Target deploy env"
+        type: environment
+        default: "prod"
+        required: true
+        options:
+          - "dev"
+          - "stage"
+          - "prod"
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+      id-token: write
+      attestations: write
+    env:
+      REGISTRY: ghcr.io
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Mise
+        uses: jdx/mise-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push server+client images
+        run: |
+          mise run docker:build --app=server
+          mise run docker:build --app=client
+          mise run docker:tag-and-push --app=server
+          mise run docker:tag-and-push --app=client
+
+      - name: Get image digests
+        id: digests
+        shell: nu {0}
+        run: |
+          def get_digest [app: string] {
+            let image = $"ghcr.io/${{ github.repository }}/($app):($env.VITE_RELEASE_VERSION)"
+            docker inspect $image | from json | get 0.RepoDigests.0 | split row '@' | last
+          }
+          $"server=(get_digest server)\nclient=(get_digest client)\n" | save --append $env.GITHUB_OUTPUT
+
+      - name: Attest server image
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-name: ghcr.io/${{ github.repository }}/server
+          subject-digest: ${{ steps.digests.outputs.server }}
+          push-to-registry: true
+
+      - name: Attest client image
+        uses: actions/attest-build-provenance@v3
+        with:
+          subject-name: ghcr.io/${{ github.repository }}/client
+          subject-digest: ${{ steps.digests.outputs.client }}
+          push-to-registry: true

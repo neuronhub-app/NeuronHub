@@ -81,10 +81,13 @@
         # Build
         # ------------------------------
 
+        # local needs sudo
+        let docker_cmd = if $env.CI? == "true" { "docker" } else { "sudo -E docker" }
+
         if $env.usage_no_cache == "true" {
-          ^sudo -E docker compose --progress=plain build --no-cache
+          nu -c $"($docker_cmd) compose --progress=plain build --no-cache"
         } else {
-          ^sudo -E docker compose --progress=plain build
+          nu -c $"($docker_cmd) compose --progress=plain build"
         }
 
         rm $compose_file
