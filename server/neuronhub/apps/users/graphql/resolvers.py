@@ -9,7 +9,6 @@ from strawberry.types import Info
 from strawberry_django.auth.utils import aget_current_user
 from strawberry_django.auth.utils import get_current_user
 
-from neuronhub.apps.posts.index import algolia_replica_sorted_by_votes
 from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.models import User
 
@@ -40,6 +39,8 @@ class UsersQuery:
     ) -> AlgoliaSearchKeyType | None:
         if not settings.ALGOLIA["IS_ENABLED"]:
             return None
+
+        from neuronhub.apps.posts.index import algolia_replica_sorted_by_votes
 
         user = await get_user_maybe(info)
         filters = ["visible_to:group/INTERNAL", "visible_to:group/PUBLIC"]
