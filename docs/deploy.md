@@ -28,8 +28,6 @@ services:
 `.env` file
 ```shell
 # Django
-# ========================================================
-
 DJANGO_ENV=prod
 DATABASE_URL=postgresql://${{db_user}}:${{db_password}}@${{db_host}}:${{db_port}}/${{db_name}}
 SECRET_KEY=${{django_secret}}
@@ -38,23 +36,24 @@ SERVER_URL=https://backend.${{domain}}
 CLIENT_URL=https://${{domain}}
 
 # S3
-# --------------------------------------------
 AWS_S3_ENDPOINT_URL=${{host}}:${{s3_port}}
-AWS_ACCESS_KEY_ID=${{key_id}}
-AWS_SECRET_ACCESS_KEY=${{key_secret}}
+AWS_ACCESS_KEY_ID=${{s3_key_id}}
+AWS_SECRET_ACCESS_KEY=${{s3_key_secret}}
 
 
 # Client
-# ========================================================
-
 VITE_SERVER_URL=https://backend.${{domain}}
 
 
 # Sentry
-# ========================================================
-
 SENTRY_DSN_BACKEND=${{dsn_backend}}
 SENTRY_DSN_FRONTEND=${{dsn_frontend}}
+
+# Algolia
+ALGOLIA_IS_ENABLED="true"
+ALGOLIA_API_KEY="${{algolia_write_key}}"
+ALGOLIA_APPLICATION_ID="${{algolia_app_id}}"
+ALGOLIA_SEARCH_API_KEY="${{algolia_search_key}}"
 ```
 
 ### Postgres 17 database
@@ -85,9 +84,16 @@ services:
 
 `.env` file
 ```shell
-ACCESS_KEY_ID=${{key_id}}
-SECRET_ACCESS_KEY=${{key_secret}}
+ACCESS_KEY_ID=${{s3_key_id}}
+SECRET_ACCESS_KEY=${{s3_key_secret}}
 ```
+
+### Algolia setup
+
+I recommend creating `ALGOLIA_API_KEY` and `ALGOLIA_SEARCH_API_KEY` that are limited to `Indices: *_prod*` in [the key settings](https://dashboard.algolia.com/account/api-keys/restricted) instead of using the global Write/Search API keys.
+
+After the first deploy, connect to the `server` docker container, and run:
+- `cd /app/; uv run manage.py algolia_reindex`
 
 ## Upgrades
 
