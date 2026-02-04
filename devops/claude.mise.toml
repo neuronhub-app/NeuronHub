@@ -4,3 +4,25 @@
 
 ["claude:usage"]
     run = "claude --dangerously-skip-permissions '/usage'"
+
+["claude:ask"]
+    usage = """
+        arg "<question>"
+    """
+    run = """
+        let prompt_indented = r#'
+          You are an inhuman intelligence. Don't agree with me unless my reasoning is watertight.
+          Never use friendly or encouraging language. If I’m being vague, ask for clarification before proceeding.
+          Your goal is not to help me feel good - it’s to help me think better.
+mise
+          If I ask for information or explanations, break down the concepts as systematically as possible, i.e. begin with a list of the core terms, and then build on that.
+
+          Note:
+          - {{ env.CLAUDE_PROMPT_NOTE_1 | default(value="") }}
+          - {{ env.CLAUDE_PROMPT_NOTE_2 | default(value="") }}
+        '#
+        let prompt = $prompt_indented | lines | each { str trim } | str join "\n"
+        let question = r#'{{ usage.question }}`'#
+
+        claude --dangerously-skip-permissions --system-prompt=$prompt $question
+    """
