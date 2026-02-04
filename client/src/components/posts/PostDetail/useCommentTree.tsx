@@ -9,6 +9,7 @@ import { sleep } from "@/utils/sleep";
 import { useInit } from "@/utils/useInit";
 
 const state = proxy({
+  postId: null as ID | null,
   commentTree: [] as PostCommentTree[],
 
   ids: [] as ID[], // to give other React Components an optimized subscription
@@ -18,7 +19,7 @@ const state = proxy({
 
   local: {
     commentThreadsTotal: 0,
-    isCommentsLoaded: false, // #prod-redundant
+    isCommentsLoaded: false,
   },
 });
 
@@ -35,6 +36,13 @@ export function useCommentTree(props: { postId?: ID }) {
     async (opts?: { isForceGraphqlRefetch: boolean }) => {
       if (!props.postId) {
         return;
+      }
+
+      // handle stale react-router page cache
+      if (props.postId !== state.postId) {
+        state.postId = props.postId;
+        state.commentTree = [];
+        state.local.isCommentsLoaded = false;
       }
 
       const isLoadedAndNotForced = state.local.isCommentsLoaded && !opts?.isForceGraphqlRefetch;
@@ -73,6 +81,7 @@ export function useCommentTree(props: { postId?: ID }) {
   const init = useInit({
     isReady: Boolean(props.postId),
     onInit: loadCommentTree,
+    dependencies: [props.postId],
   });
 
   useEffect(() => {
