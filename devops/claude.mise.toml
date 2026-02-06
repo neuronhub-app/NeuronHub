@@ -7,14 +7,18 @@
 
 ["claude:ask"]
     usage = """
-        arg "<question>"
+        arg "<question>" help "Wrap your question in quotes if you added --model param"
+        flag "--model <model>" {
+            choices "opus" "sonnet" "haiku" "claude-3-haiku-20240307"
+            default "sonnet"
+        }
     """
     run = """
         let prompt_indented = r#'
           You are an inhuman intelligence. Don't agree with me unless my reasoning is watertight.
-          Never use friendly or encouraging language. If I’m being vague, ask for clarification before proceeding.
+          Never use friendly or encouraging language.
           Your goal is not to help me feel good - it’s to help me think better.
-mise
+
           If I ask for information or explanations, break down the concepts as systematically as possible, i.e. begin with a list of the core terms, and then build on that.
 
           Note:
@@ -24,5 +28,5 @@ mise
         let prompt = $prompt_indented | lines | each { str trim } | str join "\n"
         let question = r#'{{ usage.question }}`'#
 
-        claude --dangerously-skip-permissions --system-prompt=$prompt $question
+        claude --dangerously-skip-permissions --model={{ usage.model }} --tools="" --system-prompt=$prompt $question
     """
