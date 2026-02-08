@@ -118,6 +118,7 @@ export function PostContentHighlighted(props: {
         dangerouslySetInnerHTML={{ __html: contentHTML }}
         size="sm"
         maxW="3xl"
+        color="fg.dark-friendly"
         {...setHighlighterModelData(props.post.id, "comment")}
       />
     </PostContentHighlightMenu>

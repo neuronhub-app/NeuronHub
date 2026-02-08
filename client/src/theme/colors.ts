@@ -13,6 +13,9 @@ export namespace theme {
     primary,
 
     fg: {
+      "dark-friendly": {
+        value: { _light: "fg", _dark: "{colors.gray.300/88}" },
+      },
       "muted-button": {
         value: { _light: "{colors.slate.500}", _dark: "{colors.slate.500}" },
       },
