@@ -35,9 +35,9 @@
 
         let app = $env.usage_app
         if $env.usage_app == "coder" {
-          cd devops/$env.usage_app
+          cd devops/($env.usage_app)
         } else {
-          cd $env.usage_app
+          cd ($env.usage_app)
         }
 
         # Sentry PROJECT_NAME mapping

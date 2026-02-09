@@ -5,7 +5,7 @@
     rclone = "latest"
     killport = "latest"
 
-    claude = "2.1.15"
+    claude = "latest"
         node = "24"
 
 [settings]
@@ -30,7 +30,7 @@
 
     PROJECT_NAME = "neuronhub"
     VITE_PROJECT_NAME = "NeuronHub"
-    VITE_RELEASE_VERSION = "0.2.5.0" # used in GitHub and Sentry
+    VITE_RELEASE_VERSION = "0.2.5.1" # used in GitHub and Sentry
 
     DEPENDENCY_COOLDOWN_DAYS = 4
 
