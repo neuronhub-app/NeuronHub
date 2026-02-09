@@ -19,11 +19,8 @@ test.describe("PostListAlgolia", () => {
   test("sort control changes actual post order", async ({ page }) => {
     await play.navigate(urls.posts.list, { idleWait: true });
 
-    const sortControl = play.get(ids.post.listControls.sort);
-    const dateControl = play.get(ids.post.listControls.dateRange);
-
     // Show all posts to have more data
-    await dateControl.getByText("All").click();
+    await play.get(ids.post.listControls.dateRange).getByText("All").click();
     await play.waitForNetworkIdle();
 
     // Get post IDs in "Latest" order (default)
@@ -42,7 +39,7 @@ test.describe("PostListAlgolia", () => {
     expect(latestOrder.length).toBeGreaterThan(1);
 
     // Switch to "Votes" sort
-    await sortControl.getByText("Best").click();
+    await play.get(ids.post.listControls.sort).getByText("Newest").click();
     await play.waitForNetworkIdle();
 
     const votesOrder = await getPostIds();
@@ -55,7 +52,7 @@ test.describe("PostListAlgolia", () => {
     expect(votesOrderStr).not.toBe(latestOrderStr);
 
     // Switch back to Latest - first few posts should match original order
-    await sortControl.getByText("Newest").click();
+    await play.get(ids.post.listControls.sort).getByText("Best").click();
     await play.waitForNetworkIdle();
 
     const backToLatestOrder = await getPostIds();
@@ -70,11 +67,6 @@ test.describe("PostListAlgolia", () => {
     await play.navigate(urls.posts.list, { idleWait: true });
 
     const dateControl = play.get(ids.post.listControls.dateRange);
-
-    const getPostCount = async () => {
-      const cards = page.getByTestId(ids.post.card.container);
-      return await cards.count();
-    };
 
     // Explicitly click "7d" to ensure filter is applied (even though it's default)
     await dateControl.getByText("7d").click();
@@ -92,5 +84,10 @@ test.describe("PostListAlgolia", () => {
     await play.waitForNetworkIdle();
     const count1d = await getPostCount();
     expect(count1d).toBeLessThanOrEqual(count7d);
+
+    async function getPostCount() {
+      const cards = page.getByTestId(ids.post.card.container);
+      return await cards.count();
+    }
   });
 });

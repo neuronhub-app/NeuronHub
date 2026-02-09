@@ -1,18 +1,17 @@
 import { test } from "@playwright/test";
 import { highlight_attrs } from "@/apps/highlighter/PostContentHighlighted";
 import { expect } from "@/e2e/helpers/expect";
-import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
+import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { urls } from "@/urls";
 import { Visibility } from "~/graphql/enums";
 
 test.describe("Comments", () => {
   let play: PlaywrightHelper;
-  let $: LocatorMap;
+  let $: LocatorMapToGetFirstById;
 
   test.beforeEach(async ({ page }) => {
-    const timeoutExtra = 7000; // the first E2E test (alphabetically this one) hits the cold Postgres cache & fails on timeout=4.5s
-    play = new PlaywrightHelper(page, timeoutExtra);
+    play = new PlaywrightHelper(page);
     await play.dbStubsRepopulateAndLogin({
       is_import_HN_post: false,
       is_create_single_review: true,
@@ -86,7 +85,7 @@ test.describe("Comments", () => {
     await play.click(ids.comment.form.cancelBtn);
   });
 
-  test("highlight", async ({ page }) => {
+  test("highlight (flaky)", async ({ page }) => {
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
 
@@ -114,6 +113,7 @@ test.describe("Comments", () => {
             break;
           }
         }
+        // todo ! fix: flaky - saying `parameter 1 is not of type 'Node'`
         const walker = document.createTreeWalker(commentEl!, NodeFilter.SHOW_TEXT, {
           acceptNode: (node: Node) => {
             const isEmptyNode = !node.textContent || !node.textContent.trim();

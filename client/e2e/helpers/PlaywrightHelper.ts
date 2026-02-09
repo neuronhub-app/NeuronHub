@@ -10,12 +10,12 @@ import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import type { urls } from "@/urls";
 
-export type LocatorMap = Record<TestId, Locator>;
+export type LocatorMapToGetFirstById = Record<TestId, Locator>;
 
 const actionTimeoutMsDefault: number = 7500;
 
 export class PlaywrightHelper {
-  $: LocatorMap;
+  $: LocatorMapToGetFirstById;
   private screenshotCounter = 0;
 
   constructor(
@@ -49,7 +49,7 @@ export class PlaywrightHelper {
     return response.json();
   }
 
-  locator(): LocatorMap {
+  locator(): LocatorMapToGetFirstById {
     const map = {};
     return new Proxy(map, { get: (_, selector: TestId) => this.get(selector) });
   }

@@ -1,12 +1,12 @@
 import { test } from "@playwright/test";
 import { highlight_attrs } from "@/apps/highlighter/PostContentHighlighted";
 import { expect } from "@/e2e/helpers/expect";
-import { type LocatorMap, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
+import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { urls } from "@/urls";
 
 test.describe("Library", () => {
   let play: PlaywrightHelper;
-  let $: LocatorMap;
+  let $: LocatorMapToGetFirstById;
 
   test.beforeEach(async ({ page }) => {
     const timeoutExtra = 7000;
