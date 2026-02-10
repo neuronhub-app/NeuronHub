@@ -40,9 +40,10 @@ If you're unsure which `Type` to use - use the highest, as they're sorted by imp
 ### Scopes
 
 - `post-form` - the most complex `react-hook-form`s for `Post` creation/editing
-- `importer` - for `apps.importer`
 - `tags` - `PostTag` logic
 - `comment` - re create, edit, vote, etc
+- `importer` - for `apps.importer`
+- `profile` - for `apps.profiles`
 - `upgrade[<uv|Bun>]` - pyproject.toml, package.json, lock files, or related changes
 - `API` - API layers: Apollo GraphQL, Strawberry resolvers, etc
 - `auth` - `apps.users`, models, permissions, etc

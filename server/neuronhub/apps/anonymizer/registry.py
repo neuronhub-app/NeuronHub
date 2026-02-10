@@ -104,8 +104,8 @@ class AnonimazableTimeStampedModel(TimeStampedModel):
         self.created_at = self._anonymize_datetime(self.created_at)
         self.updated_at = self._anonymize_datetime(self.updated_at, is_future_only=True)
 
-        # todo[!](auth) reset all anonymizable fields, confirm rels are reset, test
-        # todo[!](auth) respect is_erase_text_content
+        # todo ! auth: reset all anonymizable fields, confirm rels are reset, test
+        # todo ! auth: respect is_erase_text_content
 
         if self.history:
             self.history.history_manager.all().delete()

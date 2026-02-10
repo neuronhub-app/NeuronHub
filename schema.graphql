@@ -120,6 +120,7 @@ type Mutation {
   post_highlight_delete(data: DjangoModelInput!): Boolean! @IsAuthenticated
   post_import_refresh(id_external: Int!): Boolean! @IsAuthenticated
   posts_import(auth_token: String!, category: String!, limit: Int! = 60, is_use_cache: Boolean! = false): Boolean!
+  profile_send_dm(profile_id: ID!, message: String!): Boolean! @IsAuthenticated
 }
 
 input OneToManyInput {
@@ -702,6 +703,7 @@ enum UserListName {
   read_later
   library
   posts_collapsed
+  profiles_bookmarked
 }
 
 type UserSourceType {
