@@ -51,11 +51,16 @@ class Visibility(TextChoices):
     PUBLIC
 ```
 
-Because Posts are indexed by Algolia, we utilize 
-
 Files:
 - [[server/neuronhub/apps/posts/graphql/types.py]]
 - [[server/neuronhub/apps/posts/services/filter_posts_by_user.py]]
+
+### Algolia
+
+Because Posts are indexed by Algolia, we give each logged in User a personal Search API token with "Restriction" as `["visible_to:group/INTERNAL", "visible_to:group/PUBLIC", "visible_to:{username}"]` through users/graphql/resolvers [[UsersQuery#get_algolia_search_key_with_user_perms]].
+
+And the field `visible_to` is serialized for Algolia in posts/models/posts.py [[Post#get_visible_to]].
+
 
 ## Mandatory task-specific docs
 
