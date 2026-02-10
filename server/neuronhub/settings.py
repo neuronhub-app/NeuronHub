@@ -76,6 +76,7 @@ INSTALLED_APPS = [
     "neuronhub.apps.tests",
     "neuronhub.apps.importer",
     "neuronhub.apps.highlighter",
+    "neuronhub.apps.profiles",
 ]
 
 MIDDLEWARE = [
@@ -261,7 +262,7 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_AGE = 3600 * 24 * 30  # 1 month
 
 AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
+    "django.contrib.auth.backends.ModelBackend",  # #prob-redundant?
     "allauth.account.auth_backends.AuthenticationBackend",
     # "guardian.backends.ObjectPermissionBackend", todo mb: they lacks async support - see django-guardian#808 (planned for v3.3)
 ]
@@ -403,3 +404,9 @@ rich.traceback.install(
     locals_max_string=_line_width,
     suppress=[django, asyncio],  # too verbose
 )
+
+
+# apps.profiles
+# ---------------------------------------------------------------------------------------------------------
+class CONF_CONFIG:
+    eag_csv_path: Path = BASE_DIR.parent / ".local" / "EAG SF 2026.csv"

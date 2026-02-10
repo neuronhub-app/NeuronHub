@@ -12,10 +12,6 @@ from neuronhub.apps.posts.graphql.types import PostType
 from neuronhub.apps.posts.graphql.types import PostTypeI
 
 
-if typing.TYPE_CHECKING:
-    from strawberry.types.base import WithStrawberryObjectDefinition  # noqa: F401 - not sure for what
-
-
 logger = logging.getLogger(__name__)
 
 

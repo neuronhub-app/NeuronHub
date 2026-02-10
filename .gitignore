@@ -4,6 +4,10 @@
 .idea/
 .run/
 
+server/**/.gitignore
+
+*.sql
+
 # caches
 __pycache__
 server/.*_cache/
@@ -16,5 +20,3 @@ mise.local.toml
 
 # s3
 server/media/
-
-*.sql

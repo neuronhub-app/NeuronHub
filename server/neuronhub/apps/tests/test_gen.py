@@ -9,13 +9,17 @@ from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models import PostCategory
+from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models.types import PostTypeEnum
+from neuronhub.apps.profiles.models import Profile
+from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.users.models import User
 
 
 class Gen:
     users: UsersGen
     posts: PostsGen
+    profiles: ProfilesGen
     faker: UniqueProxy
     faker_non_unique: Faker
     random_gen_seeded: Random
@@ -40,6 +44,7 @@ class Gen:
             is_user_default_superuser=is_user_default_superuser,
         )
         self.posts = PostsGen(faker=self.faker, user=self.users.user_default)
+        self.profiles = ProfilesGen(faker=self.faker, user=self.users.user_default)
 
         return self
 
@@ -297,3 +302,86 @@ class PostsGen:
 
 
 PostParams = PostsGen.Params
+
+
+@dataclass
+class ProfilesGen:
+    faker: UniqueProxy
+    user: User
+
+    async def profile(
+        self,
+        user: User | None = None,
+        first_name: str = "",
+        last_name: str = "",
+        visibility: Visibility = Visibility.PUBLIC,
+        visible_to_users: list[User] | None = None,
+        company: str = "",
+        job_title: str = "",
+        biography: str = "",
+        skills: list[str] | None = None,
+        interests: list[str] | None = None,
+        seeks: str = "",
+        offers: str = "",
+    ) -> Profile:
+        profile = await Profile.objects.acreate(
+            user=user,
+            first_name=first_name or self.faker.first_name(),
+            last_name=last_name or self.faker.last_name(),
+            company=company or self.faker.company(),
+            job_title=job_title or self.faker.job(),
+            biography=biography or self.faker.text(max_nb_chars=200),
+            seeks=seeks or self.faker.sentence(),
+            offers=offers,
+            visibility=visibility,
+        )
+
+        if skills or interests:
+            tag_skill_parent, _ = await PostTag.objects.aget_or_create(
+                name="Skill", tag_parent=None
+            )
+        else:
+            tag_skill_parent = None
+
+        if skills:
+            tag_skills = [
+                (await PostTag.objects.aget_or_create(name=tag, tag_parent=tag_skill_parent))[0]
+                for tag in skills
+            ]
+            await profile.skills.aset(tag_skills)
+
+        if interests:
+            tag_interests = [
+                (await PostTag.objects.aget_or_create(name=tag, tag_parent=tag_skill_parent))[0]
+                for tag in interests
+            ]
+            await profile.interests.aset(tag_interests)
+
+        profile.match_hash = await sync_to_async(profile.compute_content_hash)()
+        await profile.asave()
+
+        if visible_to_users:
+            await profile.visible_to_users.aset(visible_to_users)
+
+        return profile
+
+    async def match(
+        self,
+        profile: Profile,
+        user: User = None,
+        score_by_llm: int | None = None,
+        reason_by_llm: str = "",
+        score_by_user: int | None = None,
+        review_by_user: str = "",
+    ) -> ProfileMatch:
+        match, _ = await ProfileMatch.objects.aupdate_or_create(
+            user=user or self.user,
+            profile=profile,
+            defaults={
+                "match_score_by_llm": score_by_llm,
+                "match_reason_by_llm": reason_by_llm,
+                "match_score": score_by_user,
+                "match_review": review_by_user,
+            },
+        )
+        return match

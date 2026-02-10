@@ -7,7 +7,7 @@
 
 ## Overview
 
-NeuronHub is privacy-first platform for sharing expertise: links, opinions, news, tools, products, etc. Users limit the visibility of their `models.Post` (Posts, Reviews, Comments) by selected User groups (akin Google Circles).
+NeuronHub (NHA) is privacy-first platform for sharing expertise: links, opinions, news, tools, products, etc. Users limit the visibility of their `models.Post` (Posts, Reviews, Comments) by selected User groups (akin Google Circles).
 
 ## Core Django Models
 
