@@ -67,6 +67,7 @@
     DB_PASS = "{{ env.PROJECT_NAME }}"
     DB_VER = "17" # psql-17 (18 also works)
 
+    PYTEST_DB_NAME = "test_database"
     E2E_DB_NAME = "test_neuronhub_e2e"
 
     S3_STORAGE_BUCKET_NAME = "media"
