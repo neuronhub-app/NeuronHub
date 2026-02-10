@@ -144,14 +144,14 @@
         dir = "server"
         depends = "dev:db"
         usage = '''
+            arg "<args>" default="" help="The rest of args"
             flag "-m --marks <marks>" default="not slow_llm_api and not firebase_subscription"
-            arg "[args]" help="The rest of args"
         '''
         run = """
             job spawn { mise dev:s3 }
 
             let marks = if ($env.usage_marks | is-empty) { "" } else { $"-m ($env.usage_marks)" }
-            let args = r#'{{ usage.args }}'# | str replace "server/" ""
+            let args = $"($env.usage_args)" | str replace "server/" ""
 
             uv run pytest $marks $args
         """
