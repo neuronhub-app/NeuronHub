@@ -135,6 +135,12 @@ dependencies = [
 [tool.pytest.ini_options]
     DJANGO_SETTINGS_MODULE = "neuronhub.settings"
     python_files = ["*__test.py"]
+    markers = [
+        "slow",
+        "slow_ext_api: HTTP queries",
+        "slow_llm_api: costs money",
+        "firebase_subscription: requires 30+ sec to receive Firebase subscription data",
+    ]
     addopts = [
         "--no-migrations",
         "--capture=no", # "no" streams print() to stdout
@@ -145,7 +151,4 @@ dependencies = [
     ]
     filterwarnings = [
         "ignore::DeprecationWarning:functools",
-    ]
-    markers = [
-        "slow: tests external HTTP queries"
     ]

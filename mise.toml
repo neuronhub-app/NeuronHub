@@ -110,6 +110,7 @@
     [tasks."dev:db"]
         dir = "devops"
         run = """
+            # starting postgres
             if $env.IS_POSTGRES_EXTERNAL == "true" {
                 print $env.POSTGRES_EXTERNAL_SHELL_MSG
             } else if $env.IS_POSTGRES_MACOS == "true" {
@@ -142,9 +143,17 @@
     [tasks."test:pytest"]
         dir = "server"
         depends = "dev:db"
+        usage = '''
+            arg "<args>" default="" help="The rest of args"
+            flag "-m --marks <marks>" default="not slow_llm_api and not firebase_subscription"
+        '''
         run = """
             job spawn { mise dev:s3 }
-            uv run pytest
+
+            let marks = if ($env.usage_marks | is-empty) { "" } else { $"-m ($env.usage_marks)" }
+            let args = $"($env.usage_args)" | str replace "server/" ""
+
+            uv run pytest $marks $args
         """
         alias = "pytest"
         env.DJANGO_ENV = "dev_test_unit"

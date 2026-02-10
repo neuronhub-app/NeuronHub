@@ -10,6 +10,7 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 # uses FS caching, ie hits API only on the first run
 class CommentRanksDeriverTest(NeuronTestCase):
     @pytest.mark.slow
+    @pytest.mark.slow_ext_api
     async def test_api_threads_ranking_limit_is_respected(self):
         api_thread_limit = 10
         importer = ImporterHackerNews(

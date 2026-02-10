@@ -12,6 +12,7 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 # uses FS caching, ie hits API only on the first run
 class HackerNewsImportTest(NeuronTestCase):
     @pytest.mark.slow
+    @pytest.mark.slow_ext_api
     async def test_import_story(self):
         post = await self._import_test_post()
 
@@ -27,6 +28,7 @@ class HackerNewsImportTest(NeuronTestCase):
         assert user_source.id_external == author_name
 
     @pytest.mark.slow
+    @pytest.mark.slow_ext_api
     async def test_import_story_with_comment_ranks(self):
         await self._import_test_post()
 
