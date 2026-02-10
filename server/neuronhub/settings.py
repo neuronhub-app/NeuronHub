@@ -139,6 +139,7 @@ DATABASES = {
             "DATABASE_URL",
             f"postgres://{db_user}:{db_pass}@{db_host}:5432/{db_name}",
         ),
+        test_options={"NAME": env.str("PYTEST_DB_NAME")},
     )
 }
 
