@@ -12,6 +12,7 @@ NeuronHub (NHA) is privacy-first platform for sharing expertise: links, opinions
 ## Core Django Models
 
 ```mermaid
+
 classDiagram
     `Post.Type` -- Post: type
     Post ..|> PostTool: type = Tool
@@ -124,6 +125,42 @@ classDiagram
             url_of_source: str
         }
     }
+
+    User o-- Profile : user (O2O)
+    Profile --> PostTag : skills, interests
+    Profile --> ProfileMatch
+    User o-- ProfileMatch : user (FK)
+
+    namespace profiles {
+        class Profile {
+            first_name, last_name
+
+            biography, seeks, offers
+
+            company: str
+            job_title: str
+            
+            career_stage: Enum
+
+            skills: M2M~PostTag~
+            interests: M2M~PostTag~
+
+            profile_for_llm_md: str? 
+
+            visibility = Visibility.PRIVATE
+            visible_to_users: M2M~User~
+        }
+
+        class ProfileMatch {
+            profile: FK~Profile~
+            match_score_by_llm: int
+            match_reason_by_llm: str
+			
+			%% review by User
+            match_score: int
+            match_review: str
+        }
+    }
 ```
 
 ## Specific docs
@@ -131,6 +168,7 @@ classDiagram
 You must read each top-level doc before its children.
 
 - [./backend](./backend/README.md)
+	- [Profiles app](./backend/profiles.md)
 - [./frontend](./frontend/README.md)
 	- [How to structure a React Component](./frontend/React-component-structure.md)
 	- [How to use GraphQL](./frontend/GraphQL.md)
