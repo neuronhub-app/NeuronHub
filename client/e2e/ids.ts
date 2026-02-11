@@ -130,6 +130,8 @@ export namespace ids {
     list: "profile.list",
     card: {
       container: "profile.card.container",
+      contentMarkdown: "profile.card.content-markdown",
+      contentSnippet: "profile.card.content-snippet",
     },
   } as const;
 

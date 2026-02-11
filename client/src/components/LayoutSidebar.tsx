@@ -16,6 +16,7 @@ import {
 import { MessageSquareText } from "lucide-react";
 import type { ComponentType } from "react";
 import { FaRegBookmark } from "react-icons/fa6";
+import { FiUsers } from "react-icons/fi";
 import { GoCommentDiscussion } from "react-icons/go";
 import { LuLayoutDashboard, LuLibrary, LuLogIn, LuLogOut, LuSettings } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
@@ -38,7 +39,7 @@ export function LayoutSidebar(props: StackProps) {
   const user = useUser();
 
   const links: Array<SidebarLink> = [
-    { to: urls.profiles.list, icon: GoCommentDiscussion, label: "Profiles" },
+    { to: urls.profiles.list, icon: FiUsers, label: "Profiles" },
     { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts" },
     { to: urls.tools.list, icon: LuLayoutDashboard, label: "Tools" },
     { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },

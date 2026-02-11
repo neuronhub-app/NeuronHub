@@ -141,6 +141,10 @@ async def _import_profiles_csv(gen: Gen):
     if csv_path.exists():
         await sync_to_async(csv_optimize_and_import)(csv_path, limit=5)
 
+    # Admin user needs a Profile in the group to see profiles via Algolia security filters
+    group, _ = await ProfileGroup.objects.aget_or_create(name="EAG-SF-2026")
+    await gen.profiles.profile(user=gen.users.user_default, groups=[group])
+
 
 # todo ! refac: move out
 async def _algolia_reindex(

@@ -26,4 +26,24 @@ test.describe("ProfileList", () => {
 
     await play.screenshot("profile-list");
   });
+
+  test("shows markdown without search, snippets with search", async ({ page }) => {
+    await play.navigate(urls.profiles.list, { idleWait: true });
+
+    // Without search: rendered markdown from GraphQL enrichment
+    const markdownContent = page.getByTestId(ids.profile.card.contentMarkdown);
+    await markdownContent.first().waitFor();
+    expect(await markdownContent.count()).toBeGreaterThanOrEqual(1);
+    expect(await page.getByTestId(ids.profile.card.contentSnippet).count()).toBe(0);
+
+    // Type search to activate Algolia snippets
+    await page.getByPlaceholder("Search profiles").fill("Onni");
+    await play.waitForNetworkIdle();
+
+    const snippetContent = page.getByTestId(ids.profile.card.contentSnippet);
+    await snippetContent.first().waitFor();
+    expect(await snippetContent.count()).toBeGreaterThanOrEqual(1);
+
+    await play.screenshot("profile-list-search-snippets");
+  });
 });
