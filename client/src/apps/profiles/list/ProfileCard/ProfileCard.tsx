@@ -1,6 +1,6 @@
 import { Badge, Flex, HStack, Heading, type JsxStyleProps, Stack, Text } from "@chakra-ui/react";
 import type { BaseHit, Hit } from "instantsearch.js";
-import { Snippet } from "react-instantsearch";
+import { Highlight, Snippet } from "react-instantsearch";
 import { Prose } from "@/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
@@ -8,9 +8,11 @@ import { markedConfigured } from "@/utils/marked-configured";
 
 export function ProfileCard(props: { profile: ProfileFragmentType; isSearchActive?: boolean }) {
   const p = props.profile;
+  const hit = p as unknown as Hit<BaseHit>;
 
   const location = [p.city, p.country].filter(Boolean).join(", ");
   const matchScore = p.my_match?.match_score ?? p.my_match?.match_score_by_llm;
+  const isHighlightable = props.isSearchActive && "_highlightResult" in p;
 
   return (
     <Stack
@@ -27,7 +29,14 @@ export function ProfileCard(props: { profile: ProfileFragmentType; isSearchActiv
         <Stack gap="gap.sm">
           <HStack gap="gap.md" align="baseline">
             <Heading fontSize="md" fontWeight="medium">
-              {p.first_name} {p.last_name}
+              {isHighlightable ? (
+                <>
+                  <Highlight attribute="first_name" hit={hit} />{" "}
+                  <Highlight attribute="last_name" hit={hit} />
+                </>
+              ) : (
+                `${p.first_name} ${p.last_name}`
+              )}
             </Heading>
             {location && (
               <Text color={style.color.help} fontSize={style.fontSize.help}>
@@ -60,7 +69,6 @@ export function ProfileCard(props: { profile: ProfileFragmentType; isSearchActiv
         snippetAttribute="biography"
         profile={p}
         isSearchActive={props.isSearchActive}
-        lineClamp={4}
       />
 
       <HStack gap="gap.lg" align="flex-start" flexWrap="wrap">
@@ -70,7 +78,6 @@ export function ProfileCard(props: { profile: ProfileFragmentType; isSearchActiv
           snippetAttribute="seeks"
           profile={p}
           isSearchActive={props.isSearchActive}
-          lineClamp={3}
           flex="1"
           minW="200px"
         />
@@ -81,7 +88,6 @@ export function ProfileCard(props: { profile: ProfileFragmentType; isSearchActiv
           snippetAttribute="offers"
           profile={p}
           isSearchActive={props.isSearchActive}
-          lineClamp={3}
           flex="1"
           minW="200px"
         />
@@ -130,7 +136,6 @@ function ProfileContentSection(props: {
   snippetAttribute: string;
   profile: ProfileFragmentType;
   isSearchActive?: boolean;
-  lineClamp?: number;
   flex?: string;
   minW?: string;
 }) {
@@ -152,6 +157,7 @@ function ProfileContentSection(props: {
           css={{
             "& mark": { bg: "yellow.200", color: "black", borderRadius: "2px", px: "1px" },
           }}
+          {...ids.set(ids.profile.card.contentSnippet)}
         >
           <Snippet
             attribute={props.snippetAttribute}
@@ -163,8 +169,8 @@ function ProfileContentSection(props: {
           // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
           dangerouslySetInnerHTML={{ __html: markedConfigured.parse(props.text) }}
           size="sm"
-          lineClamp={props.lineClamp}
           maxW="3xl"
+          {...ids.set(ids.profile.card.contentMarkdown)}
         />
       )}
     </Stack>
