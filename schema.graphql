@@ -17,6 +17,7 @@ type AlgoliaSearchKeyType {
   app_id: String!
   index_name: String!
   index_name_sorted_by_votes: String!
+  index_name_profiles: String!
 }
 
 input BoolBaseFilterLookup {
@@ -607,6 +608,39 @@ type PostVoteType {
   is_changed_my_mind: Boolean
 }
 
+input ProfileFilter {
+  id: IDBaseFilterLookup
+  AND: ProfileFilter
+  OR: ProfileFilter
+  NOT: ProfileFilter
+  DISTINCT: Boolean
+}
+
+type ProfileMatchType {
+  id: ID!
+  match_score_by_llm: Int
+  match_reason_by_llm: String!
+  match_score: Int
+  match_review: String!
+}
+
+type ProfileType {
+  id: ID!
+  first_name: String!
+  last_name: String!
+  company: String!
+  job_title: String!
+  career_stage: [String!]!
+  biography: String!
+  seeks: String!
+  offers: String!
+  country: String!
+  city: String!
+  skills(filters: PostTagFilter): [PostTagType!]!
+  interests(filters: PostTagFilter): [PostTagType!]!
+  my_match: ProfileMatchType
+}
+
 type Query {
   user_current: UserType
   algolia_search_key: AlgoliaSearchKeyType
@@ -623,6 +657,7 @@ type Query {
   post_highlights(post_ids: [ID!]!): [PostHighlightType!]! @IsAuthenticated
   post_highlight(post_id: ID!): PostHighlightType! @IsAuthenticated
   user_highlights: [PostHighlightType!]! @IsAuthenticated
+  profiles(filters: ProfileFilter): [ProfileType!]!
 }
 
 input StrFilterLookup {

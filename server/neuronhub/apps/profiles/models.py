@@ -1,6 +1,7 @@
 import hashlib
 import uuid
 
+from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
@@ -97,15 +98,6 @@ class Profile(models.Model):
         self.profile_for_llm_md = serialize_profile_to_markdown(self)
         super().save(**kwargs)
 
-    def get_tag_skills_names(self) -> list[str]:
-        return [tag.name for tag in self.skills.all()]
-
-    def get_tag_interests_names(self) -> list[str]:
-        return [tag.name for tag in self.interests.all()]
-
-    def __str__(self):
-        return f"{self.first_name} {self.last_name}"
-
     def is_needs_llm_reprocessing(self, user: User) -> bool:
         match = ProfileMatch.objects.filter(user=user, profile=self).first()
         if match is None or match.match_processed_at is None:
@@ -126,6 +118,21 @@ class Profile(models.Model):
         return hashlib.sha256(content.encode()).hexdigest()
 
     # Algolia serializers
+
+    def is_in_algolia_index(self) -> bool:
+        is_unlimited = True
+        if settings.DJANGO_ENV.is_dev():
+            is_unlimited = self.id < (settings.CONF_CONFIG.algolia_limit or 2000)
+        return self.user or is_unlimited
+
+    def get_id_as_str(self) -> str:
+        return str(self.id)
+
+    def get_tag_skills_names(self) -> list[str]:
+        return [tag.name for tag in self.skills.all()]
+
+    def get_tag_interests_names(self) -> list[str]:
+        return [tag.name for tag in self.interests.all()]
 
     # todo ! refac: dedup with Post.get_visible_to
     def get_visible_to(self) -> list[str]:
@@ -161,6 +168,9 @@ class Profile(models.Model):
 
     def get_offers_cropped(self):
         return self.offers[:1500]
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name} | {self.company}"
 
 
 class ProfileMatch(models.Model):

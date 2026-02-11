@@ -10,6 +10,7 @@ export function useAlgoliaSearchClient() {
     client: null as null | LiteClient,
     indexName: undefined as undefined | string,
     indexNameSortedByVotes: undefined as undefined | string,
+    indexNameProfiles: undefined as undefined | string,
   });
 
   const init = useInit({
@@ -23,6 +24,7 @@ export function useAlgoliaSearchClient() {
       state.mutable.client = liteClient(data.app_id, data.api_key);
       state.mutable.indexName = data.index_name;
       state.mutable.indexNameSortedByVotes = data.index_name_sorted_by_votes;
+      state.mutable.indexNameProfiles = data.index_name_profiles;
     },
   });
 
@@ -30,6 +32,7 @@ export function useAlgoliaSearchClient() {
     client: state.snap.client,
     indexName: state.snap.indexName,
     indexNameSortedByVotes: state.snap.indexNameSortedByVotes,
+    indexNameProfiles: state.snap.indexNameProfiles,
     loading: init.isLoading,
   };
 }
@@ -43,6 +46,7 @@ const AlgoliaSearchKeyQuery = graphql.persisted(
         app_id
         index_name
         index_name_sorted_by_votes
+        index_name_profiles
       }
     }
   `),

@@ -13,6 +13,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
         index_name = "profiles"
 
         fields = [
+            ["get_id_as_str", "id"],
             "first_name",
             "last_name",
             "company",
@@ -26,6 +27,8 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "country",
             "city",
             ["get_visible_to", "visible_to"],
+            "url_linkedin",
+            "url_conference",
         ]
         settings = {
             "searchableAttributes": [
@@ -40,13 +43,18 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "offers",
             ],
             "attributesForFaceting": [
-                "skills",
-                "interests",
-                "career_stage",
-                "country",
+                "searchable(skills)",
+                "searchable(interests)",
+                "searchable(career_stage)",
+                "searchable(country)",
                 "visible_to",
             ],
             "unretrievableAttributes": [
                 "visible_to",
+            ],
+            "attributesToSnippet": [
+                "biography:100",
+                "seeks:50",
+                "offers:50",
             ],
         }

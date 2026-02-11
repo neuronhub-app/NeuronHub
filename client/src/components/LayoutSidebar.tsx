@@ -38,6 +38,7 @@ export function LayoutSidebar(props: StackProps) {
   const user = useUser();
 
   const links: Array<SidebarLink> = [
+    { to: urls.profiles.list, icon: GoCommentDiscussion, label: "Profiles" },
     { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts" },
     { to: urls.tools.list, icon: LuLayoutDashboard, label: "Tools" },
     { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },

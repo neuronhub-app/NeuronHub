@@ -28,6 +28,7 @@ from neuronhub.apps.highlighter.graphql import HighlighterQuery
 from neuronhub.apps.importer.graphql.mutations import ImporterMutation
 from neuronhub.apps.posts.graphql.mutations import PostsMutation
 from neuronhub.apps.profiles.graphql import ProfilesMutation
+from neuronhub.apps.profiles.graphql import ProfilesQuery
 from neuronhub.apps.posts.graphql.resolvers import PostsQuery
 from neuronhub.apps.tests.graphql.mutations import TestsMutation
 from neuronhub.apps.users.graphql.mutations import UserMutation
@@ -36,7 +37,7 @@ from neuronhub.apps.users.graphql.resolvers import UsersQuery
 
 Query = merge_types(
     "Query",
-    types=(UsersQuery, PostsQuery, HighlighterQuery),
+    types=(UsersQuery, PostsQuery, HighlighterQuery, ProfilesQuery),
 )
 
 

@@ -1,11 +1,72 @@
+from typing import cast
+
 import strawberry
+import strawberry_django
+from django.db.models import QuerySet
 from strawberry import ID
 from strawberry import Info
+from strawberry import auto
+from strawberry_django.auth.utils import get_current_user
 from strawberry_django.permissions import IsAuthenticated
 
+from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.profiles.models import Profile
+from neuronhub.apps.profiles.models import ProfileMatch
+from neuronhub.apps.profiles.services.filter_profiles_by_user import filter_profiles_by_user
 from neuronhub.apps.profiles.services.send_dm import send_profile_dm
 from neuronhub.apps.users.graphql.resolvers import get_user
+from neuronhub.apps.users.models import User
+
+
+@strawberry_django.filter_type(Profile, lookups=True)
+class ProfileFilter:
+    id: auto
+
+
+@strawberry_django.type(ProfileMatch)
+class ProfileMatchType:
+    id: auto
+    match_score_by_llm: auto
+    match_reason_by_llm: auto
+    match_score: auto
+    match_review: auto
+
+
+@strawberry_django.type(Profile, filters=ProfileFilter)
+class ProfileType:
+    id: auto
+    first_name: auto
+    last_name: auto
+    company: auto
+    job_title: auto
+    career_stage: auto
+    biography: auto
+    seeks: auto
+    offers: auto
+    country: auto
+    city: auto
+
+    skills: list[PostTagType]
+    interests: list[PostTagType]
+
+    @classmethod
+    def get_queryset(cls, queryset: QuerySet[Profile], info: Info) -> QuerySet[Profile]:
+        user = get_current_user(info)
+        return filter_profiles_by_user(user, profiles=queryset)
+
+    @strawberry_django.field()
+    async def my_match(self: Profile, info: Info) -> ProfileMatchType | None:
+        user = get_current_user(info)
+        if not user.is_authenticated:
+            return None
+        user = cast(User, user)
+        match = await ProfileMatch.objects.filter(user=user, profile=self).afirst()
+        return cast(ProfileMatchType | None, match)
+
+
+@strawberry.type(name="Query")
+class ProfilesQuery:
+    profiles: list[ProfileType] = strawberry_django.field()
 
 
 @strawberry.type

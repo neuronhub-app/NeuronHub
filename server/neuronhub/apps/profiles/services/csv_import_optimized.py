@@ -29,7 +29,7 @@ class SyncStats:
 
 
 def csv_optimize_and_import(
-    csv_path: Path, limit: int | None = None, group_name: str = "EAG SF 2026"
+    csv_path: Path, limit: int | None = None, group_name: str = "EAG-SF-2026"
 ) -> SyncStats:
     rows = _parse_profiles_csv(csv_path)
 

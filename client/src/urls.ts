@@ -48,6 +48,12 @@ export const urls = {
       return `${this.list}/${id}/${op.edit}` as const;
     },
   },
+  profiles: {
+    list: "/profiles",
+    detail(id: ID) {
+      return `${this.list}/${id}` as const;
+    },
+  },
   tools: {
     list: "/tools",
     get create() {

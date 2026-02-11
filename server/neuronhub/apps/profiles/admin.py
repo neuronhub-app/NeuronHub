@@ -106,7 +106,7 @@ class ProfileInviteInline(admin.TabularInline):
 
 
 @admin.register(Profile)
-class EagAttendeeAdmin(SimpleHistoryAdmin):
+class ProfileAdmin(SimpleHistoryAdmin):
     form = EagAttendeeForm
     inlines = [ProfileMatchInline, ProfileInviteInline]
     list_display = [
@@ -115,6 +115,11 @@ class EagAttendeeAdmin(SimpleHistoryAdmin):
         "job_title",
         "country",
         "get_url_linkedin",
+    ]
+
+    autocomplete_fields = [
+        "user",
+        "groups",
     ]
 
     def get_list_filter(self, request: HttpRequest):
