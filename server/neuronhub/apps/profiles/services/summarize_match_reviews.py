@@ -72,9 +72,10 @@ def _serialize_review(match: ProfileMatch, exclude_extra_fields: bool = False) -
 def build_calibration_examples(matches: Matches, max_examples: int = 8) -> str:
     matches_list = list(matches)
     if len(matches_list) >= max_examples:
-        # sorted by delta ascending; take ~6 worst downvotes + ~2 mildest corrections from the end
-        n_worst = max_examples - 2
-        matches_list = matches_list[-2:] + matches_list[:n_worst]
+        # sorted by delta ascending; take ~6 negative + ~2 positive corrections
+        positive = [m for m in matches_list if getattr(m, "match_score_delta", 0) > 0][-2:]
+        n_negative = max_examples - len(positive)
+        matches_list = positive + matches_list[:n_negative]
 
     examples = "\n\n".join([_serialize_calibration_example(m) for m in matches_list])
 

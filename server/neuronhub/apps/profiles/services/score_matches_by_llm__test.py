@@ -8,8 +8,8 @@ from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.services.csv_import_optimized import csv_optimize_and_import
 from neuronhub.apps.profiles.services.score_matches_by_llm import MatchConfig
 from neuronhub.apps.profiles.services.score_matches_by_llm import _score_matches_batch_by_llm
-from neuronhub.apps.profiles.services.summarize_match_reviews__test import simulate_human_review
-from neuronhub.apps.profiles.services.summarize_match_reviews__test import simulate_llm_scoring
+from neuronhub.apps.profiles.services.summarize_match_reviews__test import gen_llm_scoring
+from neuronhub.apps.profiles.services.summarize_match_reviews__test import gen_user_review
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
@@ -68,8 +68,8 @@ class ScoreMatchesByLlmTest(NeuronTestCase):
         await _csv_optimize_and_import()
         alice = await Profile.objects.afirst()
         assert alice is not None
-        await simulate_llm_scoring(alice, self.user, score_by_llm=80)
-        await simulate_human_review(alice, self.user, score_by_user=60, review_note="too AIS")
+        await gen_llm_scoring(alice, self.user, score_by_llm=80)
+        await gen_user_review(alice, self.user, score_by_user=60, review_note="too AIS")
 
         config = MatchConfig(
             user=self.user,
