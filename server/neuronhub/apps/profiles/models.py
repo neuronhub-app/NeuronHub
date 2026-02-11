@@ -14,6 +14,7 @@ from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.profiles.services.serialize_to_md import serialize_profile_to_markdown
 from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.models import User
+from neuronhub.settings import DjangoEnv
 
 
 class ProfileGroup(TimeStampedModel):
@@ -121,7 +122,7 @@ class Profile(models.Model):
 
     def is_in_algolia_index(self) -> bool:
         is_unlimited = True
-        if settings.DJANGO_ENV.is_dev():
+        if settings.DJANGO_ENV is DjangoEnv.DEV:
             is_unlimited = self.id < (settings.CONF_CONFIG.algolia_limit or 2000)
         return self.user or is_unlimited
 

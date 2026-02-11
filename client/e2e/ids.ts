@@ -126,6 +126,13 @@ export namespace ids {
     span: "highlighter.span",
   } as const;
 
+  export const profile = {
+    list: "profile.list",
+    card: {
+      container: "profile.card.container",
+    },
+  } as const;
+
   export const auth = {
     login: {
       username: "auth.login.username",

@@ -23,6 +23,7 @@ import {
 import { ProfileCard } from "@/apps/profiles/list/ProfileCard/ProfileCard";
 import { useAlgoliaProfilesEnrichmentByGraphql } from "@/apps/profiles/list/useAlgoliaProfilesEnrichmentByGraphql";
 import { Button } from "@/components/ui/button";
+import { ids } from "@/e2e/ids";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { gap } from "@/theme/theme";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
@@ -52,7 +53,11 @@ export function ProfileList() {
           <SearchInput />
         </HStack>
 
-        <Configure hitsPerPage={30} />
+        <Configure
+          hitsPerPage={30}
+          attributesToSnippet={["biography:100", "seeks:50", "offers:50"]}
+          attributesToHighlight={["biography", "seeks", "offers", "first_name", "last_name"]}
+        />
 
         <Flex flex="1" pos="relative" gap="gap.xl">
           <ProfileListHits />
@@ -100,14 +105,23 @@ function SearchInput() {
 function ProfileListHits() {
   const hits = useHits<ProfileFragmentType>();
   const pagination = usePagination();
-  const profilesEnriched = useAlgoliaProfilesEnrichmentByGraphql(hits.items);
+  const search = useSearchBox();
+  const { items: profilesEnriched, isEnrichedByGraphql } = useAlgoliaProfilesEnrichmentByGraphql(
+    hits.items,
+  );
+  const isSearchActive = search.query.length > 0;
+
+  // When not searching, wait for GraphQL enrichment (Algolia strips markdown formatting)
+  const isReady = isSearchActive || isEnrichedByGraphql;
 
   return (
     <Stack gap="gap.xl" w="full">
-      <Stack>
+      <Stack {...ids.set(ids.profile.list)}>
         {hits.results?.nbHits ? (
-          profilesEnriched.length ? (
-            profilesEnriched.map(profile => <ProfileCard key={profile.id} profile={profile} />)
+          isReady && profilesEnriched.length ? (
+            profilesEnriched.map(profile => (
+              <ProfileCard key={profile.id} profile={profile} isSearchActive={isSearchActive} />
+            ))
           ) : (
             <>
               <Skeleton h="10" />

@@ -13,7 +13,7 @@ export function useAlgoliaEnrichmentByGraphql<TItem extends { id: ID }>(
   // biome-ignore lint/suspicious/noExplicitAny: query data/vars type varies per consumer — type safety is at call-site wrappers
   query: TadaDocumentNode<any, any>,
   extractItems: (data: Record<string, TItem[]>) => TItem[],
-): TItem[] {
+): { items: TItem[]; isEnrichedByGraphql: boolean } {
   const ids = useMemo(() => algoliaItems.map(item => item.id), [algoliaItems]);
 
   const [idsDebounced] = useDebounce(ids, 500, { leading: true });
@@ -35,7 +35,7 @@ export function useAlgoliaEnrichmentByGraphql<TItem extends { id: ID }>(
     return map;
   }, [data, extractItems]);
 
-  return useMemo(
+  const items = useMemo(
     () =>
       algoliaItems.map(item => {
         const graphqlItem = itemsFromGraphql.get(item.id);
@@ -47,4 +47,6 @@ export function useAlgoliaEnrichmentByGraphql<TItem extends { id: ID }>(
       }),
     [algoliaItems, itemsFromGraphql],
   );
+
+  return { items, isEnrichedByGraphql: Boolean(data) };
 }

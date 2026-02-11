@@ -12,6 +12,8 @@ if settings.ALGOLIA["IS_ENABLED"]:
     class ProfileIndex(AlgoliaIndex):
         index_name = "profiles"
 
+        should_index = "is_in_algolia_index"
+
         fields = [
             ["get_id_as_str", "id"],
             "first_name",
