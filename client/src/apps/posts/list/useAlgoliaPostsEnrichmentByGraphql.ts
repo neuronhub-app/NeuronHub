@@ -3,7 +3,7 @@ import { PostFragment, type PostFragmentType } from "@/graphql/fragments/posts";
 import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
 
 export function useAlgoliaPostsEnrichmentByGraphql(postsAlgolia: PostFragmentType[]) {
-  return useAlgoliaEnrichmentByGraphql(postsAlgolia, PostsByIdsQuery, data => data.posts);
+  return useAlgoliaEnrichmentByGraphql(postsAlgolia, PostsByIdsQuery, data => data.posts).items;
 }
 
 const PostsByIdsQuery = graphql.persisted(

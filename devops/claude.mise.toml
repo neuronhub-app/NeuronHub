@@ -34,7 +34,7 @@
         $sys_prompt_indented += if ("CLAUDE_PROMPT_EXTRA_NOTES" in $env) { $"\nNote:\n ($env.CLAUDE_PROMPT_EXTRA_NOTES)" } else { "" }
 
         let sys_prompt = $sys_prompt_indented | lines | each { str trim } | str join "\n"
-        let prompt = r#'{{ usage.prompt }}`'#
+        let prompt = r#'{{ usage.prompt }}'#
 
         # exit the project to not load CLAUDE.md into /context
         cd ..

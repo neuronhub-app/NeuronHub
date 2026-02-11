@@ -27,6 +27,9 @@ from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 from neuronhub.apps.profiles.models import Profile
+from neuronhub.apps.profiles.models import ProfileGroup
+from neuronhub.apps.profiles.models import ProfileInvite
+from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.tests.test_gen import UsersGen
 from neuronhub.apps.users.models import User
@@ -44,8 +47,10 @@ async def db_stubs_repopulate(
     is_delete_posts_extra: bool = True,
     is_delete_users_extra: bool = True,
     is_delete_user_default: bool = False,
+    is_delete_profiles: bool = True,
     is_create_single_review: bool | None = False,
     is_import_HN_post: bool | None = True,
+    is_import_profiles_csv: bool = True,
 ) -> Gen:
     """
     Populates the db with Posts, Tools, Reviews, tags, votes, etc.
@@ -64,7 +69,7 @@ async def db_stubs_repopulate(
                 await model._default_manager.all().adelete()
 
         if is_delete_posts:
-            # for E2E keep others to preserve IDs for Algolia
+            # for E2E keep others to preserve IDs for Algolia # todo ! refac: #prob-redundant, i don't believe we use that strategy at all - we just reset all
             for model in [
                 PostTagVote,
                 PostTag,
@@ -72,6 +77,15 @@ async def db_stubs_repopulate(
                 Post,
                 PostSource,
                 UserSource,
+            ]:
+                await model._default_manager.all().adelete()
+
+        if is_delete_profiles:
+            for model in [
+                ProfileMatch,
+                ProfileInvite,
+                Profile,
+                ProfileGroup,
             ]:
                 await model._default_manager.all().adelete()
 
@@ -106,22 +120,45 @@ async def db_stubs_repopulate(
             importer = ImporterHackerNews(is_use_cache=True, is_logging_enabled=False)
             await importer.import_post(post_with_90_comments_and_idents)
 
+        if is_import_profiles_csv:
+            await _import_profiles_csv(gen)
+
     if settings.ALGOLIA["IS_ENABLED"]:
-        await _algolia_reindex()
+        await _algolia_reindex(
+            is_import_profiles_csv=is_import_profiles_csv,
+            is_import_HN_post=is_import_HN_post,
+        )
 
     return gen
 
 
+async def _import_profiles_csv(gen: Gen):
+    from asgiref.sync import sync_to_async
+
+    from neuronhub.apps.profiles.services.csv_import_optimized import csv_optimize_and_import
+
+    csv_path = settings.CONF_CONFIG.eag_csv_path
+    if csv_path.exists():
+        await sync_to_async(csv_optimize_and_import)(csv_path, limit=5)
+
+
 # todo ! refac: move out
-async def _algolia_reindex():
+async def _algolia_reindex(
+    is_import_profiles_csv: bool = True,
+    is_import_HN_post: bool = True,
+):
     from algoliasearch_django import reindex_all
 
     from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
 
     # todo refac: replace with a [[index.py]] method
-    await sync_to_async(reindex_all)(Post)
-    await sync_to_async(reindex_all)(Profile)
-    await sync_to_async(setup_virtual_replica_sorted_by_votes)()
+    if is_import_HN_post:
+        await sync_to_async(reindex_all)(Post)
+    if is_import_profiles_csv:
+        await sync_to_async(reindex_all)(Profile)
+
+    if is_import_HN_post or is_import_profiles_csv:
+        await sync_to_async(setup_virtual_replica_sorted_by_votes)()
 
 
 class _disable_auto_indexing(ContextDecorator):
