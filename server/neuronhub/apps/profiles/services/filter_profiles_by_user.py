@@ -37,12 +37,19 @@ def filter_profiles_by_user(
                 user__connection_group__connections=user,
             )
         )
+        is_in_same_profile_group = Exists(
+            Profile.objects.filter(
+                pk=OuterRef("pk"),
+                groups__profiles__user=user,
+            )
+        )
         is_publicly_visible = Q(visibility__in=[Visibility.INTERNAL, Visibility.PUBLIC])
 
         profiles = profiles.filter(
             is_own_profile
             | is_allowed_as_user_selected
             | is_allowed_as_connection
+            | is_in_same_profile_group
             | is_publicly_visible
         )
     else:

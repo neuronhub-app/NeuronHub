@@ -1,4 +1,5 @@
 import hashlib
+import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator
@@ -8,9 +9,17 @@ from django_choices_field import TextChoicesField
 from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.anonymizer.fields import Visibility
+from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.profiles.services.serialize_to_md import serialize_profile_to_markdown
 from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.models import User
+
+
+class ProfileGroup(TimeStampedModel):
+    name = models.CharField(max_length=200, unique=True)
+
+    def __str__(self):
+        return self.name
 
 
 class CareerStage(models.TextChoices):
@@ -61,6 +70,8 @@ class Profile(models.Model):
     url_linkedin = models.CharField(blank=True, max_length=400, verbose_name="LN")
     url_conference = models.CharField(blank=True, max_length=400, verbose_name="SC")
 
+    groups = models.ManyToManyField(ProfileGroup, related_name="profiles", blank=True)
+
     visibility = TextChoicesField(Visibility, default=Visibility.PRIVATE)
     visible_to_users = models.ManyToManyField(User, related_name="profiles_visible", blank=True)
 
@@ -95,27 +106,6 @@ class Profile(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
 
-    # todo ! refac: dedup with Post.get_visible_to
-    def get_visible_to(self) -> list[str]:
-        if self.visibility is Visibility.PRIVATE:
-            assert self.user
-            return [self.user.username]
-
-        if self.visibility in [Visibility.INTERNAL, Visibility.PUBLIC]:
-            return [f"group/{self.visibility.value}"]
-
-        visible_to: list[str] = []
-
-        if self.visibility in [Visibility.USERS_SELECTED, Visibility.CONNECTIONS]:
-            visible_to.extend(list(*self.visible_to_users.all().values_list("username")))
-
-        if self.visibility is Visibility.CONNECTIONS:
-            assert self.user
-            for group in self.user.connection_groups.all():
-                visible_to.extend(list(*group.connections.all().values_list("username")))
-
-        return visible_to
-
     def is_needs_llm_reprocessing(self, user: User) -> bool:
         match = ProfileMatch.objects.filter(user=user, profile=self).first()
         if match is None or match.match_processed_at is None:
@@ -135,6 +125,43 @@ class Profile(models.Model):
         )
         return hashlib.sha256(content.encode()).hexdigest()
 
+    # Algolia serializers
+
+    # todo ! refac: dedup with Post.get_visible_to
+    def get_visible_to(self) -> list[str]:
+        visible_to: list[str] = []
+
+        for pg in self.groups.all():
+            visible_to.append(f"profile_group/{pg.name}")
+
+        if self.visibility is Visibility.PRIVATE:
+            if self.user:
+                visible_to.append(self.user.username)
+            return visible_to
+
+        if self.visibility in [Visibility.INTERNAL, Visibility.PUBLIC]:
+            visible_to.append(f"group/{self.visibility.value}")
+            return visible_to
+
+        if self.visibility in [Visibility.USERS_SELECTED, Visibility.CONNECTIONS]:
+            visible_to.extend(list(*self.visible_to_users.all().values_list("username")))
+
+        if self.visibility is Visibility.CONNECTIONS:
+            assert self.user
+            for group in self.user.connection_groups.all():
+                visible_to.extend(list(*group.connections.all().values_list("username")))
+
+        return visible_to
+
+    def get_biography_cropped(self):
+        return self.biography[:1500]
+
+    def get_seeks_cropped(self):
+        return self.seeks[:1500]  # one user has 10k
+
+    def get_offers_cropped(self):
+        return self.offers[:1500]
+
 
 class ProfileMatch(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile_matches")
@@ -148,12 +175,14 @@ class ProfileMatch(models.Model):
     )
     match_reason_by_llm = models.TextField(blank=True)
 
+    # todo ! refac-name: match_score_by_user
     match_score = models.PositiveIntegerField(
         null=True,
         blank=True,
         validators=[MinValueValidator(0), MaxValueValidator(100)],
         verbose_name="Score Adj",
     )
+    # todo ! refac-name: match_review_by_user
     match_review = models.TextField(
         blank=True,
         verbose_name="Review",
@@ -170,6 +199,16 @@ class ProfileMatch(models.Model):
 
     def __str__(self):
         return f"Match: {self.user} → {self.profile}"
+
+
+class ProfileInvite(TimeStampedModel):
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="invites")
+    token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    user_email = models.EmailField()
+    accepted_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Invite: {self.profile} → {self.user_email}"
 
 
 class ProfileMessage(models.Model):

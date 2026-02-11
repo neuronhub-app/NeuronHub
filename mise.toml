@@ -35,6 +35,7 @@
     DEPENDENCY_COOLDOWN_DAYS = 4
 
     DOMAIN_NAME = "neuronhub.app"
+    ADMIN_EMAIL = "support@{{ env.DOMAIN_NAME }}"
 
     GITHUB_ORG = "neuronhub-app"
     GITHUB_REPO = "neuronhub"

@@ -7,4 +7,5 @@ from neuronhub.apps.orgs.models import Org
 class OrgAdmin(admin.ModelAdmin):
     search_fields = [
         "name",
+        "domain",
     ]

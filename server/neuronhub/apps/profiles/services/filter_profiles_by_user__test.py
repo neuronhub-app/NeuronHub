@@ -5,6 +5,7 @@ from neuronhub.apps.users.models import UserConnectionGroup
 
 
 # todo ! refac: dedup with [[filter_posts_by_user.py]]
+# #AI
 class FilterProfilesByUserTest(NeuronTestCase):
     async def test_public_visible_to_authed(self):
         await self.gen.profiles.profile(visibility=Visibility.PUBLIC)
@@ -52,3 +53,33 @@ class FilterProfilesByUserTest(NeuronTestCase):
         await self.gen.profiles.profile(visibility=Visibility.PRIVATE, user=self.user)
 
         assert await filter_profiles_by_user(AnonymousUser()).acount() == 1
+
+    # #AI
+    async def test_group_members_see_each_other(self):
+        group = await self.gen.profiles.group(name="EAG SF 2026")
+        user_a = await self.gen.users.user()
+        user_b = await self.gen.users.user()
+        outsider = await self.gen.users.user()
+
+        await self.gen.profiles.profile(
+            user=user_a, visibility=Visibility.PRIVATE, groups=[group]
+        )
+        await self.gen.profiles.profile(
+            user=user_b, visibility=Visibility.PRIVATE, groups=[group]
+        )
+
+        assert await filter_profiles_by_user(user_a).acount() == 2
+        assert await filter_profiles_by_user(user_b).acount() == 2
+        assert await filter_profiles_by_user(outsider).acount() == 0
+
+    # #AI. Also, i don't like this behavior. Though it respects the business logic.
+    async def test_group_without_user_visible_to_members(self):
+        group = await self.gen.profiles.group(name="Test Group")
+        member = await self.gen.users.user()
+        await self.gen.profiles.profile(
+            user=member, visibility=Visibility.PRIVATE, groups=[group]
+        )
+        # CSV-imported profile: no user, but in same group
+        await self.gen.profiles.profile(user=None, visibility=Visibility.PRIVATE, groups=[group])
+
+        assert await filter_profiles_by_user(member).acount() == 2

@@ -7,6 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.static import serve
 from strawberry.django.views import AsyncGraphQLView
 
+from neuronhub.apps.profiles.views import accept_invite
 from neuronhub.graphql import schema
 
 
@@ -33,6 +34,7 @@ urlpatterns = [
             ]
         ),
     ),
+    path("profiles/accept-invite/<uuid:token>", accept_invite, name="profiles_accept_invite"),
     path("healthcheck/", include("health_check.urls")),
     re_path(
         r"^media/(?P<path>.*)$",

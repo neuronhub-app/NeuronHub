@@ -1,6 +1,7 @@
 import asyncio
 import warnings
 from enum import Enum
+from logging import getLogger
 from pathlib import Path
 from typing import TypedDict
 
@@ -14,6 +15,8 @@ from environs import Env
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import strawberry_django_settings
 
+
+logger = getLogger(__name__)
 
 django_stubs_ext.monkeypatch()
 
@@ -241,6 +244,9 @@ EMAIL_USE_TLS = True
 ANYMAIL = {
     "POSTMARK_SERVER_TOKEN": env.str("POSTMARK_SERVER_TOKEN", ""),
 }
+ADMIN_EMAIL = env.str("ADMIN_EMAIL", "")
+if not ADMIN_EMAIL:
+    logger.warning("env.ADMIN_EMAIL is missing")
 
 DEFAULT_DJANGO_SETTINGS = strawberry_django_settings()
 DEFAULT_DJANGO_SETTINGS["GENERATE_ENUMS_FROM_CHOICES"] = True  # no reason atm, can remove

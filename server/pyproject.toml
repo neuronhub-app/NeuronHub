@@ -31,7 +31,8 @@ dependencies = [
         "algoliasearch >= 4.0.0",
         "pydantic < 2.12.4", # 2.12.4-5 are broken for Python 3.14. Prob was Strawberry bug fixed lately.
     "django-timezone-field == 7.*", # [i=low, rep=high, GH=high, @mfogel] rich presence on SO (#103909), AirBnB, Yelp, etc
-    "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] I know @jrief
+    "django-admin-sortable2 == 2.*", # [i=norm, rep=norm, GH=high, @jrief, 0.8k] I worked with @jrief
+    "django-adminutils == 0.0.28", # [i=low, rep=high, GH=high, @GaretJax, 0.002], I worked with Jonathan
     "django-select2 == 8.*", # [i=low, rep=high, GH=high, @codingjoe, 0.8k] has a public CV
     "django-hijack == 3.*", # [i=none, rep=high, GH=high, @codingjoe, 1.6k] has a public CV
     "django-debug-toolbar == 6.*", # [i=low, rep=high, GH=high, @matthiask] 406.ch
