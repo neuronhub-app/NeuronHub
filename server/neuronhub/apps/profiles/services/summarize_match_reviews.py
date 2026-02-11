@@ -1,4 +1,6 @@
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
+from typing import cast
 
 from django.db.models import F
 from django.db.models import QuerySet
@@ -12,8 +14,8 @@ from neuronhub.apps.users.models import User
 Matches = Sequence[ProfileMatch] | QuerySet[ProfileMatch]
 
 
-def get_reviewed_profiles(user: User) -> QuerySet[ProfileMatch]:
-    return (
+def get_reviewed_profiles(user: User) -> QuerySet[ProfileMatchAnnotated]:
+    matches = (
         ProfileMatch.objects.filter(user=user)
         .exclude(match_score=None)
         .annotate(
@@ -23,6 +25,15 @@ def get_reviewed_profiles(user: User) -> QuerySet[ProfileMatch]:
         .prefetch_related("profile__skills")
         .order_by("match_score_delta")
     )
+    return cast(QuerySet[ProfileMatchAnnotated], matches)
+
+
+if TYPE_CHECKING:
+    from typing import type_check_only
+
+    @type_check_only
+    class ProfileMatchAnnotated(ProfileMatch):
+        match_score_delta: int
 
 
 def format_reviews_as_markdown(reviews: Matches, exclude_extra_fields: bool = False) -> str:

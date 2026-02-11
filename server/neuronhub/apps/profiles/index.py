@@ -6,6 +6,7 @@ from neuronhub.apps.profiles.models import Profile
 
 
 if settings.ALGOLIA["IS_ENABLED"]:
+    # todo ! feat: add setup_virtual_replica_sorted_by_votes for sort by ProfileMatch.match_score
 
     @register(Profile)
     class ProfileIndex(AlgoliaIndex):
@@ -17,11 +18,11 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "company",
             "job_title",
             "career_stage",
-            "biography",
             ["get_tag_skills_names", "skills"],
             ["get_tag_interests_names", "interests"],
-            "seeks",
-            "offers",
+            ["get_biography_cropped", "biography"],
+            ["get_seeks_cropped", "seeks"],
+            ["get_offers_cropped", "offers"],
             "country",
             "city",
             ["get_visible_to", "visible_to"],

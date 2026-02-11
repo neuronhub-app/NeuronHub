@@ -26,6 +26,7 @@ from neuronhub.apps.posts.models.posts import PostVote
 from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
+from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.tests.test_gen import UsersGen
 from neuronhub.apps.users.models import User
@@ -111,6 +112,7 @@ async def db_stubs_repopulate(
     return gen
 
 
+# todo ! refac: move out
 async def _algolia_reindex():
     from algoliasearch_django import reindex_all
 
@@ -118,6 +120,7 @@ async def _algolia_reindex():
 
     # todo refac: replace with a [[index.py]] method
     await sync_to_async(reindex_all)(Post)
+    await sync_to_async(reindex_all)(Profile)
     await sync_to_async(setup_virtual_replica_sorted_by_votes)()
 
 

@@ -2,12 +2,17 @@ import csv
 from dataclasses import dataclass
 from pathlib import Path
 
+from asgiref.sync import async_to_sync
+from django.conf import settings
 from django.db.models import Count
 
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.profiles.models import Profile
+from neuronhub.apps.profiles.models import ProfileGroup
 from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.profiles.services.csv_optimize_tokens import csv_optimize_tokens
+from neuronhub.apps.tests.services.db_stubs_repopulate import _algolia_reindex
+from neuronhub.apps.tests.services.db_stubs_repopulate import _disable_auto_indexing
 from neuronhub.apps.users.models import User
 
 
@@ -23,68 +28,77 @@ class SyncStats:
         return self.created + self.updated
 
 
-def csv_optimize_and_import(csv_path: Path, limit: int | None = None) -> SyncStats:
+def csv_optimize_and_import(
+    csv_path: Path, limit: int | None = None, group_name: str = "EAG SF 2026"
+) -> SyncStats:
     rows = _parse_profiles_csv(csv_path)
 
     stats = SyncStats()
 
     tag_parent, _ = PostTag.objects.get_or_create(name="Skill", tag_parent=None)
+    profile_group, _ = ProfileGroup.objects.get_or_create(name=group_name)
 
-    for profile_row_raw in rows[:limit] if limit else rows:
-        profile_row = {key: csv_optimize_tokens(val) for key, val in profile_row_raw.items()}
-        if not profile_row:
-            continue
+    with _disable_auto_indexing():
+        for profile_row_raw in rows[:limit] if limit else rows:
+            profile_row = {key: csv_optimize_tokens(val) for key, val in profile_row_raw.items()}
+            if not profile_row:
+                continue
 
-        career_stage = _split_list_of_strings(profile_row.pop("career_stage"))
-        tag_skills = _split_list_of_strings(profile_row.pop("skills"))
-        tag_interests = _split_list_of_strings(profile_row.pop("interests"))
+            career_stage = _split_list_of_strings(profile_row.pop("career_stage"))
+            tag_skills = _split_list_of_strings(profile_row.pop("skills"))
+            tag_interests = _split_list_of_strings(profile_row.pop("interests"))
 
-        defaults = {
-            **profile_row,
-            "career_stage": career_stage,
-        }
+            defaults = {
+                **profile_row,
+                "career_stage": career_stage,
+            }
 
-        if defaults["url_conference"]:
-            profile, is_created = Profile.objects.update_or_create(
-                url_conference=defaults["url_conference"],
-                defaults=defaults,
-            )
-        else:
-            profile, is_created = Profile.objects.update_or_create(
-                first_name=defaults["first_name"],
-                last_name=defaults["last_name"],
-                defaults=defaults,
-            )
+            if defaults["url_conference"]:
+                profile, is_created = Profile.objects.update_or_create(
+                    url_conference=defaults["url_conference"],
+                    defaults=defaults,
+                )
+            else:
+                profile, is_created = Profile.objects.update_or_create(
+                    first_name=defaults["first_name"],
+                    last_name=defaults["last_name"],
+                    defaults=defaults,
+                )
 
-        profile.skills.set(_resolve_tags(parent=tag_parent, names=tag_skills))
-        profile.interests.set(_resolve_tags(parent=tag_parent, names=tag_interests))
+            profile.groups.add(profile_group)
 
-        is_updated = profile.match_hash != profile.compute_content_hash()
-        if is_created:
-            stats.created += 1
-            profile.match_hash = profile.compute_content_hash()
-            profile.save()
-        elif is_updated:
-            for field, value in defaults.items():
-                if field != "match_hash":
-                    setattr(profile, field, value)
-            profile.match_hash = profile.compute_content_hash()
-            profile.save()
+            profile.skills.set(_resolve_tags(parent=tag_parent, names=tag_skills))
+            profile.interests.set(_resolve_tags(parent=tag_parent, names=tag_interests))
 
-            match = (
-                ProfileMatch.objects.filter(profile=profile)
-                .order_by("-match_processed_at")
-                .first()
-            )
-            if match:
-                match.match_score_by_llm = None
-                match.match_reason_by_llm = ""
-                match.match_processed_at = None
-                match.save()
+            is_updated = profile.match_hash != profile.compute_content_hash()
+            if is_created:
+                stats.created += 1
+                profile.match_hash = profile.compute_content_hash()
+                profile.save()
+            elif is_updated:
+                for field, value in defaults.items():
+                    if field != "match_hash":
+                        setattr(profile, field, value)
+                profile.match_hash = profile.compute_content_hash()
+                profile.save()
 
-            stats.updated += 1
-        else:
-            stats.unchanged += 1
+                match = (
+                    ProfileMatch.objects.filter(profile=profile)
+                    .order_by("-match_processed_at")
+                    .first()
+                )
+                if match:
+                    match.match_score_by_llm = None
+                    match.match_reason_by_llm = ""
+                    match.match_processed_at = None
+                    match.save()
+
+                stats.updated += 1
+            else:
+                stats.unchanged += 1
+
+    if settings.ALGOLIA["IS_ENABLED"]:
+        async_to_sync(_algolia_reindex)()
 
     _report_duplicates_if_any()
 

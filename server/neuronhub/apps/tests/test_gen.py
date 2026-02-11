@@ -12,6 +12,8 @@ from neuronhub.apps.posts.models import PostCategory
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models.types import PostTypeEnum
 from neuronhub.apps.profiles.models import Profile
+from neuronhub.apps.profiles.models import ProfileGroup
+from neuronhub.apps.profiles.models import ProfileInvite
 from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.users.models import User
 
@@ -309,6 +311,18 @@ class ProfilesGen:
     faker: UniqueProxy
     user: User
 
+    async def group(self, name: str = "") -> ProfileGroup:
+        group, _ = await ProfileGroup.objects.aget_or_create(
+            name=name or self.faker.company(),
+        )
+        return group
+
+    async def invite(self, profile: Profile, user_email: str = "") -> ProfileInvite:
+        return await ProfileInvite.objects.acreate(
+            profile=profile,
+            user_email=user_email or self.faker.email(),
+        )
+
     async def profile(
         self,
         user: User | None = None,
@@ -316,6 +330,7 @@ class ProfilesGen:
         last_name: str = "",
         visibility: Visibility = Visibility.PUBLIC,
         visible_to_users: list[User] | None = None,
+        groups: list[ProfileGroup] | None = None,
         company: str = "",
         job_title: str = "",
         biography: str = "",
@@ -362,6 +377,9 @@ class ProfilesGen:
 
         if visible_to_users:
             await profile.visible_to_users.aset(visible_to_users)
+
+        if groups:
+            await profile.groups.aset(groups)
 
         return profile
 

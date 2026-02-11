@@ -456,6 +456,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-adminutils"
+version = "0.0.28"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-object-actions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/d3/39/53e79be1997425227d5688f3b39570b69f288fa28065cb2afaf1b8eaa3c8/django_adminutils-0.0.28.tar.gz", hash = "sha256:0266771f1d21de4c281535e36f957d51fc1e83387e0a16bf2d488c496b73711b", size = 15478, upload-time = "2025-06-11T19:30:16.213Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f1/8b/e4288e408d0b229818e787a753bc7f94ecf32c8f2ac48cbcabdb4ccd13ca/django_adminutils-0.0.28-py2.py3-none-any.whl", hash = "sha256:67b2b8de9f8b8a2965844149a3655b122e8d59a81a5cedb87b45d344aee3cb58", size = 15645, upload-time = "2025-06-11T19:30:14.603Z" },
+]
+
+[[package]]
 name = "django-allauth"
 version = "65.13.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1187,6 +1200,7 @@ dependencies = [
     { name = "dj-database-url" },
     { name = "django" },
     { name = "django-admin-sortable2" },
+    { name = "django-adminutils" },
     { name = "django-allauth" },
     { name = "django-anymail" },
     { name = "django-choices-field" },
@@ -1249,6 +1263,7 @@ requires-dist = [
     { name = "dj-database-url", specifier = "==3.*" },
     { name = "django", specifier = "==5.2.*" },
     { name = "django-admin-sortable2", specifier = "==2.*" },
+    { name = "django-adminutils", specifier = "==0.0.28" },
     { name = "django-allauth", specifier = "==65.*" },
     { name = "django-anymail", specifier = "==13.*" },
     { name = "django-choices-field", specifier = "==3.*" },

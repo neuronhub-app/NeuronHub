@@ -9,6 +9,7 @@ from strawberry.types import Info
 from strawberry_django.auth.utils import aget_current_user
 from strawberry_django.auth.utils import get_current_user
 
+from neuronhub.apps.profiles.models import ProfileGroup
 from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.models import User
 
@@ -46,6 +47,10 @@ class UsersQuery:
         filters = ["visible_to:group/INTERNAL", "visible_to:group/PUBLIC"]
         if username := user.username:
             filters.append(f"visible_to:{username}")
+
+        if user.is_authenticated:
+            async for group in ProfileGroup.objects.filter(profiles__user=user):
+                filters.append(f"visible_to:profile_group/{group.name}")
 
         app_id = cast(str, settings.ALGOLIA["APPLICATION_ID"])
         search_api_key = cast(str, settings.ALGOLIA["SEARCH_API_KEY"])

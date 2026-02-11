@@ -45,11 +45,11 @@ class Command(BaseCommand):
             return
 
         self.stdout.write(f"Reviewed matches: {len(reviews)}\n")
-        for r in reviews:
+        for review in reviews:
             self.stdout.write(
-                f"  {r.match_score_delta:+3d} | {r.match_score_by_llm} -> {r.match_score} | {r.profile_id}"  # type: ignore[attr-defined]
+                f"  {review.match_score_delta:+3d} | {review.match_score_by_llm} -> {review.match_score} | {review.profile_id}"  # type: ignore[attr-defined]
             )
-            self.stdout.write(f"       review: {r.match_review}")
+            self.stdout.write(f"       review: {review.match_review}")
             self.stdout.write("")
         if export:
             md = format_reviews_as_markdown(reviews, exclude_extra_fields=exclude_extra_fields)
