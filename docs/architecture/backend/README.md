@@ -31,9 +31,9 @@ The structure of an App in `neuronhub.apps`:
 - `apps/highlighter/` - models and API for users' `Post.content_*` highlights
 - `apps/graphql/persisted_query_extension.py` - gql.tada whitelist loader and enforcer
 - `apps/tests/` - `faker` `class Gen` factories, `db_stubs_repopulate`, pytest base class, etc
-- `apps/profiles/` - Users' Profiles for Algolia directory, and matching by LLM based on: bio, expertise, skills, needs, offers, etc.
-	- `services/score_matches_by_llm.py` - calls LLM API to populate `Profile.match_score_by_llm` and `.match_reason_by_llm`
-	- `services/summarize_match_reviews.py` - Summarizes match reviews by Users from `.match_score_by_user` and `.match_review_by_user` - for prompt injection (calibration) and review by LLM.
+- `apps/profiles/` - [detailed doc](./profiles.md). Users' Profiles for Algolia directory, and LLM-powered matching.
+	- `services/score_matches_by_llm.py` - calls LLM API to populate `ProfileMatch.match_score_by_llm` and `.match_reason_by_llm`
+	- `services/summarize_match_reviews.py` - builds calibration examples from user review corrections, injected into LLM prompt
 
 Tests are placed nearby named `{module_name}__test.py`.
 
