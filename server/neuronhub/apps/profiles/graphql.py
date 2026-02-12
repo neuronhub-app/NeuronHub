@@ -66,7 +66,7 @@ class ProfileType:
             .order_by("-updated_at")
             .afirst()
         )
-        return match
+        return match  # type: ignore[return-value]  #bad-infer: Strawberry auto-converts model → type
 
 
 @strawberry.type(name="Query")
