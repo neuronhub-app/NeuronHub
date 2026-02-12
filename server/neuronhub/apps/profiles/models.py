@@ -1,13 +1,11 @@
 import hashlib
 import uuid
-from typing import Any
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
-from django_choices_field import TextChoicesField
 from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
@@ -79,10 +77,10 @@ class Profile(AlgoliaModel):
 
     groups = models.ManyToManyField(ProfileGroup, related_name="profiles", blank=True)
 
-    visible_to_users = anonymizable(
+    visible_to_users = anonymizable(  # type: ignore[var-annotated, assignment]  #bad-infer: anonymizable() wrapper
         models.ManyToManyField(User, related_name="profiles_visible", blank=True)
     )
-    visible_to_groups = anonymizable(  # type: ignore[var-annotated]
+    visible_to_groups = anonymizable(  # type: ignore[var-annotated, assignment]  #bad-infer: anonymizable() wrapper
         models.ManyToManyField(UserConnectionGroup, related_name="profiles_visible", blank=True),
     )
 
@@ -156,7 +154,7 @@ class Profile(AlgoliaModel):
         is_unlimited = True
         is_limit_test_index = settings.DJANGO_ENV is DjangoEnv.DEV
         if is_limit_test_index:
-            is_unlimited = self.id < (settings.CONF_CONFIG.algolia_limit or 2000)
+            is_unlimited = self.id < (settings.CONF_CONFIG.algolia_limit or 2000)  # type: ignore[has-type]
         return bool(self.user or is_unlimited)
 
     def get_tag_skills_json(self):

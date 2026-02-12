@@ -50,7 +50,7 @@ async def db_stubs_repopulate(
     is_delete_profiles: bool = True,
     is_create_single_review: bool | None = False,
     is_import_HN_post: bool | None = True,
-    is_import_profiles_csv: bool = True,
+    is_import_profiles_csv: bool | None = True,
 ) -> Gen:
     """
     Populates the db with Posts, Tools, Reviews, tags, votes, etc.
@@ -137,7 +137,7 @@ async def _import_profiles_csv(gen: Gen):
 
     from neuronhub.apps.profiles.services.csv_import_optimized import csv_optimize_and_import
 
-    csv_path = settings.CONF_CONFIG.eag_csv_path
+    csv_path = settings.CONF_CONFIG.eag_csv_path  # type: ignore[has-type]
     if csv_path.exists():
         await sync_to_async(csv_optimize_and_import)(csv_path, limit=5)
 
@@ -148,8 +148,8 @@ async def _import_profiles_csv(gen: Gen):
 
 # todo ! refac: move out
 async def _algolia_reindex(
-    is_import_profiles_csv: bool = True,
-    is_import_HN_post: bool = True,
+    is_import_profiles_csv: bool | None = True,
+    is_import_HN_post: bool | None = True,
 ):
     from algoliasearch_django import reindex_all
 

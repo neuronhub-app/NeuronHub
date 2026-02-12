@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
 from typing import cast
 
 from django.db.models import F
@@ -11,10 +10,8 @@ from neuronhub.apps.profiles.services.serialize_to_md import serialize_to_md_xml
 from neuronhub.apps.users.models import User
 
 
-if TYPE_CHECKING:
-
-    class ProfileMatchAnnotated(ProfileMatch):
-        match_score_delta: int
+class ProfileMatchAnnotated(ProfileMatch):
+    match_score_delta: int
 
 
 def get_reviewed_profiles(user: User) -> QuerySet[ProfileMatchAnnotated]:

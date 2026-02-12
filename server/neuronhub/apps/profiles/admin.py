@@ -282,7 +282,9 @@ class ProfileInviteAdmin(DjangoObjectActions, admin.ModelAdmin):
         action_label="Send Invite",
     )
     def send_email_invite(self, request: HttpRequest, form: InviteUserForm):
-        invite = ProfileInvite.objects.create(profile=form.profile, user_email=form.user_email)
+        invite = ProfileInvite.objects.create(
+            profile=form.cleaned_data["profile"], user_email=form.cleaned_data["user_email"]
+        )
         send_mail(
             subject="NeuronHub: you're invited to claim your profile",
             message=f"Hi {invite.profile.first_name},\n\n"
@@ -290,4 +292,4 @@ class ProfileInviteAdmin(DjangoObjectActions, admin.ModelAdmin):
             from_email=settings.ADMIN_EMAIL,
             recipient_list=[invite.user_email],
         )
-        self.message_user(request, f"Invite sent to {form.user_email}.")
+        self.message_user(request, f"Invite sent to {form.cleaned_data['user_email']}.")

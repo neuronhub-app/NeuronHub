@@ -1,5 +1,5 @@
 import type { TadaDocumentNode } from "gql.tada";
-import { useMemo, } from "react";
+import { useMemo } from "react";
 import { useDebounce } from "use-debounce";
 import type { ID } from "@/gql-tada";
 import { useApolloQuery } from "@/graphql/useApolloQuery";

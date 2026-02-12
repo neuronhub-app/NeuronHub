@@ -95,7 +95,9 @@ class AlgoliaModel(AnonimazableTimeStampedModel):
             self._graphql_algolia_cache = {}
 
             request = RequestFactory().get("/graphql")
-            request.user = User.objects.filter(is_superuser=True).last()
+            superuser = User.objects.filter(is_superuser=True).last()
+            assert superuser
+            request.user = superuser
             response = async_to_sync(schema.execute)(
                 query=_load_client_persisted_queries_json()[self.graphql_query_for_algolia],
                 variable_values={"ids": [self.pk]},
