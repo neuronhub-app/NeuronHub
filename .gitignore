@@ -7,6 +7,7 @@
 server/**/.gitignore
 
 *.sql
+*.dump
 
 # caches
 __pycache__
