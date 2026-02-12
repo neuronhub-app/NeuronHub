@@ -32,8 +32,11 @@ DJANGO_ENV=prod
 DATABASE_URL=postgresql://${{db_user}}:${{db_password}}@${{db_host}}:${{db_port}}/${{db_name}}
 SECRET_KEY=${{django_secret}}
 
-SERVER_URL=https://backend.${{domain}}
-CLIENT_URL=https://${{domain}}
+SERVER_DOMAIN=backend.${{domain}}
+SERVER_URL=https://${{SERVER_DOMAIN}}
+
+CLIENT_DOMAIN=${{domain}}
+CLIENT_URL=https://${{CLIENT_DOMAIN}}
 
 # S3
 AWS_S3_ENDPOINT_URL=${{host}}:${{s3_port}}

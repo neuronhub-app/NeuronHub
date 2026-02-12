@@ -130,18 +130,18 @@ if is_tasks_backend_immediate:
     TASKS["default"]["BACKEND"] = "django_tasks.backends.immediate.ImmediateBackend"
 
 
-db_host = env.str("DB_HOST", "host.docker.internal")
-db_name = env.str("DB_NAME", "neuronhub")
-db_user = env.str("DB_USER", db_name)
-db_pass = env.str("DB_PASS", db_name)
+_db_host = env.str("DB_HOST", "host.docker.internal")
+_db_name = env.str("DB_NAME", "neuronhub")
+_db_user = env.str("DB_USER", _db_name)
+_db_pass = env.str("DB_PASS", _db_name)
 if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
-    db_name = env.str("E2E_DB_NAME")
+    _db_name = env.str("E2E_DB_NAME")
 DATABASES = {
     "default": dj_database_url.config(
         conn_max_age=600,
         default=env.str(
             "DATABASE_URL",
-            f"postgres://{db_user}:{db_pass}@{db_host}:5432/{db_name}",
+            f"postgres://{_db_user}:{_db_pass}@{_db_host}:{env.int('DB_PORT', 5432)}/{_db_name}",
         ),
         test_options={"NAME": env.str("PYTEST_DB_NAME")},
     )
@@ -184,10 +184,15 @@ TEMPLATES = [
 # ---------------------------------------------------------------------------------------------------------
 
 SERVER_PORT = env.int("SERVER_PORT", 8000)
-SERVER_URL = env.str("SERVER_URL", f"http://localhost:{SERVER_PORT}")
-CLIENT_URL = env.str("CLIENT_URL", "http://localhost:3000")
-DOMAIN = env.str("DOMAIN", CLIENT_URL.replace("https://", "").replace("http://", ""))
-DOMAIN_NAME = env.str("DOMAIN_NAME", "neuronhub.app")
+SERVER_URL = env.str(
+    "SERVER_URL", f"http://{env.str('SERVER_DOMAIN', 'localhost')}:{SERVER_PORT}"
+)
+CLIENT_PORT = env.int("CLIENT_PORT", 3000)
+CLIENT_DOMAIN = env.str("CLIENT_DOMAIN", "localhost")
+CLIENT_URL = env.str(
+    "CLIENT_URL", f"http://{env.str('CLIENT_DOMAIN', 'localhost')}:{CLIENT_PORT}"
+)
+SERVER_DOMAIN = env.str("SERVER_DOMAIN", "neuronhub.app")
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [

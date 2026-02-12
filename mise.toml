@@ -28,14 +28,27 @@
 [env]
     # Global
 
-    PROJECT_NAME = "neuronhub"
+    PROJECT_NAME = "{{ env.PROJECT_NAME | default(value = 'neuronhub') }}"
     VITE_PROJECT_NAME = "NeuronHub"
-    VITE_RELEASE_VERSION = "0.2.5.1" # used in GitHub and Sentry
+    VITE_RELEASE_VERSION = "0.3.0.0" # used in GitHub and Sentry
 
     DEPENDENCY_COOLDOWN_DAYS = 4
 
-    DOMAIN_NAME = "neuronhub.app"
-    ADMIN_EMAIL = "support@{{ env.DOMAIN_NAME }}"
+    SERVER_DOMAIN = "localhost"
+    SERVER_PORT = 8000
+    SERVER_URL = "http://{{ env.SERVER_DOMAIN }}:{{ env.SERVER_PORT }}"
+
+    CLIENT_DOMAIN = "localhost"
+    CLIENT_PORT = 3000
+    CLIENT_URL = "http://{{ env.CLIENT_DOMAIN }}:{{ env.CLIENT_PORT }}"
+
+    DB_USER = "{{ env.PROJECT_NAME }}"
+    DB_NAME = "{{ env.PROJECT_NAME }}"
+    DB_PASS = "{{ env.PROJECT_NAME }}"
+    DB_PORT = "5432"
+    DB_VER = "17" # psql-17 (18 also works)
+
+    ADMIN_EMAIL = "support@{{ env.CLIENT_DOMAIN }}"
 
     GITHUB_ORG = "neuronhub-app"
     GITHUB_REPO = "neuronhub"
@@ -58,15 +71,8 @@
 
     # Dev
 
-    SERVER_PORT = 8000
     SERVER_PORT_E2E = 8001
-    CLIENT_PORT = 3000
     CLIENT_PORT_E2E = 3001
-
-    DB_USER = "{{ env.PROJECT_NAME }}"
-    DB_NAME = "{{ env.PROJECT_NAME }}"
-    DB_PASS = "{{ env.PROJECT_NAME }}"
-    DB_VER = "17" # psql-17 (18 also works)
 
     PYTEST_DB_NAME = "test_database"
     E2E_DB_NAME = "test_neuronhub_e2e"
@@ -98,7 +104,7 @@
         depends = "dev:db"
         dir = "client"
         run = "bun run react-router dev --host --port={{ env.CLIENT_PORT }}"
-        env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT }}"
+        env.VITE_SERVER_URL = "{{ env.SERVER_URL }}:{{ env.SERVER_PORT }}"
 
     [tasks."dev:s3"]
         dir = "server"

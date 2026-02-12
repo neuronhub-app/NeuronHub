@@ -1,6 +1,6 @@
 # used by Mise.toml
 
-name: neuronhub
+name: ${PROJECT_NAME:-neuronhub}
 
 services:
   db:
@@ -23,7 +23,7 @@ services:
       interval: 5s
       timeout: 5s
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
 
 volumes:
   postgres_data:
