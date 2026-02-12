@@ -1,18 +1,31 @@
-import { Badge, Flex, HStack, Heading, type JsxStyleProps, Stack, Text } from "@chakra-ui/react";
+import {
+  Badge,
+  Flex,
+  Heading,
+  HStack,
+  type JsxStyleProps,
+  Spinner,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { Highlight, Snippet } from "react-instantsearch";
 import { Prose } from "@/components/ui/prose";
+import { Tag } from "@/components/ui/tag";
 import { ids } from "@/e2e/ids";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { markedConfigured } from "@/utils/marked-configured";
 
-export function ProfileCard(props: { profile: ProfileFragmentType; isSearchActive?: boolean }) {
-  const p = props.profile;
-  const hit = p as unknown as Hit<BaseHit>;
+export function ProfileCard(props: {
+  profile: ProfileFragmentType;
+  isSearchActive?: boolean;
+  isEnrichedByGraphql: boolean;
+}) {
+  const profileHit = props.profile as unknown as Hit<BaseHit>;
 
-  const location = [p.city, p.country].filter(Boolean).join(", ");
-  const matchScore = p.my_match?.match_score ?? p.my_match?.match_score_by_llm;
-  const isHighlightable = props.isSearchActive && "_highlightResult" in p;
+  const matchScore =
+    props.profile.my_match?.match_score ?? props.profile.my_match?.match_score_by_llm;
+  const isHighlightable = props.isSearchActive && "_highlightResult" in props.profile;
 
   return (
     <Stack
@@ -31,52 +44,55 @@ export function ProfileCard(props: { profile: ProfileFragmentType; isSearchActiv
             <Heading fontSize="md" fontWeight="medium">
               {isHighlightable ? (
                 <>
-                  <Highlight attribute="first_name" hit={hit} />{" "}
-                  <Highlight attribute="last_name" hit={hit} />
+                  <Highlight attribute="first_name" hit={profileHit} />{" "}
+                  <Highlight attribute="last_name" hit={profileHit} />
                 </>
               ) : (
-                `${p.first_name} ${p.last_name}`
+                `${props.profile.first_name} ${props.profile.last_name}`
               )}
             </Heading>
-            {location && (
+            {props.profile.country && (
               <Text color={style.color.help} fontSize={style.fontSize.help}>
-                {location}
+                {[props.profile.city, props.profile.country].filter(Boolean).join(", ")}
               </Text>
             )}
           </HStack>
 
-          {(p.job_title || p.company) && (
+          {(props.profile.job_title || props.profile.company) && (
             <Text color={style.color.data} fontSize={style.fontSize.data}>
-              {[p.job_title, p.company].filter(Boolean).join(" @ ")}
+              {[props.profile.job_title, props.profile.company].filter(Boolean).join(" @ ")}
             </Text>
           )}
         </Stack>
 
-        {matchScore != null && (
-          <Badge
-            colorPalette={matchScore >= 70 ? "green" : matchScore >= 40 ? "yellow" : "gray"}
-            variant="subtle"
-            fontSize="xs"
-          >
-            {matchScore}
-          </Badge>
-        )}
+        <HStack gap="gap.sm">
+          {!props.isEnrichedByGraphql && <Spinner size="xs" color="fg.subtle" />}
+          {matchScore != null && (
+            <Badge
+              colorPalette={matchScore >= 70 ? "green" : matchScore >= 40 ? "yellow" : "gray"}
+              variant="subtle"
+              fontSize="xs"
+            >
+              {matchScore}
+            </Badge>
+          )}
+        </HStack>
       </HStack>
 
       <ProfileContentSection
         label="Bio"
-        text={p.biography}
+        text={props.profile.biography}
         snippetAttribute="biography"
-        profile={p}
+        profile={props.profile}
         isSearchActive={props.isSearchActive}
       />
 
       <HStack gap="gap.lg" align="flex-start" flexWrap="wrap">
         <ProfileContentSection
           label="Seeks"
-          text={p.seeks}
+          text={props.profile.seeks}
           snippetAttribute="seeks"
-          profile={p}
+          profile={props.profile}
           isSearchActive={props.isSearchActive}
           flex="1"
           minW="200px"
@@ -84,45 +100,27 @@ export function ProfileCard(props: { profile: ProfileFragmentType; isSearchActiv
 
         <ProfileContentSection
           label="Offers"
-          text={p.offers}
+          text={props.profile.offers}
           snippetAttribute="offers"
-          profile={p}
+          profile={props.profile}
           isSearchActive={props.isSearchActive}
           flex="1"
           minW="200px"
         />
       </HStack>
 
-      {(p.skills?.length > 0 || p.interests?.length > 0) && (
+      {(props.profile.skills?.length > 0 || props.profile.interests?.length > 0) && (
         <HStack gap="gap.lg" align="flex-start" flexWrap="wrap">
-          {p.skills?.length > 0 && (
-            <Stack gap="gap.xs">
-              <Text fontSize="xs" color={style.color.label} fontWeight="medium">
-                Skills
-              </Text>
-              <Flex gap="gap.sm" flexWrap="wrap">
-                {p.skills.map(skill => (
-                  <Badge key={skill.id} variant="outline" size="sm" colorPalette="gray">
-                    {skill.name}
-                  </Badge>
-                ))}
-              </Flex>
-            </Stack>
+          {props.profile.skills?.length > 0 && (
+            <ProfileTagGroup label="Skills" tags={props.profile.skills} colorPalette="gray" />
           )}
 
-          {p.interests?.length > 0 && (
-            <Stack gap="gap.xs">
-              <Text fontSize="xs" color={style.color.label} fontWeight="medium">
-                Interests
-              </Text>
-              <Flex gap="gap.sm" flexWrap="wrap">
-                {p.interests.map(interest => (
-                  <Badge key={interest.id} variant="outline" size="sm" colorPalette="blue">
-                    {interest.name}
-                  </Badge>
-                ))}
-              </Flex>
-            </Stack>
+          {props.profile.interests?.length > 0 && (
+            <ProfileTagGroup
+              label="Interests"
+              tags={props.profile.interests}
+              colorPalette="gray"
+            />
           )}
         </HStack>
       )}
@@ -177,11 +175,42 @@ function ProfileContentSection(props: {
   );
 }
 
+function ProfileTagGroup(props: {
+  label: string;
+  // Algolia returns flat strings, GraphQL returns {id, name} objects
+  tags: ({ id: string; name: string } | string)[];
+  colorPalette: string;
+}) {
+  return (
+    <Stack gap="gap.xs">
+      <Text fontSize="xs" color={style.color.label} fontWeight="medium">
+        {props.label}
+      </Text>
+      <Flex gap="gap.sm" flexWrap="wrap" {...ids.set(ids.profile.card.tags)}>
+        {props.tags.map(tag => {
+          const name = typeof tag === "string" ? tag : tag.name;
+          return (
+            <Tag
+              key={name}
+              variant="subtle"
+              size="md"
+              colorPalette={props.colorPalette}
+              fontSize="16px"
+            >
+              {name}
+            </Tag>
+          );
+        })}
+      </Flex>
+    </Stack>
+  );
+}
+
 const style = {
   color: {
     data: "fg.subtle",
     help: "fg.subtle",
-    label: "fg.subtle",
+    label: "fg",
   } satisfies { [key: string]: JsxStyleProps["color"] },
   fontSize: {
     data: "sm",

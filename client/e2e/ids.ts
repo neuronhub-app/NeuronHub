@@ -132,6 +132,7 @@ export namespace ids {
       container: "profile.card.container",
       contentMarkdown: "profile.card.content-markdown",
       contentSnippet: "profile.card.content-snippet",
+      tags: "profile.card.tags",
     },
   } as const;
 

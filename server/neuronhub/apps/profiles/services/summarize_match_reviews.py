@@ -11,7 +11,10 @@ from neuronhub.apps.profiles.services.serialize_to_md import serialize_to_md_xml
 from neuronhub.apps.users.models import User
 
 
-Matches = Sequence[ProfileMatch] | QuerySet[ProfileMatch]
+if TYPE_CHECKING:
+
+    class ProfileMatchAnnotated(ProfileMatch):
+        match_score_delta: int
 
 
 def get_reviewed_profiles(user: User) -> QuerySet[ProfileMatchAnnotated]:
@@ -28,12 +31,7 @@ def get_reviewed_profiles(user: User) -> QuerySet[ProfileMatchAnnotated]:
     return cast(QuerySet[ProfileMatchAnnotated], matches)
 
 
-if TYPE_CHECKING:
-    from typing import type_check_only
-
-    @type_check_only
-    class ProfileMatchAnnotated(ProfileMatch):
-        match_score_delta: int
+Matches = Sequence[ProfileMatch] | QuerySet[ProfileMatch]
 
 
 def format_reviews_as_markdown(reviews: Matches, exclude_extra_fields: bool = False) -> str:

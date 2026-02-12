@@ -634,11 +634,15 @@ type ProfileType {
   biography: String!
   seeks: String!
   offers: String!
+  seeking_work: String!
+  recruitment: String!
   country: String!
   city: String!
+  url_linkedin: String!
+  url_conference: String!
   skills(filters: PostTagFilter): [PostTagType!]!
   interests(filters: PostTagFilter): [PostTagType!]!
-  my_match: ProfileMatchType
+  my_match: ProfileMatchType @IsAuthenticated
 }
 
 type Query {

@@ -13,10 +13,14 @@ def csv_optimize_tokens(csv_raw: str) -> str:
     return csv_raw
 
 
+# todo ! fix leave "https://" and other tokens important for markdown
 class config:
     replacements: list[tuple[str | list[str], str]] = [
         (["‘", "’"], "'"),
-        (["•	", "•  "], "- "),
+        # todo ! regex for `^{num}) ?` -> `{num}. `
+        # todo ! regex for newlines with ^()
+        # more patterns to replace: ["^--"]
+        (["•	", "•  ", "• ", "— "], "- "),
         (["https://", "www."], ""),
         (
             [

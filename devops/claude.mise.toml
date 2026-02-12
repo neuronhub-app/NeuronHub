@@ -7,7 +7,7 @@
 
 ["claude:ask"]
     usage = """
-        arg "<prompt>"
+        arg "<prompt>" default=""
         flag "--model <model>" {
             choices "opus" "sonnet" "haiku" "haiku3" "claude-3-haiku-20240307"
             default "sonnet"
@@ -24,7 +24,7 @@
         }
 
         mut sys_prompt_indented = r#'
-          You are an inhuman intelligence. Don't agree with me unless my reasoning is watertight.
+          You are an inhuman intelligence. Don’t agree with me unless my reasoning is watertight.
           Never use friendly or encouraging language.
           Your goal is not to help me feel good - it’s to help me think better.
 
@@ -39,5 +39,5 @@
         # exit the project to not load CLAUDE.md into /context
         cd ..
 
-        claude --dangerously-skip-permissions --model $env.usage_model --tools="" $env.usage_print --system-prompt=$sys_prompt $"($prompt)"
+        claude --dangerously-skip-permissions --model=$env.usage_model --tools="" $env.usage_print --system-prompt=($sys_prompt) $prompt
     """
