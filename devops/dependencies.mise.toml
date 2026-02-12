@@ -34,33 +34,48 @@
     ]
 
 ["upgrade-deps:server"]
+    usage = """
+        flag "-d --dry-run"
+    """
     dir = "server"
     run = """
-        # uv lock & env.DEPENDENCY_COOLDOWN_DAYS
+        # uv lock & env.DEPENDENCY_COOLDOWN_DAYS --dry-run={{ usage.dry_run }}
 
         let days_cooldown = {{ env.DEPENDENCY_COOLDOWN_DAYS }}day;
         let date_cutoff = (date now) - $days_cooldown | format date "%+"
 
-        uv lock --upgrade $"--exclude-newer=($date_cutoff)"
+        let dry_run = if ($env.usage_dry_run? == null) { "" } else { "--dry-run" }
+
+        uv lock --upgrade $"--exclude-newer=($date_cutoff)" $dry_run
     """
 
 ["upgrade-deps:client"]
+    usage = """
+        flag "-d --dry-run"
+    """
     dir = "client"
     run = [
         # We freeze "graphql", due to "gql.tada" bugs with 16.12,
         # See [[package.json.md]] and [[.local/issues/closed/103-gql-tada-Persisted-Queries.md]]
-        "bun run ncu --upgrade --packageManager bun --reject=graphql --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }}",
-        "bun install"
+        """
+        # check updates with cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} --dry-run={{ usage.dry_run }}
+
+        let dry_run = if ($env.usage_dry_run? == null) {"" } else { "--dry-run" }
+
+        let $upgrade_json_flag = $"(if ($dry_run | is-empty) { '--upgrade' }"
+        bun run ncu --packageManager bun --reject=graphql --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} $upgrade_json_flag
+
+        print "\n---\n"
+
+        if ($dry_run | is-empty) {
+            bun install
+        } else {
+            print "Potential upgrades with cooldown=0:\n"
+            bun run ncu --packageManager bun --cooldown=0
+        }
+        """
     ]
 
-["upgrade-deps:client:dry"]
-    dir = "client"
-    run = [
-        "bun run ncu --packageManager bun --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} ",
-
-        "echo 'Without the cooldown'",
-        "bun run ncu --packageManager bun --cooldown=0",
-    ]
 
 ["upgrade-deps:playwright"]
     dir = "client"
