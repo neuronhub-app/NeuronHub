@@ -1,5 +1,5 @@
 import { type FragmentOf, graphql } from "@/gql-tada";
-import { PostTagFragment } from "@/graphql/fragments/tags";
+import { PostTagLeanFragment } from "@/graphql/fragments/tags";
 
 export const ProfileMatchFragment = graphql(`
   fragment ProfileMatchFragment on ProfileMatchType {
@@ -34,17 +34,17 @@ export const ProfileFragment = graphql(
       url_linkedin
 
       skills {
-        ...PostTagFragment
+        ...PostTagLeanFragment
       }
       interests {
-        ...PostTagFragment
+        ...PostTagLeanFragment
       }
       my_match {
         ...ProfileMatchFragment
       }
     }
   `,
-  [PostTagFragment, ProfileMatchFragment],
+  [PostTagLeanFragment, ProfileMatchFragment],
 );
 
 export type ProfileFragmentType = FragmentOf<typeof ProfileFragment>;

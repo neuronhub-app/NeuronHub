@@ -9,7 +9,7 @@ export default defineConfig(config => ({
   root: __dirname,
   server: {
     port: 3000,
-    allowedHosts: ["localhost", "client"],
+    allowedHosts: [process.env.CLIENT_DOMAIN ?? "localhost"],
   },
   build: { sourcemap: true },
   dev: { sourcemap: true },

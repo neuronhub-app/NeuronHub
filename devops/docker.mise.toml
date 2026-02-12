@@ -64,7 +64,7 @@
                     VITE_RELEASE_VERSION: ($env.usage_version)
 
                     # for React Router build
-                    VITE_SERVER_URL: https://backend.{{ env.DOMAIN_NAME }}
+                    VITE_SERVER_URL: https://{{ env.SERVER_DOMAIN }}
 
                     # for Sentry
                     SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN }}

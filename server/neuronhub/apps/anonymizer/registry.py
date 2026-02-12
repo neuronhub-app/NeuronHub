@@ -34,7 +34,7 @@ async def anonymize_user_data(
     is_erase_text_content: bool = False,
 ):
     user_anon, _ = await User.objects.aget_or_create(
-        email=f"anon@{settings.DOMAIN_NAME}",
+        email=f"anon@{settings.CLIENT_DOMAIN}",
         first_name="Anonym",
     )
     for model_anonymizable in anonymizer.models:

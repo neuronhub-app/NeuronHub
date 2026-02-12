@@ -37,3 +37,31 @@ export const PostTagFragment = graphql(`
 `);
 
 export type PostTagFragmentType = FragmentOf<typeof PostTagFragment>;
+
+export const PostTagLeanFragment = graphql(`
+  fragment PostTagFragment on PostTagType {
+    id
+    votes {
+      id
+      author {
+        id
+      }
+      is_vote_positive
+    }
+
+    name
+    label
+    description
+    is_important
+
+    tag_parent {
+      id
+      name
+    }
+		tag_children {
+			id
+		}
+  }
+`);
+
+export type PostTagLeanFragmentType = FragmentOf<typeof PostTagFragment>;
