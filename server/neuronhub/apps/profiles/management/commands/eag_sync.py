@@ -1,9 +1,12 @@
 from pathlib import Path
 
+from algoliasearch_django import reindex_all
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.services.csv_import_optimized import csv_optimize_and_import
+from neuronhub.apps.tests.services.db_stubs_repopulate import _disable_auto_indexing
 
 
 class Command(BaseCommand):
@@ -24,7 +27,10 @@ class Command(BaseCommand):
         if dry_run:
             self.stdout.write("DRY RUN - no changes will be made")
 
-        stats = csv_optimize_and_import(csv)
+        with _disable_auto_indexing():
+            stats = csv_optimize_and_import(csv)
+
+        reindex_all(Profile)
 
         self.stdout.write(f"Created:   {stats.created}")
         self.stdout.write(f"Updated:   {stats.updated}")
