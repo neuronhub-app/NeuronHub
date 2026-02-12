@@ -1,8 +1,6 @@
 from typing import Any
 
 from asgiref.sync import async_to_sync
-from django.contrib.auth.models import AnonymousUser
-from django.db import models
 from django.db.models import ManyToManyField
 from django.test import RequestFactory
 from django_choices_field import TextChoicesField
@@ -97,7 +95,7 @@ class AlgoliaModel(AnonimazableTimeStampedModel):
             self._graphql_algolia_cache = {}
 
             request = RequestFactory().get("/graphql")
-            request.user = self.author or AnonymousUser()
+            request.user = User.objects.filter(is_superuser=True).last()
             response = async_to_sync(schema.execute)(
                 query=_load_client_persisted_queries_json()[self.graphql_query_for_algolia],
                 variable_values={"ids": [self.pk]},
