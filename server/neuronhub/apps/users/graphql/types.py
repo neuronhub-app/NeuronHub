@@ -39,6 +39,7 @@ class UserType:
     library: auto
 
     posts_collapsed: list[PostCommentTypeLazy]
+    posts_read: list[PostCommentTypeLazy]
 
     users_followed_sources: list[UserSourceTypeLazy] = strawberry_django.field()
 

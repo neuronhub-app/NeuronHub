@@ -1161,6 +1161,7 @@ enum UserListName {
   read_later
   library
   posts_collapsed
+  posts_read
   profiles_bookmarked
   jobs_bookmarked
 }
@@ -1189,6 +1190,7 @@ type UserType {
   read_later: [DjangoModelType!]!
   library: [DjangoModelType!]!
   posts_collapsed(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
+  posts_read(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   users_followed_sources: [UserSourceType!]!
   has_profile_groups: Boolean!
 }

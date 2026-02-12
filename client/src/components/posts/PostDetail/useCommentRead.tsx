@@ -9,9 +9,9 @@ import { client } from "@/graphql/client";
 import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
 
-const collapsedIds = proxySet();
+const readIds = proxySet();
 
-export function useCommentCollapse(props: { postId?: ID }) {
+export function useCommentRead(props: { postId?: ID }) {
   const auth = useAuth();
 
   const [, startTransition] = useTransition();
@@ -20,47 +20,47 @@ export function useCommentCollapse(props: { postId?: ID }) {
     isReady: Boolean(auth.isLoggedIn && props.postId),
     onInit: async () => {
       const res = await client.query({
-        query: UserCollapsedCommentsQuery,
+        query: UserReadCommentsQuery,
         variables: { parent_root_id: props.postId! },
       });
       if (res.error) {
         return toast.error(res.error);
       }
       startTransition(() => {
-        collapsedIds.clear();
-        for (const postCollapsed of res.data!.user_current!.posts_collapsed) {
-          collapsedIds.add(postCollapsed.id);
+        readIds.clear();
+        for (const postRead of res.data!.user_current!.posts_read) {
+          readIds.add(postRead.id);
         }
       });
     },
   });
 
-  const toggleCollapse = useCallback(
+  const toggleRead = useCallback(
     async (id: ID) => {
       startTransition(async () => {
-        if (collapsedIds.has(id)) {
-          collapsedIds.delete(id);
+        if (readIds.has(id)) {
+          readIds.delete(id);
         } else {
-          collapsedIds.add(id);
+          readIds.add(id);
         }
 
         if (auth.isLoggedIn) {
           const res = await client.mutate({
-            mutation: UpdateCollapsedCommentsMutation,
+            mutation: UpdateReadCommentsMutation,
             variables: {
               id,
-              list_field_name: UserListName.PostsCollapsed,
-              is_added: collapsedIds.has(id),
+              list_field_name: UserListName.PostsRead,
+              is_added: readIds.has(id),
             },
           });
 
           if (res.error) {
-            if (collapsedIds.has(id)) {
-              collapsedIds.delete(id);
+            if (readIds.has(id)) {
+              readIds.delete(id);
             } else {
-              collapsedIds.add(id);
+              readIds.add(id);
             }
-            toast.error("Failed to update collapse status");
+            toast.error("Failed to update read status");
           }
         }
       });
@@ -70,22 +70,21 @@ export function useCommentCollapse(props: { postId?: ID }) {
 
   // Note: this is not a Valtio Snap (!) - to avoid 1000+ comments Snap subscriptions.
   // Only <CommentThread/> children must re-render - useCallback() will do it.
-  const isCollapsed = useCallback((id: ID) => collapsedIds.has(id), []);
+  const isRead = useCallback((id: ID) => readIds.has(id), []);
 
   return {
-    startTransition,
-    toggle: toggleCollapse,
-    isCollapsed,
+    toggle: toggleRead,
+    isRead,
   };
 }
 
-const UserCollapsedCommentsQuery = graphql.persisted(
-  "UserCollapsedComments",
+const UserReadCommentsQuery = graphql.persisted(
+  "UserReadComments",
   graphql(`
-    query UserCollapsedComments($parent_root_id: ID!) {
+    query UserReadComments($parent_root_id: ID!) {
       user_current {
         id
-        posts_collapsed(filters: { parent_root_id: { exact: $parent_root_id } }) {
+        posts_read(filters: { parent_root_id: { exact: $parent_root_id } }) {
           id
         }
       }
@@ -93,14 +92,10 @@ const UserCollapsedCommentsQuery = graphql.persisted(
   `),
 );
 
-const UpdateCollapsedCommentsMutation = graphql.persisted(
-  "UpdateCollapsedComments",
+const UpdateReadCommentsMutation = graphql.persisted(
+  "UpdateReadComments",
   graphql(`
-    mutation UpdateCollapsedComments(
-      $id: ID!
-      $list_field_name: UserListName!
-      $is_added: Boolean!
-    ) {
+    mutation UpdateReadComments($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
       update_user_list(id: $id, list_field_name: $list_field_name, is_added: $is_added)
     }
   `),

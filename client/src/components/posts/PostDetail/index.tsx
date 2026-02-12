@@ -20,6 +20,8 @@ import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
+import { useCommentCollapse } from "@/components/posts/PostDetail/useCommentCollapse";
+import { useCommentRead } from "@/components/posts/PostDetail/useCommentRead";
 import { useCommentTree } from "@/components/posts/PostDetail/useCommentTree";
 import { useHeadMeta } from "@/components/useHeadMeta";
 import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
@@ -34,6 +36,8 @@ export function PostDetail(props: {
   const user = useUser();
 
   const comments = useCommentTree({ postId: props.post?.id });
+  const collapse = useCommentCollapse({ postId: props.post?.id });
+  const read = useCommentRead({ postId: props.post?.id });
 
   useHighlighter({ commentIds: comments.ids });
 
@@ -64,6 +68,8 @@ export function PostDetail(props: {
                     <CommentThread
                       key={comment.id}
                       comment={comment}
+                      collapse={collapse}
+                      read={read}
                       post={props.post!} // #bad-infer
                       depth={0}
                       isLastChild={index === comments.tree.length - 1}

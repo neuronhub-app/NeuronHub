@@ -87,6 +87,7 @@ export enum UserListName {
   JobsBookmarked = 'jobs_bookmarked',
   Library = 'library',
   PostsCollapsed = 'posts_collapsed',
+  PostsRead = 'posts_read',
   ProfilesBookmarked = 'profiles_bookmarked',
   ReadLater = 'read_later'
 }

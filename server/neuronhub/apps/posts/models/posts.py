@@ -144,6 +144,12 @@ class Post(AnonimazableTimeStampedModel):
         blank=True,
         help_text="Collapsed in the UI, eg CommentThread",
     )
+    read_by_users = models.ManyToManyField(
+        User,
+        related_name="posts_read",
+        blank=True,
+        help_text="Marked as 'read' by clicking on vertical line in CommentThread",
+    )
 
     # Sharing fields
     # ----------------------------------------------------------------------
@@ -236,6 +242,7 @@ class Post(AnonimazableTimeStampedModel):
             "users_library",
             "seen_by_users",
             "collapsed_by_users",
+            "read_by_users",
             "content_polite_html_ssr",
         ],
     )

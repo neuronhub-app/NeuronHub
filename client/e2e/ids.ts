@@ -126,6 +126,7 @@ export namespace ids {
     btn: {
       edit: "comment.btn.edit",
       reply: "comment.btn.reply",
+      collapse: "comment.btn.collapse",
     },
     thread: {
       line: "comment.thread.line",
