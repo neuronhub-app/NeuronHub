@@ -23,8 +23,16 @@ export const ProfileFragment = graphql(
       biography
       seeks
       offers
+        
+      recruitment
+      seeking_work
+        
       country
       city
+
+      url_conference
+      url_linkedin
+
       skills {
         ...PostTagFragment
       }

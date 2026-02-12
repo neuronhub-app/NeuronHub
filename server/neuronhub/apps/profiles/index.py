@@ -21,8 +21,8 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "company",
             "job_title",
             "career_stage",
-            ["get_tag_skills_names", "skills"],
-            ["get_tag_interests_names", "interests"],
+            ["get_tag_skills_json", "skills"],
+            ["get_tag_interests_json", "interests"],
             ["get_biography_cropped", "biography"],
             ["get_seeks_cropped", "seeks"],
             ["get_offers_cropped", "offers"],
@@ -31,6 +31,13 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ["get_visible_to", "visible_to"],
             "url_linkedin",
             "url_conference",
+            # datetime - ISO format for GraphQL compatibility
+            ["get_iso_created_at", "created_at"],
+            ["get_iso_updated_at", "updated_at"],
+            # datetime - Unix for Algolia sorting/filtering
+            ["get_unix_created_at", "created_at_unix"],
+            ["get_unix_updated_at", "updated_at_unix"],
+            ["get_created_at_unix_aggregated", "created_at_unix_aggregated"],
         ]
         settings = {
             "searchableAttributes": [
@@ -45,18 +52,13 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "offers",
             ],
             "attributesForFaceting": [
-                "searchable(skills)",
-                "searchable(interests)",
+                "searchable(skills.name)",
+                "searchable(interests.name)",
                 "searchable(career_stage)",
                 "searchable(country)",
                 "visible_to",
             ],
             "unretrievableAttributes": [
                 "visible_to",
-            ],
-            "attributesToSnippet": [
-                "biography:100",
-                "seeks:50",
-                "offers:50",
             ],
         }

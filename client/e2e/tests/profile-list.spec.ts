@@ -1,9 +1,11 @@
+import type { Locator } from "@playwright/test";
 import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
 import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { urls } from "@/urls";
 
+// #AI
 test.describe("ProfileList", () => {
   let play: PlaywrightHelper;
 
@@ -46,4 +48,31 @@ test.describe("ProfileList", () => {
 
     await play.screenshot("profile-list-search-snippets");
   });
+
+  test("tags render as non-empty JSON values, before and after search", async ({ page }) => {
+    await play.navigate(urls.profiles.list, { idleWait: true });
+
+    const tags = page.getByTestId(ids.profile.card.tags);
+    await tags.first().waitFor();
+
+    await assertTagsAreNonEmpty(tags);
+
+    // Activate search — tags must still render real values from Algolia JSON objects
+    await page.getByPlaceholder("Search profiles").fill("Onni");
+    await play.waitForNetworkIdle();
+
+    const tagsAfter = page.getByTestId(ids.profile.card.tags);
+    await tagsAfter.first().waitFor();
+
+    await assertTagsAreNonEmpty(tagsAfter);
+
+    await play.screenshot("profile-list-tags-after-search");
+  });
 });
+
+async function assertTagsAreNonEmpty(tagsLocator: Locator) {
+  const text = await tagsLocator.first().textContent();
+  expect(text!.trim().length, "tags container should have text").toBeGreaterThan(0);
+  expect(text, "tags should not contain [object").not.toContain("[object");
+  expect(text, "tags should not contain undefined").not.toContain("undefined");
+}

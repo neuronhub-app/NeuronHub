@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     "health_check.storage",
     "health_check.contrib.migrations",
     "neuronhub.apps.db",
+    "neuronhub.apps.algolia",
     "neuronhub.apps.users",
     "neuronhub.apps.orgs",
     "neuronhub.apps.posts",

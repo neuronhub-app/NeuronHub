@@ -1,5 +1,6 @@
 import hashlib
 import uuid
+from typing import Any
 
 from django.conf import settings
 from django.contrib.postgres.fields import ArrayField
@@ -9,11 +10,15 @@ from django.db import models
 from django_choices_field import TextChoicesField
 from simple_history.models import HistoricalRecords
 
+from neuronhub.apps.algolia.models_abstract import AlgoliaModel
 from neuronhub.apps.anonymizer.fields import Visibility
+from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
+from neuronhub.apps.anonymizer.registry import anonymizable
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.profiles.services.serialize_to_md import serialize_profile_to_markdown
 from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import UserConnectionGroup
 from neuronhub.settings import DjangoEnv
 
 
@@ -36,7 +41,7 @@ class CareerStage(models.TextChoices):
     Undergrad = "Undergrad"
 
 
-class Profile(models.Model):
+class Profile(AlgoliaModel):
     user = models.OneToOneField(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name="profile"
     )
@@ -74,15 +79,16 @@ class Profile(models.Model):
 
     groups = models.ManyToManyField(ProfileGroup, related_name="profiles", blank=True)
 
-    visibility = TextChoicesField(Visibility, default=Visibility.PRIVATE)
-    visible_to_users = models.ManyToManyField(User, related_name="profiles_visible", blank=True)
+    visible_to_users = anonymizable(
+        models.ManyToManyField(User, related_name="profiles_visible", blank=True)
+    )
+    visible_to_groups = anonymizable(  # type: ignore[var-annotated]
+        models.ManyToManyField(UserConnectionGroup, related_name="profiles_visible", blank=True),
+    )
 
     bookmarked_by_users = models.ManyToManyField(
         User, related_name=UserListName.profiles_bookmarked.value, blank=True
     )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     history = HistoricalRecords()
 
@@ -118,48 +124,46 @@ class Profile(models.Model):
         )
         return hashlib.sha256(content.encode()).hexdigest()
 
-    # Algolia serializers
-
-    def is_in_algolia_index(self) -> bool:
-        is_unlimited = True
-        if settings.DJANGO_ENV is DjangoEnv.DEV:
-            is_unlimited = self.id < (settings.CONF_CONFIG.algolia_limit or 2000)
-        return self.user or is_unlimited
-
-    def get_id_as_str(self) -> str:
-        return str(self.id)
-
     def get_tag_skills_names(self) -> list[str]:
         return [tag.name for tag in self.skills.all()]
 
     def get_tag_interests_names(self) -> list[str]:
         return [tag.name for tag in self.interests.all()]
 
-    # todo ! refac: dedup with Post.get_visible_to
+    # Algolia serializers — `author` aliases `user` for AlgoliaModel._get_graphql_field compatibility
+
+    @property
+    def author(self):
+        return self.user
+
+    graphql_query_for_algolia: str = "ProfilesByIds"
+    graphql_query_for_algolia_field: str = "profiles"
+
     def get_visible_to(self) -> list[str]:
-        visible_to: list[str] = []
+        # Override PRIVATE branch: parent asserts self.author, but CSV-imported profiles have no user.
+        # Also, parent returns early for PRIVATE, skipping group visibility below.
+        if self.visibility is Visibility.PRIVATE:
+            visible_to = [self.user.username] if self.user else []
+        else:
+            visible_to = super().get_visible_to()
 
         for pg in self.groups.all():
             visible_to.append(f"profile_group/{pg.name}")
 
-        if self.visibility is Visibility.PRIVATE:
-            if self.user:
-                visible_to.append(self.user.username)
-            return visible_to
-
-        if self.visibility in [Visibility.INTERNAL, Visibility.PUBLIC]:
-            visible_to.append(f"group/{self.visibility.value}")
-            return visible_to
-
-        if self.visibility in [Visibility.USERS_SELECTED, Visibility.CONNECTIONS]:
-            visible_to.extend(list(*self.visible_to_users.all().values_list("username")))
-
-        if self.visibility is Visibility.CONNECTIONS:
-            assert self.user
-            for group in self.user.connection_groups.all():
-                visible_to.extend(list(*group.connections.all().values_list("username")))
-
         return visible_to
+
+    def is_in_algolia_index(self) -> bool:
+        is_unlimited = True
+        is_limit_test_index = settings.DJANGO_ENV is DjangoEnv.DEV
+        if is_limit_test_index:
+            is_unlimited = self.id < (settings.CONF_CONFIG.algolia_limit or 2000)
+        return bool(self.user or is_unlimited)
+
+    def get_tag_skills_json(self):
+        return self._get_graphql_field("skills") or []
+
+    def get_tag_interests_json(self):
+        return self._get_graphql_field("interests") or []
 
     def get_biography_cropped(self):
         return self.biography[:1500]
@@ -174,7 +178,7 @@ class Profile(models.Model):
         return f"{self.first_name} {self.last_name} | {self.company}"
 
 
-class ProfileMatch(models.Model):
+class ProfileMatch(AnonimazableTimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile_matches")
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="matches")
 
@@ -212,7 +216,7 @@ class ProfileMatch(models.Model):
         return f"Match: {self.user} → {self.profile}"
 
 
-class ProfileInvite(TimeStampedModel):
+class ProfileInvite(AnonimazableTimeStampedModel):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="invites")
     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     user_email = models.EmailField()
