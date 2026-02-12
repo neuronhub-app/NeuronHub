@@ -1,17 +1,20 @@
 import {
   ButtonGroup,
   Checkbox,
+  CloseButton,
   Flex,
   For,
   HStack,
   IconButton,
   Input,
+  InputGroup,
   Pagination,
-  Skeleton,
   Stack,
   Text,
 } from "@chakra-ui/react";
+import { useRef } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
+import { LuSearch } from "react-icons/lu";
 import {
   Configure,
   InstantSearch,
@@ -54,9 +57,17 @@ export function ProfileList() {
         </HStack>
 
         <Configure
-          hitsPerPage={30}
-          attributesToSnippet={["biography:100", "seeks:50", "offers:50"]}
-          attributesToHighlight={["biography", "seeks", "offers", "first_name", "last_name"]}
+          hitsPerPage={5}
+          attributesToSnippet={["biography:60", "seeks:30", "offers:30"]}
+          attributesToHighlight={[
+            "biography",
+            "seeks",
+            "offers",
+            "first_name",
+            "last_name",
+            "interests",
+            "skills",
+          ]}
         />
 
         <Flex flex="1" pos="relative" gap="gap.xl">
@@ -77,10 +88,10 @@ export function ProfileList() {
             borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
             bg={{ _light: "bg.subtle/30", _dark: "bg.subtle" }}
           >
-            <FacetFilter name="skills" label="Skills" isSearchEnabled isShowEmpty />
-            <FacetFilter name="interests" label="Interests" isSearchEnabled isShowEmpty />
-            <FacetFilter name="country" label="Country" isShowEmpty />
             <FacetFilter name="career_stage" label="Career Stage" />
+            <FacetFilter name="interests.name" label="Interests" isSearchEnabled isShowEmpty />
+            <FacetFilter name="skills.name" label="Skills" isSearchEnabled isShowEmpty />
+            <FacetFilter name="country" label="Country" isShowEmpty />
           </Stack>
         </Flex>
       </Stack>
@@ -90,15 +101,33 @@ export function ProfileList() {
 
 function SearchInput() {
   const search = useSearchBox();
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
-    <Input
-      value={search.query}
-      onChange={event => search.refine(event.target.value)}
-      type="search"
-      placeholder="Search profiles"
-      maxW="lg"
-    />
+    <InputGroup
+      startElement={<LuSearch />}
+      endElement={
+        search.query ? (
+          <CloseButton
+            size="xs"
+            onClick={() => {
+              search.refine("");
+              inputRef.current?.focus();
+            }}
+            me="-2"
+          />
+        ) : null
+      }
+      w="lg"
+    >
+      <Input
+        ref={inputRef}
+        value={search.query}
+        onChange={event => search.refine(event.target.value)}
+        type="search"
+        placeholder="Search profiles"
+      />
+    </InputGroup>
   );
 }
 
@@ -111,24 +140,18 @@ function ProfileListHits() {
   );
   const isSearchActive = search.query.length > 0;
 
-  // When not searching, wait for GraphQL enrichment (Algolia strips markdown formatting)
-  const isReady = isSearchActive || isEnrichedByGraphql;
-
   return (
     <Stack gap="gap.xl" w="full">
       <Stack {...ids.set(ids.profile.list)}>
-        {hits.results?.nbHits ? (
-          isReady && profilesEnriched.length ? (
-            profilesEnriched.map(profile => (
-              <ProfileCard key={profile.id} profile={profile} isSearchActive={isSearchActive} />
-            ))
-          ) : (
-            <>
-              <Skeleton h="10" />
-              <Skeleton h="10" />
-              <Skeleton h="10" />
-            </>
-          )
+        {hits.results?.nbHits && profilesEnriched.length ? (
+          profilesEnriched.map(profile => (
+            <ProfileCard
+              key={profile.id}
+              profile={profile}
+              isSearchActive={isSearchActive}
+              isEnrichedByGraphql={isEnrichedByGraphql}
+            />
+          ))
         ) : (
           <HStack align="center">
             <Text>No profiles found.</Text>
@@ -244,7 +267,7 @@ function FacetFilter(props: {
           size="2xs"
           colorPalette="gray"
         >
-          {refinements.hasExhaustiveItems ? "Collapse" : "Show more"}
+          {refinements.isShowingMore ? "Collapse" : "Show more"}
         </Button>
       )}
     </Stack>
