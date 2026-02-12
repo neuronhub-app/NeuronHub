@@ -3,6 +3,7 @@ from typing import cast
 import strawberry
 import strawberry_django
 from algoliasearch.search.client import SearchClientSync
+from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
 from strawberry.types import Info
@@ -20,6 +21,19 @@ def resolve_current_user(info: Info) -> UserType | None:
     if getattr(user, "is_authenticated", False):
         return cast(UserType, user)
     return None
+
+
+async def get_user(info: Info) -> User:
+    user = await aget_current_user(info=info)
+    return cast(User, user)
+
+
+get_user_sync = async_to_sync(get_user)
+
+
+async def get_user_maybe(info: Info) -> User | AnonymousUser:
+    user = await aget_current_user(info=info)
+    return cast(User | AnonymousUser, user)
 
 
 @strawberry.type
@@ -70,13 +84,3 @@ class UsersQuery:
             index_name_sorted_by_votes=algolia_replica_sorted_by_votes,
             index_name_profiles=f"profiles_{index_suffix}",
         )
-
-
-async def get_user(info: Info) -> User:
-    user = await aget_current_user(info=info)
-    return cast(User, user)
-
-
-async def get_user_maybe(info: Info) -> User | AnonymousUser:
-    user = await aget_current_user(info=info)
-    return cast(User | AnonymousUser, user)

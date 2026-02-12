@@ -20,6 +20,7 @@ from neuronhub.apps.posts.models.posts import PostTag
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
 from neuronhub.apps.posts.services.filter_posts_by_user import filter_posts_by_user
+from neuronhub.apps.users.graphql.resolvers import get_user_sync
 from neuronhub.apps.users.graphql.types import UserConnectionGroupType
 from neuronhub.apps.users.graphql.types import UserType
 
@@ -94,7 +95,7 @@ class PostTypeI:
 
     @classmethod
     def get_queryset(cls, queryset: QuerySet[Post], info: Info) -> QuerySet[Post]:
-        user = get_current_user(info)
+        user = get_user_sync(info)
         if hasattr(cls, "TYPE"):
             queryset = queryset.filter(type=cls.TYPE)
         return filter_posts_by_user(user, posts=queryset)

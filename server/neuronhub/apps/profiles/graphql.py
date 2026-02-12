@@ -1,12 +1,9 @@
-from typing import cast
-
 import strawberry
 import strawberry_django
 from django.db.models import QuerySet
 from strawberry import ID
 from strawberry import Info
 from strawberry import auto
-from strawberry_django.auth.utils import get_current_user
 from strawberry_django.permissions import IsAuthenticated
 
 from neuronhub.apps.posts.graphql.types import PostTagType
@@ -15,7 +12,7 @@ from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.profiles.services.filter_profiles_by_user import filter_profiles_by_user
 from neuronhub.apps.profiles.services.send_dm import send_profile_dm
 from neuronhub.apps.users.graphql.resolvers import get_user
-from neuronhub.apps.users.models import User
+from neuronhub.apps.users.graphql.resolvers import get_user_sync
 
 
 @strawberry_django.filter_type(Profile, lookups=True)
@@ -43,25 +40,33 @@ class ProfileType:
     biography: auto
     seeks: auto
     offers: auto
+
+    seeking_work: auto
+    recruitment: auto
+
     country: auto
     city: auto
+
+    url_linkedin: auto
+    url_conference: auto
 
     skills: list[PostTagType]
     interests: list[PostTagType]
 
     @classmethod
     def get_queryset(cls, queryset: QuerySet[Profile], info: Info) -> QuerySet[Profile]:
-        user = get_current_user(info)
+        user = get_user_sync(info)
         return filter_profiles_by_user(user, profiles=queryset)
 
-    @strawberry_django.field()
+    @strawberry_django.field(extensions=[IsAuthenticated()])
     async def my_match(self: Profile, info: Info) -> ProfileMatchType | None:
-        user = get_current_user(info)
-        if not user.is_authenticated:
-            return None
-        user = cast(User, user)
-        match = await ProfileMatch.objects.filter(user=user, profile=self).afirst()
-        return cast(ProfileMatchType | None, match)
+        user = await get_user(info)
+        match = (
+            await ProfileMatch.objects.filter(profile=self, user=user)
+            .order_by("-updated_at")
+            .afirst()
+        )
+        return match
 
 
 @strawberry.type(name="Query")
