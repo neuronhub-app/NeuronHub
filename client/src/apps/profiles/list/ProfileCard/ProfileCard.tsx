@@ -34,8 +34,7 @@ export function ProfileCard(props: {
 }) {
   const profileHit = props.profile as unknown as Hit<BaseHit>;
 
-  const matchScore =
-    props.profile.my_match?.match_score ?? props.profile.my_match?.match_score_by_llm;
+  const matchScore = props.profile.match?.match_score ?? props.profile.match?.match_score_by_llm; // wrong
   const isHighlightable = props.isSearchActive && "_highlightResult" in props.profile;
 
   return (
@@ -100,6 +99,8 @@ export function ProfileCard(props: {
         <Flex>
           <HStack gap="gap.sm">
             {!props.isEnrichedByGraphql && <Spinner size="xs" color="fg.subtle" />}
+
+            {/* wrong */}
             {matchScore != null && (
               <Badge
                 colorPalette={matchScore >= 70 ? "green" : matchScore >= 40 ? "yellow" : "gray"}

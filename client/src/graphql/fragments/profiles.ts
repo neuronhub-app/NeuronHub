@@ -39,7 +39,7 @@ export const ProfileFragment = graphql(
       interests {
         ...PostTagLeanFragment
       }
-      my_match {
+      match {
         ...ProfileMatchFragment
       }
     }

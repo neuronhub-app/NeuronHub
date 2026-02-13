@@ -82,16 +82,14 @@ def csv_optimize_and_import(
                 profile.match_hash = profile.compute_content_hash()
                 profile.save()
 
-                match = (
-                    ProfileMatch.objects.filter(profile=profile)
-                    .order_by("-match_processed_at")
-                    .first()
-                )
-                if match:
+                try:
+                    match = profile.match
                     match.match_score_by_llm = None
                     match.match_reason_by_llm = ""
                     match.match_processed_at = None
                     match.save()
+                except ProfileMatch.DoesNotExist:
+                    pass
 
                 stats.updated += 1
             else:
@@ -114,7 +112,7 @@ def _resolve_tags(names: list[str], parent: PostTag) -> list[PostTag]:
 
 
 def get_unprocessed_profiles(user: User):
-    return Profile.objects.exclude(matches__user=user, matches__match_processed_at__isnull=False)
+    return Profile.objects.exclude(match__user=user, match__match_processed_at__isnull=False)
 
 
 def _split_list_of_strings(value: str) -> list[str]:

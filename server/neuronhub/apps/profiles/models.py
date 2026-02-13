@@ -178,7 +178,7 @@ class Profile(AlgoliaModel):
 
 class ProfileMatch(AnonimazableTimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile_matches")
-    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="matches")
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name="match")
 
     match_score_by_llm = models.PositiveIntegerField(
         null=True,
@@ -206,9 +206,6 @@ class ProfileMatch(AnonimazableTimeStampedModel):
     match_processed_at = models.DateTimeField(null=True, blank=True)
 
     history = HistoricalRecords()
-
-    class Meta:
-        unique_together = ["user", "profile"]
 
     def __str__(self):
         return f"Match: {self.user} → {self.profile}"
