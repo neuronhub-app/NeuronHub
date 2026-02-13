@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from algoliasearch_django import reindex_all
+from algoliasearch_django import update_records
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
@@ -22,15 +22,20 @@ class Command(BaseCommand):
             "--dry-run",
             action="store_true",
         )
+        parser.add_argument(
+            "--limit",
+            type=int,
+            help="Limit profile imports (for testing)",
+        )
 
-    def handle(self, *args, csv: Path, dry_run: bool, **options):
+    def handle(self, *args, csv: Path, dry_run: bool, limit: int | None, **options):
         if dry_run:
             self.stdout.write("DRY RUN - no changes will be made")
 
         with _disable_auto_indexing():
-            stats = csv_optimize_and_import(csv)
+            stats = csv_optimize_and_import(csv, limit=limit)
 
-        reindex_all(Profile)
+        update_records(Profile, qs=Profile.objects.all())
 
         self.stdout.write(f"Created:   {stats.created}")
         self.stdout.write(f"Updated:   {stats.updated}")
