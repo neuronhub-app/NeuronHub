@@ -41,7 +41,6 @@ export function ProfileCard(props: {
   isSearchActive?: boolean;
   isEnrichedByGraphql: boolean;
 }) {
-  const profileHit = props.profile as unknown as Hit<BaseHit>;
   const isHighlightable = props.isSearchActive && "_highlightResult" in props.profile;
 
   return (
@@ -57,22 +56,7 @@ export function ProfileCard(props: {
       <HStack justify="space-between" align="flex-start">
         <Stack gap="gap.sm">
           <HStack gap="gap.md" align="center">
-            <Link
-              target="_blank"
-              href={`https://${props.profile.url_conference}`}
-              color={{ _light: "teal.700", _dark: "teal.400" }}
-            >
-              <Heading fontSize="md" fontWeight="semibol">
-                {isHighlightable ? (
-                  <>
-                    <Highlight attribute="first_name" hit={profileHit} />{" "}
-                    <Highlight attribute="last_name" hit={profileHit} />
-                  </>
-                ) : (
-                  `${props.profile.first_name} ${props.profile.last_name}`
-                )}
-              </Heading>
-            </Link>
+            <ProfileNameLink profile={props.profile} isHighlightable={isHighlightable} />
             <Separator orientation="vertical" h="5" />
             <Text color="fg.dark-friendly" fontSize="md">
               {props.profile.job_title}
@@ -164,6 +148,36 @@ export function ProfileCard(props: {
 
       <SeeksOffersSection profile={props.profile} isSearchActive={props.isSearchActive} />
     </Stack>
+  );
+}
+
+function ProfileNameLink(props: { profile: ProfileFragmentType; isHighlightable?: boolean }) {
+  function ProfileName() {
+    const profileHit = props.profile as unknown as Hit<BaseHit>;
+    return (
+      <Heading fontSize="md" fontWeight="semibol">
+        {props.isHighlightable ? (
+          <>
+            <Highlight attribute="first_name" hit={profileHit} />{" "}
+            <Highlight attribute="last_name" hit={profileHit} />
+          </>
+        ) : (
+          `${props.profile.first_name} ${props.profile.last_name}`
+        )}
+      </Heading>
+    );
+  }
+
+  return props.profile.url_conference ? (
+    <Link
+      target="_blank"
+      href={`https://${props.profile.url_conference}`}
+      color={{ _light: "teal.700", _dark: "teal.400" }}
+    >
+      <ProfileName />
+    </Link>
+  ) : (
+    <ProfileName />
   );
 }
 
