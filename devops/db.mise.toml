@@ -18,11 +18,12 @@
 
 ["dev:db:rm"]
     dir = "devops/"
+    depends = "dev:db:stop"
     run = """
         if $env.IS_POSTGRES_MACOS == "true" {
             dropdb-{{ env.DB_VER }} {{ env.DB_NAME }}
         } else {
-            sudo docker compose rm db
+            sudo -E docker compose down -v db
         }
     """
 
@@ -32,7 +33,7 @@
         if $env.IS_POSTGRES_MACOS == "true" {
             brew services stop postgresql@{{ env.DB_VER }}
         } else {
-            sudo docker compose stop db
+            sudo -E docker compose stop db
         }
     """
 
