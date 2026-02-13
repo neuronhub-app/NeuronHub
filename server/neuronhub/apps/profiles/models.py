@@ -66,8 +66,16 @@ class Profile(AlgoliaModel):
     seeks = models.TextField(blank=True)
     offers = models.TextField(blank=True)
 
-    seeking_work = models.CharField(max_length=200, blank=True)
-    recruitment = models.TextField(blank=True)
+    seeking_work = ArrayField(
+        models.CharField(max_length=200),
+        default=list,
+        blank=True,
+    )
+    recruitment = ArrayField(
+        models.CharField(max_length=200),
+        default=list,
+        blank=True,
+    )
 
     country = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=100, blank=True)

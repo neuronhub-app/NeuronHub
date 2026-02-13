@@ -125,7 +125,6 @@ class ProfileAdmin(SimpleHistoryAdmin):
     def get_list_filter(self, request: HttpRequest):
         return [
             CareerStageFilter,
-            "seeking_work",
         ]
 
     search_fields = [
