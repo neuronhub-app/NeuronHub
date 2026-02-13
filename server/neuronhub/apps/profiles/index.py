@@ -56,6 +56,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "searchable(interests.name)",
                 "searchable(career_stage)",
                 "searchable(country)",
+                "searchable(company)",
                 "visible_to",
             ],
             "unretrievableAttributes": [

@@ -89,9 +89,10 @@ export function ProfileList() {
             bg={{ _light: "bg.subtle/30", _dark: "bg.subtle" }}
           >
             <FacetFilter name="career_stage" label="Career Stage" />
-            <FacetFilter name="interests.name" label="Interests" isSearchEnabled isShowEmpty />
-            <FacetFilter name="skills.name" label="Skills" isSearchEnabled isShowEmpty />
-            <FacetFilter name="country" label="Country" isShowEmpty />
+            <FacetFilter name="interests.name" label="Interests" isSearchEnabled />
+            <FacetFilter name="skills.name" label="Skills" isSearchEnabled />
+            <FacetFilter name="country" label="Country" isSearchEnabled />
+            <FacetFilter name="company" label="Company" isSearchEnabled />
           </Stack>
         </Flex>
       </Stack>
@@ -196,12 +197,7 @@ function ProfileListHits() {
   );
 }
 
-function FacetFilter(props: {
-  name: string;
-  label: string;
-  isSearchEnabled?: boolean;
-  isShowEmpty?: boolean;
-}) {
+function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boolean }) {
   const refinements = useRefinementList({
     attribute: props.name,
     limit: 10,
@@ -210,15 +206,11 @@ function FacetFilter(props: {
 
   const isEmpty = refinements.items.length === 0;
 
-  if (isEmpty && !props.isShowEmpty) {
-    return null;
-  }
-
   return (
     <Stack align="flex-start">
       <Text>{props.label}</Text>
 
-      {props.isSearchEnabled && !isEmpty && (
+      {props.isSearchEnabled && (
         <Input
           onChange={event => refinements.searchForItems(event.target.value)}
           type="search"
@@ -242,10 +234,11 @@ function FacetFilter(props: {
               onCheckedChange={() => {
                 refinements.refine(item.value);
               }}
+              textOverflow="ellipsis"
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
-              <Checkbox.Label textWrap="nowrap" display="flex" gap="gap.sm" color="fg.muted">
+              <Checkbox.Label display="flex" gap="gap.sm" color="fg.muted">
                 <Text
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
                   dangerouslySetInnerHTML={{ __html: item.highlighted! }}
