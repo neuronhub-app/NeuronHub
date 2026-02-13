@@ -1,5 +1,5 @@
 import { For, Tabs } from "@chakra-ui/react";
-import { FaBell, FaUser, FaUsers } from "react-icons/fa";
+import { FaRobot, FaUser } from "react-icons/fa";
 import { NavLink, Outlet, useLocation } from "react-router";
 import { urls } from "@/urls";
 
@@ -13,15 +13,20 @@ export default function UserSettingsLayout() {
       icon: <FaUser />,
     },
     {
-      label: "Connections",
-      value: urls.user.settings.connections,
-      icon: <FaUsers />,
+      label: "LLM Profile",
+      value: urls.user.settings.llmProfile,
+      icon: <FaRobot />,
     },
-    {
-      label: "Notifications",
-      value: urls.user.settings.notifications,
-      icon: <FaBell />,
-    },
+    // {
+    //   label: "Connections",
+    //   value: urls.user.settings.connections,
+    //   icon: <FaUsers />,
+    // },
+    // {
+    //   label: "Notifications",
+    //   value: urls.user.settings.notifications,
+    //   icon: <FaBell />,
+    // },
   ];
 
   return (

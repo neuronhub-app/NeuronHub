@@ -1,4 +1,5 @@
 import hashlib
+import textwrap
 import uuid
 
 from django.conf import settings
@@ -100,6 +101,7 @@ class Profile(AlgoliaModel):
     history = HistoricalRecords()
 
     profile_for_llm_md = models.TextField(blank=True)
+    is_profile_custom = models.BooleanField(default=False)
 
     match_hash = models.CharField(max_length=64, db_index=True, blank=True)
     content_updated_at = models.DateTimeField(default=timezone.now)
@@ -111,7 +113,8 @@ class Profile(AlgoliaModel):
 
     # #AI
     def save(self, **kwargs):
-        self.profile_for_llm_md = serialize_profile_to_markdown(self)
+        if not self.is_profile_custom:
+            self.profile_for_llm_md = textwrap.dedent(serialize_profile_to_markdown(self))
 
         hash_new = self.compute_content_hash()
         if self.pk and self.match_hash and self.match_hash != hash_new:
