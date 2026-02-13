@@ -175,7 +175,7 @@ class Profile(AlgoliaModel):
         is_unlimited = True
         is_limit_test_index = settings.DJANGO_ENV is DjangoEnv.DEV
         if is_limit_test_index:
-            is_unlimited = self.id < (settings.CONF_CONFIG.algolia_limit or 2000)  # type: ignore[has-type]
+            is_unlimited = self.id < (settings.CONF_CONFIG.algolia_limit or 5000)  # type: ignore[has-type]
         return bool(self.user or is_unlimited)
 
     def get_tag_skills_json(self):
