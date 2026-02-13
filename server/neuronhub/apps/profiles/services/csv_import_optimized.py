@@ -29,7 +29,10 @@ class SyncStats:
 
 
 def csv_optimize_and_import(
-    csv_path: Path, limit: int | None = None, group_name: str = "EAG-SF-2026"
+    csv_path: Path,
+    limit: int | None = None,
+    group_name: str = "EAG-SF-2026",
+    is_reindex_algolia: bool = True,
 ) -> SyncStats:
     rows = _parse_profiles_csv(csv_path)
 
@@ -98,7 +101,7 @@ def csv_optimize_and_import(
             else:
                 stats.unchanged += 1
 
-    if settings.ALGOLIA["IS_ENABLED"]:
+    if settings.ALGOLIA["IS_ENABLED"] and is_reindex_algolia:
         async_to_sync(_algolia_reindex)()
 
     _report_duplicates_if_any()

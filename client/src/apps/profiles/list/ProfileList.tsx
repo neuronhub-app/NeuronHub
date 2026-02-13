@@ -59,7 +59,7 @@ export function ProfileList() {
         </HStack>
 
         <Configure
-          hitsPerPage={5}
+          hitsPerPage={20}
           attributesToSnippet={["biography:60", "seeks:30", "offers:30"]}
           attributesToHighlight={[
             "biography",
@@ -138,6 +138,7 @@ function SearchInput() {
         onChange={event => search.refine(event.target.value)}
         type="search"
         placeholder="Search"
+        {...ids.set(ids.profile.searchInput)}
       />
     </InputGroup>
   );

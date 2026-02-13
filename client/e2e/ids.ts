@@ -128,6 +128,7 @@ export namespace ids {
 
   export const profile = {
     list: "profile.list",
+    searchInput: "profile.search-input",
     card: {
       container: "profile.card.container",
       contentMarkdown: "profile.card.content-markdown",

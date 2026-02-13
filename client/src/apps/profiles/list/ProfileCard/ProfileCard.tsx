@@ -20,7 +20,7 @@ import { useEffect, useRef } from "react";
 import { BsBriefcase } from "react-icons/bs";
 import { FaLinkedin, FaLocationDot } from "react-icons/fa6";
 import { GoOrganization } from "react-icons/go";
-import { LuCheck, LuChevronDown, LuRefreshCw } from "react-icons/lu";
+import { LuCheck, LuChevronDown } from "react-icons/lu";
 import { MdInfoOutline } from "react-icons/md";
 import { Highlight, Snippet } from "react-instantsearch";
 import { useDebouncedCallback } from "use-debounce";
@@ -460,6 +460,7 @@ function SeeksOffersSection(props: { profile: ProfileFragmentType; isSearchActiv
 }
 
 // #AI
+// prev version rendered <Box> vs <Collapsible.Root> based on isOverflowing -> infinite re-render at 1500px+ due to scrollHeight oscillation
 function CollapsibleSection(props: {
   children: ReactNode;
   collapsedHeight: string;
@@ -474,25 +475,23 @@ function CollapsibleSection(props: {
     }
     const heightMax = Number.parseInt(props.collapsedHeight, 10);
     state.mutable.isOverflowing = contentRef.current.scrollHeight > heightMax;
-  });
+  }, []);
 
-  if (!state.snap.isOverflowing) {
-    return <Box ref={contentRef}>{props.children}</Box>;
-  }
+  const isExpanded = !state.snap.isOverflowing || props.isSearchActive || state.snap.isOpen;
 
   return (
     <Collapsible.Root
       collapsedHeight={props.collapsedHeight}
-      open={props.isSearchActive || state.snap.isOpen}
+      open={isExpanded}
       onOpenChange={details => {
         state.mutable.isOpen = details.open;
       }}
     >
-      <Collapsible.Content _closed={style.collapsibleShadow}>
+      <Collapsible.Content _closed={state.snap.isOverflowing ? style.collapsibleShadow : {}}>
         <Box ref={contentRef}>{props.children}</Box>
       </Collapsible.Content>
 
-      {!props.isSearchActive && (
+      {state.snap.isOverflowing && !props.isSearchActive && (
         <Center>
           <Collapsible.Trigger asChild>
             <Button
