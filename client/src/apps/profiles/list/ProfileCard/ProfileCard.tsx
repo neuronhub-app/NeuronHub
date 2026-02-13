@@ -205,7 +205,7 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
     }, 1500);
   }, 800);
 
-  const showReviewInput = state.snap.hasUserRated || match?.match_score != null;
+  const isShowReviewInput = state.snap.hasUserRated || match?.match_score != null;
 
   return (
     <Stack gap="gap.sm" align="flex-end" minW="200px" h="auto">
@@ -243,8 +243,8 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
         </Text>
       )}
 
-      {showReviewInput && (
-        <Box position="relative" maxW="300px" w="full">
+      {isShowReviewInput && (
+        <Box position="relative" maxW="400px" minW="240px" w="full">
           <Textarea
             autoresize
             rows={1}
@@ -269,7 +269,7 @@ function ReviewSaveIndicator(props: { status: "idle" | "saving" | "saved" }) {
   }
 
   return (
-    <Box position="absolute" top="1" right="1">
+    <Box position="absolute" top="0" right="2">
       {props.status === "saving" ? (
         <Spinner size="xs" color="fg.subtle" />
       ) : (
