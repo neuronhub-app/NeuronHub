@@ -58,15 +58,7 @@ class ProfileType:
         user = get_user_sync(info)
         return filter_profiles_by_user(user, profiles=queryset)
 
-    @strawberry_django.field(extensions=[IsAuthenticated()])
-    async def my_match(self: Profile, info: Info) -> ProfileMatchType | None:
-        user = await get_user(info)
-        match = (
-            await ProfileMatch.objects.filter(profile=self, user=user)
-            .order_by("-updated_at")
-            .afirst()
-        )
-        return match  # type: ignore[return-value]  #bad-infer: Strawberry auto-converts model → type
+    match: ProfileMatchType | None = strawberry_django.field(extensions=[IsAuthenticated()])
 
 
 @strawberry.type(name="Query")

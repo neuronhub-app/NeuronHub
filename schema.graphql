@@ -642,7 +642,7 @@ type ProfileType {
   url_conference: String!
   skills(filters: PostTagFilter): [PostTagType!]!
   interests(filters: PostTagFilter): [PostTagType!]!
-  my_match: ProfileMatchType @IsAuthenticated
+  match: ProfileMatchType @IsAuthenticated
 }
 
 type Query {
