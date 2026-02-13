@@ -10,7 +10,7 @@ from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileGroup
 from neuronhub.apps.profiles.models import ProfileMatch
-from neuronhub.apps.profiles.services.csv_optimize_tokens import csv_optimize_tokens
+from neuronhub.apps.profiles.services.csv_optimize_tokens import csv_normalize_for_db
 from neuronhub.apps.tests.services.db_stubs_repopulate import _algolia_reindex
 from neuronhub.apps.tests.services.db_stubs_repopulate import _disable_auto_indexing
 from neuronhub.apps.users.models import User
@@ -39,19 +39,18 @@ def csv_optimize_and_import(
     profile_group, _ = ProfileGroup.objects.get_or_create(name=group_name)
 
     with _disable_auto_indexing():
-        for profile_row_raw in rows[:limit] if limit else rows:
-            profile_row = {key: csv_optimize_tokens(val) for key, val in profile_row_raw.items()}
+        for profile_row in rows[:limit] if limit else rows:
             if not profile_row:
                 continue
 
-            career_stage = _split_list_of_strings(profile_row.pop("career_stage"))
-            tag_skills = _split_list_of_strings(profile_row.pop("skills"))
-            tag_interests = _split_list_of_strings(profile_row.pop("interests"))
-            seeking_work = _split_list_of_strings(profile_row.pop("seeking_work"))
-            recruitment = _split_list_of_strings(profile_row.pop("recruitment"))
+            career_stage = _split_and_normalize(profile_row.pop("career_stage"))
+            tag_skills = _split_and_normalize(profile_row.pop("skills"))
+            tag_interests = _split_and_normalize(profile_row.pop("interests"))
+            seeking_work = _split_and_normalize(profile_row.pop("seeking_work"))
+            recruitment = _split_and_normalize(profile_row.pop("recruitment"))
 
             defaults = {
-                **profile_row,
+                **{k: csv_normalize_for_db(v) for k, v in profile_row.items()},
                 "career_stage": career_stage,
                 "seeking_work": seeking_work,
                 "recruitment": recruitment,
@@ -119,10 +118,10 @@ def get_unprocessed_profiles(user: User):
     return Profile.objects.exclude(match__user=user, match__match_processed_at__isnull=False)
 
 
-def _split_list_of_strings(value: str) -> list[str]:
+def _split_and_normalize(value: str) -> list[str]:
     if not value:
         return []
-    return [part.strip() for part in value.split(";") if part.strip()]
+    return [csv_normalize_for_db(part.strip()) for part in value.split(";") if part.strip()]
 
 
 def _parse_profiles_csv(csv_path: Path) -> list[dict[str, str]]:
