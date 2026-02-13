@@ -7,7 +7,7 @@ import {
   Heading,
   HStack,
   Icon,
-  type JsxStyleProps,
+  Separator,
   Spinner,
   Stack,
   Text,
@@ -16,6 +16,7 @@ import type { BaseHit, Hit } from "instantsearch.js";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { FaLocationDot } from "react-icons/fa6";
+import { GoOrganization } from "react-icons/go";
 import { LuChevronDown } from "react-icons/lu";
 import { Highlight, Snippet } from "react-instantsearch";
 import { Button } from "@/components/ui/button";
@@ -25,7 +26,6 @@ import { ids } from "@/e2e/ids";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { markedConfigured } from "@/utils/marked-configured";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
-
 // #AI
 export function ProfileCard(props: {
   profile: ProfileFragmentType;
@@ -62,9 +62,31 @@ export function ProfileCard(props: {
                 `${props.profile.first_name} ${props.profile.last_name}`
               )}
             </Heading>
+            <Separator orientation="vertical" h="5" />
+            <Text color={style.color.data} fontSize="md">
+              {props.profile.job_title}
+            </Text>
+          </HStack>
+
+          <Flex gap="gap.sm2">
+            {props.profile.company && (
+              <Flex
+                color={style.color.data}
+                fontSize={style.fontSize.data}
+                align="center"
+                gap="gap.sm"
+              >
+                <Icon boxSize="4.5" color="fg.muted/75">
+                  <GoOrganization />
+                </Icon>
+                {props.profile.company}
+              </Flex>
+            )}
+            <Separator orientation="vertical" h="5" />
+
             {props.profile.country && (
               <Flex align="center" gap="1">
-                <Icon boxSize="3.5" color="fg.subtle">
+                <Icon boxSize="3.5" color="fg.subtle/50">
                   <FaLocationDot />
                 </Icon>
                 <Text color={style.color.help} fontSize={style.fontSize.help}>
@@ -72,27 +94,23 @@ export function ProfileCard(props: {
                 </Text>
               </Flex>
             )}
-          </HStack>
-
-          {(props.profile.job_title || props.profile.company) && (
-            <Text color={style.color.data} fontSize={style.fontSize.data}>
-              {[props.profile.job_title, props.profile.company].filter(Boolean).join(" @ ")}
-            </Text>
-          )}
+          </Flex>
         </Stack>
 
-        <HStack gap="gap.sm">
-          {!props.isEnrichedByGraphql && <Spinner size="xs" color="fg.subtle" />}
-          {matchScore != null && (
-            <Badge
-              colorPalette={matchScore >= 70 ? "green" : matchScore >= 40 ? "yellow" : "gray"}
-              variant="subtle"
-              fontSize="xs"
-            >
-              {matchScore}
-            </Badge>
-          )}
-        </HStack>
+        <Flex>
+          <HStack gap="gap.sm">
+            {!props.isEnrichedByGraphql && <Spinner size="xs" color="fg.subtle" />}
+            {matchScore != null && (
+              <Badge
+                colorPalette={matchScore >= 70 ? "green" : matchScore >= 40 ? "yellow" : "gray"}
+                variant="subtle"
+                fontSize="xs"
+              >
+                {matchScore}
+              </Badge>
+            )}
+          </HStack>
+        </Flex>
       </HStack>
 
       <ProfileContentSection
@@ -104,10 +122,8 @@ export function ProfileCard(props: {
         collapsedHeight={style.collapseHeight.bio}
       />
 
-      <SeeksOffersSection profile={props.profile} isSearchActive={props.isSearchActive} />
-
       {(props.profile.skills?.length > 0 || props.profile.interests?.length > 0) && (
-        <HStack gap="gap.lg" align="flex-start" flexWrap="wrap">
+        <HStack align="flex-start" flexWrap="wrap">
           {props.profile.skills?.length > 0 && (
             <ProfileTagGroup label="Skills" tags={props.profile.skills} colorPalette="gray" />
           )}
@@ -121,6 +137,30 @@ export function ProfileCard(props: {
           )}
         </HStack>
       )}
+
+      <SeeksOffersSection profile={props.profile} isSearchActive={props.isSearchActive} />
+    </Stack>
+  );
+}
+
+// #AI
+function ProfileTagGroup(props: {
+  label: string;
+  tags: { id: string; name: string }[];
+  colorPalette: string;
+}) {
+  return (
+    <Stack gap="gap.sm" flex="1">
+      <Text {...style.label}>{props.label}</Text>
+      <Flex gap="gap.sm" flexWrap="wrap" {...ids.set(ids.profile.card.tags)}>
+        {props.tags.map(tag => {
+          return (
+            <Tag key={tag.name} variant="subtle" size="md" colorPalette={props.colorPalette}>
+              {tag.name}
+            </Tag>
+          );
+        })}
+      </Flex>
     </Stack>
   );
 }
@@ -162,15 +202,14 @@ function ProfileContentSection(props: {
       dangerouslySetInnerHTML={{ __html: markedConfigured.parse(props.text) }}
       size="sm"
       maxW="3xl"
+      color="fg"
       {...ids.set(ids.profile.card.contentMarkdown)}
     />
   );
 
   return (
     <Stack gap="gap.xs" flex={props.flex} minW={props.minW}>
-      <Text fontSize="xs" color={style.color.label} fontWeight="medium">
-        {props.label}
-      </Text>
+      <Text {...style.label}>{props.label}</Text>
       {props.collapsedHeight ? (
         <CollapsibleSection
           collapsedHeight={props.collapsedHeight}
@@ -195,7 +234,7 @@ function SeeksOffersSection(props: { profile: ProfileFragmentType; isSearchActiv
       collapsedHeight={style.collapseHeight.seeksAndOffers}
       isSearchActive={props.isSearchActive}
     >
-      <HStack gap="gap.lg" align="flex-start" flexWrap="wrap">
+      <HStack align="flex-start" flexWrap="wrap">
         <ProfileContentSection
           label="Seeks"
           text={props.profile.seeks}
@@ -203,7 +242,6 @@ function SeeksOffersSection(props: { profile: ProfileFragmentType; isSearchActiv
           profile={props.profile}
           isSearchActive={props.isSearchActive}
           flex="1"
-          minW="200px"
         />
         <ProfileContentSection
           label="Offers"
@@ -212,7 +250,6 @@ function SeeksOffersSection(props: { profile: ProfileFragmentType; isSearchActiv
           profile={props.profile}
           isSearchActive={props.isSearchActive}
           flex="1"
-          minW="200px"
         />
       </HStack>
     </CollapsibleSection>
@@ -251,6 +288,7 @@ function CollapsibleSection(props: {
       <Collapsible.Content _closed={style.collapsibleShadow}>
         <Box ref={contentRef}>{props.children}</Box>
       </Collapsible.Content>
+
       {!props.isSearchActive && (
         <Center>
           <Collapsible.Trigger asChild>
@@ -276,46 +314,20 @@ function CollapsibleSection(props: {
 }
 
 // #AI
-function ProfileTagGroup(props: {
-  label: string;
-  tags: { id: string; name: string }[];
-  colorPalette: string;
-}) {
-  return (
-    <Stack gap="gap.xs">
-      <Text fontSize="xs" color={style.color.label} fontWeight="medium">
-        {props.label}
-      </Text>
-      <Flex gap="gap.sm" flexWrap="wrap" {...ids.set(ids.profile.card.tags)}>
-        {props.tags.map(tag => {
-          return (
-            <Tag
-              key={tag.name}
-              variant="subtle"
-              size="md"
-              colorPalette={props.colorPalette}
-              fontSize="16px"
-            >
-              {tag.name}
-            </Tag>
-          );
-        })}
-      </Flex>
-    </Stack>
-  );
-}
-
-// #AI
 const style = {
+  label: {
+    color: "fg",
+    fontSize: "xs",
+    fontWeight: "bold",
+  },
   color: {
-    data: "fg.subtle",
+    data: "fg.muted",
     help: "fg.muted",
-    label: "fg",
-  } satisfies { [key: string]: JsxStyleProps["color"] },
+  },
   fontSize: {
     data: "sm",
     help: "sm",
-  } satisfies { [key: string]: JsxStyleProps["fontSize"] },
+  },
   collapseHeight: {
     bio: "110px",
     seeksAndOffers: "140px",
