@@ -22,6 +22,8 @@ class CsvImportOptimizedTest(NeuronTestCase):
 
         assert stats.created == config.limit
         assert stats.created == await Profile.objects.acount()
+        # DB-normalized: country "United States" → "US" (# keep item)
+        assert await Profile.objects.filter(country="US").aexists()
         assert not await Profile.objects.filter(country="United States").aexists()
 
         stats_unchanged = await _csv_save_to_db()
