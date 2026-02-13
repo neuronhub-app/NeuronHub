@@ -125,7 +125,7 @@ function SearchInput() {
         value={search.query}
         onChange={event => search.refine(event.target.value)}
         type="search"
-        placeholder="Search profiles"
+        placeholder="Search"
       />
     </InputGroup>
   );
