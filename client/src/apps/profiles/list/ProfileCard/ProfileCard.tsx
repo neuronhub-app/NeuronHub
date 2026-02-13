@@ -12,6 +12,7 @@ import {
   Spinner,
   Stack,
   Text,
+  Textarea,
 } from "@chakra-ui/react";
 import type { BaseHit, Hit } from "instantsearch.js";
 import type { ReactNode } from "react";
@@ -19,9 +20,10 @@ import { useEffect, useRef } from "react";
 import { BsBriefcase } from "react-icons/bs";
 import { FaLinkedin, FaLocationDot } from "react-icons/fa6";
 import { GoOrganization } from "react-icons/go";
-import { LuChevronDown } from "react-icons/lu";
+import { LuCheck, LuChevronDown } from "react-icons/lu";
 import { MdInfoOutline } from "react-icons/md";
 import { Highlight, Snippet } from "react-instantsearch";
+import { useDebouncedCallback } from "use-debounce";
 import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/ui/prose";
 import { Tag } from "@/components/ui/tag";
@@ -132,32 +134,7 @@ export function ProfileCard(props: {
           )}
         </Stack>
 
-        <HStack gap="gap.sm2">
-          {!props.isEnrichedByGraphql ? (
-            <Spinner size="xs" color="fg.subtle" />
-          ) : (
-            <>
-              {props.profile.match?.match_score_by_llm != null && (
-                <MatchRating
-                  value={scoreToStars(props.profile.match.match_score_by_llm)}
-                  readOnly
-                  helpText="Match rating by AI"
-                />
-              )}
-              <MatchRating
-                defaultValue={scoreToStars(props.profile.match?.match_score)}
-                colorPalette="teal"
-                onValueChange={async details => {
-                  await mutateAndRefetchMountedQueries(ProfileMatchScoreUpdateMutation, {
-                    profileId: props.profile.id,
-                    matchScore: details.value * 20,
-                  });
-                }}
-                helpText="Your rating of this match by AI"
-              />
-            </>
-          )}
-        </HStack>
+        <MatchSection profile={props.profile} isEnrichedByGraphql={props.isEnrichedByGraphql} />
       </HStack>
 
       <ProfileContentSection
@@ -207,6 +184,106 @@ function scoreToStars(score: number | null | undefined): number {
   // 0/100 -> 0/5, increments in 0.5
   return Math.round(score / 10) * 0.5;
 }
+
+// #AI
+function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql: boolean }) {
+  const state = useStateValtio({
+    hasUserRated: props.profile.match?.match_score != null,
+    reviewSaveStatus: "idle" as "idle" | "saving" | "saved",
+  });
+  const match = props.profile.match;
+
+  const debouncedSaveReview = useDebouncedCallback(async (review: string) => {
+    state.mutable.reviewSaveStatus = "saving";
+    await mutateAndRefetchMountedQueries(ProfileMatchReviewUpdateMutation, {
+      profileId: props.profile.id,
+      matchReview: review,
+    });
+    state.mutable.reviewSaveStatus = "saved";
+    setTimeout(() => {
+      state.mutable.reviewSaveStatus = "idle";
+    }, 1500);
+  }, 800);
+
+  const showReviewInput = state.snap.hasUserRated || match?.match_score != null;
+
+  return (
+    <Stack gap="gap.sm" align="flex-end" minW="200px" h="auto">
+      <HStack gap="gap.sm2">
+        {!props.isEnrichedByGraphql ? (
+          <Spinner size="xs" color="fg.subtle" />
+        ) : (
+          <>
+            {match?.match_score_by_llm != null && (
+              <MatchRating
+                value={scoreToStars(match.match_score_by_llm)}
+                readOnly
+                helpText="Match rating by AI"
+              />
+            )}
+            <MatchRating
+              defaultValue={scoreToStars(match?.match_score)}
+              colorPalette="teal"
+              onValueChange={async details => {
+                state.mutable.hasUserRated = true;
+                await mutateAndRefetchMountedQueries(ProfileMatchScoreUpdateMutation, {
+                  profileId: props.profile.id,
+                  matchScore: details.value * 20,
+                });
+              }}
+              helpText="Your rating of this match by AI"
+            />
+          </>
+        )}
+      </HStack>
+
+      {match?.match_reason_by_llm && (
+        <Text fontSize="xs" color="fg.muted" maxW="300px" lineClamp={2}>
+          {match.match_reason_by_llm}
+        </Text>
+      )}
+
+      {showReviewInput && (
+        <HStack maxW="300px" w="full" gap="gap.sm">
+          <Textarea
+            autoresize
+            rows={1}
+            resize="none"
+            overflow="hidden"
+            placeholder="Your review note for AI"
+            size="xs"
+            defaultValue={match?.match_review ?? ""}
+            onChange={e => debouncedSaveReview(e.target.value)}
+          />
+          <ReviewSaveIndicator status={state.snap.reviewSaveStatus} />
+        </HStack>
+      )}
+    </Stack>
+  );
+}
+
+// #AI
+function ReviewSaveIndicator(props: { status: "idle" | "saving" | "saved" }) {
+  return (
+    <Box w="3.5" flexShrink={0} alignSelf="center">
+      {props.status === "saving" && <Spinner size="xs" color="fg.subtle" />}
+      {props.status === "saved" && (
+        <Icon animation="fade-in 200ms" color="fg.subtle" boxSize="3.5">
+          <LuCheck />
+        </Icon>
+      )}
+    </Box>
+  );
+}
+
+const ProfileMatchReviewUpdateMutation = graphql.persisted(
+  "ProfileMatchReviewUpdate",
+  graphql(`
+    mutation ProfileMatchReviewUpdate($profileId: ID!, $matchReview: String!) {
+      profile_match_review_update(profile_id: $profileId, match_review: $matchReview)
+    }
+  `),
+);
 
 function MatchRating(props: {
   value?: number;
