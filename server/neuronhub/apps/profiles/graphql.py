@@ -76,3 +76,14 @@ class ProfilesMutation:
         assert profile.user.email, "Profile has no email"
         await send_profile_dm(user_sender=sender, receiver=profile.user, message=message)
         return True
+
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def profile_match_score_update(
+        self, profile_id: ID, match_score: int, info: Info
+    ) -> bool:
+        user = await get_user(info)
+        await ProfileMatch.objects.aupdate_or_create(
+            profile_id=profile_id,
+            defaults={"match_score": match_score, "user": user},
+        )
+        return True

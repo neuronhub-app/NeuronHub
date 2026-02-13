@@ -144,7 +144,7 @@ function ProfileListHits() {
 
   return (
     <Stack gap="gap.xl" w="full">
-      <Stack {...ids.set(ids.profile.list)}>
+      <Stack {...ids.set(ids.profile.list)} gap="gap.md2">
         {hits.results?.nbHits && profilesEnriched.length ? (
           profilesEnriched.map(profile => (
             <ProfileCard
@@ -238,7 +238,8 @@ function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boo
               onCheckedChange={() => {
                 refinements.refine(item.value);
               }}
-              textOverflow="ellipsis"
+              display="flex"
+              alignItems="flex-start"
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
@@ -248,7 +249,7 @@ function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boo
                   dangerouslySetInnerHTML={{
                     __html:
                       item.highlighted! +
-                      ` <span style="margin-left: 3px; font-size: ${count.fontSize}; color: ${count.color}">${item.count}</span>`,
+                      `&nbsp;<span style="margin-left: 3px; font-size: ${count.fontSize}; color: ${count.color}">${item.count}</span>`,
                   }}
                   as="span"
                 />{" "}

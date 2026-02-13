@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Center,
   Collapsible,
@@ -8,6 +7,7 @@ import {
   HStack,
   Icon,
   Link,
+  RatingGroup,
   Separator,
   Spinner,
   Stack,
@@ -17,16 +17,19 @@ import type { BaseHit, Hit } from "instantsearch.js";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { BsBriefcase } from "react-icons/bs";
-import { FaIdCardClip, FaLinkedinIn, FaLocationDot } from "react-icons/fa6";
+import { FaLinkedin, FaLocationDot } from "react-icons/fa6";
 import { GoOrganization } from "react-icons/go";
 import { LuChevronDown } from "react-icons/lu";
-
+import { MdInfoOutline } from "react-icons/md";
 import { Highlight, Snippet } from "react-instantsearch";
 import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/ui/prose";
 import { Tag } from "@/components/ui/tag";
+import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
+import { graphql } from "@/gql-tada";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
+import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { markedConfigured } from "@/utils/marked-configured";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
 
@@ -37,66 +40,51 @@ export function ProfileCard(props: {
   isEnrichedByGraphql: boolean;
 }) {
   const profileHit = props.profile as unknown as Hit<BaseHit>;
-
-  const matchScore = props.profile.match?.match_score ?? props.profile.match?.match_score_by_llm; // wrong
   const isHighlightable = props.isSearchActive && "_highlightResult" in props.profile;
 
   return (
     <Stack
       as="article"
       gap="gap.sm2"
-      bg="bg.light"
       p="gap.md"
       borderRadius="lg"
       border="1px solid"
-      borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
+      borderColor="border.muted"
       {...ids.set(ids.profile.card.container)}
     >
       <HStack justify="space-between" align="flex-start">
         <Stack gap="gap.sm">
           <HStack gap="gap.md" align="center">
-            <Heading fontSize="md" fontWeight="medium">
-              {isHighlightable ? (
-                <>
-                  <Highlight attribute="first_name" hit={profileHit} />{" "}
-                  <Highlight attribute="last_name" hit={profileHit} />
-                </>
-              ) : (
-                `${props.profile.first_name} ${props.profile.last_name}`
-              )}
-            </Heading>
+            <Link
+              target="_blank"
+              href={`https://${props.profile.url_conference}`}
+              color={{ _light: "teal.700", _dark: "teal.400" }}
+            >
+              <Heading fontSize="md" fontWeight="semibol">
+                {isHighlightable ? (
+                  <>
+                    <Highlight attribute="first_name" hit={profileHit} />{" "}
+                    <Highlight attribute="last_name" hit={profileHit} />
+                  </>
+                ) : (
+                  `${props.profile.first_name} ${props.profile.last_name}`
+                )}
+              </Heading>
+            </Link>
             <Separator orientation="vertical" h="5" />
-            <Text color={style.color.data} fontSize="md">
+            <Text color="fg.dark-friendly" fontSize="md">
               {props.profile.job_title}
             </Text>
-            <Separator orientation="vertical" h="5" />
             {(props.profile.url_linkedin || props.profile.url_conference) && (
               <HStack gap="gap.sm2" align="center">
                 {props.profile.url_linkedin && (
                   <Link href={`https://${props.profile.url_linkedin}`} target="_blank">
                     <Icon
                       boxSize="21px"
-                      w="25px"
-                      color="fg.inverted"
-                      bg="fg.subtle/80"
-                      borderRadius="sm"
-                      p="1"
-                      px="1.5"
-                      _hover={{ bg: "blue.500" }}
+                      color="rgb(10, 102, 194)/70"
+                      _hover={{ bg: "rgb(10, 102, 194)" }}
                     >
-                      <FaLinkedinIn />
-                    </Icon>
-                  </Link>
-                )}
-                {props.profile.url_conference && (
-                  <Link href={`https://${props.profile.url_conference}`} target="_blank">
-                    <Icon
-                      boxSize="24px"
-                      color="fg.subtle/80"
-                      mt="-2px"
-                      _hover={{ color: "blue.500" }}
-                    >
-                      <FaIdCardClip />
+                      <FaLinkedin />
                     </Icon>
                   </Link>
                 )}
@@ -112,7 +100,7 @@ export function ProfileCard(props: {
                 align="center"
                 gap="gap.sm"
               >
-                <Icon boxSize="4.5" color="fg.muted/75">
+                <Icon boxSize="4.5" color="fg.muted/65">
                   <GoOrganization />
                 </Icon>
                 {props.profile.company}
@@ -122,7 +110,7 @@ export function ProfileCard(props: {
 
             {props.profile.country && (
               <Flex align="center" gap="1">
-                <Icon boxSize="3.5" color="fg.subtle/50">
+                <Icon boxSize="3.5" color="fg.subtle/60">
                   <FaLocationDot />
                 </Icon>
                 <Text color={style.color.help} fontSize={style.fontSize.help}>
@@ -133,8 +121,8 @@ export function ProfileCard(props: {
           </Flex>
 
           {props.profile.career_stage.length > 0 && (
-            <Flex align="center" gap="1.5">
-              <Icon boxSize="4" color="fg.muted/75">
+            <Flex align="center" gap="2">
+              <Icon boxSize="4" color="fg.muted/65">
                 <BsBriefcase />
               </Icon>
               <Text color={style.color.data} fontSize={style.fontSize.data}>
@@ -144,22 +132,32 @@ export function ProfileCard(props: {
           )}
         </Stack>
 
-        <Flex>
-          <HStack gap="gap.sm">
-            {!props.isEnrichedByGraphql && <Spinner size="xs" color="fg.subtle" />}
-
-            {/* wrong */}
-            {matchScore != null && (
-              <Badge
-                colorPalette={matchScore >= 70 ? "green" : matchScore >= 40 ? "yellow" : "gray"}
-                variant="subtle"
-                fontSize="xs"
-              >
-                {matchScore}
-              </Badge>
-            )}
-          </HStack>
-        </Flex>
+        <HStack gap="gap.sm2">
+          {!props.isEnrichedByGraphql ? (
+            <Spinner size="xs" color="fg.subtle" />
+          ) : (
+            <>
+              {props.profile.match?.match_score_by_llm != null && (
+                <MatchRating
+                  value={scoreToStars(props.profile.match.match_score_by_llm)}
+                  readOnly
+                  helpText="Match rating by AI"
+                />
+              )}
+              <MatchRating
+                defaultValue={scoreToStars(props.profile.match?.match_score)}
+                colorPalette="teal"
+                onValueChange={async details => {
+                  await mutateAndRefetchMountedQueries(ProfileMatchScoreUpdateMutation, {
+                    profileId: props.profile.id,
+                    matchScore: details.value * 20,
+                  });
+                }}
+                helpText="Your rating of this match by AI"
+              />
+            </>
+          )}
+        </HStack>
       </HStack>
 
       <ProfileContentSection
@@ -192,7 +190,76 @@ export function ProfileCard(props: {
   );
 }
 
+const ProfileMatchScoreUpdateMutation = graphql.persisted(
+  "ProfileMatchScoreUpdate",
+  graphql(`
+    mutation ProfileMatchScoreUpdate($profileId: ID!, $matchScore: Int!) {
+      profile_match_score_update(profile_id: $profileId, match_score: $matchScore)
+    }
+  `),
+);
+
 // #AI
+function scoreToStars(score: number | null | undefined): number {
+  if (score == null) {
+    return 0;
+  }
+  // 0/100 -> 0/5, increments in 0.5
+  return Math.round(score / 10) * 0.5;
+}
+
+function MatchRating(props: {
+  value?: number;
+  defaultValue?: number;
+  colorPalette?: string;
+  readOnly?: boolean;
+  onValueChange?: (details: { value: number }) => void;
+  helpText?: string;
+}) {
+  return (
+    <HStack align="center">
+      <RatingGroup.Root
+        allowHalf
+        count={5}
+        size="md"
+        value={props.value}
+        defaultValue={props.defaultValue}
+        colorPalette={props.colorPalette}
+        readOnly={props.readOnly}
+        onValueChange={props.onValueChange}
+      >
+        {!props.readOnly && <RatingGroup.HiddenInput />}
+        {/* custom icon doesn't work with _hover */}
+        {/*{[1, 2, 3, 4, 5].map((_, index) => (*/}
+        {/*  // biome-ignore lint/suspicious/noArrayIndexKey: static*/}
+        {/*  <RatingGroup.Item key={index} index={index + 1}>*/}
+        {/*    <RatingGroup.ItemIndicator icon={<FaStar />} />*/}
+        {/*  </RatingGroup.Item>*/}
+        {/*))}*/}
+        <RatingGroup.Control />
+      </RatingGroup.Root>
+      {props.helpText && (
+        <Tooltip
+          content={props.helpText}
+          openDelay={400}
+          closeDelay={100}
+          closeOnClick={false}
+          positioning={{ placement: "right" }}
+        >
+          <Icon
+            color="fg.subtle/50"
+            _hover={{ color: "fg", cursor: "help" }}
+            boxSize="3.5"
+            mt="1px"
+          >
+            <MdInfoOutline />
+          </Icon>
+        </Tooltip>
+      )}
+    </HStack>
+  );
+}
+
 function ProfileTagGroup(props: {
   label: string;
   tags: { id: string; name: string }[];
@@ -370,7 +437,7 @@ const style = {
     fontWeight: "bold",
   },
   color: {
-    data: "fg.muted",
+    data: "fg",
     help: "fg.muted",
   },
   fontSize: {
