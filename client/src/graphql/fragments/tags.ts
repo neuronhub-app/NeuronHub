@@ -39,7 +39,7 @@ export const PostTagFragment = graphql(`
 export type PostTagFragmentType = FragmentOf<typeof PostTagFragment>;
 
 export const PostTagLeanFragment = graphql(`
-  fragment PostTagFragment on PostTagType {
+  fragment PostTagLeanFragment on PostTagType {
     id
     votes {
       id
