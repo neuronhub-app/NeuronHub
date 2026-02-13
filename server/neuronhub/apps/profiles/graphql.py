@@ -1,7 +1,8 @@
+from typing import cast
+
 import strawberry
 import strawberry_django
 from algoliasearch_django import save_record
-from algoliasearch_django.management.commands import algolia_reindex
 from django.db.models import QuerySet
 from strawberry import ID
 from strawberry import Info
@@ -61,6 +62,9 @@ class ProfileType:
     url_linkedin: auto
     url_conference: auto
 
+    profile_for_llm_md: auto
+    is_profile_custom: auto
+
     skills: list[PostTagType]
     interests: list[PostTagType]
 
@@ -75,6 +79,15 @@ class ProfileType:
 @strawberry.type(name="Query")
 class ProfilesQuery:
     profiles: list[ProfileType] = strawberry_django.field()
+
+    # #AI-slop
+    @strawberry_django.field(extensions=[IsAuthenticated()])
+    async def my_profile(self, info: Info) -> ProfileType | None:
+        user = await get_user(info)
+        try:
+            return cast(ProfileType, await Profile.objects.aget(user=user))
+        except Profile.DoesNotExist:
+            return None
 
 
 @strawberry.type
@@ -110,4 +123,22 @@ class ProfilesMutation:
             defaults={"match_review": match_review, "user": user},
         )
         save_record(await Profile.objects.aget(profile_id))
+        return True
+
+    # AI
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def profile_llm_md_update(self, profile_for_llm_md: str, info: Info) -> bool:
+        user = await get_user(info)
+        profile = await Profile.objects.aget(user=user)
+        profile.is_profile_custom = True
+        profile.profile_for_llm_md = profile_for_llm_md
+        await profile.asave()
+        return True
+
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def profile_llm_md_reset(self, info: Info) -> bool:
+        user = await get_user(info)
+        profile = await Profile.objects.aget(user=user)
+        profile.is_profile_custom = False
+        await profile.asave()
         return True

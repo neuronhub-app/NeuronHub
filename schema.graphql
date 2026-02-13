@@ -124,6 +124,8 @@ type Mutation {
   profile_send_dm(profile_id: ID!, message: String!): Boolean! @IsAuthenticated
   profile_match_score_update(profile_id: ID!, match_score: Int!): Boolean! @IsAuthenticated
   profile_match_review_update(profile_id: ID!, match_review: String!): Boolean! @IsAuthenticated
+  profile_llm_md_update(profile_for_llm_md: String!): Boolean! @IsAuthenticated
+  profile_llm_md_reset: Boolean! @IsAuthenticated
 }
 
 input OneToManyInput {
@@ -645,6 +647,8 @@ type ProfileType {
   city: String!
   url_linkedin: String!
   url_conference: String!
+  profile_for_llm_md: String!
+  is_profile_custom: Boolean!
   skills(filters: PostTagFilter): [PostTagType!]!
   interests(filters: PostTagFilter): [PostTagType!]!
   match: ProfileMatchType @IsAuthenticated
@@ -667,6 +671,7 @@ type Query {
   post_highlight(post_id: ID!): PostHighlightType! @IsAuthenticated
   user_highlights: [PostHighlightType!]! @IsAuthenticated
   profiles(filters: ProfileFilter): [ProfileType!]!
+  my_profile: ProfileType @IsAuthenticated
 }
 
 input StrFilterLookup {

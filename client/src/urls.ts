@@ -75,6 +75,9 @@ export const urls = {
       get connections() {
         return `${this.detail}/connections` as const;
       },
+      get llmProfile() {
+        return `${this.detail}/llm-profile` as const;
+      },
       get notifications() {
         return `${this.detail}/notifications` as const;
       },

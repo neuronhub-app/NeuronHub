@@ -1,4 +1,4 @@
-import { prefix, type RouteConfig, route } from "@react-router/dev/routes";
+import { layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 import { op, urls } from "./urls";
 
 export default [
@@ -29,7 +29,9 @@ export default [
     route(`/:id/${op.edit}`, "./apps/tools/edit/index.tsx"),
   ]),
   ...prefix(urls.user.settings.detail, [
-    route("/profile", "./apps/users/settings/profile/index.tsx"),
-    route("/connections", "./apps/users/settings/connections/index.tsx"),
+    layout("./apps/users/settings/UserSettingsLayout.tsx", [
+      route("/profile", "./apps/users/settings/profile/index.tsx"),
+      route("/llm-profile", "./apps/users/settings/llm-profile/index.tsx"),
+    ]),
   ]),
 ] satisfies RouteConfig;

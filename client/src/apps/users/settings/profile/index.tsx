@@ -1,82 +1,72 @@
-import {
-  Button,
-  Container,
-  Field,
-  HStack,
-  Input,
-  InputGroup,
-  Stack,
-  Text,
-  Textarea,
-} from "@chakra-ui/react";
-import { LuLinkedin, LuTriangleAlert, LuTwitter } from "react-icons/lu";
-import { AvatarUpload } from "@/apps/users/settings/profile/AvatarUpload";
+/**
+ * #AI
+ */
+import { Container, Field, Stack, Text } from "@chakra-ui/react";
 import { ThemeSelector } from "@/apps/users/settings/profile/ThemeSelector";
+import { useUser } from "@/apps/users/useUserCurrent";
+import { graphql } from "@/gql-tada";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 export default function Profile() {
+  const user = useUser();
+  const { data } = useApolloQuery(MyProfileQuery);
+  const profile = data?.my_profile;
+
   return (
     <Container maxW="xl" py={10} m={0} px={1}>
       <Stack gap="20">
-        <form>
-          <Stack gap="5">
-            <Field.Root orientation="horizontal" mb="4">
-              <Field.Label>Photo</Field.Label>
-              <AvatarUpload />
-            </Field.Root>
-            <Field.Root orientation="horizontal">
-              <Field.Label>Name</Field.Label>
-              <Input name="name" />
-            </Field.Root>
-            <Field.Root orientation="horizontal">
-              <Field.Label>Location</Field.Label>
-              <Input name="location" />
-            </Field.Root>
-            <Field.Root orientation="horizontal">
-              <Field.Label>Bio</Field.Label>
-              <Textarea rows={4} name="bio" resize="none" />
-            </Field.Root>
-            <Field.Root orientation="horizontal">
-              <Field.Label>LinkedIn</Field.Label>
-              <InputGroup w="full" startElement={<LuLinkedin />}>
-                <Input name="linkedIn" />
-              </InputGroup>
-            </Field.Root>
-            <Field.Root orientation="horizontal">
-              <Field.Label>Twitter</Field.Label>
-              <InputGroup w="full" startElement={<LuTwitter />}>
-                <Input name="twitter" />
-              </InputGroup>
-            </Field.Root>
-            <Field.Root orientation="horizontal">
-              <Field.Label>Website</Field.Label>
-              <InputGroup w="full" startElement="https://">
-                <Input name="website" ps="7ch" />
-              </InputGroup>
-            </Field.Root>
+        <Stack gap="5">
+          <ReadOnlyField label="Email" value={user?.email} />
+          <ReadOnlyField label="Name" value={profileName(profile)} />
+          <ReadOnlyField label="Company" value={profile?.company} />
+          <ReadOnlyField label="Job Title" value={profile?.job_title} />
+          <ReadOnlyField label="Location" value={profileLocation(profile)} />
+          <ReadOnlyField label="LinkedIn" value={profile?.url_linkedin} />
 
-            <Field.Root>
-              <Field.Label>Theme</Field.Label>
-              <ThemeSelector />
-            </Field.Root>
-
-            <Button alignSelf="flex-start">Save</Button>
-          </Stack>
-        </form>
-
-        <Stack align="flex-start" gap="3" borderWidth="1px" p="6" rounded="l2">
-          <HStack color="fg.error" fontWeight="medium">
-            <LuTriangleAlert />
-            Danger Zone
-          </HStack>
-          <Text color="fg.muted" textStyle="sm">
-            Once you delete your account, there is no going back. All of your information will be
-            lost. Before you go, please download your information.
-          </Text>
-          <Button colorPalette="red" mt="2">
-            Delete account
-          </Button>
+          <Field.Root>
+            <Field.Label>Theme</Field.Label>
+            <ThemeSelector />
+          </Field.Root>
         </Stack>
       </Stack>
     </Container>
   );
 }
+
+function ReadOnlyField(props: { label: string; value: string | undefined | null }) {
+  return (
+    <Field.Root orientation="horizontal">
+      <Field.Label>{props.label}</Field.Label>
+      <Text color={props.value ? "fg" : "fg.muted"}>{props.value || "—"}</Text>
+    </Field.Root>
+  );
+}
+
+function profileName(profile: { first_name: string; last_name: string } | null | undefined) {
+  if (!profile) return undefined;
+  return [profile.first_name, profile.last_name].filter(Boolean).join(" ") || undefined;
+}
+
+function profileLocation(profile: { country: string; city: string } | null | undefined) {
+  if (!profile) return undefined;
+  return [profile.city, profile.country].filter(Boolean).join(", ") || undefined;
+}
+
+const MyProfileQuery = graphql.persisted(
+  "MyProfile",
+  graphql(`
+    query MyProfile {
+      my_profile {
+        id
+        first_name
+        last_name
+        company
+        job_title
+        country
+        city
+        url_linkedin
+        biography
+      }
+    }
+  `),
+);
