@@ -71,7 +71,6 @@ INSTALLED_APPS = [
     "strawberry_django",
     "health_check",
     "health_check.storage",
-    "health_check.contrib.migrations",
     "neuronhub.apps.db",
     "neuronhub.apps.algolia",
     "neuronhub.apps.users",

@@ -111,7 +111,7 @@ def _score_matches_batch_by_llm(
     logger.info(f"LLM: batch of {len(profiles)}...")
     llm_output_json = _call_llm_api(
         prompt,
-        _get_json_schema(min_match_score_items=len(profiles)),
+        schema=_get_json_schema(valid_ids=[profile.id for profile in profiles]),
         model=config.model,
         system_prompt=system_prompt,
     )
@@ -186,18 +186,23 @@ class json_key:
     match_reasoning_note = "match_reasoning_note"
 
 
-def _get_json_schema(min_match_score_items: int = 1):
+def _get_json_schema(valid_ids: list[int]):
     return json.dumps(
         {
             "type": "object",
             "properties": {
                 json_key.match_scores: {
                     "type": "array",
-                    "minItems": min_match_score_items,
+                    "minItems": len(valid_ids),
+                    "maxItems": len(valid_ids),
+                    "uniqueItems": True,
                     "items": {
                         "type": "object",
                         "properties": {
-                            json_key.id: {"type": "integer"},
+                            json_key.id: {
+                                "type": "integer",
+                                "enum": valid_ids,
+                            },
                             json_key.match_reasoning_note: {"type": "string", "maxLength": 256},
                             json_key.match_score: {
                                 "type": "number",
