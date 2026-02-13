@@ -94,6 +94,8 @@ export function ProfileList() {
             <FacetFilter name="skills.name" label="Skills" isSearchEnabled />
             <FacetFilter name="country" label="Country" isSearchEnabled />
             <FacetFilter name="company" label="Company" isSearchEnabled />
+            <FacetFilter name="seeking_work" label="Seeking Work" />
+            <FacetFilter name="recruitment" label="Recruitment" />
           </Stack>
         </Flex>
       </Stack>

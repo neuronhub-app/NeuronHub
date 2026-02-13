@@ -636,8 +636,8 @@ type ProfileType {
   biography: String!
   seeks: String!
   offers: String!
-  seeking_work: String!
-  recruitment: String!
+  seeking_work: [String!]!
+  recruitment: [String!]!
   country: String!
   city: String!
   url_linkedin: String!

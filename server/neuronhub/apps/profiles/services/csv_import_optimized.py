@@ -47,10 +47,14 @@ def csv_optimize_and_import(
             career_stage = _split_list_of_strings(profile_row.pop("career_stage"))
             tag_skills = _split_list_of_strings(profile_row.pop("skills"))
             tag_interests = _split_list_of_strings(profile_row.pop("interests"))
+            seeking_work = _split_list_of_strings(profile_row.pop("seeking_work"))
+            recruitment = _split_list_of_strings(profile_row.pop("recruitment"))
 
             defaults = {
                 **profile_row,
                 "career_stage": career_stage,
+                "seeking_work": seeking_work,
+                "recruitment": recruitment,
             }
 
             if defaults["url_conference"]:
