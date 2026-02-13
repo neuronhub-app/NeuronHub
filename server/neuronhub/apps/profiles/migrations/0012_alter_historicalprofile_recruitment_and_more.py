@@ -3,7 +3,8 @@
 """
 
 import django.contrib.postgres.fields
-from django.db import migrations, models
+from django.db import migrations
+from django.db import models
 
 
 def split_semicolons_forward(apps, schema_editor):
@@ -33,7 +34,7 @@ _arr = django.contrib.postgres.fields.ArrayField(
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("profiles", "0010_profile_visible_to_groups"),
+        ("profiles", "0011_alter_profilematch_unique_together_and_more"),
     ]
 
     operations = [
