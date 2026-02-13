@@ -122,6 +122,7 @@ type Mutation {
   post_import_refresh(id_external: Int!): Boolean! @IsAuthenticated
   posts_import(auth_token: String!, category: String!, limit: Int! = 60, is_use_cache: Boolean! = false): Boolean!
   profile_send_dm(profile_id: ID!, message: String!): Boolean! @IsAuthenticated
+  profile_match_score_update(profile_id: ID!, match_score: Int!): Boolean! @IsAuthenticated
 }
 
 input OneToManyInput {
