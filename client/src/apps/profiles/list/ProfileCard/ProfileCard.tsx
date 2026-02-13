@@ -1,5 +1,8 @@
 import {
   Badge,
+  Box,
+  Center,
+  Collapsible,
   Flex,
   Heading,
   HStack,
@@ -9,13 +12,19 @@ import {
   Text,
 } from "@chakra-ui/react";
 import type { BaseHit, Hit } from "instantsearch.js";
+import type { ReactNode } from "react";
+import { useEffect, useRef } from "react";
+import { LuChevronDown } from "react-icons/lu";
 import { Highlight, Snippet } from "react-instantsearch";
+import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/ui/prose";
 import { Tag } from "@/components/ui/tag";
 import { ids } from "@/e2e/ids";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { markedConfigured } from "@/utils/marked-configured";
+import { useStateValtio } from "@/utils/useValtioProxyRef";
 
+// #AI
 export function ProfileCard(props: {
   profile: ProfileFragmentType;
   isSearchActive?: boolean;
@@ -85,29 +94,10 @@ export function ProfileCard(props: {
         snippetAttribute="biography"
         profile={props.profile}
         isSearchActive={props.isSearchActive}
+        collapsedHeight={style.collapseHeight.bio}
       />
 
-      <HStack gap="gap.lg" align="flex-start" flexWrap="wrap">
-        <ProfileContentSection
-          label="Seeks"
-          text={props.profile.seeks}
-          snippetAttribute="seeks"
-          profile={props.profile}
-          isSearchActive={props.isSearchActive}
-          flex="1"
-          minW="200px"
-        />
-
-        <ProfileContentSection
-          label="Offers"
-          text={props.profile.offers}
-          snippetAttribute="offers"
-          profile={props.profile}
-          isSearchActive={props.isSearchActive}
-          flex="1"
-          minW="200px"
-        />
-      </HStack>
+      <SeeksOffersSection profile={props.profile} isSearchActive={props.isSearchActive} />
 
       {(props.profile.skills?.length > 0 || props.profile.interests?.length > 0) && (
         <HStack gap="gap.lg" align="flex-start" flexWrap="wrap">
@@ -128,12 +118,14 @@ export function ProfileCard(props: {
   );
 }
 
+// #AI
 function ProfileContentSection(props: {
   label: string;
   text?: string | null;
   snippetAttribute: string;
   profile: ProfileFragmentType;
   isSearchActive?: boolean;
+  collapsedHeight?: string;
   flex?: string;
   minW?: string;
 }) {
@@ -141,43 +133,144 @@ function ProfileContentSection(props: {
     return null;
   }
 
-  const hasSnippet = props.isSearchActive && "_snippetResult" in props.profile;
+  const isSearchSnippet = props.isSearchActive && "_snippetResult" in props.profile;
+
+  const content = isSearchSnippet ? (
+    <Text
+      color="fg.muted"
+      fontSize="sm"
+      css={{
+        "& mark": { bg: "yellow.200", color: "black", borderRadius: "2px", px: "1px" },
+      }}
+      {...ids.set(ids.profile.card.contentSnippet)}
+    >
+      <Snippet
+        attribute={props.snippetAttribute}
+        hit={props.profile as unknown as Hit<BaseHit>}
+      />
+    </Text>
+  ) : (
+    <Prose
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
+      dangerouslySetInnerHTML={{ __html: markedConfigured.parse(props.text) }}
+      size="sm"
+      maxW="3xl"
+      {...ids.set(ids.profile.card.contentMarkdown)}
+    />
+  );
 
   return (
     <Stack gap="gap.xs" flex={props.flex} minW={props.minW}>
       <Text fontSize="xs" color={style.color.label} fontWeight="medium">
         {props.label}
       </Text>
-      {hasSnippet ? (
-        <Text
-          color="fg.muted"
-          fontSize="sm"
-          css={{
-            "& mark": { bg: "yellow.200", color: "black", borderRadius: "2px", px: "1px" },
-          }}
-          {...ids.set(ids.profile.card.contentSnippet)}
+      {props.collapsedHeight ? (
+        <CollapsibleSection
+          collapsedHeight={props.collapsedHeight}
+          isSearchActive={props.isSearchActive}
         >
-          <Snippet
-            attribute={props.snippetAttribute}
-            hit={props.profile as unknown as Hit<BaseHit>}
-          />
-        </Text>
+          {content}
+        </CollapsibleSection>
       ) : (
-        <Prose
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-          dangerouslySetInnerHTML={{ __html: markedConfigured.parse(props.text) }}
-          size="sm"
-          maxW="3xl"
-          {...ids.set(ids.profile.card.contentMarkdown)}
-        />
+        content
       )}
     </Stack>
   );
 }
 
+function SeeksOffersSection(props: { profile: ProfileFragmentType; isSearchActive?: boolean }) {
+  if (!props.profile.seeks && !props.profile.offers) {
+    return null;
+  }
+
+  return (
+    <CollapsibleSection
+      collapsedHeight={style.collapseHeight.seeksAndOffers}
+      isSearchActive={props.isSearchActive}
+    >
+      <HStack gap="gap.lg" align="flex-start" flexWrap="wrap">
+        <ProfileContentSection
+          label="Seeks"
+          text={props.profile.seeks}
+          snippetAttribute="seeks"
+          profile={props.profile}
+          isSearchActive={props.isSearchActive}
+          flex="1"
+          minW="200px"
+        />
+        <ProfileContentSection
+          label="Offers"
+          text={props.profile.offers}
+          snippetAttribute="offers"
+          profile={props.profile}
+          isSearchActive={props.isSearchActive}
+          flex="1"
+          minW="200px"
+        />
+      </HStack>
+    </CollapsibleSection>
+  );
+}
+
+// #AI
+function CollapsibleSection(props: {
+  children: ReactNode;
+  collapsedHeight: string;
+  isSearchActive?: boolean;
+}) {
+  const state = useStateValtio({ isOpen: false, isOverflowing: false });
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!contentRef.current) {
+      return;
+    }
+    const heightMax = Number.parseInt(props.collapsedHeight, 10);
+    state.mutable.isOverflowing = contentRef.current.scrollHeight > heightMax;
+  });
+
+  if (!state.snap.isOverflowing) {
+    return <Box ref={contentRef}>{props.children}</Box>;
+  }
+
+  return (
+    <Collapsible.Root
+      collapsedHeight={props.collapsedHeight}
+      open={props.isSearchActive || state.snap.isOpen}
+      onOpenChange={details => {
+        state.mutable.isOpen = details.open;
+      }}
+    >
+      <Collapsible.Content _closed={style.collapsibleShadow}>
+        <Box ref={contentRef}>{props.children}</Box>
+      </Collapsible.Content>
+      {!props.isSearchActive && (
+        <Center>
+          <Collapsible.Trigger asChild>
+            <Button
+              variant="subtle"
+              size="xs"
+              colorPalette="gray"
+              {...ids.set(ids.profile.card.contentCollapsibleTrigger)}
+            >
+              {state.snap.isOpen ? "Show less" : "Show more"}
+              <Collapsible.Indicator
+                transition="transform 0.2s"
+                _open={{ transform: "rotate(180deg)" }}
+              >
+                <LuChevronDown />
+              </Collapsible.Indicator>
+            </Button>
+          </Collapsible.Trigger>
+        </Center>
+      )}
+    </Collapsible.Root>
+  );
+}
+
+// #AI
 function ProfileTagGroup(props: {
   label: string;
-  // Algolia returns flat strings, GraphQL returns {id, name} objects
   tags: ({ id: string; name: string } | string)[];
   colorPalette: string;
 }) {
@@ -206,6 +299,7 @@ function ProfileTagGroup(props: {
   );
 }
 
+// #AI
 const style = {
   color: {
     data: "fg.subtle",
@@ -216,4 +310,12 @@ const style = {
     data: "sm",
     help: "sm",
   } satisfies { [key: string]: JsxStyleProps["fontSize"] },
+  collapseHeight: {
+    bio: "110px",
+    seeksAndOffers: "140px",
+  },
+  collapsibleShadow: {
+    shadow: "inset 0 -12px 12px -12px var(--shadow-color)",
+    shadowColor: { _light: "blackAlpha.500", _dark: "whiteAlpha.300" },
+  },
 } as const;
