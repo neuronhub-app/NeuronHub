@@ -11,6 +11,7 @@ test.describe("ProfileList", () => {
 
   test.beforeEach(async ({ page }) => {
     play = new PlaywrightHelper(page);
+    const $ = play.$;
     await play.dbStubsRepopulateAndLogin({
       is_import_HN_post: false,
       is_create_single_review: false,
