@@ -6,6 +6,7 @@ import {
   Flex,
   Heading,
   HStack,
+  Icon,
   type JsxStyleProps,
   Spinner,
   Stack,
@@ -14,6 +15,7 @@ import {
 import type { BaseHit, Hit } from "instantsearch.js";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
+import { FaLocationDot } from "react-icons/fa6";
 import { LuChevronDown } from "react-icons/lu";
 import { Highlight, Snippet } from "react-instantsearch";
 import { Button } from "@/components/ui/button";
@@ -49,7 +51,7 @@ export function ProfileCard(props: {
     >
       <HStack justify="space-between" align="flex-start">
         <Stack gap="gap.sm">
-          <HStack gap="gap.md" align="baseline">
+          <HStack gap="gap.md" align="center">
             <Heading fontSize="md" fontWeight="medium">
               {isHighlightable ? (
                 <>
@@ -61,9 +63,14 @@ export function ProfileCard(props: {
               )}
             </Heading>
             {props.profile.country && (
-              <Text color={style.color.help} fontSize={style.fontSize.help}>
-                {[props.profile.city, props.profile.country].filter(Boolean).join(", ")}
-              </Text>
+              <Flex align="center" gap="1">
+                <Icon boxSize="3.5" color="fg.subtle">
+                  <FaLocationDot />
+                </Icon>
+                <Text color={style.color.help} fontSize={style.fontSize.help}>
+                  {[props.profile.city, props.profile.country].filter(Boolean).join(", ")}
+                </Text>
+              </Flex>
             )}
           </HStack>
 
@@ -137,7 +144,7 @@ function ProfileContentSection(props: {
 
   const content = isSearchSnippet ? (
     <Text
-      color="fg.muted"
+      color="fg"
       fontSize="sm"
       css={{
         "& mark": { bg: "yellow.200", color: "black", borderRadius: "2px", px: "1px" },
@@ -271,7 +278,7 @@ function CollapsibleSection(props: {
 // #AI
 function ProfileTagGroup(props: {
   label: string;
-  tags: ({ id: string; name: string } | string)[];
+  tags: { id: string; name: string }[];
   colorPalette: string;
 }) {
   return (
@@ -281,16 +288,15 @@ function ProfileTagGroup(props: {
       </Text>
       <Flex gap="gap.sm" flexWrap="wrap" {...ids.set(ids.profile.card.tags)}>
         {props.tags.map(tag => {
-          const name = typeof tag === "string" ? tag : tag.name;
           return (
             <Tag
-              key={name}
+              key={tag.name}
               variant="subtle"
               size="md"
               colorPalette={props.colorPalette}
               fontSize="16px"
             >
-              {name}
+              {tag.name}
             </Tag>
           );
         })}
@@ -303,7 +309,7 @@ function ProfileTagGroup(props: {
 const style = {
   color: {
     data: "fg.subtle",
-    help: "fg.subtle",
+    help: "fg.muted",
     label: "fg",
   } satisfies { [key: string]: JsxStyleProps["color"] },
   fontSize: {
