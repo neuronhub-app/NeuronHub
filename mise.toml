@@ -34,12 +34,12 @@
 
     DEPENDENCY_COOLDOWN_DAYS = 4
 
-    SERVER_DOMAIN = "localhost"
-    SERVER_PORT = 8000
+    SERVER_DOMAIN = "{{ env.SERVER_DOMAIN | default(value = 'localhost') }}"
+    SERVER_PORT = "{{ env.SERVER_PORT | default(value = 8000) }}"
     SERVER_URL = "http://{{ env.SERVER_DOMAIN }}:{{ env.SERVER_PORT }}"
 
-    CLIENT_DOMAIN = "localhost"
-    CLIENT_PORT = 3000
+    CLIENT_DOMAIN = "{{ env.CLIENT_DOMAIN | default(value = 'localhost') }}"
+    CLIENT_PORT = "{{ env.CLIENT_PORT | default(value = 300) }}"
     CLIENT_URL = "http://{{ env.CLIENT_DOMAIN }}:{{ env.CLIENT_PORT }}"
 
     DB_USER = "{{ env.PROJECT_NAME }}"
@@ -71,11 +71,11 @@
 
     # Dev
 
-    SERVER_PORT_E2E = 8001
-    CLIENT_PORT_E2E = 3001
+    SERVER_PORT_E2E = "{{ env.SERVER_PORT_E2E | default(value = 8001) }}"
+    CLIENT_PORT_E2E = "{{ env.CLIENT_PORT_E2E | default(value = 3001) }}"
 
-    PYTEST_DB_NAME = "test_database"
-    E2E_DB_NAME = "test_neuronhub_e2e"
+    PYTEST_DB_NAME = "{{ env.PYTEST_DB_NAME | default(value = 'test_database') }}"
+    E2E_DB_NAME = "{{ env.E2E_DB_NAME | default(value = 'test_neuronhub_e2e') }}"
 
     S3_STORAGE_BUCKET_NAME = "media"
     S3_PORT = 8333
@@ -104,7 +104,7 @@
         depends = "dev:db"
         dir = "client"
         run = "bun run react-router dev --host --port={{ env.CLIENT_PORT }}"
-        env.VITE_SERVER_URL = "{{ env.SERVER_URL }}:{{ env.SERVER_PORT }}"
+        env.VITE_SERVER_URL = "{{ env.SERVER_URL }}"
 
     [tasks."dev:s3"]
         dir = "server"

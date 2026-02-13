@@ -183,16 +183,11 @@ TEMPLATES = [
 # ALLOWED_HOSTS & django-cors-headers
 # ---------------------------------------------------------------------------------------------------------
 
-SERVER_PORT = env.int("SERVER_PORT", 8000)
-SERVER_URL = env.str(
-    "SERVER_URL", f"http://{env.str('SERVER_DOMAIN', 'localhost')}:{SERVER_PORT}"
-)
-CLIENT_PORT = env.int("CLIENT_PORT", 3000)
 CLIENT_DOMAIN = env.str("CLIENT_DOMAIN", "localhost")
-CLIENT_URL = env.str(
-    "CLIENT_URL", f"http://{env.str('CLIENT_DOMAIN', 'localhost')}:{CLIENT_PORT}"
-)
+CLIENT_URL = env.str("CLIENT_URL", f"http://{CLIENT_DOMAIN}:3000")
+
 SERVER_DOMAIN = env.str("SERVER_DOMAIN", "neuronhub.app")
+SERVER_URL = env.str("SERVER_URL", "http://localhost:8000")
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [
@@ -215,7 +210,7 @@ CSRF_TRUSTED_ORIGINS = CORS_ALLOWED_ORIGINS
 
 ALLOWED_HOSTS = env.list(
     "ALLOWED_HOSTS",
-    default=[SERVER_URL.replace("https://", "").replace("http://", "")],
+    default=[SERVER_DOMAIN],
 )
 if DJANGO_ENV.is_dev():
     ALLOWED_HOSTS.append(".localhost")
