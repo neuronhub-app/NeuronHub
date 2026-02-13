@@ -7,6 +7,7 @@ import {
   Heading,
   HStack,
   Icon,
+  Link,
   Separator,
   Spinner,
   Stack,
@@ -15,9 +16,11 @@ import {
 import type { BaseHit, Hit } from "instantsearch.js";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
-import { FaLocationDot } from "react-icons/fa6";
+import { BsBriefcase } from "react-icons/bs";
+import { FaIdCardClip, FaLinkedinIn, FaLocationDot } from "react-icons/fa6";
 import { GoOrganization } from "react-icons/go";
 import { LuChevronDown } from "react-icons/lu";
+
 import { Highlight, Snippet } from "react-instantsearch";
 import { Button } from "@/components/ui/button";
 import { Prose } from "@/components/ui/prose";
@@ -26,6 +29,7 @@ import { ids } from "@/e2e/ids";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { markedConfigured } from "@/utils/marked-configured";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
+
 // #AI
 export function ProfileCard(props: {
   profile: ProfileFragmentType;
@@ -40,7 +44,7 @@ export function ProfileCard(props: {
   return (
     <Stack
       as="article"
-      gap="gap.md"
+      gap="gap.sm2"
       bg="bg.light"
       p="gap.md"
       borderRadius="lg"
@@ -65,6 +69,39 @@ export function ProfileCard(props: {
             <Text color={style.color.data} fontSize="md">
               {props.profile.job_title}
             </Text>
+            <Separator orientation="vertical" h="5" />
+            {(props.profile.url_linkedin || props.profile.url_conference) && (
+              <HStack gap="gap.sm2" align="center">
+                {props.profile.url_linkedin && (
+                  <Link href={`https://${props.profile.url_linkedin}`} target="_blank">
+                    <Icon
+                      boxSize="21px"
+                      w="25px"
+                      color="fg.inverted"
+                      bg="fg.subtle/80"
+                      borderRadius="sm"
+                      p="1"
+                      px="1.5"
+                      _hover={{ bg: "blue.500" }}
+                    >
+                      <FaLinkedinIn />
+                    </Icon>
+                  </Link>
+                )}
+                {props.profile.url_conference && (
+                  <Link href={`https://${props.profile.url_conference}`} target="_blank">
+                    <Icon
+                      boxSize="24px"
+                      color="fg.subtle/80"
+                      mt="-2px"
+                      _hover={{ color: "blue.500" }}
+                    >
+                      <FaIdCardClip />
+                    </Icon>
+                  </Link>
+                )}
+              </HStack>
+            )}
           </HStack>
 
           <Flex gap="gap.sm2">
@@ -94,6 +131,17 @@ export function ProfileCard(props: {
               </Flex>
             )}
           </Flex>
+
+          {props.profile.career_stage.length > 0 && (
+            <Flex align="center" gap="1.5">
+              <Icon boxSize="4" color="fg.muted/75">
+                <BsBriefcase />
+              </Icon>
+              <Text color={style.color.data} fontSize={style.fontSize.data}>
+                {props.profile.career_stage.join(", ")}
+              </Text>
+            </Flex>
+          )}
         </Stack>
 
         <Flex>
