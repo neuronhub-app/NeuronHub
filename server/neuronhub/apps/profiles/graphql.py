@@ -1,5 +1,7 @@
 import strawberry
 import strawberry_django
+from algoliasearch_django import save_record
+from algoliasearch_django.management.commands import algolia_reindex
 from django.db.models import QuerySet
 from strawberry import ID
 from strawberry import Info
@@ -27,6 +29,15 @@ class ProfileMatchType:
     match_reason_by_llm: auto
     match_score: auto
     match_review: auto
+    match_processed_at: auto
+
+    @strawberry_django.field(only=["match_score_by_llm"])
+    async def is_scored_by_llm(root: ProfileMatch) -> bool:
+        return root.match_score_by_llm is not None
+
+    @strawberry_django.field(only=["match_review"])
+    async def is_reviewed_by_user(root: ProfileMatch) -> bool:
+        return bool(root.match_review and root.match_review.strip())
 
 
 @strawberry_django.type(Profile, filters=ProfileFilter)
@@ -86,6 +97,7 @@ class ProfilesMutation:
             profile_id=profile_id,
             defaults={"match_score": match_score, "user": user},
         )
+        save_record(await Profile.objects.aget(profile_id))
         return True
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
@@ -97,4 +109,5 @@ class ProfilesMutation:
             profile_id=profile_id,
             defaults={"match_review": match_review, "user": user},
         )
+        save_record(await Profile.objects.aget(profile_id))
         return True
