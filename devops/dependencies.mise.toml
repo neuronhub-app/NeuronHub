@@ -62,9 +62,10 @@
         """
         # check updates with cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} --dry-run={{ usage.dry_run }}
 
-        let dry_run = $env.usage_dry_run == "true"
+        let dry_run = $env.usage_dry_run | into bool
 
-        let $upgrade_json_flag = $"(if ($dry_run == false) { '--upgrade' }"
+        let $upgrade_json_flag = if ($dry_run == false) { "--upgrade" } else { "" }
+
         bun run ncu --packageManager bun --reject=graphql --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} $upgrade_json_flag
 
         print "\n---\n"
