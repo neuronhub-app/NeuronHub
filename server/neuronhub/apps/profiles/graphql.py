@@ -87,3 +87,14 @@ class ProfilesMutation:
             defaults={"match_score": match_score, "user": user},
         )
         return True
+
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def profile_match_review_update(
+        self, profile_id: ID, match_review: str, info: Info
+    ) -> bool:
+        user = await get_user(info)
+        await ProfileMatch.objects.aupdate_or_create(
+            profile_id=profile_id,
+            defaults={"match_review": match_review, "user": user},
+        )
+        return True

@@ -51,7 +51,7 @@ export function ProfileList() {
     >
       <Stack gap="gap.lg">
         <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
-          <Text fontSize="xl" fontWeight="bold">
+          <Text fontSize="2xl" fontWeight="bold">
             Profiles
           </Text>
           <SearchInput />
