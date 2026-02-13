@@ -20,7 +20,7 @@ import { useEffect, useRef } from "react";
 import { BsBriefcase } from "react-icons/bs";
 import { FaLinkedin, FaLocationDot } from "react-icons/fa6";
 import { GoOrganization } from "react-icons/go";
-import { LuCheck, LuChevronDown } from "react-icons/lu";
+import { LuCheck, LuChevronDown, LuRefreshCw } from "react-icons/lu";
 import { MdInfoOutline } from "react-icons/md";
 import { Highlight, Snippet } from "react-instantsearch";
 import { useDebouncedCallback } from "use-debounce";
@@ -206,6 +206,10 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
   }, 800);
 
   const isShowReviewInput = state.snap.hasUserRated || match?.match_score != null;
+
+  // if it's an Algolia hit, it'll have it #AI
+  const needsReprocessing =
+    (props.profile as Record<string, unknown>).needs_reprocessing === true;
 
   return (
     <Stack gap="gap.sm" align="flex-end" minW="200px" h="auto">

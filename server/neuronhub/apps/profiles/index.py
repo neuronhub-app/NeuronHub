@@ -36,10 +36,16 @@ if settings.ALGOLIA["IS_ENABLED"]:
             # datetime - ISO format for GraphQL compatibility
             ["get_iso_created_at", "created_at"],
             ["get_iso_updated_at", "updated_at"],
+            ["get_iso_content_updated_at", "content_updated_at"],
             # datetime - Unix for Algolia sorting/filtering
             ["get_unix_created_at", "created_at_unix"],
             ["get_unix_updated_at", "updated_at_unix"],
+            ["get_unix_content_updated_at", "content_updated_at_unix"],
             ["get_created_at_unix_aggregated", "created_at_unix_aggregated"],
+            # match status — O2O from ProfileMatch
+            ["get_is_scored_by_llm", "is_scored_by_llm"],
+            ["get_is_reviewed_by_user", "is_reviewed_by_user"],
+            ["get_needs_reprocessing", "needs_reprocessing"],
         ]
         settings = {
             "searchableAttributes": [
@@ -62,6 +68,9 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "searchable(country)",
                 "searchable(company)",
                 "visible_to",
+                "filterOnly(is_scored_by_llm)",
+                "filterOnly(is_reviewed_by_user)",
+                "filterOnly(needs_reprocessing)",
             ],
             "unretrievableAttributes": [
                 "visible_to",

@@ -23,6 +23,7 @@ import {
   usePagination,
   useRefinementList,
   useSearchBox,
+  useToggleRefinement,
 } from "react-instantsearch";
 import { ProfileCard } from "@/apps/profiles/list/ProfileCard/ProfileCard";
 import { useAlgoliaProfilesEnrichmentByGraphql } from "@/apps/profiles/list/useAlgoliaProfilesEnrichmentByGraphql";
@@ -89,6 +90,12 @@ export function ProfileList() {
             borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
             bg={{ _light: "bg.subtle/30", _dark: "bg.subtle" }}
           >
+            <Stack gap="gap.sm">
+              <Text>Match Status</Text>
+              <ToggleFacet attribute="is_scored_by_llm" label="LLM Scored" />
+              <ToggleFacet attribute="is_reviewed_by_user" label="Reviewed" />
+              <ToggleFacet attribute="needs_reprocessing" label="Needs Update" />
+            </Stack>
             <FacetFilter name="career_stage" label="Career Stage" />
             <FacetFilter name="interests.name" label="Interests" isSearchEnabled />
             <FacetFilter name="skills.name" label="Skills" isSearchEnabled />
@@ -272,5 +279,22 @@ function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boo
         </Button>
       )}
     </Stack>
+  );
+}
+
+function ToggleFacet(props: { attribute: string; label: string }) {
+  const toggle = useToggleRefinement({ attribute: props.attribute, on: true });
+
+  return (
+    <Checkbox.Root
+      checked={toggle.value.isRefined}
+      onCheckedChange={() => toggle.refine(toggle.value)}
+      display="flex"
+      alignItems="flex-start"
+    >
+      <Checkbox.HiddenInput />
+      <Checkbox.Control />
+      <Checkbox.Label color="fg.dark-friendly">{props.label}</Checkbox.Label>
+    </Checkbox.Root>
   );
 }

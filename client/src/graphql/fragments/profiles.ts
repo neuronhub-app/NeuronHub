@@ -8,6 +8,9 @@ export const ProfileMatchFragment = graphql(`
     match_reason_by_llm
     match_score
     match_review
+    match_processed_at
+    is_scored_by_llm
+    is_reviewed_by_user
   }
 `);
 

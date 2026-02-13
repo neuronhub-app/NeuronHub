@@ -6,6 +6,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils import timezone
 from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
@@ -101,29 +102,41 @@ class Profile(AlgoliaModel):
     profile_for_llm_md = models.TextField(blank=True)
 
     match_hash = models.CharField(max_length=64, db_index=True, blank=True)
+    content_updated_at = models.DateTimeField(default=timezone.now)
 
     class Meta:
         indexes = [
             models.Index(fields=["match_hash"]),
         ]
 
+    # #AI
     def save(self, **kwargs):
         self.profile_for_llm_md = serialize_profile_to_markdown(self)
+
+        hash_new = self.compute_content_hash()
+        if self.pk and self.match_hash and self.match_hash != hash_new:
+            self.content_updated_at = timezone.now()
+        self.match_hash = hash_new
+
         super().save(**kwargs)
 
-    def is_needs_llm_reprocessing(self, user: User) -> bool:
-        match = ProfileMatch.objects.filter(user=user, profile=self).first()
+    # #AI
+    def is_needs_llm_reprocessing(self) -> bool:
+        match = self._get_match_or_none()
         if match is None or match.match_processed_at is None:
             return True
-
-        return self.match_hash != self.compute_content_hash()
+        return self.content_updated_at > match.match_processed_at
 
     def compute_content_hash(self) -> str:
+        # M2M required a saved instance
+        skills = "; ".join(sorted(self.get_tag_skills_names())) if self.pk else ""
+        interests = "; ".join(sorted(self.get_tag_interests_names())) if self.pk else ""
+
         content = "|".join(
             [
                 self.biography,
-                "; ".join(sorted(self.get_tag_skills_names())),
-                "; ".join(sorted(self.get_tag_interests_names())),
+                skills,
+                interests,
                 self.seeks,
                 self.offers,
             ]
@@ -179,6 +192,34 @@ class Profile(AlgoliaModel):
 
     def get_offers_cropped(self):
         return self.offers[:1500]
+
+    def get_unix_content_updated_at(self):
+        return int(self.content_updated_at.timestamp()) if self.content_updated_at else None
+
+    def get_iso_content_updated_at(self):
+        return self.content_updated_at.isoformat() if self.content_updated_at else None
+
+    def get_is_scored_by_llm(self) -> bool:
+        match = self._get_match_or_none()
+        return match is not None and match.match_score_by_llm is not None
+
+    # #AI
+    def get_is_reviewed_by_user(self) -> bool:
+        match = self._get_match_or_none()
+        if match:
+            return bool(match.match_review and match.match_review.strip()) or bool(
+                match.match_score
+            )
+        return False
+
+    def get_needs_reprocessing(self) -> bool:
+        return self.is_needs_llm_reprocessing()
+
+    def _get_match_or_none(self) -> ProfileMatch | None:
+        try:
+            return self.match
+        except ProfileMatch.DoesNotExist:
+            return None
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} | {self.company}"

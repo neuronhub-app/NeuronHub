@@ -624,6 +624,9 @@ type ProfileMatchType {
   match_reason_by_llm: String!
   match_score: Int
   match_review: String!
+  match_processed_at: DateTime
+  is_scored_by_llm: Boolean!
+  is_reviewed_by_user: Boolean!
 }
 
 type ProfileType {
