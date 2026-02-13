@@ -35,7 +35,7 @@
 
 ["upgrade-deps:server"]
     usage = """
-        flag "-d --dry-run"
+        flag "-d --dry-run" default=#false
     """
     dir = "server"
     run = """
@@ -44,14 +44,16 @@
         let days_cooldown = {{ env.DEPENDENCY_COOLDOWN_DAYS }}day;
         let date_cutoff = (date now) - $days_cooldown | format date "%+"
 
-        let dry_run = if ($env.usage_dry_run? == null) { "" } else { "--dry-run" }
-
-        uv lock --upgrade $"--exclude-newer=($date_cutoff)" $dry_run
+        if ($env.usage_dry_run == "false") {
+            uv lock --upgrade $"--exclude-newer=($date_cutoff)"
+        } else {
+            uv lock --upgrade $"--exclude-newer=($date_cutoff)" --dry-run
+        }
     """
 
 ["upgrade-deps:client"]
     usage = """
-        flag "-d --dry-run"
+        flag "-d --dry-run" default=#false
     """
     dir = "client"
     run = [
@@ -60,18 +62,18 @@
         """
         # check updates with cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} --dry-run={{ usage.dry_run }}
 
-        let dry_run = if ($env.usage_dry_run? == null) {"" } else { "--dry-run" }
+        let dry_run = $env.usage_dry_run == "true"
 
-        let $upgrade_json_flag = $"(if ($dry_run | is-empty) { '--upgrade' }"
+        let $upgrade_json_flag = $"(if ($dry_run == false) { '--upgrade' }"
         bun run ncu --packageManager bun --reject=graphql --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} $upgrade_json_flag
 
         print "\n---\n"
 
-        if ($dry_run | is-empty) {
-            bun install
-        } else {
+        if ($dry_run) {
             print "Potential upgrades with cooldown=0:\n"
             bun run ncu --packageManager bun --cooldown=0
+        } else {
+            bun install
         }
         """
     ]
