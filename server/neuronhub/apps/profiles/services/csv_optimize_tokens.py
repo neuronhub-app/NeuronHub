@@ -18,7 +18,7 @@ class R:
 
 
 _replacements: list[R] = [
-    R(raw=["'", "\u2019"], llm="'"),
+    R(raw=["'", "\u2019"], replace_all="'"),
     # todo ! regex for `^{num}) ?` -> `{num}. `
     # todo ! regex for newlines with ^()
     # more patterns to replace: ["^--"]
@@ -71,12 +71,15 @@ _replacements: list[R] = [
         replace_all="have funding and seeking project leads",
     ),
     R(raw="Not employed, but looking", replace_all="Not employed, looking"),
-    R(raw="Employed, full-time", llm="Employed"),
-    R(raw="Self employed", llm="Self-employed"),
-    R(raw=["Pursuing a doctoral degree (e.g. PhD)", "Pursuing a doctoral"], llm="PhD student"),
+    R(raw="Employed, full-time", replace_all="Employed"),
+    R(raw="Self employed", replace_all="Self-employed"),
+    R(
+        raw=["Pursuing a doctoral degree (e.g. PhD)", "Pursuing a doctoral"],
+        replace_all="PhD student",
+    ),
     R(
         raw=["Pursuing a graduate degree (e.g. Masters)", "Pursuing a graduate degree"],
-        llm="Grad student",
+        replace_all="Grad student",
     ),
     R(
         raw=["Pursuing an undergraduate degree", "Pursuing an undergrad"],
