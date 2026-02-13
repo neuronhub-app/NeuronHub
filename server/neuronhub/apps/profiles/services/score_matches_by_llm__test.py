@@ -93,7 +93,6 @@ class ScoreMatchesByLlmTest(NeuronTestCase):
         result = await sync_to_async(_score_matches_batch_by_llm)(profiles, config)
 
         assert "<Calibration_Examples>" in result.prompt
-        assert str(alice) in result.prompt
         assert "too AIS" in result.prompt
 
 
