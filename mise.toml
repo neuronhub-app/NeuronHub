@@ -32,7 +32,7 @@
     VITE_PROJECT_NAME = "NeuronHub"
     VITE_RELEASE_VERSION = "0.3.0.0" # used in GitHub and Sentry
 
-    DEPENDENCY_COOLDOWN_DAYS = 4
+    DEPENDENCY_COOLDOWN_DAYS = 0
 
     SERVER_DOMAIN = "{{ env.SERVER_DOMAIN | default(value = 'localhost') }}"
     SERVER_PORT = "{{ env.SERVER_PORT | default(value = 8000) }}"
