@@ -11,6 +11,7 @@ import {
   Pagination,
   Stack,
   Text,
+  useToken,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
@@ -82,7 +83,7 @@ export function ProfileList() {
             p={{ base: gap.md, md: gap.md }}
             px={{ base: gap.md, md: gap.md }}
             minW={{ base: "", md: "2xs" }}
-            gap="gap.md"
+            gap="gap.md2"
             borderRadius="md"
             border="1px solid"
             borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
@@ -204,7 +205,10 @@ function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boo
     showMore: true,
   });
 
-  const isEmpty = refinements.items.length === 0;
+  const count = {
+    color: useToken("colors", "fg.subtle")[0],
+    fontSize: useToken("fontSizes", "sm")[0],
+  };
 
   return (
     <Stack align="flex-start">
@@ -219,7 +223,7 @@ function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boo
         />
       )}
 
-      {isEmpty && (
+      {refinements.items.length === 0 && (
         <Text color="fg.subtle" fontSize="sm">
           No results
         </Text>
@@ -238,15 +242,16 @@ function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boo
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
-              <Checkbox.Label display="flex" gap="gap.sm" color="fg.muted">
+              <Checkbox.Label display="inline-flex" gap="gap.sm" color="fg.dark-friendly">
                 <Text
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-                  dangerouslySetInnerHTML={{ __html: item.highlighted! }}
+                  dangerouslySetInnerHTML={{
+                    __html:
+                      item.highlighted! +
+                      ` <span style="margin-left: 3px; font-size: ${count.fontSize}; color: ${count.color}">${item.count}</span>`,
+                  }}
                   as="span"
                 />{" "}
-                <Text as="span" color="fg.subtle" fontSize="xs">
-                  {item.count}
-                </Text>
               </Checkbox.Label>
             </Checkbox.Root>
           )}
