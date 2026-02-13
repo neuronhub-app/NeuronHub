@@ -84,7 +84,7 @@ export function ProfileCard(props: {
                     <Icon
                       boxSize="21px"
                       color="rgb(10, 102, 194)/70"
-                      _hover={{ bg: "rgb(10, 102, 194)" }}
+                      _hover={{ color: "rgb(10, 102, 194)" }}
                     >
                       <FaLinkedin />
                     </Icon>
@@ -231,7 +231,7 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
                   matchScore: details.value * 20,
                 });
               }}
-              helpText="Your rating of this match by AI"
+              helpText="Rate this match by AI for calibration"
             />
           </>
         )}
@@ -244,19 +244,19 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
       )}
 
       {showReviewInput && (
-        <HStack maxW="300px" w="full" gap="gap.sm">
+        <Box position="relative" maxW="300px" w="full">
           <Textarea
             autoresize
             rows={1}
             resize="none"
             overflow="hidden"
-            placeholder="Your review note for AI"
+            placeholder="Review for AI..."
             size="xs"
             defaultValue={match?.match_review ?? ""}
             onChange={e => debouncedSaveReview(e.target.value)}
           />
           <ReviewSaveIndicator status={state.snap.reviewSaveStatus} />
-        </HStack>
+        </Box>
       )}
     </Stack>
   );
@@ -264,10 +264,15 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
 
 // #AI
 function ReviewSaveIndicator(props: { status: "idle" | "saving" | "saved" }) {
+  if (props.status === "idle") {
+    return null;
+  }
+
   return (
-    <Box w="3.5" flexShrink={0} alignSelf="center">
-      {props.status === "saving" && <Spinner size="xs" color="fg.subtle" />}
-      {props.status === "saved" && (
+    <Box position="absolute" top="1" right="1">
+      {props.status === "saving" ? (
+        <Spinner size="xs" color="fg.subtle" />
+      ) : (
         <Icon animation="fade-in 200ms" color="fg.subtle" boxSize="3.5">
           <LuCheck />
         </Icon>
@@ -417,6 +422,7 @@ function ProfileContentSection(props: {
   );
 }
 
+// #AI
 function SeeksOffersSection(props: { profile: ProfileFragmentType; isSearchActive?: boolean }) {
   if (!props.profile.seeks && !props.profile.offers) {
     return null;
