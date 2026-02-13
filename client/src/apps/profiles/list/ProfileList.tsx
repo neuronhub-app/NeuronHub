@@ -83,7 +83,8 @@ export function ProfileList() {
             hideBelow="lg"
             p={{ base: gap.md, md: gap.md }}
             px={{ base: gap.md, md: gap.md }}
-            minW={{ base: "", md: "2xs" }}
+            minW={{ base: "", md: "2xs", lg: "300px" }}
+            maxW="300px"
             gap="gap.md2"
             borderRadius="md"
             border="1px solid"
