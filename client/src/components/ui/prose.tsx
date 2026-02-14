@@ -8,13 +8,33 @@ const mListItem = "0.085em";
 
 export const Prose = chakra("div", {
   base: {
-    color: "fg.muted",
-    maxWidth: "65ch",
-    lineHeight: "1.5em",
+    // overridden
+
+    color: "fg.dark-friendly",
+
+    // silent giant H1/H2
+    "& h1": {
+      fontSize: "inherit",
+      fontWeight: "bold",
+      marginTop: "0",
+      mb: 1.5,
+      lineHeight: "inherit",
+    },
+    "& h2": {
+      fontSize: "inherit",
+      fontWeight: "bold",
+      marginTop: "0",
+      mb: 1.5,
+      lineHeight: "inherit",
+    },
     "& p": {
       marginTop: padding,
       marginBottom: padding,
     },
+
+    // defaults
+    maxWidth: "65ch",
+    lineHeight: "1.5em",
     "& em": {
       fontStyle: "italic",
     },
@@ -37,20 +57,6 @@ export const Prose = chakra("div", {
     },
     "& a strong": {
       color: "inherit",
-    },
-    "& h1": {
-      fontSize: "2.15em",
-      letterSpacing: "-0.02em",
-      marginTop: "0",
-      marginBottom: "0.8em",
-      lineHeight: "1.2em",
-    },
-    "& h2": {
-      fontSize: "1.4em",
-      letterSpacing: "-0.02em",
-      marginTop: "1.6em",
-      marginBottom: "0.8em",
-      lineHeight: "1.4em",
     },
     "& h3": {
       fontSize: "1.285em",
