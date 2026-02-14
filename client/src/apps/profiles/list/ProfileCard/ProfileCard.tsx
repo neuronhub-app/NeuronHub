@@ -22,11 +22,13 @@ import {
 import type { BaseHit, Hit } from "instantsearch.js";
 import { type ReactNode, useEffect, useRef } from "react";
 import { BsBriefcase } from "react-icons/bs";
-import { FaLinkedin, } from "react-icons/fa6";
+import { FaLinkedin } from "react-icons/fa6";
+import { FiExternalLink } from "react-icons/fi";
 import { GoOrganization } from "react-icons/go";
 import { IoLocationOutline } from "react-icons/io5";
-import { LuCheck, LuChevronDown, LuFoldVertical, LuUnfoldVertical } from "react-icons/lu";
-import { MdInfoOutline } from "react-icons/md";
+import { LuCheck, LuChevronDown } from "react-icons/lu";
+import { MdInfoOutline, MdUnfoldLess, MdUnfoldMore } from "react-icons/md";
+import { RiRobot2Line } from "react-icons/ri";
 import { Highlight, Snippet } from "react-instantsearch";
 import { useDebouncedCallback } from "use-debounce";
 import { Button } from "@/components/ui/button";
@@ -94,27 +96,26 @@ export function ProfileCard(props: {
       {props.isSearchActive && (
         <Float placement="top-end" offsetX="6">
           <Button
-            variant="subtle"
-            size="2xs"
+            variant="outline"
+            bg="bg.panel"
+            color="fg"
+            size="xs"
             colorPalette="gray"
             onClick={() => {
               state.mutable.isSearchSnippetUnfolded = !state.snap.isSearchSnippetUnfolded;
             }}
+            _hover={{
+              bg: "bg.subtle",
+            }}
             {...ids.set(ids.profile.card.unfoldBtn)}
           >
             <Icon boxSize="3.5">
-              {isSearchSnippetUnfolded ? <LuFoldVertical /> : <LuUnfoldVertical />}
+              {isSearchSnippetUnfolded ? <MdUnfoldLess /> : <MdUnfoldMore />}
             </Icon>
             {isSearchSnippetUnfolded ? "Fold" : "Unfold"}
           </Button>
         </Float>
       )}
-
-      <MatchSection profile={props.profile} isEnrichedByGraphql={props.isEnrichedByGraphql} />
-
-      <Bleed inline={cardStyle.padding}>
-        <Separator color="bg.muted" size="xs" />
-      </Bleed>
 
       <Stack gap="gap.sm2">
         <HStack gap="gap.md" align="flex-start" justify="space-between">
@@ -216,6 +217,11 @@ export function ProfileCard(props: {
           isUnfolded={isSearchSnippetUnfolded}
         />
       </Flex>
+      <Bleed inline={cardStyle.padding}>
+        <Separator color="bg.muted" size="xs" />
+      </Bleed>
+
+      <MatchSection profile={props.profile} isEnrichedByGraphql={props.isEnrichedByGraphql} />
     </Stack>
   );
 }
@@ -238,14 +244,27 @@ function ProfileNameLink(props: { profile: ProfileFragmentType; isHighlightable?
   }
 
   return props.profile.url_conference ? (
-    <Link
-      target="_blank"
-      fontWeight="semibold"
-      href={props.profile.url_conference}
-      color={{ _light: "teal.700/90", _dark: "teal.400" }}
-    >
-      <ProfileName />
-    </Link>
+    <Box className="group" cursor="pointer" pos="relative">
+      <Link
+        target="_blank"
+        fontWeight="semibold"
+        href={props.profile.url_conference}
+        color={{ _light: "colorPalette.600/88", _dark: "colorPalette.400" }}
+      >
+        <ProfileName />
+      </Link>
+      <Float placement="top-end" offsetX="-2" offsetY="1.5">
+        <Icon
+          boxSize="3.5"
+          opacity="0"
+          _groupHover={{ opacity: "1" }}
+          transition="opacity .2s"
+          color={{ _light: "colorPalette.600/88", _dark: "colorPalette.400" }}
+        >
+          <FiExternalLink />
+        </Icon>
+      </Float>
+    </Box>
   ) : (
     <ProfileName />
   );
@@ -359,11 +378,12 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
                   helpText="Match rating by AI"
                   colorPalette="teal"
                 />
-                <Tooltip content={match.match_reason_by_llm}>
-                  <Text fontSize="xs" color="fg.muted" maxW="300px" lineClamp={2}>
-                    {match.match_reason_by_llm}
-                  </Text>
-                </Tooltip>
+                <Text fontSize="sm">
+                  <Icon boxSize="4.5" color="fg.subtle" mr="gap.sm" mt="-2px">
+                    <RiRobot2Line />
+                  </Icon>
+                  {match.match_reason_by_llm}
+                </Text>
               </>
             )}
           </VStack>
@@ -473,7 +493,7 @@ function ProfileTagGroup(props: {
       <Flex gap="gap.sm" flexWrap="wrap" {...ids.set(ids.profile.card.tags)}>
         {props.tags.map(tag => {
           return (
-            <Tag key={tag.name} variant="subtle" colorPalette={props.colorPalette} size="lg">
+            <Tag key={tag.name} variant="subtle" colorPalette={props.colorPalette}>
               {tag.name}
             </Tag>
           );
@@ -628,9 +648,9 @@ function CollapsibleSection(props: {
         <Center>
           <Collapsible.Trigger asChild>
             <Button
-              variant="subtle"
-              size="xs"
+              variant="ghost"
               colorPalette="gray"
+              size="xs"
               {...ids.set(ids.profile.card.contentCollapsibleTrigger)}
             >
               {state.snap.isOpen ? "Show less" : "Show more"}
