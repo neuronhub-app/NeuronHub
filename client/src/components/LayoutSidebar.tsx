@@ -46,7 +46,7 @@ export function LayoutSidebar(props: StackProps) {
   ];
   if (user) {
     links.push(
-      { to: urls.readingList, icon: FaRegBookmark, label: "Reading list" },
+      // { to: urls.readingList, icon: FaRegBookmark, label: "Reading list" },
       { to: urls.library, icon: LuLibrary, label: "Library" },
     );
   }
