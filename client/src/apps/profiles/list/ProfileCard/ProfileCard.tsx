@@ -13,6 +13,7 @@ import {
   Stack,
   Text,
   Textarea,
+  VStack,
 } from "@chakra-ui/react";
 import type { BaseHit, Hit } from "instantsearch.js";
 import type { ReactNode } from "react";
@@ -55,10 +56,10 @@ export function ProfileCard(props: {
     >
       <HStack justify="space-between" align="flex-start">
         <Stack gap="gap.sm">
-          <HStack gap="gap.md" align="center">
+          <HStack gap="gap.md" align="flex-start">
             <ProfileNameLink profile={props.profile} isHighlightable={isHighlightable} />
             <Separator orientation="vertical" h="5" />
-            <Text color="fg.dark-friendly" fontSize="md">
+            <Text color="fg.dark-friendly" fontSize="md" maxW="2xs">
               {props.profile.job_title}
             </Text>
             {(props.profile.url_linkedin || props.profile.url_conference) && (
@@ -92,7 +93,9 @@ export function ProfileCard(props: {
                 {props.profile.company}
               </Flex>
             )}
-            <Separator orientation="vertical" h="5" />
+            {props.profile.company && props.profile.country && (
+              <Separator orientation="vertical" h="5" />
+            )}
 
             {props.profile.country && (
               <Flex align="center" gap="1">
@@ -199,6 +202,7 @@ function scoreToStars(score: number | null | undefined): number {
   return Math.round(score / 10) * 0.5;
 }
 
+// todo refac: move out
 // #AI
 function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql: boolean }) {
   const state = useStateValtio({
@@ -226,56 +230,58 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
     (props.profile as Record<string, unknown>).needs_reprocessing === true;
 
   return (
-    <Stack gap="gap.sm" align="flex-end" minW="200px" h="auto">
-      <HStack gap="gap.sm2">
+    <Stack gap="gap.sm" align="flex-end" minW="400px" h="auto">
+      <HStack gap="gap.sm2" justify="space-between" align="flex-start">
         {!props.isEnrichedByGraphql ? (
           <Spinner size="xs" color="fg.subtle" />
         ) : (
           <>
             {match?.match_score_by_llm != null && (
-              <MatchRating
-                value={scoreToStars(match.match_score_by_llm)}
-                readOnly
-                helpText="Match rating by AI"
-              />
+              <VStack align="flex-start">
+                <MatchRating
+                  value={scoreToStars(match.match_score_by_llm)}
+                  readOnly
+                  helpText="Match rating by AI"
+                />
+                <Tooltip content={match.match_reason_by_llm}>
+                  <Text fontSize="xs" color="fg.muted" maxW="300px" lineClamp={2}>
+                    {match.match_reason_by_llm}
+                  </Text>
+                </Tooltip>
+              </VStack>
             )}
-            <MatchRating
-              defaultValue={scoreToStars(match?.match_score)}
-              colorPalette="teal"
-              onValueChange={async details => {
-                state.mutable.hasUserRated = true;
-                await mutateAndRefetchMountedQueries(ProfileMatchScoreUpdateMutation, {
-                  profileId: props.profile.id,
-                  matchScore: details.value * 20,
-                });
-              }}
-              helpText="Rate this match by AI for calibration"
-            />
+            <VStack align="flex-start">
+              <MatchRating
+                defaultValue={scoreToStars(match?.match_score)}
+                colorPalette="teal"
+                onValueChange={async details => {
+                  state.mutable.hasUserRated = true;
+                  await mutateAndRefetchMountedQueries(ProfileMatchScoreUpdateMutation, {
+                    profileId: props.profile.id,
+                    matchScore: details.value * 20,
+                  });
+                }}
+                helpText="Rate this match by AI for calibration"
+              />
+              {isShowReviewInput && (
+                <Box position="relative" maxW="400px" minW="240px" w="full">
+                  <Textarea
+                    autoresize
+                    rows={1}
+                    resize="none"
+                    overflow="hidden"
+                    placeholder="Review for AI..."
+                    size="xs"
+                    defaultValue={match?.match_review ?? ""}
+                    onChange={e => debouncedSaveReview(e.target.value)}
+                  />
+                  <ReviewSaveIndicator status={state.snap.reviewSaveStatus} />
+                </Box>
+              )}
+            </VStack>
           </>
         )}
       </HStack>
-
-      {match?.match_reason_by_llm && (
-        <Text fontSize="xs" color="fg.muted" maxW="300px" lineClamp={2}>
-          {match.match_reason_by_llm}
-        </Text>
-      )}
-
-      {isShowReviewInput && (
-        <Box position="relative" maxW="400px" minW="240px" w="full">
-          <Textarea
-            autoresize
-            rows={1}
-            resize="none"
-            overflow="hidden"
-            placeholder="Review for AI..."
-            size="xs"
-            defaultValue={match?.match_review ?? ""}
-            onChange={e => debouncedSaveReview(e.target.value)}
-          />
-          <ReviewSaveIndicator status={state.snap.reviewSaveStatus} />
-        </Box>
-      )}
     </Stack>
   );
 }
@@ -308,55 +314,64 @@ const ProfileMatchReviewUpdateMutation = graphql.persisted(
   `),
 );
 
+// todo refac: move out
 function MatchRating(props: {
   value?: number;
   defaultValue?: number;
+  matchReview?: string;
   colorPalette?: string;
   readOnly?: boolean;
   onValueChange?: (details: { value: number }) => void;
   helpText?: string;
 }) {
   return (
-    <HStack align="center">
-      <RatingGroup.Root
-        allowHalf
-        count={5}
-        size="md"
-        value={props.value}
-        defaultValue={props.defaultValue}
-        colorPalette={props.colorPalette}
-        readOnly={props.readOnly}
-        onValueChange={props.onValueChange}
-      >
-        {!props.readOnly && <RatingGroup.HiddenInput />}
-        {/* custom icon doesn't work with _hover */}
-        {/*{[1, 2, 3, 4, 5].map((_, index) => (*/}
-        {/*  // biome-ignore lint/suspicious/noArrayIndexKey: static*/}
-        {/*  <RatingGroup.Item key={index} index={index + 1}>*/}
-        {/*    <RatingGroup.ItemIndicator icon={<FaStar />} />*/}
-        {/*  </RatingGroup.Item>*/}
-        {/*))}*/}
-        <RatingGroup.Control />
-      </RatingGroup.Root>
-      {props.helpText && (
-        <Tooltip
-          content={props.helpText}
-          openDelay={400}
-          closeDelay={100}
-          closeOnClick={false}
-          positioning={{ placement: "right" }}
+    <VStack align="flex-start">
+      <HStack align="center">
+        <RatingGroup.Root
+          allowHalf
+          count={5}
+          size="md"
+          value={props.value}
+          defaultValue={props.defaultValue}
+          colorPalette={props.colorPalette}
+          readOnly={props.readOnly}
+          onValueChange={props.onValueChange}
         >
-          <Icon
-            color="fg.subtle/50"
-            _hover={{ color: "fg", cursor: "help" }}
-            boxSize="3.5"
-            mt="1px"
+          {!props.readOnly && <RatingGroup.HiddenInput />}
+          {/* custom icon doesn't work with _hover */}
+          {/*{[1, 2, 3, 4, 5].map((_, index) => (*/}
+          {/*  // biome-ignore lint/suspicious/noArrayIndexKey: static*/}
+          {/*  <RatingGroup.Item key={index} index={index + 1}>*/}
+          {/*    <RatingGroup.ItemIndicator icon={<FaStar />} />*/}
+          {/*  </RatingGroup.Item>*/}
+          {/*))}*/}
+          <RatingGroup.Control />
+        </RatingGroup.Root>
+        {props.helpText && (
+          <Tooltip
+            content={props.helpText}
+            openDelay={400}
+            closeDelay={100}
+            closeOnClick={false}
+            positioning={{ placement: "right" }}
           >
-            <MdInfoOutline />
-          </Icon>
-        </Tooltip>
+            <Icon
+              color="fg.subtle/50"
+              _hover={{ color: "fg", cursor: "help" }}
+              boxSize="3.5"
+              mt="1px"
+            >
+              <MdInfoOutline />
+            </Icon>
+          </Tooltip>
+        )}
+      </HStack>
+      {props.matchReview && (
+        <Text fontSize="xs" color="fg.muted" maxW="300px" lineClamp={2}>
+          {props.matchReview}
+        </Text>
       )}
-    </HStack>
+    </VStack>
   );
 }
 
