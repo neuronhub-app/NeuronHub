@@ -31,12 +31,13 @@ _replacements: list[R] = [
             "Centre for Effective Altruism",
             "Center for Effective Altruism",
         ],
+        db="Centre for Effective Altruism",
         llm="CEA",
     ),
     R(raw="Giving What We Can", llm="GWWC"),
     R(raw="Open Philanthropy", llm="OpenPhil"),
     R(raw="BlueDot Impact", llm="BlueDot"),
-    R(raw=["80,000 Hours", "80000 Hours", "80 000 Hours"], llm="80k Hours"),
+    R(raw=["80,000 Hours", "80000 Hours", "80 000 Hours"], db="80,000 Hours", llm="80k Hours"),
     R(raw="I'm actively looking for a new role", replace_all="looking for a new role"),
     R(
         raw="I'm happy where I am but feel free to pitch me new ideas",
@@ -102,8 +103,7 @@ _replacements: list[R] = [
     R(raw="Global health & development", llm="Global health", db="Global health & dev"),
     R(raw="Global priorities research", replace_all="Global priorities"),
     R(raw="Climate change mitigation", replace_all="Climate change"),
-    R(raw=["Farmed animal welfare", "Wild animal welfare"], llm="Animal welfare"),
-    R(raw="China-Western relations", replace_all="China-West"),
+    R(raw="China-Western relations", replace_all="China-Western rels"),
     R(
         raw=[
             "Software development/Software engineering",
@@ -113,6 +113,7 @@ _replacements: list[R] = [
         db="Software Engineering",
     ),
     R(raw="Data science/Data visualization", llm="Data science"),
+    R(raw=["AI-safety", "AI Safety"], db="AI Safety"),
     R(raw=["AI safety technical research", "AI-safety", "AI Safety"], llm="AIS"),
     R(
         raw=["Project management/Program management", "Project management"],

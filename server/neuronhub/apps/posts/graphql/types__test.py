@@ -1,13 +1,15 @@
 import asyncio
 
-from asgiref.sync import sync_to_async, async_to_sync
+import pytest
+from asgiref.sync import async_to_sync
+from asgiref.sync import sync_to_async
 
 from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
-
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
 class PostGraphqlTypesTest(NeuronTestCase):
+    @pytest.mark.slow
     async def test_post_reviews_requires_below_23_SQL_queries(self):
         await db_stubs_repopulate(is_import_HN_post=False, is_create_single_review=True)
         reviews = await asyncio.gather(*[self.gen.posts.review() for _ in range(5)])
