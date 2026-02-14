@@ -37,6 +37,31 @@ import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMounte
 import { markedConfigured } from "@/utils/marked-configured";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
 
+const style = {
+  collapseHeight: {
+    bio: "180px",
+    seeksAndOffers: "180px",
+  },
+  header: {
+    fontSize: "md",
+    lineHeight: "inherit",
+  },
+  // #AI-slop, must be <Text {...style.data}/>
+  label: {
+    color: "fg",
+    fontSize: "xs",
+    fontWeight: "bold",
+  },
+  color: {
+    data: "fg",
+    help: "fg.muted",
+  },
+  fontSize: {
+    data: "sm",
+    help: "sm",
+  },
+} as const;
+
 // #AI
 export function ProfileCard(props: {
   profile: ProfileFragmentType;
@@ -83,7 +108,7 @@ export function ProfileCard(props: {
           <HStack gap="gap.md" align="flex-start">
             <ProfileNameLink profile={props.profile} isHighlightable={isHighlightable} />
             <Separator orientation="vertical" h="23px" />
-            <Text color="fg.dark-friendly" fontSize="md" maxW="2xs">
+            <Text color="fg.dark-friendly" {...style.header}>
               {props.profile.job_title}
             </Text>
             {(props.profile.url_linkedin || props.profile.url_conference) && (
@@ -187,7 +212,7 @@ function ProfileNameLink(props: { profile: ProfileFragmentType; isHighlightable?
   function ProfileName() {
     const profileHit = props.profile as unknown as Hit<BaseHit>;
     return (
-      <Heading fontSize="md" lineHeight="inherit">
+      <Heading {...style.header}>
         {props.isHighlightable ? (
           <>
             <Highlight attribute="first_name" hit={profileHit} />{" "}
@@ -553,7 +578,16 @@ function CollapsibleSection(props: {
         state.mutable.isOpen = details.open;
       }}
     >
-      <Collapsible.Content _closed={state.snap.isOverflowing ? style.collapsibleShadow : {}}>
+      <Collapsible.Content
+        _closed={
+          state.snap.isOverflowing
+            ? {
+                shadow: "inset 0 -12px 12px -12px var(--shadow-color)",
+                shadowColor: { _light: "blackAlpha.500", _dark: "whiteAlpha.300" },
+              }
+            : {}
+        }
+      >
         <Box ref={contentRef}>{props.children}</Box>
       </Collapsible.Content>
 
@@ -580,28 +614,3 @@ function CollapsibleSection(props: {
     </Collapsible.Root>
   );
 }
-
-// #AI
-const style = {
-  label: {
-    color: "fg",
-    fontSize: "xs",
-    fontWeight: "bold",
-  },
-  color: {
-    data: "fg",
-    help: "fg.muted",
-  },
-  fontSize: {
-    data: "sm",
-    help: "sm",
-  },
-  collapseHeight: {
-    bio: "180px",
-    seeksAndOffers: "180px",
-  },
-  collapsibleShadow: {
-    shadow: "inset 0 -12px 12px -12px var(--shadow-color)",
-    shadowColor: { _light: "blackAlpha.500", _dark: "whiteAlpha.300" },
-  },
-} as const;
