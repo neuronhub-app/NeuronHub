@@ -59,12 +59,12 @@ export function ProfileCard(props: {
         <Stack gap="gap.sm">
           <HStack gap="gap.md" align="flex-start">
             <ProfileNameLink profile={props.profile} isHighlightable={isHighlightable} />
-            <Separator orientation="vertical" h="5" />
+            <Separator orientation="vertical" h="23px" />
             <Text color="fg.dark-friendly" fontSize="md" maxW="2xs">
               {props.profile.job_title}
             </Text>
             {(props.profile.url_linkedin || props.profile.url_conference) && (
-              <HStack gap="gap.sm2" align="center">
+              <HStack gap="gap.sm2" align="center" mt="2px">
                 {props.profile.url_linkedin && (
                   <Link href={`https://${props.profile.url_linkedin}`} target="_blank">
                     <Icon
@@ -159,7 +159,7 @@ function ProfileNameLink(props: { profile: ProfileFragmentType; isHighlightable?
   function ProfileName() {
     const profileHit = props.profile as unknown as Hit<BaseHit>;
     return (
-      <Heading fontSize="md" fontWeight="semibol">
+      <Heading fontSize="md" lineHeight="inherit">
         {props.isHighlightable ? (
           <>
             <Highlight attribute="first_name" hit={profileHit} />{" "}
@@ -561,8 +561,8 @@ const style = {
     help: "sm",
   },
   collapseHeight: {
-    bio: "110px",
-    seeksAndOffers: "140px",
+    bio: "180px",
+    seeksAndOffers: "180px",
   },
   collapsibleShadow: {
     shadow: "inset 0 -12px 12px -12px var(--shadow-color)",

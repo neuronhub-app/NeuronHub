@@ -97,9 +97,9 @@ export function ProfileList() {
             bg={{ _light: "bg.subtle/30", _dark: "bg.subtle" }}
           >
             <Stack gap="gap.sm">
-              <Text>Match Status</Text>
-              <ToggleFacet attribute="is_scored_by_llm" label="LLM Scored" />
-              <ToggleFacet attribute="is_reviewed_by_user" label="Reviewed" />
+              <Text {...style.facets.label}>AI Match Status</Text>
+              <ToggleFacet attribute="is_scored_by_llm" label="Scored by AI" />
+              <ToggleFacet attribute="is_reviewed_by_user" label="Reviewed by you" />
             </Stack>
             <FacetFilter name="career_stage" label="Career Stage" />
             <FacetFilter name="interests.name" label="Interests" isSearchEnabled />
@@ -257,6 +257,22 @@ function ProfileListHits() {
   );
 }
 
+const style = {
+  facets: {
+    label: {
+      color: "fg.muted",
+      fontWeight: "bold",
+      fontSize: "13px",
+    },
+    value: {
+      display: "inline-flex",
+      gap: "gap.sm",
+      color: "fg.muted",
+      fontSize: "13px",
+    },
+  },
+} as const;
+
 function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boolean }) {
   const refinements = useRefinementList({
     attribute: props.name,
@@ -266,12 +282,12 @@ function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boo
 
   const count = {
     color: useToken("colors", "fg.subtle")[0],
-    fontSize: useToken("fontSizes", "sm")[0],
+    fontSize: useToken("fontSizes", "2xs")[0],
   };
 
   return (
     <Stack align="flex-start">
-      <Text>{props.label}</Text>
+      <Text {...style.facets.label}>{props.label}</Text>
 
       {props.isSearchEnabled && (
         <Input
@@ -299,16 +315,17 @@ function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boo
               }}
               display="flex"
               alignItems="flex-start"
+              size="sm"
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control />
-              <Checkbox.Label display="inline-flex" gap="gap.sm" color="fg.dark-friendly">
+              <Checkbox.Label {...style.facets.value} mt="-3px">
                 <Text
                   // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
                   dangerouslySetInnerHTML={{
                     __html:
                       item.highlighted! +
-                      `&nbsp;<span style="margin-left: 3px; font-size: ${count.fontSize}; color: ${count.color}">${item.count}</span>`,
+                      `&nbsp;<span style="margin-left: 1px; font-size: ${count.fontSize}; color: ${count.color}">${item.count}</span>`,
                   }}
                   as="span"
                 />{" "}
@@ -340,11 +357,12 @@ function ToggleFacet(props: { attribute: string; label: string }) {
       checked={toggle.value.isRefined}
       onCheckedChange={() => toggle.refine(toggle.value)}
       display="flex"
-      alignItems="flex-start"
+      alignItems="center"
+      size="sm"
     >
       <Checkbox.HiddenInput />
       <Checkbox.Control />
-      <Checkbox.Label color="fg.dark-friendly">{props.label}</Checkbox.Label>
+      <Checkbox.Label {...style.facets.value}>{props.label}</Checkbox.Label>
     </Checkbox.Root>
   );
 }
