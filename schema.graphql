@@ -792,6 +792,7 @@ type UserType {
   read_later: [DjangoModelType!]!
   library: [DjangoModelType!]!
   posts_collapsed(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
+  has_profile_groups: Boolean!
 }
 
 input UserTypeInput {

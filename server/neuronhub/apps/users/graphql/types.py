@@ -1,3 +1,4 @@
+import strawberry
 import strawberry_django
 from strawberry import auto
 
@@ -36,6 +37,15 @@ class UserType:
     library: auto
 
     posts_collapsed: list[PostCommentTypeLazy]
+
+    @strawberry.field
+    async def has_profile_groups(self) -> bool:
+        from neuronhub.apps.profiles.models import Profile
+
+        profile = await Profile.objects.filter(user=self).afirst()  # type: ignore[misc]
+        if profile is None:
+            return False
+        return await profile.groups.aexists()
 
 
 @strawberry_django.input(User, partial=True)

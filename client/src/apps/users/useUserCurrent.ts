@@ -64,6 +64,7 @@ export const UserQueryDoc = graphql.persisted(
       name: username
       email
       is_superuser
+      has_profile_groups
 
       library { pk }
 
