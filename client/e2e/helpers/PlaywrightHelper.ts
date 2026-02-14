@@ -161,7 +161,7 @@ export class PlaywrightHelper {
     });
   }
 
-  private async login() {
+  async login() {
     const cookies = await this.page.context().cookies();
     const isHasDjangoSession = cookies.some(cookie => cookie.name === "sessionid");
     if (isHasDjangoSession) {

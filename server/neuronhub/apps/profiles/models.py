@@ -224,6 +224,14 @@ class Profile(AlgoliaModel):
         except ProfileMatch.DoesNotExist:
             return None
 
+    def get_match_score_by_llm(self) -> int | None:
+        match = self._get_match_or_none()
+        return match.match_score_by_llm if match else None
+
+    def get_match_score(self) -> int | None:
+        match = self._get_match_or_none()
+        return match.match_score if match else None
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} | {self.company}"
 

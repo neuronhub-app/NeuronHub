@@ -129,6 +129,9 @@ export namespace ids {
   export const profile = {
     list: "profile.list",
     searchInput: "profile.search-input",
+    listControls: {
+      sort: "profile.list.controls.sort",
+    },
     card: {
       container: "profile.card.container",
       contentMarkdown: "profile.card.content-markdown",

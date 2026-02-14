@@ -132,6 +132,7 @@ async def db_stubs_repopulate(
     return gen
 
 
+# #AI
 async def _import_profiles_csv(gen: Gen):
     from asgiref.sync import sync_to_async
 
@@ -139,11 +140,26 @@ async def _import_profiles_csv(gen: Gen):
 
     csv_path = settings.CONF_CONFIG.eag_csv_path  # type: ignore[has-type]
     if csv_path.exists():
-        await sync_to_async(csv_optimize_and_import)(csv_path, limit=5)
+        await sync_to_async(csv_optimize_and_import)(csv_path, limit=5, is_reindex_algolia=False)
 
     # Admin user needs a Profile in the group to see profiles via Algolia security filters
     group, _ = await ProfileGroup.objects.aget_or_create(name="EAG-SF-2026")
     await gen.profiles.profile(user=gen.users.user_default, groups=[group])
+
+    # Profiles with varied match scores: ensures LLM / User / Newest sorts produce different orderings
+    user = gen.users.user_default
+    now = timezone.now()
+    for i, (llm_score, user_score) in enumerate([(90, 20), (50, 80), (20, 50)]):
+        profile = await gen.profiles.profile(groups=[group])
+        await Profile.objects.filter(pk=profile.pk).aupdate(
+            created_at=now - datetime.timedelta(hours=3 - i),
+        )
+        await gen.profiles.match(
+            profile=profile,
+            user=user,
+            score_by_llm=llm_score,
+            score_by_user=user_score,
+        )
 
 
 # todo ! refac: move out
@@ -154,15 +170,15 @@ async def _algolia_reindex(
     from algoliasearch_django import reindex_all
 
     from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
+    from neuronhub.apps.profiles.index import setup_replicas_sorted_by_scores
 
     # todo refac: replace with a [[index.py]] method
     if is_import_HN_post:
         await sync_to_async(reindex_all)(Post)
+        await sync_to_async(setup_virtual_replica_sorted_by_votes)()
     if is_import_profiles_csv:
         await sync_to_async(reindex_all)(Profile)
-
-    if is_import_HN_post or is_import_profiles_csv:
-        await sync_to_async(setup_virtual_replica_sorted_by_votes)()
+        await sync_to_async(setup_replicas_sorted_by_scores)()
 
 
 class _disable_auto_indexing(ContextDecorator):

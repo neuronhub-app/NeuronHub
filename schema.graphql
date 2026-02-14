@@ -18,6 +18,8 @@ type AlgoliaSearchKeyType {
   index_name: String!
   index_name_sorted_by_votes: String!
   index_name_profiles: String!
+  index_name_profiles_sorted_by_user: String!
+  index_name_profiles_sorted_by_newest: String!
 }
 
 input BoolBaseFilterLookup {

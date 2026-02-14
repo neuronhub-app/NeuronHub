@@ -53,6 +53,7 @@ export function ProfileCard(props: {
       border="1px solid"
       borderColor="border.muted"
       {...ids.set(ids.profile.card.container)}
+      data-id={props.profile.id}
     >
       <HStack justify="space-between" align="flex-start">
         <Stack gap="gap.sm">
