@@ -138,6 +138,17 @@ class ProfilesQuery:
         )
 
     @strawberry.field(extensions=[IsAuthenticated()])
+    async def profile_match_stats(self, info: Info) -> ProfileMatchStatsType:
+        user = await get_user(info)
+        rated_count = await ProfileMatch.objects.filter(
+            user=user, match_score__isnull=False
+        ).acount()
+        llm_scored_count = await ProfileMatch.objects.filter(
+            user=user, match_score_by_llm__isnull=False
+        ).acount()
+        return ProfileMatchStatsType(rated_count=rated_count, llm_scored_count=llm_scored_count)
+
+    @strawberry.field(extensions=[IsAuthenticated()])
     async def profile_user_llm_md(self, info: Info) -> str:
         user = await get_user(info)
         try:
@@ -145,6 +156,12 @@ class ProfilesQuery:
             return profile.profile_for_llm_md or ""
         except Profile.DoesNotExist:
             return ""
+
+
+@strawberry.type
+class ProfileMatchStatsType:
+    rated_count: int
+    llm_scored_count: int
 
 
 @strawberry.type
@@ -206,7 +223,7 @@ class ProfilesMutation:
     async def profile_matches_trigger_llm(
         self,
         info: Info,
-        limit: int = 50,
+        limit: int = 200,
         model: str = "haiku",
     ) -> ProgressType:
         from neuronhub.apps.profiles.tasks import score_profiles_task
@@ -218,10 +235,12 @@ class ProfilesMutation:
         except Profile.DoesNotExist:
             user_profile = ""
 
+        assert model in MODEL_LIMITS
+        model_limit = MODEL_LIMITS.get(model)
         await score_profiles_task.aenqueue(
             user_id=user.id,
             user_profile=user_profile,
-            limit=limit,
+            limit=min(limit, model_limit["max"]),
             batch_size=10,
             model=model,
         )
@@ -238,3 +257,9 @@ class ProfilesMutation:
             status__in=[TaskResultStatus.READY, TaskResultStatus.RUNNING],
         ).aupdate(status=TaskResultStatus.FAILED)
         return updated > 0
+
+
+MODEL_LIMITS: dict[str, dict[str, int]] = {
+    "haiku": {"max": 400, "default": 200},
+    "sonnet": {"max": 80, "default": 40},
+}
