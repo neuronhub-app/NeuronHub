@@ -16,17 +16,21 @@ export function useInit(options: {
     if (!options.isReady) {
       return;
     }
-    state.mutable.isLoading = true;
+    try {
+      state.mutable.isLoading = true;
 
-    const initOutput = options.onInit();
+      const initOutput = options.onInit();
 
-    if (initOutput instanceof Promise) {
-      initOutput.catch(captureException); // todo ! UI: add .error() toast
-      initOutput.finally(() => {
-        state.mutable.isLoading = false;
-      });
-    } else {
-      return initOutput;
+      if (initOutput instanceof Promise) {
+        initOutput.catch(captureException); // todo ! UI: add .error() toast
+        initOutput.finally(() => {
+          state.mutable.isLoading = false;
+        });
+      } else {
+        return initOutput;
+      }
+    } finally {
+      state.mutable.isLoading = false;
     }
   }, [...(options.dependencies ?? []), options.isReady]);
 

@@ -103,7 +103,7 @@ export function Library() {
     <Stack gap="gap.lg">
       <Heading size="2xl">Library</Heading>
 
-      {(isLoadingFirstTime || initHighlights.isLoading) && <Text>Loading highlights...</Text>}
+      {initHighlights.isLoading && <Text>Loading highlights...</Text>}
       {error && <Text color="fg.error">Error: {error.message}</Text>}
 
       <Stack gap="gap.lg">
