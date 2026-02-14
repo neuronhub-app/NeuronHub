@@ -1,4 +1,3 @@
-import type { Locator } from "@playwright/test";
 import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
 import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
@@ -7,15 +6,23 @@ import { urls } from "@/urls";
 
 // #AI
 test.describe("ProfileList", () => {
+  test.describe.configure({ mode: "serial" });
+
   let play: PlaywrightHelper;
+  let isPopulated = false;
 
   test.beforeEach(async ({ page }) => {
     play = new PlaywrightHelper(page);
-    await play.dbStubsRepopulateAndLogin({
-      is_import_HN_post: false,
-      is_create_single_review: false,
-      is_import_profiles_csv: true,
-    });
+    if (!isPopulated) {
+      await play.dbStubsRepopulateAndLogin({
+        is_import_HN_post: false,
+        is_create_single_review: false,
+        is_import_profiles_csv: true,
+      });
+      isPopulated = true;
+    } else {
+      await play.login();
+    }
   });
 
   test("shows markdown without search, snippets with search", async ({ page }) => {

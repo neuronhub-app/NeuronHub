@@ -9,6 +9,7 @@ import {
   Input,
   InputGroup,
   Pagination,
+  SegmentGroup,
   Stack,
   Text,
   useToken,
@@ -23,6 +24,7 @@ import {
   usePagination,
   useRefinementList,
   useSearchBox,
+  useSortBy,
   useToggleRefinement,
 } from "react-instantsearch";
 import { ProfileCard } from "@/apps/profiles/list/ProfileCard/ProfileCard";
@@ -39,7 +41,7 @@ export function ProfileList() {
   if (algolia.loading) {
     return <p>Loading Algolia...</p>;
   }
-  if (!algolia.client || !algolia.indexNameProfiles) {
+  if (!isAlgoliaLoaded(algolia)) {
     return <p>Search not available</p>;
   }
 
@@ -52,9 +54,12 @@ export function ProfileList() {
     >
       <Stack gap="gap.lg">
         <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
-          <Text fontSize="2xl" fontWeight="bold">
-            Profiles
-          </Text>
+          <Flex gap="gap.md">
+            <Text fontSize="2xl" fontWeight="bold">
+              Profiles
+            </Text>
+            <AlgoliaSortControl algolia={algolia} />
+          </Flex>
           <SearchInput />
         </HStack>
 
@@ -95,7 +100,6 @@ export function ProfileList() {
               <Text>Match Status</Text>
               <ToggleFacet attribute="is_scored_by_llm" label="LLM Scored" />
               <ToggleFacet attribute="is_reviewed_by_user" label="Reviewed" />
-              <ToggleFacet attribute="needs_reprocessing" label="Needs Update" />
             </Stack>
             <FacetFilter name="career_stage" label="Career Stage" />
             <FacetFilter name="interests.name" label="Interests" isSearchEnabled />
@@ -108,6 +112,50 @@ export function ProfileList() {
         </Flex>
       </Stack>
     </InstantSearch>
+  );
+}
+
+type AlgoliaState = ReturnType<typeof useAlgoliaSearchClient>;
+type WithNonNullable<T, Key extends keyof T> = Omit<T, Key> & {
+  [key in Key]-?: NonNullable<T[key]>;
+};
+type AlgoliaStateLoaded = WithNonNullable<
+  AlgoliaState,
+  | "client"
+  | "indexNameProfiles"
+  | "indexNameProfilesSortedByUser"
+  | "indexNameProfilesSortedByNewest"
+>;
+
+function AlgoliaSortControl(props: { algolia: AlgoliaStateLoaded }) {
+  const sort = useSortBy({
+    items: [
+      { value: props.algolia.indexNameProfiles, label: "LLM Score" },
+      { value: props.algolia.indexNameProfilesSortedByUser, label: "Your Score" },
+      { value: props.algolia.indexNameProfilesSortedByNewest, label: "Newest" },
+    ],
+  });
+
+  return (
+    <SegmentGroup.Root
+      value={sort.currentRefinement}
+      onValueChange={event => sort.refine(event.value!)}
+      size="sm"
+      {...ids.set(ids.profile.listControls.sort)}
+      h="fit-content"
+    >
+      <SegmentGroup.Indicator />
+      <SegmentGroup.Items items={sort.options} />
+    </SegmentGroup.Root>
+  );
+}
+
+function isAlgoliaLoaded(algolia: AlgoliaState): algolia is AlgoliaStateLoaded {
+  return Boolean(
+    algolia.client &&
+      algolia.indexNameProfiles &&
+      algolia.indexNameProfilesSortedByUser &&
+      algolia.indexNameProfilesSortedByNewest,
   );
 }
 

@@ -192,7 +192,17 @@
 
 [tasks."django:algolia-reindex"]
     dir = "server"
-    run = "uv run manage.py algolia_reindex_with_replica"
+    run = [
+        "mise django:algolia-reindex:post",
+        "mise django:algolia-reindex:profile",
+    ]
+[tasks."django:algolia-reindex:profile"]
+    dir = "server"
+    run = "uv run manage.py algolia_reindex_with_replica --model=Profile"
+
+[tasks."django:algolia-reindex:post"]
+    dir = "server"
+    run = "uv run manage.py algolia_reindex_with_replica --model=Post"
 
 
 # typegen → format → lint

@@ -11,6 +11,8 @@ export function useAlgoliaSearchClient() {
     indexName: undefined as undefined | string,
     indexNameSortedByVotes: undefined as undefined | string,
     indexNameProfiles: undefined as undefined | string,
+    indexNameProfilesSortedByUser: undefined as undefined | string,
+    indexNameProfilesSortedByNewest: undefined as undefined | string,
   });
 
   const init = useInit({
@@ -25,6 +27,8 @@ export function useAlgoliaSearchClient() {
       state.mutable.indexName = data.index_name;
       state.mutable.indexNameSortedByVotes = data.index_name_sorted_by_votes;
       state.mutable.indexNameProfiles = data.index_name_profiles;
+      state.mutable.indexNameProfilesSortedByUser = data.index_name_profiles_sorted_by_user;
+      state.mutable.indexNameProfilesSortedByNewest = data.index_name_profiles_sorted_by_newest;
     },
   });
 
@@ -33,6 +37,8 @@ export function useAlgoliaSearchClient() {
     indexName: state.snap.indexName,
     indexNameSortedByVotes: state.snap.indexNameSortedByVotes,
     indexNameProfiles: state.snap.indexNameProfiles,
+    indexNameProfilesSortedByUser: state.snap.indexNameProfilesSortedByUser,
+    indexNameProfilesSortedByNewest: state.snap.indexNameProfilesSortedByNewest,
     loading: init.isLoading,
   };
 }
@@ -47,6 +53,8 @@ const AlgoliaSearchKeyQuery = graphql.persisted(
         index_name
         index_name_sorted_by_votes
         index_name_profiles
+        index_name_profiles_sorted_by_user
+        index_name_profiles_sorted_by_newest
       }
     }
   `),
