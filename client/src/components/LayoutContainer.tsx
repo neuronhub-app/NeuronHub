@@ -1,7 +1,7 @@
 import { Container, Flex, HStack, IconButton, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { LuAlignRight } from "react-icons/lu";
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import { HighlightActionBar } from "@/apps/highlighter/HighlightActionBar";
 import { LayoutSidebar, NeuronLogo } from "@/components/LayoutSidebar";
 import {
@@ -11,17 +11,21 @@ import {
   DrawerRoot,
   DrawerTrigger,
 } from "@/components/ui/drawer";
+import { urls } from "@/urls";
 
 const style = {
   breakpoint: "md",
 } as const;
 
 export function LayoutContainer(props?: { children?: ReactNode }) {
+  const location = useLocation();
+
+  const isHasBackground = !location.pathname.startsWith(urls.posts.list);
   return (
     <>
       <NavbarMobile />
 
-      <Flex flex="1" pos="relative" h="full">
+      <Flex flex="1" pos="relative" h="full" bg={isHasBackground ? "bg.muted" : ""}>
         <LayoutSidebar
           hideBelow={style.breakpoint}
           maxH="100vh"

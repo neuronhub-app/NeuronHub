@@ -1,6 +1,8 @@
 import {
+  Bleed,
   Box,
   Center,
+  Checkbox,
   Collapsible,
   Flex,
   Float,
@@ -10,6 +12,7 @@ import {
   Link,
   RatingGroup,
   Separator,
+  Spacer,
   Spinner,
   Stack,
   Text,
@@ -17,11 +20,11 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import type { BaseHit, Hit } from "instantsearch.js";
-import type { ReactNode } from "react";
-import { useEffect, useRef } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { BsBriefcase } from "react-icons/bs";
-import { FaLinkedin, FaLocationDot } from "react-icons/fa6";
+import { FaLinkedin, } from "react-icons/fa6";
 import { GoOrganization } from "react-icons/go";
+import { IoLocationOutline } from "react-icons/io5";
 import { LuCheck, LuChevronDown, LuFoldVertical, LuUnfoldVertical } from "react-icons/lu";
 import { MdInfoOutline } from "react-icons/md";
 import { Highlight, Snippet } from "react-instantsearch";
@@ -72,15 +75,19 @@ export function ProfileCard(props: {
   const isHighlightable = props.isSearchActive && "_highlightResult" in props.profile;
   const isSearchSnippetUnfolded = state.snap.isSearchSnippetUnfolded;
 
+  const cardStyle = {
+    padding: "gap.md",
+  } as const;
+
   return (
     <Stack
       as="article"
       gap="gap.sm2"
-      p="gap.md"
+      p={cardStyle.padding}
       borderRadius="lg"
-      border="1px solid"
-      borderColor="border.muted"
+      borderColor="border.subtle"
       position="relative"
+      bg="bg.panel"
       {...ids.set(ids.profile.card.container)}
       data-id={props.profile.id}
     >
@@ -103,75 +110,75 @@ export function ProfileCard(props: {
         </Float>
       )}
 
-      <HStack justify="space-between" align="flex-start">
-        <Stack gap="gap.sm">
+      <MatchSection profile={props.profile} isEnrichedByGraphql={props.isEnrichedByGraphql} />
+
+      <Bleed inline={cardStyle.padding}>
+        <Separator color="bg.muted" size="xs" />
+      </Bleed>
+
+      <Stack gap="gap.sm2">
+        <HStack gap="gap.md" align="flex-start" justify="space-between">
           <HStack gap="gap.md" align="flex-start">
             <ProfileNameLink profile={props.profile} isHighlightable={isHighlightable} />
             <Separator orientation="vertical" h="23px" />
             <Text color="fg.dark-friendly" {...style.header}>
               {props.profile.job_title}
             </Text>
-            {(props.profile.url_linkedin || props.profile.url_conference) && (
-              <HStack gap="gap.sm2" align="center" mt="2px">
-                {props.profile.url_linkedin && (
-                  <Link href={`https://${props.profile.url_linkedin}`} target="_blank">
-                    <Icon
-                      boxSize="21px"
-                      color="rgb(10, 102, 194)/70"
-                      _hover={{ color: "rgb(10, 102, 194)" }}
-                    >
-                      <FaLinkedin />
-                    </Icon>
-                  </Link>
-                )}
-              </HStack>
-            )}
           </HStack>
+        </HStack>
 
-          <Flex gap="gap.sm2">
-            {props.profile.company && (
-              <Flex
-                color={style.color.data}
-                fontSize={style.fontSize.data}
-                align="center"
-                gap="gap.sm"
-              >
-                <Icon boxSize="4.5" color="fg.muted/65">
-                  <GoOrganization />
-                </Icon>
-                {props.profile.company}
-              </Flex>
-            )}
-            {props.profile.company && props.profile.country && (
-              <Separator orientation="vertical" h="5" />
-            )}
-
-            {props.profile.country && (
-              <Flex align="center" gap="1">
-                <Icon boxSize="3.5" color="fg.subtle/60">
-                  <FaLocationDot />
-                </Icon>
-                <Text color={style.color.help} fontSize={style.fontSize.help}>
-                  {[props.profile.city, props.profile.country].filter(Boolean).join(", ")}
-                </Text>
-              </Flex>
-            )}
-          </Flex>
-
-          {props.profile.career_stage.length > 0 && (
-            <Flex align="center" gap="2">
-              <Icon boxSize="4" color="fg.muted/65">
-                <BsBriefcase />
+        <Flex gap="gap.sm2">
+          {props.profile.company && (
+            <Flex
+              color={style.color.data}
+              fontSize={style.fontSize.data}
+              align="center"
+              gap="gap.sm"
+            >
+              <Icon boxSize="4.5" color="fg.muted/65">
+                <GoOrganization />
               </Icon>
-              <Text color={style.color.data} fontSize={style.fontSize.data}>
-                {props.profile.career_stage.join(", ")}
+              {props.profile.company}
+            </Flex>
+          )}
+
+          {props.profile.company && props.profile.country && (
+            <Separator orientation="vertical" h="5" />
+          )}
+          {props.profile.country && (
+            <Flex align="center" gap="1">
+              <Icon boxSize="19px" color="fg.subtle" ml="-1">
+                <IoLocationOutline />
+              </Icon>
+              <Text color={style.color.help} fontSize={style.fontSize.help}>
+                {[props.profile.city, props.profile.country].filter(Boolean).join(", ")}
               </Text>
             </Flex>
           )}
-        </Stack>
 
-        <MatchSection profile={props.profile} isEnrichedByGraphql={props.isEnrichedByGraphql} />
-      </HStack>
+          {props.profile.country && props.profile.url_linkedin && (
+            <Separator orientation="vertical" h="5" />
+          )}
+          {props.profile.url_linkedin && (
+            <Link href={props.profile.url_linkedin} target="_blank">
+              <Icon boxSize="19px" color="fg.subtle" _hover={{ color: "rgb(10, 102, 194)" }}>
+                <FaLinkedin />
+              </Icon>
+            </Link>
+          )}
+        </Flex>
+
+        {props.profile.career_stage.length > 0 && (
+          <Flex align="center" gap="2">
+            <Icon boxSize="4" color="fg.muted/65">
+              <BsBriefcase />
+            </Icon>
+            <Text color={style.color.data} fontSize={style.fontSize.data}>
+              {props.profile.career_stage.join(", ")}
+            </Text>
+          </Flex>
+        )}
+      </Stack>
 
       <ProfileContentSection
         label="Bio"
@@ -184,26 +191,31 @@ export function ProfileCard(props: {
       />
 
       {(props.profile.skills?.length > 0 || props.profile.interests?.length > 0) && (
-        <HStack align="flex-start" flexWrap="wrap">
-          {props.profile.skills?.length > 0 && (
-            <ProfileTagGroup label="Skills" tags={props.profile.skills} colorPalette="gray" />
-          )}
+        <>
+          <HStack align="flex-start" flexWrap="wrap" gap="gap.md">
+            {props.profile.skills?.length > 0 && (
+              <ProfileTagGroup label="Skills" tags={props.profile.skills} colorPalette="gray" />
+            )}
 
-          {props.profile.interests?.length > 0 && (
-            <ProfileTagGroup
-              label="Interests"
-              tags={props.profile.interests}
-              colorPalette="gray"
-            />
-          )}
-        </HStack>
+            {props.profile.interests?.length > 0 && (
+              <ProfileTagGroup
+                label="Interests"
+                tags={props.profile.interests}
+                colorPalette="gray"
+              />
+            )}
+          </HStack>
+          <Spacer h="0" />
+        </>
       )}
 
-      <SeeksOffersSection
-        profile={props.profile}
-        isSearchActive={props.isSearchActive}
-        isUnfolded={isSearchSnippetUnfolded}
-      />
+      <Flex mt="gap.sm">
+        <SeeksOffersSection
+          profile={props.profile}
+          isSearchActive={props.isSearchActive}
+          isUnfolded={isSearchSnippetUnfolded}
+        />
+      </Flex>
     </Stack>
   );
 }
@@ -212,7 +224,7 @@ function ProfileNameLink(props: { profile: ProfileFragmentType; isHighlightable?
   function ProfileName() {
     const profileHit = props.profile as unknown as Hit<BaseHit>;
     return (
-      <Heading {...style.header}>
+      <Heading {...style.header} fontWeight="semibold">
         {props.isHighlightable ? (
           <>
             <Highlight attribute="first_name" hit={profileHit} />{" "}
@@ -228,8 +240,9 @@ function ProfileNameLink(props: { profile: ProfileFragmentType; isHighlightable?
   return props.profile.url_conference ? (
     <Link
       target="_blank"
-      href={`https://${props.profile.url_conference}`}
-      color={{ _light: "teal.700", _dark: "teal.400" }}
+      fontWeight="semibold"
+      href={props.profile.url_conference}
+      color={{ _light: "teal.700/90", _dark: "teal.400" }}
     >
       <ProfileName />
     </Link>
@@ -259,11 +272,19 @@ function scoreToStars(score: number | null | undefined): number {
 // todo refac: move out
 // #AI
 function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql: boolean }) {
+  const match = props.profile.match;
   const state = useStateValtio({
-    hasUserRated: props.profile.match?.match_score != null,
+    isReviewToggled: null as boolean | null,
+    isUserHasRated: null as boolean | null,
     reviewSaveStatus: "idle" as "idle" | "saving" | "saved",
   });
-  const match = props.profile.match;
+
+  useEffect(() => {
+    state.mutable.isUserHasRated = Boolean(match?.match_score);
+  }, [match]);
+
+  const isUserHasReview = !!match?.match_review;
+  const isUserReviewOpen = state.snap.isReviewToggled ?? isUserHasReview;
 
   const debouncedSaveReview = useDebouncedCallback(async (review: string) => {
     state.mutable.reviewSaveStatus = "saving";
@@ -277,66 +298,78 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
     }, 1500);
   }, 800);
 
-  const isShowReviewInput = state.snap.hasUserRated || match?.match_score != null;
-
-  // if it's an Algolia hit, it'll have it #AI
-  const needsReprocessing =
-    (props.profile as Record<string, unknown>).needs_reprocessing === true;
-
   return (
-    <Stack gap="gap.sm" align="flex-end" minW="400px" h="auto">
-      <HStack gap="gap.sm2" justify="space-between" align="flex-start">
-        {!props.isEnrichedByGraphql ? (
-          <Spinner size="xs" color="fg.subtle" />
-        ) : (
-          <>
+    <Flex gap="gap.sm2" align="flex-start">
+      {!props.isEnrichedByGraphql ? (
+        <Spinner size="xs" color="fg.subtle" />
+      ) : (
+        <>
+          <VStack align="flex-start" flex="1">
+            <HStack align="center" gap="gap.sm2">
+              <MatchRating
+                defaultValue={scoreToStars(match?.match_score)}
+                onValueChange={async details => {
+                  state.mutable.isReviewToggled = true;
+                  state.mutable.isUserHasRated = true;
+                  await mutateAndRefetchMountedQueries(ProfileMatchScoreUpdateMutation, {
+                    profileId: props.profile.id,
+                    matchScore: details.value * 20,
+                  });
+                }}
+                helpText="Rate this profile for AI calibration"
+              />
+              {state.snap.isUserHasRated && (
+                <Checkbox.Root
+                  checked={isUserReviewOpen}
+                  onCheckedChange={details => {
+                    state.mutable.isReviewToggled = !!details.checked;
+                  }}
+                  size="sm"
+                >
+                  <Checkbox.HiddenInput />
+                  <Checkbox.Control />
+                  <Checkbox.Label color="fg.subtle" fontSize="12px">
+                    Review note
+                  </Checkbox.Label>
+                </Checkbox.Root>
+              )}
+            </HStack>
+            {isUserReviewOpen && (
+              <Box position="relative" maxW="400px" minW="240px" w="full">
+                <Textarea
+                  autoresize
+                  rows={1}
+                  resize="none"
+                  overflow="hidden"
+                  placeholder="Leave a review of this Profile for AI calibration"
+                  size="xs"
+                  defaultValue={match?.match_review ?? ""}
+                  onChange={e => debouncedSaveReview(e.target.value)}
+                />
+                <ReviewSaveIndicator status={state.snap.reviewSaveStatus} />
+              </Box>
+            )}
+          </VStack>
+          <VStack align="flex-start" flex="1">
             {match?.match_score_by_llm != null && (
-              <VStack align="flex-start">
+              <>
                 <MatchRating
                   value={scoreToStars(match.match_score_by_llm)}
                   readOnly
                   helpText="Match rating by AI"
+                  colorPalette="teal"
                 />
                 <Tooltip content={match.match_reason_by_llm}>
                   <Text fontSize="xs" color="fg.muted" maxW="300px" lineClamp={2}>
                     {match.match_reason_by_llm}
                   </Text>
                 </Tooltip>
-              </VStack>
+              </>
             )}
-            <VStack align="flex-start">
-              <MatchRating
-                defaultValue={scoreToStars(match?.match_score)}
-                colorPalette="teal"
-                onValueChange={async details => {
-                  state.mutable.hasUserRated = true;
-                  await mutateAndRefetchMountedQueries(ProfileMatchScoreUpdateMutation, {
-                    profileId: props.profile.id,
-                    matchScore: details.value * 20,
-                  });
-                }}
-                helpText="Rate this match by AI for calibration"
-              />
-              {isShowReviewInput && (
-                <Box position="relative" maxW="400px" minW="240px" w="full">
-                  <Textarea
-                    autoresize
-                    rows={1}
-                    resize="none"
-                    overflow="hidden"
-                    placeholder="Review for AI..."
-                    size="xs"
-                    defaultValue={match?.match_review ?? ""}
-                    onChange={e => debouncedSaveReview(e.target.value)}
-                  />
-                  <ReviewSaveIndicator status={state.snap.reviewSaveStatus} />
-                </Box>
-              )}
-            </VStack>
-          </>
-        )}
-      </HStack>
-    </Stack>
+          </VStack>
+        </>
+      )}
+    </Flex>
   );
 }
 
@@ -440,7 +473,7 @@ function ProfileTagGroup(props: {
       <Flex gap="gap.sm" flexWrap="wrap" {...ids.set(ids.profile.card.tags)}>
         {props.tags.map(tag => {
           return (
-            <Tag key={tag.name} variant="subtle" size="md" colorPalette={props.colorPalette}>
+            <Tag key={tag.name} variant="subtle" colorPalette={props.colorPalette} size="lg">
               {tag.name}
             </Tag>
           );
@@ -526,7 +559,7 @@ function SeeksOffersSection(props: {
       collapsedHeight={style.collapseHeight.seeksAndOffers}
       isSearchActive={props.isSearchActive}
     >
-      <HStack align="flex-start" flexWrap="wrap">
+      <HStack align="flex-start" flexWrap="wrap" gap="gap.md">
         <ProfileContentSection
           label="Seeks"
           text={props.profile.seeks}
