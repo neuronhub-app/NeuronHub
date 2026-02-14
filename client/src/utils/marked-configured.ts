@@ -15,6 +15,7 @@ marked.use({
       return `<code>${highlightRawHTML}</code>`;
     },
   },
+  gfm: true,
   breaks: true, // add <br/> on single newlines - most HackerNews authors expect it
 });
 
