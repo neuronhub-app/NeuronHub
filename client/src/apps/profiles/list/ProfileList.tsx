@@ -249,7 +249,12 @@ function ProfileListHits() {
 
             <Pagination.Items
               render={page => (
-                <IconButton key={page.value} variant={{ base: "ghost", _selected: "outline" }}>
+                <IconButton
+                  key={page.value}
+                  variant={{ base: "ghost", _selected: "outline" }}
+                  bg={{ _selected: "bg.panel" }}
+                  _hover={{ bg: { base: "bg.panel", _selected: "bg.emphasized" } }}
+                >
                   {page.value}
                 </IconButton>
               )}

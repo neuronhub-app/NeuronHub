@@ -148,7 +148,7 @@ export function ProfileCard(props: {
           )}
           {props.profile.country && (
             <Flex align="center" gap="1">
-              <Icon boxSize="19px" color="fg.subtle" ml="-1">
+              <Icon boxSize="19px" color="fg.muted" ml="-1">
                 <IoLocationOutline />
               </Icon>
               <Text color={style.color.help} fontSize={style.fontSize.help}>
