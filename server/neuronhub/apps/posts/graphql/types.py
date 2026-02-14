@@ -130,7 +130,7 @@ class PostReviewOrder:
     reviewed_at: auto
 
 
-@strawberry_django.type(Post, ordering=PostReviewOrder)
+@strawberry_django.type(Post, filters=PostFilter, ordering=PostReviewOrder)
 class PostReviewType(PostTypeI):
     TYPE = Post.Type.Review
 

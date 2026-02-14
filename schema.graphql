@@ -676,7 +676,7 @@ type Query {
   post_comment(pk: ID!): PostCommentType
   posts(filters: PostFilter, ordering: [PostOrder!]! = []): [PostType!]!
   post_tools(filters: PostFilter): [PostToolType!]!
-  post_reviews(ordering: [PostReviewOrder!]! = []): [PostReviewType!]!
+  post_reviews(filters: PostFilter, ordering: [PostReviewOrder!]! = []): [PostReviewType!]!
   post_comments(filters: PostFilter, ordering: [PostOrder!]! = []): [PostCommentType!]!
   tags(filters: PostTagFilter): [PostTagType!]!
   post_highlights(post_ids: [ID!]!): [PostHighlightType!]! @IsAuthenticated

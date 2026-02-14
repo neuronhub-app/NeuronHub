@@ -56,7 +56,7 @@ export function isEditMode(
   return Boolean(review);
 }
 
-// we filter out .parent=null in [[PostReviewList.tsx]] #95
+// we filter out .parent=null on the list page #95
 export function isReview(
   post: PostFragmentType | PostReviewFragmentType,
 ): post is PostReviewFragmentType & {

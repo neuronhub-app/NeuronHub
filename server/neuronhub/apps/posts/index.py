@@ -62,6 +62,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "review_usage_status",
             "is_review_later",
             ["get_review_tags_json", "review_tags"],
+            ["get_has_github_url", "has_github_url"],
             # apps.import
             "source_author",
             ["get_post_source_json", "post_source"],
@@ -83,12 +84,15 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ],
             "attributesForFaceting": [
                 "searchable(tags.name)",
-                "review_tags",
+                "searchable(review_tags.name)",
                 "type",
                 "category",
                 "tool_type",
                 "review_usage_status",
                 "review_experience_hours",
+                "review_importance",
+                "filterOnly(reviewed_at_unix)",
+                "has_github_url",
                 "visible_to",
             ],
             "unretrievableAttributes": [

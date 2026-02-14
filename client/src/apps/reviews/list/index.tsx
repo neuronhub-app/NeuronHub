@@ -1,5 +1,5 @@
-import { PostReviewList } from "@/apps/reviews/list/PostReviewList";
+import { ReviewListAlgolia } from "@/apps/reviews/list/ReviewListAlgolia";
 
 export default function PostReviewListRoute() {
-  return <PostReviewList />;
+  return <ReviewListAlgolia />;
 }
