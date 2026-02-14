@@ -137,6 +137,7 @@ export namespace ids {
       contentMarkdown: "profile.card.content-markdown",
       contentSnippet: "profile.card.content-snippet",
       contentCollapsibleTrigger: "profile.card.content-collapsible-trigger",
+      unfoldBtn: "profile.card.unfold-btn",
       tags: "profile.card.tags",
     },
   } as const;

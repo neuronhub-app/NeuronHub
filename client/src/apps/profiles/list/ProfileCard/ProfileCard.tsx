@@ -3,6 +3,7 @@ import {
   Center,
   Collapsible,
   Flex,
+  Float,
   Heading,
   HStack,
   Icon,
@@ -21,7 +22,7 @@ import { useEffect, useRef } from "react";
 import { BsBriefcase } from "react-icons/bs";
 import { FaLinkedin, FaLocationDot } from "react-icons/fa6";
 import { GoOrganization } from "react-icons/go";
-import { LuCheck, LuChevronDown } from "react-icons/lu";
+import { LuCheck, LuChevronDown, LuFoldVertical, LuUnfoldVertical } from "react-icons/lu";
 import { MdInfoOutline } from "react-icons/md";
 import { Highlight, Snippet } from "react-instantsearch";
 import { useDebouncedCallback } from "use-debounce";
@@ -42,7 +43,9 @@ export function ProfileCard(props: {
   isSearchActive?: boolean;
   isEnrichedByGraphql: boolean;
 }) {
+  const state = useStateValtio({ isSearchSnippetUnfolded: false });
   const isHighlightable = props.isSearchActive && "_highlightResult" in props.profile;
+  const isSearchSnippetUnfolded = state.snap.isSearchSnippetUnfolded;
 
   return (
     <Stack
@@ -52,9 +55,29 @@ export function ProfileCard(props: {
       borderRadius="lg"
       border="1px solid"
       borderColor="border.muted"
+      position="relative"
       {...ids.set(ids.profile.card.container)}
       data-id={props.profile.id}
     >
+      {props.isSearchActive && (
+        <Float placement="top-end" offsetX="6">
+          <Button
+            variant="subtle"
+            size="2xs"
+            colorPalette="gray"
+            onClick={() => {
+              state.mutable.isSearchSnippetUnfolded = !state.snap.isSearchSnippetUnfolded;
+            }}
+            {...ids.set(ids.profile.card.unfoldBtn)}
+          >
+            <Icon boxSize="3.5">
+              {isSearchSnippetUnfolded ? <LuFoldVertical /> : <LuUnfoldVertical />}
+            </Icon>
+            {isSearchSnippetUnfolded ? "Fold" : "Unfold"}
+          </Button>
+        </Float>
+      )}
+
       <HStack justify="space-between" align="flex-start">
         <Stack gap="gap.sm">
           <HStack gap="gap.md" align="flex-start">
@@ -131,6 +154,7 @@ export function ProfileCard(props: {
         snippetAttribute="biography"
         profile={props.profile}
         isSearchActive={props.isSearchActive}
+        isSearchSnippetUnfolded={isSearchSnippetUnfolded}
         collapsedHeight={style.collapseHeight.bio}
       />
 
@@ -150,7 +174,11 @@ export function ProfileCard(props: {
         </HStack>
       )}
 
-      <SeeksOffersSection profile={props.profile} isSearchActive={props.isSearchActive} />
+      <SeeksOffersSection
+        profile={props.profile}
+        isSearchActive={props.isSearchActive}
+        isUnfolded={isSearchSnippetUnfolded}
+      />
     </Stack>
   );
 }
@@ -404,6 +432,7 @@ function ProfileContentSection(props: {
   snippetAttribute: string;
   profile: ProfileFragmentType;
   isSearchActive?: boolean;
+  isSearchSnippetUnfolded?: boolean;
   collapsedHeight?: string;
   flex?: string;
   minW?: string;
@@ -412,7 +441,8 @@ function ProfileContentSection(props: {
     return null;
   }
 
-  const isSearchSnippet = props.isSearchActive && "_snippetResult" in props.profile;
+  const isSearchSnippet =
+    props.isSearchActive && !props.isSearchSnippetUnfolded && "_snippetResult" in props.profile;
 
   const content = isSearchSnippet ? (
     <Text
@@ -457,7 +487,11 @@ function ProfileContentSection(props: {
 }
 
 // #AI
-function SeeksOffersSection(props: { profile: ProfileFragmentType; isSearchActive?: boolean }) {
+function SeeksOffersSection(props: {
+  profile: ProfileFragmentType;
+  isSearchActive?: boolean;
+  isUnfolded?: boolean;
+}) {
   if (!props.profile.seeks && !props.profile.offers) {
     return null;
   }
@@ -474,6 +508,7 @@ function SeeksOffersSection(props: { profile: ProfileFragmentType; isSearchActiv
           snippetAttribute="seeks"
           profile={props.profile}
           isSearchActive={props.isSearchActive}
+          isSearchSnippetUnfolded={props.isUnfolded}
           flex="1"
         />
         <ProfileContentSection
@@ -482,6 +517,7 @@ function SeeksOffersSection(props: { profile: ProfileFragmentType; isSearchActiv
           snippetAttribute="offers"
           profile={props.profile}
           isSearchActive={props.isSearchActive}
+          isSearchSnippetUnfolded={props.isUnfolded}
           flex="1"
         />
       </HStack>
