@@ -16,7 +16,7 @@ import {
   useToken,
   Wrap,
 } from "@chakra-ui/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { LuSearch, LuX } from "react-icons/lu";
 import {
@@ -35,14 +35,18 @@ import { AiMatchingButtonTrigger } from "@/apps/profiles/list/AiMatchingButtonTr
 import { AiMatchingProgressBar } from "@/apps/profiles/list/AiMatchingProgressBar";
 import { ProfileCard } from "@/apps/profiles/list/ProfileCard/ProfileCard";
 import { useAlgoliaProfilesEnrichmentByGraphql } from "@/apps/profiles/list/useAlgoliaProfilesEnrichmentByGraphql";
+import { useProfilesSortedByDjango } from "@/apps/profiles/list/useProfilesSortedByDjango";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { gap } from "@/theme/theme";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
+type SortOption = "llm_score" | "user_score" | "newest";
+
 export function ProfileList() {
   const algolia = useAlgoliaSearchClient();
+  const [sort, setSort] = useState<SortOption>("llm_score");
 
   if (algolia.loading) {
     return <p>Loading Algolia...</p>;
@@ -58,76 +62,101 @@ export function ProfileList() {
       routing
       future={{ preserveSharedStateOnUnmount: true }}
     >
-      <Stack gap="gap.lg" w="100%">
-        <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
-          <Flex gap="14" align="center">
-            <Text fontSize="2xl" fontWeight="bold">
-              Profiles
-            </Text>
-            <Flex align="center" gap="gap.md" fontSize="sm" color="fg.subtle">
-              <Text mt="2px">Sort by</Text>
-              <AlgoliaSortControl algolia={algolia} />
-            </Flex>
-          </Flex>
-          <HStack gap="gap.md">
-            <AiMatchingButtonTrigger />
-            <SearchInput />
-          </HStack>
-        </HStack>
-
-        <AiMatchingProgressBar />
-
-        <Configure
-          hitsPerPage={20}
-          attributesToSnippet={["biography:60", "seeks:30", "offers:30"]}
-          attributesToHighlight={[
-            "biography",
-            "seeks",
-            "offers",
-            "first_name",
-            "last_name",
-            "job_title",
-            "company",
-            "interests",
-            "skills",
-          ]}
-        />
-
-        <Flex flex="1" pos="relative" gap="gap.xl">
-          <ProfileListHits />
-
-          <Stack
-            as="aside"
-            aria-label="sidebar"
-            pos="sticky"
-            h="min"
-            hideBelow="lg"
-            p={{ base: gap.md, md: gap.md }}
-            px={{ base: gap.md, md: gap.md }}
-            minW={{ base: "", md: "2xs", lg: "300px" }}
-            maxW="300px"
-            gap="gap.md2"
-            borderRadius="lg"
-            borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
-            bg="bg.panel"
-          >
-            <ActiveRefinements />
-            <Stack gap="gap.sm">
-              <Text {...style.facets.label}>AI Match Status</Text>
-              <ToggleFacet attribute="is_scored_by_llm" label="Scored by AI" />
-              <ToggleFacet attribute="is_reviewed_by_user" label="Reviewed by you" />
-            </Stack>
-            <FacetFilter name="career_stage" label="Career Stage" />
-            <FacetFilter name="interests.name" label="Interests" isSearchEnabled />
-            <FacetFilter name="skills.name" label="Skills" isSearchEnabled />
-            <FacetFilter name="country" label="Country" isSearchEnabled />
-            <FacetFilter name="company" label="Company" isSearchEnabled />
-            <FacetFilter name="seeking_work" label="Seeking Work" />
-            <FacetFilter name="recruitment" label="Recruitment" />
-          </Stack>
-        </Flex>
-      </Stack>
+      <ProfileListInner algolia={algolia} sort={sort} setSort={setSort} />
     </InstantSearch>
+  );
+}
+
+function ProfileListInner(props: {
+  algolia: AlgoliaStateLoaded;
+  sort: SortOption;
+  setSort: (sort: SortOption) => void;
+}) {
+  const search = useSearchBox();
+  const refinements = useCurrentRefinements();
+
+  const isAlgoliaSearchActive = search.query.length > 0 || refinements.items.length > 0;
+  const isDjangoMode = props.sort !== "newest" && !isAlgoliaSearchActive;
+
+  return (
+    <Stack gap="gap.lg" w="100%">
+      <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
+        <Flex gap="14" align="center">
+          <Text fontSize="2xl" fontWeight="bold">
+            Profiles
+          </Text>
+          <Flex align="center" gap="gap.md" fontSize="sm" color="fg.subtle">
+            <Text mt="2px">Sort by</Text>
+            <SortControl
+              algolia={props.algolia}
+              sort={props.sort}
+              setSort={props.setSort}
+              isDjangoMode={isDjangoMode}
+            />
+          </Flex>
+        </Flex>
+        <HStack gap="gap.md">
+          <AiMatchingButtonTrigger />
+          <SearchInput />
+        </HStack>
+      </HStack>
+
+      <AiMatchingProgressBar />
+
+      <Configure
+        hitsPerPage={20}
+        attributesToSnippet={["biography:60", "seeks:30", "offers:30"]}
+        attributesToHighlight={[
+          "biography",
+          "seeks",
+          "offers",
+          "first_name",
+          "last_name",
+          "job_title",
+          "company",
+          "interests",
+          "skills",
+        ]}
+      />
+
+      <Flex flex="1" pos="relative" gap="gap.xl">
+        {isDjangoMode ? (
+          <DjangoHits sort={props.sort} />
+        ) : (
+          <AlgoliaHits searchQuery={search.query} />
+        )}
+
+        <Stack
+          as="aside"
+          aria-label="sidebar"
+          pos="sticky"
+          h="min"
+          hideBelow="lg"
+          p={{ base: gap.md, md: gap.md }}
+          px={{ base: gap.md, md: gap.md }}
+          minW={{ base: "", md: "2xs", lg: "300px" }}
+          maxW="300px"
+          gap="gap.md2"
+          borderRadius="lg"
+          borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
+          bg="bg.panel"
+        >
+          <ActiveRefinements />
+          <Stack gap="gap.sm">
+            <Text {...style.facets.label}>AI Match Status</Text>
+            <ToggleFacet attribute="is_scored_by_llm" label="Scored by AI" />
+            <ToggleFacet attribute="is_reviewed_by_user" label="Reviewed by you" />
+          </Stack>
+          <FacetFilter name="career_stage" label="Career Stage" />
+          <FacetFilter name="interests.name" label="Interests" isSearchEnabled />
+          <FacetFilter name="skills.name" label="Skills" isSearchEnabled />
+          <FacetFilter name="country" label="Country" isSearchEnabled />
+          <FacetFilter name="company" label="Company" isSearchEnabled />
+          <FacetFilter name="seeking_work" label="Seeking Work" />
+          <FacetFilter name="recruitment" label="Recruitment" />
+        </Stack>
+      </Flex>
+    </Stack>
   );
 }
 
@@ -137,42 +166,58 @@ type WithNonNullable<T, Key extends keyof T> = Omit<T, Key> & {
 };
 type AlgoliaStateLoaded = WithNonNullable<
   AlgoliaState,
-  | "client"
-  | "indexNameProfiles"
-  | "indexNameProfilesSortedByUser"
-  | "indexNameProfilesSortedByNewest"
+  "client" | "indexNameProfiles" | "indexNameProfilesSortedByNewest"
 >;
 
-function AlgoliaSortControl(props: { algolia: AlgoliaStateLoaded }) {
-  const sort = useSortBy({
+function SortControl(props: {
+  algolia: AlgoliaStateLoaded;
+  sort: SortOption;
+  setSort: (sort: SortOption) => void;
+  isDjangoMode: boolean;
+}) {
+  const sortBy = useSortBy({
     items: [
       { value: props.algolia.indexNameProfiles, label: "AI Score" },
-      { value: props.algolia.indexNameProfilesSortedByUser, label: "Your Score" },
       { value: props.algolia.indexNameProfilesSortedByNewest, label: "Newest" },
     ],
   });
 
+  // Sync Algolia index when falling back to Algolia mode
+  useEffect(() => {
+    if (props.isDjangoMode) return;
+    const indexName =
+      props.sort === "newest"
+        ? props.algolia.indexNameProfilesSortedByNewest
+        : props.algolia.indexNameProfiles;
+    if (sortBy.currentRefinement !== indexName) {
+      sortBy.refine(indexName);
+    }
+  }, [props.isDjangoMode, props.sort]);
+
+  const sortOptions: { value: SortOption; label: string }[] = [
+    { value: "llm_score", label: "AI Score" },
+    { value: "user_score", label: "Your Score" },
+    { value: "newest", label: "Newest" },
+  ];
+
   return (
     <SegmentGroup.Root
-      value={sort.currentRefinement}
-      onValueChange={event => sort.refine(event.value!)}
+      value={props.sort}
+      onValueChange={event => props.setSort(event.value as SortOption)}
       size="sm"
       {...ids.set(ids.profile.listControls.sort)}
       h="fit-content"
       bg="bg.panel"
     >
       <SegmentGroup.Indicator />
-      <SegmentGroup.Items items={sort.options} />
+      <SegmentGroup.Items items={sortOptions} />
     </SegmentGroup.Root>
   );
 }
 
 function isAlgoliaLoaded(algolia: AlgoliaState): algolia is AlgoliaStateLoaded {
   return Boolean(
-    algolia.client &&
-      algolia.indexNameProfiles &&
-      algolia.indexNameProfilesSortedByUser &&
-      algolia.indexNameProfilesSortedByNewest,
+    algolia.client && algolia.indexNameProfiles && algolia.indexNameProfilesSortedByNewest,
   );
 }
 
@@ -212,14 +257,98 @@ function SearchInput() {
   );
 }
 
-function ProfileListHits() {
+const PAGE_SIZE = 20;
+
+function DjangoHits(props: { sort: SortOption }) {
+  const [page, setPage] = useState(1);
+
+  // Reset page when sort changes
+  useEffect(() => {
+    setPage(1);
+  }, [props.sort]);
+
+  const offset = (page - 1) * PAGE_SIZE;
+  const { items, totalCount, isLoadingFirstTime } = useProfilesSortedByDjango({
+    sort: props.sort,
+    offset,
+    limit: PAGE_SIZE,
+    skip: false,
+  });
+
+  if (isLoadingFirstTime) {
+    return (
+      <Stack gap="gap.xl" w="full">
+        <Text color="fg.subtle">Loading...</Text>
+      </Stack>
+    );
+  }
+
+  return (
+    <Stack gap="gap.xl" w="full">
+      <Stack {...ids.set(ids.profile.list)} gap="gap.xl">
+        {items.length > 0 ? (
+          items.map(profile => (
+            <ProfileCard
+              key={profile.id}
+              profile={profile}
+              isSearchActive={false}
+              isEnrichedByGraphql={true}
+            />
+          ))
+        ) : (
+          <HStack align="center">
+            <Text>No profiles found.</Text>
+          </HStack>
+        )}
+      </Stack>
+
+      {totalCount > PAGE_SIZE && (
+        <Pagination.Root
+          count={totalCount}
+          pageSize={PAGE_SIZE}
+          page={page}
+          onPageChange={details => setPage(details.page)}
+          siblingCount={2}
+        >
+          <ButtonGroup variant="ghost" size="sm" colorPalette="gray">
+            <Pagination.PrevTrigger asChild>
+              <IconButton>
+                <HiChevronLeft />
+              </IconButton>
+            </Pagination.PrevTrigger>
+
+            <Pagination.Items
+              render={page => (
+                <IconButton
+                  key={page.value}
+                  variant={{ base: "ghost", _selected: "outline" }}
+                  bg={{ _selected: "bg.panel" }}
+                  _hover={{ bg: { base: "bg.panel", _selected: "bg.emphasized" } }}
+                >
+                  {page.value}
+                </IconButton>
+              )}
+            />
+
+            <Pagination.NextTrigger asChild>
+              <IconButton>
+                <HiChevronRight />
+              </IconButton>
+            </Pagination.NextTrigger>
+          </ButtonGroup>
+        </Pagination.Root>
+      )}
+    </Stack>
+  );
+}
+
+function AlgoliaHits(props: { searchQuery: string }) {
   const hits = useHits<ProfileFragmentType>();
   const pagination = usePagination();
-  const search = useSearchBox();
   const { items: profilesEnriched, isEnrichedByGraphql } = useAlgoliaProfilesEnrichmentByGraphql(
     hits.items,
   );
-  const isSearchActive = search.query.length > 0;
+  const isSearchActive = props.searchQuery.length > 0;
 
   return (
     <Stack gap="gap.xl" w="full">

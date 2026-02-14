@@ -10,12 +10,16 @@ from django_tasks.base import TaskResultStatus
 from strawberry import ID
 from strawberry import Info
 from strawberry import auto
+from strawberry_django.pagination import OffsetPaginated
 from strawberry_django.permissions import IsAuthenticated
 
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.profiles.services.filter_profiles_by_user import filter_profiles_by_user
+from neuronhub.apps.profiles.services.get_sorted_by_match import (
+    get_profiles_queryset_sorted_by_match,
+)
 from neuronhub.apps.profiles.services.send_dm import send_profile_dm
 from neuronhub.apps.users.graphql.resolvers import get_user
 from neuronhub.apps.users.graphql.resolvers import get_user_sync
@@ -136,6 +140,13 @@ class ProfilesQuery:
             is_processing=True,
             model=kwargs.get("model"),
         )
+
+    @strawberry_django.offset_paginated(OffsetPaginated[ProfileType])
+    def profiles_sorted_by_match(self, info: Info, sort: str) -> QuerySet[Profile]:
+        user = get_user_sync(info)
+        if not user.is_authenticated:
+            return Profile.objects.none()
+        return get_profiles_queryset_sorted_by_match(user, sort)
 
     @strawberry.field(extensions=[IsAuthenticated()])
     async def profile_user_llm_md(self, info: Info) -> str:

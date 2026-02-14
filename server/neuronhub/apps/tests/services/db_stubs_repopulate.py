@@ -170,7 +170,6 @@ async def _algolia_reindex(
     from algoliasearch_django import reindex_all
 
     from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
-    from neuronhub.apps.profiles.index import setup_replicas_sorted_by_scores
 
     # todo refac: replace with a [[index.py]] method
     if is_import_HN_post:
@@ -178,7 +177,6 @@ async def _algolia_reindex(
         await sync_to_async(setup_virtual_replica_sorted_by_votes)()
     if is_import_profiles_csv:
         await sync_to_async(reindex_all)(Profile)
-        await sync_to_async(setup_replicas_sorted_by_scores)()
 
 
 class _disable_auto_indexing(ContextDecorator):

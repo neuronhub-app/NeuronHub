@@ -46,6 +46,38 @@ test.describe("ProfileList", () => {
     expect(await snippetContent.count()).toBeGreaterThanOrEqual(1);
   });
 
+  test("Django sort: AI Score and Your Score show profiles, switch works", async ({ page }) => {
+    await play.navigate(urls.profiles.list, { idleWait: true });
+
+    // Default sort is AI Score (Django mode) — should show profile cards
+    const sortControl = page.getByTestId(ids.profile.listControls.sort);
+    const profileList = page.getByTestId(ids.profile.list);
+    await profileList.waitFor();
+    const cardsOnAiScore = await profileList.getByTestId(ids.profile.card.container).count();
+    expect(cardsOnAiScore).toBeGreaterThanOrEqual(1);
+
+    // Switch to Your Score — still Django mode
+    await sortControl.getByText("Your Score").click();
+    await play.waitForNetworkIdle();
+    await profileList.waitFor();
+    const cardsOnUserScore = await profileList.getByTestId(ids.profile.card.container).count();
+    expect(cardsOnUserScore).toBeGreaterThanOrEqual(1);
+
+    // Switch to Newest — Algolia mode
+    await sortControl.getByText("Newest").click();
+    await play.waitForNetworkIdle();
+    await profileList.waitFor();
+    const cardsOnNewest = await profileList.getByTestId(ids.profile.card.container).count();
+    expect(cardsOnNewest).toBeGreaterThanOrEqual(1);
+
+    // Switch back to AI Score — Django mode again
+    await sortControl.getByText("AI Score").click();
+    await play.waitForNetworkIdle();
+    await profileList.waitFor();
+    const cardsBackToAi = await profileList.getByTestId(ids.profile.card.container).count();
+    expect(cardsBackToAi).toBeGreaterThanOrEqual(1);
+  });
+
   test("trigger LLM shows progress bar, cancel hides it", async () => {
     await play.navigate(urls.profiles.list, { idleWait: true });
 
