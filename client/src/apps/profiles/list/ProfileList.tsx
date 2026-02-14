@@ -27,7 +27,9 @@ import {
   useSortBy,
   useToggleRefinement,
 } from "react-instantsearch";
+import { AiMatchingProgressBar } from "@/apps/profiles/list/AiMatchingProgressBar";
 import { ProfileCard } from "@/apps/profiles/list/ProfileCard/ProfileCard";
+import { AiMatchingButtonTrigger } from "@/apps/profiles/list/AiMatchingButtonTrigger";
 import { useAlgoliaProfilesEnrichmentByGraphql } from "@/apps/profiles/list/useAlgoliaProfilesEnrichmentByGraphql";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
@@ -52,7 +54,7 @@ export function ProfileList() {
       routing
       future={{ preserveSharedStateOnUnmount: true }}
     >
-      <Stack gap="gap.lg">
+      <Stack gap="gap.lg" w="100%">
         <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
           <Flex gap="gap.md">
             <Text fontSize="2xl" fontWeight="bold">
@@ -60,8 +62,13 @@ export function ProfileList() {
             </Text>
             <AlgoliaSortControl algolia={algolia} />
           </Flex>
-          <SearchInput />
+          <HStack gap="gap.md">
+            <AiMatchingButtonTrigger />
+            <SearchInput />
+          </HStack>
         </HStack>
+
+        <AiMatchingProgressBar />
 
         <Configure
           hitsPerPage={20}

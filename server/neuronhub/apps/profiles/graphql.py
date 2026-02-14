@@ -5,6 +5,8 @@ import strawberry_django
 from algoliasearch_django import save_record
 from asgiref.sync import sync_to_async
 from django.db.models import QuerySet
+from django_tasks.backends.database.models import DBTaskResult
+from django_tasks.base import TaskResultStatus
 from strawberry import ID
 from strawberry import Info
 from strawberry import auto
@@ -77,6 +79,23 @@ class ProfileType:
     match: ProfileMatchType | None = strawberry_django.field(extensions=[IsAuthenticated()])
 
 
+SCORE_PROFILES_TASK = "neuronhub.apps.profiles.tasks.score_profiles_task"
+
+
+@strawberry.type
+class ProgressType:
+    total: int
+    processed: int
+    is_processing: bool
+    model: str | None = None
+
+    @strawberry.field
+    def percent(self) -> float:
+        if self.total == 0:
+            return 0.0
+        return round((self.processed / self.total) * 100, 1)
+
+
 @strawberry.type(name="Query")
 class ProfilesQuery:
     profiles: list[ProfileType] = strawberry_django.field()
@@ -89,6 +108,43 @@ class ProfilesQuery:
             return cast(ProfileType, await Profile.objects.aget(user=user))
         except Profile.DoesNotExist:
             return None
+
+    @strawberry.field(extensions=[IsAuthenticated()])
+    async def profile_match_progress(self, info: Info) -> ProgressType:
+        user = await get_user(info)
+
+        active_task = (
+            await DBTaskResult.objects.filter(
+                task_path=SCORE_PROFILES_TASK,
+                status__in=[TaskResultStatus.READY, TaskResultStatus.RUNNING],
+            )
+            .order_by("-enqueued_at")
+            .afirst()
+        )
+        if not active_task:
+            return ProgressType(total=0, processed=0, is_processing=False)
+
+        kwargs = active_task.args_kwargs.get("kwargs", {}) if active_task.args_kwargs else {}
+
+        processed = await ProfileMatch.objects.filter(
+            user=user, match_processed_at__gte=active_task.enqueued_at
+        ).acount()
+
+        return ProgressType(
+            total=kwargs.get("limit", 0),
+            processed=processed,
+            is_processing=True,
+            model=kwargs.get("model"),
+        )
+
+    @strawberry.field(extensions=[IsAuthenticated()])
+    async def profile_user_llm_md(self, info: Info) -> str:
+        user = await get_user(info)
+        try:
+            profile = await Profile.objects.aget(user=user)
+            return profile.profile_for_llm_md or ""
+        except Profile.DoesNotExist:
+            return ""
 
 
 @strawberry.type
@@ -145,3 +201,40 @@ class ProfilesMutation:
         profile.is_profile_custom = False
         await profile.asave()
         return True
+
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def profile_matches_trigger_llm(
+        self,
+        info: Info,
+        limit: int = 50,
+        model: str = "haiku",
+    ) -> ProgressType:
+        from neuronhub.apps.profiles.tasks import score_profiles_task
+
+        user = await get_user(info)
+        try:
+            profile = await Profile.objects.aget(user=user)
+            user_profile = profile.profile_for_llm_md or ""
+        except Profile.DoesNotExist:
+            user_profile = ""
+
+        await score_profiles_task.aenqueue(
+            user_id=user.id,
+            user_profile=user_profile,
+            limit=limit,
+            batch_size=10,
+            model=model,
+        )
+
+        return ProgressType(total=limit, processed=0, is_processing=True, model=model)
+
+    @strawberry.mutation(extensions=[IsAuthenticated()])
+    async def profile_matches_cancel_llm(self, info: Info) -> bool:
+        from django_tasks.backends.database.models import DBTaskResult
+        from django_tasks.base import TaskResultStatus
+
+        updated = await DBTaskResult.objects.filter(
+            task_path=SCORE_PROFILES_TASK,
+            status__in=[TaskResultStatus.READY, TaskResultStatus.RUNNING],
+        ).aupdate(status=TaskResultStatus.FAILED)
+        return updated > 0
