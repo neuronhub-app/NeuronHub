@@ -206,7 +206,11 @@ function SearchInput() {
         {...ids.set(ids.profile.searchInput)}
         bg="bg.panel"
         borderRadius="md"
-        border="0"
+        border="1px solid"
+        borderColor="inherit"
+        _hover={{
+          borderColor: "border.emphasized",
+        }}
       />
     </InputGroup>
   );
