@@ -64,7 +64,7 @@ export function ProfileList() {
             <Text fontSize="2xl" fontWeight="bold">
               Profiles
             </Text>
-            <Flex align="center" gap="gap.md" fontSize="sm" color="fg.subtle">
+            <Flex align="center" gap="gap.md" fontSize="sm" color="fg.muted">
               <Text mt="2px">Sort by</Text>
               <AlgoliaSortControl algolia={algolia} />
             </Flex>
