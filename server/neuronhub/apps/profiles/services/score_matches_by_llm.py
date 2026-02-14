@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from logging import getLogger
 
 from algoliasearch_django import save_record
-from algoliasearch_django import update_records
+from django.conf import settings
 from django.db.models import QuerySet
 from django.utils import timezone
 from faker.proxy import Faker
@@ -65,12 +65,11 @@ def score_matches_by_llm(
                 },
             )
 
-        update_records(
-            model=Profile,
-            qs=Profile.objects.filter(
+        if settings.ALGOLIA["IS_ENABLED"]:
+            for profile in Profile.objects.filter(
                 id__in=[score.profile_id for score in match_result.scores]
-            ),
-        )
+            ):
+                save_record(profile)
 
     return scores
 
