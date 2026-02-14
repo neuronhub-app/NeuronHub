@@ -115,6 +115,8 @@ class ProfileAdmin(SimpleHistoryAdmin):
         "job_title",
         "country",
         "get_url_linkedin",
+        "match__match_score_by_llm",
+        "match__match_score",
     ]
 
     autocomplete_fields = [
@@ -122,11 +124,11 @@ class ProfileAdmin(SimpleHistoryAdmin):
         "groups",
     ]
 
-    def get_list_filter(self, request: HttpRequest):
-        return [
-            "recruitment",
-            CareerStageFilter,
-        ]
+    # def get_list_filter(self, request: HttpRequest):
+    #     return [
+    #         CareerStageFilter,
+    #         "user",
+    #     ]
 
     search_fields = [
         "first_name",
