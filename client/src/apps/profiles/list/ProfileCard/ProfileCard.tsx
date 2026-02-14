@@ -65,6 +65,9 @@ const style = {
     data: "sm",
     help: "sm",
   },
+  markHighlight: {
+    "& mark": { bg: "yellow.200", color: "black", borderRadius: "2px", px: "1px" },
+  },
 } as const;
 
 // #AI
@@ -75,6 +78,7 @@ export function ProfileCard(props: {
 }) {
   const state = useStateValtio({ isSearchSnippetUnfolded: false });
   const isHighlightable = props.isSearchActive && "_highlightResult" in props.profile;
+  const profileHit = props.profile as unknown as Hit<BaseHit>;
   const isSearchSnippetUnfolded = state.snap.isSearchSnippetUnfolded;
 
   const cardStyle = {
@@ -90,6 +94,7 @@ export function ProfileCard(props: {
       borderColor="border.subtle"
       position="relative"
       bg="bg.panel"
+      css={style.markHighlight}
       {...ids.set(ids.profile.card.container)}
       data-id={props.profile.id}
     >
@@ -123,7 +128,11 @@ export function ProfileCard(props: {
             <ProfileNameLink profile={props.profile} isHighlightable={isHighlightable} />
             <Separator orientation="vertical" h="23px" />
             <Text color="fg.dark-friendly" {...style.header}>
-              {props.profile.job_title}
+              {isHighlightable ? (
+                <Highlight attribute="job_title" hit={profileHit} />
+              ) : (
+                props.profile.job_title
+              )}
             </Text>
           </HStack>
         </HStack>
@@ -139,7 +148,11 @@ export function ProfileCard(props: {
               <Icon boxSize="4.5" color="fg.muted/65">
                 <GoOrganization />
               </Icon>
-              {props.profile.company}
+              {isHighlightable ? (
+                <Highlight attribute="company" hit={profileHit} />
+              ) : (
+                props.profile.company
+              )}
             </Flex>
           )}
 
@@ -195,7 +208,12 @@ export function ProfileCard(props: {
         <>
           <HStack align="flex-start" flexWrap="wrap" gap="gap.md">
             {props.profile.skills?.length > 0 && (
-              <ProfileTagGroup label="Skills" tags={props.profile.skills} colorPalette="gray" />
+              <ProfileTagGroup
+                label="Skills"
+                tags={props.profile.skills}
+                colorPalette="gray"
+                hit={isHighlightable ? profileHit : undefined}
+              />
             )}
 
             {props.profile.interests?.length > 0 && (
@@ -203,6 +221,7 @@ export function ProfileCard(props: {
                 label="Interests"
                 tags={props.profile.interests}
                 colorPalette="gray"
+                hit={isHighlightable ? profileHit : undefined}
               />
             )}
           </HStack>
@@ -486,15 +505,21 @@ function ProfileTagGroup(props: {
   label: string;
   tags: { id: string; name: string }[];
   colorPalette: string;
+  hit?: Hit<BaseHit>;
 }) {
+  const attribute = props.label.toLowerCase();
   return (
     <Stack gap="gap.sm" flex="1">
       <Text {...style.label}>{props.label}</Text>
       <Flex gap="gap.sm" flexWrap="wrap" {...ids.set(ids.profile.card.tags)}>
-        {props.tags.map(tag => {
+        {props.tags.map((tag, index) => {
           return (
             <Tag key={tag.name} variant="subtle" colorPalette={props.colorPalette}>
-              {tag.name}
+              {props.hit ? (
+                <Highlight attribute={[attribute, String(index), "name"]} hit={props.hit} />
+              ) : (
+                tag.name
+              )}
             </Tag>
           );
         })}
@@ -523,14 +548,7 @@ function ProfileContentSection(props: {
     props.isSearchActive && !props.isSearchSnippetUnfolded && "_snippetResult" in props.profile;
 
   const content = isSearchSnippet ? (
-    <Text
-      color="fg"
-      fontSize="sm"
-      css={{
-        "& mark": { bg: "yellow.200", color: "black", borderRadius: "2px", px: "1px" },
-      }}
-      {...ids.set(ids.profile.card.contentSnippet)}
-    >
+    <Text color="fg" fontSize="sm" {...ids.set(ids.profile.card.contentSnippet)}>
       <Snippet
         attribute={props.snippetAttribute}
         hit={props.profile as unknown as Hit<BaseHit>}
