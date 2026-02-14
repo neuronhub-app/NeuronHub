@@ -11,15 +11,19 @@ import {
   Pagination,
   SegmentGroup,
   Stack,
+  Tag,
   Text,
   useToken,
+  Wrap,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
-import { LuSearch } from "react-icons/lu";
+import { LuSearch, LuX } from "react-icons/lu";
 import {
   Configure,
   InstantSearch,
+  useClearRefinements,
+  useCurrentRefinements,
   useHits,
   usePagination,
   useRefinementList,
@@ -56,11 +60,14 @@ export function ProfileList() {
     >
       <Stack gap="gap.lg" w="100%">
         <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
-          <Flex gap="gap.md">
+          <Flex gap="14" align="center">
             <Text fontSize="2xl" fontWeight="bold">
               Profiles
             </Text>
-            <AlgoliaSortControl algolia={algolia} />
+            <Flex align="center" gap="gap.md" fontSize="sm" color="fg.subtle">
+              <Text mt="2px">Sort by</Text>
+              <AlgoliaSortControl algolia={algolia} />
+            </Flex>
           </Flex>
           <HStack gap="gap.md">
             <AiMatchingButtonTrigger />
@@ -104,6 +111,7 @@ export function ProfileList() {
             borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
             bg="bg.panel"
           >
+            <ActiveRefinements />
             <Stack gap="gap.sm">
               <Text {...style.facets.label}>AI Match Status</Text>
               <ToggleFacet attribute="is_scored_by_llm" label="Scored by AI" />
@@ -138,7 +146,7 @@ type AlgoliaStateLoaded = WithNonNullable<
 function AlgoliaSortControl(props: { algolia: AlgoliaStateLoaded }) {
   const sort = useSortBy({
     items: [
-      { value: props.algolia.indexNameProfiles, label: "LLM Score" },
+      { value: props.algolia.indexNameProfiles, label: "AI Score" },
       { value: props.algolia.indexNameProfilesSortedByUser, label: "Your Score" },
       { value: props.algolia.indexNameProfilesSortedByNewest, label: "Newest" },
     ],
@@ -289,6 +297,54 @@ const style = {
     },
   },
 } as const;
+
+// #AI
+function ActiveRefinements() {
+  const current = useCurrentRefinements();
+  const clear = useClearRefinements();
+
+  if (!clear.canRefine) return null;
+
+  return (
+    <Stack gap="gap.sm">
+      <HStack justify="space-between">
+        <Text {...style.facets.label}>Active Filters</Text>
+        <Button onClick={() => clear.refine()} variant="outline" size="2xs">
+          Reset all
+        </Button>
+      </HStack>
+      <Wrap gap="gap.sm">
+        {current.items.flatMap(item =>
+          item.refinements.map(refinement => {
+            const label =
+              {
+                is_scored_by_llm: "Scored by AI",
+                is_reviewed_by_user: "Reviewed by you",
+              }[item.attribute] ?? refinement.label;
+            return (
+              <Tag.Root
+                key={`${item.attribute}-${refinement.label}`}
+                size="sm"
+                variant="subtle"
+                colorPalette="gray"
+                cursor="pointer"
+                onClick={() => item.refine(refinement)}
+                _hover={{ bg: "bg.emphasized" }}
+                transition="backgrounds"
+                css={{ "&:hover .close-icon": { color: "red" } }}
+              >
+                <Tag.Label>{label}</Tag.Label>
+                <Tag.EndElement>
+                  <LuX className="close-icon" />
+                </Tag.EndElement>
+              </Tag.Root>
+            );
+          }),
+        )}
+      </Wrap>
+    </Stack>
+  );
+}
 
 function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boolean }) {
   const refinements = useRefinementList({

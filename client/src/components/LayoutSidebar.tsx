@@ -15,7 +15,6 @@ import {
 } from "@chakra-ui/react";
 import { MessageSquareText } from "lucide-react";
 import type { ComponentType } from "react";
-import { FaRegBookmark } from "react-icons/fa6";
 import { FiUsers } from "react-icons/fi";
 import { GoCommentDiscussion } from "react-icons/go";
 import { LuLayoutDashboard, LuLibrary, LuLogIn, LuLogOut, LuSettings } from "react-icons/lu";
