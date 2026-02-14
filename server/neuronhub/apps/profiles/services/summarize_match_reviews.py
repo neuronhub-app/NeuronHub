@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from typing import cast
+from typing import TYPE_CHECKING
 
 from django.db.models import F
 from django.db.models import QuerySet
@@ -10,8 +10,12 @@ from neuronhub.apps.profiles.services.serialize_to_md import serialize_to_md_xml
 from neuronhub.apps.users.models import User
 
 
-class ProfileMatchAnnotated(ProfileMatch):
-    match_score_delta: int
+if TYPE_CHECKING:
+    from typing import type_check_only
+
+    @type_check_only
+    class ProfileMatchAnnotated(ProfileMatch):
+        match_score_delta: int
 
 
 def get_reviewed_profiles(user: User) -> QuerySet[ProfileMatchAnnotated]:
@@ -25,7 +29,7 @@ def get_reviewed_profiles(user: User) -> QuerySet[ProfileMatchAnnotated]:
         .prefetch_related("profile__skills")
         .order_by("match_score_delta")
     )
-    return cast(QuerySet[ProfileMatchAnnotated], matches)
+    return matches  # type: ignore[return-value] # can't cast. And Mypy ignores annotate()
 
 
 Matches = Sequence[ProfileMatch] | QuerySet[ProfileMatch]
