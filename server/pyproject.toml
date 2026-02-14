@@ -73,7 +73,6 @@ dependencies = [
         "wat == 0.7.*",
         "pytest == 8.*",
         "pytest-django == 4.*",
-        "pytest-pspec == 0.0.4", # ~dead, mostly useless, #freeze
         "pytest-rich == 0.*",
         "types-requests == 2.*",
     ]
@@ -148,7 +147,6 @@ dependencies = [
         "--color=yes",
         "--code-highlight=yes",
         "--no-header",
-        "--pspec", # allows to use docstrings instead of test function names
     ]
     filterwarnings = [
         "ignore::DeprecationWarning:functools",

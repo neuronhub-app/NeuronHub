@@ -1245,7 +1245,6 @@ dev = [
     { name = "pip" },
     { name = "pytest" },
     { name = "pytest-django" },
-    { name = "pytest-pspec" },
     { name = "pytest-rich" },
     { name = "ruff" },
     { name = "types-requests" },
@@ -1308,7 +1307,6 @@ dev = [
     { name = "pip", specifier = "==25.*" },
     { name = "pytest", specifier = "==8.*" },
     { name = "pytest-django", specifier = "==4.*" },
-    { name = "pytest-pspec", specifier = "==0.0.4" },
     { name = "pytest-rich", specifier = "==0.*" },
     { name = "ruff", specifier = "==0.14.*" },
     { name = "types-requests", specifier = "==2.*" },
@@ -1668,19 +1666,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b1/fb/55d580352db26eb3d59ad50c64321ddfe228d3d8ac107db05387a2fadf3a/pytest_django-4.11.1.tar.gz", hash = "sha256:a949141a1ee103cb0e7a20f1451d355f83f5e4a5d07bdd4dcfdd1fd0ff227991", size = 86202, upload-time = "2025-04-03T18:56:09.338Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/be/ac/bd0608d229ec808e51a21044f3f2f27b9a37e7a0ebaca7247882e67876af/pytest_django-4.11.1-py3-none-any.whl", hash = "sha256:1b63773f648aa3d8541000c26929c1ea63934be1cfa674c76436966d73fe6a10", size = 25281, upload-time = "2025-04-03T18:56:07.678Z" },
-]
-
-[[package]]
-name = "pytest-pspec"
-version = "0.0.4"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-    { name = "six" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/cc/e1/c22cf2cdd39dfdc5b482e3f11754a3646b5bb8d6e5bc50b5722322574016/pytest-pspec-0.0.4.tar.gz", hash = "sha256:5c0b0c9e964d5066cc5f2a2e1b296ad1313abbf58c4fd75014553fdf65bfe67a", size = 5268, upload-time = "2020-06-02T17:13:20.166Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/91/e4/1b8cd89205c84f46bc4240eb86840bf2b6729db95c2ede712abc7226c5ff/pytest_pspec-0.0.4-py2.py3-none-any.whl", hash = "sha256:f80cc46f8896524bfe68750f3a5324bad8d4cb5112e90004bfdaafb7248e5cfd", size = 7313, upload-time = "2020-06-02T17:13:19.183Z" },
 ]
 
 [[package]]
