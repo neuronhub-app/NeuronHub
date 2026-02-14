@@ -142,7 +142,7 @@ DATABASES = {
             "DATABASE_URL",
             f"postgres://{_db_user}:{_db_pass}@{_db_host}:{env.int('DB_PORT', 5432)}/{_db_name}",
         ),
-        test_options={"NAME": env.str("PYTEST_DB_NAME")},
+        test_options={"NAME": env.str("PYTEST_DB_NAME", f"{_db_name}_test")},
     )
 }
 
