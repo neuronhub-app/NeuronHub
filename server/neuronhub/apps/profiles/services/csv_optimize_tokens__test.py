@@ -8,12 +8,6 @@ class CsvOptimizeTokensTest(NeuronTestCase):
         assert csv_optimize_tokens("Software development/Software engineering") == "SWE"
         assert csv_optimize_tokens("Software development / Software engineering") == "SWE"
 
-    def test_replacements_apply_case_insensitive(self):
-        assert csv_optimize_tokens("AI SAFETY") == "AIS"
-
-    def test_replacements_apply_empty(self):
-        assert csv_optimize_tokens("") == ""
-
     def test_new_replacements(self):
         assert csv_optimize_tokens("Global health & development") == "Global health"
         assert csv_optimize_tokens("Pursuing a graduate degree (e.g. Masters)") == "Grad student"

@@ -31,7 +31,7 @@ class Command(BaseCommand):
             self.stdout.write("DRY RUN - no changes will be made")
 
         with _disable_auto_indexing():
-            stats = csv_optimize_and_import(csv, limit=limit)
+            stats = csv_optimize_and_import(csv, limit=limit, is_reindex_algolia=False)
 
         self.stdout.write(f"Created:   {stats.created}")
         self.stdout.write(f"Updated:   {stats.updated}")
