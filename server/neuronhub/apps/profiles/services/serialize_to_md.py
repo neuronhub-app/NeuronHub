@@ -48,7 +48,6 @@ def serialize_profile_to_markdown(profile: Profile) -> str:
         text="\n\n".join(parts),
         attributes={
             "id": profile.id or "N/A",
-            "name": f"{optimized_first_name} {optimized_last_name}",
         },
         indent="\t",
     )
