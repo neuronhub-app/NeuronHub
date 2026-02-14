@@ -3,6 +3,7 @@ from typing import cast
 import strawberry
 import strawberry_django
 from algoliasearch_django import save_record
+from asgiref.sync import sync_to_async
 from django.db.models import QuerySet
 from strawberry import ID
 from strawberry import Info
@@ -110,7 +111,8 @@ class ProfilesMutation:
             profile_id=profile_id,
             defaults={"match_score": match_score, "user": user},
         )
-        save_record(await Profile.objects.aget(profile_id))
+        profile = await Profile.objects.aget(id=profile_id)
+        await sync_to_async(save_record)(profile)
         return True
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
@@ -122,7 +124,8 @@ class ProfilesMutation:
             profile_id=profile_id,
             defaults={"match_review": match_review, "user": user},
         )
-        save_record(await Profile.objects.aget(profile_id))
+        profile = await Profile.objects.aget(id=profile_id)
+        await sync_to_async(save_record)(profile)
         return True
 
     # AI
