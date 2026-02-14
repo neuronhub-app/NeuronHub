@@ -64,7 +64,12 @@ export function AiMatchingButtonTrigger() {
   return (
     <Popover.Root open={isOpen} onOpenChange={e => setIsOpen(e.open)}>
       <Popover.Trigger asChild>
-        <Button size="sm" variant="outline" {...ids.set(ids.profile.llm.triggerButton)}>
+        <Button
+          colorPalette="teal"
+          size="sm"
+          variant="solid"
+          {...ids.set(ids.profile.llm.triggerButton)}
+        >
           Run AI Matching
         </Button>
       </Popover.Trigger>

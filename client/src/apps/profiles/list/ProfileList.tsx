@@ -27,9 +27,9 @@ import {
   useSortBy,
   useToggleRefinement,
 } from "react-instantsearch";
+import { AiMatchingButtonTrigger } from "@/apps/profiles/list/AiMatchingButtonTrigger";
 import { AiMatchingProgressBar } from "@/apps/profiles/list/AiMatchingProgressBar";
 import { ProfileCard } from "@/apps/profiles/list/ProfileCard/ProfileCard";
-import { AiMatchingButtonTrigger } from "@/apps/profiles/list/AiMatchingButtonTrigger";
 import { useAlgoliaProfilesEnrichmentByGraphql } from "@/apps/profiles/list/useAlgoliaProfilesEnrichmentByGraphql";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
@@ -149,6 +149,7 @@ function AlgoliaSortControl(props: { algolia: AlgoliaStateLoaded }) {
       size="sm"
       {...ids.set(ids.profile.listControls.sort)}
       h="fit-content"
+      bg="bg.panel"
     >
       <SegmentGroup.Indicator />
       <SegmentGroup.Items items={sort.options} />
