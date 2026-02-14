@@ -95,7 +95,7 @@
         dir = "server"
         run = "uv run manage.py runserver {{ env.SERVER_PORT }}"
 
-    [tasks."dev:server-background-tasks"]
+    [tasks."dev:server-db-worker"]
         depends = "dev:db"
         dir = "server"
         run = "uv run manage.py db_worker"
