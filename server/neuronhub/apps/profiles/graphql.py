@@ -100,6 +100,12 @@ class ProgressType:
         return round((self.processed / self.total) * 100, 1)
 
 
+@strawberry.type
+class ProfileMatchStatsType:
+    rated_count: int
+    llm_scored_count: int
+
+
 @strawberry.type(name="Query")
 class ProfilesQuery:
     profiles: list[ProfileType] = strawberry_django.field()
@@ -167,12 +173,6 @@ class ProfilesQuery:
             return profile.profile_for_llm_md or ""
         except Profile.DoesNotExist:
             return ""
-
-
-@strawberry.type
-class ProfileMatchStatsType:
-    rated_count: int
-    llm_scored_count: int
 
 
 @strawberry.type
