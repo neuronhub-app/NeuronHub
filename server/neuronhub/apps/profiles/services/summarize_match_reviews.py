@@ -83,9 +83,16 @@ def build_calibration_examples(matches: Matches, max_examples: int = 8) -> str:
     matches_list = list(matches)
     if len(matches_list) >= max_examples:
         # sorted by delta ascending; take ~6 negative + ~2 positive corrections
-        positive = [m for m in matches_list if getattr(m, "match_score_delta", 0) > 0][-2:]
-        n_negative = max_examples - len(positive)
-        matches_list = positive + matches_list[:n_negative]
+        matches_positive = []
+        for match in matches_list:
+            match_delta = getattr(match, "match_score_delta", 0)
+            match_delta = 0 if match_delta is None else match_delta
+            if match_delta > 0:
+                matches_positive.append(match)
+        matches_positive = matches_positive[-2:]
+        matches_negative = max_examples - len(matches_positive)
+
+        matches_list = matches_positive + matches_list[:matches_negative]
 
     examples = "\n\n".join([_serialize_calibration_example(m) for m in matches_list])
 
