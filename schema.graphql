@@ -128,6 +128,8 @@ type Mutation {
   profile_match_review_update(profile_id: ID!, match_review: String!): Boolean! @IsAuthenticated
   profile_llm_md_update(profile_for_llm_md: String!): Boolean! @IsAuthenticated
   profile_llm_md_reset: Boolean! @IsAuthenticated
+  profile_matches_trigger_llm(limit: Int! = 50, model: String! = "haiku"): ProgressType! @IsAuthenticated
+  profile_matches_cancel_llm: Boolean! @IsAuthenticated
 }
 
 input OneToManyInput {
@@ -656,6 +658,14 @@ type ProfileType {
   match: ProfileMatchType @IsAuthenticated
 }
 
+type ProgressType {
+  total: Int!
+  processed: Int!
+  is_processing: Boolean!
+  model: String
+  percent: Float!
+}
+
 type Query {
   user_current: UserType
   algolia_search_key: AlgoliaSearchKeyType
@@ -674,6 +684,8 @@ type Query {
   user_highlights: [PostHighlightType!]! @IsAuthenticated
   profiles(filters: ProfileFilter): [ProfileType!]!
   my_profile: ProfileType @IsAuthenticated
+  profile_match_progress: ProgressType! @IsAuthenticated
+  profile_user_llm_md: String! @IsAuthenticated
 }
 
 input StrFilterLookup {

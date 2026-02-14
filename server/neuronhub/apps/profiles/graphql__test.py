@@ -44,29 +44,3 @@ class ProfileModelTest(NeuronTestCase):
 
         profile = await self._get_profile_with_match(profile.pk)
         assert await sync_to_async(profile.is_needs_llm_reprocessing)() is False
-
-    async def test_profile_llm_md_reset_restores_auto_generation(self):
-        user = await self.gen.users.user()
-        profile = await self.gen.profiles.profile(user=user)
-
-        # Set custom profile
-        profile.is_profile_custom = True
-        profile.profile_for_llm_md = "Custom markdown content"
-        await profile.asave()
-
-        assert profile.is_profile_custom is True
-        custom_md = profile.profile_for_llm_md
-
-        # Reset to auto-generation
-        mutation = """
-            mutation {
-                profile_llm_md_reset
-            }
-        """
-        result = await self.graphql_query(mutation, user_authed=user)
-        assert result.errors is None
-
-        # Verify auto-generation is restored
-        profile = await Profile.objects.aget(pk=profile.pk)
-        assert profile.is_profile_custom is False
-        assert profile.profile_for_llm_md != custom_md

@@ -140,6 +140,14 @@ export namespace ids {
       unfoldBtn: "profile.card.unfold-btn",
       tags: "profile.card.tags",
     },
+    llm: {
+      progressBar: "profile.llm.progress-bar",
+      triggerButton: "profile.llm.trigger-button",
+      modelSelect: "profile.llm.model-select",
+      limitInput: "profile.llm.limit-input",
+      submitButton: "profile.llm.submit-button",
+      cancelButton: "profile.llm.cancel-button",
+    },
   } as const;
 
   export const auth = {
