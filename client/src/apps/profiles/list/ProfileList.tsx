@@ -91,10 +91,9 @@ export function ProfileList() {
             minW={{ base: "", md: "2xs", lg: "300px" }}
             maxW="300px"
             gap="gap.md2"
-            borderRadius="md"
-            border="1px solid"
+            borderRadius="lg"
             borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
-            bg={{ _light: "bg.subtle/30", _dark: "bg.subtle" }}
+            bg="bg.panel"
           >
             <Stack gap="gap.sm">
               <Text {...style.facets.label}>AI Match Status</Text>
@@ -187,6 +186,9 @@ function SearchInput() {
         type="search"
         placeholder="Search"
         {...ids.set(ids.profile.searchInput)}
+        bg="bg.panel"
+        borderRadius="md"
+        border="0"
       />
     </InputGroup>
   );
@@ -203,7 +205,7 @@ function ProfileListHits() {
 
   return (
     <Stack gap="gap.xl" w="full">
-      <Stack {...ids.set(ids.profile.list)} gap="gap.md2">
+      <Stack {...ids.set(ids.profile.list)} gap="gap.xl">
         {hits.results?.nbHits && profilesEnriched.length ? (
           profilesEnriched.map(profile => (
             <ProfileCard
@@ -261,8 +263,8 @@ const style = {
   facets: {
     label: {
       color: "fg.muted",
-      fontWeight: "bold",
       fontSize: "13px",
+      fontWeight: "semibold",
     },
     value: {
       display: "inline-flex",
