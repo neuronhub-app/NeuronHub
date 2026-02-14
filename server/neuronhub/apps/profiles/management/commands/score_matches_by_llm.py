@@ -1,5 +1,8 @@
 from django.core.management.base import BaseCommand
 
+from neuronhub.apps.profiles.services.csv_import_optimized import (
+    get_top_llm_scored_unreviewed_profiles,
+)
 from neuronhub.apps.profiles.services.csv_import_optimized import get_unprocessed_profiles
 from neuronhub.apps.profiles.services.score_matches_by_llm import MatchConfig
 from neuronhub.apps.profiles.services.score_matches_by_llm import score_matches_by_llm
@@ -66,15 +69,18 @@ class Command(BaseCommand):
             use_calibration=not no_calibration,
         )
 
-        attendees = get_unprocessed_profiles(user_obj)
+        is_rescore = model != "haiku"
+        if is_rescore:
+            attendees = get_top_llm_scored_unreviewed_profiles(user_obj)
+        else:
+            attendees = get_unprocessed_profiles(user_obj)
         count_total = attendees.count()
 
         if limit:
             attendees = attendees[:limit]
 
-        self.stdout.write(
-            f"Processing {attendees.count()} of {count_total} unprocessed attendees"
-        )
+        label = "top AI-scored unreviewed" if is_rescore else "unprocessed"
+        self.stdout.write(f"Processing {attendees.count()} of {count_total} {label} attendees")
         self.stdout.write(f"Batch size: {batch_size}, Model: {model}")
         self.stdout.write("")
 

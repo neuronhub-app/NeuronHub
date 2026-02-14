@@ -121,6 +121,17 @@ def get_unprocessed_profiles(user: User):
     return Profile.objects.exclude(match__user=user, match__match_processed_at__isnull=False)
 
 
+def get_top_llm_scored_unreviewed_profiles(user: User):
+    return (
+        Profile.objects.filter(
+            match__user=user,
+            match__match_score_by_llm__isnull=False,
+        )
+        .exclude(match__match_score__isnull=False)
+        .order_by("-match__match_score_by_llm")
+    )
+
+
 def _split_and_normalize(value: str) -> list[str]:
     if not value:
         return []
