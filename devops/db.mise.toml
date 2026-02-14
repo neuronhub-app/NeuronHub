@@ -45,7 +45,8 @@
         if $env.IS_POSTGRES_MACOS == "true" {
             createdb-{{ env.DB_VER }} --owner={{ env.DB_USER }} {{ env.E2E_DB_NAME }} | complete
         } else {
-            let res = ( sudo -E docker compose exec db bash -c "createdb --owner={{ env.DB_USER }} {{ env.E2E_DB_NAME }}" | complete )
+            print 'sudo -E docker compose exec db bash -c "createdb --owner={{ env.DB_USER }} --port={{ env.DB_PORT }} {{ env.E2E_DB_NAME }}'
+            let res = ( sudo -E docker compose exec db bash -c "createdb --user={{ env.DB_USER }} --owner={{ env.DB_USER }} {{ env.E2E_DB_NAME }}" | complete )
             if $res.exit_code > 0 {
                 if ($res.stderr | str contains "already exists") {
                     print "db already exists"
