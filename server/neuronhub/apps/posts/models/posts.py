@@ -330,7 +330,7 @@ class Post(AnonimazableTimeStampedModel):
 
     def _get_graphql_field(self, field: str) -> Any | None:
         """
-        We re-use the "PostsByIds" query to supply the identical JSON schema to FE from both Algolia and GraphQL.
+        We re-use the "{Type}ByIds" query to supply the identical JSON schema to FE from both Algolia and GraphQL.
         See [[Algolia.md]].
 
         Caches GraphQL to avoid N+1 in Algolia indexing.
@@ -344,16 +344,22 @@ class Post(AnonimazableTimeStampedModel):
         if not self._algolia_graphql_cache:
             self._algolia_graphql_cache = {}
 
+            query_name, resolver_key = {
+                "post": ("PostsByIds", "posts"),
+                "tool": ("ToolsByIds", "post_tools"),
+                "review": ("ReviewsByIds", "post_reviews"),
+            }.get(self.type, ("PostsByIds", "posts"))
+
             request = RequestFactory().get("/graphql")
             request.user = self.author or AnonymousUser()
             response = async_to_sync(schema.execute)(
-                query=_load_client_persisted_queries_json()["PostsByIds"],
+                query=_load_client_persisted_queries_json()[query_name],
                 variable_values={"ids": [self.pk]},
                 context_value=StrawberryContext(request=request),
             )
             assert response.data
-            if posts := response.data["posts"]:
-                self._algolia_graphql_cache = posts[0]
+            if items := response.data[resolver_key]:
+                self._algolia_graphql_cache = items[0]
 
         return self._algolia_graphql_cache.get(field)
 
@@ -377,6 +383,9 @@ class Post(AnonimazableTimeStampedModel):
 
     def get_parent_json(self) -> dict | None:
         return self._get_graphql_field("parent")
+
+    def get_has_github_url(self) -> bool:
+        return bool(self.github_url)
 
     def __str__(self):
         match self.type:

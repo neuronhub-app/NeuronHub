@@ -1,5 +1,5 @@
-import { PostToolList } from "@/apps/tools/list/PostToolList";
+import { ToolListAlgolia } from "@/apps/tools/list/ToolListAlgolia";
 
 export default function PostToolListRoute() {
-  return <PostToolList />;
+  return <ToolListAlgolia />;
 }
