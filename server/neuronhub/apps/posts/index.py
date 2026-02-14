@@ -98,6 +98,6 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "desc(created_at_unix_aggregated)",
             ],
             "replicas": [
-                f"virtual({algolia_replica_sorted_by_votes})",
+                algolia_replica_sorted_by_votes,
             ],
         }
