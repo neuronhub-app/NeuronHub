@@ -4,8 +4,11 @@ import textwrap
 from dataclasses import dataclass
 from logging import getLogger
 
+from algoliasearch_django import save_record
+from algoliasearch_django import update_records
 from django.db.models import QuerySet
 from django.utils import timezone
+from faker.proxy import Faker
 
 from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileMatch
@@ -41,24 +44,33 @@ def score_matches_by_llm(
 
     scores: list[ProfileScore] = []
     for batch_index, batch in enumerate(batches):
-        batch_id_str = f"{batch[0].first_name}..{batch[-1].first_name}".lower()
+        faker = Faker()
+        faker.seed_instance(f"{batch[0].last_name}..{batch[-1].last_name}")
+        batch_id = " ".join(faker.words(nb=3))  # deterministic "hash"
 
-        result = _score_matches_batch_by_llm(profiles=batch, config=config)
-        scores.extend(result.scores)
+        match_result = _score_matches_batch_by_llm(profiles=batch, config=config)
+        scores.extend(match_result.scores)
 
-        logger.info(f"Saving batch {batch_index + 1}/{len(batches)}, id={batch_id_str}")
+        logger.info(f"Saving batch {batch_index + 1}/{len(batches)}, id={batch_id}")
         now = timezone.now()
-        for score in result.scores:
+        for score in match_result.scores:
             ProfileMatch.objects.update_or_create(
                 user=config.user,
                 profile=Profile.objects.get(id=score.profile_id),
                 defaults={
-                    "match_batch_id": batch_id_str,
+                    "match_batch_id": batch_id,
                     "match_score_by_llm": score.match_score,
                     "match_reason_by_llm": score.match_reasoning_note,
                     "match_processed_at": now,
                 },
             )
+
+        update_records(
+            model=Profile,
+            qs=Profile.objects.filter(
+                id__in=[score.profile_id for score in match_result.scores]
+            ),
+        )
 
     return scores
 
