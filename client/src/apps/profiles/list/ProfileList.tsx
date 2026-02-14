@@ -79,6 +79,8 @@ export function ProfileList() {
             "offers",
             "first_name",
             "last_name",
+            "job_title",
+            "company",
             "interests",
             "skills",
           ]}
