@@ -176,7 +176,11 @@ type AlgoliaStateLoaded = WithNonNullable<AlgoliaState, "client" | "indexNamePro
 
 function SortControl(props: { sort: SortOption; setSort: (sort: SortOption) => void }) {
   const sortOptions: { value: SortOption; label: string; testId: string }[] = [
-    { value: algoliaIndexName, label: "Default", testId: ids.profile.listControls.sortDefault },
+    {
+      value: algoliaIndexName,
+      label: "Search Relevance",
+      testId: ids.profile.listControls.sortDefault,
+    },
     { value: "llm_score", label: "AI Score", testId: ids.profile.listControls.sortAiScore },
     { value: "user_score", label: "Your Score", testId: ids.profile.listControls.sortYourScore },
   ];
