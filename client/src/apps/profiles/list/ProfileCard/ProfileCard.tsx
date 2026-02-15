@@ -164,7 +164,7 @@ export function ProfileCard(props: {
               <Icon boxSize="19px" color="fg.muted" ml="-1">
                 <IoLocationOutline />
               </Icon>
-              <Text color={style.color.help} fontSize={style.fontSize.help}>
+              <Text fontSize={style.fontSize.help}>
                 {[props.profile.city, props.profile.country].filter(Boolean).join(", ")}
               </Text>
             </Flex>

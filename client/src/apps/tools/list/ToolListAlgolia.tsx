@@ -56,7 +56,7 @@ export function ToolListAlgolia() {
   return (
     <InstantSearch
       searchClient={algolia.client}
-      indexName={algolia.indexNameSortedByVotes}
+      indexName={algolia.indexName}
       routing
       future={{ preserveSharedStateOnUnmount: true }}
     >
@@ -66,7 +66,6 @@ export function ToolListAlgolia() {
             <Text fontSize="2xl" fontWeight="bold">
               Tools
             </Text>
-            <TopSegmentSort algolia={algolia} />
           </Flex>
 
           <Flex gap="gap.md">
@@ -118,61 +117,6 @@ type AlgoliaStateLoaded = WithNonNullable<
 
 function isAlgoliaLoaded(algolia: AlgoliaState): algolia is AlgoliaStateLoaded {
   return Boolean(algolia.client && algolia.indexName && algolia.indexNameSortedByVotes);
-}
-
-function TopSegmentSort(props: { algolia: AlgoliaStateLoaded }) {
-  const sort = useSortBy({
-    items: [
-      { value: props.algolia.indexNameSortedByVotes, label: "Best" },
-      { value: props.algolia.indexName, label: "Newest" },
-    ],
-  });
-
-  type DateGteDays = "7" | "30" | "all";
-  const [dateGteDays, setDateGteDays] = useState<DateGteDays>("all");
-
-  let dateGte = null;
-  if (dateGteDays !== "all") {
-    dateGte = getUnixTime(subDays(new Date(), Number(dateGteDays)));
-  }
-  const dateFilter = dateGte ? `created_at_unix_aggregated >= ${dateGte}` : "";
-
-  return (
-    <Flex gap="gap.md">
-      <Configure
-        filters={["type:tool", dateFilter].filter(Boolean).join(" AND ")}
-        hitsPerPage={35}
-      />
-
-      <SegmentGroup.Root
-        value={sort.currentRefinement}
-        onValueChange={event => sort.refine(event.value!)}
-        size="sm"
-        h="fit-content"
-        bg="bg.panel"
-      >
-        <SegmentGroup.Indicator />
-        <SegmentGroup.Items items={sort.options} />
-      </SegmentGroup.Root>
-
-      <SegmentGroup.Root
-        value={dateGteDays}
-        onValueChange={event => setDateGteDays(event.value as unknown as DateGteDays)}
-        size="sm"
-        h="fit-content"
-        bg="bg.panel"
-      >
-        <SegmentGroup.Indicator />
-        <SegmentGroup.Items
-          items={[
-            { value: "7", label: "7d" },
-            { value: "30", label: "30d" },
-            { value: "all", label: "All" },
-          ]}
-        />
-      </SegmentGroup.Root>
-    </Flex>
-  );
 }
 
 function SearchInput() {
