@@ -22,7 +22,6 @@ async def run_score_profiles(
     user_id: int, user_profile: str, limit: int, batch_size: int, model: str
 ):
     user = await User.objects.aget(id=user_id)
-    filter_profiles_by_user(user)
     profiles = filter_profiles_by_user(user).order_by("id")[:limit]
 
     config = MatchConfig(

@@ -4,6 +4,7 @@ import textwrap
 from dataclasses import dataclass
 from logging import getLogger
 
+from algoliasearch_django import get_adapter
 from algoliasearch_django import save_record
 from django.conf import settings
 from django.db.models import QuerySet
@@ -15,7 +16,7 @@ from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.profiles.services.serialize_to_md import serialize_profile_to_markdown
 from neuronhub.apps.profiles.services.serialize_to_md import serialize_to_md_xml_field
 from neuronhub.apps.profiles.services.summarize_match_reviews import build_calibration_examples
-from neuronhub.apps.profiles.services.summarize_match_reviews import get_reviewed_profiles
+from neuronhub.apps.profiles.services.summarize_match_reviews import get_matches_reviewed
 from neuronhub.apps.users.models import User
 
 
@@ -37,26 +38,25 @@ def score_matches_by_llm(
     config: MatchConfig,
 ) -> list[ProfileScore]:
     profile_list = list(profiles)
-    batches = [
+    profile_batches = [
         profile_list[index : index + config.batch_size]
         for index in range(0, len(profile_list), config.batch_size)
     ]
 
     scores: list[ProfileScore] = []
-    for batch_index, batch in enumerate(batches):
-        faker = Faker()
-        faker.seed_instance(f"{batch[0].last_name}..{batch[-1].last_name}")
-        batch_id = " ".join(faker.words(nb=3))  # deterministic "hash"
-
+    matches_updated: list[ProfileMatch] = []
+    for batch_index, batch in enumerate(profile_batches):
         match_result = _score_matches_batch_by_llm(profiles=batch, config=config)
+
         scores.extend(match_result.scores)
 
-        logger.info(f"Saving batch {batch_index + 1}/{len(batches)}, id={batch_id}")
+        batch_id = _get_deterministic_profile_batch_id(batch)
+        logger.info(f"Saving batch {batch_index + 1}/{len(profile_batches)}, id={batch_id}")
         now = timezone.now()
         for score in match_result.scores:
-            ProfileMatch.objects.update_or_create(
+            match, _ = ProfileMatch.objects.update_or_create(
                 user=config.user,
-                profile=Profile.objects.get(id=score.profile_id),
+                profile_id=score.profile_id,
                 defaults={
                     "match_batch_id": batch_id,
                     "match_score_by_llm": score.match_score,
@@ -64,12 +64,27 @@ def score_matches_by_llm(
                     "match_processed_at": now,
                 },
             )
+            matches_updated.append(match)
 
         if settings.ALGOLIA["IS_ENABLED"]:
-            for profile in Profile.objects.filter(
-                id__in=[score.profile_id for score in match_result.scores]
-            ):
-                save_record(profile)
+            adapter = get_adapter(Profile)
+            # todo ! refac: #AI, prob dumb and invalid access
+            adapter._AlgoliaIndex__client.partial_update_objects(
+                index_name=adapter.index_name,
+                objects=[
+                    {
+                        "objectID": match.profile_id,
+                        "match_score_by_llm": match.match_score_by_llm,
+                        "match_reason_by_llm": match.match_reason_by_llm,
+                        "match_score": match.match_score,
+                        "match_processed_at": match.match_processed_at.isoformat(),
+                        "is_scored_by_llm": True,
+                        "needs_reprocessing": False,
+                    }
+                    for match in matches_updated
+                ],
+                wait_for_tasks=False,
+            )
 
     return scores
 
@@ -79,6 +94,13 @@ class ProfileScore:
     profile_id: int
     match_score: int
     match_reasoning_note: str
+
+
+def _get_deterministic_profile_batch_id(batch: list[Profile]) -> str:
+    faker = Faker()
+    faker.seed_instance(f"{batch[0].last_name}..{batch[-1].last_name}")
+    batch_id = "_".join(faker.words(nb=4))  # deterministic "hash" out of "words"
+    return batch_id
 
 
 @dataclass
@@ -92,13 +114,13 @@ def _score_matches_batch_by_llm(
     profiles: list[Profile],
     config: MatchConfig,
 ) -> BatchResult:
-    calibration_block = ""
-    if config.use_calibration:
-        reviews = get_reviewed_profiles(config.user)
-        if reviews:
-            calibration_block = serialize_to_md_xml_field(
-                "Calibration_Examples", build_calibration_examples(reviews)
-            )
+    reviewed_calibration_md = ""
+
+    if (matches_reviewed := get_matches_reviewed(config.user)) and config.use_calibration:
+        reviewed_calibration_md = serialize_to_md_xml_field(
+            tag_name="Reviewed_By_User_For_Calibration",
+            text=build_calibration_examples(matches=matches_reviewed, max_examples=8),
+        )
 
     profiles_xml = "\n\n".join([serialize_profile_to_markdown(a) for a in profiles])
     prompt = (
@@ -106,7 +128,7 @@ def _score_matches_batch_by_llm(
         "\n\n"
         f"{serialize_to_md_xml_field('My_Profile', config.user_profile)}"
         "\n\n\n"
-        f"{calibration_block}"
+        f"{reviewed_calibration_md}"
         "\n\n\n"
         f"<Profile_List>\n{profiles_xml}\n</Profile_List>\n"
     )

@@ -9,6 +9,7 @@ from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
 from simple_history.models import HistoricalRecords
+from strawberry_django.descriptors import model_property
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
 from neuronhub.apps.anonymizer.fields import Visibility
@@ -123,13 +124,6 @@ class Profile(AlgoliaModel):
 
         super().save(**kwargs)
 
-    # #AI
-    def is_needs_llm_reprocessing(self) -> bool:
-        match = self._get_match_or_none()
-        if match is None or match.match_processed_at is None:
-            return True
-        return self.content_updated_at > match.match_processed_at
-
     def compute_content_hash(self) -> str:
         # M2M required a saved instance
         skills = "; ".join(sorted(self.get_tag_skills_names())) if self.pk else ""
@@ -202,35 +196,60 @@ class Profile(AlgoliaModel):
     def get_iso_content_updated_at(self):
         return self.content_updated_at.isoformat() if self.content_updated_at else None
 
-    def get_is_scored_by_llm(self) -> bool:
-        match = self._get_match_or_none()
-        return match is not None and match.match_score_by_llm is not None
+    # Algolia ProfileMatch fields
+
+    def get_iso_match_processed_at(self) -> str | None:
+        if match := self._get_match():
+            return match.match_processed_at.isoformat()
+        return None
 
     # #AI
+    def is_needs_llm_reprocessing(self) -> bool:
+        match = self._get_match()
+        if match is None or match.match_processed_at is None:
+            return True
+        return self.content_updated_at > match.match_processed_at
+
+    def get_is_scored_by_llm(self) -> bool:
+        if match := self._get_match():
+            return bool(match.match_score_by_llm)
+        return False
+
     def get_is_reviewed_by_user(self) -> bool:
-        match = self._get_match_or_none()
-        if match:
-            return bool(match.match_review and match.match_review.strip()) or bool(
-                match.match_score
-            )
+        if match := self._get_match():
+            return bool(match.match_review) or bool(match.match_score)
         return False
 
     def get_needs_reprocessing(self) -> bool:
         return self.is_needs_llm_reprocessing()
 
-    def _get_match_or_none(self) -> ProfileMatch | None:
+    def get_match_score_by_llm(self) -> int | None:
+        if match := self._get_match():
+            return match.match_score_by_llm
+        return None
+
+    def get_match_reason_by_llm(self) -> str:
+        if match := self._get_match():
+            return match.match_reason_by_llm
+        return ""
+
+    def get_match_score(self) -> int | None:
+        if match := self._get_match():
+            return match.match_score
+        return None
+
+    def get_match_review(self) -> int | None:
+        if match := self._get_match():
+            return match.match_review
+        return None
+
+    # todo ! refac(perf): review
+    @model_property(cached=True, select_related="match")
+    def _get_match(self) -> ProfileMatch | None:
         try:
             return self.match
         except ProfileMatch.DoesNotExist:
             return None
-
-    def get_match_score_by_llm(self) -> int | None:
-        match = self._get_match_or_none()
-        return match.match_score_by_llm if match else None
-
-    def get_match_score(self) -> int | None:
-        match = self._get_match_or_none()
-        return match.match_score if match else None
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} | {self.company}"
@@ -262,7 +281,7 @@ class ProfileMatch(AnonimazableTimeStampedModel):
         help_text="Usually why I scored it lower than LLM. Can be opinions, or pos feedback.",
     )
 
-    match_batch_id = models.CharField(max_length=64, blank=True, db_index=True)
+    match_batch_id = models.CharField(max_length=128, blank=True)
     match_processed_at = models.DateTimeField(null=True, blank=True)
 
     history = HistoricalRecords()
