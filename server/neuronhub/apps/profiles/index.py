@@ -77,8 +77,8 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "searchable(country)",
                 "searchable(company)",
                 "visible_to",
-                "filterOnly(is_scored_by_llm)",
-                "filterOnly(is_reviewed_by_user)",
+                "is_scored_by_llm",
+                "is_reviewed_by_user",
                 "filterOnly(needs_reprocessing)",
             ],
             "unretrievableAttributes": [

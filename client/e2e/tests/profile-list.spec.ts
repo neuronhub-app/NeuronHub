@@ -46,7 +46,9 @@ test.describe("ProfileList", () => {
     expect(await snippetContent.count()).toBeGreaterThanOrEqual(1);
   });
 
-  test("Django sort: AI Score and Your Score show profiles, switch works", async ({ page }) => {
+  test("Django sort: AI Score and Your Score show profiles, switch works #AI-slop - matches strings instead of ids and will always break", async ({
+    page,
+  }) => {
     await play.navigate(urls.profiles.list, { idleWait: true });
 
     // Default sort is AI Score (Django mode) — should show profile cards
@@ -63,12 +65,12 @@ test.describe("ProfileList", () => {
     const cardsOnUserScore = await profileList.getByTestId(ids.profile.card.container).count();
     expect(cardsOnUserScore).toBeGreaterThanOrEqual(1);
 
-    // Switch to Newest — Algolia mode
-    await sortControl.getByText("Newest").click();
+    // Switch to Default — Algolia mode
+    await sortControl.getByText("Default").click();
     await play.waitForNetworkIdle();
     await profileList.waitFor();
-    const cardsOnNewest = await profileList.getByTestId(ids.profile.card.container).count();
-    expect(cardsOnNewest).toBeGreaterThanOrEqual(1);
+    const cardsOnDefault = await profileList.getByTestId(ids.profile.card.container).count();
+    expect(cardsOnDefault).toBeGreaterThanOrEqual(1);
 
     // Switch back to AI Score — Django mode again
     await sortControl.getByText("AI Score").click();
@@ -76,6 +78,37 @@ test.describe("ProfileList", () => {
     await profileList.waitFor();
     const cardsBackToAi = await profileList.getByTestId(ids.profile.card.container).count();
     expect(cardsBackToAi).toBeGreaterThanOrEqual(1);
+  });
+
+  test("facet counts and search stats are visible - #AI-slop - matches strings instead of ids and will always break", async ({
+    page,
+  }) => {
+    await play.navigate(urls.profiles.list, { idleWait: true });
+
+    // Switch to Default (Algolia mode) to see facets and stats
+    const sortControl = page.getByTestId(ids.profile.listControls.sort);
+    await sortControl.getByText("Default").click();
+    await play.waitForNetworkIdle();
+
+    // Search stats shows total profiles count
+    const searchStats = page.getByTestId(ids.profile.searchStats);
+    await searchStats.waitFor();
+    const statsText = await searchStats.textContent();
+    expect(statsText).toContain("profiles");
+
+    // Toggle facets show non-zero counts (db_stubs creates 3 scored profiles)
+    const sidebar = page.locator("aside");
+    const scoredByAi = sidebar.getByText(/Scored by AI\s*\([1-9]\d*\)/);
+    await scoredByAi.first().waitFor();
+    const reviewedByUser = sidebar.getByText(/Reviewed by you\s*\([1-9]\d*\)/);
+    await reviewedByUser.first().waitFor();
+
+    // Search narrows results — stats show "X / Y profiles"
+    const searchInput = page.getByTestId(ids.profile.searchInput);
+    await searchInput.fill("On");
+    await play.waitForNetworkIdle();
+    const filteredStats = await searchStats.textContent();
+    expect(filteredStats).toMatch(/\d+ \/ \d+ profiles/);
   });
 
   test("trigger LLM shows progress bar, cancel hides it", async () => {

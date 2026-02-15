@@ -29,6 +29,7 @@ import {
   useRefinementList,
   useSearchBox,
   useSortBy,
+  useStats,
   useToggleRefinement,
 } from "react-instantsearch";
 import { AiMatchingButtonTrigger } from "@/apps/profiles/list/AiMatchingButtonTrigger";
@@ -105,6 +106,7 @@ function ProfileListInner(props: {
 
       <Configure
         hitsPerPage={20}
+        facets={["*"]}
         attributesToSnippet={["biography:60", "seeks:30", "offers:30"]}
         attributesToHighlight={[
           "biography",
@@ -141,6 +143,9 @@ function ProfileListInner(props: {
           borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
           bg="bg.panel"
         >
+          <Flex mb="-2">
+            <SearchStats isAlgoliaSearchActive={isAlgoliaSearchActive} />
+          </Flex>
           <ActiveRefinements />
           <Stack gap="gap.sm">
             <Text {...style.facets.label}>AI Match Status</Text>
@@ -178,7 +183,7 @@ function SortControl(props: {
   const sortBy = useSortBy({
     items: [
       { value: props.algolia.indexNameProfiles, label: "AI Score" },
-      { value: props.algolia.indexNameProfilesSortedByNewest, label: "Newest" },
+      { value: props.algolia.indexNameProfilesSortedByNewest, label: "Default" },
     ],
   });
 
@@ -195,9 +200,9 @@ function SortControl(props: {
   }, [props.isDjangoMode, props.sort]);
 
   const sortOptions: { value: SortOption; label: string }[] = [
+    { value: "newest", label: "Default" },
     { value: "llm_score", label: "AI Score" },
     { value: "user_score", label: "Your Score" },
-    { value: "newest", label: "Newest" },
   ];
 
   return (
@@ -218,6 +223,34 @@ function SortControl(props: {
 function isAlgoliaLoaded(algolia: AlgoliaState): algolia is AlgoliaStateLoaded {
   return Boolean(
     algolia.client && algolia.indexNameProfiles && algolia.indexNameProfilesSortedByNewest,
+  );
+}
+
+function SearchStats(props: { isAlgoliaSearchActive: boolean }) {
+  const stats = useStats();
+  const totalRef = useRef(0);
+
+  const total = totalRef.current;
+
+  // Capture total on initial unrefined load
+  if (!props.isAlgoliaSearchActive && stats.nbHits > 0) {
+    totalRef.current = stats.nbHits;
+  }
+
+  return (
+    <Flex>
+      {props.isAlgoliaSearchActive
+        ? total && (
+            <Text fontSize="xs" color="fg.subtle" {...ids.set(ids.profile.searchStats)}>
+              {stats.nbHits} / {total} profiles
+            </Text>
+          )
+        : total && (
+            <Text fontSize="xs" color="fg.subtle" {...ids.set(ids.profile.searchStats)}>
+              {total} profiles
+            </Text>
+          )}
+    </Flex>
   );
 }
 
@@ -557,6 +590,7 @@ function FacetFilter(props: { name: string; label: string; isSearchEnabled?: boo
 
 function ToggleFacet(props: { attribute: string; label: string }) {
   const toggle = useToggleRefinement({ attribute: props.attribute, on: true });
+  const count = toggle.value.onFacetValue.count ?? 0;
 
   return (
     <Checkbox.Root
@@ -568,7 +602,12 @@ function ToggleFacet(props: { attribute: string; label: string }) {
     >
       <Checkbox.HiddenInput />
       <Checkbox.Control />
-      <Checkbox.Label {...style.facets.value}>{props.label}</Checkbox.Label>
+      <Checkbox.Label {...style.facets.value}>
+        {props.label}
+        <Text as="span" color="fg.subtle" fontSize="2xs" ml="1">
+          ({count})
+        </Text>
+      </Checkbox.Label>
     </Checkbox.Root>
   );
 }
