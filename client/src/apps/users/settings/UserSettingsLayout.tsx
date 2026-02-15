@@ -8,12 +8,12 @@ export default function UserSettingsLayout() {
 
   const tabs = [
     {
-      label: "Profile",
+      label: "User",
       value: urls.user.settings.profile,
       icon: <FaUser />,
     },
     {
-      label: "LLM Profile",
+      label: "Profile for matching",
       value: urls.user.settings.llmProfile,
       icon: <FaRobot />,
     },

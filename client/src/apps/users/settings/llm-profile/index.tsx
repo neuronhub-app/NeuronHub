@@ -5,6 +5,7 @@ import { Container, HStack, Span, Stack, Text, Textarea } from "@chakra-ui/react
 import { useRef } from "react";
 import { LuCheck } from "react-icons/lu";
 import { useDebouncedCallback } from "use-debounce";
+import { ProfileUserLlmMdQuery } from "@/apps/profiles/list/AiMatchingButtonTrigger";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -18,7 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { graphql } from "@/gql-tada";
-import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { client } from "@/graphql/client";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
 
@@ -40,14 +41,18 @@ export default function LlmProfile() {
       return;
     }
     state.mutable.saveStatus = "saving";
-    await mutateAndRefetchMountedQueries(ProfileLlmMdUpdateMutation, {
-      profileForLlmMd: value,
+    await client.mutate({
+      mutation: ProfileLlmMdUpdateMutation,
+      variables: {
+        profileForLlmMd: value,
+      },
+      refetchQueries: [ProfileUserLlmMdQuery],
     });
     state.mutable.saveStatus = "saved";
     setTimeout(() => {
       state.mutable.saveStatus = "idle";
-    }, 2000);
-  }, 1000);
+    }, 1000);
+  }, 700);
 
   const handleResetToAutoGeneration = async () => {
     state.mutable.isResetting = true;
@@ -56,7 +61,11 @@ export default function LlmProfile() {
       debouncedSave.cancel();
       state.mutable.saveStatus = "idle";
 
-      await mutateAndRefetchMountedQueries(ProfileLlmMdResetMutation, {});
+      await client.mutate({
+        mutation: ProfileLlmMdResetMutation,
+        variables: {},
+        refetchQueries: [ProfileUserLlmMdQuery],
+      });
       const result = await refetch();
       state.mutable.showConfirmDialog = false;
       const newProfileMd = result.data?.my_profile?.profile_for_llm_md;
@@ -82,15 +91,51 @@ export default function LlmProfile() {
 
   return (
     <>
-      <Container maxW="4xl" py={10} m={0} px={1}>
+      <Container maxW="4xl" py={5} m={0} px={1}>
         <Stack gap="4">
-          <Stack gap="1">
-            <Text fontWeight="medium">LLM Profile Markdown</Text>
-            <Text color="fg.muted" textStyle="sm">
-              This text is sent to the LLM for matching. Edit it to customize how the LLM sees
-              your profile.
-            </Text>
-          </Stack>
+          <Text color="fg.muted" textStyle="sm">
+            You can override the profile sent to AI, eg with non-public info.
+          </Text>
+
+          <Checkbox
+            display="flex"
+            alignItems="flex-start"
+            checked={!profile.is_profile_custom}
+            onCheckedChange={async details => {
+              if (details.checked) {
+                // User wants to enable auto-generation (custom → auto)
+                state.mutable.showConfirmDialog = true;
+              } else {
+                // User wants to disable auto-generation (auto → custom)
+                // Just set the flag without changing content
+                debouncedSave.cancel();
+                state.mutable.saveStatus = "saving";
+                await client.mutate({
+                  mutation: ProfileLlmMdUpdateMutation,
+                  variables: {
+                    profileForLlmMd: textareaRef.current?.value || profile.profile_for_llm_md,
+                  },
+                  refetchQueries: [ProfileUserLlmMdQuery],
+                });
+
+                state.mutable.saveStatus = "saved";
+                setTimeout(() => {
+                  state.mutable.saveStatus = "idle";
+                }, 2000);
+                await refetch();
+              }
+            }}
+          >
+            <Text>Auto-generate profile from data</Text>
+            <HStack w="full" justify="space-between">
+              <Text color="fg.muted" textStyle="xs">
+                {profile.is_profile_custom
+                  ? "Custom profile active — edits saved automatically"
+                  : "Edit to customize"}
+              </Text>
+              <SaveStatus status={state.snap.saveStatus} />
+            </HStack>
+          </Checkbox>
 
           <Textarea
             ref={textareaRef}
@@ -103,40 +148,6 @@ export default function LlmProfile() {
             defaultValue={profile.profile_for_llm_md}
             onChange={e => debouncedSave(e.target.value)}
           />
-
-          <HStack w="full" justify="space-between">
-            <Text color="fg.muted" textStyle="xs">
-              {profile.is_profile_custom
-                ? "Custom profile active — edits saved automatically"
-                : "Auto-generated — edit to customize"}
-            </Text>
-            <SaveStatus status={state.snap.saveStatus} />
-          </HStack>
-
-          <Checkbox
-            checked={!profile.is_profile_custom}
-            onCheckedChange={async details => {
-              if (details.checked) {
-                // User wants to enable auto-generation (custom → auto)
-                state.mutable.showConfirmDialog = true;
-              } else {
-                // User wants to disable auto-generation (auto → custom)
-                // Just set the flag without changing content
-                debouncedSave.cancel();
-                state.mutable.saveStatus = "saving";
-                await mutateAndRefetchMountedQueries(ProfileLlmMdUpdateMutation, {
-                  profileForLlmMd: textareaRef.current?.value || profile.profile_for_llm_md,
-                });
-                state.mutable.saveStatus = "saved";
-                setTimeout(() => {
-                  state.mutable.saveStatus = "idle";
-                }, 2000);
-                await refetch();
-              }
-            }}
-          >
-            Auto-generate profile from data
-          </Checkbox>
         </Stack>
       </Container>
 
