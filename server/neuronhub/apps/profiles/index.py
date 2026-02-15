@@ -12,9 +12,6 @@ from neuronhub.apps.profiles.models import Profile
 
 logger = logging.getLogger(__name__)
 
-algolia_replica_sorted_by_newest = f"profiles_{settings.ALGOLIA['INDEX_SUFFIX']}_by__newest"
-
-
 if settings.ALGOLIA["IS_ENABLED"]:
 
     @register(Profile)
@@ -83,8 +80,5 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ],
             "unretrievableAttributes": [
                 "visible_to",
-            ],
-            "replicas": [
-                algolia_replica_sorted_by_newest,
             ],
         }

@@ -18,7 +18,6 @@ type AlgoliaSearchKeyType {
   index_name: String!
   index_name_sorted_by_votes: String!
   index_name_profiles: String!
-  index_name_profiles_sorted_by_newest: String!
 }
 
 input BoolBaseFilterLookup {
@@ -127,7 +126,7 @@ type Mutation {
   profile_match_review_update(profile_id: ID!, match_review: String!): Boolean! @IsAuthenticated
   profile_llm_md_update(profile_for_llm_md: String!): Boolean! @IsAuthenticated
   profile_llm_md_reset: Boolean! @IsAuthenticated
-  profile_matches_trigger_llm(limit: Int! = 50, model: String! = "haiku"): ProgressType! @IsAuthenticated
+  profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku"): ProgressType! @IsAuthenticated
   profile_matches_cancel_llm: Boolean! @IsAuthenticated
 }
 
@@ -633,6 +632,11 @@ input ProfileFilter {
   DISTINCT: Boolean
 }
 
+type ProfileMatchStatsType {
+  rated_count: Int!
+  llm_scored_count: Int!
+}
+
 type ProfileMatchType {
   id: ID!
   match_score_by_llm: Int
@@ -705,6 +709,7 @@ type Query {
   my_profile: ProfileType @IsAuthenticated
   profile_match_progress: ProgressType! @IsAuthenticated
   profiles_sorted_by_match(sort: String!, filters: ProfileFilter, pagination: OffsetPaginationInput): ProfileTypeOffsetPaginated!
+  profile_match_stats: ProfileMatchStatsType! @IsAuthenticated
   profile_user_llm_md: String! @IsAuthenticated
 }
 

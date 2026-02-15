@@ -43,7 +43,6 @@ class AlgoliaSearchKeyType:
     index_name: str
     index_name_sorted_by_votes: str
     index_name_profiles: str
-    index_name_profiles_sorted_by_newest: str
 
 
 @strawberry.type(name="Query")
@@ -58,7 +57,6 @@ class UsersQuery:
             return None
 
         from neuronhub.apps.posts.index import algolia_replica_sorted_by_votes
-        from neuronhub.apps.profiles.index import algolia_replica_sorted_by_newest
 
         user = await get_user_maybe(info)
         filters = ["visible_to:group/INTERNAL", "visible_to:group/PUBLIC"]
@@ -85,5 +83,4 @@ class UsersQuery:
             index_name=f"posts_{index_suffix}",
             index_name_sorted_by_votes=algolia_replica_sorted_by_votes,
             index_name_profiles=f"profiles_{index_suffix}",
-            index_name_profiles_sorted_by_newest=algolia_replica_sorted_by_newest,
         )

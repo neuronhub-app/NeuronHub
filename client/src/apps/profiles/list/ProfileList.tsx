@@ -28,7 +28,6 @@ import {
   usePagination,
   useRefinementList,
   useSearchBox,
-  useSortBy,
   useStats,
   useToggleRefinement,
 } from "react-instantsearch";
@@ -43,7 +42,8 @@ import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { gap } from "@/theme/theme";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
-type SortOption = "llm_score" | "user_score" | "newest";
+const algoliaIndexName = "newest" as const;
+type SortOption = "llm_score" | "user_score" | typeof algoliaIndexName;
 
 export function ProfileList() {
   const algolia = useAlgoliaSearchClient();
@@ -77,7 +77,15 @@ function ProfileListInner(props: {
   const refinements = useCurrentRefinements();
 
   const isAlgoliaSearchActive = search.query.length > 0 || refinements.items.length > 0;
-  const isDjangoMode = props.sort !== "newest" && !isAlgoliaSearchActive;
+
+  const isDjangoMode = props.sort !== algoliaIndexName && !isAlgoliaSearchActive;
+
+  // reset to Algolia index if User makes isAlgoliaSearchActive
+  useEffect(() => {
+    if (isAlgoliaSearchActive && props.sort !== algoliaIndexName) {
+      props.setSort(algoliaIndexName);
+    }
+  }, [isAlgoliaSearchActive]);
 
   return (
     <Stack gap="gap.lg" w="100%">
@@ -88,12 +96,7 @@ function ProfileListInner(props: {
           </Text>
           <Flex align="center" gap="gap.md" fontSize="sm" color="fg.subtle">
             <Text mt="2px">Sort by</Text>
-            <SortControl
-              algolia={props.algolia}
-              sort={props.sort}
-              setSort={props.setSort}
-              isDjangoMode={isDjangoMode}
-            />
+            <SortControl sort={props.sort} setSort={props.setSort} />
           </Flex>
         </Flex>
         <HStack gap="gap.md">
@@ -169,40 +172,13 @@ type AlgoliaState = ReturnType<typeof useAlgoliaSearchClient>;
 type WithNonNullable<T, Key extends keyof T> = Omit<T, Key> & {
   [key in Key]-?: NonNullable<T[key]>;
 };
-type AlgoliaStateLoaded = WithNonNullable<
-  AlgoliaState,
-  "client" | "indexNameProfiles" | "indexNameProfilesSortedByNewest"
->;
+type AlgoliaStateLoaded = WithNonNullable<AlgoliaState, "client" | "indexNameProfiles">;
 
-function SortControl(props: {
-  algolia: AlgoliaStateLoaded;
-  sort: SortOption;
-  setSort: (sort: SortOption) => void;
-  isDjangoMode: boolean;
-}) {
-  const sortBy = useSortBy({
-    items: [
-      { value: props.algolia.indexNameProfiles, label: "AI Score" },
-      { value: props.algolia.indexNameProfilesSortedByNewest, label: "Default" },
-    ],
-  });
-
-  // Sync Algolia index when falling back to Algolia mode
-  useEffect(() => {
-    if (props.isDjangoMode) return;
-    const indexName =
-      props.sort === "newest"
-        ? props.algolia.indexNameProfilesSortedByNewest
-        : props.algolia.indexNameProfiles;
-    if (sortBy.currentRefinement !== indexName) {
-      sortBy.refine(indexName);
-    }
-  }, [props.isDjangoMode, props.sort]);
-
-  const sortOptions: { value: SortOption; label: string }[] = [
-    { value: "newest", label: "Default" },
-    { value: "llm_score", label: "AI Score" },
-    { value: "user_score", label: "Your Score" },
+function SortControl(props: { sort: SortOption; setSort: (sort: SortOption) => void }) {
+  const sortOptions: { value: SortOption; label: string; testId: string }[] = [
+    { value: algoliaIndexName, label: "Default", testId: ids.profile.listControls.sortDefault },
+    { value: "llm_score", label: "AI Score", testId: ids.profile.listControls.sortAiScore },
+    { value: "user_score", label: "Your Score", testId: ids.profile.listControls.sortYourScore },
   ];
 
   return (
@@ -215,15 +191,18 @@ function SortControl(props: {
       bg="bg.panel"
     >
       <SegmentGroup.Indicator />
-      <SegmentGroup.Items items={sortOptions} />
+      {sortOptions.map(option => (
+        <SegmentGroup.Item key={option.value} value={option.value} {...ids.set(option.testId)}>
+          <SegmentGroup.ItemText>{option.label}</SegmentGroup.ItemText>
+          <SegmentGroup.ItemHiddenInput />
+        </SegmentGroup.Item>
+      ))}
     </SegmentGroup.Root>
   );
 }
 
 function isAlgoliaLoaded(algolia: AlgoliaState): algolia is AlgoliaStateLoaded {
-  return Boolean(
-    algolia.client && algolia.indexNameProfiles && algolia.indexNameProfilesSortedByNewest,
-  );
+  return Boolean(algolia.client && algolia.indexNameProfiles);
 }
 
 function SearchStats(props: { isAlgoliaSearchActive: boolean }) {

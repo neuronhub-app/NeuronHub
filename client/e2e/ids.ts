@@ -132,6 +132,9 @@ export namespace ids {
     searchStats: "profile.search-stats",
     listControls: {
       sort: "profile.list.controls.sort",
+      sortDefault: "profile.list.controls.sort.default",
+      sortAiScore: "profile.list.controls.sort.ai-score",
+      sortYourScore: "profile.list.controls.sort.your-score",
     },
     card: {
       container: "profile.card.container",
