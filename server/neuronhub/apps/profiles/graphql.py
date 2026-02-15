@@ -4,6 +4,8 @@ import strawberry
 import strawberry_django
 from algoliasearch_django import save_record
 from asgiref.sync import sync_to_async
+from django.db.models import F
+from django.db.models import Q
 from django.db.models import QuerySet
 from django_tasks.backends.database.models import DBTaskResult
 from django_tasks.base import TaskResultStatus
@@ -104,6 +106,8 @@ class ProgressType:
 class ProfileMatchStatsType:
     rated_count: int
     llm_scored_count: int
+    unprocessed_count: int
+    needs_reprocessing_count: int
 
 
 @strawberry.type(name="Query")
@@ -154,16 +158,33 @@ class ProfilesQuery:
             return Profile.objects.none()
         return get_profiles_queryset_sorted_by_match(user, sort)
 
+    # #AI
     @strawberry.field(extensions=[IsAuthenticated()])
     async def profile_match_stats(self, info: Info) -> ProfileMatchStatsType:
         user = await get_user(info)
-        rated_count = await ProfileMatch.objects.filter(
-            user=user, match_score__isnull=False
-        ).acount()
-        llm_scored_count = await ProfileMatch.objects.filter(
-            user=user, match_score_by_llm__isnull=False
-        ).acount()
-        return ProfileMatchStatsType(rated_count=rated_count, llm_scored_count=llm_scored_count)
+        visible = filter_profiles_by_user(user)
+
+        return ProfileMatchStatsType(
+            rated_count=(
+                await ProfileMatch.objects.filter(user=user, match_score__isnull=False).acount()
+            ),
+            llm_scored_count=(
+                await ProfileMatch.objects.filter(
+                    user=user, match_score_by_llm__isnull=False
+                ).acount()
+            ),
+            unprocessed_count=(
+                await visible.filter(
+                    Q(match__isnull=True) | Q(match__match_processed_at__isnull=True)
+                ).acount()
+            ),
+            needs_reprocessing_count=(
+                await visible.filter(
+                    match__match_processed_at__isnull=False,
+                    content_updated_at__gt=F("match__match_processed_at"),
+                ).acount()
+            ),
+        )
 
     @strawberry.field(extensions=[IsAuthenticated()])
     async def profile_user_llm_md(self, info: Info) -> str:
@@ -236,6 +257,7 @@ class ProfilesMutation:
         info: Info,
         limit: int = 200,
         model: str = "haiku",
+        include_reprocessing: bool = True,
     ) -> ProgressType:
         from neuronhub.apps.profiles.tasks import score_profiles_task
 
@@ -254,6 +276,7 @@ class ProfilesMutation:
             limit=min(limit, model_limit["max"]),  # type: ignore[index] # bad-infer, see `assert`
             batch_size=10,
             model=model,
+            include_reprocessing=include_reprocessing,
         )
 
         return ProgressType(total=limit, processed=0, is_processing=True, model=model)
@@ -271,6 +294,6 @@ class ProfilesMutation:
 
 
 MODEL_LIMITS: dict[str, dict[str, int]] = {
-    "haiku": {"max": 400, "default": 200},
-    "sonnet": {"max": 80, "default": 40},
+    "haiku": {"max": 500, "default": 250},
+    "sonnet": {"max": 100, "default": 50},
 }

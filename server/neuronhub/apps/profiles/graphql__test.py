@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from asgiref.sync import sync_to_async
 from django.utils import timezone
 
@@ -52,32 +54,49 @@ class ProfileMatchStatsQueryTest(NeuronTestCase):
         p1 = await self.gen.profiles.profile(user=None, visibility=Visibility.PUBLIC)
         p2 = await self.gen.profiles.profile(user=None, visibility=Visibility.PUBLIC)
         p3 = await self.gen.profiles.profile(user=None, visibility=Visibility.PUBLIC)
+        p4 = await self.gen.profiles.profile(user=None, visibility=Visibility.PUBLIC)
 
-        # p1: LLM scored only
-        await self.gen.profiles.match(profile=p1, score_by_llm=70)
-        # p2: LLM scored + user rated
-        await self.gen.profiles.match(profile=p2, score_by_llm=80, score_by_user=60)
-        # p3: no scores
+        fresh_time = timezone.now() + timedelta(seconds=1)
+        # p1: LLM scored, processed
+        m1 = await self.gen.profiles.match(profile=p1, score_by_llm=70)
+        m1.match_processed_at = fresh_time
+        await m1.asave()
+        # p2: LLM scored + user rated, processed
+        m2 = await self.gen.profiles.match(profile=p2, score_by_llm=80, score_by_user=60)
+        m2.match_processed_at = fresh_time
+        await m2.asave()
+        # p3: match exists but never processed (no match_processed_at)
         await self.gen.profiles.match(profile=p3)
+        # p4: no match at all
 
         result = await self.graphql_query("""
-            query { profile_match_stats { rated_count llm_scored_count } }
+            query { profile_match_stats {
+                rated_count llm_scored_count
+                unprocessed_count needs_reprocessing_count
+            } }
         """)
 
         assert result.errors is None
         stats = result.data["profile_match_stats"]
         assert stats["llm_scored_count"] == 2
         assert stats["rated_count"] == 1
+        assert stats["unprocessed_count"] == 2  # p3 (no match_processed_at) + p4 (no match)
+        assert stats["needs_reprocessing_count"] == 0
 
     async def test_profile_match_stats_empty(self):
         result = await self.graphql_query("""
-            query { profile_match_stats { rated_count llm_scored_count } }
+            query { profile_match_stats {
+                rated_count llm_scored_count
+                unprocessed_count needs_reprocessing_count
+            } }
         """)
 
         assert result.errors is None
         stats = result.data["profile_match_stats"]
         assert stats["llm_scored_count"] == 0
         assert stats["rated_count"] == 0
+        assert stats["unprocessed_count"] == 0
+        assert stats["needs_reprocessing_count"] == 0
 
 
 # #AI

@@ -4,6 +4,8 @@
 import {
   Box,
   Collapsible,
+  HStack,
+  Link,
   NativeSelect,
   NumberInput,
   Popover,
@@ -13,19 +15,22 @@ import {
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { LuChevronDown, LuTriangleAlert } from "react-icons/lu";
+import { NavLink } from "react-router";
 import { ProfileMatchProgressQuery } from "@/apps/profiles/list/AiMatchingProgressBar";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { urls } from "@/urls";
 import { useIsLoading } from "@/utils/useIsLoading";
 
 const ProfileMatchesTriggerLlmMutation = graphql.persisted(
   "ProfileMatchesTriggerLlm",
   graphql(`
-    mutation ProfileMatchesTriggerLlm($limit: Int!, $model: String!) {
-      profile_matches_trigger_llm(limit: $limit, model: $model) {
+    mutation ProfileMatchesTriggerLlm($limit: Int!, $model: String!, $includeReprocessing: Boolean!) {
+      profile_matches_trigger_llm(limit: $limit, model: $model, include_reprocessing: $includeReprocessing) {
         total
         processed
         is_processing
@@ -35,7 +40,7 @@ const ProfileMatchesTriggerLlmMutation = graphql.persisted(
   `),
 );
 
-const ProfileUserLlmMdQuery = graphql.persisted(
+export const ProfileUserLlmMdQuery = graphql.persisted(
   "ProfileUserLlmMd",
   graphql(`
     query ProfileUserLlmMd {
@@ -51,14 +56,16 @@ const ProfileMatchStatsQuery = graphql.persisted(
       profile_match_stats {
         rated_count
         llm_scored_count
+        unprocessed_count
+        needs_reprocessing_count
       }
     }
   `),
 );
 
 const MODEL_LIMITS = {
-  haiku: { max: 400, default: 200 },
-  sonnet: { max: 80, default: 40 },
+  haiku: { max: 500, default: 250 },
+  sonnet: { max: 100, default: 50 },
 } as const;
 
 const SONNET_MIN_RATED = 10;
@@ -68,6 +75,7 @@ export function AiMatchingButtonTrigger() {
   const loading = useIsLoading();
   const [model, setModel] = useState<"haiku" | "sonnet">("haiku");
   const [limit, setLimit] = useState<number>(MODEL_LIMITS.haiku.default);
+  const [includeReprocessing, setIncludeReprocessing] = useState(true);
   const [isOpen, setIsOpen] = useState(false);
   const { data: profileData } = useApolloQuery(ProfileUserLlmMdQuery, {});
   const { data: statsData } = useApolloQuery(ProfileMatchStatsQuery, {});
@@ -76,6 +84,8 @@ export function AiMatchingButtonTrigger() {
   const stats = statsData?.profile_match_stats;
   const ratedCount = stats?.rated_count ?? 0;
   const llmScoredCount = stats?.llm_scored_count ?? 0;
+  const unprocessedCount = stats?.unprocessed_count ?? 0;
+  const needsReprocessingCount = stats?.needs_reprocessing_count ?? 0;
 
   const isSonnetAllowed =
     ratedCount >= SONNET_MIN_RATED && llmScoredCount >= SONNET_MIN_LLM_SCORED;
@@ -91,7 +101,7 @@ export function AiMatchingButtonTrigger() {
     setIsOpen(false);
     await client.mutate({
       mutation: ProfileMatchesTriggerLlmMutation,
-      variables: { limit, model },
+      variables: { limit, model, includeReprocessing },
     });
     await client.refetchQueries({ include: [ProfileMatchProgressQuery] });
   }
@@ -111,7 +121,7 @@ export function AiMatchingButtonTrigger() {
 
       <Portal>
         <Popover.Positioner>
-          <Popover.Content w="320px">
+          <Popover.Content w="500px">
             <Popover.Arrow />
             <Popover.Body>
               <Stack gap="gap.md">
@@ -166,6 +176,21 @@ export function AiMatchingButtonTrigger() {
                       </Stack>
                     </Stack>
                   )}
+
+                  <Stack gap="gap.sm">
+                    <Text fontSize="xs" color="fg.muted">
+                      Profiles not processed: {unprocessedCount}
+                    </Text>
+                    <Checkbox
+                      size="sm"
+                      checked={includeReprocessing}
+                      onCheckedChange={e => setIncludeReprocessing(!!e.checked)}
+                    >
+                      <Text fontSize="xs">
+                        Include re-processing ({needsReprocessingCount} changed)
+                      </Text>
+                    </Checkbox>
+                  </Stack>
                 </Stack>
 
                 <Stack gap="gap.sm">
@@ -193,23 +218,29 @@ export function AiMatchingButtonTrigger() {
 
                 {profileMd && (
                   <Collapsible.Root>
-                    <Collapsible.Trigger asChild>
-                      <Button variant="plain" size="xs" colorPalette="gray" gap="gap.sm">
-                        Your profile preview
-                        <Collapsible.Indicator
-                          transition="transform 0.2s"
-                          _open={{ transform: "rotate(180deg)" }}
-                        >
-                          <LuChevronDown />
-                        </Collapsible.Indicator>
-                      </Button>
-                    </Collapsible.Trigger>
+                    <HStack justify="space-between">
+                      <Collapsible.Trigger asChild>
+                        <Button variant="ghost" size="xs" colorPalette="gray" gap="gap.sm">
+                          Your profile preview
+                          <Collapsible.Indicator
+                            transition="transform 0.2s"
+                            _open={{ transform: "rotate(180deg)" }}
+                          >
+                            <LuChevronDown />
+                          </Collapsible.Indicator>
+                        </Button>
+                      </Collapsible.Trigger>
+                      <Link asChild fontSize="xs" target="_blank">
+                        <NavLink to={urls.user.settings.llmProfile}>Override profile</NavLink>
+                      </Link>
+                    </HStack>
+
                     <Collapsible.Content>
                       <Text
                         fontSize="xs"
                         color="fg.muted"
                         whiteSpace="pre-wrap"
-                        maxH="200px"
+                        maxH="380px"
                         overflowY="auto"
                         p="gap.sm"
                         bg="bg.subtle"
