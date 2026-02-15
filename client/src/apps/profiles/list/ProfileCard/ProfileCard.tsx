@@ -411,9 +411,21 @@ function MatchSection(props: {
               colorPalette="teal"
             />
             <Text fontSize="sm">
-              <Icon boxSize="4.5" color="fg.subtle" mr="gap.sm" mt="-2px">
-                <RiRobot2Line />
-              </Icon>
+              <Tooltip
+                content="Reason for the rating from AI"
+                positioning={{ placement: "left" }}
+                showArrow
+              >
+                <Icon
+                  boxSize="4.5"
+                  color="fg.subtle"
+                  mr="gap.sm"
+                  mt="-2px"
+                  _hover={{ cursor: "help" }}
+                >
+                  <RiRobot2Line />
+                </Icon>
+              </Tooltip>
               {props.isHighlightable && profileHit._highlightResult?.match_reason_by_llm ? (
                 <Highlight attribute="match_reason_by_llm" hit={profileHit} />
               ) : (
@@ -514,6 +526,7 @@ function MatchRating(props: {
             closeDelay={100}
             closeOnClick={false}
             positioning={{ placement: "right" }}
+            showArrow
           >
             <Icon
               color="fg.subtle/50"
