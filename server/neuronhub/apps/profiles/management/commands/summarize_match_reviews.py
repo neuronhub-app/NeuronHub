@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from neuronhub.apps.profiles.services.summarize_match_reviews import format_reviews_as_markdown
-from neuronhub.apps.profiles.services.summarize_match_reviews import get_reviewed_profiles
+from neuronhub.apps.profiles.services.summarize_match_reviews import get_matches_reviewed
 from neuronhub.apps.users.models import User
 
 
@@ -38,7 +38,7 @@ class Command(BaseCommand):
         **options,
     ):
         user_obj = User.objects.get(username=user)
-        reviews = get_reviewed_profiles(user_obj)
+        reviews = get_matches_reviewed(user_obj)
 
         if not reviews:
             self.stdout.write("No reviewed matches found.")

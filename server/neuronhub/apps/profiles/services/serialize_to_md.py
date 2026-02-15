@@ -40,9 +40,6 @@ def serialize_profile_to_markdown(profile: Profile) -> str:
             serialize_to_md_xml_field("offers", text=csv_optimize_tokens(profile.offers))
         )
 
-    optimized_first_name = csv_optimize_tokens(profile.first_name)
-    optimized_last_name = csv_optimize_tokens(profile.last_name)
-
     return serialize_to_md_xml_field(
         tag_name="Profile",
         text="\n\n".join(parts),

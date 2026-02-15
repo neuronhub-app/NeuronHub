@@ -7,13 +7,13 @@ from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.profiles.services.csv_import_optimized import csv_optimize_and_import
 from neuronhub.apps.profiles.services.summarize_match_reviews import build_calibration_examples
 from neuronhub.apps.profiles.services.summarize_match_reviews import format_reviews_as_markdown
-from neuronhub.apps.profiles.services.summarize_match_reviews import get_reviewed_profiles
+from neuronhub.apps.profiles.services.summarize_match_reviews import get_matches_reviewed
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 from neuronhub.apps.users.models import User
 
 
 def _get_reviewed_attendees_list(user):
-    return list(get_reviewed_profiles(user))
+    return list(get_matches_reviewed(user))
 
 
 # #AI-slop

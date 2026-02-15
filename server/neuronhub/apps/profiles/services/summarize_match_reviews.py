@@ -18,7 +18,7 @@ if TYPE_CHECKING:
         match_score_delta: int
 
 
-def get_reviewed_profiles(user: User) -> QuerySet[ProfileMatchAnnotated]:
+def get_matches_reviewed(user: User) -> QuerySet[ProfileMatchAnnotated]:
     matches = (
         ProfileMatch.objects.filter(user=user)
         .exclude(match_score=None)
@@ -46,21 +46,23 @@ def _serialize_review(match: ProfileMatch, exclude_extra_fields: bool = False) -
     parts = [
         serialize_to_md_field("Review by LLM", match.match_reason_by_llm),
         serialize_to_md_field("Review by User", match.match_review),
-        serialize_to_md_field("Job", f"{profile.job_title} @ {profile.company}"),
+        serialize_to_md_field("Job title", profile.job_title),
+        serialize_to_md_field("Company", profile.company),
         serialize_to_md_field("Skills", profile.get_tag_skills_names()),
         serialize_to_md_field("Needs", profile.seeks),
     ]
     if not exclude_extra_fields:
         parts.extend(
             [
-                serialize_to_md_field("Offers", profile.offers),
-                serialize_to_md_xml_field("bio", profile.biography[:200])
+                serialize_to_md_field("Offers", profile.offers[:1000]),
+                serialize_to_md_xml_field("bio", profile.biography[:500])
                 if profile.biography
                 else "",
             ]
         )
 
     assert match.match_score
+    # todo ! fix: verify it's correct, i saw it being reversed, ie bad for LLM
     score_delta = match.match_score - (match.match_score_by_llm or 0)
     if score_delta == 0:
         score_delta_str = "0"
