@@ -49,6 +49,13 @@
           "{{ env.PROJECT_NAME }}-backend"
         }
 
+        mut server_domain = "{{ env.SERVER_DOMAIN }}"
+        let server_prod_subdomain = "backend."
+        let is_wrong_mise_env_loaded = false == ($server_prod_subdomain in $server_domain)
+        if ($is_wrong_mise_env_loaded) {
+          $server_domain = "backend.neuronhub.app"
+        }
+
         # Force-pass Mise env & tag to the Docker build
         # ------------------------------
 
@@ -64,7 +71,7 @@
                     VITE_RELEASE_VERSION: ($env.usage_version)
 
                     # for React Router build
-                    VITE_SERVER_URL: https://{{ env.SERVER_DOMAIN }}
+                    VITE_SERVER_URL: https://($server_domain)
 
                     # for Sentry
                     SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN }}
@@ -77,6 +84,8 @@
 "
 
         $compose_content | save --force $compose_file
+
+        print $compose_content
 
         # Build
         # ------------------------------
