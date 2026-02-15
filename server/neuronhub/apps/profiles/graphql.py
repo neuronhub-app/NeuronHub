@@ -251,7 +251,7 @@ class ProfilesMutation:
         await score_profiles_task.aenqueue(
             user_id=user.id,
             user_profile=user_profile,
-            limit=min(limit, model_limit["max"]),
+            limit=min(limit, model_limit["max"]),  # type: ignore[index] # bad-infer, see `assert`
             batch_size=10,
             model=model,
         )
