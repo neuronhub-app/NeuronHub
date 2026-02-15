@@ -294,6 +294,7 @@ class ProfileInvite(AnonimazableTimeStampedModel):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="invites")
     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     user_email = models.EmailField()
+    username = models.CharField(max_length=256)
     accepted_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):

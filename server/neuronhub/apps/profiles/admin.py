@@ -1,11 +1,8 @@
 from typing import ClassVar
 
-from adminutils import form_processing_action
-from adminutils import options
 from django import forms
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.widgets import AutocompleteSelect
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.core.mail import send_mail
 from django.db import models
@@ -14,6 +11,7 @@ from django.db.models import TextChoices
 from django.http import HttpRequest
 from django.urls import reverse
 from django_object_actions import DjangoObjectActions
+from django_object_actions import takes_instance_or_queryset
 from simple_history.admin import SimpleHistoryAdmin
 
 from neuronhub.apps.profiles.models import CareerStage
@@ -235,32 +233,6 @@ class ProfileGroupAdmin(admin.ModelAdmin):
     search_fields = ["name"]
 
 
-class CustomAutocompleteSelect(AutocompleteSelect):
-    def __init__(self, field, prompt="", admin_site=None, attrs=None, choices=(), using=None):
-        self.prompt = prompt
-        super().__init__(field, admin_site, attrs=attrs, choices=choices, using=using)
-
-    def build_attrs(self, base_attrs, extra_attrs=None):
-        attrs = super().build_attrs(base_attrs, extra_attrs=extra_attrs)
-        attrs.update(
-            {
-                "data-ajax--delay": 250,
-                "data-placeholder": self.prompt,
-                "style": "width: 30em;",
-            }
-        )
-        return attrs
-
-
-class InviteUserForm(forms.Form):
-    user_email = forms.CharField()
-    profile = forms.ModelChoiceField(
-        queryset=Profile.objects.filter(user__isnull=True),
-        widget=AutocompleteSelect(field="profile", admin_site=admin.site),
-        label="Profile",
-    )
-
-
 @admin.register(ProfileInvite)
 class ProfileInviteAdmin(DjangoObjectActions, admin.ModelAdmin):
     list_display = [
@@ -274,24 +246,16 @@ class ProfileInviteAdmin(DjangoObjectActions, admin.ModelAdmin):
     list_filter = ["accepted_at"]
     search_fields = ["profile__first_name", "profile__last_name", "user_email"]
     readonly_fields = ["token", "accepted_at"]
-    changelist_actions = [
+    change_actions = [
         "send_email_invite",
     ]
 
-    @options(label="Invite user")
-    @form_processing_action(
-        form_class=InviteUserForm,
-        action_label="Send Invite",
-    )
-    def send_email_invite(self, request: HttpRequest, form: InviteUserForm):
-        invite = ProfileInvite.objects.create(
-            profile=form.cleaned_data["profile"], user_email=form.cleaned_data["user_email"]
-        )
+    @takes_instance_or_queryset
+    def send_email_invite(self, request: HttpRequest, obj: ProfileInvite):
         send_mail(
             subject="NeuronHub: you're invited to claim your profile",
-            message=f"Hi {invite.profile.first_name},\n\n"
-            f"Claim your profile on NeuronHub:\n{f'{settings.SERVER_URL}{reverse("profiles_accept_invite", args=[invite.token])}'}\n",
+            message=f"Hi {obj.profile.first_name},\n\n"
+            f"Claim your profile on NeuronHub:\n{f'{settings.SERVER_URL}{reverse("profiles_accept_invite", args=[obj.token])}'}\n",
             from_email=settings.ADMIN_EMAIL,
-            recipient_list=[invite.user_email],
+            recipient_list=[obj.user_email],
         )
-        self.message_user(request, f"Invite sent to {form.cleaned_data['user_email']}.")

@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from logging import getLogger
 
 from algoliasearch_django import get_adapter
-from algoliasearch_django import save_record
 from django.conf import settings
 from django.db.models import QuerySet
 from django.utils import timezone
@@ -77,7 +76,9 @@ def score_matches_by_llm(
                         "match_score_by_llm": match.match_score_by_llm,
                         "match_reason_by_llm": match.match_reason_by_llm,
                         "match_score": match.match_score,
-                        "match_processed_at": match.match_processed_at.isoformat(),
+                        "match_processed_at": match.match_processed_at.isoformat()
+                        if match.match_processed_at
+                        else None,
                         "is_scored_by_llm": True,
                         "needs_reprocessing": False,
                     }

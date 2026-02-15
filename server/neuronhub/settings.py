@@ -419,3 +419,4 @@ rich.traceback.install(
 class CONF_CONFIG:
     eag_csv_path: Path | None = env.path("PROFILES_CSV_PATH", None)
     algolia_limit: int = env.int("ALGOLIA_INDEX_LIMIT", 2000)
+    eag_group: str = "EAG-SF-2026"
