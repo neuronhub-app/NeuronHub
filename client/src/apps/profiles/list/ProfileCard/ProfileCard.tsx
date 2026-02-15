@@ -240,7 +240,12 @@ export function ProfileCard(props: {
         <Separator color="bg.muted" size="xs" />
       </Bleed>
 
-      <MatchSection profile={props.profile} isEnrichedByGraphql={props.isEnrichedByGraphql} />
+      <MatchSection
+        profile={props.profile}
+        isEnrichedByGraphql={props.isEnrichedByGraphql}
+        isSearchActive={props.isSearchActive}
+        isHighlightable={isHighlightable}
+      />
     </Stack>
   );
 }
@@ -309,8 +314,14 @@ function scoreToStars(score: number | null | undefined): number {
 
 // todo refac: move out
 // #AI
-function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql: boolean }) {
-  const match = props.profile.match;
+function MatchSection(props: {
+  profile: ProfileFragmentType;
+  isEnrichedByGraphql: boolean;
+  isSearchActive?: boolean;
+  isHighlightable?: boolean;
+}) {
+  const fields = getMatchFields(props.profile);
+  const profileHit = props.profile as unknown as Hit<BaseHit>;
   const state = useStateValtio({
     isReviewToggled: null as boolean | null,
     isUserHasRated: null as boolean | null,
@@ -318,10 +329,10 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
   });
 
   useEffect(() => {
-    state.mutable.isUserHasRated = Boolean(match?.match_score);
-  }, [match]);
+    state.mutable.isUserHasRated = Boolean(fields.match_score);
+  }, [fields.match_score]);
 
-  const isUserHasReview = !!match?.match_review;
+  const isUserHasReview = !!fields.match_review;
   const isUserReviewOpen = state.snap.isReviewToggled ?? isUserHasReview;
 
   const debouncedSaveReview = useDebouncedCallback(async (review: string) => {
@@ -338,14 +349,14 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
 
   return (
     <Flex gap="gap.sm2" align="flex-start">
-      {!props.isEnrichedByGraphql ? (
-        <Spinner size="xs" color="fg.subtle" />
-      ) : (
-        <>
-          <VStack align="flex-start" flex="1">
+      <VStack align="flex-start" flex="1">
+        {!props.isEnrichedByGraphql ? (
+          <Spinner size="xs" color="fg.subtle" />
+        ) : (
+          <>
             <HStack align="center" gap="gap.sm2">
               <MatchRating
-                defaultValue={scoreToStars(match?.match_score)}
+                defaultValue={scoreToStars(fields.match_score)}
                 onValueChange={async details => {
                   state.mutable.isReviewToggled = true;
                   state.mutable.isUserHasRated = true;
@@ -381,35 +392,58 @@ function MatchSection(props: { profile: ProfileFragmentType; isEnrichedByGraphql
                   overflow="hidden"
                   placeholder="Leave a review of this Profile for AI calibration"
                   size="xs"
-                  defaultValue={match?.match_review ?? ""}
+                  defaultValue={fields.match_review ?? ""}
                   onChange={e => debouncedSaveReview(e.target.value)}
                 />
                 <ReviewSaveIndicator status={state.snap.reviewSaveStatus} />
               </Box>
             )}
-          </VStack>
-          <VStack align="flex-start" flex="1">
-            {match?.match_score_by_llm != null && (
-              <>
-                <MatchRating
-                  value={scoreToStars(match.match_score_by_llm)}
-                  readOnly
-                  helpText="Match rating by AI"
-                  colorPalette="teal"
-                />
-                <Text fontSize="sm">
-                  <Icon boxSize="4.5" color="fg.subtle" mr="gap.sm" mt="-2px">
-                    <RiRobot2Line />
-                  </Icon>
-                  {match.match_reason_by_llm}
-                </Text>
-              </>
-            )}
-          </VStack>
-        </>
-      )}
+          </>
+        )}
+      </VStack>
+      <VStack align="flex-start" flex="1">
+        {fields.match_score_by_llm != null && (
+          <>
+            <MatchRating
+              value={scoreToStars(fields.match_score_by_llm)}
+              readOnly
+              helpText="Match rating by AI"
+              colorPalette="teal"
+            />
+            <Text fontSize="sm">
+              <Icon boxSize="4.5" color="fg.subtle" mr="gap.sm" mt="-2px">
+                <RiRobot2Line />
+              </Icon>
+              {props.isHighlightable && profileHit._highlightResult?.match_reason_by_llm ? (
+                <Highlight attribute="match_reason_by_llm" hit={profileHit} />
+              ) : (
+                fields.match_reason_by_llm
+              )}
+            </Text>
+          </>
+        )}
+      </VStack>
     </Flex>
   );
+}
+
+/**
+ * #AI-slop
+ * Read match fields from nested GraphQL `profile.match` or flat Algolia hit fields.
+ * */
+function getMatchFields(profile: ProfileFragmentType) {
+  const match = profile.match;
+  const algolia = profile as Record<string, unknown>;
+  return {
+    match_score_by_llm: (match?.match_score_by_llm ?? algolia.match_score_by_llm ?? null) as
+      | number
+      | null,
+    match_reason_by_llm: (match?.match_reason_by_llm ?? algolia.match_reason_by_llm ?? null) as
+      | string
+      | null,
+    match_score: (match?.match_score ?? algolia.match_score ?? null) as number | null,
+    match_review: (match?.match_review ?? algolia.match_review ?? null) as string | null,
+  };
 }
 
 // #AI

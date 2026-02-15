@@ -55,7 +55,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ["get_is_reviewed_by_user", "is_reviewed_by_user"],
             ["get_needs_reprocessing", "needs_reprocessing"],
             ["get_match_score_by_llm", "match_score_by_llm"],
-            ["get_match_reason_by_llm", "match_review"],
+            ["get_match_reason_by_llm", "match_reason_by_llm"],
             ["get_match_score", "match_score"],
             ["get_match_review", "match_review"],
         ]

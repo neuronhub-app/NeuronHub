@@ -199,7 +199,7 @@ class Profile(AlgoliaModel):
     # Algolia ProfileMatch fields
 
     def get_iso_match_processed_at(self) -> str | None:
-        if match := self._match:
+        if (match := self._match) and match.match_processed_at:
             return match.match_processed_at.isoformat()
         return None
 
@@ -238,7 +238,7 @@ class Profile(AlgoliaModel):
             return match.match_score
         return None
 
-    def get_match_review(self) -> int | None:
+    def get_match_review(self) -> str | None:
         if match := self._match:
             return match.match_review
         return None

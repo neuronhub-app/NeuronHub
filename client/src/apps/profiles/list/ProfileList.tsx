@@ -121,6 +121,8 @@ function ProfileListInner(props: {
           "company",
           "interests",
           "skills",
+          "match_reason_by_llm",
+          "match_review",
         ]}
       />
 
