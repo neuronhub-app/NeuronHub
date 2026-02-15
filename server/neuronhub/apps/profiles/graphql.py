@@ -94,6 +94,7 @@ class ProgressType:
     processed: int
     is_processing: bool
     model: str | None = None
+    error: str | None = None
 
     @strawberry.field
     def percent(self) -> float:
@@ -131,12 +132,13 @@ class ProfilesQuery:
             await DBTaskResult.objects.filter(
                 task_path=SCORE_PROFILES_TASK,
                 status__in=[TaskResultStatus.READY, TaskResultStatus.RUNNING],
+                args_kwargs__kwargs__user_id=user.id,
             )
             .order_by("-enqueued_at")
             .afirst()
         )
         if not active_task:
-            return ProgressType(total=0, processed=0, is_processing=False)
+            return await _check_failed_task(user)
 
         kwargs = active_task.args_kwargs.get("kwargs", {}) if active_task.args_kwargs else {}
 
@@ -269,7 +271,7 @@ class ProfilesMutation:
             user_profile = ""
 
         assert model in MODEL_LIMITS
-        model_limit = MODEL_LIMITS.get(model)
+        model_limit = MODEL_LIMITS[model]
         await score_profiles_task.aenqueue(
             user_id=user.id,
             user_profile=user_profile,
@@ -286,9 +288,11 @@ class ProfilesMutation:
         from django_tasks.backends.database.models import DBTaskResult
         from django_tasks.base import TaskResultStatus
 
+        user = await get_user(info)
         updated = await DBTaskResult.objects.filter(
             task_path=SCORE_PROFILES_TASK,
             status__in=[TaskResultStatus.READY, TaskResultStatus.RUNNING],
+            args_kwargs__kwargs__user_id=user.id,
         ).aupdate(status=TaskResultStatus.FAILED)
         return updated > 0
 
@@ -297,3 +301,39 @@ MODEL_LIMITS: dict[str, dict[str, int]] = {
     "haiku": {"max": 500, "default": 250},
     "sonnet": {"max": 100, "default": 50},
 }
+
+
+# #AI
+async def _check_failed_task(user) -> ProgressType:
+    latest_task = (
+        await DBTaskResult.objects.filter(
+            task_path=SCORE_PROFILES_TASK,
+            args_kwargs__kwargs__user_id=user.id,
+        )
+        .order_by("-enqueued_at")
+        .afirst()
+    )
+    if not latest_task or latest_task.status != TaskResultStatus.FAILED:
+        return ProgressType(total=0, processed=0, is_processing=False)
+
+    error_msg = latest_task.traceback or (
+        f"Task failed: {latest_task.exception_class_path}"
+        if latest_task.exception_class_path
+        else None
+    )
+    if not error_msg:
+        # Cancelled by user — not a real failure
+        return ProgressType(total=0, processed=0, is_processing=False)
+
+    kwargs = latest_task.args_kwargs.get("kwargs", {}) if latest_task.args_kwargs else {}
+    return ProgressType(
+        is_processing=False,
+        error=error_msg,
+        total=kwargs.get("limit", 0),
+        model=kwargs.get("model"),
+        processed=(
+            await ProfileMatch.objects.filter(
+                user=user, match_processed_at__gte=latest_task.enqueued_at
+            ).acount()
+        ),
+    )

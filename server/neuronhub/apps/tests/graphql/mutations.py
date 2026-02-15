@@ -1,5 +1,6 @@
 import strawberry
 from django.conf import settings
+from django.utils import timezone
 from strawberry import Info
 
 from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
@@ -29,3 +30,30 @@ class TestsMutation:
             is_import_profiles_csv=is_import_profiles_csv,
         )
         return gen.users.user_default.username
+
+    # #AI
+    @strawberry.mutation()
+    async def test_create_failed_task(self, info: Info) -> bool:
+        from django.contrib.auth import get_user_model
+        from django_tasks.backends.database.models import DBTaskResult
+        from django_tasks.base import TaskResultStatus
+
+        from neuronhub.apps.profiles.graphql import SCORE_PROFILES_TASK
+
+        assert settings.DEBUG
+        assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
+
+        User = get_user_model()
+        user = await User.objects.aget(username="admin")
+        await DBTaskResult.objects.acreate(
+            task_path=SCORE_PROFILES_TASK,
+            status=TaskResultStatus.FAILED,
+            args_kwargs={
+                "args": [],
+                "kwargs": {"limit": 10, "model": "haiku", "user_id": user.id},
+            },
+            backend_name="default",
+            run_after=timezone.now(),
+            traceback="RuntimeError: db_worker is not running",
+        )
+        return True

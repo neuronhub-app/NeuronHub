@@ -20,6 +20,7 @@ export const ProfileMatchProgressQuery = graphql.persisted(
         is_processing
         percent
         model
+        error
       }
     }
   `),
@@ -52,7 +53,7 @@ export function AiMatchingProgressBar() {
     return () => clearInterval(interval);
   }, [progress?.is_processing, refetch]);
 
-  if (!progress?.is_processing) {
+  if (!progress?.is_processing && !progress?.error) {
     return null;
   }
 
@@ -61,14 +62,39 @@ export function AiMatchingProgressBar() {
     refetch();
   }
 
+  if (progress?.error) {
+    return (
+      <Stack gap="gap.sm" {...ids.set(ids.profile.llm.progressBar)}>
+        <HStack gap="gap.sm" align="flex-start">
+          <Text fontSize="sm" color="fg.error" fontWeight="medium">
+            AI Matching failed
+          </Text>
+        </HStack>
+        <Text
+          fontSize="xs"
+          color="fg.muted"
+          whiteSpace="pre-wrap"
+          maxH="200px"
+          overflowY="auto"
+          p="gap.sm"
+          bg="bg.error"
+          borderRadius="sm"
+          fontFamily="mono"
+        >
+          {progress.error}
+        </Text>
+      </Stack>
+    );
+  }
+
   return (
     <Stack gap="gap.sm" {...ids.set(ids.profile.llm.progressBar)}>
       <HStack justify="space-between" align="center">
         <HStack gap="gap.sm">
           <Spinner size="xs" />
           <Text fontSize="sm" color="fg.subtle">
-            AI Processing ({progress.model ?? "haiku"}): {progress.processed} / {progress.total}{" "}
-            profiles, 10 per batch
+            AI Processing ({progress?.model ?? "haiku"}): {progress?.processed} /{" "}
+            {progress?.total} profiles, 10 per batch
           </Text>
         </HStack>
         <Button
@@ -82,7 +108,8 @@ export function AiMatchingProgressBar() {
           Cancel
         </Button>
       </HStack>
-      <Progress.Root value={progress.percent} max={100} size="sm">
+
+      <Progress.Root value={progress?.percent} max={100} size="sm">
         <Progress.Track>
           <Progress.Range />
         </Progress.Track>

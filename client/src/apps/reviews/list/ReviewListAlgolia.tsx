@@ -12,18 +12,16 @@ import {
   Input,
   InputGroup,
   Pagination,
-  SegmentGroup,
   Slider,
   Stack,
   Text,
   useToken,
 } from "@chakra-ui/react";
 import { getUnixTime, subDays, subMonths, subYears } from "date-fns";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { LuSearch } from "react-icons/lu";
 import {
-  Configure,
   InstantSearch,
   useHits,
   useNumericMenu,
@@ -31,7 +29,6 @@ import {
   useRange,
   useRefinementList,
   useSearchBox,
-  useSortBy,
 } from "react-instantsearch";
 import { NavLink } from "react-router";
 import { useAlgoliaReviewsEnrichmentByGraphql } from "@/apps/reviews/list/useAlgoliaReviewsEnrichmentByGraphql";

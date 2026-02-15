@@ -12,23 +12,19 @@ import {
   Input,
   InputGroup,
   Pagination,
-  SegmentGroup,
   Stack,
   Text,
   useToken,
 } from "@chakra-ui/react";
-import { getUnixTime, subDays } from "date-fns";
-import { useRef, useState } from "react";
+import { useRef, } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { LuSearch } from "react-icons/lu";
 import {
-  Configure,
   InstantSearch,
   useHits,
   usePagination,
   useRefinementList,
   useSearchBox,
-  useSortBy,
   useToggleRefinement,
 } from "react-instantsearch";
 import { NavLink } from "react-router";

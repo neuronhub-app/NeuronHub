@@ -2,8 +2,12 @@ from datetime import timedelta
 
 from asgiref.sync import sync_to_async
 from django.utils import timezone
+from django_tasks.backends.database.models import DBTaskResult
+from django_tasks.base import TaskResultStatus
 
 from neuronhub.apps.anonymizer.fields import Visibility
+from neuronhub.apps.profiles.graphql import SCORE_PROFILES_TASK
+from neuronhub.apps.profiles.graphql import _check_failed_task
 from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.tests.test_cases import NeuronTestCase
@@ -112,3 +116,97 @@ class ProfileTriggerLlmLimitTest(NeuronTestCase):
 
         assert MODEL_LIMITS["sonnet"]["max"] == 80
         assert MODEL_LIMITS["sonnet"]["default"] == 40
+
+
+# #AI
+def _create_task_result(
+    *,
+    status=TaskResultStatus.READY,
+    traceback="",
+    exception_class_path="",
+    user_id: int = 0,
+    **kwargs,
+):
+    defaults = {
+        "task_path": SCORE_PROFILES_TASK,
+        "status": status,
+        "args_kwargs": {
+            "args": [],
+            "kwargs": {"limit": 100, "model": "haiku", "user_id": user_id},
+        },
+        "backend_name": "default",
+        "run_after": timezone.now(),
+        "traceback": traceback,
+        "exception_class_path": exception_class_path,
+    }
+    defaults.update(kwargs)
+    return DBTaskResult.objects.create(**defaults)
+
+
+# #AI
+class CheckFailedTaskTest(NeuronTestCase):
+    async def test_returns_error_on_failed_task(self):
+        await sync_to_async(_create_task_result)(
+            status=TaskResultStatus.FAILED,
+            traceback="Traceback: something broke",
+            exception_class_path="builtins.RuntimeError",
+            user_id=self.user.id,
+        )
+
+        result = await _check_failed_task(self.user)
+        assert result.is_processing is False
+        assert result.error == "Traceback: something broke"
+        assert result.total == 100
+        assert result.model == "haiku"
+
+    async def test_returns_no_error_when_no_tasks(self):
+        result = await _check_failed_task(self.user)
+        assert result.is_processing is False
+        assert result.error is None
+        assert result.total == 0
+
+    async def test_returns_no_error_when_latest_task_succeeded(self):
+        await sync_to_async(_create_task_result)(
+            status=TaskResultStatus.SUCCEEDED,
+            user_id=self.user.id,
+        )
+
+        result = await _check_failed_task(self.user)
+        assert result.is_processing is False
+        assert result.error is None
+
+    async def test_returns_fallback_error_when_no_traceback(self):
+        await sync_to_async(_create_task_result)(
+            status=TaskResultStatus.FAILED,
+            traceback="",
+            exception_class_path="builtins.RuntimeError",
+            user_id=self.user.id,
+        )
+
+        result = await _check_failed_task(self.user)
+        assert result.error == "Task failed: builtins.RuntimeError"
+
+    async def test_does_not_see_other_users_failed_task(self):
+        other_user = await self.gen.users.user()
+        await sync_to_async(_create_task_result)(
+            status=TaskResultStatus.FAILED,
+            traceback="Other user's error",
+            user_id=other_user.id,
+        )
+
+        result = await _check_failed_task(self.user)
+        assert result.error is None
+        assert result.total == 0
+
+    async def test_cancelled_task_not_shown_as_error(self):
+        """Cancel sets status=FAILED but no traceback/exception — should not show error."""
+        await sync_to_async(_create_task_result)(
+            status=TaskResultStatus.FAILED,
+            traceback="",
+            exception_class_path="",
+            user_id=self.user.id,
+        )
+
+        result = await _check_failed_task(self.user)
+        assert result.error is None
+        assert result.is_processing is False

@@ -117,6 +117,7 @@ type Mutation {
   post_tag_vote_create_or_update(post_id: ID!, tag_id: ID!, is_vote_positive: Boolean, comment: String = null): Boolean! @IsAuthenticated
   update_post_seen_status(id: ID!): Boolean! @IsAuthenticated
   test_db_stubs_repopulate(is_import_HN_post: Boolean = true, is_create_single_review: Boolean = false, is_import_profiles_csv: Boolean = false): String!
+  test_create_failed_task: Boolean!
   post_highlight_create(data: PostHighlightTypeInput!): Boolean! @IsAuthenticated
   post_highlight_delete(data: DjangoModelInput!): Boolean! @IsAuthenticated
   post_import_refresh(id_external: Int!): Boolean! @IsAuthenticated
@@ -688,6 +689,7 @@ type ProgressType {
   processed: Int!
   is_processing: Boolean!
   model: String
+  error: String
   percent: Float!
 }
 

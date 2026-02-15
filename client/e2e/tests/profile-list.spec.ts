@@ -1,7 +1,12 @@
 import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
-import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
+import {
+  type LocatorMapToGetFirstById,
+  PlaywrightHelper,
+  TestCreateFailedTaskMutate,
+} from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
+import { client } from "@/graphql/client";
 import { urls } from "@/urls";
 
 // #AI
@@ -125,5 +130,20 @@ test.describe("ProfileList", () => {
     // Cancel hides the progress
     await play.click(ids.profile.llm.cancelButton);
     await progressBar.waitFor({ state: "hidden" });
+  });
+
+  test("failed task shows error message", async () => {
+    // Create a failed task via test mutation
+    await client.mutate({ mutation: TestCreateFailedTaskMutate });
+
+    await play.navigate(urls.profiles.list, { idleWait: true });
+
+    // Error state shows in progress bar area
+    const progressBar = $[ids.profile.llm.progressBar];
+    await progressBar.waitFor();
+
+    const text = await progressBar.textContent();
+    expect(text).toContain("AI Matching failed");
+    expect(text).toContain("db_worker is not running");
   });
 });

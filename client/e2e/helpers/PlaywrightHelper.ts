@@ -184,3 +184,12 @@ const DbStubsRepopulateMutate = graphql.persisted(
     }
   `),
 );
+
+export const TestCreateFailedTaskMutate = graphql.persisted(
+  "test_create_failed_task",
+  graphql(`
+    mutation test_create_failed_task {
+      test_create_failed_task
+    }
+  `),
+);
