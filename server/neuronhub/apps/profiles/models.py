@@ -199,24 +199,24 @@ class Profile(AlgoliaModel):
     # Algolia ProfileMatch fields
 
     def get_iso_match_processed_at(self) -> str | None:
-        if match := self._get_match():
+        if match := self._match:
             return match.match_processed_at.isoformat()
         return None
 
     # #AI
     def is_needs_llm_reprocessing(self) -> bool:
-        match = self._get_match()
+        match = self._match
         if match is None or match.match_processed_at is None:
             return True
         return self.content_updated_at > match.match_processed_at
 
     def get_is_scored_by_llm(self) -> bool:
-        if match := self._get_match():
+        if match := self._match:
             return bool(match.match_score_by_llm)
         return False
 
     def get_is_reviewed_by_user(self) -> bool:
-        if match := self._get_match():
+        if match := self._match:
             return bool(match.match_review) or bool(match.match_score)
         return False
 
@@ -224,28 +224,28 @@ class Profile(AlgoliaModel):
         return self.is_needs_llm_reprocessing()
 
     def get_match_score_by_llm(self) -> int | None:
-        if match := self._get_match():
+        if match := self._match:
             return match.match_score_by_llm
         return None
 
     def get_match_reason_by_llm(self) -> str:
-        if match := self._get_match():
+        if match := self._match:
             return match.match_reason_by_llm
         return ""
 
     def get_match_score(self) -> int | None:
-        if match := self._get_match():
+        if match := self._match:
             return match.match_score
         return None
 
     def get_match_review(self) -> int | None:
-        if match := self._get_match():
+        if match := self._match:
             return match.match_review
         return None
 
     # todo ! refac(perf): review
     @model_property(cached=True, select_related="match")
-    def _get_match(self) -> ProfileMatch | None:
+    def _match(self) -> ProfileMatch | None:
         try:
             return self.match
         except ProfileMatch.DoesNotExist:
