@@ -297,6 +297,7 @@ class ProfilesMutation:
         return updated > 0
 
 
+# todo ? refac: in dataclass #AI-slop
 MODEL_LIMITS: dict[str, dict[str, int]] = {
     "haiku": {"max": 500, "default": 250},
     "sonnet": {"max": 100, "default": 50},

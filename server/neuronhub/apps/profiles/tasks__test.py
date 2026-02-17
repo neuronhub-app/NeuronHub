@@ -6,6 +6,7 @@ from neuronhub.apps.profiles.tasks import run_score_profiles
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
+# #AI-slop
 class TasksTest(NeuronTestCase):
     async def test_score_profiles_task_updates_match_processed_at(self):
         profile = await self.gen.profiles.profile(user=None, visibility=Visibility.PUBLIC)
