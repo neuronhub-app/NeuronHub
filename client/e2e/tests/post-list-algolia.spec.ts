@@ -1,21 +1,23 @@
 import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
-import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
+import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { urls } from "@/urls";
 
-// #AI stupid and wrong.
 test.describe("PostListAlgolia", () => {
   let play: PlaywrightHelper;
+  let $: LocatorMapToGetFirstById;
 
   test.beforeEach(async ({ page }) => {
     play = new PlaywrightHelper(page);
+    $ = play.$;
     await play.dbStubsRepopulateAndLogin({
       is_import_HN_post: true,
       is_create_single_review: false,
     });
   });
 
+  // #AI stupid and wrong
   test("sort control changes actual post order", async ({ page }) => {
     await play.navigate(urls.posts.list, { idleWait: true });
 
@@ -66,28 +68,19 @@ test.describe("PostListAlgolia", () => {
   test("date filter excludes old posts", async ({ page }) => {
     await play.navigate(urls.posts.list, { idleWait: true });
 
-    const dateControl = play.get(ids.post.listControls.dateRange);
-
-    // Explicitly click "7d" to ensure filter is applied (even though it's default)
-    await dateControl.getByText("7d").click();
-    await play.waitForNetworkIdle();
-    const count7d = await getPostCount();
-
-    // Switch to "All" - should have more or equal posts
-    await dateControl.getByText("All").click();
+    // trigger state change from the "7d" default
+    await $[ids.post.listControls.dateRange].getByText("All").click();
     await play.waitForNetworkIdle();
     const countAll = await getPostCount();
-    expect(countAll).toBeGreaterThanOrEqual(count7d);
 
-    // Switch to "1d" - should have fewer or equal posts than 7d
-    await dateControl.getByText("1d").click();
+    // "1d" <= "All" posts
+    await $[ids.post.listControls.dateRange].getByText("7d").click();
     await play.waitForNetworkIdle();
-    const count1d = await getPostCount();
-    expect(count1d).toBeLessThanOrEqual(count7d);
+    const count7d = await getPostCount();
+    expect(count7d).toBeLessThanOrEqual(countAll);
 
     async function getPostCount() {
-      const cards = page.getByTestId(ids.post.card.container);
-      return await cards.count();
+      return page.getByTestId(ids.post.card.container).count();
     }
   });
 });

@@ -124,10 +124,7 @@ async def db_stubs_repopulate(
             await _import_profiles_csv(gen)
 
     if settings.ALGOLIA["IS_ENABLED"]:
-        await _algolia_reindex(
-            is_import_profiles_csv=is_import_profiles_csv,
-            is_import_HN_post=is_import_HN_post,
-        )
+        await _algolia_reindex(is_import_profiles_csv=is_import_profiles_csv)
 
     return gen
 
@@ -163,18 +160,14 @@ async def _import_profiles_csv(gen: Gen):
 
 
 # todo ! refac: move out
-async def _algolia_reindex(
-    is_import_profiles_csv: bool | None = True,
-    is_import_HN_post: bool | None = True,
-):
+async def _algolia_reindex(is_import_profiles_csv: bool | None = True):
     from algoliasearch_django import reindex_all
 
     from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
 
-    # todo refac: replace with a [[index.py]] method
-    if is_import_HN_post:
-        await sync_to_async(reindex_all)(Post)
-        await sync_to_async(setup_virtual_replica_sorted_by_votes)()
+    await sync_to_async(reindex_all)(Post)
+    await sync_to_async(setup_virtual_replica_sorted_by_votes)()
+
     if is_import_profiles_csv:
         await sync_to_async(reindex_all)(Profile)
 

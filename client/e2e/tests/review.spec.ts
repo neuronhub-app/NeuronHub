@@ -42,7 +42,7 @@ test.describe("Review", () => {
 
   test("Edit Review.tags & Tool.tags", async () => {
     await play.navigate(urls.reviews.list);
-    await play.click(ids.post.card.link.edit);
+    await openEditFormPyCharm();
 
     const tags = {
       parent: { existing: "IDE" },
@@ -56,19 +56,21 @@ test.describe("Review", () => {
 
     // Add
     await play.addTag(tags.review.new, { isReviewTag: true });
-    await submitAndReload();
+    await play.submit(ids.post.form, { waitIdle: true });
+    await openEditFormPyCharm();
     await expect(reviewTags).toHaveTag(tags.review.new);
 
     // todo refac: use ids - ie make "remove" btn a child of ids.review.form.tags
     await reviewTags.locator(`[aria-label="Remove ${tags.review.new}"]`).click();
-    await submitAndReload();
+    await play.submit(ids.post.form, { waitIdle: true });
+    await openEditFormPyCharm();
     await expect(reviewTags).not.toHaveTag(tags.review.new);
     await expect(toolTags).toHaveTag(tags.review.new);
   });
 
   test("Tag (existing) voting & add a Tag", async () => {
     await play.navigate(urls.reviews.list);
-    await play.click(ids.post.card.link.edit);
+    await openEditFormPyCharm();
 
     const tags = { existing: "Django", new: "New tag" };
     const vote = play.getTagVoteButtons(tags.existing, { isReviewTag: true });
@@ -79,22 +81,23 @@ test.describe("Review", () => {
 
     // downvote
     await vote.down.click();
-    await submitAndReload();
+    await play.submit(ids.post.form, { waitIdle: true });
+    await openEditFormPyCharm();
     await expect(vote.up).not.checked();
     await expect(vote.down).checked();
 
     // add new
     await play.addTag(tags.new, { isReviewTag: true });
-    await submitAndReload();
+    await play.submit(ids.post.form, { waitIdle: true });
+    await openEditFormPyCharm();
     await expect($[ids.review.form.tags]).toHaveTag(tags.existing);
     await expect($[ids.review.form.tags]).toHaveTag(tags.new);
     await expect(vote.up).not.checked();
     await expect(vote.down).checked();
   });
 
-  async function submitAndReload() {
-    await play.submit(ids.post.form);
-    await play.page.waitForLoadState("networkidle");
-    await play.click(ids.post.card.link.edit);
+  async function openEditFormPyCharm() {
+    const card = play.getAll(ids.post.card.container).filter({ hasText: "PyCharm" }).first();
+    await card.getByTestId(ids.post.card.link.edit).click();
   }
 });
