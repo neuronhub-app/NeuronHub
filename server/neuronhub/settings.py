@@ -253,6 +253,8 @@ DEFAULT_DJANGO_SETTINGS = strawberry_django_settings()
 DEFAULT_DJANGO_SETTINGS["GENERATE_ENUMS_FROM_CHOICES"] = True  # no reason atm, can remove
 # "pk" by default is a nice idea, but bad implementation - "id" is soft-required in Django
 DEFAULT_DJANGO_SETTINGS["DEFAULT_PK_FIELD_NAME"] = "id"
+# default is unlimited for compatibility, see v0.74.0 changelog
+DEFAULT_DJANGO_SETTINGS["PAGINATION_MAX_LIMIT"] = 300
 
 
 # django.auth + django-allauth
