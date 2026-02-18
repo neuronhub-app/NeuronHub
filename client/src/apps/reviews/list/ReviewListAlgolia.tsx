@@ -22,6 +22,7 @@ import { useMemo, useRef, } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { LuSearch } from "react-icons/lu";
 import {
+  Configure,
   InstantSearch,
   useHits,
   useNumericMenu,
@@ -59,6 +60,7 @@ export function ReviewListAlgolia() {
       routing
       future={{ preserveSharedStateOnUnmount: true }}
     >
+      <Configure filters="type:Review" />
       <Stack gap="gap.lg">
         <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
           <Flex gap="gap.md" align="center">
