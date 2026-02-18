@@ -2,8 +2,11 @@
     run = "claude --dangerously-skip-permissions"
     env = { TSC_CONFIG = "tsconfig.quiet.json" } # #prob-redundant
 
+["claude:med"]
+    run = "mise claude --effort=medium"
+
 ["claude:usage"]
-    run = "claude --dangerously-skip-permissions '/usage'"
+    run = "mise claude '/usage'"
 
 ["claude:ask"]
     usage = """
@@ -15,7 +18,7 @@
         flag "-p --print" help="Print output and exit" default=#false
     """
     run = """
-        # claude $prompt
+        # "claude $prompt" with a short system_prompt
 
         $env.usage_print = if ($env.usage_print | into bool) { "--print" } else { "" }
 
