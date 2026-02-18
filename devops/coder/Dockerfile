@@ -16,6 +16,10 @@ RUN sudo apt update
 RUN sudo apt upgrade --yes
 RUN sudo apt install --yes --no-install-recommends fish
 SHELL ["fish", "--command"]
+RUN sudo chsh -s $(which fish) $USER
+
+# Coder CLI ignores /etc/passwrd
+RUN echo '[[ -o interactive ]] && exec fish' >> ~/.bashrc
 
 
 # XDG envs
