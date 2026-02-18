@@ -173,6 +173,7 @@
         # duplicate $env with `dev:e2e:server`, as Playwright resets $env when it starts Mise from [[playwright.config.ts]]
         env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
+        env.IS_TASKS_BACKEND_IMMEDIATE = "false"
 
 
 # Django
