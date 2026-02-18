@@ -28,8 +28,17 @@ class MatchConfig:
     user_profile: str
     batch_size: int = 50
     model: str = "haiku"
-    dry_run: bool = False
-    use_calibration: bool = True
+
+    is_dry_run: bool = False
+
+    is_use_calibration: bool = True
+    calibration_xml_tag = "Reviewed_By_User_For_Calibration"
+
+    is_logs_enabled: bool = True
+
+    def log(self, msg: str):
+        if self.is_logs_enabled:
+            logger.info(f"LLM scoring: {msg}")
 
 
 def score_matches_by_llm(
@@ -50,7 +59,9 @@ def score_matches_by_llm(
         scores.extend(match_result.scores)
 
         batch_id = _get_deterministic_profile_batch_id(batch)
-        logger.info(f"Saving batch {batch_index + 1}/{len(profile_batches)}, id={batch_id}")
+
+        config.log(f"saving batch {batch_index + 1}/{len(profile_batches)}, id={batch_id}")
+
         now = timezone.now()
         for score in match_result.scores:
             match, _ = ProfileMatch.objects.update_or_create(
@@ -115,9 +126,9 @@ def _score_matches_batch_by_llm(
 ) -> BatchResult:
     reviewed_calibration_md = ""
 
-    if (matches_reviewed := get_matches_reviewed(config.user)) and config.use_calibration:
+    if config.is_use_calibration and (matches_reviewed := get_matches_reviewed(config.user)):
         reviewed_calibration_md = serialize_to_md_xml_field(
-            tag_name="Reviewed_By_User_For_Calibration",
+            tag_name=config.calibration_xml_tag,
             text=build_calibration_examples(matches=matches_reviewed, max_examples=8),
         )
 
@@ -133,14 +144,15 @@ def _score_matches_batch_by_llm(
     )
 
     system_prompt = _build_system_prompt()
-    if config.dry_run:
+    if config.is_dry_run:
         scores = [
             ProfileScore(profile_id=profile.id, match_score=50, match_reasoning_note="dry run")
             for profile in profiles
         ]
-        return BatchResult(scores=scores, prompt=prompt, system_prompt=system_prompt)
+        return BatchResult(scores=scores, system_prompt=system_prompt, prompt=prompt)
 
-    logger.info(f"LLM: batch of {len(profiles)}...")
+    config.log(f"batch of {len(profiles)}...")
+
     llm_output_json = _call_llm_api(
         prompt,
         schema=_get_json_schema(valid_ids=[profile.id for profile in profiles]),
@@ -157,7 +169,8 @@ def _score_matches_batch_by_llm(
         for score in llm_output_json[json_key.match_scores]
     ]
 
-    logger.info(f"Claude: scored {len(scores)}")
+    config.log(f"scored {len(scores)}")
+
     return BatchResult(scores=scores, system_prompt=system_prompt, prompt=prompt)
 
 

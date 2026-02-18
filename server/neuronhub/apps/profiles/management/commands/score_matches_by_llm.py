@@ -65,8 +65,8 @@ class Command(BaseCommand):
             user_profile=user_profile,
             batch_size=batch_size,
             model=model,
-            dry_run=dry_run,
-            use_calibration=not no_calibration,
+            is_dry_run=dry_run,
+            is_use_calibration=not no_calibration,
         )
 
         is_rescore = model != "haiku"
