@@ -40,7 +40,7 @@ test.describe("Review", () => {
     await play.submit(ids.post.form);
   });
 
-  test("Edit Review.tags & Tool.tags", async () => {
+  test("Edit Review.tags & Tool.tags (flkay)", async () => {
     await play.navigate(urls.reviews.list);
     await openEditFormPyCharm();
 

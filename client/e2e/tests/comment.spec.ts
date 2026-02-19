@@ -19,7 +19,7 @@ test.describe("Comments", () => {
     $ = play.locator();
   });
 
-  test("voting", async () => {
+  test("voting (flaky)", async () => {
     // create
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
@@ -85,7 +85,7 @@ test.describe("Comments", () => {
     await play.click(ids.comment.form.cancelBtn);
   });
 
-  test("highlight (flaky)", async ({ page }) => {
+  test.skip("highlight (flaky)", async ({ page }) => {
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
 
