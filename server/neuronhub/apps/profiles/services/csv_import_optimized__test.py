@@ -44,9 +44,9 @@ class CsvImportOptimizedTest(NeuronTestCase):
         assert len(skill_tags) > 0
 
         profile_with_skills = await sync_to_async(
-            lambda: Profile.objects.prefetch_related("skills")
-            .filter(skills__isnull=False)
-            .first()
+            lambda: (
+                Profile.objects.prefetch_related("skills").filter(skills__isnull=False).first()
+            )
         )()
         assert profile_with_skills is not None
         skills = await sync_to_async(profile_with_skills.get_tag_skills_names)()

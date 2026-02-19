@@ -397,8 +397,8 @@ if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
     LOGGING.setdefault("filters", {})
     LOGGING["filters"]["suppress_cancelled"] = {
         "()": "django.utils.log.CallbackFilter",
-        "callback": lambda record: not (
-            record.exc_info and record.exc_info[0] == asyncio.exceptions.CancelledError
+        "callback": lambda record: (
+            not (record.exc_info and record.exc_info[0] == asyncio.exceptions.CancelledError)
         ),
     }
     # noinspection PyTypeChecker
