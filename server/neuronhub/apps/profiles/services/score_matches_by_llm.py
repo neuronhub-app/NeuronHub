@@ -4,7 +4,6 @@ import textwrap
 from dataclasses import dataclass
 from logging import getLogger
 
-from algoliasearch_django import algolia_engine
 from django.conf import settings
 from django.db.models import QuerySet
 from django.utils import timezone
@@ -77,6 +76,8 @@ def score_matches_by_llm(
             matches_updated.append(match)
 
         if settings.ALGOLIA["IS_ENABLED"]:
+            from algoliasearch_django import algolia_engine
+
             algolia_engine.client.partial_update_objects(
                 index_name="profiles",
                 objects=[

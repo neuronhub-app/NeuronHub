@@ -2,7 +2,6 @@ from typing import cast
 
 import strawberry
 import strawberry_django
-from algoliasearch_django import save_record
 from asgiref.sync import sync_to_async
 from django.db.models import F
 from django.db.models import Q
@@ -213,6 +212,8 @@ class ProfilesMutation:
     async def profile_match_score_update(
         self, profile_id: ID, match_score: int, info: Info
     ) -> bool:
+        from algoliasearch_django import save_record
+
         user = await get_user(info)
         await ProfileMatch.objects.aupdate_or_create(
             profile_id=profile_id,
@@ -226,6 +227,8 @@ class ProfilesMutation:
     async def profile_match_review_update(
         self, profile_id: ID, match_review: str, info: Info
     ) -> bool:
+        from algoliasearch_django import save_record
+
         user = await get_user(info)
         await ProfileMatch.objects.aupdate_or_create(
             profile_id=profile_id,
