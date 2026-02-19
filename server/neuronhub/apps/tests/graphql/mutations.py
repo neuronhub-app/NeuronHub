@@ -1,7 +1,6 @@
 import strawberry
 from django.conf import settings
 from django.utils import timezone
-from strawberry import Info
 
 from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
 from neuronhub.settings import DjangoEnv
@@ -12,7 +11,7 @@ class TestsMutation:
     @strawberry.mutation()
     async def test_db_stubs_repopulate(
         self,
-        info: Info,
+        info: strawberry.Info,
         is_import_HN_post: bool | None = True,
         is_create_single_review: bool | None = False,
         is_import_profiles_csv: bool | None = False,
@@ -33,7 +32,7 @@ class TestsMutation:
 
     # #AI
     @strawberry.mutation()
-    async def test_create_failed_task(self, info: Info) -> bool:
+    async def test_create_failed_task(self, info: strawberry.Info) -> bool:
         from django.contrib.auth import get_user_model
         from django_tasks.backends.database.models import DBTaskResult
         from django_tasks.base import TaskResultStatus

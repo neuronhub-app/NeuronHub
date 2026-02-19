@@ -9,7 +9,6 @@ from django.db.models import QuerySet
 from django_tasks.backends.database.models import DBTaskResult
 from django_tasks.base import TaskResultStatus
 from strawberry import ID
-from strawberry import Info
 from strawberry import auto
 from strawberry_django.pagination import OffsetPaginated
 from strawberry_django.permissions import IsAuthenticated
@@ -77,7 +76,9 @@ class ProfileType:
     interests: list[PostTagType]
 
     @classmethod
-    def get_queryset(cls, queryset: QuerySet[Profile], info: Info) -> QuerySet[Profile]:
+    def get_queryset(
+        cls, queryset: QuerySet[Profile], info: strawberry.Info
+    ) -> QuerySet[Profile]:
         user = get_user_sync(info)
         return filter_profiles_by_user(user, profiles=queryset)
 
@@ -116,7 +117,7 @@ class ProfilesQuery:
 
     # #AI-slop
     @strawberry_django.field(extensions=[IsAuthenticated()])
-    async def my_profile(self, info: Info) -> ProfileType | None:
+    async def my_profile(self, info: strawberry.Info) -> ProfileType | None:
         user = await get_user(info)
         try:
             return cast(ProfileType, await Profile.objects.aget(user=user))
@@ -124,7 +125,7 @@ class ProfilesQuery:
             return None
 
     @strawberry.field(extensions=[IsAuthenticated()])
-    async def profile_match_progress(self, info: Info) -> ProgressType:
+    async def profile_match_progress(self, info: strawberry.Info) -> ProgressType:
         user = await get_user(info)
 
         active_task = (
@@ -153,7 +154,7 @@ class ProfilesQuery:
         )
 
     @strawberry_django.offset_paginated(OffsetPaginated[ProfileType])
-    def profiles_sorted_by_match(self, info: Info, sort: str) -> QuerySet[Profile]:
+    def profiles_sorted_by_match(self, info: strawberry.Info, sort: str) -> QuerySet[Profile]:
         user = get_user_sync(info)
         if not user.is_authenticated:
             return Profile.objects.none()
@@ -161,7 +162,7 @@ class ProfilesQuery:
 
     # #AI
     @strawberry.field(extensions=[IsAuthenticated()])
-    async def profile_match_stats(self, info: Info) -> ProfileMatchStatsType:
+    async def profile_match_stats(self, info: strawberry.Info) -> ProfileMatchStatsType:
         user = await get_user(info)
         visible = filter_profiles_by_user(user)
 
@@ -188,7 +189,7 @@ class ProfilesQuery:
         )
 
     @strawberry.field(extensions=[IsAuthenticated()])
-    async def profile_user_llm_md(self, info: Info) -> str:
+    async def profile_user_llm_md(self, info: strawberry.Info) -> str:
         user = await get_user(info)
         try:
             profile = await Profile.objects.aget(user=user)
@@ -200,7 +201,7 @@ class ProfilesQuery:
 @strawberry.type
 class ProfilesMutation:
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def profile_send_dm(self, profile_id: ID, message: str, info: Info) -> bool:
+    async def profile_send_dm(self, profile_id: ID, message: str, info: strawberry.Info) -> bool:
         sender = await get_user(info)
         profile = await Profile.objects.select_related("user").aget(id=profile_id)
         assert profile.user, "Profile has no user"
@@ -210,7 +211,7 @@ class ProfilesMutation:
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def profile_match_score_update(
-        self, profile_id: ID, match_score: int, info: Info
+        self, profile_id: ID, match_score: int, info: strawberry.Info
     ) -> bool:
         from algoliasearch_django import save_record
 
@@ -225,7 +226,7 @@ class ProfilesMutation:
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def profile_match_review_update(
-        self, profile_id: ID, match_review: str, info: Info
+        self, profile_id: ID, match_review: str, info: strawberry.Info
     ) -> bool:
         from algoliasearch_django import save_record
 
@@ -240,7 +241,9 @@ class ProfilesMutation:
 
     # AI
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def profile_llm_md_update(self, profile_for_llm_md: str, info: Info) -> bool:
+    async def profile_llm_md_update(
+        self, profile_for_llm_md: str, info: strawberry.Info
+    ) -> bool:
         user = await get_user(info)
         profile = await Profile.objects.aget(user=user)
         profile.is_profile_custom = True
@@ -249,7 +252,7 @@ class ProfilesMutation:
         return True
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def profile_llm_md_reset(self, info: Info) -> bool:
+    async def profile_llm_md_reset(self, info: strawberry.Info) -> bool:
         user = await get_user(info)
         profile = await Profile.objects.aget(user=user)
         profile.is_profile_custom = False
@@ -259,7 +262,7 @@ class ProfilesMutation:
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def profile_matches_trigger_llm(
         self,
-        info: Info,
+        info: strawberry.Info,
         limit: int = 200,
         model: str = "haiku",
         include_reprocessing: bool = True,
@@ -295,7 +298,7 @@ class ProfilesMutation:
         return ProgressType(total=limit_total, processed=0, is_processing=True, model=model)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def profile_matches_cancel_llm(self, info: Info) -> bool:
+    async def profile_matches_cancel_llm(self, info: strawberry.Info) -> bool:
         from django_tasks.backends.database.models import DBTaskResult
         from django_tasks.base import TaskResultStatus
 

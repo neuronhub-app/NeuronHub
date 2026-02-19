@@ -1,5 +1,4 @@
 import strawberry
-from strawberry import Info
 from strawberry_django.permissions import IsAuthenticated
 
 from neuronhub.apps.graphql.persisted_query_extension import GraphqlQuery
@@ -14,7 +13,7 @@ from neuronhub.apps.users.graphql.resolvers import get_user
 @strawberry.type
 class ImporterMutation:
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def post_import_refresh(self, id_external: int, info: Info) -> bool:
+    async def post_import_refresh(self, id_external: int, info: strawberry.Info) -> bool:
         user = await get_user(info)
         assert user.is_superuser
 

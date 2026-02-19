@@ -8,7 +8,6 @@ import strawberry_django
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import F
 from django.db.models import QuerySet
-from strawberry import Info
 from strawberry import auto
 from strawberry_django.auth.utils import get_current_user
 
@@ -94,14 +93,14 @@ class PostTypeI:
     updated_at: auto
 
     @classmethod
-    def get_queryset(cls, queryset: QuerySet[Post], info: Info) -> QuerySet[Post]:
+    def get_queryset(cls, queryset: QuerySet[Post], info: strawberry.Info) -> QuerySet[Post]:
         user = get_user_sync(info)
         if hasattr(cls, "TYPE"):
             queryset = queryset.filter(type=cls.TYPE)
         return filter_posts_by_user(user, posts=queryset)
 
     @strawberry_django.field()
-    async def comments(self: Post, info: Info) -> list[PostCommentType]:
+    async def comments(self: Post, info: strawberry.Info) -> list[PostCommentType]:
         comments_qs = Post.objects.filter(parent_root=self, type=Post.Type.Comment)
         comments_filtered = filter_posts_by_user(user=get_current_user(info), posts=comments_qs)
         comments_ordered = comments_filtered.order_by(

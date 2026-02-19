@@ -1,7 +1,6 @@
 from typing import cast
 
 import strawberry
-from strawberry import Info
 from strawberry_django import mutations
 from strawberry_django.auth.utils import aget_current_user
 from strawberry_django.permissions import IsAuthenticated
@@ -27,7 +26,9 @@ class PostsMutation:
     post_delete: PostType = mutations.delete(DjangoModelInput, extensions=[IsAuthenticated()])
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def post_update_or_create(self, data: PostTypeInput, info: Info) -> PostType:
+    async def post_update_or_create(
+        self, data: PostTypeInput, info: strawberry.Info
+    ) -> PostType:
         user = await aget_current_user(info)
         post = await post_update_or_create(author=cast(User, user), data=data)
         return cast(PostType, post)
@@ -37,7 +38,7 @@ class PostsMutation:
         self,
         id: strawberry.ID,
         is_vote_positive: bool | None,
-        info: Info,
+        info: strawberry.Info,
         is_changed_my_mind: bool | None = None,
     ) -> bool:
         await PostVote.objects.aupdate_or_create(
@@ -56,7 +57,7 @@ class PostsMutation:
         post_id: strawberry.ID,
         tag_id: strawberry.ID,
         is_vote_positive: bool | None,
-        info: Info,
+        info: strawberry.Info,
         comment: str | None = None,
     ) -> bool:
         await PostTagVote.objects.aupdate_or_create(
@@ -71,7 +72,7 @@ class PostsMutation:
         return True
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def update_post_seen_status(self, id: strawberry.ID, info: Info) -> bool:
+    async def update_post_seen_status(self, id: strawberry.ID, info: strawberry.Info) -> bool:
         user = await get_user(info)
         post = await Post.objects.aget(id=id)
         await post.seen_by_users.aadd(user.id)

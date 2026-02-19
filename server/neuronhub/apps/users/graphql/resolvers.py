@@ -6,7 +6,6 @@ from algoliasearch.search.client import SearchClientSync
 from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-from strawberry.types import Info
 from strawberry_django.auth.utils import aget_current_user
 from strawberry_django.auth.utils import get_current_user
 
@@ -15,7 +14,7 @@ from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.models import User
 
 
-def resolve_current_user(info: Info) -> UserType | None:
+def resolve_current_user(info: strawberry.Info) -> UserType | None:
     # todo refac: drop if `strawberry_django/auth/queries.py::current_user` stops throwing Errors (still does)
     user = get_current_user(info)
     if getattr(user, "is_authenticated", False):
@@ -23,7 +22,7 @@ def resolve_current_user(info: Info) -> UserType | None:
     return None
 
 
-async def get_user(info: Info) -> User:
+async def get_user(info: strawberry.Info) -> User:
     user = await aget_current_user(info=info)
     return cast(User, user)
 
@@ -31,7 +30,7 @@ async def get_user(info: Info) -> User:
 get_user_sync = async_to_sync(get_user)
 
 
-async def get_user_maybe(info: Info) -> User | AnonymousUser:
+async def get_user_maybe(info: strawberry.Info) -> User | AnonymousUser:
     user = await aget_current_user(info=info)
     return cast(User | AnonymousUser, user)
 
@@ -51,7 +50,7 @@ class UsersQuery:
 
     @strawberry.field(name="algolia_search_key")
     async def get_algolia_search_key_with_user_perms(
-        self, info: Info
+        self, info: strawberry.Info
     ) -> AlgoliaSearchKeyType | None:
         if not settings.ALGOLIA["IS_ENABLED"]:
             return None

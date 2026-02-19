@@ -2,9 +2,7 @@ from typing import cast
 
 import strawberry
 import strawberry_django
-from django.db.models import QuerySet
 from strawberry import ID
-from strawberry import Info
 from strawberry import auto
 from strawberry_django.permissions import IsAuthenticated
 
@@ -44,7 +42,9 @@ class PostHighlightTypeInput:
 @strawberry.type(name="Query")
 class HighlighterQuery:
     @strawberry.field(extensions=[IsAuthenticated()])
-    async def post_highlights(self, post_ids: list[ID], info: Info) -> list[PostHighlightType]:
+    async def post_highlights(
+        self, post_ids: list[ID], info: strawberry.Info
+    ) -> list[PostHighlightType]:
         user = await get_user(info)
         highlights = [
             highlight
@@ -53,14 +53,14 @@ class HighlighterQuery:
         return cast(list[PostHighlightType], highlights)
 
     @strawberry.field(extensions=[IsAuthenticated()])
-    async def post_highlight(self, post_id: ID, info: Info) -> PostHighlightType:
+    async def post_highlight(self, post_id: ID, info: strawberry.Info) -> PostHighlightType:
         user = await get_user(info)
         highlight = await PostHighlight.objects.filter(post_id=post_id, user_id=user.id).aget()
         return cast(PostHighlightType, cast(object, highlight))
 
     # todo !! we have at least 5-level children #AI-slop
     @strawberry.field(extensions=[IsAuthenticated()])
-    async def user_highlights(self, info: Info) -> list[PostHighlightType]:
+    async def user_highlights(self, info: strawberry.Info) -> list[PostHighlightType]:
         user = await get_user(info)
         highlights = [
             highlight
@@ -74,7 +74,9 @@ class HighlighterQuery:
 @strawberry.type
 class HighlighterMutation:
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def post_highlight_create(self, data: PostHighlightTypeInput, info: Info) -> bool:
+    async def post_highlight_create(
+        self, data: PostHighlightTypeInput, info: strawberry.Info
+    ) -> bool:
         user = await get_user(info)
         # todo !(sec): clean HTML. But atm PostHighlight has no sharing.
         # FE can't send HTML, but a bot/human will.
@@ -88,7 +90,7 @@ class HighlighterMutation:
         return True
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
-    async def post_highlight_delete(self, data: DjangoModelInput, info: Info) -> bool:
+    async def post_highlight_delete(self, data: DjangoModelInput, info: strawberry.Info) -> bool:
         user = await get_user(info)
         await PostHighlight.objects.filter(id=data.id, user=user).adelete()
         return True

@@ -3,7 +3,6 @@ from typing import cast
 import strawberry
 from asgiref.sync import sync_to_async
 from django.contrib.auth import aauthenticate, alogin
-from strawberry import Info
 from strawberry_django import auth
 from strawberry_django.permissions import IsAuthenticated
 
@@ -31,7 +30,7 @@ class UserMutation:
     logout: bool = auth.logout()
 
     @strawberry.mutation()
-    async def login(self, data: LoginInput, info: Info) -> LoginResponse:
+    async def login(self, data: LoginInput, info: strawberry.Info) -> LoginResponse:
         username = data.username_or_email
         if "@" in username:
             if user := await User.objects.filter(email=data.username_or_email).afirst():
@@ -51,7 +50,7 @@ class UserMutation:
     async def update_user(
         self,
         data: UserTypeInput,
-        info: Info,
+        info: strawberry.Info,
     ) -> UserType:
         user: User = info.context.request.user
 
@@ -67,7 +66,7 @@ class UserMutation:
         id: strawberry.ID,
         list_field_name: UserListName,
         is_added: bool,
-        info: Info,
+        info: strawberry.Info,
     ) -> bool:
         user: User = info.context.request.user
 
