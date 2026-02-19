@@ -25,6 +25,7 @@
       },
       "correctness": {
         "noUnusedVariables": "off",
+        "noUnusedFunctionParameters": "off",
         "useExhaustiveDependencies": "off", // can't define "exhaustive"
       },
       "style": {
