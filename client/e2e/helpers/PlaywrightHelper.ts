@@ -26,6 +26,11 @@ export class PlaywrightHelper {
     this.$ = this.locator();
   }
 
+  setDefaultTimeout(timeout: number) {
+    this.actionTimeoutMs = timeout;
+    this.page.setDefaultTimeout(this.actionTimeoutMs);
+  }
+
   async dbStubsRepopulateAndLogin(options?: {
     is_import_HN_post?: boolean;
     is_create_single_review?: boolean;

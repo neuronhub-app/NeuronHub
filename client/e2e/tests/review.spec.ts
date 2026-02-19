@@ -41,7 +41,7 @@ test.describe("Review", () => {
   });
 
   test("Edit Review.tags & Tool.tags", async ({ page }) => {
-    page.setDefaultTimeout(12_000); // 7.5s makes it flaky
+    play.setDefaultTimeout(12_000); // 7.5s makes it flaky
 
     await play.navigate(urls.reviews.list);
     await openEditFormPyCharm();

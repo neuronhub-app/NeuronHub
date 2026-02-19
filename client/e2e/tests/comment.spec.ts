@@ -20,8 +20,6 @@ test.describe("Comments", () => {
   });
 
   test.skip("voting (broken test)", async ({ page }) => {
-    page.setDefaultTimeout(10_000); // 7.5s makes it flaky
-
     // create
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
