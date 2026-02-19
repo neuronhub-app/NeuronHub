@@ -32,10 +32,10 @@ def accept_invite(request: HttpRequest, token: str):
 
     profile_group, _ = ProfileGroup.objects.get_or_create(name=settings.CONF_CONFIG.eag_group)  # type: ignore[has-type]
     invite.profile.groups.add(profile_group)
-    invite.profile.user = User.objects.create(
-        email=invite.user_email,
-        username=invite.user_email.split("@")[0],
+    user, _ = User.objects.get_or_create(
+        email=invite.user_email, defaults={"username": invite.username}
     )
+    invite.profile.user = user
     invite.profile.save()
 
     invite.accepted_at = timezone.now()
