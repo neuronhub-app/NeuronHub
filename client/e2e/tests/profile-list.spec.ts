@@ -54,40 +54,35 @@ test.describe("ProfileList", () => {
   test("Django sort: AI Score and Your Score show profiles, switch works", async ({ page }) => {
     await play.navigate(urls.profiles.list, { idleWait: true });
 
-    // Default sort is AI Score (Django mode) — should show profile cards
     const profileList = page.getByTestId(ids.profile.list);
+    await profileList.waitFor();
+    const cardsOnDefault = await profileList.getByTestId(ids.profile.card.container).count();
+    expect(cardsOnDefault).toBeGreaterThanOrEqual(1);
+
+    // Switch to Django/AI Score
+    await page.getByTestId(ids.profile.listControls.sortAiScore).click();
+    await play.waitForNetworkIdle();
     await profileList.waitFor();
     const cardsOnAiScore = await profileList.getByTestId(ids.profile.card.container).count();
     expect(cardsOnAiScore).toBeGreaterThanOrEqual(1);
 
-    // Switch to Your Score — still Django mode
+    // Switch to Django/Your Score
     await page.getByTestId(ids.profile.listControls.sortYourScore).click();
     await play.waitForNetworkIdle();
     await profileList.waitFor();
     const cardsOnUserScore = await profileList.getByTestId(ids.profile.card.container).count();
     expect(cardsOnUserScore).toBeGreaterThanOrEqual(1);
 
-    // Switch to Default — Algolia mode
+    // Switch Algolia
     await page.getByTestId(ids.profile.listControls.sortDefault).click();
     await play.waitForNetworkIdle();
     await profileList.waitFor();
-    const cardsOnDefault = await profileList.getByTestId(ids.profile.card.container).count();
-    expect(cardsOnDefault).toBeGreaterThanOrEqual(1);
-
-    // Switch back to AI Score — Django mode again
-    await page.getByTestId(ids.profile.listControls.sortAiScore).click();
-    await play.waitForNetworkIdle();
-    await profileList.waitFor();
-    const cardsBackToAi = await profileList.getByTestId(ids.profile.card.container).count();
-    expect(cardsBackToAi).toBeGreaterThanOrEqual(1);
+    const cardsBackToDefault = await profileList.getByTestId(ids.profile.card.container).count();
+    expect(cardsBackToDefault).toBeGreaterThanOrEqual(1);
   });
 
   test("facet counts and search stats are visible", async ({ page }) => {
     await play.navigate(urls.profiles.list, { idleWait: true });
-
-    // Switch to Default (Algolia mode) to see facets and stats
-    await page.getByTestId(ids.profile.listControls.sortDefault).click();
-    await play.waitForNetworkIdle();
 
     // Search stats shows total profiles count
     const searchStats = page.getByTestId(ids.profile.searchStats);

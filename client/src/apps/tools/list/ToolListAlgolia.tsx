@@ -16,7 +16,7 @@ import {
   Text,
   useToken,
 } from "@chakra-ui/react";
-import { useRef, } from "react";
+import { useRef } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { LuSearch } from "react-icons/lu";
 import {

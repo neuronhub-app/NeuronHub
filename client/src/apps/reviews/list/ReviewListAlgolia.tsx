@@ -18,7 +18,7 @@ import {
   useToken,
 } from "@chakra-ui/react";
 import { getUnixTime, subDays, subMonths, subYears } from "date-fns";
-import { useMemo, useRef, } from "react";
+import { useMemo, useRef } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { LuSearch } from "react-icons/lu";
 import {

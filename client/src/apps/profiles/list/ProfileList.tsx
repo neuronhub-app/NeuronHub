@@ -47,7 +47,7 @@ type SortOption = "llm_score" | "user_score" | typeof algoliaIndexName;
 
 export function ProfileList() {
   const algolia = useAlgoliaSearchClient();
-  const [sort, setSort] = useState<SortOption>("llm_score");
+  const [sort, setSort] = useState<SortOption>(algoliaIndexName);
 
   if (algolia.loading) {
     return <p>Loading Algolia...</p>;
