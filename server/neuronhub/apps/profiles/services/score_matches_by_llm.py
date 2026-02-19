@@ -8,6 +8,7 @@ from django.conf import settings
 from django.db.models import QuerySet
 from django.utils import timezone
 from faker.proxy import Faker
+from wat import wat
 
 from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileMatch
@@ -191,8 +192,9 @@ def _call_llm_api(prompt: str, schema: str, model: str, system_prompt: str) -> d
         text=True,
         check=True,
     )
-    response = json.loads(result.stdout)
-    return response["structured_output"]
+    response_raw = json.loads(result.stdout)
+    response_last = response_raw[-1]
+    return response_last["structured_output"]
 
 
 def _build_system_prompt() -> str:
