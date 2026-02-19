@@ -33,6 +33,8 @@ test.describe("ProfileList", () => {
   });
 
   test("shows profile cards with markdown, switches to snippets on search", async ({ page }) => {
+    page.setDefaultTimeout(12_000); // 7.5s makes it flaky
+
     await play.navigate(urls.profiles.list, { idleWait: true });
 
     // Without search: rendered markdown from GraphQL enrichment

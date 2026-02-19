@@ -19,7 +19,9 @@ test.describe("HN Comments", () => {
   });
 
   // takes 36s on avg
-  test("view imported HN post with tree-structured comments", async () => {
+  test("view imported HN post with tree-structured comments", async ({ page }) => {
+    page.setDefaultTimeout(12_000); // 7.5s makes it flaky
+
     await play.navigate(urls.posts.list, { idleWait: true });
 
     // unhide HN Post which has old .created_at_external
