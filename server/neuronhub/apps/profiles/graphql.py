@@ -260,7 +260,9 @@ class ProfilesMutation:
         limit: int = 200,
         model: str = "haiku",
         include_reprocessing: bool = True,
+        is_dry: bool = False,
     ) -> ProgressType:
+        from neuronhub.apps.profiles.tasks import get_profiles_to_score_qs
         from neuronhub.apps.profiles.tasks import score_profiles_task
 
         user = await get_user(info)
@@ -272,16 +274,22 @@ class ProfilesMutation:
 
         assert model in MODEL_LIMITS
         model_limit = MODEL_LIMITS[model]
-        await score_profiles_task.aenqueue(
-            user_id=user.id,
-            user_profile=user_profile,
-            limit=min(limit, model_limit["max"]),  # type: ignore[index] # bad-infer, see `assert`
-            batch_size=10,
-            model=model,
-            include_reprocessing=include_reprocessing,
-        )
+        limit_clamped = min(limit, model_limit["max"])  # type: ignore[index] # bad-infer, see `assert`
 
-        return ProgressType(total=limit, processed=0, is_processing=True, model=model)
+        profiles_qs = await get_profiles_to_score_qs(user, include_reprocessing).acount()
+        limit_total = min(limit_clamped, profiles_qs)
+
+        if not is_dry:
+            await score_profiles_task.aenqueue(
+                user_id=user.id,
+                user_profile=user_profile,
+                limit=limit_total,
+                batch_size=10,
+                model=model,
+                include_reprocessing=include_reprocessing,
+            )
+
+        return ProgressType(total=limit_total, processed=0, is_processing=True, model=model)
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def profile_matches_cancel_llm(self, info: Info) -> bool:
@@ -297,7 +305,7 @@ class ProfilesMutation:
         return updated > 0
 
 
-# todo ? refac: in dataclass #AI-slop
+# todo ? refac: in enum/dataclass #AI-slop
 MODEL_LIMITS: dict[str, dict[str, int]] = {
     "haiku": {"max": 500, "default": 250},
     "sonnet": {"max": 100, "default": 50},

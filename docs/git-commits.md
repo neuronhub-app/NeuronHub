@@ -44,6 +44,7 @@ If you're unsure which `Type` to use - use the highest, as they're sorted by imp
 - `comment` - re create, edit, vote, etc
 - `importer` - for `apps.importer`
 - `profile` - for `apps.profiles`
+- `profile/score` - ProfileMatch scoring by LLM
 - `upgrade[<uv|Bun>]` - pyproject.toml, package.json, lock files, or related changes
 - `API` - API layers: Apollo GraphQL, Strawberry resolvers, etc
 - `auth` - `apps.users`, models, permissions, etc

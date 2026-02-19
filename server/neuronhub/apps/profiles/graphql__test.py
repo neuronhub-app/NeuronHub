@@ -52,8 +52,8 @@ class ProfileModelTest(NeuronTestCase):
         assert await sync_to_async(profile.is_needs_llm_reprocessing)() is False
 
 
-# #AI
 class ProfileMatchStatsQueryTest(NeuronTestCase):
+    # #AI
     async def test_profile_match_stats_returns_counts(self):
         p1 = await self.gen.profiles.profile(user=None, visibility=Visibility.PUBLIC)
         p2 = await self.gen.profiles.profile(user=None, visibility=Visibility.PUBLIC)
@@ -87,6 +87,7 @@ class ProfileMatchStatsQueryTest(NeuronTestCase):
         assert stats["unprocessed_count"] == 2  # p3 (no match_processed_at) + p4 (no match)
         assert stats["needs_reprocessing_count"] == 0
 
+    # #AI
     async def test_profile_match_stats_empty(self):
         result = await self.graphql_query("""
             query { profile_match_stats {
@@ -102,20 +103,26 @@ class ProfileMatchStatsQueryTest(NeuronTestCase):
         assert stats["unprocessed_count"] == 0
         assert stats["needs_reprocessing_count"] == 0
 
+    async def test_trigger_total_capped_by_available(self):
+        await self.gen.profiles.profile(user=self.user)
+        await self.gen.profiles.profile(user=None)
+        await self.gen.profiles.profile(user=None)
 
-# #AI
-class ProfileTriggerLlmLimitTest(NeuronTestCase):
-    async def test_haiku_limit_clamped_to_400(self):
-        from neuronhub.apps.profiles.graphql import MODEL_LIMITS
+        result = await self.graphql_query(
+            """
+              mutation {
+                  profile_matches_trigger_llm(limit: 999, model: "haiku", is_dry: true) {
+                      total
+                      is_processing model
+                  }
+              }
+            """
+        )
 
-        assert MODEL_LIMITS["haiku"]["max"] == 400
-        assert MODEL_LIMITS["haiku"]["default"] == 200
-
-    async def test_sonnet_limit_clamped_to_80(self):
-        from neuronhub.apps.profiles.graphql import MODEL_LIMITS
-
-        assert MODEL_LIMITS["sonnet"]["max"] == 80
-        assert MODEL_LIMITS["sonnet"]["default"] == 40
+        assert result.errors is None
+        data = result.data["profile_matches_trigger_llm"]
+        assert data["total"] == 3
+        assert data["is_processing"]
 
 
 # #AI

@@ -127,7 +127,7 @@ type Mutation {
   profile_match_review_update(profile_id: ID!, match_review: String!): Boolean! @IsAuthenticated
   profile_llm_md_update(profile_for_llm_md: String!): Boolean! @IsAuthenticated
   profile_llm_md_reset: Boolean! @IsAuthenticated
-  profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku", include_reprocessing: Boolean! = true): ProgressType! @IsAuthenticated
+  profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku", include_reprocessing: Boolean! = true, is_dry: Boolean! = false): ProgressType! @IsAuthenticated
   profile_matches_cancel_llm: Boolean! @IsAuthenticated
 }
 
