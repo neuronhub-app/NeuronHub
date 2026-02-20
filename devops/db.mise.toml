@@ -57,6 +57,8 @@
         }
         mise run django:migrate
     """
+    env.DJANGO_ENV = "dev_test_e2e"
+    env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
 
 ["dev:db:e2e:rm"]
     dir = "devops"
