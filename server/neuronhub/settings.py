@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "neuronhub.apps.importer",
     "neuronhub.apps.highlighter",
     "neuronhub.apps.profiles",
+    "neuronhub.apps.jobs",
 ]
 
 MIDDLEWARE = [
@@ -422,3 +423,8 @@ class CONF_CONFIG:
     eag_csv_path: Path | None = env.path("PROFILES_CSV_PATH", None)
     algolia_limit: int = env.int("ALGOLIA_INDEX_LIMIT", 2000)
     eag_group: str = "EAG-SF-2026"
+
+
+# apps.jobs
+# ---------------------------------------------------------------------------------------------------------
+JOBS_CSV_PATH: Path | None = env.path("JOBS_CSV_PATH", None)

@@ -14,6 +14,7 @@ from neuronhub.apps.highlighter.models import PostHighlight
 from neuronhub.apps.importer.models import PostSource
 from neuronhub.apps.importer.models import UserSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
+from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models import PostCategory
@@ -158,7 +159,9 @@ async def _import_profiles_csv(gen: Gen):
 
 
 # todo ! refac: move out
-async def _algolia_reindex(is_import_profiles_csv: bool | None = True):
+async def _algolia_reindex(
+    is_import_profiles_csv: bool | None = True, is_reindex_jobs: bool = True
+):
     from algoliasearch_django import reindex_all
 
     from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
@@ -168,6 +171,9 @@ async def _algolia_reindex(is_import_profiles_csv: bool | None = True):
 
     if is_import_profiles_csv:
         await sync_to_async(reindex_all)(Profile)
+
+    if is_reindex_jobs:
+        await sync_to_async(reindex_all)(Job)
 
 
 class _disable_auto_indexing(ContextDecorator):

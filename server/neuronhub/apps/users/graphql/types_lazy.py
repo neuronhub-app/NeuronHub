@@ -6,3 +6,4 @@ class UserListName(Enum):
     library = "library"
     posts_collapsed = "posts_collapsed"
     profiles_bookmarked = "profiles_bookmarked"
+    jobs_bookmarked = "jobs_bookmarked"

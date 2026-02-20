@@ -51,6 +51,7 @@ export enum UsageStatus {
 }
 
 export enum UserListName {
+  JobsBookmarked = 'jobs_bookmarked',
   Library = 'library',
   PostsCollapsed = 'posts_collapsed',
   ProfilesBookmarked = 'profiles_bookmarked',

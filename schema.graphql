@@ -82,6 +82,35 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](https:/
 """
 scalar JSON @specifiedBy(url: "https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf")
 
+input JobFilter {
+  id: IDBaseFilterLookup
+  AND: JobFilter
+  OR: JobFilter
+  NOT: JobFilter
+  DISTINCT: Boolean
+}
+
+type JobType {
+  id: ID!
+  title: String!
+  org: String!
+  is_remote: Boolean
+  is_remote_friendly: Boolean
+  is_visa_sponsor: Boolean
+  salary_min: Int
+  salary_max: Int
+  country: [String!]!
+  city: [String!]!
+  url_external: String!
+  posted_at: DateTime
+  closes_at: DateTime
+  tags_skill(filters: PostTagFilter): [PostTagType!]!
+  tags_area(filters: PostTagFilter): [PostTagType!]!
+  tags_education(filters: PostTagFilter): [PostTagType!]!
+  tags_experience(filters: PostTagFilter): [PostTagType!]!
+  tags_workload(filters: PostTagFilter): [PostTagType!]!
+}
+
 input LoginInput {
   username_or_email: String!
   password: String!
@@ -724,6 +753,7 @@ type Query {
   profiles_sorted_by_match(sort: String!, filters: ProfileFilter, pagination: OffsetPaginationInput): ProfileTypeOffsetPaginated!
   profile_match_stats: ProfileMatchStatsType! @IsAuthenticated
   profile_user_llm_md: String! @IsAuthenticated
+  jobs(filters: JobFilter): [JobType!]!
 }
 
 input StrFilterLookup {
@@ -861,6 +891,7 @@ enum UserListName {
   library
   posts_collapsed
   profiles_bookmarked
+  jobs_bookmarked
 }
 
 type UserSourceType {

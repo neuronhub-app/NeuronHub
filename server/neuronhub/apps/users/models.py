@@ -29,7 +29,7 @@ class User(AbstractUser):
         null=True,
         blank=True,
     )
-    email = models.EmailField(unique=True, blank=True)  # override unique=False
+    email = models.EmailField(unique=True, blank=True)  # overriding super().email(unique=False)
 
     avatar = models.FileField(
         upload_to="avatars/",
