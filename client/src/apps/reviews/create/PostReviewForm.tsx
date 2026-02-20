@@ -93,7 +93,7 @@ export namespace PostReviewForm {
         return [];
       }
       return tags.map(tag => {
-        const userTagVote = user!.post_tag_votes.find(vote => {
+        const userTagVote = user?.post_tag_votes.find(vote => {
           const isThisPostVote = [props.review?.id, props.review?.parent?.id].includes(
             vote.post.id,
           );
