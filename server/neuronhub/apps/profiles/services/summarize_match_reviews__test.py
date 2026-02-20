@@ -1,3 +1,4 @@
+import pytest
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.utils import timezone
@@ -17,6 +18,7 @@ def _get_reviewed_attendees_list(user):
 
 
 # #AI-slop
+@pytest.mark.profiles_csv_import
 class SummarizeMatchReviewsTest(NeuronTestCase):
     async def test_get_reviewed_matches_detects_score_delta_from_history(self):
         attendees = await _get_profiles_from_csv(limit=5)

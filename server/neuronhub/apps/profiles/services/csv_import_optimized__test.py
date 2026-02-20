@@ -1,3 +1,4 @@
+import pytest
 from asgiref.sync import sync_to_async
 from django.conf import settings
 
@@ -16,6 +17,8 @@ class config:
     limit = 100
 
 
+# #AI
+@pytest.mark.profiles_csv_import
 class CsvImportOptimizedTest(NeuronTestCase):
     async def test_first_row_is_not_header(self):
         stats = await _csv_save_to_db(limit=2)

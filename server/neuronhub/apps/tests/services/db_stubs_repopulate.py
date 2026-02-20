@@ -131,16 +131,14 @@ async def db_stubs_repopulate(
 
 # #AI
 async def _import_profiles_csv(gen: Gen):
-    from asgiref.sync import sync_to_async
-
     from neuronhub.apps.profiles.services.csv_import_optimized import csv_optimize_and_import
 
     csv_path = settings.CONF_CONFIG.eag_csv_path  # type: ignore[has-type]
-    if csv_path.exists():
+    if csv_path and csv_path.exists():
         await sync_to_async(csv_optimize_and_import)(csv_path, limit=5, is_reindex_algolia=False)
 
     # Admin user needs a Profile in the group to see profiles via Algolia security filters
-    group, _ = await ProfileGroup.objects.aget_or_create(name="EAG-SF-2026")
+    group, _ = await ProfileGroup.objects.aget_or_create(name=settings.CONF_CONFIG.eag_group)  # type: ignore[has-type]
     await gen.profiles.profile(user=gen.users.user_default, groups=[group])
 
     # Profiles with varied match scores: ensures LLM / User / Newest sorts produce different orderings

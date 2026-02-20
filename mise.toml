@@ -225,6 +225,7 @@
         sources = ["neuronhub/**/*.py"]
         outputs = ["../schema.graphql"]
         quiet = true
+        env.ALGOLIA_IS_ENABLED = "false"
 
     [tasks."typegen:client"]
         depends = [
