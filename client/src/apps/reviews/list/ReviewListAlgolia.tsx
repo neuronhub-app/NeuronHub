@@ -42,6 +42,7 @@ import { gap } from "@/theme/theme";
 import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
+// #AI todo ! refac: dedup
 export function ReviewListAlgolia() {
   const algolia = useAlgoliaSearchClient();
   const user = useUser();

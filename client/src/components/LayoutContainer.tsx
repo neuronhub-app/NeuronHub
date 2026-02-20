@@ -20,12 +20,15 @@ const style = {
 export function LayoutContainer(props?: { children?: ReactNode }) {
   const location = useLocation();
 
-  const isHasBackground = !location.pathname.startsWith(urls.posts.list);
+  // todo ! refac: dumb. move to routes.ts param or similar
+  const isBgWhite =
+    location.pathname.startsWith(urls.posts.list) || location.pathname.includes("/edit");
+
   return (
     <>
       <NavbarMobile />
 
-      <Flex flex="1" pos="relative" h="full" bg={isHasBackground ? "bg.muted" : ""}>
+      <Flex flex="1" pos="relative" h="full" bg={isBgWhite ? "" : "bg.muted"}>
         <LayoutSidebar
           hideBelow={style.breakpoint}
           maxH="100vh"

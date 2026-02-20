@@ -20,6 +20,7 @@ import { useRef } from "react";
 import { HiChevronLeft, HiChevronRight } from "react-icons/hi2";
 import { LuSearch } from "react-icons/lu";
 import {
+  Configure,
   InstantSearch,
   useHits,
   usePagination,
@@ -38,6 +39,7 @@ import { gap } from "@/theme/theme";
 import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
+// #AI todo ! refac: dedup
 export function ToolListAlgolia() {
   const algolia = useAlgoliaSearchClient();
   const user = useUser();
@@ -56,6 +58,8 @@ export function ToolListAlgolia() {
       routing
       future={{ preserveSharedStateOnUnmount: true }}
     >
+      <Configure filters="type:Tool" />
+
       <Stack gap="gap.lg">
         <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
           <Flex gap="gap.md" align="center">
