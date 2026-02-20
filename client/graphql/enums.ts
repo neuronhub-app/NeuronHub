@@ -25,6 +25,14 @@ export enum PostTypeEnum {
   Tool = 'Tool'
 }
 
+export enum TagCategoryEnum {
+  Area = 'Area',
+  Education = 'Education',
+  Experience = 'Experience',
+  Skill = 'Skill',
+  Workload = 'Workload'
+}
+
 export enum ToolType {
   App = 'App',
   Material = 'Material',

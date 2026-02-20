@@ -16,6 +16,7 @@ from neuronhub.apps.importer.graphql.types import PostSourceType
 from neuronhub.apps.posts.models import PostTypeEnum
 from neuronhub.apps.posts.models.posts import Post
 from neuronhub.apps.posts.models.posts import PostTag
+from neuronhub.apps.posts.models.posts import PostTagCategory
 from neuronhub.apps.posts.models.posts import PostTagVote
 from neuronhub.apps.posts.models.posts import PostVote
 from neuronhub.apps.posts.services.filter_posts_by_user import filter_posts_by_user
@@ -209,12 +210,18 @@ class PostTypeInput:
 # ---------------------------------------------------------------
 
 
+@strawberry_django.filter_type(PostTagCategory, lookups=True)
+class PostTagCategoryFilter:
+    name: auto
+
+
 @strawberry_django.filter_type(PostTag, lookups=True)
 class PostTagFilter:
     id: auto
     name: auto
     description: auto
     is_review_tag: auto
+    categories: PostTagCategoryFilter | None = strawberry.UNSET
 
 
 @strawberry_django.type(PostTag, filters=PostTagFilter)

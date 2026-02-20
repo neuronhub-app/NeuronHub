@@ -363,11 +363,20 @@ type PostSourceType {
   updated_at: DateTime!
 }
 
+input PostTagCategoryFilter {
+  name: TagCategoryEnumFilterLookup
+  AND: PostTagCategoryFilter
+  OR: PostTagCategoryFilter
+  NOT: PostTagCategoryFilter
+  DISTINCT: Boolean
+}
+
 input PostTagFilter {
   id: IDBaseFilterLookup
   name: StrFilterLookup
   description: StrFilterLookup
   is_review_tag: BoolBaseFilterLookup
+  categories: PostTagCategoryFilter
   AND: PostTagFilter
   OR: PostTagFilter
   NOT: PostTagFilter
@@ -763,6 +772,62 @@ input StrFilterLookup {
   Case-insensitive regular expression match. Filter will be skipped on `null` value
   """
   i_regex: String
+}
+
+enum TagCategoryEnum {
+  Area
+  Skill
+  Education
+  Experience
+  Workload
+}
+
+input TagCategoryEnumFilterLookup {
+  """Exact match. Filter will be skipped on `null` value"""
+  exact: TagCategoryEnum
+
+  """Assignment test. Filter will be skipped on `null` value"""
+  is_null: Boolean
+
+  """
+  Exact match of items in a given list. Filter will be skipped on `null` value
+  """
+  in_list: [TagCategoryEnum!]
+
+  """Case-insensitive exact match. Filter will be skipped on `null` value"""
+  i_exact: TagCategoryEnum
+
+  """
+  Case-sensitive containment test. Filter will be skipped on `null` value
+  """
+  contains: TagCategoryEnum
+
+  """
+  Case-insensitive containment test. Filter will be skipped on `null` value
+  """
+  i_contains: TagCategoryEnum
+
+  """Case-sensitive starts-with. Filter will be skipped on `null` value"""
+  starts_with: TagCategoryEnum
+
+  """Case-insensitive starts-with. Filter will be skipped on `null` value"""
+  i_starts_with: TagCategoryEnum
+
+  """Case-sensitive ends-with. Filter will be skipped on `null` value"""
+  ends_with: TagCategoryEnum
+
+  """Case-insensitive ends-with. Filter will be skipped on `null` value"""
+  i_ends_with: TagCategoryEnum
+
+  """
+  Case-sensitive regular expression match. Filter will be skipped on `null` value
+  """
+  regex: TagCategoryEnum
+
+  """
+  Case-insensitive regular expression match. Filter will be skipped on `null` value
+  """
+  i_regex: TagCategoryEnum
 }
 
 enum ToolType {

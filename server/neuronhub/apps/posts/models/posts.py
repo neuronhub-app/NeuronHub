@@ -21,8 +21,10 @@ from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable
 from neuronhub.apps.anonymizer.registry import anonymizer
 from neuronhub.apps.db.fields import MarkdownField
+from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.graphql.persisted_query_extension import _load_client_persisted_queries_json
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
+from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models.tools import ToolCompany
 from neuronhub.apps.posts.models.types import PostTypeEnum
 from neuronhub.apps.users.graphql.types_lazy import UserListName
@@ -428,6 +430,13 @@ class PostVote(AnonimazableTimeStampedModel):
         return f"{self.post} - {self.author} [{self.is_vote_positive}]"
 
 
+class PostTagCategory(TimeStampedModel):
+    name = TextChoicesField(TagCategoryEnum, max_length=256, unique=True)
+
+    def __str__(self):
+        return str(self.name)
+
+
 @anonymizer.register
 class PostTag(AnonimazableTimeStampedModel):
     tag_parent = models.ForeignKey(
@@ -446,6 +455,8 @@ class PostTag(AnonimazableTimeStampedModel):
     )
     name = models.CharField(max_length=255)
     description = anonymizable(models.TextField(blank=True))
+
+    categories = models.ManyToManyField(PostTagCategory)
 
     is_review_tag = models.BooleanField(
         default=False,

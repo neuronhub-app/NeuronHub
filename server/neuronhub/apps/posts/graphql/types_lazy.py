@@ -1,14 +1,15 @@
-from typing import Annotated
 from typing import TYPE_CHECKING
+from typing import Annotated
 
 from django.db import models
 from strawberry import lazy
 
+
 if TYPE_CHECKING:
+    from neuronhub.apps.posts.graphql.types import PostCommentType
+    from neuronhub.apps.posts.graphql.types import PostTagVoteType
     from neuronhub.apps.posts.graphql.types import PostType
     from neuronhub.apps.posts.graphql.types import PostVoteType
-    from neuronhub.apps.posts.graphql.types import PostTagVoteType
-    from neuronhub.apps.posts.graphql.types import PostCommentType
 
 
 _posts_types = lazy("neuronhub.apps.posts.graphql.types")
@@ -37,3 +38,11 @@ class ReviewTagName(models.TextChoices):
     # article
     changed_my_mind = "changed_my_mind", "Changed my mind"
     read_fully = "read_fully", "Read fully"
+
+
+class TagCategoryEnum(models.TextChoices):
+    Area = "area"
+    Skill = "skill"
+    Education = "education"  # "PhD"
+    Experience = "experience"  # "Middle (5-9y)"
+    Workload = "workload"  # "Full-time"
