@@ -25,12 +25,13 @@ import {
   useSortBy,
 } from "react-instantsearch";
 import { NavLink } from "react-router";
-import { useAlgoliaPostsEnrichmentByGraphql } from "@/apps/posts/list/useAlgoliaPostsEnrichmentByGraphql";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCardSmall } from "@/components/posts/PostCard/PostCardSmall";
 import { Button } from "@/components/ui/button";
 import { ids } from "@/e2e/ids";
-import type { PostFragmentType } from "@/graphql/fragments/posts";
+import { graphql } from "@/gql-tada";
+import { PostFragment, type PostFragmentType } from "@/graphql/fragments/posts";
+import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
 import { gap } from "@/theme/theme";
 import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
@@ -43,7 +44,7 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
   if (algolia.loading) {
     return <p>Loading Algolia...</p>;
   }
-  if (!isAlgoliaLoaded(algolia)) {
+  if (!algolia.client || !algolia.indexName || !algolia.indexNameSortedByVotes) {
     return <p>Search not available</p>;
   }
 
@@ -56,7 +57,11 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
     >
       <Stack gap="gap.lg">
         <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
-          <TopSegmentSort algolia={algolia} category={props.category} />
+          <TopSegmentSort
+            indexName={algolia.indexName}
+            indexNameSortedByVotes={algolia.indexNameSortedByVotes}
+            category={props.category}
+          />
 
           <Flex gap="gap.md">
             <SearchInput />
@@ -87,7 +92,7 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
             borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
             bg={{ _light: "bg.subtle/30", _dark: "bg.subtle" }}
           >
-            <FacetFilter name="tags.name" label="Tags" isSearchEnabled isShowEmpty />
+            <FacetFilter name="tags.name" label="Tags" isSearchEnabled />
             <FacetFilter name="tool_type" label="Tool Type" />
           </Stack>
         </Flex>
@@ -96,24 +101,15 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
   );
 }
 
-type AlgoliaState = ReturnType<typeof useAlgoliaSearchClient>;
-type WithNonNullable<T, Key extends keyof T> = Omit<T, Key> & {
-  [key in Key]-?: NonNullable<T[key]>;
-};
-type AlgoliaStateLoaded = WithNonNullable<
-  AlgoliaState,
-  "client" | "indexName" | "indexNameSortedByVotes"
->;
-
-function isAlgoliaLoaded(algolia: AlgoliaState): algolia is AlgoliaStateLoaded {
-  return Boolean(algolia.client && algolia.indexName && algolia.indexNameSortedByVotes);
-}
-
-function TopSegmentSort(props: { algolia: AlgoliaStateLoaded; category?: PostCategory }) {
+function TopSegmentSort(props: {
+  indexName: string;
+  indexNameSortedByVotes: string;
+  category?: PostCategory;
+}) {
   const sort = useSortBy({
     items: [
-      { value: props.algolia.indexNameSortedByVotes, label: "Best" },
-      { value: props.algolia.indexName, label: "Newest" },
+      { value: props.indexNameSortedByVotes, label: "Best" },
+      { value: props.indexName, label: "Newest" },
     ],
   });
 
@@ -185,31 +181,40 @@ function PostListHits() {
 
   const pagination = usePagination();
 
-  const postsEnriched = useAlgoliaPostsEnrichmentByGraphql(hits.items);
+  const { items: postsEnriched } = useAlgoliaEnrichmentByGraphql(
+    hits.items,
+    PostsByIdsQuery,
+    data => data.posts,
+  );
 
   return (
     <Stack gap="gap.xl" w="full">
       <Stack {...ids.set(ids.post.list)}>
-        {hits.results?.nbHits ? (
-          postsEnriched.length ? (
-            postsEnriched.map(post => (
-              <PostCardSmall key={post.id} post={post} urlNamespace="posts" />
-            ))
-          ) : (
-            <>
-              <Skeleton h="10" />
-              <Skeleton h="10" />
-              <Skeleton h="10" />
-              <Skeleton h="10" />
-            </>
-          )
-        ) : (
+        {!hits.results ? (
+          <>
+            <Skeleton h="10" />
+            <Skeleton h="10" />
+            <Skeleton h="10" />
+            <Skeleton h="10" />
+          </>
+        ) : hits.results.nbHits === 0 ? (
           <HStack align="center">
             <Text>No matches found.</Text>
             <Button variant="ghost" size="sm">
               Reset filters
             </Button>
           </HStack>
+        ) : postsEnriched.length ? (
+          postsEnriched.map(post => (
+            <PostCardSmall key={post.id} post={post} urlNamespace="posts" />
+          ))
+        ) : (
+          <>
+            <Skeleton h="10" />
+            <Skeleton h="10" />
+            <Skeleton h="10" />
+            <Skeleton h="10" />
+          </>
         )}
       </Stack>
 
@@ -328,3 +333,17 @@ function FacetFilter(props: {
     </Stack>
   );
 }
+
+const PostsByIdsQuery = graphql.persisted(
+  "PostsByIds",
+  graphql(
+    `
+    query PostsByIds($ids: [ID!]!) {
+      posts(filters: { id: { in_list: $ids } }) {
+        ...PostFragment
+      }
+    }
+  `,
+    [PostFragment],
+  ),
+);

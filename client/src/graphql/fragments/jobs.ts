@@ -17,6 +17,7 @@ export const JobFragment = graphql(
       url_external
       posted_at
       closes_at
+
       tags_skill {
         ...PostTagLeanFragment
       }

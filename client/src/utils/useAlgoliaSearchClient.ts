@@ -5,13 +5,19 @@ import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
 
+const algoliaIndexNames = {
+  indexName: undefined as undefined | string,
+  indexNameSortedByVotes: undefined as undefined | string,
+  indexNameProfiles: undefined as undefined | string,
+  indexNameJobs: undefined as undefined | string,
+};
+
+export type AlgoliaIndexKey = keyof typeof algoliaIndexNames;
+
 export function useAlgoliaSearchClient() {
   const state = useStateValtio({
     client: null as null | LiteClient,
-    indexName: undefined as undefined | string,
-    indexNameSortedByVotes: undefined as undefined | string,
-    indexNameProfiles: undefined as undefined | string,
-    indexNameJobs: undefined as undefined | string,
+    ...algoliaIndexNames,
   });
 
   const init = useInit({
