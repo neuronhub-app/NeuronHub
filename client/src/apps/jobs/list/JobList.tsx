@@ -2,8 +2,6 @@ import { Configure } from "react-instantsearch";
 
 import { JobCard } from "@/apps/jobs/list/JobCard/JobCard";
 import { AlgoliaFacetAttribute } from "@/components/algolia/AlgoliaFacetAttribute";
-import { AlgoliaFacetBoolean } from "@/components/algolia/AlgoliaFacetBoolean";
-import { AlgoliaFacetsActive } from "@/components/algolia/AlgoliaFacetsActive";
 import { AlgoliaList } from "@/components/algolia/AlgoliaList";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
@@ -36,9 +34,9 @@ export function JobList() {
         ]}
       />
 
-      <AlgoliaFacetsActive toggleLabels={{ is_remote: "Remote" }} />
+      {/*<AlgoliaFacetsActive toggleLabels={{ is_remote: "Remote" }} />*/}
 
-      <AlgoliaFacetBoolean attribute="is_remote" label="Remote" />
+      {/*<AlgoliaFacetBoolean attribute="is_remote" label="Remote" />*/}
 
       <AlgoliaFacetAttribute attribute="tags_experience.name" label="Experience" />
       <AlgoliaFacetAttribute attribute="country" label="Country" isSearchEnabled showFirst={4} />
