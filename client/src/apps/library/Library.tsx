@@ -101,7 +101,7 @@ export function Library() {
 
   return (
     <Stack gap="gap.lg">
-      <Heading size="2xl">Library</Heading>
+      <Heading size="2xl">Archive</Heading>
 
       {initHighlights.isLoading && <Text>Loading highlights...</Text>}
       {error && <Text color="fg.error">Error: {error.message}</Text>}

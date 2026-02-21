@@ -13,11 +13,17 @@ import {
   type StackProps,
   Text,
 } from "@chakra-ui/react";
-import { MessageSquareText } from "lucide-react";
 import type { ComponentType } from "react";
-import { FiUsers } from "react-icons/fi";
-import { GoCommentDiscussion } from "react-icons/go";
-import { LuLayoutDashboard, LuLibrary, LuLogIn, LuLogOut, LuSettings } from "react-icons/lu";
+import {
+  GoArchive,
+  GoBriefcase,
+  GoComment,
+  GoCommentDiscussion,
+  GoGear,
+  GoPeople,
+  GoTools,
+} from "react-icons/go";
+import { LuLogIn, LuLogOut } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink, useLocation } from "react-router";
 import { useUser } from "@/apps/users/useUserCurrent";
@@ -38,17 +44,12 @@ export function LayoutSidebar(props: StackProps) {
   const user = useUser();
 
   const links: Array<SidebarLink> = [
-    { to: urls.profiles.list, icon: FiUsers, label: "Profiles" },
-    { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts" },
-    { to: urls.tools.list, icon: LuLayoutDashboard, label: "Tools" },
-    { to: urls.reviews.list, icon: MessageSquareText, label: "Reviews" },
+    { to: urls.jobs.list, icon: GoBriefcase, label: "Jobs" },
+    { to: urls.profiles.list, icon: GoPeople, label: "Profiles" },
+    { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts", separator: true },
+    { to: urls.reviews.list, icon: GoComment, label: "Reviews" },
+    { to: urls.tools.list, icon: GoTools, label: "Tools" },
   ];
-  if (user) {
-    links.push(
-      // { to: urls.readingList, icon: FaRegBookmark, label: "Reading list" },
-      { to: urls.library, icon: LuLibrary, label: "Library" },
-    );
-  }
 
   return (
     <Stack
@@ -69,23 +70,26 @@ export function LayoutSidebar(props: StackProps) {
           <Stack gap="gap.sm">
             <Stack gap="gap.xs">
               {links.map(link => (
-                <Bleed
-                  as="li"
-                  aria-label="Nav Menu Item"
-                  key={link.label}
-                  inline={styles.inline}
-                >
-                  {link.children ? (
-                    <SidebarLinkGroup label={link.label} to={link.to} icon={link.icon}>
-                      {link.children}
-                    </SidebarLinkGroup>
-                  ) : (
-                    <SidebarLinkButton to={link.to}>
-                      <link.icon />
-                      {link.label}
-                    </SidebarLinkButton>
-                  )}
-                </Bleed>
+                <>
+                  {link.separator && <Separator my="gap.sm" />}
+                  <Bleed
+                    as="li"
+                    aria-label="Nav Menu Item"
+                    key={link.label}
+                    inline={styles.inline}
+                  >
+                    {link.children ? (
+                      <SidebarLinkGroup label={link.label} to={link.to} icon={link.icon}>
+                        {link.children}
+                      </SidebarLinkGroup>
+                    ) : (
+                      <SidebarLinkButton to={link.to}>
+                        <link.icon />
+                        {link.label}
+                      </SidebarLinkButton>
+                    )}
+                  </Bleed>
+                </>
               ))}
             </Stack>
           </Stack>
@@ -93,10 +97,17 @@ export function LayoutSidebar(props: StackProps) {
       </Stack>
 
       <Stack aria-label="User Settings" as="section" gap="gap.sm">
-        <Stack gap="gap.sm" px={0}>
+        <Stack gap="gap.sm">
+          <Bleed inline={styles.inline}>
+            <SidebarLinkButton to={urls.library}>
+              <GoArchive />
+              Archive
+            </SidebarLinkButton>
+          </Bleed>
+
           <Bleed inline={styles.inline}>
             <SidebarLinkButton to={urls.user.settings.profile}>
-              <LuSettings />
+              <GoGear />
               Settings
             </SidebarLinkButton>
           </Bleed>
@@ -114,6 +125,7 @@ type SidebarLink = {
   to: LinkProps["to"];
   icon: ComponentType;
   label: string;
+  separator?: boolean;
   children?: ReadonlyArray<{ label: string; to: LinkProps["to"] }>;
 };
 
