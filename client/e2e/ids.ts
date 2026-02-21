@@ -126,6 +126,16 @@ export namespace ids {
     span: "highlighter.span",
   } as const;
 
+  export const job = {
+    list: "job.list",
+    searchInput: "job.search-input",
+    searchStats: "job.search-stats",
+    card: {
+      container: "job.card.container",
+      tags: "job.card.tags",
+    },
+  } as const;
+
   export const profile = {
     list: "profile.list",
     searchInput: "profile.search-input",

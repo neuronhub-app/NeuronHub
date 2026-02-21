@@ -49,9 +49,11 @@ async def db_stubs_repopulate(
     is_delete_users_extra: bool = True,
     is_delete_user_default: bool = False,
     is_delete_profiles: bool = True,
+    is_delete_jobs: bool = True,
     is_create_single_review: bool | None = False,
     is_import_HN_post: bool | None = True,
     is_import_profiles_csv: bool | None = True,
+    is_import_jobs_csv: bool | None = True,
 ) -> Gen:
     """
     Populates the db with Posts, Tools, Reviews, tags, votes, etc.
@@ -90,6 +92,9 @@ async def db_stubs_repopulate(
             ]:
                 await model._default_manager.all().adelete()
 
+        if is_delete_jobs:
+            await Job.objects.all().adelete()
+
         if is_delete_user_default:
             await User.objects.all().adelete()
             await Org.objects.all().adelete()
@@ -124,8 +129,14 @@ async def db_stubs_repopulate(
         if is_import_profiles_csv:
             await _import_profiles_csv(gen)
 
+        if is_import_jobs_csv:
+            await _import_jobs_csv()
+
     if settings.ALGOLIA["IS_ENABLED"]:
-        await _algolia_reindex(is_import_profiles_csv=is_import_profiles_csv)
+        await _algolia_reindex(
+            is_import_profiles_csv=is_import_profiles_csv,
+            is_reindex_jobs=is_import_jobs_csv or False,
+        )
 
     return gen
 
@@ -156,6 +167,14 @@ async def _import_profiles_csv(gen: Gen):
             score_by_llm=llm_score,
             score_by_user=user_score,
         )
+
+
+async def _import_jobs_csv():
+    from neuronhub.apps.jobs.services.csv_import import csv_import_jobs
+
+    csv_path = settings.JOBS_CSV_PATH
+    if csv_path and csv_path.exists():
+        await csv_import_jobs(csv_path, limit=6, is_reindex_algolia=False)
 
 
 # todo ! refac: move out

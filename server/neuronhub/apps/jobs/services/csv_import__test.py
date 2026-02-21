@@ -1,5 +1,4 @@
 from django.conf import settings
-from wat import wat
 
 from neuronhub.apps.jobs.services.csv_import import csv_import_jobs
 from neuronhub.apps.tests.test_cases import NeuronTestCase
@@ -34,4 +33,3 @@ class TestCsvImportJobs(NeuronTestCase):
 
         assert not result.errors
         jobs = result.data["jobs"]
-        wat(jobs)

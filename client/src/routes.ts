@@ -22,6 +22,7 @@ export default [
     route(`/:id/${op.edit}`, "./apps/posts/edit/index.tsx"),
   ]),
   ...prefix(urls.profiles.list, [route("/", "./apps/profiles/list/index.tsx")]),
+  ...prefix(urls.jobs.list, [route("/", "./apps/jobs/list/index.tsx")]),
   ...prefix(urls.tools.list, [
     route("/", "./apps/tools/list/index.tsx"),
     route("/:id", "./apps/tools/detail/index.tsx"),

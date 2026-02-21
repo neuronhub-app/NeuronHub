@@ -18,6 +18,7 @@ type AlgoliaSearchKeyType {
   index_name: String!
   index_name_sorted_by_votes: String!
   index_name_profiles: String!
+  index_name_jobs: String!
 }
 
 input BoolBaseFilterLookup {
@@ -145,7 +146,7 @@ type Mutation {
   post_vote_update_or_create(id: ID!, is_vote_positive: Boolean, is_changed_my_mind: Boolean = null): Boolean! @IsAuthenticated
   post_tag_vote_create_or_update(post_id: ID!, tag_id: ID!, is_vote_positive: Boolean, comment: String = null): Boolean! @IsAuthenticated
   update_post_seen_status(id: ID!): Boolean! @IsAuthenticated
-  test_db_stubs_repopulate(is_import_HN_post: Boolean = true, is_create_single_review: Boolean = false, is_import_profiles_csv: Boolean = false): String!
+  test_db_stubs_repopulate(is_import_HN_post: Boolean = true, is_create_single_review: Boolean = false, is_import_profiles_csv: Boolean = false, is_import_jobs_csv: Boolean = false): String!
   test_create_failed_task: Boolean!
   post_highlight_create(data: PostHighlightTypeInput!): Boolean! @IsAuthenticated
   post_highlight_delete(data: DjangoModelInput!): Boolean! @IsAuthenticated

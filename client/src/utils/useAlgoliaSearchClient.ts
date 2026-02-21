@@ -11,6 +11,7 @@ export function useAlgoliaSearchClient() {
     indexName: undefined as undefined | string,
     indexNameSortedByVotes: undefined as undefined | string,
     indexNameProfiles: undefined as undefined | string,
+    indexNameJobs: undefined as undefined | string,
   });
 
   const init = useInit({
@@ -25,6 +26,7 @@ export function useAlgoliaSearchClient() {
       state.mutable.indexName = data.index_name;
       state.mutable.indexNameSortedByVotes = data.index_name_sorted_by_votes;
       state.mutable.indexNameProfiles = data.index_name_profiles;
+      state.mutable.indexNameJobs = data.index_name_jobs;
     },
   });
 
@@ -33,6 +35,7 @@ export function useAlgoliaSearchClient() {
     indexName: state.snap.indexName,
     indexNameSortedByVotes: state.snap.indexNameSortedByVotes,
     indexNameProfiles: state.snap.indexNameProfiles,
+    indexNameJobs: state.snap.indexNameJobs,
     loading: init.isLoading,
   };
 }
@@ -47,6 +50,7 @@ const AlgoliaSearchKeyQuery = graphql.persisted(
         index_name
         index_name_sorted_by_votes
         index_name_profiles
+        index_name_jobs
       }
     }
   `),

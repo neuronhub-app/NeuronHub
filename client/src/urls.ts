@@ -54,6 +54,9 @@ export const urls = {
       return `${this.list}/${id}` as const;
     },
   },
+  jobs: {
+    list: "/jobs",
+  },
   tools: {
     list: "/tools",
     get create() {

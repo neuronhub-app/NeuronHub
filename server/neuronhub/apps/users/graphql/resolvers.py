@@ -42,6 +42,7 @@ class AlgoliaSearchKeyType:
     index_name: str
     index_name_sorted_by_votes: str
     index_name_profiles: str
+    index_name_jobs: str
 
 
 @strawberry.type(name="Query")
@@ -82,4 +83,5 @@ class UsersQuery:
             index_name=f"posts_{index_suffix}",
             index_name_sorted_by_votes=algolia_replica_sorted_by_votes,
             index_name_profiles=f"profiles_{index_suffix}",
+            index_name_jobs=f"jobs_{index_suffix}",
         )
