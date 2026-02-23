@@ -392,6 +392,15 @@ wheels = [
 ]
 
 [[package]]
+name = "dalf"
+version = "0.7.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a9/17/964669dfcbfccb02266602793ccf68791de7a7de365c8a4813d363f29059/dalf-0.7.1.tar.gz", hash = "sha256:620170e8ddca5f4696ccc0f6c7ebc094e4b17fe1f99825bcf0b651ee1bf85167", size = 14152, upload-time = "2026-01-30T16:20:43.97Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/38/85/be61584c4477733a538c202b2de359fd74bd9590e0747c20a36d734d4fc3/dalf-0.7.1-py3-none-any.whl", hash = "sha256:7c7fb0cab1af224df4bfcc2b38b69e78b572043335272ff7d96853335fd715f7", size = 11865, upload-time = "2026-01-30T16:20:42.073Z" },
+]
+
+[[package]]
 name = "daphne"
 version = "4.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -490,18 +499,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a3/a5/258d7b7bc1b0ca91791c25c704fa4c2d500727d0c3e29843c182f9f9c4be/django_anymail-13.1.tar.gz", hash = "sha256:b51783176f8a8382e958808151551558e4a46d1375fbc343742d1ebd06ce8e9e", size = 96518, upload-time = "2025-09-03T20:00:21.071Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c9/ba/d34a011cb8da04ed4a7c60b9a7aa25eed61348d1f6113af66ba725b56ae4/django_anymail-13.1-py3-none-any.whl", hash = "sha256:63e48402ec8258f17640eb73c8c64141f16d2f8ae7d448d0fb1c66e82b7cbcf6", size = 134063, upload-time = "2025-09-03T20:00:19.427Z" },
-]
-
-[[package]]
-name = "django-appconf"
-version = "1.2.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/d1/a2/e58bec8d7941b914af52a67c35b5709eceed2caa2848f28437f1666ed668/django_appconf-1.2.0.tar.gz", hash = "sha256:15a88d60dd942d6059f467412fe4581db632ef03018a3c183fb415d6fc9e5cec", size = 16127, upload-time = "2025-11-08T15:46:27.304Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/e8/e6/4c34d94dfb74bbcbc489606e61f1924933de30d22c593dd1f429f35fbd7f/django_appconf-1.2.0-py3-none-any.whl", hash = "sha256:b81bce5ef0ceb9d84df48dfb623a32235d941c78cc5e45dbb6947f154ea277f4", size = 6500, upload-time = "2025-11-08T15:46:25.957Z" },
 ]
 
 [[package]]
@@ -643,19 +640,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a6/67/e307a5fef657e7992468f567b521534c52e01bdda5a1ae5b12de679a670f/django_rich-2.2.0.tar.gz", hash = "sha256:ecec7842d040024ed8a225699388535e46b87277550c33f46193b52cece2f780", size = 62427, upload-time = "2025-09-18T11:42:17.182Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/27/ed/23fa669493d78cd67e7f6734fa380f8690f2b4d75b4f72fd645a52c3b32a/django_rich-2.2.0-py3-none-any.whl", hash = "sha256:a0d2c916bd9750b6e9beb57407aef5e836c8705d7dbe9e4fd4725f7bbe41c407", size = 9210, upload-time = "2025-09-18T11:42:15.779Z" },
-]
-
-[[package]]
-name = "django-select2"
-version = "8.4.8"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "django" },
-    { name = "django-appconf" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/2d/cc/6dc944fd0cdc53f49b532640d3d3bdf194411dc3b086b039994c2760fafd/django_select2-8.4.8.tar.gz", hash = "sha256:592e52effff2b5850cb7c98b265715b6704fb784699c4aedddfdd8ae1ffa1e81", size = 13662, upload-time = "2026-01-07T18:44:17.356Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/93/d5/e84591b966a4af1003944245d950621645cd7d2f4475c491339338849d31/django_select2-8.4.8-py3-none-any.whl", hash = "sha256:a2ce6a4c556dd2d4d57eb3753618d6f31f8d3910e9d9fa1b686d9340f50b14eb", size = 15573, upload-time = "2026-01-07T18:44:15.897Z" },
 ]
 
 [[package]]
@@ -1198,6 +1182,7 @@ dependencies = [
     { name = "algoliasearch" },
     { name = "algoliasearch-django" },
     { name = "beautifulsoup4", extra = ["lxml"] },
+    { name = "dalf" },
     { name = "daphne" },
     { name = "dj-database-url" },
     { name = "django" },
@@ -1217,7 +1202,6 @@ dependencies = [
     { name = "django-hijack" },
     { name = "django-object-actions" },
     { name = "django-rich" },
-    { name = "django-select2" },
     { name = "django-simple-history" },
     { name = "django-solo" },
     { name = "django-storages", extra = ["boto3"] },
@@ -1260,6 +1244,7 @@ requires-dist = [
     { name = "algoliasearch", specifier = ">=4.0.0" },
     { name = "algoliasearch-django", specifier = ">=4.0.0" },
     { name = "beautifulsoup4", extras = ["lxml"], specifier = "==4.*" },
+    { name = "dalf", specifier = "==0.7.1" },
     { name = "daphne", specifier = "==4.*" },
     { name = "dj-database-url", specifier = "==3.*" },
     { name = "django", specifier = "==5.2.*" },
@@ -1279,7 +1264,6 @@ requires-dist = [
     { name = "django-hijack", specifier = "==3.*" },
     { name = "django-object-actions", specifier = "==5.*" },
     { name = "django-rich", specifier = "==2.*" },
-    { name = "django-select2", specifier = "==8.*" },
     { name = "django-simple-history", specifier = "==3.*" },
     { name = "django-solo", specifier = "==2.*" },
     { name = "django-storages", extras = ["boto3"], specifier = "==1.14.6" },

@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "health_check",
     "health_check.storage",
     "adminutils",
+    "dalf",
     "neuronhub.apps.db",
     "neuronhub.apps.algolia",
     "neuronhub.apps.users",
