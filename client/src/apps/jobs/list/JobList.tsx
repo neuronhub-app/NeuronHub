@@ -16,7 +16,6 @@ export function JobList() {
       index="indexNameJobs"
       label="job"
       searchInputTestId={ids.job.searchInput}
-      statsTestId={ids.job.searchStats}
       hits={{
         enrichment: { query: JobsByIdsQuery, extractItems: data => data.jobs },
         renderHit: (job, ctx) => (

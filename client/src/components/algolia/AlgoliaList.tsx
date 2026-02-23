@@ -20,7 +20,6 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
   typeFilter?: PostTypeEnum;
   createUrl?: string;
   searchInputTestId?: string;
-  statsTestId?: string;
   hits: {
     enrichment: {
       query: TadaDocumentNode<TData, { ids: ID[] }>;
@@ -76,13 +75,7 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
 
         <Flex flex="1" pos="relative" gap="gap.xl">
           <AlgoliaHits label={labelPlural} {...props.hits} />
-          <AlgoliaFacets
-            stats={
-              props.statsTestId ? { label: labelPlural, testId: props.statsTestId } : undefined
-            }
-          >
-            {props.children}
-          </AlgoliaFacets>
+          <AlgoliaFacets label={labelPlural}>{props.children}</AlgoliaFacets>
         </Flex>
       </Stack>
     </InstantSearch>

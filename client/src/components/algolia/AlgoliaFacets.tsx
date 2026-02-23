@@ -1,8 +1,8 @@
-import { Flex, Stack, Text } from "@chakra-ui/react";
-import type { ReactNode } from "react";
-import { useRef } from "react";
+import { Flex, SkeletonText, Stack } from "@chakra-ui/react";
+import { type ReactNode, useEffect } from "react";
 import { useSearchBox, useStats } from "react-instantsearch";
 import { gap } from "@/theme/theme";
+import { useStateValtio } from "@/utils/useValtioProxyRef";
 
 export const facetStyle = {
   label: {
@@ -21,7 +21,8 @@ export const facetStyle = {
 // #AI
 export function AlgoliaFacets(props: {
   children: ReactNode;
-  stats?: { label: string; testId: string; isSearchActive?: boolean };
+  label: string;
+  isSearchActive?: boolean;
 }) {
   return (
     <Stack
@@ -39,38 +40,43 @@ export function AlgoliaFacets(props: {
       borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
       bg="bg.panel"
     >
-      {props.stats && <SearchStats {...props.stats} />}
+      <SearchStats label={props.label} isSearchActive={props.isSearchActive} />
       {props.children}
     </Stack>
   );
 }
 
-// #AI
-function SearchStats(props: { label: string; testId: string; isSearchActive?: boolean }) {
+function SearchStats(props: { label: string; isSearchActive?: boolean }) {
   const search = useSearchBox();
   const stats = useStats();
-  const totalRef = useRef(0);
+
+  const state = useStateValtio({
+    total: null as number | null,
+  });
 
   const isSearchActive = props.isSearchActive ?? search.query.length > 0;
-  const total = totalRef.current;
 
-  if (!isSearchActive && stats.nbHits > 0) {
-    totalRef.current = stats.nbHits;
-  }
+  useEffect(() => {
+    const isSearchActive = props.isSearchActive ?? search.query.length > 0;
+    if (!isSearchActive && stats.nbHits > 0) {
+      state.mutable.total = stats.nbHits;
+    }
+  }, [props.isSearchActive, stats.nbHits, search.query.length]);
 
   return (
     <Flex mb="-2">
-      {isSearchActive
-        ? total && (
-            <Text fontSize="xs" color="fg.subtle" data-testid={props.testId}>
-              {stats.nbHits} / {total} {props.label}
-            </Text>
-          )
-        : total && (
-            <Text fontSize="xs" color="fg.subtle" data-testid={props.testId}>
-              {total} {props.label}
-            </Text>
-          )}
+      <Flex fontSize="xs" color="fg.subtle" gap="gap.sm">
+        {isSearchActive ? (
+          <>
+            {stats.nbHits} / {state.snap.total} {props.label}
+          </>
+        ) : (
+          <>
+            {state.snap.total || <SkeletonText display="inline-flex" noOfLines={1} w="6" />}{" "}
+            {props.label}
+          </>
+        )}
+      </Flex>
     </Flex>
   );
 }

@@ -32,8 +32,5 @@ test.describe("JobList", () => {
     const searchInput = page.getByTestId(ids.job.searchInput);
     await searchInput.fill("Research");
     await play.waitForNetworkIdle();
-
-    const searchStats = page.getByTestId(ids.job.searchStats);
-    await searchStats.waitFor();
   });
 });

@@ -125,13 +125,7 @@ function ProfileListInner(props: { sort: SortOption; setSort: (sort: SortOption)
           />
         )}
 
-        <AlgoliaFacets
-          stats={{
-            isSearchActive: isAlgoliaSearchActive,
-            label: "profiles",
-            testId: ids.profile.searchStats,
-          }}
-        >
+        <AlgoliaFacets isSearchActive={isAlgoliaSearchActive} label="profiles">
           <AlgoliaFacetsActive
             labelsOverride={{
               is_scored_by_llm: "Scored by AI",
