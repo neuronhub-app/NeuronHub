@@ -71,11 +71,13 @@ ALGOLIA_APPLICATION_ID="${{algolia_app_id}}"
 ALGOLIA_SEARCH_API_KEY="${{algolia_search_key}}"
 ```
 
-### Postgres 17 database
+### Postgres 18 database
 
 At your discretion.
 
-### Rclone S3 server
+### S3 server
+
+#### Rclone
 
 To create Rclone "S3 bucket" you need to create a dir, eg `mkdir -p /srv/neuronhub/media/data/media`.
 
@@ -114,12 +116,4 @@ After the first deploy, connect to the `server` docker container, and run:
 
 Watch out for the `BREAKING CHANGE` notes in the release descriptions - it's specifically for self-hosting.
 
-You can use `:latest` docker tag, but I advice to hardcode the non-breaking release eg `1.1`, as the two last numbers are for non-breaking changes, ie `1.1.2.2` won't break your deployment.
-
-## Caveats
-
-### Vite prod is calling "localhost"
-
-If you're building the images for deploy with eg `mise docker:build --app=client` and `mise docker:tag-and-push --app=client`, Mise might not supply your envs vars from `mise.local.toml`, and you'll have to override `mise.toml` `[env].SERVER_DOMAIN` manually.
-
-(Likely Mise bugs, have seen several lately re envs)
+You may use `:latest` docker tag, but I advice to hardcode the non-breaking release eg `1.1`, as the two last numbers are for non-breaking changes, ie `1.1.2.2` won't break your deployment.

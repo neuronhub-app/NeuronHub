@@ -1,0 +1,80 @@
+projects:
+  - name: neuronhub
+    environments:
+      - name: stage
+
+        databases:
+          - name: neuronhub
+            postgresMajorVersion: "18"
+            plan: free
+
+        services:
+        - name: neuronhub-backend
+          type: web
+          plan: starter
+          runtime: image
+          image:
+            url: ghcr.io/neuronhub-app/neuronhub/server:latest
+          dockerCommand: uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application
+          preDeployCommand: uv run manage.py migrate
+          healthCheckPath: /healthcheck/
+          domains:
+            - pg.stage.backend.neuronhub.app
+          envVars:
+            - key: DATABASE_URL
+              fromDatabase:
+                name: neuronhub
+                property: connectionString
+            - key: SECRET_KEY
+              generateValue: true
+
+            - key: ALGOLIA_IS_ENABLED
+              value: "true"
+            - key: ALGOLIA_API_KEY
+              sync: false
+            - key: ALGOLIA_APPLICATION_ID
+              sync: false
+            - key: ALGOLIA_SEARCH_API_KEY
+              sync: false
+
+            - fromGroup: shared
+            - fromGroup: stage
+
+        - name: neuronhub-frontend
+          type: web
+          plan: free
+          runtime: image
+          image:
+            url: ghcr.io/neuronhub-app/neuronhub/client:latest
+          domains:
+            - pg.stage.neuronhub.app
+          envVars:
+            - fromGroup: shared
+            - fromGroup: stage
+
+        envVarGroups:
+          - name: stage
+            envVars:
+            - key: DJANGO_ENV
+              value: stage
+            - key: SERVER_DOMAIN
+              value: pg.stage.backend.neuronhub.app
+            - key: SERVER_URL
+              value: https://pg.stage.backend.neuronhub.app
+            - key: CLIENT_DOMAIN
+              value: pg.stage.neuronhub.app
+            - key: CLIENT_URL
+              value: https://pg.stage.neuronhub.app
+            - key: VITE_SERVER_URL
+              value: https://pg.stage.backend.neuronhub.app
+
+        networking:
+          isolation: enabled
+
+envVarGroups:
+  - name: shared
+    envVars:
+      - key: SENTRY_DSN_BACKEND
+        value: https://417078bf385cad9c59d41a020892e689@o4507887634284544.ingest.us.sentry.io/4510305221869575
+      - key: SENTRY_DSN_FRONTEND
+        value: https://97d9ce8ba2e7102f6ccfed17dd2e25aa@o4507887634284544.ingest.us.sentry.io/4510303776145408
