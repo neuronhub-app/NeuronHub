@@ -84,6 +84,18 @@ class Job(AlgoliaModel):
     graphql_query_for_algolia: str = "JobsByIds"
     graphql_query_for_algolia_field: str = "jobs"
 
+    def get_unix_posted_at(self) -> float | None:
+        return self.posted_at.timestamp() if self.posted_at else None
+
+    def get_unix_closes_at(self) -> float | None:
+        return self.closes_at.timestamp() if self.closes_at else None
+
+    def get_iso_posted_at(self) -> str:
+        return self.posted_at.isoformat() if self.posted_at else ""
+
+    def get_iso_closes_at(self) -> str:
+        return self.closes_at.isoformat() if self.closes_at else ""
+
     def get_tags_json_skill(self):
         return self._get_graphql_field("tags_skill") or []
 

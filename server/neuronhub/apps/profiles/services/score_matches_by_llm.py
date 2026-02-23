@@ -8,7 +8,6 @@ from django.conf import settings
 from django.db.models import QuerySet
 from django.utils import timezone
 from faker.proxy import Faker
-from wat import wat
 
 from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileMatch
@@ -79,8 +78,10 @@ def score_matches_by_llm(
         if settings.ALGOLIA["IS_ENABLED"]:
             from algoliasearch_django import algolia_engine
 
+            from neuronhub.apps.profiles.index import ProfileIndex
+
             algolia_engine.client.partial_update_objects(
-                index_name="profiles",
+                index_name=f"{ProfileIndex.index_name}{settings.ALGOLIA['INDEX_SUFFIX']}",
                 objects=[
                     {
                         "objectID": match.profile_id,

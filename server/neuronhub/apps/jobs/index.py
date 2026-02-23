@@ -29,6 +29,8 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "country",
             "city",
             "url_external",
+            "is_remote",
+            "salary_min",
             ["get_visible_to", "visible_to"],
             # GraphQL compatibility
             ["get_tags_json_skill", "tags_skill"],
@@ -38,6 +40,8 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ["get_tags_json_workload", "tags_workload"],
             ["get_iso_created_at", "created_at"],
             ["get_iso_updated_at", "updated_at"],
+            ["get_iso_posted_at", "posted_at"],
+            ["get_iso_closes_at", "closes_at"],
             # datetime - Unix for Algolia sorting/filtering #prob-redundant
             ["get_unix_created_at", "created_at_unix"],
             ["get_unix_updated_at", "updated_at_unix"],
@@ -56,6 +60,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "is_remote",
                 "is_remote_friendly",
                 "is_visa_sponsor",
+                "salary_min",
                 "searchable(tags_skill.name)",
                 "searchable(tags_area.name)",
                 "searchable(tags_education.name)",

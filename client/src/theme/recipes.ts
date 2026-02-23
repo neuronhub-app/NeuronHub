@@ -6,7 +6,8 @@ export const recipes = {
   button: defineRecipe({
     variants: {
       variant: {
-        // todo refac: move the state handler to voting-only, and keep the style "subtle-ghost"
+        // todo ? refac: move the state handler to voting-only, and keep the style "subtle-ghost"
+        // todo ? refac: keep only subtle-ghost-v3
         // "subtle-ghost-v2" below is PoC of this
         "subtle-ghost": {
           colorPalette: "slate",
@@ -36,6 +37,18 @@ export const recipes = {
             color: { _light: "slate.500", _dark: "slate.200" },
             borderColor: { _light: "slate.500", _dark: "slate.200" },
             border: "sm",
+          },
+        },
+        "subtle-ghost-v3": {
+          colorPalette: "gray",
+          bg: "bg.transparent",
+          borderRadius: "md",
+          px: "2.5px",
+          h: "auto",
+          color: { _light: "gray.400", _dark: "gray.500" },
+          _hover: {
+            color: "fg",
+            bg: "bg.muted",
           },
         },
       },

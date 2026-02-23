@@ -71,9 +71,8 @@ export function AlgoliaFacetAttribute(props: {
       {refinements.canToggleShowMore && (
         <Button
           onClick={() => refinements.toggleShowMore()}
-          variant="subtle-ghost-v2"
+          variant="subtle-ghost-v3"
           size="2xs"
-          colorPalette="gray"
         >
           {refinements.isShowingMore ? "Collapse" : "Show more"}
         </Button>

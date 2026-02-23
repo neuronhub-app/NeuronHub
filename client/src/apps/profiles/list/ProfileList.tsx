@@ -133,7 +133,7 @@ function ProfileListInner(props: { sort: SortOption; setSort: (sort: SortOption)
           }}
         >
           <AlgoliaFacetsActive
-            toggleLabels={{
+            labelsOverride={{
               is_scored_by_llm: "Scored by AI",
               is_reviewed_by_user: "Reviewed by you",
             }}

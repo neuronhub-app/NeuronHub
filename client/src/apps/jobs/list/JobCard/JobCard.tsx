@@ -19,6 +19,7 @@ import { Highlight } from "react-instantsearch";
 import { Tag } from "@/components/ui/tag";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
+import { datetime } from "@/utils/date-fns";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 const style = {
@@ -104,7 +105,13 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
         </VStack>
       </HStack>
 
-      <JobTagGroups job={props.job} highlightable={["tags_area"]} jobHit={jobHit} />
+      <HStack justify="space-between">
+        <JobTagGroups job={props.job} highlightable={["tags_area"]} jobHit={jobHit} />
+
+        <Text color="fg.subtle" fontSize={style.fontSize.data}>
+          {datetime.relative(props.job.posted_at)}
+        </Text>
+      </HStack>
     </Stack>
   );
 }
