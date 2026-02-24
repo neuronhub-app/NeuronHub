@@ -117,3 +117,9 @@ After the first deploy, connect to the `server` docker container, and run:
 Watch out for the `BREAKING CHANGE` notes in the release descriptions - it's specifically for self-hosting.
 
 You may use `:latest` docker tag, but I advice to hardcode the non-breaking release eg `1.1`, as the two last numbers are for non-breaking changes, ie `1.1.2.2` won't break your deployment.
+
+## Caveats
+
+### Vite prod is using a wrong VITE_SERVER_URL
+
+During the `docker build` step, the `npx react-router build` hardcodes `VITE_SERVER_URL`, ie it ignores the runtime envs as `SERVER_URL` and others.
