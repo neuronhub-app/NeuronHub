@@ -34,7 +34,7 @@ export function LayoutContainer(props?: { children?: ReactNode }) {
           maxH="100vh"
           minH="100vh"
           pos="sticky"
-          top={0}
+          top="0"
         />
 
         <Stack as="main" flex="1" alignItems="stretch">

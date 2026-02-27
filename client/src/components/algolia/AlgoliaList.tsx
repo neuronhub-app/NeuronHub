@@ -73,7 +73,7 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
           </Flex>
         </HStack>
 
-        <Flex flex="1" pos="relative" gap="gap.xl">
+        <Flex flex="1" pos="relative" gap={{ base: "gap.lg", "2xl": "gap.xl" }}>
           <AlgoliaHits label={labelPlural} {...props.hits} />
           <AlgoliaFacets label={labelPlural}>{props.children}</AlgoliaFacets>
         </Flex>

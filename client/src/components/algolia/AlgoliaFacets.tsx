@@ -2,6 +2,7 @@ import { Flex, SkeletonText, Stack } from "@chakra-ui/react";
 import { type ReactNode, useEffect } from "react";
 import { useSearchBox, useStats } from "react-instantsearch";
 import { gap } from "@/theme/theme";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { useStateValtio } from "@/utils/useValtioProxyRef";
 
 export const facetStyle = {
@@ -15,6 +16,11 @@ export const facetStyle = {
     gap: "gap.sm",
     color: { _dark: "gray.300", _light: "gray.600" },
     fontSize: "13px",
+  },
+  breakpoint: {
+    md: "md",
+    lg: "lg",
+    xl: "2xl",
   },
 } as const;
 
@@ -31,14 +37,19 @@ export function AlgoliaFacets(props: {
       pos="sticky"
       h="min"
       hideBelow="lg"
-      p={{ base: gap.md, md: gap.md }}
-      px={{ base: gap.md, md: gap.md }}
-      minW={{ base: "", md: "2xs", lg: "300px" }}
+      p={{ base: gap.md, [facetStyle.breakpoint.md]: gap.md }}
+      px={{ base: gap.md, [facetStyle.breakpoint.md]: gap.md }}
+      minW={{
+        base: "",
+        [facetStyle.breakpoint.md]: "2xs",
+        [facetStyle.breakpoint.xl]: "300px",
+      }}
       maxW="300px"
       gap="gap.md2"
       borderRadius="lg"
       borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}
       bg="bg.panel"
+      {...getOutlineBleedingProps("muted")}
     >
       <SearchStats label={props.label} isSearchActive={props.isSearchActive} />
       {props.children}

@@ -37,19 +37,21 @@ import { toast } from "@/utils/toast";
 
 const styles = {
   inline: "gap.sm",
-  breakpoint: "xl",
+
+  breakpoint: {
+    lg: "xl",
+    xl: "2xl",
+  },
 };
 
 export function LayoutSidebar(props: StackProps) {
-  const user = useUser();
-
   const links: Array<SidebarLink> = [
     { to: urls.jobs.list, icon: GoBriefcase, label: "Jobs" },
     { to: urls.profiles.list, icon: GoPeople, label: "Profiles" },
-    { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts", separator: true },
+    { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts", isHasSeparator: true },
     { to: urls.reviews.list, icon: GoComment, label: "Reviews" },
     { to: urls.tools.list, icon: GoTools, label: "Tools" },
-  ];
+  ] as const;
 
   return (
     <Stack
@@ -59,7 +61,7 @@ export function LayoutSidebar(props: StackProps) {
       bg="bg.panel"
       borderRightWidth="1px"
       justifyContent="space-between"
-      maxW="xs"
+      maxW={{ base: "2xs", [styles.breakpoint.xl]: "xs" }}
       overflow="auto"
       {...props}
     >
@@ -70,26 +72,25 @@ export function LayoutSidebar(props: StackProps) {
           <Stack gap="gap.sm">
             <Stack gap="gap.xs">
               {links.map(link => (
-                <>
-                  {link.separator && <Separator my="gap.sm" />}
-                  <Bleed
-                    as="li"
-                    aria-label="Nav Menu Item"
-                    key={link.label}
-                    inline={styles.inline}
-                  >
-                    {link.children ? (
-                      <SidebarLinkGroup label={link.label} to={link.to} icon={link.icon}>
-                        {link.children}
-                      </SidebarLinkGroup>
-                    ) : (
-                      <SidebarLinkButton to={link.to}>
-                        <link.icon />
-                        {link.label}
-                      </SidebarLinkButton>
-                    )}
-                  </Bleed>
-                </>
+                <Bleed
+                  as="li"
+                  aria-label="Nav Menu Item"
+                  key={link.label}
+                  inline={styles.inline}
+                >
+                  {link.isHasSeparator && <Separator my="gap.sm" />}
+
+                  {link.children ? (
+                    <SidebarLinkGroup label={link.label} to={link.to} icon={link.icon}>
+                      {link.children}
+                    </SidebarLinkGroup>
+                  ) : (
+                    <SidebarLinkButton to={link.to}>
+                      <link.icon />
+                      {link.label}
+                    </SidebarLinkButton>
+                  )}
+                </Bleed>
               ))}
             </Stack>
           </Stack>
@@ -125,7 +126,7 @@ type SidebarLink = {
   to: LinkProps["to"];
   icon: ComponentType;
   label: string;
-  separator?: boolean;
+  isHasSeparator?: boolean;
   children?: ReadonlyArray<{ label: string; to: LinkProps["to"] }>;
 };
 
@@ -140,7 +141,7 @@ export function NeuronLogo() {
         gap="gap.sm"
         block="gap.sm"
         inline="gap.sm"
-        p={{ base: "1px", [styles.breakpoint]: "gap.sm" }}
+        p={{ base: "1px", [styles.breakpoint.lg]: "gap.sm" }}
         _hover={{
           bgColor: "colorPalette.subtle",
         }}
@@ -150,7 +151,7 @@ export function NeuronLogo() {
           <Icon color="primary" size="xl">
             <PiGraph />
           </Icon>
-          <Text fontSize={{ base: "lg", [styles.breakpoint]: "1.4rem" }} fontWeight="bold">
+          <Text fontSize={{ base: "lg", [styles.breakpoint.lg]: "1.4rem" }} fontWeight="bold">
             NeuronHub
           </Text>
         </Flex>
@@ -208,7 +209,7 @@ function SidebarLinkButton(props: { to: LinkProps["to"] } & ButtonProps) {
             color: "colorPalette.fg",
           }}
           aria-current={linkProps.isActive ? "page" : undefined}
-          size={{ base: "xs", [styles.breakpoint]: "md" }}
+          size={{ base: "xs", [styles.breakpoint.lg]: "md" }}
           {...buttonProps}
         >
           {children}
@@ -247,14 +248,14 @@ export function UserProfile() {
   return (
     <Stack gap="gap.sm">
       <HStack gap="gap.sm" justify="space-between">
-        <HStack gap={{ base: "2", [styles.breakpoint]: "gap.md" }}>
-          <Avatar name={user.username} size={{ base: "xs", [styles.breakpoint]: "sm" }} />
+        <HStack gap={{ base: "2", [styles.breakpoint.lg]: "gap.md" }}>
+          <Avatar name={user.username} size={{ base: "xs", [styles.breakpoint.lg]: "sm" }} />
 
           <Box mt="-2px">
-            <Text textStyle={{ base: "xs", [styles.breakpoint]: "sm" }} fontWeight="medium">
+            <Text textStyle={{ base: "xs", [styles.breakpoint.lg]: "sm" }} fontWeight="medium">
               {user.username}
             </Text>
-            <Text textStyle={{ base: "2xs", [styles.breakpoint]: "sm" }} color="fg.muted">
+            <Text textStyle={{ base: "2xs", [styles.breakpoint.xl]: "sm" }} color="fg.muted">
               {user.email}
             </Text>
           </Box>
@@ -264,7 +265,7 @@ export function UserProfile() {
       </HStack>
       <Button
         variant="ghost"
-        size={{ base: "xs", [styles.breakpoint]: "sm" }}
+        size={{ base: "xs", [styles.breakpoint.lg]: "sm" }}
         onClick={handleLogout}
         colorPalette="gray"
         {...ids.set(ids.auth.logout.btn)}
