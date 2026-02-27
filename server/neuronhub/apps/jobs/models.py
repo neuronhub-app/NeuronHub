@@ -4,6 +4,7 @@ from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
 from neuronhub.apps.anonymizer.registry import anonymizable
+from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.models import User
@@ -20,7 +21,11 @@ class Job(AlgoliaModel):
 
     title = models.CharField(max_length=512)
 
-    org = models.CharField(max_length=512, blank=True)
+    org = models.ForeignKey(
+        Org,
+        on_delete=models.PROTECT,
+        related_name="jobs",
+    )
 
     is_remote = models.BooleanField(blank=True, null=True)
     is_remote_friendly = models.BooleanField(blank=True, null=True)
@@ -111,5 +116,8 @@ class Job(AlgoliaModel):
     def get_tags_json_workload(self):
         return self._get_graphql_field("tags_workload") or []
 
+    def get_org_json(self):
+        return self._get_graphql_field("org") or {}
+
     def __str__(self):
-        return f"{self.title} | {self.org}"
+        return self.title

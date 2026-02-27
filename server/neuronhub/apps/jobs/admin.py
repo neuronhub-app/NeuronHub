@@ -20,6 +20,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
 
     autocomplete_fields = [
         "author",
+        "org",
         "tags_education",
         "tags_area",
         "tags_skill",
@@ -37,6 +38,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         ("tags_workload", DALFRelatedFieldAjaxMulti),
         ("tags_experience", DALFRelatedFieldAjaxMulti),
         ("bookmarked_by_users", DALFRelatedFieldAjaxMulti),
+        ("org", DALFRelatedFieldAjaxMulti),
         "created_at",
         "posted_at",
         "closes_at",
@@ -44,7 +46,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
 
     search_fields = [
         "title",
-        "org",
+        "org__name",
     ]
 
     fieldsets = [

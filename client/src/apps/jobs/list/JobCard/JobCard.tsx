@@ -66,19 +66,35 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
       {...getOutlineBleedingProps("muted")}
     >
       <HStack gap="gap.sm2">
-        <Box
-          w="24"
-          h="24"
-          borderRadius="md"
-          {...getOutlineBleedingProps("muted")}
-          bg="bg.subtle"
-        />
+        {props.job.org?.logo ? (
+          <Image
+            src={props.job.org.logo.url}
+            w="24"
+            h="24"
+            borderRadius="md"
+            objectFit="contain"
+            {...getOutlineBleedingProps("muted")}
+            bg="bg.subtle"
+          />
+        ) : (
+          <Box
+            w="24"
+            h="24"
+            borderRadius="md"
+            {...getOutlineBleedingProps("muted")}
+            bg="bg.subtle"
+          />
+        )}
 
         <VStack align="flex-start" gap="gap.sm">
           <JobTitleLink job={props.job} isHighlightable={isHighlightable} jobHit={jobHit} />
 
           <Flex>
-            {isHighlightable ? <Highlight attribute="org" hit={jobHit} /> : props.job.org}
+            {isHighlightable ? (
+              <Highlight attribute={["org", "name"]} hit={jobHit} />
+            ) : (
+              props.job.org?.name
+            )}
           </Flex>
 
           <Flex gap="gap.xs" align="center">

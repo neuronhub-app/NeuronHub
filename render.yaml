@@ -17,7 +17,6 @@ projects:
             url: ghcr.io/neuronhub-app/neuronhub/server:latest
           dockerCommand: uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application
           preDeployCommand: uv run manage.py migrate
-          healthCheckPath: /healthcheck/
           domains:
             - pg.stage.backend.neuronhub.app
           envVars:
@@ -51,6 +50,23 @@ projects:
           envVars:
             - fromGroup: shared
             - fromGroup: stage
+
+        - name: nha-storage-stage
+          type: pserv
+          runtime: docker
+          plan: free
+          repo: https://github.com/render-examples/minio.git
+          envVars:
+            - key: MINIO_ROOT_USER
+              value: root
+            - key: MINIO_ROOT_PASSWORD
+              generateValue: true
+            - key: PORT
+              value: 10000
+          disk:
+            name: media
+            mountPath: /media
+            sizeGB: 10
 
         envVarGroups:
           - name: stage

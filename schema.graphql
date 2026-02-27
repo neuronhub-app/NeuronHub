@@ -94,7 +94,7 @@ input JobFilter {
 type JobType {
   id: ID!
   title: String!
-  org: String!
+  org: OrgType!
   is_remote: Boolean
   is_remote_friendly: Boolean
   is_visa_sponsor: Boolean
@@ -182,6 +182,16 @@ enum Ordering {
   DESC
   DESC_NULLS_FIRST
   DESC_NULLS_LAST
+}
+
+type OrgType {
+  id: ID!
+  name: String!
+  website: String!
+  jobs_page_url: String!
+  is_highlighted: Boolean!
+  logo: DjangoImageType
+  tags_area(filters: PostTagFilter): [PostTagType!]!
 }
 
 enum PostCategory {

@@ -129,7 +129,6 @@ export namespace ids {
   export const job = {
     list: "job.list",
     searchInput: "job.search-input",
-    searchStats: "job.search-stats",
     card: {
       container: "job.card.container",
       tags: "job.card.tags",
@@ -139,7 +138,6 @@ export namespace ids {
   export const profile = {
     list: "profile.list",
     searchInput: "profile.search-input",
-    searchStats: "profile.search-stats",
     listControls: {
       sort: "profile.list.controls.sort",
       sortDefault: "profile.list.controls.sort.default",

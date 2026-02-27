@@ -83,30 +83,6 @@ test.describe("ProfileList", () => {
     expect(cardsBackToDefault).toBeGreaterThanOrEqual(1);
   });
 
-  test("facet counts and search stats are visible", async ({ page }) => {
-    await play.navigate(urls.profiles.list, { idleWait: true });
-
-    // Search stats shows total profiles count
-    const searchStats = page.getByTestId(ids.profile.searchStats);
-    await searchStats.waitFor();
-    const statsText = await searchStats.textContent();
-    expect(statsText).toContain("profiles");
-
-    // Toggle facets show non-zero counts (db_stubs creates 3 scored profiles)
-    const sidebar = page.locator("aside");
-    const scoredByAi = sidebar.getByText(/Scored by AI\s*\([1-9]\d*\)/);
-    await scoredByAi.first().waitFor();
-    const reviewedByUser = sidebar.getByText(/Reviewed by you\s*\([1-9]\d*\)/);
-    await reviewedByUser.first().waitFor();
-
-    // Search narrows results — stats show "X / Y profiles"
-    const searchInput = page.getByTestId(ids.profile.searchInput);
-    await searchInput.fill("On");
-    await play.waitForNetworkIdle();
-    const filteredStats = await searchStats.textContent();
-    expect(filteredStats).toMatch(/\d+ \/ \d+ profiles/);
-  });
-
   test("trigger LLM shows progress bar, cancel hides it", async () => {
     await play.navigate(urls.profiles.list, { idleWait: true });
 

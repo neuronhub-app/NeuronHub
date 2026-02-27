@@ -5,8 +5,20 @@ from strawberry import auto
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
+from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.users.graphql.resolvers import get_user_sync
+
+
+@strawberry_django.type(Org)
+class OrgType:
+    id: auto
+    name: auto
+    website: auto
+    jobs_page_url: auto
+    is_highlighted: auto
+    logo: auto
+    tags_area: list[PostTagType]
 
 
 @strawberry_django.filter_type(Job, lookups=True)
@@ -18,7 +30,7 @@ class JobFilter:
 class JobType:
     id: auto
     title: auto
-    org: auto
+    org: OrgType
 
     is_remote: auto
     is_remote_friendly: auto

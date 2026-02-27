@@ -24,8 +24,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
         fields = [
             ["get_id_as_str", "id"],
             "title",
-            "org",
-            "title",
+            ["get_org_json", "org"],
             "country",
             "city",
             "url_external",
@@ -49,18 +48,19 @@ if settings.ALGOLIA["IS_ENABLED"]:
         settings = {
             "searchableAttributes": [
                 "title",
-                "org",
+                "org.name",
                 "job_title",
                 "url_external",
             ],
             "attributesForFaceting": [
-                "searchable(org)",
+                "searchable(org.name)",
                 "searchable(country)",
                 "searchable(city)",
                 "is_remote",
                 "is_remote_friendly",
                 "is_visa_sponsor",
                 "salary_min",
+                "org.is_highlighted",
                 "searchable(tags_skill.name)",
                 "searchable(tags_area.name)",
                 "searchable(tags_education.name)",

@@ -429,3 +429,4 @@ class CONF_CONFIG:
 # apps.jobs
 # ---------------------------------------------------------------------------------------------------------
 JOBS_CSV_PATH: Path | None = env.path("JOBS_CSV_PATH", None)
+ORGS_CSV_PATH: Path | None = env.path("ORGS_CSV_PATH", None)

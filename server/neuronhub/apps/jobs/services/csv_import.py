@@ -1,3 +1,7 @@
+"""
+#AI
+"""
+
 import csv
 from dataclasses import dataclass
 from datetime import UTC
@@ -9,6 +13,7 @@ from django.conf import settings
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models import PostTagCategory
@@ -42,10 +47,15 @@ async def csv_import_jobs(
                     category=category,
                 )
 
+            org = None
+            if org_name := job_dict.pop("org_name", "").replace('"', ""):
+                org, _ = await Org.objects.aget_or_create(name=org_name)
+
             job, is_created = await Job.objects.aupdate_or_create(
                 url_external=job_dict["url_external"],
                 defaults={
                     **job_dict,
+                    "org": org,
                     "visibility": Visibility.PUBLIC,
                 },
             )
@@ -122,7 +132,7 @@ def _list_split_and_strip(str_raw: str) -> list[str]:
 
 columns_csv_to_django = {
     "Job Title": "title",
-    "Organization": "org",
+    "Organization": "org_name",
     "Job Link": "url_external",
     "Country": "country",
     "City / State": "city",

@@ -28,7 +28,7 @@ export function JobList() {
         hitsPerPage={20}
         attributesToHighlight={[
           "title",
-          "org",
+          "org.name",
           "country",
           "city",
           "tags_skill.name",
@@ -56,7 +56,7 @@ export function JobList() {
       <AlgoliaFacetAttribute attribute="tags_workload.name" label="Workload" />
       <AlgoliaFacetDate attribute="posted_at" label="Posted" />
       <AlgoliaFacetAttribute attribute="tags_education.name" label="Education" />
-      <AlgoliaFacetAttribute attribute="org" label="Organization" isSearchEnabled />
+      <AlgoliaFacetAttribute attribute="org.name" label="Organization" isSearchEnabled />
     </AlgoliaList>
   );
 }

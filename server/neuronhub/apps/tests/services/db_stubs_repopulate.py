@@ -171,10 +171,15 @@ async def _import_profiles_csv(gen: Gen):
 
 async def _import_jobs_csv():
     from neuronhub.apps.jobs.services.csv_import import csv_import_jobs
+    from neuronhub.apps.jobs.services.csv_import_orgs import csv_import_orgs
 
     csv_path = settings.JOBS_CSV_PATH
     if csv_path and csv_path.exists():
         await csv_import_jobs(csv_path, limit=6, is_reindex_algolia=False)
+
+    orgs_csv_path = settings.ORGS_CSV_PATH
+    if orgs_csv_path and orgs_csv_path.exists():
+        await csv_import_orgs(orgs_csv_path, limit=6)
 
 
 # todo ! refac: move out
