@@ -1,9 +1,12 @@
+import uuid
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
 from neuronhub.apps.anonymizer.registry import anonymizable
+from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.users.graphql.types_lazy import UserListName
@@ -102,22 +105,43 @@ class Job(AlgoliaModel):
         return self.closes_at.isoformat() if self.closes_at else ""
 
     def get_tags_json_skill(self):
-        return self._get_graphql_field("tags_skill") or []
+        return self._get_graphql_field("tags_skill")
 
     def get_tags_json_area(self):
-        return self._get_graphql_field("tags_area") or []
+        return self._get_graphql_field("tags_area")
 
     def get_tags_json_education(self):
-        return self._get_graphql_field("tags_education") or []
+        return self._get_graphql_field("tags_education")
 
     def get_tags_json_experience(self):
-        return self._get_graphql_field("tags_experience") or []
+        return self._get_graphql_field("tags_experience")
 
     def get_tags_json_workload(self):
-        return self._get_graphql_field("tags_workload") or []
+        return self._get_graphql_field("tags_workload")
 
     def get_org_json(self):
         return self._get_graphql_field("org") or {}
 
     def __str__(self):
         return self.title
+
+
+class JobAlert(TimeStampedModel):
+    id_ext = models.UUIDField(default=uuid.uuid4)
+
+    email = models.EmailField()
+
+    tags = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
+        "posts.PostTag",
+        related_name="tags",
+        blank=True,
+    )
+    is_orgs_highlighted = models.BooleanField(blank=True, null=True)
+
+    is_active = models.BooleanField(default=True)
+
+    sent_count = models.PositiveIntegerField(default=0)
+    jobs_clicked_count = models.PositiveIntegerField(default=0)
+    jobs_clicked = models.ManyToManyField(Job, blank=True)
+
+    history = HistoricalRecords()

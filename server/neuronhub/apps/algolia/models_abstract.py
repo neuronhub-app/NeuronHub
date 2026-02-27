@@ -78,7 +78,7 @@ class AlgoliaModel(AnonimazableTimeStampedModel):
             return self.post_source.created_at_external.timestamp()
         return self.created_at.timestamp()
 
-    def _get_graphql_field(self, field: str) -> Any | None:
+    def _get_graphql_field(self, field: str) -> Any:
         """
         We re-use the "PostsByIds" query to supply the identical JSON schema to FE from both Algolia and GraphQL.
         See [[Algolia.md]].
@@ -89,7 +89,7 @@ class AlgoliaModel(AnonimazableTimeStampedModel):
         from neuronhub.graphql import schema
 
         if not self.is_in_algolia_index():  # should be redundant, but isn't
-            return None
+            return []
 
         if not self._graphql_algolia_cache:
             self._graphql_algolia_cache = {}
