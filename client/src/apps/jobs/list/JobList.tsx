@@ -39,7 +39,7 @@ export function JobList() {
       <AlgoliaFacetsActive
         labelsOverride={{
           is_remote: "Remote",
-          "org.is_highlighted": "Highlighted orgs",
+          "org.is_highlighted": "Highlighted",
           posted_at: "Posted",
         }}
         dateAttributes={["posted_at"]}
@@ -47,7 +47,7 @@ export function JobList() {
 
       <Stack gap="1">
         <AlgoliaFacetBoolean attribute="is_remote" label="Remote" />
-        <AlgoliaFacetBoolean attribute="org.is_highlighted" label="Highlighted orgs" />
+        <AlgoliaFacetBoolean attribute="org.is_highlighted" label="Highlighted Organizations" />
       </Stack>
 
       <AlgoliaFacetAttribute attribute="tags_experience.name" label="Experience" />
