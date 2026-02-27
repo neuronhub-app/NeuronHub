@@ -42,8 +42,11 @@ async def csv_import_jobs(
             tags_by_field_name = {}
             for category in TagCategoryEnum:
                 field_name = f"tags_{category.value}"
+                names = [
+                    _abbreviate_tag(n) for n in _list_split_and_strip(job_dict.pop(field_name))
+                ]
                 tags_by_field_name[field_name] = await _get_or_create_tags_by_category(
-                    names=_list_split_and_strip(job_dict.pop(field_name)),
+                    names=names,
                     category=category,
                 )
 
@@ -99,11 +102,24 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
     for row in job_rows:
         job = {}
 
-        for name_csv, name_django in columns_csv_to_django.items():
+        for name_csv, name_django in {
+            "Job Title": "title",
+            "Organization": "org_name",
+            "Job Link": "url_external",
+            "Country": "country",
+            "City / State": "city",
+            "Cause Area(s)": "tags_area",
+            "Role Types": "tags_workload",
+            "Education": "tags_education",
+            "Experience": "tags_experience",
+            "Skill Sets": "tags_skill",
+        }.items():
             job[name_django] = row.get(name_csv, "").strip()
 
-        job["country"] = _list_split_and_strip(job.get("country", ""))
-        job["city"] = _list_split_and_strip(job.get("city", ""))
+        job["country"] = [
+            _abbreviate_country(c) for c in _list_split_and_strip(job.get("country", ""))
+        ]
+        job["city"] = [_abbreviate_city(c) for c in _list_split_and_strip(job.get("city", ""))]
 
         job["is_remote"] = "Remote" == row.get("Remote? ", "").strip()
 
@@ -132,15 +148,60 @@ def _list_split_and_strip(str_raw: str) -> list[str]:
     return [tag.strip() for tag in str_raw.split(",") if tag.strip()]
 
 
-columns_csv_to_django = {
-    "Job Title": "title",
-    "Organization": "org_name",
-    "Job Link": "url_external",
-    "Country": "country",
-    "City / State": "city",
-    "Cause Area(s)": "tags_area",
-    "Role Types": "tags_workload",
-    "Education": "tags_education",
-    "Experience": "tags_experience",
-    "Skill Sets": "tags_skill",
-}
+def _abbreviate_country(country: str) -> str:
+    return {
+        "United States (USA)": "US",
+        "United Kingdom (UK)": "UK",
+    }.get(country, country)
+
+
+def _abbreviate_city(city: str) -> str:
+    _city_abbreviations = {
+        "San Francisco CA": "SF",
+        "New York NY": "NY",
+        "Washington D.C.": "Washington DC",
+    }
+    if city in _city_abbreviations:
+        return _city_abbreviations[city]
+
+    # Strip 2-letter code suffix for well-known cities: "Zurich CH" → "Zurich"
+    parts = city.rsplit(" ", 1)
+    _cities_strip_code = {
+        "Abuja",
+        "Addis Ababa",
+        "Amsterdam",
+        "Bangkok",
+        "Berkeley",
+        "Berlin",
+        "Boston",
+        "Cambridge",
+        "Emeryville",
+        "London",
+        "Munich",
+        "Nairobi",
+        "New Delhi",
+        "Palo Alto",
+        "Paris",
+        "Salt Lake City",
+        "Seattle",
+        "Zurich",
+    }
+
+    if (
+        len(parts) == 2
+        and len(parts[1]) == 2
+        and parts[1].isalpha()
+        and parts[0] in _cities_strip_code
+    ):
+        return parts[0]
+    return city
+
+
+def _abbreviate_tag(name: str) -> str:
+    for old, new in [
+        ("+ years experience", "y+"),
+        (" years experience", "y"),
+        ("Undergraduate", "Undergrad"),
+    ]:
+        name = name.replace(old, new)
+    return name
