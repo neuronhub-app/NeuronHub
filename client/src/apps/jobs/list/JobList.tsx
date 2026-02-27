@@ -1,5 +1,5 @@
+import { Stack } from "@chakra-ui/react";
 import { Configure } from "react-instantsearch";
-
 import { JobCard } from "@/apps/jobs/list/JobCard/JobCard";
 import { AlgoliaFacetAttribute } from "@/components/algolia/AlgoliaFacetAttribute";
 import { AlgoliaFacetBoolean } from "@/components/algolia/AlgoliaFacetBoolean";
@@ -37,11 +37,18 @@ export function JobList() {
       />
 
       <AlgoliaFacetsActive
-        labelsOverride={{ is_remote: "Remote", posted_at: "Posted" }}
+        labelsOverride={{
+          is_remote: "Remote",
+          "org.is_highlighted": "Highlighted orgs",
+          posted_at: "Posted",
+        }}
         dateAttributes={["posted_at"]}
       />
 
-      <AlgoliaFacetBoolean attribute="is_remote" label="Remote" />
+      <Stack gap="1">
+        <AlgoliaFacetBoolean attribute="is_remote" label="Remote" />
+        <AlgoliaFacetBoolean attribute="org.is_highlighted" label="Highlighted orgs" />
+      </Stack>
 
       <AlgoliaFacetAttribute attribute="tags_experience.name" label="Experience" />
       <AlgoliaFacetAttribute attribute="country" label="Country" isSearchEnabled showFirst={4} />

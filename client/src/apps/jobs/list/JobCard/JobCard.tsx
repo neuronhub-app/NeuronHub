@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Flex,
   Float,
@@ -89,7 +90,12 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
         <VStack align="flex-start" gap="gap.sm">
           <JobTitleLink job={props.job} isHighlightable={isHighlightable} jobHit={jobHit} />
 
-          <Flex>
+          <Flex align="center" gap="gap.sm">
+            {props.job.org?.is_highlighted && (
+              <Badge variant="subtle" colorPalette="yellow">
+                Highlighted
+              </Badge>
+            )}
             {isHighlightable ? (
               <Highlight attribute={["org", "name"]} hit={jobHit} />
             ) : (
