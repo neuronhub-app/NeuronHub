@@ -5,6 +5,7 @@ import {
   Heading,
   HStack,
   Icon,
+  Image,
   Link,
   Separator,
   Stack,
@@ -15,8 +16,10 @@ import type { BaseHit, Hit } from "instantsearch.js";
 import { FiExternalLink } from "react-icons/fi";
 import { IoLocationSharp } from "react-icons/io5";
 import { LuGlobe } from "react-icons/lu";
+import { PiClockClockwiseFill } from "react-icons/pi";
 import { Highlight } from "react-instantsearch";
 import { Tag } from "@/components/ui/tag";
+import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
 import { datetime } from "@/utils/date-fns";
@@ -48,10 +51,6 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
   const isHighlightable = props.isSearchActive && "_highlightResult" in props.job;
   const jobHit = props.job as unknown as Hit<BaseHit>;
 
-  const location = [...(props.job.city ?? []), ...(props.job.country ?? [])]
-    .filter(Boolean)
-    .join(", ");
-
   return (
     <Stack
       as="article"
@@ -82,37 +81,118 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
             {isHighlightable ? <Highlight attribute="org" hit={jobHit} /> : props.job.org}
           </Flex>
 
-          <Flex align="center" gap="gap.sm2" color="fg.muted" mt="2px">
-            <Flex gap="gap.xs">
-              <Icon boxSize="17px" color="fg.subtle/80" ml="-1" mt="2px">
-                <IoLocationSharp />
-              </Icon>
-              <Text fontSize={style.fontSize.data}>{location}</Text>
-            </Flex>
+          <Flex gap="gap.xs" align="center">
+            <Icon boxSize="17px" color="fg.subtle/80" ml="-1" mt="2px">
+              <IoLocationSharp />
+            </Icon>
 
-            {props.job.is_remote && (
-              <>
-                <Separator orientation="vertical" h="5" />
-                <Flex align="center" gap="1">
-                  <Icon boxSize="4" color="fg.subtle/80">
-                    <LuGlobe />
-                  </Icon>
-                  <Text fontSize={style.fontSize.data}>Remote</Text>
-                </Flex>
-              </>
-            )}
+            <Flex align="center" gap="gap.sm2" color="fg.muted" mt="2px">
+              <JobLocations job={props.job} />
+
+              {props.job.is_remote && (
+                <>
+                  <Separator orientation="vertical" h="5" />
+                  <Flex align="center" gap="1">
+                    <Icon boxSize="4" color="fg.subtle/80">
+                      <LuGlobe />
+                    </Icon>
+                    <Text fontSize={style.fontSize.data}>Remote</Text>
+                  </Flex>
+                </>
+              )}
+            </Flex>
           </Flex>
         </VStack>
       </HStack>
 
-      <HStack justify="space-between">
+      <HStack justify="space-between" align="flex-end">
         <JobTagGroups job={props.job} highlightable={["tags_area"]} jobHit={jobHit} />
 
-        <Text color="fg.subtle" fontSize={style.fontSize.data}>
-          {datetime.relative(props.job.posted_at)}
-        </Text>
+        <VStack align="flex-end" fontSize="xs" whiteSpace="nowrap" pos="relative">
+          {props.job.closes_at && (
+            <Tooltip
+              content={
+                datetime.isFutureDate(props.job.closes_at)
+                  ? `Closes ${datetime.full(props.job.closes_at)}`
+                  : "Applications closed"
+              }
+              positioning={{ placement: "left" }}
+            >
+              <Flex
+                gap="gap.sm"
+                align="center"
+                color="fg.subtle"
+                pos="absolute"
+                transform="translateY(-120%)"
+              >
+                <Icon
+                  boxSize="4"
+                  color={datetime.isFutureDate(props.job.closes_at) ? "" : "fg.warning/80"}
+                >
+                  <PiClockClockwiseFill />
+                </Icon>
+                {datetime.isFutureDate(props.job.closes_at) ? (
+                  <Text>{datetime.relative(props.job.closes_at)}</Text>
+                ) : (
+                  <Text color="fg.warning/80">Closed</Text>
+                )}
+              </Flex>
+            </Tooltip>
+          )}
+          <Text color="fg.subtle">{datetime.relative(props.job.posted_at)}</Text>
+        </VStack>
       </HStack>
     </Stack>
+  );
+}
+
+function JobLocations(props: { job: JobFragmentType }) {
+  const locations = [...(props.job.city ?? []), ...(props.job.country ?? [])].filter(Boolean);
+
+  const abbreviations = [
+    { input: "United States (USA)", output: "US" },
+    { input: "United Kingdom (UK)", output: "UK" },
+    { input: "Washington D.C.", output: "Washington DC" },
+    { input: "London UK", output: "London" },
+    { input: "San Francisco CA", output: "SF" },
+    { input: "New York NY", output: "NY" },
+    { input: "Berkeley CA", output: "Berkeley" },
+    { input: "New Delhi IN", output: "New Delhi" },
+  ];
+
+  return (
+    <HStack gap="0">
+      {locations
+        .map(location => {
+          for (const abbr of abbreviations) {
+            if (location === abbr.input) {
+              return location.replace(abbr.input, abbr.output);
+            }
+          }
+          return location;
+        })
+        .map((location, index) => {
+          const isHasSeparator = index !== 0;
+
+          return (
+            <>
+              {isHasSeparator && (
+                <Separator
+                  key={`${location}-sep`}
+                  border="0"
+                  orientation="horizontal"
+                  color="fg.subtle"
+                >
+                  ・
+                </Separator>
+              )}
+              <Text key={location} fontSize={style.fontSize.data}>
+                {location}
+              </Text>
+            </>
+          );
+        })}
+    </HStack>
   );
 }
 
@@ -181,31 +261,56 @@ function JobTagGroups(props: {
     },
   ].filter(group => group.tags?.length > 0);
 
+  const tagsHidden = ["No education requirement", "Other", "Full-time"];
+
+  const tagsAbbreviations = [
+    { input: "+ years experience", output: "y+" },
+    { input: " years experience", output: "y" },
+    { input: "Undergraduate", output: "Undergrad" },
+  ];
+
   return (
-    <HStack gap="gap.md">
-      {tagGroups.map(tagGroup => (
-        <Flex key={tagGroup.attribute} gap="gap.sm">
-          <Flex gap="gap.sm" flexWrap="wrap" {...ids.set(ids.job.card.tags)}>
-            {tagGroup.tags.map((tag, index) => (
-              <Tag
-                key={tag.name}
-                variant="subtle"
-                colorPalette={tagGroup.color}
-                {...getOutlineBleedingProps("subtle")}
-              >
-                {props.highlightable.includes(tagGroup.attribute) ? (
-                  <Highlight
-                    attribute={[tagGroup.attribute, String(index), "name"]}
-                    hit={props.jobHit}
-                  />
-                ) : (
-                  tag.name
-                )}
-              </Tag>
-            ))}
-          </Flex>
-        </Flex>
-      ))}
+    <HStack gap="gap.sm2" flexWrap="wrap">
+      {tagGroups.map(tagGroup => {
+        let tags = tagGroup.tags.filter(tag => !tagsHidden.includes(tag.name));
+
+        tags = tags.map(tag => {
+          const tagNew = { ...tag };
+          for (const abbr of tagsAbbreviations) {
+            tagNew.name = tagNew.name.replace(abbr.input, abbr.output);
+          }
+          return tagNew;
+        });
+
+        const isHasTags = tags.length > 0;
+
+        return (
+          isHasTags && (
+            <Flex key={tagGroup.attribute} gap="gap.sm">
+              <Flex gap="gap.sm" flexWrap="wrap" {...ids.set(ids.job.card.tags)}>
+                {tags.map((tag, index) => (
+                  <Tag
+                    display="flex"
+                    key={tag.name}
+                    variant="subtle"
+                    colorPalette={tagGroup.color}
+                    {...getOutlineBleedingProps("subtle")}
+                  >
+                    {props.highlightable.includes(tagGroup.attribute) ? (
+                      <Highlight
+                        attribute={[tagGroup.attribute, String(index), "name"]}
+                        hit={props.jobHit}
+                      />
+                    ) : (
+                      tag.name
+                    )}
+                  </Tag>
+                ))}
+              </Flex>
+            </Flex>
+          )
+        );
+      })}
     </HStack>
   );
 }

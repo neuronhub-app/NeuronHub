@@ -1,6 +1,7 @@
 import { TZDate, tzName } from "@date-fns/tz";
-import { format, formatDistanceToNowStrict } from "date-fns";
+import { format, formatDistanceToNowStrict, isFuture } from "date-fns";
 
+// todo ? refac-name: datetime.ts
 export namespace datetime {
   type DateRaw = Date | number | string | unknown;
 
@@ -26,13 +27,25 @@ export namespace datetime {
       .replace(" minutes", "min")
       .replace(" hours", "h")
       .replace(" days", "d")
+      .replace(" month", "m")
       .replace(" months", "m")
       .replace(" years", "y");
 
+    if (isFuture(date)) {
+      return `in ${distance}`;
+    }
     return `${distance} ago`;
   }
 
-  function parseRaw(dateRaw: DateRaw): Date | undefined {
+  export function isFutureDate(dateRaw: DateRaw): boolean {
+    const date = parseRaw(dateRaw);
+    if (date) {
+      return isFuture(date);
+    }
+    return false;
+  }
+
+  export function parseRaw(dateRaw: DateRaw): Date | undefined {
     if (!dateRaw) {
       return;
     }

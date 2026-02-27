@@ -15,10 +15,10 @@ export function AlgoliaFacetBoolean(props: { attribute: string; label: string })
     >
       <Checkbox.HiddenInput />
       <Checkbox.Control />
-      <Checkbox.Label {...facetStyle.value}>
+      <Checkbox.Label {...facetStyle.value} gap="1">
         {props.label}
-        <Text as="span" color="fg.subtle" fontSize="2xs" ml="1">
-          ({toggleFacet.value.onFacetValue.count ?? 0})
+        <Text as="span" color="fg.subtle" fontSize="2xs" mt="1px">
+          {toggleFacet.value.onFacetValue.count ?? 0}
         </Text>
       </Checkbox.Label>
     </Checkbox.Root>
