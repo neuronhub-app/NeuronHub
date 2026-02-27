@@ -47,9 +47,11 @@ async def csv_import_jobs(
                     category=category,
                 )
 
-            org = None
-            if org_name := job_dict.pop("org_name", "").replace('"', ""):
-                org, _ = await Org.objects.aget_or_create(name=org_name)
+            org_name = job_dict.pop("org_name", "").replace('"', "")
+            is_broken_job_org = not org_name
+            if is_broken_job_org:
+                org_name = job_dict["title"]
+            org, _ = await Org.objects.aget_or_create(name=org_name)
 
             job, is_created = await Job.objects.aupdate_or_create(
                 url_external=job_dict["url_external"],
