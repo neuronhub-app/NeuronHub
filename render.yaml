@@ -51,23 +51,6 @@ projects:
             - fromGroup: shared
             - fromGroup: stage
 
-        - name: nha-storage-stage
-          type: pserv
-          runtime: docker
-          plan: free
-          repo: https://github.com/render-examples/minio.git
-          envVars:
-            - key: MINIO_ROOT_USER
-              value: root
-            - key: MINIO_ROOT_PASSWORD
-              generateValue: true
-            - key: PORT
-              value: 10000
-          disk:
-            name: media
-            mountPath: /media
-            sizeGB: 10
-
         envVarGroups:
           - name: stage
             envVars:

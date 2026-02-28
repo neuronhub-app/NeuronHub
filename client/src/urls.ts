@@ -56,6 +56,7 @@ export const urls = {
   },
   jobs: {
     list: "/jobs",
+    subscriptions: "/jobs/subscriptions",
   },
   tools: {
     list: "/tools",

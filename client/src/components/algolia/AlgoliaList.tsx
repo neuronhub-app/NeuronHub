@@ -32,6 +32,7 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
     listTestId?: string;
   };
   children: ReactNode;
+  cta?: ReactNode;
 }) {
   const algolia = useAlgoliaSearchClient();
   const user = useUser();
@@ -56,12 +57,16 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
       {props.typeFilter && <Configure filters={`type:${props.typeFilter}`} />}
 
       <Stack gap="gap.lg" w="100%">
-        <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
+        <HStack as="header" gap="gap.lg" flexWrap="wrap" justify="space-between">
           <Text fontSize="2xl" fontWeight="bold" textTransform="capitalize">
             {labelPlural}
           </Text>
-          <Flex gap="gap.md">
+
+          <Flex gap="gap.md" align="center">
             <AlgoliaSearchInput testId={props.searchInputTestId} />
+
+            {Boolean(props.cta) && props.cta}
+
             {props.createUrl && user?.id && (
               <NavLink to={props.createUrl}>
                 <Button

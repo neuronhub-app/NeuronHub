@@ -137,6 +137,8 @@ class JobAlert(TimeStampedModel):
         blank=True,
     )
     is_orgs_highlighted = models.BooleanField(blank=True, null=True)
+    is_remote = models.BooleanField(blank=True, null=True)
+    salary_min = models.PositiveIntegerField(blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
 

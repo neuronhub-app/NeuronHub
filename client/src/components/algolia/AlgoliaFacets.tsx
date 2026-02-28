@@ -39,12 +39,12 @@ export function AlgoliaFacets(props: {
       hideBelow="lg"
       p={{ base: gap.md, [facetStyle.breakpoint.md]: gap.md }}
       px={{ base: gap.md, [facetStyle.breakpoint.md]: gap.md }}
-      minW={{
+      w={{
         base: "",
-        [facetStyle.breakpoint.md]: "2xs",
-        [facetStyle.breakpoint.xl]: "300px",
+        [facetStyle.breakpoint.md]: "sm",
+        [facetStyle.breakpoint.lg]: "350px",
+        [facetStyle.breakpoint.xl]: "400px",
       }}
-      maxW="300px"
       gap="gap.md2"
       borderRadius="lg"
       borderColor={{ _light: "bg.muted/70", _dark: "bg.muted/70" }}

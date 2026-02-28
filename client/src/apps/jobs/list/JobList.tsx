@@ -1,9 +1,11 @@
 import { Stack } from "@chakra-ui/react";
 import { Configure } from "react-instantsearch";
 import { JobCard } from "@/apps/jobs/list/JobCard/JobCard";
+import { JobsSubscribeModal } from "@/apps/jobs/list/JobsSubscribeModal";
 import { AlgoliaFacetAttribute } from "@/components/algolia/AlgoliaFacetAttribute";
 import { AlgoliaFacetBoolean } from "@/components/algolia/AlgoliaFacetBoolean";
 import { AlgoliaFacetDate } from "@/components/algolia/AlgoliaFacetDate";
+import { AlgoliaFacetSalary } from "@/components/algolia/AlgoliaFacetSalary";
 import { AlgoliaFacetsActive } from "@/components/algolia/AlgoliaFacetsActive";
 import { AlgoliaList } from "@/components/algolia/AlgoliaList";
 import { ids } from "@/e2e/ids";
@@ -15,7 +17,7 @@ export function JobList() {
     <AlgoliaList<JobFragmentType>
       index="indexNameJobs"
       label="job"
-      searchInputTestId={ids.job.searchInput}
+      cta={<JobsSubscribeModal />}
       hits={{
         enrichment: { query: JobsByIdsQuery, extractItems: data => data.jobs },
         renderHit: (job, ctx) => (
@@ -23,6 +25,7 @@ export function JobList() {
         ),
         listTestId: ids.job.list,
       }}
+      searchInputTestId={ids.job.searchInput}
     >
       <Configure
         hitsPerPage={20}
@@ -40,9 +43,10 @@ export function JobList() {
         labelsOverride={{
           is_remote: "Remote",
           "org.is_highlighted": "Highlighted",
-          posted_at: "Posted",
+          posted_at_unix: "Posted",
+          salary_min: "Salary",
         }}
-        dateAttributes={["posted_at"]}
+        dateAttributes={["posted_at_unix"]}
       />
 
       <Stack gap="1">
@@ -51,8 +55,9 @@ export function JobList() {
       </Stack>
 
       <AlgoliaFacetAttribute attribute="tags_experience.name" label="Experience" />
-      <AlgoliaFacetAttribute attribute="country" label="Country" isSearchEnabled showFirst={4} />
-      <AlgoliaFacetAttribute attribute="city" label="City" isSearchEnabled showFirst={3} />
+      <AlgoliaFacetAttribute attribute="country" label="Country" isSearchEnabled showFirst={5} />
+      <AlgoliaFacetAttribute attribute="city" label="City" isSearchEnabled showFirst={5} />
+      <AlgoliaFacetSalary attribute="salary_min" label="Salary" />
       <AlgoliaFacetAttribute
         attribute="tags_skill.name"
         label="Skills"
@@ -61,7 +66,7 @@ export function JobList() {
       />
       <AlgoliaFacetAttribute attribute="tags_area.name" label="Area" />
       <AlgoliaFacetAttribute attribute="tags_workload.name" label="Workload" />
-      <AlgoliaFacetDate attribute="posted_at" label="Posted" />
+      <AlgoliaFacetDate attribute="posted_at_unix" label="Posted" />
       <AlgoliaFacetAttribute attribute="tags_education.name" label="Education" />
       <AlgoliaFacetAttribute attribute="org.name" label="Organization" isSearchEnabled />
     </AlgoliaList>

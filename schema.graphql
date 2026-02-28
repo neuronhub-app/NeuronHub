@@ -83,6 +83,19 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](https:/
 """
 scalar JSON @specifiedBy(url: "https://ecma-international.org/wp-content/uploads/ECMA-404_2nd_edition_december_2017.pdf")
 
+type JobAlertType {
+  id: ID!
+  id_ext: UUID!
+  email: String!
+  tags(filters: PostTagFilter): [PostTagType!]!
+  is_orgs_highlighted: Boolean
+  is_remote: Boolean
+  salary_min: Int
+  is_active: Boolean!
+  created_at: DateTime!
+  sent_count: Int!
+}
+
 input JobFilter {
   id: IDBaseFilterLookup
   AND: JobFilter
@@ -159,6 +172,9 @@ type Mutation {
   profile_llm_md_reset: Boolean! @IsAuthenticated
   profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku", include_reprocessing: Boolean! = true, is_dry: Boolean! = false): ProgressType! @IsAuthenticated
   profile_matches_cancel_llm: Boolean! @IsAuthenticated
+  job_alert_subscribe(email: String!, tag_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null): Boolean!
+  job_alert_toggle_active(id_ext: UUID!): Boolean!
+  job_alert_remove(id_ext: UUID!): Boolean!
 }
 
 type OffsetPaginationInfo {
@@ -435,6 +451,7 @@ type PostTagType {
   tag_children(filters: PostTagFilter): [PostTagType!]!
   votes: [PostTagVoteType!]!
   author: UserType
+  category_name: String
 }
 
 input PostTagTypeInput {
@@ -765,6 +782,7 @@ type Query {
   profile_match_stats: ProfileMatchStatsType! @IsAuthenticated
   profile_user_llm_md: String! @IsAuthenticated
   jobs(filters: JobFilter): [JobType!]!
+  job_alerts: [JobAlertType!]!
 }
 
 input StrFilterLookup {
@@ -879,6 +897,8 @@ enum ToolType {
   Product
   Other
 }
+
+scalar UUID
 
 """Represents a file upload."""
 scalar Upload

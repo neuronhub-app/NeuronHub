@@ -1,13 +1,5 @@
 import { For, RadioGroup, Stack, Text } from "@chakra-ui/react";
-import {
-  addDays,
-  addMonths,
-  addYears,
-  getUnixTime,
-  subDays,
-  subMonths,
-  subYears,
-} from "date-fns";
+import { addDays, addMonths, getUnixTime, subDays, subMonths } from "date-fns";
 import { useMemo } from "react";
 import { useNumericMenu } from "react-instantsearch";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
@@ -33,6 +25,7 @@ export function AlgoliaFacetDate(props: {
     return [
       ...choices.map(item => ({
         label: item.label,
+        // #AI-slop doesn't work
         [props.isFuture ? "end" : "start"]: getUnixTime(item.calcDate(dateNow)),
       })),
       { label: "All" },
@@ -47,11 +40,17 @@ export function AlgoliaFacetDate(props: {
       <RadioGroup.Root
         onValueChange={details => menuNumeric.refine(details.value ?? "")}
         value={menuNumeric.items.find(i => i.isRefined)?.value}
+        size="sm"
       >
-        <Stack gap="gap.sm">
+        <Stack gap="1">
           <For each={menuNumeric.items}>
             {item => (
-              <RadioGroup.Item key={item.value} value={item.value}>
+              <RadioGroup.Item
+                key={item.value}
+                value={item.value}
+                color={facetStyle.value.color}
+                fontSize={facetStyle.value.fontSize}
+              >
                 <RadioGroup.ItemHiddenInput />
                 <RadioGroup.ItemIndicator />
                 <RadioGroup.ItemText>
@@ -76,7 +75,7 @@ function renderLabel(
   const isNonDefault = value.start || value.end;
 
   if (!opts.isFuture && isNonDefault) {
-    return `${item.label} ago`;
+    return `≤ ${item.label} ago`;
   }
   return item.label;
 }
@@ -87,14 +86,14 @@ const choicesDateAgo = [
   { label: "1d", calcDate: (now: Date) => subDays(now, 1) },
   { label: "7d", calcDate: (now: Date) => subDays(now, 7) },
   { label: "30d", calcDate: (now: Date) => subDays(now, 30) },
+  { label: "2m", calcDate: (now: Date) => subMonths(now, 2) },
   { label: "6m", calcDate: (now: Date) => subMonths(now, 6) },
-  { label: "1y", calcDate: (now: Date) => subYears(now, 1) },
 ] as const;
 
 const choicesDateAfter = [
   { label: "1d", calcDate: (now: Date) => addDays(now, 1) },
   { label: "7d", calcDate: (now: Date) => addDays(now, 7) },
   { label: "30d", calcDate: (now: Date) => addDays(now, 30) },
+  { label: "2m", calcDate: (now: Date) => addMonths(now, 2) },
   { label: "6m", calcDate: (now: Date) => addMonths(now, 6) },
-  { label: "1y", calcDate: (now: Date) => addYears(now, 1) },
 ] as const;

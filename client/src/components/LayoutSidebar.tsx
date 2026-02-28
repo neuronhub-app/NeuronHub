@@ -26,12 +26,14 @@ import {
 import { LuLogIn, LuLogOut } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink, useLocation } from "react-router";
+import { JobAlertsQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
 import { ColorModeButton } from "@/components/ui/color-mode";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
 
@@ -45,8 +47,19 @@ const styles = {
 };
 
 export function LayoutSidebar(props: StackProps) {
+  const { data } = useApolloQuery(JobAlertsQuery);
+  const alertsCount = data?.job_alerts?.length ?? 0;
+
   const links: Array<SidebarLink> = [
-    { to: urls.jobs.list, icon: GoBriefcase, label: "Jobs" },
+    {
+      to: urls.jobs.list,
+      icon: GoBriefcase,
+      label: "Jobs",
+      children:
+        alertsCount > 0
+          ? [{ label: `Subscriptions (${alertsCount})`, to: urls.jobs.subscriptions }]
+          : undefined,
+    },
     { to: urls.profiles.list, icon: GoPeople, label: "Profiles" },
     { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts", isHasSeparator: true },
     { to: urls.reviews.list, icon: GoComment, label: "Reviews" },

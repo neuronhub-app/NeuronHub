@@ -4,6 +4,7 @@ from django.contrib import admin
 from simple_history.admin import SimpleHistoryAdmin
 
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.models import JobAlert
 
 
 @admin.register(Job)
@@ -82,3 +83,21 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
     ]
 
     readonly_fields = ["created_at", "updated_at"]
+
+
+@admin.register(JobAlert)
+class JobAlertAdmin(SimpleHistoryAdmin, DALFModelAdmin):
+    list_display = [
+        "email",
+        "is_active",
+        "sent_count",
+        "created_at",
+    ]
+    autocomplete_fields = ["tags", "jobs_clicked"]
+    list_filter = [
+        ("tags", DALFRelatedFieldAjaxMulti),
+        "is_orgs_highlighted",
+        "is_active",
+        "created_at",
+        "updated_at",
+    ]

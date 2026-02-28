@@ -239,6 +239,11 @@ class PostTagType:
     votes: list[PostTagVoteType]
     author: UserType | None
 
+    @strawberry_django.field(only=["categories"])
+    async def category_name(self) -> str | None:
+        cat = await self.categories.afirst()  # type: ignore[attr-defined]
+        return cat.name if cat else None
+
 
 @strawberry_django.type(Post)
 class PostSimpleType:

@@ -41,9 +41,11 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ["get_iso_updated_at", "updated_at"],
             ["get_iso_posted_at", "posted_at"],
             ["get_iso_closes_at", "closes_at"],
-            # datetime - Unix for Algolia sorting/filtering #prob-redundant
+            # datetime - Unix for Algolia sorting/filtering
             ["get_unix_created_at", "created_at_unix"],
             ["get_unix_updated_at", "updated_at_unix"],
+            ["get_unix_posted_at", "posted_at_unix"],
+            ["get_unix_closes_at", "closes_at_unix"],
         ]
         settings = {
             "searchableAttributes": [

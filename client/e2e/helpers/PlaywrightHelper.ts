@@ -121,7 +121,8 @@ export class PlaywrightHelper {
       | typeof urls.reviews.list
       | typeof urls.reviews.create
       | typeof urls.profiles.list
-      | typeof urls.jobs.list,
+      | typeof urls.jobs.list
+      | typeof urls.jobs.subscriptions,
     opts?: { idleWait?: boolean; idleWaitTimeout?: number },
   ) {
     await this.page.goto(path);

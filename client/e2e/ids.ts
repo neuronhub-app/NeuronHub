@@ -133,6 +133,17 @@ export namespace ids {
       container: "job.card.container",
       tags: "job.card.tags",
     },
+    alert: {
+      subscribeBtn: "job.alert.subscribe-btn",
+      emailInput: "job.alert.email-input",
+      submitBtn: "job.alert.submit-btn",
+    },
+    subscriptions: {
+      list: "job.subscriptions.list",
+      card: "job.subscriptions.card",
+      toggleBtn: "job.subscriptions.toggle-btn",
+      removeBtn: "job.subscriptions.remove-btn",
+    },
   } as const;
 
   export const profile = {
@@ -178,9 +189,14 @@ export namespace ids {
     return `[data-testid="${id}"]`;
   }
 
-  export function set<S extends TestId>(id: S): { "data-testid": S } {
+  export function set<S extends TestId>(id?: S): { "data-testid": S } | ObjectEmpty {
+    if (id === undefined) {
+      return {};
+    }
     return { "data-testid": id };
   }
+
+  type ObjectEmpty = Record<keyof never, never>;
 
   export function setInput<Id extends TestId>(id: Id): { inputProps: { "data-testid": Id } } {
     return { inputProps: { "data-testid": id } };

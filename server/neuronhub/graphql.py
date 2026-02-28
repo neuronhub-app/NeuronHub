@@ -28,6 +28,7 @@ from neuronhub.apps.highlighter.graphql import HighlighterQuery
 from neuronhub.apps.importer.graphql.mutations import ImporterMutation
 from neuronhub.apps.posts.graphql.mutations import PostsMutation
 from neuronhub.apps.profiles.graphql import ProfilesMutation
+from neuronhub.apps.jobs.graphql import JobsMutation
 from neuronhub.apps.jobs.graphql import JobsQuery
 from neuronhub.apps.profiles.graphql import ProfilesQuery
 from neuronhub.apps.posts.graphql.resolvers import PostsQuery
@@ -50,6 +51,7 @@ class Mutation(
     HighlighterMutation,
     ImporterMutation,
     ProfilesMutation,
+    JobsMutation,
 ):
     pass
 
