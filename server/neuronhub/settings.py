@@ -224,15 +224,15 @@ if DJANGO_ENV.is_dev():
 AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "any")
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "any")
 S3_STORAGE_BUCKET_NAME = env.str("S3_STORAGE_BUCKET_NAME", "media")
-AWS_S3_SIGNATURE_VERSION = env.str("AWS_S3_SIGNATURE_VERSION", "v4")
 AWS_STORAGE_BUCKET_NAME = S3_STORAGE_BUCKET_NAME
 S3_PORT = env.str("S3_PORT", 8333)
 AWS_S3_ENDPOINT_URL = env.str("AWS_S3_ENDPOINT_URL", f"http://localhost:{S3_PORT}")
+AWS_S3_CUSTOM_DOMAIN = env.str("AWS_S3_CUSTOM_DOMAIN", None)
 AWS_S3_USE_SSL = env.bool("AWS_S3_USE_SSL", default=False)
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = "public-read"
 AWS_QUERYSTRING_AUTH = False
-AWS_S3_ADDRESSING_STYLE = "path"
+AWS_S3_ADDRESSING_STYLE = env.str("AWS_S3_ADDRESSING_STYLE", "path")
 STORAGES = {
     "default": {"BACKEND": "storages.backends.s3boto3.S3Boto3Storage"},
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
