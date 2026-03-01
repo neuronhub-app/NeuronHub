@@ -44,7 +44,6 @@ urlpatterns = [
                 "health_check.Storage",
                 "health_check.contrib.psutil.Disk",
                 "health_check.contrib.psutil.Memory",
-                "health_check.contrib.celery.Ping",
             ]
         ),
     ),
