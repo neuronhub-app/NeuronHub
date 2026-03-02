@@ -62,6 +62,14 @@ function LayoutHead() {
       <meta name="viewport" content="width=device-width, initial-scale=1" />
       <meta name="color-scheme" content="light dark" />
 
+      {siteConfig.googleFontsHref && (
+        <>
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+          <link rel="stylesheet" href={siteConfig.googleFontsHref} />
+        </>
+      )}
+
       {/* favicons */}
       <link rel="icon" type="image/svg+xml" href={siteConfig.favicon.svg} />
       <link rel="icon" type="image/png" href={siteConfig.favicon.png96} sizes="96x96" />

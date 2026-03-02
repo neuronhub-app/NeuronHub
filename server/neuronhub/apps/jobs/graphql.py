@@ -46,6 +46,7 @@ class JobType:
     id: auto
     title: auto
     slug: auto
+    description: auto
 
     is_remote: auto
     is_remote_friendly: auto

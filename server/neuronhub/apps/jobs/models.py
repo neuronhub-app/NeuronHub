@@ -25,6 +25,8 @@ class Job(AlgoliaModel):
 
     title = models.CharField(max_length=512)
 
+    description = models.TextField(blank=True)
+
     slug = AutoSlugField(populate_from=["title", "org__name"])
 
     org = models.ForeignKey(

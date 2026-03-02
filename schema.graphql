@@ -122,6 +122,7 @@ type JobType {
   id: ID!
   title: String!
   slug: String!
+  description: String!
   is_remote: Boolean
   is_remote_friendly: Boolean
   salary_min: Int

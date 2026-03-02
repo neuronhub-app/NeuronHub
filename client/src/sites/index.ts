@@ -11,6 +11,7 @@ export type SiteConfig = {
     appleTouchIcon: string;
     webmanifest: string;
   };
+  googleFontsHref?: string;
 };
 
 const neuronConfig: SiteConfig = {
@@ -26,6 +27,8 @@ const neuronConfig: SiteConfig = {
 
 const pgConfig: SiteConfig = {
   theme: pgSystem,
+  googleFontsHref:
+    "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Serif:wght@400;600&display=swap",
   favicon: {
     svg: "/favicon/favicon.svg",
     png96: "/favicon/favicon-96x96.png",

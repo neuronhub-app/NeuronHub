@@ -37,9 +37,11 @@ async def create_jobs_stubs() -> None:
             org=Org(name="Novafield Labs", website="novafield.ai", is_highlighted=True),
             job=Job(
                 title="Research Scientist, Interpretability",
+                description="Support and empower AI safety researchers by helping drive impactful work forward and strengthening the overall MATS program.\nPartner with leading mentors to nurture mentees' research capabilities and shepherd AI safety projects through every stage of development.\nAdvise early-career researchers on promising research paths, written outputs, and long-term professional development.\nHelp scholars access key resources and introduce them to subject-matter experts who can advance their work.\nShape MATS strategic direction by leading internal initiatives and enhancing the program's operational foundations.",
                 url_external="https://novafield.ai/careers/interpretability",
                 salary_min=180_000,
-                posted_at=datetime(2026, 1, 15, tzinfo=UTC),
+                posted_at=datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+                - timedelta(days=1),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
@@ -69,7 +71,7 @@ async def create_jobs_stubs() -> None:
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime],
                 country=[val.country.US],
-                city=[val.city.Oakland],
+                city=[val.city.Oakland, val.city.SF],
             ),
         ),
         JobStub(
@@ -80,9 +82,10 @@ async def create_jobs_stubs() -> None:
             ),
             job=Job(
                 title="Policy Researcher, AI Governance",
+                description="The Meridian Governance Institute seeks a Policy Researcher to analyze emerging AI governance frameworks across jurisdictions, contribute to policy briefs and reports, and engage with governments and international organisations on AI regulation. Remote-friendly with occasional travel to our offices.",
                 url_external="https://meridiangovernance.org/vacancies/policy",
                 is_remote=True,
-                posted_at=datetime(2026, 1, 20, tzinfo=UTC),
+                posted_at=datetime(2026, 1, 9, tzinfo=UTC),
                 closes_at=datetime(2026, 5, 15, tzinfo=UTC) + timedelta(days=10),
                 visibility=Visibility.PUBLIC,
             ),
@@ -112,7 +115,7 @@ async def create_jobs_stubs() -> None:
                 url_external="https://bridgefund.io/hiring/country-director",
                 salary_min=90_000,
                 salary_max=130_000,
-                posted_at=datetime(2025, 12, 10, tzinfo=UTC),
+                posted_at=datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(

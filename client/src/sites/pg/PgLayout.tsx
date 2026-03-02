@@ -3,11 +3,11 @@ import { NavLink, Outlet } from "react-router";
 
 export default function PgLayout() {
   return (
-    <Flex flex="1" direction="column" h="full">
+    <Flex flex="1" direction="column" h="full" bg="bg">
       <PgHeader />
 
       <Stack as="main" flex="1" alignItems="stretch">
-        <Container mt={6} h="full" pb="gap.xl">
+        <Container mt={{ base: 3, md: 6 }} h="full" pb="gap.xl" px={{ base: "gap.sm", md: "6" }}>
           <Outlet />
         </Container>
       </Stack>

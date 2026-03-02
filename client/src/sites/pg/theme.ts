@@ -5,10 +5,19 @@ import {
   defineTokens,
   mergeConfigs,
 } from "@chakra-ui/react";
-import { theme } from "@/theme/colors";
+import { theme } from "@/sites/pg/colors";
 import { recipes, slotRecipes } from "@/theme/recipes";
 
 const tokens = defineTokens({
+  radii: {
+    sm: { value: "4px" },
+    md: { value: "5px" },
+    lg: { value: "10px" },
+  },
+  fonts: {
+    body: { value: "'DM Sans', sans-serif" },
+    heading: { value: "'IBM Plex Serif', serif" },
+  },
   assets: {
     logo: {
       value: {
@@ -22,13 +31,21 @@ const tokens = defineTokens({
   },
 });
 
+export const gap = {
+  xs: "{spacing.1.5}", // 6px
+  sm: "{spacing.2.5}", // 10px
+  md: "{spacing.4}", // 16px
+  lg: "{spacing.5}", // 20px
+  xl: "{spacing.6}", // 24px
+};
+
 export const system = createSystem(
   mergeConfigs(
     defaultConfig,
     defineConfig({
       globalCss: {
         html: {
-          colorPalette: "teal",
+          colorPalette: "green",
         },
       },
 
@@ -39,7 +56,7 @@ export const system = createSystem(
         semanticTokens: {
           colors: theme.colors,
           spacing: {
-            gap: {}, // inherits from base
+            gap: Object.fromEntries(Object.entries(gap).map(([key, value]) => [key, { value }])),
           },
         },
       },

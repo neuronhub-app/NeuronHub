@@ -38,6 +38,7 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
     ) => ReactNode;
     hitOpenedPinned?: { node?: ReactNode; id?: ID };
     listTestId?: string;
+    listGap?: string;
   };
   sort?: { items: Array<{ value: string; label: string }> };
   subheader?: ReactNode;
@@ -141,6 +142,7 @@ export function AlgoliaHits<TItem extends { id: ID }, TData = unknown>(props: {
   hitOpenedPinned?: { node?: ReactNode; id?: ID };
   label?: string;
   listTestId?: string;
+  listGap?: string;
 }) {
   const search = useSearchBox();
   const refinements = useCurrentRefinements();
@@ -161,7 +163,7 @@ export function AlgoliaHits<TItem extends { id: ID }, TData = unknown>(props: {
     <Stack gap="gap.xl" w="full">
       {props.hitOpenedPinned?.node && !isSearchActive && props.hitOpenedPinned.node}
 
-      <Stack data-testid={props.listTestId} gap="gap.md2">
+      <Stack data-testid={props.listTestId} gap={props.listGap ?? "gap.md2"}>
         {!hits.results ? (
           <Text color="fg.subtle">Loading...</Text>
         ) : hits.results.nbHits === 0 && !props.hitOpenedPinned?.node ? (

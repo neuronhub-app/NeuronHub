@@ -1,5 +1,5 @@
 import { TZDate, tzName } from "@date-fns/tz";
-import { format, formatDistanceToNowStrict, isFuture } from "date-fns";
+import { format, formatDistanceToNowStrict, isFuture, isToday, isYesterday } from "date-fns";
 
 // todo ? refac-name: datetime.ts
 export namespace datetime {
@@ -14,6 +14,20 @@ export namespace datetime {
     const tzNameShort = tz ? tzName(tz, date, "shortGeneric") : "";
 
     return `${format(date, "yyyy-MM-dd kk:mm")} ${tzNameShort}`;
+  }
+
+  export function relativeFull(dateRaw: DateRaw): string {
+    const date = parseRaw(dateRaw);
+    if (!date) {
+      return "";
+    }
+    if (isToday(date)) {
+      return "Today";
+    }
+    if (isYesterday(date)) {
+      return "Yesterday";
+    }
+    return `${formatDistanceToNowStrict(date, { roundingMethod: "floor" })} ago`;
   }
 
   export function relative(dateRaw: DateRaw): string {
@@ -35,6 +49,14 @@ export namespace datetime {
       return `in ${distance}`;
     }
     return `${distance} ago`;
+  }
+
+  export function date(dateRaw: DateRaw): string {
+    const date = parseRaw(dateRaw);
+    if (!date) {
+      return "";
+    }
+    return format(date, "MMM d, yyyy");
   }
 
   export function isFutureDate(dateRaw: DateRaw): boolean {

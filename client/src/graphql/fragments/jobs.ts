@@ -30,6 +30,7 @@ export const JobFragment = graphql(
       is_published
       posted_at
       closes_at
+      description
 
       tags_skill {
         ...PostTagLeanFragment

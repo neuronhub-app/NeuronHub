@@ -11,4 +11,12 @@ export namespace format {
     }
     return `$${thousands}k`;
   }
+
+  export function salary(min?: number | null, max?: number | null): string {
+    if (!min) {
+      return "Not specified";
+    }
+    const formatAmount = (amount: number) => `$${amount.toLocaleString("en-US")}`;
+    return max ? `${formatAmount(min)} – ${formatAmount(max)}` : `${formatAmount(min)}+`;
+  }
 }
