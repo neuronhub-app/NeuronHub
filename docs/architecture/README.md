@@ -3,7 +3,7 @@
 - Server: Django v5.2, Strawberry GraphQL, PostgreSQL, pytest, uv, mypy
 - Client: React Router v7, @chakra-ui, react-hook-form, Zod, Valtio, Apollo, gql-tada, Bun, Biome
 - Search: Algolia
-- DevOps: Mise, GitHub CI, Docker
+- DevOps: Mise, GitHub CI, Docker, Sentry
 
 ## Overview
 

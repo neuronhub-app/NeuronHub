@@ -67,3 +67,7 @@ Re-runs Step 1 with calibration from Step 2. `build_calibration_examples(max=8)`
 ### Visibility & Algolia
 
 Mirrors [[filter_posts_by_user.py]]. Algolia index uses `Profile.get_visible_to()` for token-restricted search (same as Posts: per-User).
+
+### Testing
+
+![](/docs/architecture/backend/pytest.md#llm-api-tests)

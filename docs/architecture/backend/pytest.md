@@ -50,3 +50,8 @@ comment = await self.gen.posts.comment(parent_root=post)
 review_1 = await self.gen.posts.review(tool=post, visibility=Visibility.INTERNAL)
 review_2 = await self.gen.posts.review(tool=post, author=user)
 ```
+
+### LLM API tests
+
+`@pytest.mark.slow_llm_api` is for integration tests that call the Claude Code binary - this always fails when invoked within the `claude` process, as it prohibits calling itself.
+They're skipped by default in `mise pytest` command.
