@@ -1,15 +1,15 @@
 from typing import Any
 
-from wat import wat
 from asgiref.sync import sync_to_async
 from django.db.models.query import QuerySet
+from wat import wat
 
 
-async def wat_log(*objects: QuerySet | Any, is_long: bool = False, title: str = None):
+async def wat_log(*objects: QuerySet | Any, is_long: bool = False, title: str | None = None):
     await sync_to_async(_log_sync)(*objects, is_long=is_long, title=title)
 
 
-def _log_sync(*objects: QuerySet | Any, is_long: bool = False, title: str = None):
+def _log_sync(*objects: QuerySet | Any, is_long: bool = False, title: str | None = None):
     print("\n")
     if title:
         print(title)

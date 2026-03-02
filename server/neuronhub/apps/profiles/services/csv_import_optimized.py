@@ -4,7 +4,6 @@ from pathlib import Path
 
 from asgiref.sync import async_to_sync
 from django.conf import settings
-from django.db.models import Count
 
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.profiles.models import Profile
@@ -104,8 +103,6 @@ def csv_optimize_and_import(
     if settings.ALGOLIA["IS_ENABLED"] and is_reindex_algolia:
         async_to_sync(_algolia_reindex)()
 
-    _report_duplicates_if_any()
-
     return stats
 
 
@@ -171,36 +168,3 @@ def _parse_profiles_csv(csv_path: Path) -> list[dict[str, str]]:
         result.append(record)
 
     return result
-
-
-def _report_duplicates_if_any():
-    duplicate_urls = (
-        Profile.objects.values("url_conference")
-        .annotate(count=Count("id"))
-        .filter(count__gt=1)
-        .values_list("url_conference", flat=True)
-    )
-    profile_dups = (
-        Profile.objects.filter(url_conference__in=duplicate_urls)
-        .values("first_name", "created_at", "url_conference")
-        .order_by("url_conference", "created_at")
-    )
-    for profile in profile_dups:
-        print(profile)
-
-    duplicate_urls = (
-        Profile.objects.values("first_name", "last_name", "id")
-        .annotate(count=Count("id"))
-        .filter(count__gt=1)
-        .values_list("id", flat=True)
-    )
-    profile_dups = (
-        Profile.objects.filter(
-            id__in=duplicate_urls,
-        )
-        .values("first_name", "created_at", "url_conference")
-        .order_by("first_name", "created_at")
-    )
-
-    for profile in profile_dups:
-        print(profile)
