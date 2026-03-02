@@ -9,6 +9,25 @@ import {
 import { theme } from "@/sites/pg/colors";
 import { recipes, slotRecipes } from "@/theme/recipes";
 
+const pgRecipes = {
+  ...recipes,
+  button: defineRecipe({
+    ...recipes.button,
+    variants: {
+      ...recipes.button.variants,
+      variant: {
+        ...recipes.button.variants?.variant,
+        "pg-primary": {
+          bg: "brand.green.light",
+          color: "white",
+          _hover: { bg: "brand.green" },
+        },
+      },
+    },
+  }),
+  container: defineRecipe({ base: { maxWidth: "1280px" } }),
+};
+
 const tokens = defineTokens({
   radii: {
     sm: { value: "4px" },
@@ -51,10 +70,7 @@ export const system = createSystem(
       },
 
       theme: {
-        recipes: {
-          ...recipes,
-          container: defineRecipe({ base: { maxWidth: "1280px" } }),
-        },
+        recipes: pgRecipes,
         slotRecipes,
         tokens,
         semanticTokens: {
