@@ -14,8 +14,8 @@ class TestsMutation:
         info: strawberry.Info,
         is_import_HN_post: bool | None = True,
         is_create_single_review: bool | None = False,
-        is_import_profiles_csv: bool | None = False,
-        is_import_jobs_csv: bool | None = False,
+        is_create_profiles: bool | None = False,
+        is_create_jobs: bool | None = False,
     ) -> str:
         assert settings.DEBUG
         assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
@@ -27,8 +27,8 @@ class TestsMutation:
             is_delete_users_extra=True,
             is_import_HN_post=is_import_HN_post,
             is_create_single_review=is_create_single_review,
-            is_import_profiles_csv=is_import_profiles_csv,
-            is_import_jobs_csv=is_import_jobs_csv,
+            is_create_profiles=is_create_profiles,
+            is_create_jobs=is_create_jobs,
         )
         return gen.users.user_default.username
 

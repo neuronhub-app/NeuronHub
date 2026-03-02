@@ -169,11 +169,7 @@ class Profile(AlgoliaModel):
         return visible_to
 
     def is_in_algolia_index(self) -> bool:
-        is_unlimited = True
-        is_limit_test_index = settings.DJANGO_ENV is DjangoEnv.DEV
-        if is_limit_test_index:
-            is_unlimited = self.id < (settings.CONF_CONFIG.algolia_limit or 5000)  # type: ignore[has-type]
-        return bool(self.user or is_unlimited)
+        return bool(self.user)
 
     def get_tag_skills_json(self):
         return self._get_graphql_field("skills") or []

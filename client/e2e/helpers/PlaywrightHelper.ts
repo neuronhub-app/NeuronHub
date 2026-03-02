@@ -34,8 +34,8 @@ export class PlaywrightHelper {
   async dbStubsRepopulateAndLogin(options?: {
     is_import_HN_post?: boolean;
     is_create_single_review?: boolean;
-    is_import_profiles_csv?: boolean;
-    is_import_jobs_csv?: boolean;
+    is_create_profiles?: boolean;
+    is_create_jobs?: boolean;
   }) {
     await this.dbStubsRepopulate(options);
     await this.login();
@@ -106,8 +106,8 @@ export class PlaywrightHelper {
   async dbStubsRepopulate(options?: {
     is_import_HN_post?: boolean;
     is_create_single_review?: boolean;
-    is_import_profiles_csv?: boolean;
-    is_import_jobs_csv?: boolean;
+    is_create_profiles?: boolean;
+    is_create_jobs?: boolean;
   }) {
     return client.mutate({ mutation: DbStubsRepopulateMutate, variables: options });
   }
@@ -188,8 +188,8 @@ export class PlaywrightHelper {
 const DbStubsRepopulateMutate = graphql.persisted(
   "db_stubs_repopulate",
   graphql(`
-    mutation db_stubs_repopulate($is_import_HN_post: Boolean, $is_create_single_review: Boolean, $is_import_profiles_csv: Boolean, $is_import_jobs_csv: Boolean) {
-      test_db_stubs_repopulate(is_import_HN_post: $is_import_HN_post, is_create_single_review: $is_create_single_review, is_import_profiles_csv: $is_import_profiles_csv, is_import_jobs_csv: $is_import_jobs_csv)
+    mutation db_stubs_repopulate($is_import_HN_post: Boolean, $is_create_single_review: Boolean, $is_create_profiles: Boolean, $is_create_jobs: Boolean) {
+      test_db_stubs_repopulate(is_import_HN_post: $is_import_HN_post, is_create_single_review: $is_create_single_review, is_create_profiles: $is_create_profiles, is_create_jobs: $is_create_jobs)
     }
   `),
 );

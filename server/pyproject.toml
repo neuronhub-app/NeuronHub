@@ -140,7 +140,6 @@ dependencies = [
         "slow_ext_api: HTTP queries",
         "slow_llm_api: costs money",
         "firebase_subscription: requires 30+ sec to receive Firebase subscription data",
-        "profiles_csv_import: needs the CSV file",
     ]
     addopts = [
         "--no-migrations",

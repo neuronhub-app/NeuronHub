@@ -10,6 +10,7 @@ The basic BE and FE works. Still a week worth of work, but we'll handle it one t
 - index.py
 - graphql.py
 - services/csv_import.py
+- tests/db_stubs.py.py
 FE
 - apps/jobs/list/JobList.tsx
 - apps/jobs/list/JobsSubscribeModal.tsx
@@ -29,5 +30,6 @@ FE
     - [x] GraphQL and UI to toggle `.is_active` true/false
     - [x] show facet attribute custom labels on `JobAlert` modal
 - [x] add a `.salary_min` facet
-	- [x] save `.salary_min` to `JobAlert`
+    - [x] save `.salary_min` to `JobAlert`
 - [x] S3 Cloudflare R2
+- [x] add `db_stubs.py` for `jobs` and `profiles`; drop CSV usage in db_stubs_repopulate

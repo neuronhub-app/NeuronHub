@@ -51,6 +51,6 @@
   "ProfileLlmMdReset": "mutation ProfileLlmMdReset {\n  profile_llm_md_reset\n}",
   "MyProfile": "query MyProfile {\n  my_profile {\n    id\n    first_name\n    last_name\n    company\n    job_title\n    country\n    city\n    url_linkedin\n    biography\n  }\n}",
   "PostImportRefresh": "mutation PostImportRefresh($idExternal: Int!) {\n  post_import_refresh(id_external: $idExternal)\n}",
-  "db_stubs_repopulate": "mutation db_stubs_repopulate($is_import_HN_post: Boolean, $is_create_single_review: Boolean, $is_import_profiles_csv: Boolean, $is_import_jobs_csv: Boolean) {\n  test_db_stubs_repopulate(\n    is_import_HN_post: $is_import_HN_post\n    is_create_single_review: $is_create_single_review\n    is_import_profiles_csv: $is_import_profiles_csv\n    is_import_jobs_csv: $is_import_jobs_csv\n  )\n}",
+  "db_stubs_repopulate": "mutation db_stubs_repopulate($is_import_HN_post: Boolean, $is_create_single_review: Boolean, $is_create_profiles: Boolean, $is_create_jobs: Boolean) {\n  test_db_stubs_repopulate(\n    is_import_HN_post: $is_import_HN_post\n    is_create_single_review: $is_create_single_review\n    is_create_profiles: $is_create_profiles\n    is_create_jobs: $is_create_jobs\n  )\n}",
   "test_create_failed_task": "mutation test_create_failed_task {\n  test_create_failed_task\n}"
 }

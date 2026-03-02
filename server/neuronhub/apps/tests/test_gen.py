@@ -11,6 +11,7 @@ from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models import PostCategory
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models.types import PostTypeEnum
+from neuronhub.apps.profiles.models import CareerStage
 from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileGroup
 from neuronhub.apps.profiles.models import ProfileInvite
@@ -328,6 +329,7 @@ class ProfilesGen:
         user: User | None = None,
         first_name: str = "",
         last_name: str = "",
+        career_stage: list[CareerStage] | None = None,
         visibility: Visibility = Visibility.PUBLIC,
         visible_to_users: list[User] | None = None,
         groups: list[ProfileGroup] | None = None,
@@ -345,6 +347,7 @@ class ProfilesGen:
             last_name=last_name or self.faker.last_name(),
             company=company or self.faker.company(),
             job_title=job_title or self.faker.job(),
+            career_stage=career_stage or [],
             biography=biography or self.faker.text(max_nb_chars=200),
             seeks=seeks or self.faker.sentence(),
             offers=offers,

@@ -24,7 +24,7 @@ test.describe("ProfileList", () => {
       await play.dbStubsRepopulateAndLogin({
         is_import_HN_post: false,
         is_create_single_review: false,
-        is_import_profiles_csv: true,
+        is_create_profiles: true,
       });
       isPopulated = true;
     } else {

@@ -15,6 +15,7 @@ from neuronhub.apps.importer.models import PostSource
 from neuronhub.apps.importer.models import UserSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.tests.db_stubs import create_jobs_stubs
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models import PostCategory
@@ -31,6 +32,7 @@ from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileGroup
 from neuronhub.apps.profiles.models import ProfileInvite
 from neuronhub.apps.profiles.models import ProfileMatch
+from neuronhub.apps.profiles.tests.db_stubs import create_profiles_stubs
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.tests.test_gen import UsersGen
 from neuronhub.apps.users.models import User
@@ -50,10 +52,10 @@ async def db_stubs_repopulate(
     is_delete_user_default: bool = False,
     is_delete_profiles: bool = True,
     is_delete_jobs: bool = True,
-    is_create_single_review: bool | None = False,
-    is_import_HN_post: bool | None = True,
-    is_import_profiles_csv: bool | None = True,
-    is_import_jobs_csv: bool | None = True,
+    is_create_single_review: bool = False,
+    is_import_HN_post: bool = True,
+    is_create_profiles: bool = True,
+    is_create_jobs: bool = True,
 ) -> Gen:
     """
     Populates the db with Posts, Tools, Reviews, tags, votes, etc.
@@ -126,66 +128,23 @@ async def db_stubs_repopulate(
             importer = ImporterHackerNews(is_use_cache=True, is_logging_enabled=False)
             await importer.import_post(post_with_90_comments_and_idents)
 
-        if is_import_profiles_csv:
-            await _import_profiles_csv(gen)
+        if is_create_profiles:
+            await create_profiles_stubs(gen)
 
-        if is_import_jobs_csv:
-            await _import_jobs_csv()
+        if is_create_jobs:
+            await create_jobs_stubs()
 
     if settings.ALGOLIA["IS_ENABLED"]:
         await _algolia_reindex(
-            is_import_profiles_csv=is_import_profiles_csv,
-            is_reindex_jobs=is_import_jobs_csv or False,
+            is_reindex_profiles=is_create_profiles,
+            is_reindex_jobs=is_create_jobs,
         )
 
     return gen
 
 
-# #AI
-async def _import_profiles_csv(gen: Gen):
-    from neuronhub.apps.profiles.services.csv_import_optimized import csv_optimize_and_import
-
-    csv_path = settings.CONF_CONFIG.eag_csv_path  # type: ignore[has-type]
-    if csv_path and csv_path.exists():
-        await sync_to_async(csv_optimize_and_import)(csv_path, limit=5, is_reindex_algolia=False)
-
-    # Admin user needs a Profile in the group to see profiles via Algolia security filters
-    group, _ = await ProfileGroup.objects.aget_or_create(name=settings.CONF_CONFIG.eag_group)  # type: ignore[has-type]
-    await gen.profiles.profile(user=gen.users.user_default, groups=[group])
-
-    # Profiles with varied match scores: ensures LLM / User / Newest sorts produce different orderings
-    user = gen.users.user_default
-    now = timezone.now()
-    for i, (llm_score, user_score) in enumerate([(90, 20), (50, 80), (20, 50)]):
-        profile = await gen.profiles.profile(groups=[group])
-        await Profile.objects.filter(pk=profile.pk).aupdate(
-            created_at=now - datetime.timedelta(hours=3 - i),
-        )
-        await gen.profiles.match(
-            profile=profile,
-            user=user,
-            score_by_llm=llm_score,
-            score_by_user=user_score,
-        )
-
-
-async def _import_jobs_csv():
-    from neuronhub.apps.jobs.services.csv_import import csv_import_jobs
-    from neuronhub.apps.jobs.services.csv_import_orgs import csv_import_orgs
-
-    csv_path = settings.JOBS_CSV_PATH
-    if csv_path and csv_path.exists():
-        await csv_import_jobs(csv_path, limit=6, is_reindex_algolia=False)
-
-    orgs_csv_path = settings.ORGS_CSV_PATH
-    if orgs_csv_path and orgs_csv_path.exists():
-        await csv_import_orgs(orgs_csv_path, limit=6)
-
-
 # todo ! refac: move out
-async def _algolia_reindex(
-    is_import_profiles_csv: bool | None = True, is_reindex_jobs: bool = True
-):
+async def _algolia_reindex(is_reindex_profiles: bool = True, is_reindex_jobs: bool = True):
     from algoliasearch_django import reindex_all
 
     from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
@@ -193,16 +152,17 @@ async def _algolia_reindex(
     await sync_to_async(reindex_all)(Post)
     await sync_to_async(setup_virtual_replica_sorted_by_votes)()
 
-    if is_import_profiles_csv:
+    if is_reindex_profiles:
         await sync_to_async(reindex_all)(Profile)
 
     if is_reindex_jobs:
         await sync_to_async(reindex_all)(Job)
 
 
+# todo ! refac-name: disable_algolia_indexing_if_enabled
 class _disable_auto_indexing(ContextDecorator):
     """
-    Lazy import, as algoliasearch_django crashes if settings.ALGOLIA_API_KEY is missing.
+    Uses lazy imports, as algoliasearch_django crashes Django if settings.ALGOLIA_API_KEY is missing.
     """
 
     decorator: ContextDecorator

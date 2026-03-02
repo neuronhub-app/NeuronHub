@@ -19,7 +19,7 @@ test.describe("JobList", () => {
       await play.dbStubsRepopulateAndLogin({
         is_import_HN_post: false,
         is_create_single_review: false,
-        is_import_jobs_csv: true,
+        is_create_jobs: true,
       });
       isPopulated = true;
     } else {
