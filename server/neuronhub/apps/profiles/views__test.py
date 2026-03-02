@@ -28,7 +28,8 @@ class AcceptInviteTest(NeuronTestCase):
 
     async def test_reject_invalid_token(self):
         user = await self.gen.users.user()
-        response = await _login_and_accept(user, token=uuid.uuid4())
+        with self.assertLogs("django.request", level="WARNING"):
+            response = await _login_and_accept(user, token=uuid.uuid4())
         assert response.status_code == HTTPStatus.UNAUTHORIZED
 
     async def test_reject_already_accepted(self):
@@ -39,7 +40,8 @@ class AcceptInviteTest(NeuronTestCase):
         await _login_and_accept(user, token=invite.token)
 
         other_user = await self.gen.users.user()
-        response = await _login_and_accept(other_user, token=invite.token)
+        with self.assertLogs("django.request", level="WARNING"):
+            response = await _login_and_accept(other_user, token=invite.token)
         assert response.status_code == HTTPStatus.UNAUTHORIZED
 
 

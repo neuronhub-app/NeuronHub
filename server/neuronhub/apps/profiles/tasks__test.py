@@ -31,6 +31,7 @@ class TasksTest(NeuronTestCase):
                 limit=10,
                 batch_size=10,
                 model="haiku",
+                is_logs_enabled=False,
             )
 
         match = await ProfileMatch.objects.aget(user=user, profile=profile)
