@@ -25,10 +25,10 @@ class TestsMutation:
             is_delete_posts_extra=True,
             is_delete_user_default=True,
             is_delete_users_extra=True,
-            is_import_HN_post=is_import_HN_post,
-            is_create_single_review=is_create_single_review,
-            is_create_profiles=is_create_profiles,
-            is_create_jobs=is_create_jobs,
+            is_import_HN_post=is_import_HN_post or False,
+            is_create_single_review=is_create_single_review or False,
+            is_create_profiles=is_create_profiles or False,
+            is_create_jobs=is_create_jobs or False,
         )
         return gen.users.user_default.username
 

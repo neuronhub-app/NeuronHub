@@ -320,7 +320,7 @@ MODEL_LIMITS: dict[str, dict[str, int]] = {
 
 # #AI
 async def _check_failed_task(user) -> ProgressType:
-    latest_task = (
+    task_latest = (
         await DBTaskResult.objects.filter(
             task_path=SCORE_PROFILES_TASK,
             args_kwargs__kwargs__user_id=user.id,
@@ -328,19 +328,19 @@ async def _check_failed_task(user) -> ProgressType:
         .order_by("-enqueued_at")
         .afirst()
     )
-    if not latest_task or latest_task.status != TaskResultStatus.FAILED:
+    if not task_latest or task_latest.status != TaskResultStatus.FAILED:
         return ProgressType(total=0, processed=0, is_processing=False)
 
-    error_msg = latest_task.traceback or (
-        f"Task failed: {latest_task.exception_class_path}"
-        if latest_task.exception_class_path
+    error_msg = task_latest.traceback or (
+        f"Task failed: {task_latest.exception_class_path}"
+        if task_latest.exception_class_path
         else None
     )
     if not error_msg:
         # Cancelled by user — not a real failure
         return ProgressType(total=0, processed=0, is_processing=False)
 
-    kwargs = latest_task.args_kwargs.get("kwargs", {}) if latest_task.args_kwargs else {}
+    kwargs = task_latest.args_kwargs.get("kwargs", {}) if task_latest.args_kwargs else {}
     return ProgressType(
         is_processing=False,
         error=error_msg,
@@ -348,7 +348,7 @@ async def _check_failed_task(user) -> ProgressType:
         model=kwargs.get("model"),
         processed=(
             await ProfileMatch.objects.filter(
-                user=user, match_processed_at__gte=latest_task.enqueued_at
+                user=user, match_processed_at__gte=task_latest.enqueued_at
             ).acount()
         ),
     )
