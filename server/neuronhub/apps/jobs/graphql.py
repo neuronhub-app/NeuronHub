@@ -34,9 +34,11 @@ class JobFilter:
 
 @strawberry_django.type(Job, filters=JobFilter)
 class JobType:
+    org: OrgType
+
     id: auto
     title: auto
-    org: OrgType
+    slug: auto
 
     is_remote: auto
     is_remote_friendly: auto
@@ -45,8 +47,8 @@ class JobType:
     salary_min: auto
     salary_max: auto
 
-    country: list[str]
-    city: list[str]
+    country: auto
+    city: auto
 
     url_external: auto
 

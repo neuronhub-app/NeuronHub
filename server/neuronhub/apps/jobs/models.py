@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
@@ -23,6 +24,8 @@ class Job(AlgoliaModel):
     )
 
     title = models.CharField(max_length=512)
+
+    slug = AutoSlugField(populate_from=["title", "org__name"])
 
     org = models.ForeignKey(
         Org,

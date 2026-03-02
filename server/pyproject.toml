@@ -16,7 +16,7 @@ dependencies = [
     "django-anymail == 13.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, weird KLOC: +84/-40
     "django-cors-headers == 4.*", # [i=high, rep=highest, @adamchainz] Django Security Team
     "django-rich == 2.*", # [i=norm, rep=highest, @adamchainz] Django Security Team
-    "django-extensions == 4.*",
+    "django-extensions == 4.*", #[i=norm, rep=high, GH=high, @trbs, 6.8k] author is actively maintaining it since 2007
         "ipython == 9.*",
     "strawberry-graphql ~= 0.296.1",
         "strawberry-graphql-django ~= 0.75.2",

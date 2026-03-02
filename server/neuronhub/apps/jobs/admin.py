@@ -56,6 +56,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
             {
                 "fields": [
                     "title",
+                    "slug",
                     "org",
                     ("country", "city"),
                     "is_remote",
@@ -82,7 +83,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         ),
     ]
 
-    readonly_fields = ["created_at", "updated_at"]
+    readonly_fields = ["slug", "created_at", "updated_at"]
 
 
 @admin.register(JobAlert)

@@ -105,9 +105,10 @@ input JobFilter {
 }
 
 type JobType {
+  org: OrgType!
   id: ID!
   title: String!
-  org: OrgType!
+  slug: String!
   is_remote: Boolean
   is_remote_friendly: Boolean
   is_visa_sponsor: Boolean
