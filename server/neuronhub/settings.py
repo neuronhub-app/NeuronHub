@@ -70,7 +70,6 @@ INSTALLED_APPS = [
     "codemirror2",
     "strawberry_django",
     "health_check",
-    "health_check.storage",
     "adminutils",
     "dalf",
     "neuronhub.apps.db",

@@ -29,10 +29,10 @@
     # Global
 
     PROJECT_NAME = "{{ env.PROJECT_NAME | default(value = 'neuronhub') }}"
-    VITE_PROJECT_NAME = "NeuronHub"
+    VITE_PROJECT_NAME = "NeuronHub" # for FE HTML
     VITE_RELEASE_VERSION = "0.3.2.0-rc.2" # used in GitHub and Sentry
 
-    DEPENDENCY_COOLDOWN_DAYS = 0
+    DEPENDENCY_COOLDOWN_DAYS = 4
 
     SERVER_DOMAIN = "{{ env.SERVER_DOMAIN | default(value = 'localhost') }}"
     SERVER_PORT = "{{ env.SERVER_PORT | default(value = 8000) }}"
@@ -50,9 +50,7 @@
 
     ADMIN_EMAIL = "support@{{ env.CLIENT_DOMAIN }}"
 
-    GITHUB_ORG = "neuronhub-app"
-    GITHUB_REPO = "neuronhub"
-    GITHUB_PATH = "{{ env.GITHUB_ORG }}/{{ env.GITHUB_REPO }}"
+    GITHUB_PATH = "neuronhub-app/neuronhub"
 
     # Sentry
 
