@@ -7,19 +7,19 @@ import { format } from "@/utils/format";
 export function AlgoliaFacetSalary(props: { attribute: string; label: string }) {
   const algoliaRange = useRange({ attribute: props.attribute });
 
-  if (!algoliaRange.canRefine) {
+  if (!algoliaRange.range.min || !algoliaRange.range.max) {
     return null;
   }
 
   const valueStart = algoliaRange.start[0];
   const slider = {
     step: 1000,
-    min: algoliaRange.range.min!,
-    max: algoliaRange.range.max!,
+    min: algoliaRange.range.min,
+    max: algoliaRange.range.max,
     isActive: false,
   };
 
-  const isActive = valueStart != null && Number.isFinite(valueStart) && valueStart > slider.min!; // #AI
+  const isActive = valueStart != null && Number.isFinite(valueStart) && valueStart > slider.min; // #AI
   const valueCurrent = isActive ? valueStart : slider.min;
   slider.isActive = isActive; // badly code due to TS #bad-infer
 

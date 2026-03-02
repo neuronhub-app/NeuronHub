@@ -23,8 +23,6 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
 	lockfile = true
 
-	task.timings = false
-
 [task_config]
     includes = [
         "devops/dependencies.mise.toml",

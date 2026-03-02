@@ -23,7 +23,8 @@ export function AlgoliaSearchInput(props: { testId?: string }) {
           />
         ) : null
       }
-      w="lg"
+      w="full"
+      maxW="lg"
     >
       <Input
         ref={inputRef}

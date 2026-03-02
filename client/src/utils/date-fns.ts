@@ -35,6 +35,12 @@ export namespace datetime {
     if (!date) {
       return "";
     }
+    if (isToday(date)) {
+      return "Today";
+    }
+    if (isYesterday(date)) {
+      return "Yesterday";
+    }
     const distanceVerbose = formatDistanceToNowStrict(date);
     const distance = distanceVerbose
       .replace(" seconds", "s")
