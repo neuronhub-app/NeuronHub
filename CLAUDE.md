@@ -15,5 +15,5 @@
 </mise_tasks>
 
 <doc_roadmap>
-@docs/roadmap/roadmap-v0.2.md
+@docs/roadmap/roadmap-v0.3.md
 </doc_roadmap>

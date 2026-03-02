@@ -1,0 +1,34 @@
+### v0.4.0
+
+- Enable the optimized HN `apps.importer`.
+- Mark a Comment as "read"
+- Sharing: content, Highlights, library, upvotes, etc
+- User.aliases
+- User.avatar
+- Security review
+    - extra tests for `filter_posts_by_user`; dedup it from `profiles` and `jobs`
+    - drop .history fields? it's been good for debugging - bad for privacy
+
+### v0.4.1
+
+- OAuth Apple/Google
+- Notifications for Posts and Comments
+- Recurring exports
+
+### TBD
+
+- [refactor-pending](/docs/refactor-pending.md)
+- Post.tags voting on list pages
+- field `Review.review_experience`
+- Notifications for `PostHighlight` from User Connections
+- LLM moderation: Post .category, .tool, .tags, ...
+- field `Vote.is_changed_my_mind`
+- field `Tag.is_show_parent_name` and/or `.category` integration
+- for privacy expire Posts
+- `Post.alternatives` votes & comments
+
+### Potential
+
+- `Post.Type.Quote`
+    - show "Quotes" under "Posts" in left menu, default is "All"
+    - eg HN comments
