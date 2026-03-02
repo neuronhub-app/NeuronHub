@@ -7,4 +7,4 @@ The annotations (`//`) specs are in [[pyproject.toml]]
 
 ### Frozen versions
 
-`graphql` is frozen on ~16.9, because `gql.tada` devs inappropriately copy-pasted chunks of `graphql` types into its codebase (eg Document.Kind), and upgrading `graphql` to latest (eg 16.12) breaks all `graphql.persisted()` typing.
+`graphql` is frozen on ~16.9, because `gql.tada` devs inappropriately copy-pasted chunks of `graphql` types into its codebase (eg Document.Kind), and upgrading `graphql` to latest (eg 16.12 or 16.13) breaks all `graphql.persisted()` typing.
