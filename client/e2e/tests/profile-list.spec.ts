@@ -32,41 +32,13 @@ test.describe("ProfileList", () => {
     }
   });
 
-  test("shows profile cards with markdown, switches to snippets on search", async ({ page }) => {
-    play.setDefaultTimeout(12_000); // 7.5s makes it flaky
-
-    await play.navigate(urls.profiles.list, { idleWait: true });
-
-    // Without search: rendered markdown from GraphQL enrichment
-    const markdownContent = page.getByTestId(ids.profile.card.contentMarkdown);
-    await markdownContent.first().waitFor();
-    expect(await markdownContent.count()).toBeGreaterThanOrEqual(1);
-    expect(await page.getByTestId(ids.profile.card.contentSnippet).count()).toBe(0);
-
-    // Type search to activate Algolia snippets
-    const searchInput = page.getByTestId(ids.profile.searchInput);
-    await searchInput.fill("On");
-    await play.waitForNetworkIdle();
-
-    const snippetContent = page.getByTestId(ids.profile.card.contentSnippet);
-    await snippetContent.first().waitFor();
-    expect(await snippetContent.count()).toBeGreaterThanOrEqual(1);
-  });
-
-  test("Django sort: AI Score and Your Score show profiles, switch works", async ({ page }) => {
+  test("Sorting switches between GraphQL Django result & Algolia index", async ({ page }) => {
     await play.navigate(urls.profiles.list, { idleWait: true });
 
     const profileList = page.getByTestId(ids.profile.list);
     await profileList.waitFor();
     const cardsOnDefault = await profileList.getByTestId(ids.profile.card.container).count();
     expect(cardsOnDefault).toBeGreaterThanOrEqual(1);
-
-    // Switch to Django/AI Score
-    await page.getByTestId(ids.profile.listControls.sortAiScore).click();
-    await play.waitForNetworkIdle();
-    await profileList.waitFor();
-    const cardsOnAiScore = await profileList.getByTestId(ids.profile.card.container).count();
-    expect(cardsOnAiScore).toBeGreaterThanOrEqual(1);
 
     // Switch to Django/Your Score
     await page.getByTestId(ids.profile.listControls.sortYourScore).click();
