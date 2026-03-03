@@ -8,18 +8,21 @@ import type { StackProps } from "@chakra-ui/react"; // FYI: JsxStyleProps doesn'
  * Learnt from https://tailwindcss.com/docs/colors color palette squares.
  */
 export function getOutlineBleedingProps(
-  variant: "default" | "subtle" | "muted" = "default",
+  variant: "default" | "emphasized" | "subtle" | "muted" = "default",
 ): StackProps {
   let transparency = {
     light: 10,
     dark: 14,
   };
   switch (variant) {
-    case "subtle":
-      transparency = { light: 4, dark: 3 };
+    case "emphasized":
+      transparency = { light: 14, dark: 18 };
       break;
     case "muted":
       transparency = { light: 6, dark: 6 };
+      break;
+    case "subtle":
+      transparency = { light: 4, dark: 3 };
       break;
   }
   return {

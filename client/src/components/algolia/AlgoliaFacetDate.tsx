@@ -3,6 +3,7 @@ import { addDays, addMonths, getUnixTime, subDays, subMonths } from "date-fns";
 import { useMemo } from "react";
 import { useNumericMenu } from "react-instantsearch";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 /**
  * Algolia BE is unaware of `Date` type - this is a `number` filter.
@@ -50,9 +51,14 @@ export function AlgoliaFacetDate(props: {
                 value={item.value}
                 color={facetStyle.value.color}
                 fontSize={facetStyle.value.fontSize}
+                _hover={{ cursor: "pointer" }}
+                className="group"
               >
                 <RadioGroup.ItemHiddenInput />
-                <RadioGroup.ItemIndicator />
+                <RadioGroup.ItemIndicator
+                  _groupHover={{ ...getOutlineBleedingProps("emphasized") }}
+                  _hover={{ cursor: "pointer" }}
+                />
                 <RadioGroup.ItemText>
                   {renderLabel(item, { isFuture: props.isFuture })}
                 </RadioGroup.ItemText>
