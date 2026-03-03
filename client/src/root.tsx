@@ -3,20 +3,19 @@ import { ChakraProvider } from "@chakra-ui/react";
 import * as Sentry from "@sentry/react-router";
 import type { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
-import { Scripts, ScrollRestoration } from "react-router";
+import { Outlet, Scripts, ScrollRestoration } from "react-router";
 
-import { LayoutContainer } from "@/components/LayoutContainer";
 import { ColorModeProvider } from "@/components/ui/color-mode";
 import { useMetaTitle } from "@/components/useMetaTitle";
 import { env } from "@/env";
 import { client } from "@/graphql/client";
-import { system } from "@/theme/theme";
-import type { Route } from "~/react-router/home/+types";
+import { siteConfig } from "@/sites/index";
+import type { Route } from "./+types/root";
 
 export default function App() {
   return (
     <AppProviders>
-      <LayoutContainer />
+      <Outlet />
     </AppProviders>
   );
 }
@@ -24,7 +23,7 @@ export default function App() {
 function AppProviders(props: { children: ReactNode }) {
   return (
     <ApolloProvider client={client}>
-      <ChakraProvider value={system}>
+      <ChakraProvider value={siteConfig.theme}>
         <ColorModeProvider enableSystem={true}>
           {props.children}
 
@@ -64,11 +63,11 @@ function LayoutHead() {
       <meta name="color-scheme" content="light dark" />
 
       {/* favicons */}
-      <link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg" />
-      <link rel="icon" type="image/png" href="/favicon/favicon-96x96.png" sizes="96x96" />
-      <link rel="shortcut icon" href="/favicon/favicon.ico" />
-      <link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png" sizes="180x180" />
-      <link rel="manifest" href="/favicon/site.webmanifest" />
+      <link rel="icon" type="image/svg+xml" href={siteConfig.favicon.svg} />
+      <link rel="icon" type="image/png" href={siteConfig.favicon.png96} sizes="96x96" />
+      <link rel="shortcut icon" href={siteConfig.favicon.ico} />
+      <link rel="apple-touch-icon" href={siteConfig.favicon.appleTouchIcon} sizes="180x180" />
+      <link rel="manifest" href={siteConfig.favicon.webmanifest} />
     </>
   );
 }
@@ -93,7 +92,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
   return (
     <AppProviders>
-      <LayoutContainer>
+      <main style={{ padding: "2rem" }}>
         {message && <h1>{message}</h1>}
         <p>{details}</p>
         {stack && (
@@ -101,7 +100,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
             <code>{stack}</code>
           </pre>
         )}
-      </LayoutContainer>
+      </main>
     </AppProviders>
   );
 }

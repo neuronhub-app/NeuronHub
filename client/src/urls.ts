@@ -1,5 +1,6 @@
 // todo refac-name: use singular namespaces, ie `review` not `reviews`
 import type { PostListItemType } from "@/components/posts/ListContainer";
+import { env } from "@/env";
 import type { ID } from "@/gql-tada";
 
 type PostUrls = typeof urls.posts | typeof urls.reviews | typeof urls.tools;
@@ -55,8 +56,8 @@ export const urls = {
     },
   },
   jobs: {
-    list: "/jobs",
-    subscriptions: "/jobs/subscriptions",
+    list: env.VITE_SITE === "pg" ? "/" : "/jobs",
+    subscriptions: env.VITE_SITE === "pg" ? "/subscriptions" : "/jobs/subscriptions",
   },
   tools: {
     list: "/tools",

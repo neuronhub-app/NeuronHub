@@ -43,6 +43,7 @@ You're working on a pre-MVP pre-PMF codebase:
 - Use `??` for null/undefined, never use `||` (preserves falsy).
 - No inline conditionals: `if (x) action();` write as `if (x) {\n action()\n }`.
 - Functions are declared as `function`, not `const`.
+- Never use `export default`.
 
 ## Tags
 

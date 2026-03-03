@@ -247,7 +247,7 @@
             "bun run gql-tada generate persisted --output ../server/persisted-queries.json",
         ]
         sources = ["src/**/*", "e2e/**/*"]
-        silent = true
+        silent = true # quiet doesn't work
 
     [tasks."typegen:client:react-router"]
         dir = "client"
@@ -255,11 +255,17 @@
         sources = ["src/apps/**/index.tsx", "src/routes.ts"]
         quiet = true
 
-    [tasks."typegen:client:chakra"]
+    [tasks."typegen:client:chakra:neuron"]
         dir = "client"
-        run = "bunx @chakra-ui/cli typegen src/theme/theme.ts"
+        run = "npx @chakra-ui/cli typegen src/theme/theme.ts"
         sources = ["src/theme/**/*.ts"]
-        silent = true
+        silent = true # quiet doesn't work
+
+    [tasks."typegen:client:chakra:pg"]
+        dir = "client"
+        run = "npx @chakra-ui/cli typegen src/sites/pg/theme.ts"
+        sources = ["src/sites/theme/**/*.ts", "src/sites/pg/theme.ts"]
+        silent = true # quiet doesn't work
 
 
 [tasks."format"]

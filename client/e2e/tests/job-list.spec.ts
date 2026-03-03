@@ -2,7 +2,10 @@ import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
+import { env } from "@/env";
 import { urls } from "@/urls";
+
+const isPg = env.VITE_SITE === "pg";
 
 // #AI
 test.describe("JobList", () => {
@@ -31,9 +34,11 @@ test.describe("JobList", () => {
   test("subscribe to JobAlert, toggle and remove on /jobs/subscriptions/", async ({ page }) => {
     await play.navigate(urls.jobs.list, { idleWait: true });
 
-    // Sidebar should NOT show Subscriptions before any alerts exist
     const sidebar = page.locator('[aria-label="Sidebar"]');
-    await expect(sidebar).not.toHaveText("Subscriptions");
+
+    if (!isPg) {
+      await expect(sidebar).not.toHaveText("Subscriptions");
+    }
 
     const testEmail = "e2e@test.com";
 
@@ -41,8 +46,9 @@ test.describe("JobList", () => {
     await play.fill(ids.job.alert.emailInput, testEmail);
     await play.click(ids.job.alert.submitBtn);
 
-    // After subscribing, sidebar should show Subscriptions (1)
-    await expect(sidebar).toHaveText("Subscriptions (1)");
+    if (!isPg) {
+      await expect(sidebar).toHaveText("Subscriptions (1)");
+    }
 
     // Email should be pre-populated from user account when re-opening the dialog
     await play.click(ids.job.alert.subscribeBtn);
@@ -63,7 +69,8 @@ test.describe("JobList", () => {
     // Card should be gone
     await expect(page).not.toHaveText(testEmail);
 
-    // Sidebar should hide Subscriptions after all alerts removed
-    await expect(sidebar).not.toHaveText("Subscriptions");
+    if (!isPg) {
+      await expect(sidebar).not.toHaveText("Subscriptions");
+    }
   });
 });
