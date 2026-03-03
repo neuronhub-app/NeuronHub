@@ -1,13 +1,13 @@
 ## Tech Stack
 
 - Server: Django v5.2, Strawberry GraphQL, PostgreSQL, pytest, uv, mypy
-- Client: React Router v7, @chakra-ui, react-hook-form, Zod, Valtio, Apollo, gql-tada, Bun, Biome
+- Client: React Router v7, @chakra-ui v3, react-hook-form, Zod, Valtio, Apollo, gql-tada, Bun, Biome
 - Search: Algolia
 - DevOps: Mise, GitHub CI, Docker, Sentry
 
 ## Overview
 
-NeuronHub is privacy-first directory platform for: news, tools, products, profiles, jobs, etc. Users limit the visibility of their `models.Post` (Posts, Reviews, Comments) by selected User groups (akin Google Circles).
+NeuronHub (NHA, Neuron) is privacy-first directory platform for: news, tools, products, profiles, jobs, etc. Users limit the visibility of their `models.Post` (Posts, Reviews, Comments) by selected User groups (akin Google Circles).
 
 ## Core Django Models
 

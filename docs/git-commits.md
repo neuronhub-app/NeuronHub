@@ -73,6 +73,7 @@ If you're unsure which `Type` to use - use the highest, as they're sorted by imp
 - `arch` - abbreviation of `architecture`
 - `README` - only 3 options: README file in `server/`, `client/`, or root `/` 
 - `roadmap` - `docs/roadmap/*`
+- `LLM-logs` - `LLM-spec-logs/*.md` files
 - `{file name without the ".md" extension}`
 
 #### Unused
