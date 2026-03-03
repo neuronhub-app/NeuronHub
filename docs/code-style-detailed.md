@@ -1,25 +1,16 @@
 ---
-description: For LLM-driven code cleanup. LLM needs it in a separate prompt to not impair its problem-solving.
+description: For LLM-driven code cleanup. A separate file to avoid context rot.
 ---
 
 
 Code Style Detailed
 ----------------------------------------
 
-Every line of code is tech debt
-========================================
+### Every line of code is tech debt
 
 All code is tech debt. Either current or future, no fucking difference.
 
 Every redundant line MUST be removed. Every redundant word must be removed.
-
-
-Best practices
-========================================
-
-- 2+ uses of strings → define them in a local var
-- Use absolute path imports only, see `tsconfig.json`'s `path`
-- Project-specific classes or functions are prefixed with `neuron`
 
 ### Comments
 
@@ -45,7 +36,32 @@ const data = {
 };
 ```
 
-In Python use a lowercase-named dataclass / class.
+In Python use a lowercase-named dataclass / class, placed below invocation:
+
+```py
+# Bad
+POST_COUNT = 1
+FILE_PATH = Path(...)
+
+def function():
+    if POST_COUNT:
+        data = [("key", "value"), ("key", "value")]
+
+
+# Good
+def function():
+    if _conf.post_count:
+        params = [PostParam(users=[alex]), PostParam(users=[])]
+
+class _conf:
+    post_count = 1
+    file_path = Path(...)
+
+@dataclass
+class PostParam:
+    users: list[User]
+```
+
 
 ### Use function named parameters over redundant vars
 
@@ -55,10 +71,10 @@ const input = {
   ...data.review,
   parent: { id: response.data.create_post.id },
 };
-await mutateReview(input);
+await mutate(input);
 
 // Good:
-await mutateReview({
+await mutate({
   input: {
     ...data.review,
     parent: { id: response.data.create_post.id },
@@ -66,44 +82,51 @@ await mutateReview({
 });
 ```
 
-### Naming functions
+### Naming
 
-As `{category}? {noun} {verb}`: `{category}` creates logical modules at a glance (in files or file tree), and `{noun} {verb}` is how brain works.
+Project-specific classes or functions are prefixed with `neuron`
+
+As `{category}? {noun} {verb} {adjective}`: `{category}` creates logical modules at a glance (eg in vertical list of files or vars).
+
+For vars lean towards `{noun} {adjective}` - to let the brain create a `category` our of the `noun` - this is how brain works.
 
 Examples:
-- `post_review_create`, not `create_post_review`
+- `{noun}_{adjective}`: `value_current`, not `current_value`
+- `{category}_{noun}_{verb}`: `post_review_create`, not `create_post_review` 
 
 TypeScript
 ========================================
 
 - Always `ESNext`
 - Named exports only
-- No inline conditionals: `if (x) action();`
-- instead of `useState` use `useValtioProxyRef`. Unless there's a tangible maintenance benefit to `useState`
-
-### Error handling
-
-Never pollute console logs. Use Sentry's `captureException` or `logger.{level}()` 
-
-### Nullish coalescing
-
-`??` for null/undefined, never use `||` (preserves falsy).
-
-### Types
-
-If TS inference is broken - comment with `// @ts-expect-error #bad-infer {reason}`. The `{reason}` should explain when it's worth trying to remove the exception.
 
 ### No destructing
 
-No destructuring, because it obscures the origin. Especially of React `props`. There are ONLY 2 exceptions:
-- tuple return types
-- `useApolloQuery` - because it's the standard exception in this codebase. This exception is ONLY for Components with a SINGLE `useApolloQuery`, ie the `data` var is not ambiguous in the local context.
+Especially of React `props`. There are only 2 exceptions:
+- tuple return types, eg from React
+- `useApolloQuery` - because it's the standard in the ecosystem. Only for Components with a single `useApolloQuery`, ie when a var as `data` isn't ambiguous.
 
 ### Function declarations only
 
 ```ts
 // Good
-function mutateReview(user: User) { }
+function mutate(user: User) { }
 // Bad
-const mutateReview = (user: User) => { }
+const mutate = (user: User) => { }
 ```
+
+### TSX props ordering
+
+1. props requiring brackets, eg `value={value}`
+2. functions, eg `onChange={}`
+3. props specific to this Component, eg `field="job"`
+4. props specific to this Chakra Component, eg `step`, `size`, `variant`, etc
+5. styling static props, in the provided order:
+    1. Positioning: `pos`, `zIndex`, `top`/`right`, `translate`, `rotate`, etc
+    2. Display & Box: `display`, `hideBelow`, `flex` params, `overflow`, `w`, `h`, `p`, `border`, `divideXWidth`, `m`, etc
+    3. Effects: `transition`, `animation`, `bg`, `shadow`, `opacity`, `mixBlendMode`, `rounded`, etc
+    4. Filters: `filter`, `blur`, `backdropBlur`, `mixBlendMode` , etc
+    5. Font or content: `truncate`, `lineClamp`, `color`, `whiteSpace`, `fontSize`, etc
+6. styling interactive props:
+    - `cursor`, `scrollbar`, `willChange`, etc
+    - `_hover`, `_focus`, etc

@@ -2,7 +2,7 @@
 
 ### Write simple, self-documented code
 
-Devs overestimate their intelligence - KISS.
+Every dev overestimates their intelligence due to empathy gaps - KISS.
 
 Comments
 - Every comment is a tech debt - it'll fuck you up once outdated.
@@ -22,16 +22,27 @@ You're working on a pre-MVP pre-PMF codebase:
 - Assume backend enforces invariants. Use `?.` chaining, not defensive `if`s.
 - Always report errors - to the users and Sentry.
 
-#### Best practices
+### Best practices
 
+- 2+ uses of a magic string → define them as a var.
 - Functions > 20 lines → decompose. Think of later debugging prod at 3am.
 - Extract explanatory variables and functions.
 - When objects are used only in one place - keep them together, esp if the file < 200 LOC.
 - Define variables at the point of use.
 - Single-use vars → inline as named args.
-- In functions accept objects over primitives: `update(user: User)` not `update(id: string)`.
 - Avoid non-KISS constructs as `reduce` or list comprehensions.
+- In functions that have hard dependency on the parent - accept objects over primitives: eg `update(user: User)` instead `update(id: string)` - do not conceal implementation.
 - Use or create wrappers to declutter bad API of third-parties (eg Playwright).
+- If type inference is broken - comment with `// @ts-expect-error #bad-infer {reason}` - explain when it's worth trying to remove this exception. Same for Python.
+- Use function named parameters over redundant single-use vars.
+- You must place vars/functions below their invocation or usage, not prior.
+
+#### TypeScript
+
+- No destructuring, because it obscures the origin. Only exception is the one-per-function `useApolloQuery`.
+- Use `??` for null/undefined, never use `||` (preserves falsy).
+- No inline conditionals: `if (x) action();` write as `if (x) {\n action()\n }`.
+- Functions are declared as `function`, not `const`.
 
 ## Tags
 
