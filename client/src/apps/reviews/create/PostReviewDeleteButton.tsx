@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateDeleteAndResetStore } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
   const navigate = useNavigate();
 
-  const state = useValtioProxyRef({ isLoading: false });
+  const state = useStateValtio({ isLoading: false });
 
   async function deleteReview() {
     state.mutable.isLoading = true;

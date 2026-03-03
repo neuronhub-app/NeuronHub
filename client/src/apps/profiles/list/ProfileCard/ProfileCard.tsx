@@ -40,7 +40,7 @@ import { graphql } from "@/gql-tada";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { markedConfigured } from "@/utils/marked-configured";
-import { useStateValtio } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 const style = {
   collapseHeight: {

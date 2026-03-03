@@ -9,12 +9,12 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 export function LoginForm() {
   const navigate = useNavigate();
 
-  const state = useValtioProxyRef({
+  const state = useStateValtio({
     error: null as string | null,
   });
 

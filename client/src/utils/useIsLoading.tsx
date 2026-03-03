@@ -1,8 +1,8 @@
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 /** A simple shorthand for an .isLoading state in a try/finally */
 export function useIsLoading<T>() {
-  const state = useValtioProxyRef({ isLoading: false });
+  const state = useStateValtio({ isLoading: false });
 
   return {
     isActive: state.snap.isLoading,

@@ -3,7 +3,7 @@ import { type ReactNode, useEffect } from "react";
 import { useSearchBox, useStats } from "react-instantsearch";
 import { gap } from "@/theme/theme";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
-import { useStateValtio } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 export const facetStyle = {
   label: {

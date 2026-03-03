@@ -36,7 +36,7 @@ import {
 } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { toast } from "@/utils/toast";
-import { useStateValtio } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 const styleGlobal = {
   indent: 9,

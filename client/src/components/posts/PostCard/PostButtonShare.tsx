@@ -5,7 +5,7 @@ import { useSnapshot } from "valtio/react";
 import { user } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { ID } from "@/gql-tada";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 import type { UserListName } from "~/graphql/enums";
 
 // todo ? refac-name: PostActionsShare
@@ -17,7 +17,7 @@ export function PostButtonShare(props: {
 }) {
   const userSnap = useSnapshot(user.state);
 
-  const state = useValtioProxyRef({
+  const state = useStateValtio({
     isLoading: false,
     isAdded: false,
   });

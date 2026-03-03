@@ -32,7 +32,7 @@ import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 // Post.tags, .review_tags, .alternatives
 export interface SelectVotableOption {
@@ -74,7 +74,7 @@ export function SelectVotable(
 
   const commentInputRef = useRef<HTMLInputElement>(null);
 
-  const state = useValtioProxyRef({
+  const state = useStateValtio({
     isDialogOpen: false,
     optionSelected: null as SelectVotableOption | null,
   });

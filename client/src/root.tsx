@@ -4,6 +4,7 @@ import * as Sentry from "@sentry/react-router";
 import type { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { Scripts, ScrollRestoration } from "react-router";
+
 import { LayoutContainer } from "@/components/LayoutContainer";
 import { ColorModeProvider } from "@/components/ui/color-mode";
 import { useMetaTitle } from "@/components/useMetaTitle";

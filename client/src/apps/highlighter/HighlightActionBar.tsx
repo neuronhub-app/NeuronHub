@@ -10,7 +10,7 @@ import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtio } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 // todo ! refac: move out into a hook, as this much logic in a "Component" is idiotic
 export function HighlightActionBar() {

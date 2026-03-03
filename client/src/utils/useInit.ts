@@ -1,6 +1,6 @@
 import { captureException } from "@sentry/react";
 import { type DependencyList, useEffect } from "react";
-import { useStateValtio } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 /**
  * This is an async useEffect() wrapper.

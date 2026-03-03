@@ -18,7 +18,7 @@ import { datetime } from "@/utils/date-fns";
 import { markedConfigured } from "@/utils/marked-configured";
 import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
-import { useStateValtio } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 // todo ? refac-name: indicate it can load UserSource profile, eg as `PostAuthor{Clickable|Popover}`
 export function PostAuthor(props: {

@@ -13,7 +13,7 @@ import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import { markedConfigured } from "@/utils/marked-configured";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtio } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 export const highlight_attrs = {
   flag: "highlightable",

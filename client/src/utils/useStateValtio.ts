@@ -17,7 +17,7 @@ import { env } from "@/env";
  *
  * todo refac: assert that any keys in `val` are not Set() or Map() - as proxy() won't handle them
  */
-export function useValtioProxyRef<T extends object>(val: T, devtoolsName?: string) {
+export function useStateValtio<T extends object>(val: T, devtoolsName?: string) {
   const ref = useRef(proxy(val));
   const state = ref.current;
 
@@ -35,8 +35,6 @@ export function useValtioProxyRef<T extends object>(val: T, devtoolsName?: strin
     },
   };
 }
-
-export const useStateValtio = useValtioProxyRef;
 
 /**
  * Valtio doesn't support Map() and Set() objects with the `proxy()` construct.

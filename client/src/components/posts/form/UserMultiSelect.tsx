@@ -16,7 +16,7 @@ import {
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useStateValtio } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 
 export type UserSelectOption =
   | NonNullable<schemas.sharable.Schema["recommend_to"]>[number]

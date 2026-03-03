@@ -10,7 +10,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { useValtioProxyRef } from "@/utils/useValtioProxyRef";
+import { useStateValtio } from "@/utils/useStateValtio";
 import { UserListName } from "~/graphql/enums";
 
 // this is overly complex & abstract for a child component
@@ -59,7 +59,7 @@ function ReviewButton(props: {
 }) {
   const userSnap = useSnapshot(user.state);
 
-  const state = useValtioProxyRef({
+  const state = useStateValtio({
     isLoading: false,
     isAdded: false,
   });
