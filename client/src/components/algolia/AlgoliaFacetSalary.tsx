@@ -5,30 +5,30 @@ import { format } from "@/utils/format";
 
 // #AI
 export function AlgoliaFacetSalary(props: { attribute: string; label: string }) {
-  const rangeState = useRange({ attribute: props.attribute });
+  const algoliaRange = useRange({ attribute: props.attribute });
 
-  if (!rangeState.canRefine) {
+  if (!algoliaRange.canRefine) {
     return null;
   }
 
-  const valueStart = rangeState.start[0];
-  const range = {
+  const valueStart = algoliaRange.start[0];
+  const slider = {
     step: 1000,
-    min: rangeState.range.min!,
-    max: rangeState.range.max!,
+    min: algoliaRange.range.min!,
+    max: algoliaRange.range.max!,
     isActive: false,
   };
 
-  const isActive = valueStart != null && Number.isFinite(valueStart) && valueStart > range.min!;
-  const valueCurrent = isActive ? valueStart : range.min;
-  range.isActive = isActive; // bad arrangement due to #bad-infer
+  const isActive = valueStart != null && Number.isFinite(valueStart) && valueStart > slider.min!; // #AI
+  const valueCurrent = isActive ? valueStart : slider.min;
+  slider.isActive = isActive; // badly code due to TS #bad-infer
 
   function refine(value: number) {
-    if (value <= range.min) {
-      rangeState.refine([range.min, range.max]);
+    if (value <= slider.min) {
+      algoliaRange.refine([slider.min, slider.max]);
     } else {
-      const valueRounded = Math.round(value / range.step) * range.step;
-      rangeState.refine([Math.min(valueRounded, range.max), range.max]);
+      const valueRounded = Math.round(value / slider.step) * slider.step;
+      algoliaRange.refine([Math.min(valueRounded, slider.max), slider.max]);
     }
   }
 
@@ -37,7 +37,7 @@ export function AlgoliaFacetSalary(props: { attribute: string; label: string }) 
       <Text {...facetStyle.label}>{props.label}</Text>
 
       <NumberInput.Root
-        value={range.isActive ? String(valueCurrent) : ""}
+        value={slider.isActive ? String(valueCurrent) : ""}
         onValueChange={details => {
           if (Number.isFinite(details.valueAsNumber)) {
             refine(details.valueAsNumber);
@@ -45,22 +45,24 @@ export function AlgoliaFacetSalary(props: { attribute: string; label: string }) 
         }}
         size="xs"
         w="full"
-        step={range.step}
-        max={range.max}
+        step={slider.step}
+        max={slider.max}
         formatOptions={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
       >
-        <NumberInput.Input placeholder={`${format.money(range.min)}+`} />
+        <NumberInput.Input placeholder={`${format.money(slider.min)}+`} />
       </NumberInput.Root>
 
       <Slider.Root
-        w="full"
-        size="sm"
-        px="2px"
-        min={range.min}
-        max={range.max}
-        step={range.step}
-        value={[valueCurrent]}
+        value={[valueCurrent, slider.max]}
+        min={slider.min}
+        max={slider.max}
+        step={slider.step}
         onValueChange={details => refine(details.value[0])}
+        thumbCollisionBehavior="push"
+        size="sm"
+        colorPalette="gray"
+        w="full"
+        px="3px"
       >
         <Slider.Control>
           <Slider.Track>
@@ -70,9 +72,9 @@ export function AlgoliaFacetSalary(props: { attribute: string; label: string }) 
         </Slider.Control>
       </Slider.Root>
 
-      <Flex w="full" justify="space-between" {...facetStyle.value} fontSize="2xs">
-        <Text>{format.money(range.min)}</Text>
-        <Text>{format.money(range.max)}</Text>
+      <Flex w="full" justify="space-between" px="1" color="fg.subtle" fontSize="2xs">
+        <Text>{format.money(slider.min)}</Text>
+        <Text>{format.money(slider.max)}</Text>
       </Flex>
     </Stack>
   );
