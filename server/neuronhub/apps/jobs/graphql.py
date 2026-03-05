@@ -13,6 +13,7 @@ from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.posts.models import PostTag
+from neuronhub.apps.users.graphql.resolvers import get_user_maybe
 from neuronhub.apps.users.graphql.resolvers import get_user_sync
 
 
@@ -84,6 +85,12 @@ class JobAlertType:
 @strawberry.type(name="Query")
 class JobsQuery:
     jobs: list[JobType] = strawberry_django.field()
+
+    @strawberry_django.field
+    async def job_by_slug(self, info: strawberry.Info, slug: str) -> JobType | None:
+        user = await get_user_maybe(info)
+        job = await filter_jobs_by_user(user).filter(slug=slug).afirst()
+        return cast(JobType | None, job)
 
     @strawberry_django.field
     async def job_alerts(self, info: strawberry.Info) -> list[JobAlertType]:

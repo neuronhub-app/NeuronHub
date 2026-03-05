@@ -91,6 +91,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     IS_POSTGRES_MACOS = "{{ env.IS_POSTGRES_EXTERNAL }}"
     POSTGRES_EXTERNAL_SHELL_MSG = "Skipping Postgres operation, as using non-Mise db (ie on GitHub CI)"
 
+    CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS = "true"
+
 
 # Dev servers
 # -----------------------------------------------------

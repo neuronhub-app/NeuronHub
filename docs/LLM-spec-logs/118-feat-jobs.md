@@ -34,23 +34,24 @@ FE
     - [x] save `.salary_min` to `JobAlert`
 - [x] S3 Cloudflare R2
 - [x] add `db_stubs.py` for `jobs` and `profiles`; drop CSV usage in db_stubs_repopulate
-- [ ] make FE modular for PG deployment (jobs.probablygood.org)
+- [x] make FE modular for PG deployment (jobs.probablygood.org)
     - scope: single `sites/pg/` dir with custom layout+theme, reusing shared components
-    - 3m target: NPM package `neuronhub` + `neuronhub-template` repo (out of scope now)
+    - 3 months target: NPM package `neuronhub` + `neuronhub-template` repo (out of scope now)
+- [x] open Job by .slug for email alerts: show the jobs page, but query the job by GraphQL, and put it on the top of Algolia results. On search hide it.
 
 ## Exec-Plan
 
-1. Add `VITE_SITE` env var
-2. Refactor `root.tsx` → providers-only + `<Outlet />`; theme via `sites/index.ts`
-3. `sites/neuronhub/NeuronLayout.tsx` wraps existing `LayoutContainer`; `sites/neuronhub/routes.ts` = current routes in `layout(NeuronLayout)`
-4. `sites/pg/`: `theme.ts`, `PgLayout.tsx` (header + Outlet), `routes.ts` (jobs-only in `layout(PgLayout)`)
-5. Main `routes.ts` → dispatcher: `VITE_SITE === "pg" ? pgRoutes : nhaRoutes`
-6. ErrorBoundary → generic (no sidebar shell)
+- BE: add `job_by_slug(slug)` async resolver to `JobsQuery` in `graphql.py`
+  - use `get_user_maybe`, `filter_jobs_by_user(...).filter(slug=slug).afirst()`, `cast`
+- FE: add `hitOpened` prop to `AlgoliaList` + `AlgoliaHits` (render pinned node, filter out id)
+- FE: add `/jobs/:slug` route (neuronhub) and `/:slug` route (pg) pointing to `slug.tsx`
+- FE: add `slug(s)` helper to `urls.jobs`
+- Run `mise lint` → `mise pytest` → `mise e2e`
 
 ## Thinking-Log
 
-- Analyzed all jobs app imports: JobCard is pure, JobList/Subscribe need Apollo, AlertList is fully auth-gated
-- PG still needs NHA backend (Algolia key + enrichment queries via GraphQL)
-- Route file paths in `route()` resolve relative to `appDirectory` regardless of caller location
-- Rejected: Vite aliases (magic), appDirectory switch (fragile `../../` paths), runtime hostname (leaks site-awareness into components)
-- Chose B over A: NHA disruption is fine, B gives cleaner architecture + best NPM migration path
+- All pieces implemented: BE resolver, AlgoliaList hitOpened, routes, urls, slug.tsx
+- Fixed: `isNotNeeded` check moved before `isNotFound` to avoid false "not found" when no slug
+- Fixed: routes were lost after stash — re-added `/:slug` to both neuronhub and pg routes
+- `mise lint` passes, `mise pytest` passes (66/66)
+- e2e `job-list` fails on pre-existing `networkidle` timeout (not related to slug changes)

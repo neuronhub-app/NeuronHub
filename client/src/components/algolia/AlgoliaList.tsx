@@ -1,7 +1,13 @@
 import { Flex, HStack, Stack, Text } from "@chakra-ui/react";
 import type { TadaDocumentNode } from "gql.tada";
 import type { ReactNode } from "react";
-import { Configure, InstantSearch, useHits, useSearchBox } from "react-instantsearch";
+import {
+  Configure,
+  InstantSearch,
+  useCurrentRefinements,
+  useHits,
+  useSearchBox,
+} from "react-instantsearch";
 import { NavLink } from "react-router";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { Button } from "@/components/ui/button";
@@ -29,6 +35,7 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
       item: TItem,
       ctx: { isSearchActive: boolean; isEnrichedByGraphql: boolean },
     ) => ReactNode;
+    hitOpenedPinned?: { node?: ReactNode; id?: ID };
     listTestId?: string;
   };
   children: ReactNode;
@@ -97,29 +104,40 @@ export function AlgoliaHits<TItem extends { id: ID }, TData = unknown>(props: {
     item: TItem,
     ctx: { isSearchActive: boolean; isEnrichedByGraphql: boolean },
   ) => ReactNode;
+  hitOpenedPinned?: { node?: ReactNode; id?: ID };
   label?: string;
   listTestId?: string;
 }) {
   const search = useSearchBox();
+  const refinements = useCurrentRefinements();
   const hits = useHits<TItem>();
   const { items, isEnrichedByGraphql } = useAlgoliaEnrichmentByGraphql(
     hits.items,
     props.enrichment.query,
     props.enrichment.extractItems,
   );
-  const isSearchActive = search.query.length > 0;
+  const isSearchActive = search.query.length > 0 || refinements.items.length > 0;
+
+  const filteredItems =
+    props.hitOpenedPinned?.id && !isSearchActive
+      ? items.filter(item => item.id !== props.hitOpenedPinned!.id)
+      : items;
 
   return (
     <Stack gap="gap.xl" w="full">
+      {props.hitOpenedPinned?.node && !isSearchActive && props.hitOpenedPinned.node}
+
       <Stack data-testid={props.listTestId} gap="gap.md2">
         {!hits.results ? (
           <Text color="fg.subtle">Loading...</Text>
-        ) : hits.results.nbHits === 0 ? (
+        ) : hits.results.nbHits === 0 && !props.hitOpenedPinned?.node ? (
           <HStack align="center">
             <Text>No {props.label ?? "results"} found.</Text>
           </HStack>
         ) : (
-          items.map(item => props.renderHit(item, { isSearchActive, isEnrichedByGraphql }))
+          filteredItems.map(item =>
+            props.renderHit(item, { isSearchActive, isEnrichedByGraphql }),
+          )
         )}
       </Stack>
 

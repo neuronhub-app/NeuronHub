@@ -4,6 +4,7 @@ export default [
   layout("./sites/pg/PgLayout.tsx", [
     route("/", "./apps/jobs/list/index.tsx"),
     route("/subscriptions", "./apps/jobs/subscriptions/index.tsx"),
+    route("/:slug", "./apps/jobs/list/slug.tsx"),
   ]),
 
   // NHA-only routes under unreachable prefix — for react-router +types generation

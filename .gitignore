@@ -3,6 +3,7 @@
 .local/
 .idea/
 .run/
+.mutagen
 
 server/**/.gitignore
 

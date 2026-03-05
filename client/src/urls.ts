@@ -58,6 +58,9 @@ export const urls = {
   jobs: {
     list: env.VITE_SITE === "pg" ? "/" : "/jobs",
     subscriptions: env.VITE_SITE === "pg" ? "/subscriptions" : "/jobs/subscriptions",
+    slug(slug: string) {
+      return `${this.list === "/" ? "" : this.list}/${slug}` as const;
+    },
   },
   tools: {
     list: "/tools",

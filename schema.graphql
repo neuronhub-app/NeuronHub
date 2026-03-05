@@ -783,6 +783,7 @@ type Query {
   profile_match_stats: ProfileMatchStatsType! @IsAuthenticated
   profile_user_llm_md: String! @IsAuthenticated
   jobs(filters: JobFilter): [JobType!]!
+  job_by_slug(slug: String!): JobType
   job_alerts: [JobAlertType!]!
 }
 

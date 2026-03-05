@@ -1,4 +1,5 @@
-import { Stack } from "@chakra-ui/react";
+import { Box, Code, HStack, Separator, Skeleton, Stack, Text } from "@chakra-ui/react";
+import type { ReactNode } from "react";
 import { Configure } from "react-instantsearch";
 import { JobCard } from "@/apps/jobs/list/JobCard/JobCard";
 import { JobsSubscribeModal } from "@/apps/jobs/list/JobsSubscribeModal";
@@ -9,10 +10,13 @@ import { AlgoliaFacetSalary } from "@/components/algolia/AlgoliaFacetSalary";
 import { AlgoliaFacetsActive } from "@/components/algolia/AlgoliaFacetsActive";
 import { AlgoliaList } from "@/components/algolia/AlgoliaList";
 import { ids } from "@/e2e/ids";
-import { graphql } from "@/gql-tada";
+import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 
-export function JobList() {
+export function JobList(props: { slug?: string }) {
+  const jobOpenPinned = useJobOpenPinned(props.slug);
+
   return (
     <AlgoliaList<JobFragmentType>
       index="indexNameJobs"
@@ -23,6 +27,7 @@ export function JobList() {
         renderHit: (job, ctx) => (
           <JobCard key={job.id} job={job} isSearchActive={ctx.isSearchActive} />
         ),
+        hitOpenedPinned: jobOpenPinned,
         listTestId: ids.job.list,
       }}
       searchInputTestId={ids.job.searchInput}
@@ -73,11 +78,79 @@ export function JobList() {
   );
 }
 
+function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
+  const isNotNeeded = !slug;
+
+  const query = useApolloQuery(JobBySlugQuery, { slug: slug ?? "" }, { skip: isNotNeeded });
+
+  const isLoading = query.isLoadingFirstTime || query.loading;
+
+  const job = query.data?.job_by_slug;
+
+  if (isNotNeeded) {
+    return {};
+  }
+
+  const isNotFound = !isLoading && !job;
+  if (isNotFound) {
+    return {
+      id: undefined,
+      node: (
+        <Box>
+          <Text>
+            Job not found: <Code>{slug}</Code>
+          </Text>
+          <JobOpenSeparator />
+        </Box>
+      ),
+    };
+  }
+
+  return {
+    id: job?.id,
+    node: (
+      <Box position="relative">
+        {isLoading ? (
+          <Skeleton h="32" w="full" />
+        ) : (
+          <JobCard job={job!} isSearchActive={false} />
+        )}
+
+        <JobOpenSeparator />
+      </Box>
+    ),
+  };
+}
+
+function JobOpenSeparator() {
+  return (
+    <HStack mt="gap.md2">
+      <Separator flex="1" />
+      <Text flexShrink="0" color="fg.subtle" fontSize="sm">
+        All jobs
+      </Text>
+      <Separator flex="1" />
+    </HStack>
+  );
+}
+
 const JobsByIdsQuery = graphql.persisted(
   "JobsByIds",
   graphql(
     `query JobsByIds($ids: [ID!]!) {
       jobs(filters: { id: { in_list: $ids } }) {
+        ...JobFragment
+      }
+    }`,
+    [JobFragment],
+  ),
+);
+
+const JobBySlugQuery = graphql.persisted(
+  "JobBySlug",
+  graphql(
+    `query JobBySlug($slug: String!) {
+      job_by_slug(slug: $slug) {
         ...JobFragment
       }
     }`,

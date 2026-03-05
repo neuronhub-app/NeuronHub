@@ -24,8 +24,8 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
 import { datetime } from "@/utils/date-fns";
-import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { format } from "@/utils/format";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 const style = {
   header: {
@@ -149,7 +149,12 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
       </HStack>
 
       <HStack justify="space-between" align="flex-end">
-        <JobTagGroups job={props.job} highlightable={["tags_area"]} jobHit={jobHit} />
+        <JobTagGroups
+          job={props.job}
+          highlightable={["tags_area"]}
+          jobHit={jobHit}
+          isHighlightable={isHighlightable}
+        />
 
         <HStack align="flex-end" fontSize="xs" whiteSpace="nowrap" pos="relative" gap="gap.sm2">
           {props.job.closes_at && (
@@ -249,6 +254,7 @@ function JobTagGroups(props: {
   job: JobFragmentType;
   highlightable: string[];
   jobHit: Hit<BaseHit>;
+  isHighlightable?: boolean;
 }) {
   const tagGroups = [
     {
@@ -296,7 +302,7 @@ function JobTagGroups(props: {
                   variant="subtle"
                   colorPalette={tagGroup.color}
                 >
-                  {props.highlightable.includes(tagGroup.attribute) ? (
+                  {props.isHighlightable && props.highlightable.includes(tagGroup.attribute) ? (
                     <Highlight
                       attribute={[tagGroup.attribute, String(index), "name"]}
                       hit={props.jobHit}
