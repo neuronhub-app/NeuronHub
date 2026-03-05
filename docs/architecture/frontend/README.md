@@ -51,7 +51,9 @@ Note: `toast.error()` from [[client/src/utils/toast.tsx]] also calls `Sentry.cap
 
 ## Mandatory task-specific docs
 
-- [How to use GraphQL](./GraphQL.md)
+Must read when working with any of those module.
+
 - [How to structure a React Component](./React-component-structure.md)
+- [How to use GraphQL](./GraphQL.md)
 - [How to use Playwright](./Playwright.md)
-- [How to use Chakra UI](./Chakra-UI-Semantic-Tokens.md)
+- [How to use Chakra UI](Chakra-UI.md)

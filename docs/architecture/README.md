@@ -172,7 +172,7 @@ You must read each top-level doc before its children.
 - [./frontend](./frontend/README.md)
 	- [How to structure a React Component](./frontend/React-component-structure.md)
 	- [How to use GraphQL](./frontend/GraphQL.md)
-	- [How to use Chakra UI](frontend/Chakra-UI-Semantic-Tokens.md)
+	- [How to use Chakra UI](frontend/Chakra-UI.md)
 - [./tests](./tests.md)
 	- [How to use pytest](./backend/pytest.md)
 	- [How to use Playwright](./frontend/Playwright.md)

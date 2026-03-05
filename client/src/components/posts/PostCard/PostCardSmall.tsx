@@ -150,6 +150,7 @@ export function PostCardSmall(props: {
   );
 }
 
+// #AI-slop, must by by entity, not style type.
 const style = {
   color: {
     // top-down hierarchy:
