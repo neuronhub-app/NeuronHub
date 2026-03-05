@@ -1,4 +1,9 @@
+# env
+redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
+
 [tools]
+	usage = "latest"
+
     bun = "latest"
     uv = "latest"
     biome = "latest"
@@ -6,7 +11,7 @@
     killport = "latest"
 
     claude = "latest"
-        node = "24"
+        node = "latest"
 
 [settings]
     # use Nushell for everything
@@ -15,6 +20,10 @@
     use_file_shell_for_executable_tasks = true
 
     python.uv_venv_auto = true
+
+	lockfile = true
+
+	task.timings = false
 
 [task_config]
     includes = [
@@ -216,14 +225,15 @@
     depends = "typegen:server"
     run = "mise typegen:client"
     description = "Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries; @chakra-ui; etc"
+    quiet = true
 
     [tasks."typegen:server"]
         dir = "server"
         run = "uv run manage.py export_schema neuronhub.graphql --path=../schema.graphql"
         sources = ["neuronhub/**/*.py"]
         outputs = ["../schema.graphql"]
-        quiet = true
         env.ALGOLIA_IS_ENABLED = "false"
+    	quiet = true
 
     [tasks."typegen:client"]
         depends = [
@@ -285,15 +295,16 @@
         quiet = true
 
 
-[tasks."lint"]
+[tasks.lint]
     depends = [
-        "typegen --output=silent",
-        "format --output=silent",
+        "typegen",
+        "format",
     ]
     depends_post = [
         "lint:server",
         "lint:client",
     ]
+    quiet = true
 
     [tasks."lint:server"]
         dir = "server"
