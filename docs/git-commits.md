@@ -56,6 +56,9 @@ If you're unsure which `Type` to use - use the highest, as they're sorted by imp
 - `admin` - Django Admin, ie no impact on the user-facing logic
 - `perf` - performance of SQL, UI, etc
 
+Sites:
+- `PG` - for ProbablyGood.org specific changes in `client/src/sites/pg/`
+
 `Scope`s only for Type `build` (as they shouldn't affect runtime):
 - `build(CI)` - GitHub CI
 - `build(Mise)` - eg `mise.toml`

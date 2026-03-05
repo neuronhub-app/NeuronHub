@@ -27,11 +27,11 @@ const neuronConfig: SiteConfig = {
 const pgConfig: SiteConfig = {
   theme: pgSystem,
   favicon: {
-    svg: "/favicon-pg/favicon.svg",
-    png96: "/favicon-pg/favicon-96x96.png",
-    ico: "/favicon-pg/favicon.ico",
-    appleTouchIcon: "/favicon-pg/apple-touch-icon.png",
-    webmanifest: "/favicon-pg/site.webmanifest",
+    svg: "/favicon/favicon.svg",
+    png96: "/favicon/favicon-96x96.png",
+    ico: "/favicon/favicon.ico",
+    appleTouchIcon: "/favicon/apple-touch-icon.png",
+    webmanifest: "/favicon/site.webmanifest",
   },
 };
 

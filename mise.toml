@@ -230,7 +230,7 @@
             "typegen:client:graphql-codegen",
             "typegen:client:gql-tada",
             "typegen:client:react-router",
-            "typegen:client:chakra",
+            "typegen:client:chakra:*",
         ]
         quiet = true
 
