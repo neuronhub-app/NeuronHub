@@ -1,6 +1,7 @@
 /**
  * #AI
  */
+
 import {
   Badge,
   Card,
@@ -14,6 +15,7 @@ import {
 } from "@chakra-ui/react";
 import { LuPause, LuPlay, LuTrash2 } from "react-icons/lu";
 import { NavLink } from "react-router";
+import { useJobUnsubscribeHandler } from "@/apps/jobs/subscriptions/useJobUnsubscribeHandler";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql, type ResultOf } from "@/gql-tada";
@@ -22,10 +24,13 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
 import { datetime } from "@/utils/date-fns";
 import { format } from "@/utils/format";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { useIsLoading } from "@/utils/useIsLoading";
 
-export function JobAlertList() {
-  const { data, isLoadingFirstTime } = useApolloQuery(JobAlertsQuery);
+export function JobAlertList(props: { unsubscribeAlertIdExt?: string }) {
+  const { data, isLoadingFirstTime } = useApolloQuery(JobAlertListQuery);
+
+  const unsubscribe = useJobUnsubscribeHandler(props.unsubscribeAlertIdExt);
 
   if (isLoadingFirstTime) {
     return <Text color="fg.muted">Loading subscriptions...</Text>;
@@ -35,6 +40,8 @@ export function JobAlertList() {
 
   return (
     <Stack gap="gap.lg" w="100%">
+      {unsubscribe.isUnsubscribeRequest && <unsubscribe.Alert />}
+
       <HStack as="header" gap="gap.lg" flexWrap="wrap" justify="space-between">
         <Text fontSize="2xl" fontWeight="bold">
           Job Subscriptions
@@ -60,7 +67,7 @@ export function JobAlertList() {
   );
 }
 
-type AlertType = NonNullable<ResultOf<typeof JobAlertsQuery>["job_alerts"]>[number];
+type AlertType = NonNullable<ResultOf<typeof JobAlertListQuery>["job_alerts"]>[number];
 
 function AlertCard(props: { alert: AlertType }) {
   const loading = useIsLoading();
@@ -83,12 +90,23 @@ function AlertCard(props: { alert: AlertType }) {
   }
 
   return (
-    <Card.Root {...ids.set(ids.job.subscriptions.card)}>
+    <Card.Root
+      {...ids.set(ids.job.subscriptions.card)}
+      border="0"
+      {...getOutlineBleedingProps()}
+    >
       <Card.Body gap="gap.sm">
         <Flex justify="space-between" align="center">
           <Flex align="center" gap="gap.sm">
             <Text fontWeight="medium">{props.alert.email}</Text>
-            <Badge colorPalette={props.alert.is_active ? "green" : "gray"}>
+            <Badge
+              colorPalette={props.alert.is_active ? "green" : "gray"}
+              {...ids.set(
+                props.alert.is_active
+                  ? ids.job.subscriptions.status.active
+                  : ids.job.subscriptions.status.inactive,
+              )}
+            >
               {props.alert.is_active ? "Active" : "Inactive"}
             </Badge>
           </Flex>
@@ -173,10 +191,10 @@ function AlertCard(props: { alert: AlertType }) {
   );
 }
 
-export const JobAlertsQuery = graphql.persisted(
-  "JobAlerts",
+export const JobAlertListQuery = graphql.persisted(
+  "JobAlertList",
   graphql(`
-    query JobAlerts {
+    query JobAlertList {
       job_alerts {
         id
         id_ext

@@ -127,11 +127,7 @@ class JobsMutation:
         return True
 
     @strawberry.mutation
-    async def job_alert_toggle_active(
-        self,
-        info: strawberry.Info,
-        id_ext: uuid.UUID,
-    ) -> bool:
+    async def job_alert_toggle_active(self, id_ext: uuid.UUID, info: strawberry.Info) -> bool:
         session_ids = await _read_session_job_alerts(info)
         if str(id_ext) not in session_ids:
             return False
@@ -141,16 +137,25 @@ class JobsMutation:
         return True
 
     @strawberry.mutation
-    async def job_alert_remove(
-        self,
-        info: strawberry.Info,
-        id_ext: uuid.UUID,
-    ) -> bool:
+    async def job_alert_remove(self, id_ext: uuid.UUID, info: strawberry.Info) -> bool:
         session_ids = await _read_session_job_alerts(info)
         if str(id_ext) not in session_ids:
             return False
         await JobAlert.objects.filter(id_ext=id_ext).adelete()
         await _drop_session_job_alert(info, id_ext)
+        return True
+
+    @strawberry.mutation
+    async def job_alert_unsubscribe(self, id_ext: uuid.UUID, info: strawberry.Info) -> bool:
+        # No session check/login - .id_ext is enough
+        alert = await JobAlert.objects.filter(id_ext=id_ext).afirst()
+        if not alert:
+            # todo ? UX: shouldn't be an Error - it's a "success"/"info"
+            raise strawberry.exceptions.StrawberryGraphQLError(
+                "Subscription not found, or was deleted already."
+            )
+        alert.is_active = False
+        await alert.asave()
         return True
 
 

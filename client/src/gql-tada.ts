@@ -20,6 +20,7 @@ export const graphql = initGraphQLTada<{
     Decimal: string;
     Upload: File;
     PK: string;
+    UUID: string;
   };
 }>();
 

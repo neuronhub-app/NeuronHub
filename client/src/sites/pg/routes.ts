@@ -4,6 +4,7 @@ export default [
   layout("./sites/pg/PgLayout.tsx", [
     route("/", "./apps/jobs/list/index.tsx"),
     route("/subscriptions", "./apps/jobs/subscriptions/index.tsx"),
+    route("/subscriptions/remove/:id_ext", "./apps/jobs/subscriptions/remove.tsx"),
     route("/:slug", "./apps/jobs/list/slug.tsx"),
   ]),
 

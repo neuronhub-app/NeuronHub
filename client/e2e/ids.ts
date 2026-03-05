@@ -2,6 +2,10 @@ export type TestId = string;
 
 // todo refac: gen values from keys
 export namespace ids {
+  export const layout = {
+    sidebar: "layout.sidebar",
+  };
+
   export const post = {
     list: "post.list",
     listControls: {
@@ -141,8 +145,14 @@ export namespace ids {
     subscriptions: {
       list: "job.subscriptions.list",
       card: "job.subscriptions.card",
+      // todo ? refac-name: `btn.toggle` and `btn.delete`
       toggleBtn: "job.subscriptions.toggle-btn",
       removeBtn: "job.subscriptions.remove-btn",
+      status: {
+        inactive: "job.subscriptions.status.inactive",
+        active: "job.subscriptions.status.active",
+      },
+      unsubscribed: { alert: "job.subscriptions.unsubscribed.alert" },
     },
   } as const;
 
@@ -180,6 +190,7 @@ export namespace ids {
       submit: "auth.login.submit",
       error: "auth.login.error",
     },
+    // todo ? refac: move to ids.layout.sidebar
     logout: {
       btn: "auth.logout.btn",
     },

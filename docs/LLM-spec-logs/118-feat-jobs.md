@@ -37,21 +37,40 @@ FE
 - [x] make FE modular for PG deployment (jobs.probablygood.org)
     - scope: single `sites/pg/` dir with custom layout+theme, reusing shared components
     - 3 months target: NPM package `neuronhub` + `neuronhub-template` repo (out of scope now)
-- [x] open Job by .slug for email alerts: show the jobs page, but query the job by GraphQL, and put it on the top of Algolia results. On search hide it.
+- [ ] JobAlert email:
+    - [x] open Job by .slug for email alerts: query by GraphQL -> put on the top of Algolia results.
+    - [x] Add FE `/jobs/subscriptions/remove/<.id_ext>` that removes the alert using GraphQL and:
+        - show /jobs/subscriptions/ + place on top a closable `<Alert/>` saying that it was removed
 
 ## Exec-Plan
 
-- BE: add `job_by_slug(slug)` async resolver to `JobsQuery` in `graphql.py`
-  - use `get_user_maybe`, `filter_jobs_by_user(...).filter(slug=slug).afirst()`, `cast`
-- FE: add `hitOpened` prop to `AlgoliaList` + `AlgoliaHits` (render pinned node, filter out id)
-- FE: add `/jobs/:slug` route (neuronhub) and `/:slug` route (pg) pointing to `slug.tsx`
-- FE: add `slug(s)` helper to `urls.jobs`
-- Run `mise lint` → `mise pytest` → `mise e2e`
+<LLM_unverified_report>
+
+### Current state
+The unsubscribe feature works end-to-end (3/3 e2e tests pass: subscribe+toggle+remove, unsubscribe-success, unsubscribe-error).
+
+### What was done
+1. **BE** (`server/neuronhub/apps/jobs/graphql.py:148-158`): `job_alert_unsubscribe` now raises `StrawberryGraphQLError("Subscription not found")` instead of `return False` when alert not found. This is the first usage of GraphQL errors in this codebase.
+2. **FE** (`client/src/apps/jobs/subscriptions/JobAlertList.tsx:34-104`): The unsubscribe UI uses `useInit` + `mutateAndRefetchMountedQueries` with a closable `<Alert.Root>` that shows 3 states:
+   - Loading: `status="info"` with `<Alert.Indicator><Spinner size="sm" /></Alert.Indicator>` + "Unsubscribing..."
+   - Success: `status="success"` with `<Alert.Indicator />` (default icon) + "Unsubscribed."
+   - Error: `status="error"` with `<Alert.Indicator />` (default icon) + error message from BE
+3. **E2E** (`client/e2e/tests/job-list.spec.ts:78-108`): Two unsubscribe tests — success path (create alert, visit remove URL, assert "Unsubscribed." + Inactive badge) and error path (bogus UUID, assert "Subscription not found").
+4. **Route** (`client/src/apps/jobs/subscriptions/remove.tsx`): Thin route that passes `removeIdExt` prop to `JobAlertList`.
+
+### What needs to be done next
+CTO wants the unsubscribe logic (lines 37-74 + the Alert JSX at lines 78-104) extracted from `JobAlertList` into a new `JobUnsubscribeRequestStatus` component. This means:
+- Extract state (`isUnsubscribeRequest`, `unsubscribeError`), `useInit` hook, `unsubStatus` derivation, and the `<Alert.Root>` block into `JobUnsubscribeRequestStatus(props: { removeIdExt?: string })`
+- `JobAlertList` renders `<JobUnsubscribeRequestStatus removeIdExt={props.removeIdExt} />` at the top of the Stack
+- `remove.tsx` may render `<JobUnsubscribeRequestStatus>` + `<JobAlertList>` separately, or keep passing the prop through — CTO to decide
+- The `JobAlertUnsubscribeMutation` graphql definition stays in `JobAlertList.tsx` (or moves with the new component)
+
+### Chakra Alert.Indicator pattern (important)
+- `<Alert.Indicator />` with **no children** → renders the default status icon (checkmark, error icon, etc.)
+- `<Alert.Indicator><Spinner size="sm" /></Alert.Indicator>` with children → overrides with Spinner
+- Do NOT pass `{false}` or `{condition && <Spinner/>}` as children — it suppresses the default icon. Use a ternary with two separate `<Alert.Indicator>` elements.
+
+</LLM_unverified_report>
 
 ## Thinking-Log
 
-- All pieces implemented: BE resolver, AlgoliaList hitOpened, routes, urls, slug.tsx
-- Fixed: `isNotNeeded` check moved before `isNotFound` to avoid false "not found" when no slug
-- Fixed: routes were lost after stash — re-added `/:slug` to both neuronhub and pg routes
-- `mise lint` passes, `mise pytest` passes (66/66)
-- e2e `job-list` fails on pre-existing `networkidle` timeout (not related to slug changes)

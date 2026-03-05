@@ -26,7 +26,7 @@ import {
 import { LuLogIn, LuLogOut } from "react-icons/lu";
 import { PiGraph } from "react-icons/pi";
 import { type LinkProps, NavLink, useLocation } from "react-router";
-import { JobAlertsQuery } from "@/apps/jobs/subscriptions/JobAlertList";
+import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
 import { ColorModeButton } from "@/components/ui/color-mode";
@@ -47,7 +47,7 @@ const styles = {
 };
 
 export function LayoutSidebar(props: StackProps) {
-  const { data } = useApolloQuery(JobAlertsQuery);
+  const { data } = useApolloQuery(JobAlertListQuery);
   const alertsCount = data?.job_alerts?.length ?? 0;
 
   const links: Array<SidebarLink> = [
@@ -77,6 +77,7 @@ export function LayoutSidebar(props: StackProps) {
       maxW={{ base: "2xs", [styles.breakpoint.xl]: "xs" }}
       overflow="auto"
       {...props}
+      {...ids.set(ids.layout.sidebar)}
     >
       <Stack as="nav" gap="gap.md">
         <NeuronLogo />

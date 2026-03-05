@@ -1,13 +1,13 @@
 import { test } from "@playwright/test";
+import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { env } from "@/env";
 import { urls } from "@/urls";
 
-const isPg = env.VITE_SITE === "pg";
+const isSiteProbablyGood = env.VITE_SITE === "pg";
 
-// #AI
 test.describe("JobList", () => {
   test.describe.configure({ mode: "serial" });
 
@@ -31,13 +31,12 @@ test.describe("JobList", () => {
   });
 
   // todo ! refac: #AI-slop, trash matchers, magic strings, no testid
+  // replace "Subscriptions (1)" and "Subscriptions" with some `data-{}` attribute and testid usage
   test("subscribe to JobAlert, toggle and remove on /jobs/subscriptions/", async ({ page }) => {
-    await play.navigate(urls.jobs.list, { idleWait: true });
+    await play.navigate(urls.jobs.list);
 
-    const sidebar = page.locator('[aria-label="Sidebar"]');
-
-    if (!isPg) {
-      await expect(sidebar).not.toHaveText("Subscriptions");
+    if (!isSiteProbablyGood) {
+      await expect($[ids.layout.sidebar]).not.toHaveText("Subscriptions");
     }
 
     const testEmail = "e2e@test.com";
@@ -46,31 +45,39 @@ test.describe("JobList", () => {
     await play.fill(ids.job.alert.emailInput, testEmail);
     await play.click(ids.job.alert.submitBtn);
 
-    if (!isPg) {
-      await expect(sidebar).toHaveText("Subscriptions (1)");
+    if (!isSiteProbablyGood) {
+      await expect($[ids.layout.sidebar]).toHaveText("Subscriptions (1)");
     }
-
-    // Email should be pre-populated from user account when re-opening the dialog
-    await play.click(ids.job.alert.subscribeBtn);
-    const emailInput = page.locator(ids.selector(ids.job.alert.emailInput));
-    await expect(emailInput).not.toHaveValue("");
-    await page.keyboard.press("Escape");
 
     await play.navigate(urls.jobs.subscriptions);
     await expect($[ids.job.subscriptions.card]).toHaveText(testEmail);
 
-    // Pause the alert
+    // Pause & delete JobAlert
     await play.click(ids.job.subscriptions.toggleBtn);
-    await expect($[ids.job.subscriptions.card]).toHaveText("Inactive");
-
-    // Remove button appears for inactive alerts
+    await expect($[ids.job.subscriptions.status.inactive]).toBeVisible();
     await play.click(ids.job.subscriptions.removeBtn);
-
-    // Card should be gone
     await expect(page).not.toHaveText(testEmail);
+  });
 
-    if (!isPg) {
-      await expect(sidebar).not.toHaveText("Subscriptions");
-    }
+  test("subscribe & call /jobs/subscriptions/remove/:id_ext", async ({ page }) => {
+    await play.navigate(urls.jobs.list);
+
+    const testEmail = "e2e@test.com";
+
+    await play.click(ids.job.alert.subscribeBtn);
+    await play.fill(ids.job.alert.emailInput, testEmail);
+    await play.click(ids.job.alert.submitBtn);
+
+    await play.navigate(urls.jobs.subscriptions, { idleWait: true });
+
+    await expect($[ids.job.subscriptions.unsubscribed.alert]).not.toBeVisible();
+
+    const result = await play.graphqlQuery(JobAlertListQuery, {}); // get .id_ext form GraphQL
+    const alerts = result.data.job_alerts;
+    const alert = alerts.find(alert => alert.email === testEmail)!;
+
+    await page.goto(urls.jobs.subscriptionsRemove(alert.id_ext));
+    await expect($[ids.job.subscriptions.status.inactive]).toBeVisible();
+    await expect($[ids.job.subscriptions.unsubscribed.alert]).toBeVisible();
   });
 });

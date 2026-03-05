@@ -1,7 +1,6 @@
-import { useParams } from "react-router";
 import { JobList } from "@/apps/jobs/list/JobList";
+import type { Route } from "~/react-router/jobs/list/+types/slug";
 
-export default function JobSlugRoute() {
-  const params = useParams<{ slug: string }>();
-  return <JobList slug={params.slug} />;
+export default function JobSlugRoute(props: Route.ComponentProps) {
+  return <JobList slug={props.params.slug} />;
 }

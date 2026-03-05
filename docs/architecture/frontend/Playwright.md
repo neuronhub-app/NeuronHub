@@ -11,8 +11,7 @@ Specs are stored in `client/e2e/tests`.
 
 Notes:
 - If e2e needs timeouts as `waitForTimeout` - it is trash and must be rewritten.
-- `client/e2e/helpers/expect.ts`: replaces `localor(text="<nonce>") -> epxect(page).toHaveText` and `toHaveAttribute("data-state", <nonce>) -> except.checked(locator)`
-- Use `data-testid` for locators, in JSX set as `{...ids.set(ids.post.btn.submit)}`, see `client/e2e/ids.ts`
+- Use `data-testid` for locators, in JSX set with `{...ids.set(ids.post.btn.submit)}` - see `client/e2e/ids.ts`
 - For auth we use Django `/admin/login/` and cookies - CORS 100% works.
 
 ### PlaywrightHelper.ts
@@ -23,6 +22,17 @@ A wrapper for bad Playwright API, its methods:
 - `.fill(id: str, contnet: str)`: input waitFor, clear, fill. 
 - `.navigate`: goto and waitForNetworkIdle
 - `.setDefaultTimeout`: calls `page.setDefaultTimeoput` and _some_ of waitForNetworkIdle. Will be improved later.
+- `.$[ids.value]`: calls `page.getByTestId(ids.value).first()`
+
+You must never use magic strings, instead:
+- if it's used 2+ times -> declare a `const` or an object eg as `const user = { email: ..., username: ... }`.
+- if it's a text from a Component indicating action status (eg added/removed/error) -> add `ids.set(condition ? ids.value.active : ids.value.inactive)` -> check it with `expect(ids.value).toBeVisible()`.
+
+### `e2e/helpers/expect.ts`
+
+Replaces:
+- `.toHaveAttribute("data-state", true)` -> `except($[ids.value]).checked(locator)`
+- `.localor(text="{value}")` -> `epxect(page).toHaveText`
 
 ### Mise
 

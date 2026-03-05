@@ -61,6 +61,9 @@ export const urls = {
     slug(slug: string) {
       return `${this.list === "/" ? "" : this.list}/${slug}` as const;
     },
+    subscriptionsRemove(idExt: string) {
+      return `${this.subscriptions}/remove/${idExt}` as const;
+    },
   },
   tools: {
     list: "/tools",

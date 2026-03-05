@@ -176,6 +176,7 @@ type Mutation {
   job_alert_subscribe(email: String!, tag_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null): Boolean!
   job_alert_toggle_active(id_ext: UUID!): Boolean!
   job_alert_remove(id_ext: UUID!): Boolean!
+  job_alert_unsubscribe(id_ext: UUID!): Boolean!
 }
 
 type OffsetPaginationInfo {
