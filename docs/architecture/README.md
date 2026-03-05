@@ -168,12 +168,13 @@ classDiagram
 You must read each top-level doc before its children.
 
 - [./backend](./backend/README.md)
-	- [Profiles app](./backend/profiles.md)
+    - [Profiles app](./backend/profiles.md)
 - [./frontend](./frontend/README.md)
-	- [How to structure a React Component](./frontend/React-component-structure.md)
-	- [How to use GraphQL](./frontend/GraphQL.md)
-	- [How to use Chakra UI](frontend/Chakra-UI.md)
+    - [How to structure a React Component](./frontend/React-component-structure.md)
+    - [How to use GraphQL](./frontend/GraphQL.md)
+    - [How to use Chakra UI](frontend/Chakra-UI.md)
 - [./tests](./tests.md)
-	- [How to use pytest](./backend/pytest.md)
-	- [How to use Playwright](./frontend/Playwright.md)
+    - [How to use pytest](./backend/pytest.md)
+    - [How to use Playwright](./frontend/Playwright.md)
 - [Algolia integration](./Algolia.md) - used on all FE /posts list pages for its Facets, Pagination, and InstantSearch.
+- [LLM spec logs](/docs/LLM-spec-logs/) - historical ticket-prompts LLM received and their Git history - ie it's complimentary to the Git log. Named as `{id}-{type}-{name}.md` - `#{id}` is from the Git logs.

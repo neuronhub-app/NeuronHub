@@ -1,3 +1,5 @@
-This directory contains the gist of the prompts LLM was working on - ie it's complimentary to the Git history.
+Contains historical ticket-prompts LLM received and their Git history - ie it's complimentary to the Git log.
 
-The private Git submodule `.local/issues/` has the full history of those prompts - please feel free to reach out for excerpts.
+Named as `{id}-{type}-{name}.md` - `#{id}` is from the Git logs.
+
+The private Git submodule `.local/issues/` has the full Git (dirty) history of those prompts - please feel free to reach out for excerpts.
