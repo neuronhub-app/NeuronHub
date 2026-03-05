@@ -7,13 +7,16 @@ paths:
 
 We use `pytest` for unit tests, and `playwright` in `client/e2e`.
 
-The biggest issues are:
-1. The fucking maintenance cost.
-2. The dev workflow feedback slowdown from low quality tests.
+We must use red/green TDD.
 
-Tests will speed up coding, but only when written using a highly maintainable framework, focused on our business logic.
+The biggest test's issues are:
+1. The fucking maintenance cost: quality != quantity.
+2. The clean and readable tests are more important than the code.
+3. The dev workflow feedback slowdown from redundant tests.
 
-Create low-quality temporarily pytest or Playwright cases when it helps. Make sure to clean up afterwards.
+Tests speed up development, but only when focused on the core business logic, and written using highly maintainable frameworks - eg our `test_gen.py` and `PlaywrightHelper.ts`.
+
+It's ok to create low-quality temporarily pytest or Playwright cases for TDD - make sure to remove them afterwards.
 
 Never leave third-party libraries tests in the codebase (Strawberry, GraphQL, etc).
 
