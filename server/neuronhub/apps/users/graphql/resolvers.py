@@ -43,6 +43,7 @@ class AlgoliaSearchKeyType:
     index_name_sorted_by_votes: str
     index_name_profiles: str
     index_name_jobs: str
+    index_name_jobs_sorted_by_closes_at: str
 
 
 @strawberry.type(name="Query")
@@ -56,6 +57,7 @@ class UsersQuery:
         if not settings.ALGOLIA["IS_ENABLED"]:
             return None
 
+        from neuronhub.apps.jobs.index import algolia_replica_jobs_sorted_by_closes_at
         from neuronhub.apps.posts.index import algolia_replica_sorted_by_votes
 
         user = await get_user_maybe(info)
@@ -84,4 +86,5 @@ class UsersQuery:
             index_name_sorted_by_votes=algolia_replica_sorted_by_votes,
             index_name_profiles=f"profiles_{index_suffix}",
             index_name_jobs=f"jobs_{index_suffix}",
+            index_name_jobs_sorted_by_closes_at=algolia_replica_jobs_sorted_by_closes_at,
         )

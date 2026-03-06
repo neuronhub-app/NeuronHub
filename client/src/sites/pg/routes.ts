@@ -3,6 +3,7 @@ import { layout, prefix, type RouteConfig, route } from "@react-router/dev/route
 export default [
   layout("./sites/pg/PgLayout.tsx", [
     route("/", "./apps/jobs/list/index.tsx"),
+    route("/faq", "./apps/jobs/faq/index.tsx"),
     route("/subscriptions", "./apps/jobs/subscriptions/index.tsx"),
     route("/subscriptions/remove/:id_ext", "./apps/jobs/subscriptions/remove.tsx"),
     route("/:slug", "./apps/jobs/list/slug.tsx"),

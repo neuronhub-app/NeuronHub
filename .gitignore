@@ -18,6 +18,7 @@ server/.venv/
 
 # .env
 mise.local.toml
+mise.*.local.toml
 **/.env*
 
 # s3

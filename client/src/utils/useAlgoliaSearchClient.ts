@@ -10,6 +10,7 @@ const algoliaIndexNames = {
   indexNameSortedByVotes: undefined as undefined | string,
   indexNameProfiles: undefined as undefined | string,
   indexNameJobs: undefined as undefined | string,
+  indexNameJobsSortedByClosesAt: undefined as undefined | string,
 };
 
 export type AlgoliaIndexKey = keyof typeof algoliaIndexNames;
@@ -33,6 +34,7 @@ export function useAlgoliaSearchClient() {
       state.mutable.indexNameSortedByVotes = data.index_name_sorted_by_votes;
       state.mutable.indexNameProfiles = data.index_name_profiles;
       state.mutable.indexNameJobs = data.index_name_jobs;
+      state.mutable.indexNameJobsSortedByClosesAt = data.index_name_jobs_sorted_by_closes_at;
     },
   });
 
@@ -42,6 +44,7 @@ export function useAlgoliaSearchClient() {
     indexNameSortedByVotes: state.snap.indexNameSortedByVotes,
     indexNameProfiles: state.snap.indexNameProfiles,
     indexNameJobs: state.snap.indexNameJobs,
+    indexNameJobsSortedByClosesAt: state.snap.indexNameJobsSortedByClosesAt,
     loading: init.isLoading,
   };
 }
@@ -57,6 +60,7 @@ const AlgoliaSearchKeyQuery = graphql.persisted(
         index_name_sorted_by_votes
         index_name_profiles
         index_name_jobs
+        index_name_jobs_sorted_by_closes_at
       }
     }
   `),

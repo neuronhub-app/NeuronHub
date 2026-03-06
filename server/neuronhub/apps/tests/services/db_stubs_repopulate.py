@@ -149,6 +149,7 @@ async def db_stubs_repopulate(
 async def _algolia_reindex(is_reindex_profiles: bool = True, is_reindex_jobs: bool = True):
     from algoliasearch_django import reindex_all
 
+    from neuronhub.apps.jobs.index import setup_virtual_replica_sorted_by_closes_at
     from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
 
     await sync_to_async(reindex_all)(Post)
@@ -159,6 +160,7 @@ async def _algolia_reindex(is_reindex_profiles: bool = True, is_reindex_jobs: bo
 
     if is_reindex_jobs:
         await sync_to_async(reindex_all)(Job)
+        await sync_to_async(setup_virtual_replica_sorted_by_closes_at)()
 
 
 # todo ! refac-name: disable_algolia_indexing_if_enabled

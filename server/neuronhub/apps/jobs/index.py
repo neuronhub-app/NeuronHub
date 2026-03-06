@@ -4,6 +4,7 @@ See [[docs/architecture/Algolia.md]]
 
 import logging
 
+from algoliasearch.search.client import SearchClientSync
 from algoliasearch_django import AlgoliaIndex
 from algoliasearch_django.decorators import register
 from django.conf import settings
@@ -12,6 +13,22 @@ from neuronhub.apps.jobs.models import Job
 
 
 logger = logging.getLogger(__name__)
+
+
+def setup_virtual_replica_sorted_by_closes_at():
+    client = SearchClientSync(
+        app_id=settings.ALGOLIA["APPLICATION_ID"], api_key=settings.ALGOLIA["API_KEY"]
+    )
+    client.set_settings(
+        index_name=algolia_replica_jobs_sorted_by_closes_at,
+        index_settings={"customRanking": ["asc(closes_at_unix)"]},
+    )
+
+
+algolia_replica_jobs_sorted_by_closes_at = (
+    f"jobs_{settings.ALGOLIA['INDEX_SUFFIX']}_by_closes_at"
+)
+
 
 if settings.ALGOLIA["IS_ENABLED"]:
 
@@ -72,5 +89,11 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ],
             "unretrievableAttributes": [
                 "visible_to",
+            ],
+            "customRanking": [
+                "desc(posted_at_unix)",
+            ],
+            "replicas": [
+                algolia_replica_jobs_sorted_by_closes_at,
             ],
         }

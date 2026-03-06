@@ -1,6 +1,20 @@
-import { Box, Code, HStack, Separator, Skeleton, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Code,
+  Flex,
+  HStack,
+  Icon,
+  Link,
+  Separator,
+  Skeleton,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import type { ReactNode } from "react";
+import { GoComment, GoQuestion } from "react-icons/go";
 import { Configure } from "react-instantsearch";
+import { NavLink } from "react-router";
+
 import { JobCard } from "@/apps/jobs/list/JobCard/JobCard";
 import { JobsSubscribeModal } from "@/apps/jobs/list/JobsSubscribeModal";
 import { AlgoliaFacetAttribute } from "@/components/algolia/AlgoliaFacetAttribute";
@@ -13,15 +27,49 @@ import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { urls } from "@/urls";
+import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function JobList(props: { slug?: string }) {
   const jobOpenPinned = useJobOpenPinned(props.slug);
+
+  const algolia = useAlgoliaSearchClient();
 
   return (
     <AlgoliaList<JobFragmentType>
       index="indexNameJobs"
       label="job"
       cta={<JobsSubscribeModal />}
+      sort={
+        algolia.indexNameJobs && algolia.indexNameJobsSortedByClosesAt
+          ? {
+              items: [
+                { value: algolia.indexNameJobs, label: "Newest" },
+                { value: algolia.indexNameJobsSortedByClosesAt, label: "Closing" },
+              ],
+            }
+          : undefined
+      }
+      subheader={
+        <Flex gap="gap.md" pr="1" fontSize="xs">
+          <Link asChild>
+            <NavLink to={urls.jobs.faq}>
+              <Icon>
+                <GoComment />
+              </Icon>
+              Contact
+            </NavLink>
+          </Link>
+          <Link asChild>
+            <NavLink to={urls.jobs.faq}>
+              <Icon>
+                <GoQuestion />
+              </Icon>
+              FAQ
+            </NavLink>
+          </Link>
+        </Flex>
+      }
       hits={{
         enrichment: { query: JobsByIdsQuery, extractItems: data => data.jobs },
         renderHit: (job, ctx) => (

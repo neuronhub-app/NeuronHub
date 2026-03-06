@@ -19,6 +19,7 @@ type AlgoliaSearchKeyType {
   index_name_sorted_by_votes: String!
   index_name_profiles: String!
   index_name_jobs: String!
+  index_name_jobs_sorted_by_closes_at: String!
 }
 
 input BoolBaseFilterLookup {

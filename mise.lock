@@ -29,17 +29,17 @@ backend = "core:bun"
 "platforms.windows-x64-baseline" = { checksum = "sha256:715709c69b176e20994533d3292bd0b7c32de9c0c5575b916746ec6b2aa38346", url = "https://github.com/oven-sh/bun/releases/download/bun-v1.3.10/bun-windows-x64-baseline.zip"}
 
 [[tools.claude]]
-version = "2.1.69"
+version = "2.1.70"
 backend = "aqua:anthropics/claude-code"
-"platforms.linux-arm64" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.69/linux-arm64/claude"}
-"platforms.linux-arm64-musl" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.69/linux-arm64/claude"}
-"platforms.linux-x64" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.69/linux-x64/claude"}
-"platforms.linux-x64-baseline" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.69/linux-x64/claude"}
-"platforms.linux-x64-musl" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.69/linux-x64/claude"}
-"platforms.linux-x64-musl-baseline" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.69/linux-x64/claude"}
-"platforms.macos-arm64" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.69/darwin-arm64/claude"}
-"platforms.macos-x64" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.69/darwin-x64/claude"}
-"platforms.macos-x64-baseline" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.69/darwin-x64/claude"}
+"platforms.linux-arm64" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.70/linux-arm64/claude"}
+"platforms.linux-arm64-musl" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.70/linux-arm64/claude"}
+"platforms.linux-x64" = { checksum = "blake3:3a0c17c082ed02bddae3fc9fdd523f9044df082b92c3d53ca5cb76258c77aa2e", url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.70/linux-x64/claude"}
+"platforms.linux-x64-baseline" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.70/linux-x64/claude"}
+"platforms.linux-x64-musl" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.70/linux-x64/claude"}
+"platforms.linux-x64-musl-baseline" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.70/linux-x64/claude"}
+"platforms.macos-arm64" = { checksum = "blake3:c07b56746d78813d423e366343e8c8ea0f7a60e3a25114e55f26d8013a1e2f83", url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.70/darwin-arm64/claude"}
+"platforms.macos-x64" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.70/darwin-x64/claude"}
+"platforms.macos-x64-baseline" = { url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.70/darwin-x64/claude"}
 
 [[tools.killport]]
 version = "1.1.0"

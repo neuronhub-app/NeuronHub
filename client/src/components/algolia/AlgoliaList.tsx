@@ -1,4 +1,4 @@
-import { Flex, HStack, Stack, Text } from "@chakra-ui/react";
+import { Flex, HStack, NativeSelect, Stack, Text } from "@chakra-ui/react";
 import type { TadaDocumentNode } from "gql.tada";
 import type { ReactNode } from "react";
 import {
@@ -7,6 +7,7 @@ import {
   useCurrentRefinements,
   useHits,
   useSearchBox,
+  useSortBy,
 } from "react-instantsearch";
 import { NavLink } from "react-router";
 import { useUser } from "@/apps/users/useUserCurrent";
@@ -38,6 +39,8 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
     hitOpenedPinned?: { node?: ReactNode; id?: ID };
     listTestId?: string;
   };
+  sort?: { items: Array<{ value: string; label: string }> };
+  subheader?: ReactNode;
   children: ReactNode;
   cta?: ReactNode;
 }) {
@@ -63,27 +66,36 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
     >
       {props.typeFilter && <Configure filters={`type:${props.typeFilter}`} />}
 
-      <Stack gap="gap.lg" w="100%">
-        <HStack as="header" gap="gap.lg" flexWrap="wrap" justify="space-between">
-          <Text fontSize="2xl" fontWeight="bold" textTransform="capitalize">
-            {labelPlural}
-          </Text>
+      <Stack gap="gap.sm" w="100%">
+        <Stack as="header" gap="gap.sm">
+          <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">
+            <Text fontSize="2xl" fontWeight="bold" textTransform="capitalize">
+              {labelPlural}
+            </Text>
 
-          <Flex gap="gap.md" align="center">
-            <AlgoliaSearchInput testId={props.searchInputTestId} />
+            <Flex gap="gap.md" align="center">
+              <AlgoliaSearchInput testId={props.searchInputTestId} />
 
-            {Boolean(props.cta) && props.cta}
+              {Boolean(props.cta) && props.cta}
 
-            {props.createUrl && user?.id && (
-              <NavLink to={props.createUrl}>
-                <Button
-                  variant="subtle"
-                  textTransform="capitalize"
-                >{`Create ${props.label}`}</Button>
-              </NavLink>
-            )}
-          </Flex>
-        </HStack>
+              {props.createUrl && user?.id && (
+                <NavLink to={props.createUrl}>
+                  <Button
+                    variant="subtle"
+                    textTransform="capitalize"
+                  >{`Create ${props.label}`}</Button>
+                </NavLink>
+              )}
+            </Flex>
+          </HStack>
+
+          {(props.sort || props.subheader) && (
+            <HStack gap="gap.md" justify="space-between">
+              {props.sort && <AlgoliaSortSelect items={props.sort.items} />}
+              {props.subheader}
+            </HStack>
+          )}
+        </Stack>
 
         <Flex flex="1" pos="relative" gap={{ base: "gap.lg", "2xl": "gap.xl" }}>
           <AlgoliaHits label={labelPlural} {...props.hits} />
@@ -91,6 +103,28 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
         </Flex>
       </Stack>
     </InstantSearch>
+  );
+}
+
+function AlgoliaSortSelect(props: { items: Array<{ value: string; label: string }> }) {
+  const sort = useSortBy({ items: props.items });
+
+  return (
+    <NativeSelect.Root variant="plain" size="xs" w="fit-content">
+      <NativeSelect.Field
+        value={sort.currentRefinement}
+        onChange={event => sort.refine(event.target.value)}
+        ps="1"
+        w="fit-content"
+      >
+        {sort.options.map(option => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </NativeSelect.Field>
+      <NativeSelect.Indicator />
+    </NativeSelect.Root>
   );
 }
 
