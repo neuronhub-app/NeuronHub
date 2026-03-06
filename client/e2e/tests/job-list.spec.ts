@@ -9,25 +9,17 @@ import { urls } from "@/urls";
 const isSiteProbablyGood = env.VITE_SITE === "pg";
 
 test.describe("JobList", () => {
-  test.describe.configure({ mode: "serial" });
-
   let play: PlaywrightHelper;
   let $: LocatorMapToGetFirstById;
-  let isPopulated = false;
 
   test.beforeEach(async ({ page }) => {
     play = new PlaywrightHelper(page);
     $ = play.$;
-    if (!isPopulated) {
-      await play.dbStubsRepopulateAndLogin({
-        is_import_HN_post: false,
-        is_create_single_review: false,
-        is_create_jobs: true,
-      });
-      isPopulated = true;
-    } else {
-      await play.login();
-    }
+    await play.dbStubsRepopulateAndLogin({
+      is_import_HN_post: false,
+      is_create_single_review: false,
+      is_create_jobs: true,
+    });
   });
 
   // todo ! refac: #AI-slop, trash matchers, magic strings, no testid

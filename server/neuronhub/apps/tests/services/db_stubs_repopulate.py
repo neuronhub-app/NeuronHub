@@ -15,6 +15,7 @@ from neuronhub.apps.importer.models import PostSource
 from neuronhub.apps.importer.models import UserSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.tests.db_stubs import create_jobs_stubs
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
@@ -95,6 +96,7 @@ async def db_stubs_repopulate(
                 await model._default_manager.all().adelete()
 
         if is_delete_jobs:
+            await JobAlert.objects.all().adelete()
             await Job.objects.all().adelete()
 
         if is_delete_user_default:
