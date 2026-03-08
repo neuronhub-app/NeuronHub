@@ -2,6 +2,7 @@ import uuid
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.utils.crypto import salted_hmac
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
 
@@ -150,3 +151,27 @@ class JobAlert(TimeStampedModel):
     jobs_clicked = models.ManyToManyField(Job, blank=True)
 
     history = HistoricalRecords()
+
+    def __str__(self):
+        return f"JobAlert({self.pk}, {self.email}, active={self.is_active})"
+
+
+class JobAlertLog(TimeStampedModel):
+    job_alert = models.ForeignKey(
+        JobAlert,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="logs",
+    )
+    job = models.ForeignKey(
+        Job,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="alert_logs",
+    )
+    email_hash = models.CharField(max_length=128)
+    sent_at = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def hash_email(email: str) -> str:
+        return salted_hmac(key_salt="JobAlertLog", value=email).hexdigest()

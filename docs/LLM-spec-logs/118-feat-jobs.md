@@ -40,10 +40,19 @@ FE
 - [ ] JobAlert email
     - [x] open Job by .slug for email alerts: query by GraphQL -> put on the top of Algolia results.
     - [x] Add FE `/jobs/subscriptions/remove/<.id_ext>` that removes the alert using GraphQL and
-    - [ ] email template to send, similar to their existing template `.local/issues/attachments/118-job-alert-email.png`
+    - [x] email template in `apps/jobs/templates/jobs/alert_email.html`
+    - [x] store which email was notified of which Jobs (`JobAlertLog` model)
 - [x] add sorting: by default show newest first, allow to switch to `.closes_at`
 
 ## Thinking-Log
+- Model renamed from `JobAlertNotification` → `JobAlertLog`
+- Dropped `unique_together` constraint on `(job_alert, job)` — duplicate alerts across different `JobAlert`s are acceptable; the log is for stats/impact assessment, not dedup enforcement
+- Gen factories: removed magic strings (`title`, `visibility` params) — only `email` is needed on `job_alert()`
+- Merged `send_job_alert_email_for_job()` into `send_job_alert_emails(*, jobs=None)` — single entry point, no duplication
+- First attempt had `JobAlertNotification` with `unique_together` — violated the spec that duplicate alerts for different JobAlerts are fine
 
-- Sorting done: BE replica + customRanking, FE SegmentGroup sort toggle (Newest / Closing Soon)
-- Note: need to run `setup_virtual_replica_sorted_by_closes_at()` once in prod to create the Algolia virtual replica
+Review done. Fixed 3 bugs in `send_alert_email.py`, tests 69/69 pass.
+- **Race condition**: `alert.sent_count += 1; asave()` → `F("sent_count") + 1` via `.aupdate()`
+- **Falsy empty list**: `jobs_override or ...` → `if jobs_override is not None` (empty `[]` was falling through to `_find_matching_jobs`)
+- **No ordering**: `_find_matching_jobs` results had random DB order → added `.order_by("-posted_at")`
+Rest of the code (models, signals, tasks, tests, template, gen factories) is clean.

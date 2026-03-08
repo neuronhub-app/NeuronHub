@@ -7,6 +7,9 @@ from faker import Faker
 from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
 
 from neuronhub.apps.anonymizer.fields import Visibility
+from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models import PostCategory
 from neuronhub.apps.posts.models import PostTag
@@ -23,6 +26,7 @@ class Gen:
     users: UsersGen
     posts: PostsGen
     profiles: ProfilesGen
+    jobs: JobsGen
     faker: UniqueProxy
     faker_non_unique: Faker
     random_gen_seeded: Random
@@ -48,6 +52,7 @@ class Gen:
         )
         self.posts = PostsGen(faker=self.faker, user=self.users.user_default)
         self.profiles = ProfilesGen(faker=self.faker, user=self.users.user_default)
+        self.jobs = JobsGen(faker=self.faker)
 
         return self
 
@@ -406,3 +411,26 @@ class ProfilesGen:
             },
         )
         return match
+
+
+@dataclass
+class JobsGen:
+    faker: UniqueProxy
+
+    async def job(self, org: Org | None = None) -> Job:
+        if not org:
+            org, _ = await Org.objects.aget_or_create(
+                name=self.faker.company(),
+                defaults={"website": self.faker.domain_name()},
+            )
+        return await Job.objects.acreate(
+            title=self.faker.sentence(),
+            org=org,
+            visibility=Visibility.PUBLIC,
+        )
+
+    async def job_alert(self, email: str = "", is_active=True) -> JobAlert:
+        return await JobAlert.objects.acreate(
+            email=email or self.faker.email(),
+            is_active=is_active,
+        )
