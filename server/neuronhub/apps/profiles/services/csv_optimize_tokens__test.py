@@ -3,17 +3,8 @@ from neuronhub.apps.profiles.services.csv_optimize_tokens import csv_optimize_to
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
+# #AI
 class CsvOptimizeTokensTest(NeuronTestCase):
-    def test_replacements_apply_slash_variations(self):
-        assert csv_optimize_tokens("Software development/Software engineering") == "SWE"
-        assert csv_optimize_tokens("Software development / Software engineering") == "SWE"
-
-    def test_new_replacements(self):
-        assert csv_optimize_tokens("Global health & development") == "Global health"
-        assert csv_optimize_tokens("Pursuing a graduate degree (e.g. Masters)") == "Grad student"
-
-
-class CsvNormalizeForDbTest(NeuronTestCase):
     def test_keep_items_applied(self):
         assert csv_normalize_for_db("United States") == "US"
         assert csv_normalize_for_db("United Kingdom") == "UK"

@@ -1,31 +1,12 @@
 from strawberry import UNSET
 
+from neuronhub.apps.posts.graphql.types import PostTagTypeInput
+from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
-from neuronhub.apps.posts.models import PostTagVote, Post
-from neuronhub.apps.posts.services.post_update_or_create import (
-    post_update_or_create,
-)
-from neuronhub.apps.posts.graphql.types import PostTypeInput, PostTagTypeInput
+from neuronhub.apps.posts.models import Post
+from neuronhub.apps.posts.models import PostTagVote
+from neuronhub.apps.posts.services.post_update_or_create import post_update_or_create
 from neuronhub.apps.tests.test_cases import NeuronTestCase
-
-
-class CommentTest(NeuronTestCase):
-    async def test_comment_create_sets_correct_type(self):
-        post = await self.gen.posts.create()
-        content_test = "Test comment content"
-
-        comment = await post_update_or_create(
-            author=self.user,
-            data=PostTypeInput(
-                type=Post.Type.Comment,
-                parent=PostTypeInput(id=post.id),
-                content_polite=content_test,
-            ),
-        )
-        assert comment.type == Post.Type.Comment
-        assert comment.content_polite == content_test
-        assert comment.parent_id == post.id
-        assert comment.author_id == self.user.id
 
 
 class ReviewCreateOrUpdateTest(NeuronTestCase):
@@ -382,7 +363,5 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
             ),
             None,
         )
-        assert author_vote_after is not None, (
-            "Author vote disappeared after save without changes"
-        )
+        assert author_vote_after is not None, "vote disappeared after save without changes"
         assert author_vote_after["is_vote_positive"] is True

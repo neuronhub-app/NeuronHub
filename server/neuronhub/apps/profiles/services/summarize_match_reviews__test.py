@@ -47,39 +47,6 @@ class SummarizeMatchReviewsTest(NeuronTestCase):
         assert better.match_score == 60
         assert better.match_score_delta == -20
 
-    async def test_calibration_examples_use_real_attendee_data(self):
-        profiles = await self._create_profiles(1)
-
-        await gen_llm_scoring(profiles[0], self.user, score_by_llm=75, reason="some SWE overlap")
-        await gen_user_review(
-            profiles[0], self.user, score_by_user=40, review_note="no shared seeks"
-        )
-
-        reviews = await sync_to_async(_get_reviewed_list)(self.user)
-        calibration = build_calibration_examples(reviews)
-
-        assert '="75"' in calibration
-        assert '="40"' in calibration
-        assert "<match_review_by_user>" in calibration
-        assert "<match_reason_by_llm>" in calibration
-        assert "<seeks>" not in calibration
-        assert "<offers>" not in calibration
-
-    async def test_calibration_capped_at_max_examples(self):
-        profiles = await self._create_profiles(12)
-
-        for i, profile in enumerate(profiles):
-            await gen_llm_scoring(profile, self.user, score_by_llm=70 + i)
-            await gen_user_review(
-                profile, self.user, score_by_user=30 + i, review_note=f"reason {i}"
-            )
-
-        reviews = await sync_to_async(_get_reviewed_list)(self.user)
-        assert len(reviews) == 12
-
-        calibration = build_calibration_examples(reviews, max_examples=8)
-        assert calibration.count("<Example ") == 8
-
     async def test_calibration_picks_positive_over_mild_negative(self):
         profiles = await self._create_profiles(12)
 

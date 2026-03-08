@@ -8,7 +8,7 @@ from neuronhub.settings import DjangoEnv
 
 @strawberry.type
 class TestsMutation:
-    @strawberry.mutation()
+    @strawberry.mutation
     async def test_db_stubs_repopulate(
         self,
         info: strawberry.Info,
@@ -33,7 +33,7 @@ class TestsMutation:
         return gen.users.user_default.username
 
     # #AI
-    @strawberry.mutation()
+    @strawberry.mutation
     async def test_create_failed_task(self, info: strawberry.Info) -> bool:
         from django.contrib.auth import get_user_model
         from django_tasks.backends.database.models import DBTaskResult
