@@ -1,6 +1,5 @@
 import uuid
 
-from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils.crypto import salted_hmac
 from django_extensions.db.fields import AutoSlugField
@@ -40,6 +39,9 @@ class Job(AlgoliaModel):
 
     salary_min = models.PositiveIntegerField(blank=True, null=True)
     salary_max = models.PositiveIntegerField(blank=True, null=True)
+    # salary_ranges = models.TextField(
+    #     blank=True, help_text="Orgs can specify multiple ranges for multiple locations."
+    # )
 
     tags_skill = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
         "posts.PostTag",
@@ -72,8 +74,18 @@ class Job(AlgoliaModel):
         blank=True,
     )
 
-    country = ArrayField(models.CharField(max_length=128), default=list, blank=True)
-    city = ArrayField(models.CharField(max_length=128), default=list, blank=True)
+    tags_country = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
+        "posts.PostTag",
+        limit_choices_to={"categories__name": TagCategoryEnum.Country},
+        related_name=f"tags_job_{TagCategoryEnum.Country.value}",
+        blank=True,
+    )
+    tags_city = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
+        "posts.PostTag",
+        limit_choices_to={"categories__name": TagCategoryEnum.City},
+        related_name=f"tags_job_{TagCategoryEnum.City.value}",
+        blank=True,
+    )
 
     url_external = models.CharField(blank=True, max_length=1024, verbose_name="URL")
 
@@ -123,8 +135,14 @@ class Job(AlgoliaModel):
     def get_tags_json_workload(self):
         return self._get_graphql_field("tags_workload")
 
+    def get_tags_json_country(self):
+        return self._get_graphql_field("tags_country")
+
+    def get_tags_json_city(self):
+        return self._get_graphql_field("tags_city")
+
     def get_org_json(self):
-        return self._get_graphql_field("org") or {}
+        return self._get_graphql_field("org")
 
     def __str__(self):
         return self.title

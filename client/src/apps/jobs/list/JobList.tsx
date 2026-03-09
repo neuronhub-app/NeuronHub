@@ -85,8 +85,8 @@ export function JobList(props: { slug?: string }) {
         attributesToHighlight={[
           "title",
           "org.name",
-          "country",
-          "city",
+          "tags_country.name",
+          "tags_city.name",
           "tags_skill.name",
           "tags_area.name",
         ]}
@@ -108,8 +108,18 @@ export function JobList(props: { slug?: string }) {
       </Stack>
 
       <AlgoliaFacetAttribute attribute="tags_experience.name" label="Experience" />
-      <AlgoliaFacetAttribute attribute="country" label="Country" isSearchEnabled showFirst={5} />
-      <AlgoliaFacetAttribute attribute="city" label="City" isSearchEnabled showFirst={5} />
+      <AlgoliaFacetAttribute
+        attribute="tags_country.name"
+        label="Country"
+        isSearchEnabled
+        showFirst={5}
+      />
+      <AlgoliaFacetAttribute
+        attribute="tags_city.name"
+        label="City"
+        isSearchEnabled
+        showFirst={5}
+      />
       <AlgoliaFacetSalary attribute="salary_min" label="Salary" />
       <AlgoliaFacetAttribute
         attribute="tags_skill.name"

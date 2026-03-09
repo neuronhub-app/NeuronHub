@@ -12,7 +12,8 @@ import requests
 from asgiref.sync import sync_to_async
 from django.core.files.base import ContentFile
 
-from neuronhub.apps.jobs.services.csv_import import _get_or_create_tags_by_category
+from neuronhub.apps.jobs.services.csv_import import TagFields
+from neuronhub.apps.jobs.services.csv_import import _get_or_create_tags
 from neuronhub.apps.jobs.services.csv_import import _list_split_and_strip
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
@@ -39,8 +40,8 @@ async def csv_import_orgs(
                 continue
 
             tags_area_names = _list_split_and_strip(org_dict.pop("tags_area"))
-            tags_area = await _get_or_create_tags_by_category(
-                names=tags_area_names,
+            tags_area = await _get_or_create_tags(
+                tag_fields=[TagFields(name=name) for name in tags_area_names],
                 category=TagCategoryEnum.Area,
             )
 

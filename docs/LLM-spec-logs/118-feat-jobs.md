@@ -43,8 +43,14 @@ FE
     - [x] email template in `apps/jobs/templates/jobs/alert_email.html`
     - [x] store which email was notified of which Jobs (`JobAlertLog` model)
 - [x] add sorting: by default show newest first, allow to switch to `.closes_at`
+- facets
+    - [x] convert .country and .city to PostTags
+    - [x] add field `PostTag.aliases: ArrayField` - store there the full name eg `USA (United States)` while keep using `US` for the `tag.name`. aliases will be indexed by Algolia, but not in the FE render or highlight
 
 ## Thinking-Log
+
+- Sorting done: BE replica + customRanking, FE SegmentGroup sort toggle (Newest / Closing Soon)
+- Note: need to run `setup_virtual_replica_sorted_by_closes_at()` once in prod to create the Algolia virtual replica
 - Model renamed from `JobAlertNotification` → `JobAlertLog`
 - Dropped `unique_together` constraint on `(job_alert, job)` — duplicate alerts across different `JobAlert`s are acceptable; the log is for stats/impact assessment, not dedup enforcement
 - Gen factories: removed magic strings (`title`, `visibility` params) — only `email` is needed on `job_alert()`

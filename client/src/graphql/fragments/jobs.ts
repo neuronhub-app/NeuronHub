@@ -21,8 +21,12 @@ export const JobFragment = graphql(
       is_visa_sponsor
       salary_min
       salary_max
-      country
-      city
+      tags_country {
+        ...PostTagLeanFragment
+      }
+      tags_city {
+        ...PostTagLeanFragment
+      }
       url_external
       posted_at
       closes_at

@@ -5,6 +5,7 @@ import { FaBell } from "react-icons/fa6";
 import { GoInfo } from "react-icons/go";
 import { useCurrentRefinements } from "react-instantsearch";
 import { z } from "zod";
+
 import { useUser } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
@@ -28,23 +29,22 @@ const FormSchema = z.object({
 });
 
 export function JobsSubscribeModal() {
-  const refinesCurrent = useCurrentRefinements();
   const user = useUser();
-
   const loading = useIsLoading();
+
+  const refinesCurrent = useCurrentRefinements();
 
   const state = useStateValtio({
     isOpen: false,
   });
 
   const emailStoreKey = "job_alert_email";
-
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: { email: user?.email ?? localStorage.getItem(emailStoreKey) ?? "" },
   });
 
-  const refinesCurrentMap = refinesCurrent.items.flatMap(item =>
+  const refinesCurrentReadableMap = refinesCurrent.items.flatMap(item =>
     item.refinements.map(refinement => ({
       attribute: ATTRIBUTE_LABELS[item.attribute] ?? item.attribute,
       label: refinement.label,
@@ -52,15 +52,13 @@ export function JobsSubscribeModal() {
   );
 
   async function handleSubscribe(fields: z.infer<typeof FormSchema>) {
-    const tagNames = refinesCurrent.items
-      .filter(item => item.attribute.startsWith("tags_"))
-      .flatMap(item => item.refinements.map(tag => String(tag.value)));
-
     const salaryRefinement = refinesCurrent.items.find(item => item.attribute === "salary_min");
 
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,
-      tag_names: tagNames.length > 0 ? tagNames : null,
+      tag_names: refinesCurrent.items
+        .filter(item => item.attribute.startsWith("tags_"))
+        .flatMap(item => item.refinements.map(tag => String(tag.value))),
       is_orgs_highlighted:
         refinesCurrent.items.some(item => item.attribute === "org.is_highlighted") ?? null,
       is_remote: refinesCurrent.items.some(item => item.attribute === "is_remote") ?? null,
@@ -136,13 +134,13 @@ export function JobsSubscribeModal() {
                   }}
                 />
 
-                {refinesCurrentMap.length > 0 && (
+                {refinesCurrentReadableMap.length > 0 ? (
                   <Stack gap="gap.sm">
                     <Text fontSize="sm" fontWeight="medium">
                       Filters
                     </Text>
                     <Flex gap="gap.sm" flexWrap="wrap">
-                      {refinesCurrentMap.map(facet => (
+                      {refinesCurrentReadableMap.map(facet => (
                         <Group
                           key={`${facet.attribute}-${facet.label}`}
                           attached
@@ -157,9 +155,7 @@ export function JobsSubscribeModal() {
                       Updates sent daily when new jobs match.
                     </Text>
                   </Stack>
-                )}
-
-                {!refinesCurrentMap.length && (
+                ) : (
                   <Flex align="center" color="fg.info" gap="gap.sm">
                     <Icon>
                       <GoInfo />
@@ -198,8 +194,8 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_experience.name": "Experience",
   "tags_education.name": "Education",
   "tags_workload.name": "Workload",
-  country: "Country",
-  city: "City",
+  "tags_country.name": "Country",
+  "tags_city.name": "City",
   is_remote: "Remote",
   "org.is_highlighted": "Highlighted",
   "org.name": "Organization",

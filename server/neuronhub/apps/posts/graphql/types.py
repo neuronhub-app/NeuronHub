@@ -228,6 +228,7 @@ class PostTagFilter:
 class PostTagType:
     id: auto
     name: auto
+    aliases: auto
     label: auto
     description: auto
     is_important: auto

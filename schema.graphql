@@ -115,8 +115,8 @@ type JobType {
   is_visa_sponsor: Boolean
   salary_min: Int
   salary_max: Int
-  country: [String!]!
-  city: [String!]!
+  tags_country(filters: PostTagFilter): [PostTagType!]!
+  tags_city(filters: PostTagFilter): [PostTagType!]!
   url_external: String!
   posted_at: DateTime
   closes_at: DateTime
@@ -445,6 +445,7 @@ input PostTagFilter {
 type PostTagType {
   id: ID!
   name: String!
+  aliases: [String!]!
   label: String!
   description: String!
   is_important: Boolean
@@ -843,6 +844,8 @@ enum TagCategoryEnum {
   Education
   Experience
   Workload
+  Country
+  City
 }
 
 input TagCategoryEnumFilterLookup {

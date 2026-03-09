@@ -46,3 +46,5 @@ class TagCategoryEnum(models.TextChoices):
     Education = "education"  # "PhD"
     Experience = "experience"  # "Middle (5-9y)"
     Workload = "workload"  # "Full-time"
+    Country = "country"
+    City = "city"

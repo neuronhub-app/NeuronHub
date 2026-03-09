@@ -19,6 +19,8 @@ class JobTags:
     education: list[str] = field(default_factory=list)
     experience: list[str] = field(default_factory=list)
     workload: list[str] = field(default_factory=list)
+    country: list[str] = field(default_factory=list)
+    city: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -35,8 +37,6 @@ async def create_jobs_stubs() -> None:
             job=Job(
                 title="Research Scientist, Interpretability",
                 url_external="https://novafield.ai/careers/interpretability",
-                country=[val.country.US],
-                city=[val.city.SF],
                 salary_min=180_000,
                 posted_at=datetime(2026, 1, 15, tzinfo=UTC),
                 visibility=Visibility.PUBLIC,
@@ -47,6 +47,8 @@ async def create_jobs_stubs() -> None:
                 education=[val.education.PhD],
                 experience=[val.experience.Middle],
                 workload=[val.workload.FullTime],
+                country=[val.country.US],
+                city=[val.city.SF],
             ),
         ),
         JobStub(
@@ -54,8 +56,6 @@ async def create_jobs_stubs() -> None:
             job=Job(
                 title="Operations Associate",
                 url_external="https://cleargrant.org/jobs/ops-associate",
-                country=[val.country.US],
-                city=[val.city.Oakland],
                 salary_min=75_000,
                 posted_at=datetime(2026, 2, 1, tzinfo=UTC),
                 visibility=Visibility.PUBLIC,
@@ -66,6 +66,8 @@ async def create_jobs_stubs() -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime],
+                country=[val.country.US],
+                city=[val.city.Oakland],
             ),
         ),
         JobStub(
@@ -77,14 +79,6 @@ async def create_jobs_stubs() -> None:
             job=Job(
                 title="Policy Researcher, AI Governance",
                 url_external="https://meridiangovernance.org/vacancies/policy",
-                country=[val.country.UK, val.country.US],
-                city=[
-                    val.city.London,
-                    val.city.Oxford,
-                    val.city.DC,
-                    val.city.Geneva,
-                    val.city.Brussels,
-                ],
                 is_remote=True,
                 posted_at=datetime(2026, 1, 20, tzinfo=UTC),
                 closes_at=datetime(2026, 5, 15, tzinfo=UTC) + timedelta(days=10),
@@ -96,6 +90,14 @@ async def create_jobs_stubs() -> None:
                 education=[val.education.Masters],
                 experience=[val.experience.Junior, val.experience.Middle],
                 workload=[val.workload.FullTime],
+                country=[val.country.UK, val.country.US],
+                city=[
+                    val.city.London,
+                    val.city.Oxford,
+                    val.city.DC,
+                    val.city.Geneva,
+                    val.city.Brussels,
+                ],
             ),
         ),
         JobStub(
@@ -105,16 +107,6 @@ async def create_jobs_stubs() -> None:
             job=Job(
                 title="Country Director, East Africa Programs",
                 url_external="https://bridgefund.io/hiring/country-director",
-                country=[
-                    val.country.Kenya,
-                    val.country.Uganda,
-                    val.country.Rwanda,
-                    val.country.Tanzania,
-                    val.country.Malawi,
-                    val.country.Mozambique,
-                    val.country.DRC,
-                ],
-                city=[val.city.Nairobi, val.city.Kampala, val.city.Kigali, val.city.DarEsSalaam],
                 salary_min=90_000,
                 salary_max=130_000,
                 posted_at=datetime(2025, 12, 10, tzinfo=UTC),
@@ -126,6 +118,16 @@ async def create_jobs_stubs() -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Senior],
                 workload=[val.workload.FullTime],
+                country=[
+                    val.country.Kenya,
+                    val.country.Uganda,
+                    val.country.Rwanda,
+                    val.country.Tanzania,
+                    val.country.Malawi,
+                    val.country.Mozambique,
+                    val.country.DRC,
+                ],
+                city=[val.city.Nairobi, val.city.Kampala, val.city.Kigali, val.city.DarEsSalaam],
             ),
         ),
         JobStub(
@@ -133,8 +135,6 @@ async def create_jobs_stubs() -> None:
             job=Job(
                 title="Summer Research Fellowship",
                 url_external="https://arclightresearch.org/fellowship",
-                country=[val.country.US],
-                city=[val.city.Berkeley],
                 posted_at=datetime(2026, 2, 15, tzinfo=UTC),
                 closes_at=datetime(2026, 3, 31, tzinfo=UTC) + timedelta(days=30),
                 visibility=Visibility.PUBLIC,
@@ -145,6 +145,8 @@ async def create_jobs_stubs() -> None:
                 education=[val.education.NoReq],
                 experience=[val.experience.Entry],
                 workload=[val.workload.Internship, val.workload.ThreeMonths],
+                country=[val.country.US],
+                city=[val.city.Berkeley],
             ),
         ),
         JobStub(
@@ -152,7 +154,6 @@ async def create_jobs_stubs() -> None:
             job=Job(
                 title="Data Analyst, Animal Welfare Metrics",
                 url_external="https://sentientmetrics.org/careers/data-analyst",
-                country=[val.country.US, val.country.UK, val.country.Remote],
                 is_remote=True,
                 is_visa_sponsor=False,
                 posted_at=datetime(2026, 2, 20, tzinfo=UTC),
@@ -164,6 +165,7 @@ async def create_jobs_stubs() -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime, val.workload.PartTime],
+                country=[val.country.US, val.country.UK, val.country.Remote],
             ),
         ),
     ]
@@ -194,9 +196,6 @@ class val:
     class country:
         US = "US"
         UK = "UK"
-        Switzerland = "Switzerland"
-        Germany = "Germany"
-        Belgium = "Belgium"
         Kenya = "Kenya"
         Uganda = "Uganda"
         Rwanda = "Rwanda"

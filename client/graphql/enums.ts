@@ -27,6 +27,8 @@ export enum PostTypeEnum {
 
 export enum TagCategoryEnum {
   Area = 'Area',
+  City = 'City',
+  Country = 'Country',
   Education = 'Education',
   Experience = 'Experience',
   Skill = 'Skill',

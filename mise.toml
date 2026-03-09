@@ -121,7 +121,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
             # rclone serve s3
             if $env.CI? != "true" {
                 mkdir {{ env.S3_STORAGE_BUCKET_NAME }}
-                try { rclone serve s3 . --addr :{{ env.S3_PORT }} }
+                try { rclone serve s3 . --addr 0.0.0.0:{{ env.S3_PORT }} }
             }
         """
 

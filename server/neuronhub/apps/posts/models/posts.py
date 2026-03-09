@@ -3,6 +3,7 @@ from typing import Any
 
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import CharField
 from django.db.models import ManyToManyField
@@ -454,6 +455,7 @@ class PostTag(AnonimazableTimeStampedModel):
         null=True,
     )
     name = models.CharField(max_length=255)
+    aliases = ArrayField(models.CharField(max_length=255), default=list, blank=True)
     description = anonymizable(models.TextField(blank=True))
 
     categories = models.ManyToManyField(PostTagCategory)

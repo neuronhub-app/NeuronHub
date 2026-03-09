@@ -34,9 +34,7 @@ class Command(BaseCommand):
 
         with _disable_auto_indexing():
             if csv:
-                stats = async_to_sync(csv_import_jobs)(
-                    csv, limit=limit, is_reindex_algolia=False
-                )
+                stats = async_to_sync(csv_import_jobs)(csv, limit=limit)
                 self.stdout.write(f"Jobs created:   {stats.created}")
                 self.stdout.write(f"Jobs updated:   {stats.updated}")
 

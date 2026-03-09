@@ -1,15 +1,13 @@
 """
-#AI
+#AI (refactored 2 times)
 """
 
 import csv
 from dataclasses import dataclass
+from dataclasses import field
 from datetime import UTC
 from datetime import datetime
 from pathlib import Path
-
-from asgiref.sync import sync_to_async
-from django.conf import settings
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
@@ -26,11 +24,7 @@ class CsvSyncStats:
     updated: int = 0
 
 
-async def csv_import_jobs(
-    csv_path: Path,
-    limit: int | None = None,
-    is_reindex_algolia: bool = True,
-) -> CsvSyncStats:
+async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncStats:
     stats = CsvSyncStats()
 
     with _disable_auto_indexing():
@@ -39,14 +33,20 @@ async def csv_import_jobs(
             if not job_dict:
                 continue
 
-            tags_by_field_name = {}
+            tags_by_field_name: dict[str, list[PostTag]] = {}
             for category in TagCategoryEnum:
-                field_name = f"tags_{category.value}"
-                names = [
-                    _abbreviate_tag(n) for n in _list_split_and_strip(job_dict.pop(field_name))
-                ]
-                tags_by_field_name[field_name] = await _get_or_create_tags_by_category(
-                    names=names,
+                tag_field_name = f"tags_{category.value}"
+                raw_values = job_dict.pop(tag_field_name, "")
+                if not raw_values:
+                    continue
+
+                abbreviate = {
+                    TagCategoryEnum.Country: _abbreviate_country,
+                    TagCategoryEnum.City: _abbreviate_city,
+                }.get(category, _abbreviate_tag)
+
+                tags_by_field_name[tag_field_name] = await _get_or_create_tags(
+                    tag_fields=[abbreviate(val) for val in _list_split_and_strip(raw_values)],
                     category=category,
                 )
 
@@ -69,28 +69,32 @@ async def csv_import_jobs(
             else:
                 stats.updated += 1
 
-            for field_name, tags in tags_by_field_name.items():
-                await getattr(job, field_name).aset(tags)
-
-    if settings.ALGOLIA["IS_ENABLED"] and is_reindex_algolia:
-        from algoliasearch_django import reindex_all
-
-        await sync_to_async(reindex_all)(Job)
+            for tag_field_name, tags in tags_by_field_name.items():
+                await getattr(job, tag_field_name).aset(tags)
 
     return stats
 
 
-async def _get_or_create_tags_by_category(
-    names: list[str],
+async def _get_or_create_tags(
+    tag_fields: list[TagFields],
     category: TagCategoryEnum,
 ) -> list[PostTag]:
     category_obj, _ = await PostTagCategory.objects.aget_or_create(name=category.value)
     tags = []
-    for name in names:
-        tag, _ = await PostTag.objects.aget_or_create(name=name)
+    for tag_fields in tag_fields:
+        tag, _ = await PostTag.objects.aget_or_create(
+            name=tag_fields.name,
+            defaults={"aliases": tag_fields.aliases},
+        )
         await tag.categories.aadd(category_obj)
         tags.append(tag)
     return tags
+
+
+@dataclass
+class TagFields:
+    name: str
+    aliases: list[str] = field(default_factory=list)
 
 
 def _parse_jobs_csv(csv_path: Path) -> list[dict]:
@@ -106,8 +110,8 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
             "Job Title": "title",
             "Organization": "org_name",
             "Job Link": "url_external",
-            "Country": "country",
-            "City / State": "city",
+            "Country": "tags_country",
+            "City / State": "tags_city",
             "Cause Area(s)": "tags_area",
             "Role Types": "tags_workload",
             "Education": "tags_education",
@@ -116,21 +120,13 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
         }.items():
             job[name_django] = row.get(name_csv, "").strip()
 
-        job["country"] = [
-            _abbreviate_country(c) for c in _list_split_and_strip(job.get("country", ""))
-        ]
-        job["city"] = [_abbreviate_city(c) for c in _list_split_and_strip(job.get("city", ""))]
-
         job["is_remote"] = "Remote" == row.get("Remote? ", "").strip()
 
         if salary_raw := row.get("Minimum Salary", ""):
             job["salary_min"] = int(float(salary_raw))
 
         if closes_at_raw := row.get("Deadline", ""):
-            job["closes_at"] = datetime.strptime(closes_at_raw, "%Y-%m-%d").replace(
-                # todo ? fix: use TZ of .city / .country
-                tzinfo=UTC
-            )
+            job["closes_at"] = datetime.strptime(closes_at_raw, "%Y-%m-%d").replace(tzinfo=UTC)
 
         if posted_at_raw := row.get("Date Added", ""):
             job["posted_at"] = datetime.strptime(posted_at_raw, "%B %d, %Y %I:%M%p").replace(
@@ -148,60 +144,33 @@ def _list_split_and_strip(str_raw: str) -> list[str]:
     return [tag.strip() for tag in str_raw.split(",") if tag.strip()]
 
 
-def _abbreviate_country(country: str) -> str:
-    return {
-        "United States (USA)": "US",
-        "United Kingdom (UK)": "UK",
-    }.get(country, country)
-
-
-def _abbreviate_city(city: str) -> str:
-    _city_abbreviations = {
-        "San Francisco CA": "SF",
-        "New York NY": "NY",
-        "Washington D.C.": "Washington DC",
-    }
-    if city in _city_abbreviations:
-        return _city_abbreviations[city]
-
-    # Strip 2-letter code suffix for well-known cities: "Zurich CH" → "Zurich"
-    parts = city.rsplit(" ", 1)
-    _cities_strip_code = {
-        "Abuja",
-        "Addis Ababa",
-        "Amsterdam",
-        "Bangkok",
-        "Berkeley",
-        "Berlin",
-        "Boston",
-        "Cambridge",
-        "Emeryville",
-        "London",
-        "Munich",
-        "Nairobi",
-        "New Delhi",
-        "Palo Alto",
-        "Paris",
-        "Salt Lake City",
-        "Seattle",
-        "Zurich",
-    }
-
-    if (
-        len(parts) == 2
-        and len(parts[1]) == 2
-        and parts[1].isalpha()
-        and parts[0] in _cities_strip_code
-    ):
-        return parts[0]
-    return city
-
-
-def _abbreviate_tag(name: str) -> str:
+def _abbreviate_tag(name_raw: str) -> TagFields:
+    name = name_raw
     for old, new in [
         ("+ years experience", "y+"),
         (" years experience", "y"),
         ("Undergraduate", "Undergrad"),
     ]:
         name = name.replace(old, new)
-    return name
+    return TagFields(name=name)
+
+
+def _abbreviate_country(name_raw: str) -> TagFields:
+    abbreviated = {
+        "United States (USA)": "United States",
+        "United Kingdom (UK)": "United Kingdom",
+    }.get(name_raw)
+    if abbreviated:
+        return TagFields(abbreviated, aliases=[name_raw])
+    return TagFields(name=name_raw)
+
+
+def _abbreviate_city(name_raw: str) -> TagFields:
+    if abbreviated := {"Washington D.C.": "Washington DC"}.get(name_raw):
+        return TagFields(abbreviated, aliases=[name_raw])
+
+    # Strip 2-letter code suffix: "Zurich CH" → "Zurich" (alias keeps original)
+    parts = name_raw.rsplit(" ", 1)
+    if len(parts) == 2 and len(parts[1]) == 2 and parts[1].isalpha():
+        return TagFields(parts[0], aliases=[name_raw])
+    return TagFields(name=name_raw)

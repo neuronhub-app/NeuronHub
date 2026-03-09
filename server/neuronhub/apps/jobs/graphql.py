@@ -48,8 +48,8 @@ class JobType:
     salary_min: auto
     salary_max: auto
 
-    country: auto
-    city: auto
+    tags_country: list[PostTagType]
+    tags_city: list[PostTagType]
 
     url_external: auto
 

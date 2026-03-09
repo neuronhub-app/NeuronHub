@@ -192,7 +192,10 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
 }
 
 function JobLocations(props: { job: JobFragmentType }) {
-  const locations = [...(props.job.city ?? []), ...(props.job.country ?? [])]
+  const locations = [
+    ...(props.job.tags_city ?? []).map(t => t.name),
+    ...(props.job.tags_country ?? []).map(t => t.name),
+  ]
     .filter(Boolean)
     .join("・");
 
