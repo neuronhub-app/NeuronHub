@@ -139,13 +139,13 @@ classDiagram
 
             company: str
             job_title: str
-            
+
             career_stage: Enum
 
             skills: M2M~PostTag~
             interests: M2M~PostTag~
 
-            profile_for_llm_md: str? 
+            profile_for_llm_md: str?
 
             visibility = Visibility.PRIVATE
             visible_to_users: M2M~User~
@@ -155,10 +155,49 @@ classDiagram
             profile: FK~Profile~
             match_score_by_llm: int
             match_reason_by_llm: str
-			
+
 			%% review by User
             match_score: int
             match_review: str
+        }
+    }
+
+    Job --> PostTag : tags (M2M)
+    JobAlert --> PostTag : tags (M2M)
+    JobAlert --> Job : jobs_clicked (M2M)
+    JobAlertLog --> JobAlert : job_alert (FK)
+    JobAlertLog --> Job : job (FK)
+
+    namespace jobs {
+        class Job {
+            title: str
+            org: FK~Org~
+            author?: FK~User~
+            is_remote: bool?
+            salary_min: int?
+            posted_at, closes_at: datetime?
+            tags_skill, tags_area: M2M~PostTag~
+            visible_to_users: M2M~User~
+            visible_to_groups: M2M~UserConnectionGroup~
+            bookmarked_by_users: M2M~User~
+        }
+
+        class JobAlert {
+            id_ext: UUID
+            email: str
+            tags: M2M~PostTag~
+            is_orgs_highlighted: bool?
+            is_remote: bool?
+            salary_min: int?
+            is_active: bool
+            jobs_clicked: M2M~Job~
+        }
+
+        class JobAlertLog {
+            job_alert: FK~JobAlert~
+            job: FK~Job~
+            email_hash: str
+            sent_at: datetime
         }
     }
 ```
@@ -176,5 +215,5 @@ You must read each top-level doc before its children.
 - [./tests](./tests.md)
     - [How to use pytest](./backend/pytest.md)
     - [How to use Playwright](./frontend/Playwright.md)
-- [Algolia integration](./Algolia.md) - used on all FE /posts list pages for its Facets, Pagination, and InstantSearch.
+- [Algolia integration](./Algolia.md) - used on all FE list pages (posts, jobs, profiles) for InstantSearch, Facets, and Pagination.
 - [LLM spec logs](/docs/LLM-spec-logs/) - historical ticket-prompts LLM received and their Git history - ie it's complimentary to the Git log. Named as `{id}-{type}-{name}.md` - `#{id}` is from the Git logs.

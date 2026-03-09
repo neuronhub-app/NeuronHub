@@ -26,6 +26,7 @@ paths:
 	- [[useApolloQuery.ts]] - use instead of the broken `useQuery`, including its `isLoadingFirstTime` instead of `loading`
 	- `src/graphql/[[client.ts]]` - Apollo `export const client` for when you need exceptions
 	- `src/[[codegen.ts]]` - is only used for TS enums generation - all GraphQL types are handled by gql.tada.
+- `src/components/algolia/` - see `Algolia.md` if needed
 - `src/theme/` - @chakra-ui theme config and semantic tokens
 - `src/[[env.ts]]` - typed `export const env`
 - `e2e/` - Playwright with its `e2e/tests`
@@ -39,6 +40,7 @@ We save all `client/` queries to the whitelist at [[server/persisted-queries.jso
 Note: `toast.error()` from [[client/src/utils/toast.tsx]] also calls `Sentry.captureException`.
 
 ## Code Conventions
+
 - instead of `useState` use [[useStateValtio.ts]]. Unless there's a significant maintenance/performance benefit in the `useState`
 
 ## Constraints
@@ -57,3 +59,4 @@ Must read when working with any of those module.
 - [How to use GraphQL](./GraphQL.md)
 - [How to use Playwright](./Playwright.md)
 - [How to use Chakra UI](Chakra-UI.md)
+- [How to work with sub-sites as `VITE_SITE="pg"`](Sub-sites-with-VITE_SITE.md) from `src/sites/`

@@ -46,6 +46,10 @@ FE
 - facets
     - [x] convert .country and .city to PostTags
     - [x] add field `PostTag.aliases: ArrayField` - store there the full name eg `USA (United States)` while keep using `US` for the `tag.name`. aliases will be indexed by Algolia, but not in the FE render or highlight
+- [x] Document
+    - `apps.jobs`: add to the architechture/README, extend the UML schema
+    - `env.VITE_SITE` and `sites/pg` dir: explain why, how it works, and limitations (eg `urls` difference)
+    - components/algolia: the goal (of 3 months), how they're styled right now, and how they can be reused by sub-sites as `sites/pg`
 
 ## Thinking-Log
 

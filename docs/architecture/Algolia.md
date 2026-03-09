@@ -1,30 +1,32 @@
 ---
 paths:
   - server/neuronhub/apps/posts/index.py
-  - client/src/apps/posts/list/PostListAlgolia.tsx
-  - client/src/apps/posts/list/useAlgoliaPostsEnrichmentByGraphql.ts
+  - server/neuronhub/apps/jobs/index.py
+  - client/src/components/algolia/**
 ---
 
-We use Algolia `posts.Post` model Index as the list view on FE, with its Search, Facets, and Pagination.
+## Indexes
 
-We have one Index of Posts with postfixes per env: `posts_{DJANGO_ENV.value}`, defined in `neuronhub/apps/posts/index.py`.
+Each Model ha an Index with env postfix: `{name}_{DJANGO_ENV.value}`. Mise adds `env.USER` suffix to avoid dev clashes, eg `posts_dev_john`.
 
-To avoid dev Index clashes, Mise adds a suffix with the OS `env.USER` string, eg `posts_dev_john`.
+- `posts` - [[server/neuronhub/apps/posts/index.py]]
+- `jobs` - [[server/neuronhub/apps/jobs/index.py]]
 
-### Posts serialization for Algolia Index
+FE index names are in [[client/src/utils/useAlgoliaSearchClient.ts]].
 
-We serialize Posts on BE using the GraphQL query `PostsByIds` in [[Post#_get_graphql_field]].
+### Serialization
 
-It's done to keep using our single-place GraphQL [cache reset](/docs/architecture/frontend/GraphQL.md#cache-reset): on `/posts` page instead of showing Algolia's hits, we enrich it with [[useAlgoliaPostsEnrichmentByGraphql.ts]] by `PostsByIds` query. This allows our function `mutateAndRefetchMountedQueries` to auto-refetch the Posts on mutations as voting, adding to users_library, etc.
+We serialize models on BE using GraphQL queries (eg `PostsByIds`, `JobsByIds`) in `_get_graphql_field`. This keeps the single-place GraphQL [cache reset](/docs/architecture/frontend/GraphQL.md#cache-reset): on list pages, Algolia hits are enriched via [[useAlgoliaEnrichmentByGraphql.ts]] so `mutateAndRefetchMountedQueries` auto-refetches on mutations.
 
-### Testing
+## Shared FE components (`components/algolia/`)
+
+`AlgoliaList` is the master container (header, search, sort, facets sidebar, hits, pagination) used by Jobs, Reviews, and Tools lists. Also exports `AlgoliaHits` for custom layouts (Profiles, Posts).
+
+Facet components: `AlgoliaFacetAttribute` (checkbox), `AlgoliaFacetBoolean`, `AlgoliaFacetDate`, `AlgoliaFacetSalary` (range slider). All use `export const facetStyle` from `AlgoliaFacets.tsx` and Chakra semantic tokens for theme-awareness across sub-sites.
+
+Sub-sites (eg `sites/pg/`) reuse these components without changes - see [Sub-sites](/docs/architecture/frontend/Sub-sites-with-VITE_SITE.md).
+
+## Testing
 
 - Pytest: Algolia is disabled.
-- E2E: uses an Index with its env suffix - `posts_dev_test_e2e`
-
-### Related Files
-
-- [[server/neuronhub/apps/posts/index.py]]
-- [[server/neuronhub/apps/posts/models/posts.py]]
-- [[client/src/apps/posts/list/PostListAlgolia.tsx]]
-- [[client/src/apps/posts/list/useAlgoliaPostsEnrichmentByGraphql.ts]]
+- E2E: uses an Index with its env suffix, eg `posts_dev_test_e2e`

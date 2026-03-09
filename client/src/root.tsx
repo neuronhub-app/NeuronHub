@@ -9,7 +9,7 @@ import { ColorModeProvider } from "@/components/ui/color-mode";
 import { useMetaTitle } from "@/components/useMetaTitle";
 import { env } from "@/env";
 import { client } from "@/graphql/client";
-import { siteConfig } from "@/sites/index";
+import { siteConfig } from "@/sites";
 import type { Route } from "./+types/root";
 
 export default function App() {
