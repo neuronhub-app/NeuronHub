@@ -1,0 +1,4 @@
+server/persisted-queries.json diff=generated
+client/graphql/gql-tada/graphql-env.d.ts diff=generated
+schema.graphql diff=generated
+*.lock diff=generated
