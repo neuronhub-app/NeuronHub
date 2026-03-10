@@ -58,7 +58,7 @@ def _partial_update_all(model: AlgoliaModel, limit: int):
     }[model]
     adapter = algolia_engine.get_adapter(model=django_model)
 
-    qs = adapter.get_queryset() if callable(adapter.get_queryset) else django_model.objects.all()
+    qs = adapter.get_queryset() if callable(adapter.get_queryset) else django_model.objects.all()  # type: ignore[attr-defined] #bad-infer mypy bug
 
     batch: list[dict] = []
     for instance in qs[:limit]:
