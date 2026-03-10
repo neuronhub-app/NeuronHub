@@ -64,7 +64,6 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
                     "org",
                     "is_remote",
                     "is_remote_friendly",
-                    "is_visa_sponsor",
                     ("salary_min", "salary_max"),
                     # "salary_ranges",
                     "url_external",

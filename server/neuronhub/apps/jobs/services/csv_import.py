@@ -54,6 +54,8 @@ async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncSt
                     category=category,
                 )
 
+            is_visa_sponsorship = job_dict.pop("_has_visa_sponsorship", False)
+
             org_name = job_dict.pop("org_name", "").replace('"', "")
             is_broken_job_org = not org_name
             if is_broken_job_org:
@@ -75,6 +77,11 @@ async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncSt
 
             for tag_field_name, tags in tags_by_field_name.items():
                 await getattr(job, tag_field_name).aset(tags)
+
+            if is_visa_sponsorship:
+                country_tags = tags_by_field_name.get("tags_country", [])
+                await _create_visa_child_tags([t.name for t in country_tags])
+                await job.tags_country_visa_sponsor.aset(country_tags)
 
     return stats
 
@@ -125,6 +132,9 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
             job[name_django] = row.get(name_csv, "").strip()
 
         job["is_remote"] = "Remote" == row.get("Remote? ", "").strip()
+
+        presented_location = row.get("Presented Location", "").strip()
+        job["_has_visa_sponsorship"] = "visa sponsorship" in presented_location.lower()
 
         if salary_raw := row.get("Minimum Salary", ""):
             job["salary_min"] = int(float(salary_raw))
@@ -178,3 +188,21 @@ def _abbreviate_city(name_raw: str) -> TagParams:
     if len(parts) == 2 and len(parts[1]) == 2 and parts[1].isalpha():
         return TagParams(parts[0], aliases=[name_raw])
     return TagParams(name=name_raw)
+
+
+async def _create_visa_child_tags(country_names: list[str]) -> None:
+    """
+    #AI
+    """
+    visa_cat, _ = await PostTagCategory.objects.aget_or_create(
+        name=TagCategoryEnum.VisaSponsorship.value
+    )
+    for country_name in country_names:
+        parent_tag = await PostTag.objects.filter(name=country_name, tag_parent=None).afirst()
+        if not parent_tag:
+            continue
+        child_tag, _ = await PostTag.objects.aget_or_create(
+            name=f"can sponsor visas ({country_name})",
+            tag_parent=parent_tag,
+        )
+        await child_tag.categories.aadd(visa_cat)

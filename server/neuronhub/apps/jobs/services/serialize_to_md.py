@@ -8,7 +8,6 @@ async def serialize_job_to_markdown(job: Job) -> str:
         f"- URL: {job.url_external}",
         f"- Remote: {job.is_remote}",
         f"- Remote-friendly: {job.is_remote_friendly}",
-        f"- Visa sponsor: {job.is_visa_sponsor}",
         f"- Salary: {job.salary_min}",
         f"- Posted: {job.posted_at}",
         f"- Closes: {job.closes_at}",

@@ -1,4 +1,4 @@
-import { Checkbox, For, Input, Stack, Text, useToken } from "@chakra-ui/react";
+import { Checkbox, Input, Stack, Text, useToken } from "@chakra-ui/react";
 import { useRefinementList } from "react-instantsearch";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { Button } from "@/components/ui/button";
@@ -8,14 +8,18 @@ export function AlgoliaFacetAttribute(props: {
   label: string;
   isSearchEnabled?: boolean;
   showFirst?: number;
+  subFacet?: { attribute: string; label: string };
 }) {
   const refinements = useRefinementList({
     attribute: props.attribute,
     limit: props.showFirst ?? 10,
     showMore: true,
   });
+  const subRefinements = useRefinementList({
+    attribute: props.subFacet?.attribute ?? props.attribute,
+  });
 
-  const count = {
+  const countStyle = {
     color: useToken("colors", "fg.subtle")[0],
     fontSize: useToken("fontSizes", "2xs")[0],
   };
@@ -40,32 +44,31 @@ export function AlgoliaFacetAttribute(props: {
       )}
 
       <Stack gap="gap.sm">
-        <For each={refinements.items}>
-          {item => (
-            <Checkbox.Root
-              key={item.value}
-              checked={item.isRefined}
-              onCheckedChange={() => refinements.refine(item.value)}
-              display="flex"
-              alignItems="flex-start"
-              size="sm"
-            >
-              <Checkbox.HiddenInput />
-              <Checkbox.Control />
-              <Checkbox.Label {...facetStyle.value} mt="-3px">
-                <Text
-                  // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-                  dangerouslySetInnerHTML={{
-                    __html:
-                      item.highlighted! +
-                      `&nbsp;<span style="margin-left: 1px; font-size: ${count.fontSize}; color: ${count.color}">${item.count}</span>`,
-                  }}
-                  as="span"
-                />{" "}
-              </Checkbox.Label>
-            </Checkbox.Root>
-          )}
-        </For>
+        {refinements.items.map(item => {
+          // #AI
+          const subItemsByValue = props.subFacet
+            ? new Map(subRefinements.items.map(item => [item.value, item]))
+            : undefined;
+          const subItem = subItemsByValue?.get(item.value);
+          return (
+            <Stack key={item.value} gap="gap.sm">
+              <FacetCheckboxItem
+                item={item}
+                countStyle={countStyle}
+                onRefine={() => refinements.refine(item.value)}
+              />
+              {subItem && (
+                <FacetCheckboxItem
+                  item={subItem}
+                  countStyle={countStyle}
+                  labelOverride={props.subFacet!.label}
+                  onRefine={() => subRefinements.refine(subItem.value)}
+                  ps="5"
+                />
+              )}
+            </Stack>
+          );
+        })}
       </Stack>
 
       {refinements.canToggleShowMore && (
@@ -78,5 +81,38 @@ export function AlgoliaFacetAttribute(props: {
         </Button>
       )}
     </Stack>
+  );
+}
+
+function FacetCheckboxItem(props: {
+  item: { value: string; isRefined: boolean; highlighted?: string; count: number };
+  countStyle: { color: string; fontSize: string };
+  onRefine: () => void;
+  labelOverride?: string;
+  ps?: string;
+}) {
+  return (
+    <Checkbox.Root
+      checked={props.item.isRefined}
+      onCheckedChange={props.onRefine}
+      display="flex"
+      alignItems="flex-start"
+      ps={props.ps}
+      size="sm"
+    >
+      <Checkbox.HiddenInput />
+      <Checkbox.Control />
+      <Checkbox.Label {...facetStyle.value} mt="-3px">
+        <Text
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
+          dangerouslySetInnerHTML={{
+            __html:
+              (props.labelOverride ?? props.item.highlighted!) +
+              `&nbsp;<span style="margin-left: 1px; font-size: ${props.countStyle.fontSize}; color: ${props.countStyle.color}">${props.item.count}</span>`,
+          }}
+          as="span"
+        />{" "}
+      </Checkbox.Label>
+    </Checkbox.Root>
   );
 }

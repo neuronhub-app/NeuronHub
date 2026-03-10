@@ -35,8 +35,6 @@ class Job(AlgoliaModel):
 
     is_remote = models.BooleanField(blank=True, null=True)
     is_remote_friendly = models.BooleanField(blank=True, null=True)
-    is_visa_sponsor = models.BooleanField(blank=True, null=True)
-
     salary_min = models.PositiveIntegerField(blank=True, null=True)
     salary_max = models.PositiveIntegerField(blank=True, null=True)
     # salary_ranges = models.TextField(
@@ -85,6 +83,13 @@ class Job(AlgoliaModel):
         limit_choices_to={"categories__name": TagCategoryEnum.City},
         related_name=f"tags_job_{TagCategoryEnum.City.value}",
         blank=True,
+    )
+
+    tags_country_visa_sponsor = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
+        "posts.PostTag",
+        related_name="visa_sponsor_jobs",
+        blank=True,
+        help_text="Country PostTags where this job sponsors visas",
     )
 
     url_external = models.CharField(blank=True, max_length=1024, verbose_name="URL")
@@ -160,6 +165,12 @@ class Job(AlgoliaModel):
 
     def get_tags_json_city(self):
         return self._get_graphql_field("tags_city")
+
+    def get_tags_country_visa_sponsor_json(self):
+        """
+        #AI-slop - should be _get_graphql_field
+        """
+        return [{"name": tag.name} for tag in self.tags_country_visa_sponsor.all()]
 
     def get_org_json(self):
         return self._get_graphql_field("org")

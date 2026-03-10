@@ -59,6 +59,8 @@ FE
         - on click -> select for approval
         - on list submit: is_published=false -> is_published=true -> index by Algolia [bulk] (wait=False)
     - [x] Create `services/serialize_to_md.py` with `async serialize_job_to_markdown(job)` — line-per-field format for clean diffs
+- [x] Sub-facets: some Jobs have a field in the CSV column `Presented Location` as `USA, visa sponsorship possible` - in the "Country" facet we want to render `United States` on top with a sub item `Confirmed visa sponsorship`
+    - see the example .local/issues/attachments/118-facets.png
 
 
 <LLM_unverified_report>
@@ -91,3 +93,23 @@ The "regression" was caused by the Algolia `RequestException: Index not allowed 
 - `server/neuronhub/apps/jobs/services/approve_versions.py` — `_reindex_approved()` uses `adapter.index_name`
 
 </LLM_unverified_report>
+
+## Exec-Plan
+
+Fix per-job visa sub-facets. The `tag_children` approach is globally broken (all US jobs show visa).
+
+**Approach: Option B** — separate Algolia field `tags_country_visa_sponsor` with direct serialization (no GraphQL).
+- Tradeoff vs A: simpler, no need to modify shared PostTagType. Visa data only for Algolia faceting, not FE card rendering.
+
+1. `models.py`: add `tags_country_visa_sponsor` M2M on Job → country PostTags; add `get_tags_country_visa_sponsor_json()`
+2. Migration `0013_job_tags_country_visa_sponsor`
+3. `index.py`: add `tags_country_visa_sponsor` field; replace `tags_country.tag_children.name` with `tags_country_visa_sponsor.name`
+4. `db_stubs.py`: fix child tag name `"can sponsor visas ({name})"`, set `job.tags_country_visa_sponsor.aset()`
+5. `csv_import.py`: same fixes, set `job.tags_country_visa_sponsor`
+6. `JobList.tsx`: sub-facet attribute → `tags_country_visa_sponsor.name`
+7. `index__test.py`: verify per-job counts
+8. `mise lint` → `mise pytest` → `mise e2e`
+
+## Thinking-Log
+
+- Done. pytest 55/55, e2e 3/3. Screenshot confirms per-job visa counts (US=1, UK=1, others=0).

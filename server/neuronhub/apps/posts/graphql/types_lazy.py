@@ -48,3 +48,4 @@ class TagCategoryEnum(models.TextChoices):
     Workload = "workload"  # "Full-time"
     Country = "country"
     City = "city"
+    VisaSponsorship = "visa_sponsorship"

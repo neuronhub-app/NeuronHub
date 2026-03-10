@@ -10,6 +10,18 @@ When the condition fails, the following can be returned (following this priority
 """
 directive @IsAuthenticated repeatable on FIELD_DEFINITION
 
+"""
+Can only be resolved by staff users.
+
+When the condition fails, the following can be returned (following this priority):
+1) `OperationInfo`/`OperationMessage` if those types are allowed at the return type
+2) `null` in case the field is not mandatory (e.g. `String` or `[String]`)
+3) An empty list in case the field is a list (e.g. `[String]!`)
+4) An empty `Connection` in case the return type is a relay connection
+2) Otherwise, an error will be raised
+"""
+directive @IsStaff repeatable on FIELD_DEFINITION
+
 directive @oneOf on INPUT_OBJECT
 
 type AlgoliaSearchKeyType {
@@ -112,7 +124,6 @@ type JobType {
   slug: String!
   is_remote: Boolean
   is_remote_friendly: Boolean
-  is_visa_sponsor: Boolean
   salary_min: Int
   salary_max: Int
   tags_country(filters: PostTagFilter): [PostTagType!]!
@@ -186,7 +197,7 @@ type Mutation {
   job_alert_subscribe(email: String!, tag_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null): Boolean!
   job_alert_toggle_active(id_ext: UUID!): Boolean!
   job_alert_remove(id_ext: UUID!): Boolean!
-  job_versions_approve(draft_ids: [Int!]!): Boolean!
+  job_versions_approve(draft_ids: [Int!]!): Boolean! @IsStaff
   job_alert_unsubscribe(id_ext: UUID!): Boolean!
 }
 
@@ -798,7 +809,7 @@ type Query {
   jobs(filters: JobFilter): [JobType!]!
   job_by_slug(slug: String!): JobType
   job_alerts: [JobAlertType!]!
-  job_versions_pending: [JobVersionType!]!
+  job_versions_pending: [JobVersionType!]! @IsAuthenticated
 }
 
 input StrFilterLookup {
@@ -857,6 +868,7 @@ enum TagCategoryEnum {
   Workload
   Country
   City
+  VisaSponsorship
 }
 
 input TagCategoryEnumFilterLookup {

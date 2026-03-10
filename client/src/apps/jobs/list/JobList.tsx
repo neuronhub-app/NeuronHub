@@ -113,6 +113,10 @@ export function JobList(props: { slug?: string }) {
         label="Country"
         isSearchEnabled
         showFirst={5}
+        subFacet={{
+          attribute: "tags_country_visa_sponsor.name",
+          label: "Visa sponsorship",
+        }}
       />
       <AlgoliaFacetAttribute
         attribute="tags_city.name"

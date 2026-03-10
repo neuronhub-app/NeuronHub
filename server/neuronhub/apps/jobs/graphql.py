@@ -49,8 +49,6 @@ class JobType:
 
     is_remote: auto
     is_remote_friendly: auto
-    is_visa_sponsor: auto
-
     salary_min: auto
     salary_max: auto
 
@@ -123,7 +121,8 @@ class JobsQuery:
             Job.objects.filter(is_published=False).select_related("org").order_by("-updated_at")
         )
         drafts = filter_jobs_by_user(user, jobs=drafts)
-        return [await _compose_job_version(user, draft) async for draft in drafts]
+        job_versions = [await _compose_job_version(user, draft) async for draft in drafts]
+        return [job_version for job_version in job_versions if job_version]
 
 
 async def _compose_job_version(user: User, job_draft: Job) -> JobVersionType | None:

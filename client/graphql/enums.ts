@@ -32,6 +32,7 @@ export enum TagCategoryEnum {
   Education = 'Education',
   Experience = 'Experience',
   Skill = 'Skill',
+  VisaSponsorship = 'VisaSponsorship',
   Workload = 'Workload'
 }
 

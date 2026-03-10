@@ -19,7 +19,7 @@ test.describe("HN Comments", () => {
   });
 
   // takes 36s on avg
-  test("view imported HN post with tree-structured comments", async ({ page }) => {
+  test("view imported HN post with tree-structured comments (falky)", async ({ page }) => {
     play.setDefaultTimeout(12_000); // 7.5s makes it flaky
 
     await play.navigate(urls.posts.list, { idleWait: true });
@@ -35,7 +35,7 @@ test.describe("HN Comments", () => {
       .click();
     await play.waitForNetworkIdle();
 
-    // Wait for delayed load
+    // todo ! fix: #AI-slop - use waitForResponseGraphql. And remove/off import of blog.archive.org <meta> (if exists)
     await expect($[ids.comment.thread.container]).toBeVisible();
 
     const threadCount = await play.getAll(ids.comment.thread.container).count();

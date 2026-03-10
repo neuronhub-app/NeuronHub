@@ -21,6 +21,7 @@ class JobTags:
     workload: list[str] = field(default_factory=list)
     country: list[str] = field(default_factory=list)
     city: list[str] = field(default_factory=list)
+    visa_countries: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -49,6 +50,7 @@ async def create_jobs_stubs() -> None:
                 workload=[val.workload.FullTime],
                 country=[val.country.US],
                 city=[val.city.SF],
+                visa_countries=[val.country.US],
             ),
         ),
         JobStub(
@@ -98,6 +100,7 @@ async def create_jobs_stubs() -> None:
                     val.city.Geneva,
                     val.city.Brussels,
                 ],
+                visa_countries=[val.country.UK],
             ),
         ),
         JobStub(
@@ -155,7 +158,6 @@ async def create_jobs_stubs() -> None:
                 title="Data Analyst, Animal Welfare Metrics",
                 url_external="https://sentientmetrics.org/careers/data-analyst",
                 is_remote=True,
-                is_visa_sponsor=False,
                 posted_at=datetime(2026, 2, 20, tzinfo=UTC),
                 visibility=Visibility.PUBLIC,
             ),
@@ -177,9 +179,17 @@ async def create_jobs_stubs() -> None:
 
     for stub in job_stubs:
         for category in TagCategoryEnum:
-            if tag_names := getattr(stub.tags, category.value):
+            if tag_names := getattr(stub.tags, category.value, None):
                 tags = await _get_or_create_tags(tag_names, category)
                 await getattr(stub.job, f"tags_{category.value}").aset(tags)
+
+        if stub.tags.visa_countries:
+            await _create_visa_child_tags(stub.tags.visa_countries)
+            country_tags = [
+                await PostTag.objects.aget(name=name, tag_parent=None)
+                for name in stub.tags.visa_countries
+            ]
+            await stub.job.tags_country_visa_sponsor.aset(country_tags)
 
     await _create_draft_version(published=job_stubs[0].job)
 
@@ -213,6 +223,22 @@ async def _get_or_create_tags(tag_names: list[str], category: TagCategoryEnum) -
         await tag.categories.aadd(category_obj)
         tags.append(tag)
     return tags
+
+
+async def _create_visa_child_tags(country_names: list[str]) -> None:
+    """
+    #AI-slop, might be wrong re parent/child rels, as we switched away from it
+    """
+    visa_category, _ = await PostTagCategory.objects.aget_or_create(
+        name=TagCategoryEnum.VisaSponsorship.value
+    )
+    for country in country_names:
+        tag_parent = await PostTag.objects.aget(name=country, tag_parent=None)
+        tag_child, _ = await PostTag.objects.aget_or_create(
+            name=f"can sponsor visas ({country})",
+            tag_parent=tag_parent,
+        )
+        await tag_child.categories.aadd(visa_category)
 
 
 class val:
