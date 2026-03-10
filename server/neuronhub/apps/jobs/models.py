@@ -103,7 +103,7 @@ class Job(AlgoliaModel):
         models.ManyToManyField(UserConnectionGroup, related_name="jobs_visible", blank=True),
     )
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=["slug"])
 
     graphql_query_for_algolia: str = "JobsByIds"
     graphql_query_for_algolia_field: str = "jobs"
