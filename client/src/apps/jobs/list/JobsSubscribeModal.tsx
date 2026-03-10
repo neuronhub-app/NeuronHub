@@ -203,7 +203,7 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   posted_at: "Posted",
 } as const;
 
-const JobAlertSubscribeMutation = graphql.persisted(
+export const JobAlertSubscribeMutation = graphql.persisted(
   "JobAlertSubscribe",
   graphql(`
     mutation JobAlertSubscribe(

@@ -19,6 +19,7 @@ Notes:
 A wrapper for bad Playwright API, its methods:
 - `.screenshot(name: str, { fullPage = false, maxH = 3000 })`: saves to `e2e/screenshots/`
 - `.graphqlQuery`: uses `this.page.request.post` as we can't use `client.query` in e2e.
+- `.waitForResponseGraphql(query: TadaDocumentNode<TData>): Promise<{ data: TData }>`: can await mutations/queries to avoid `waitForNetworkIdle`.
 - `.fill(id: str, contnet: str)`: input waitFor, clear, fill. 
 - `.navigate`: goto and waitForNetworkIdle
 - `.setDefaultTimeout`: calls `page.setDefaultTimeoput` and _some_ of waitForNetworkIdle. Will be improved later.

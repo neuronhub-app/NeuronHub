@@ -48,7 +48,7 @@ export class PlaywrightHelper {
   ): Promise<{ data: TData }> {
     // use Playwright's request context, which shares cookies with the browser,
     // while client.query runs in isolated by PW Vite env
-    const response = await this.page.request.post(`${env.VITE_SERVER_URL}/api/graphql`, {
+    const response = await this.page.request.post(env.VITE_SERVER_URL_API, {
       headers: { "Content-Type": "application/json" },
       data: { query: print(query), variables },
     });
@@ -99,8 +99,19 @@ export class PlaywrightHelper {
     }
   }
 
-  async awaitMutation(operationName: "UserCurrent") {
-    return this.page.waitForResponse(response => response.url().includes(operationName));
+  waitForResponseGraphql<
+    TData = unknown,
+    TVariables extends OperationVariables = OperationVariables,
+  >(query: TadaDocumentNode<TData, TVariables>): Promise<{ data: TData }> {
+    // @ts-expect-error #bad-infer all gql.tada have .name
+    const queryName: string = query.definitions[0]!.name!.value;
+    return this.page
+      .waitForResponse(
+        response =>
+          response.url().includes(env.VITE_SERVER_URL_API) &&
+          (response.request().postData()?.includes(queryName) ?? false),
+      )
+      .then(response => response.json());
   }
 
   async dbStubsRepopulate(options?: {

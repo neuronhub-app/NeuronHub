@@ -1,4 +1,6 @@
 import { test } from "@playwright/test";
+import { data } from "react-router";
+import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
@@ -58,15 +60,16 @@ test.describe("JobList", () => {
 
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
+    const mutationSubscribe = play.waitForResponseGraphql(JobAlertSubscribeMutation);
     await play.click(ids.job.alert.submitBtn);
+    await mutationSubscribe;
 
+    const queryList = play.waitForResponseGraphql(JobAlertListQuery);
     await play.navigate(urls.jobs.subscriptions, { idleWait: true });
+    const response = await queryList;
+    const alert = response.data.job_alerts!.find(a => a.email === testEmail)!;
 
     await expect($[ids.job.subscriptions.unsubscribed.alert]).not.toBeVisible();
-
-    const result = await play.graphqlQuery(JobAlertListQuery, {}); // get .id_ext form GraphQL
-    const alerts = result.data.job_alerts;
-    const alert = alerts.find(alert => alert.email === testEmail)!;
 
     await page.goto(urls.jobs.subscriptionsRemove(alert.id_ext));
     await expect($[ids.job.subscriptions.status.inactive]).toBeVisible();

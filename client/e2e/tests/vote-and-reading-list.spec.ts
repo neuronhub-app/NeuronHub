@@ -1,4 +1,5 @@
 import { test } from "@playwright/test";
+import { UserQueryDoc } from "@/apps/users/useUserCurrent";
 import { expect } from "@/e2e/helpers/expect";
 import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids, type TestId } from "@/e2e/ids";
@@ -31,7 +32,7 @@ test.describe("Post - action button", () => {
 
     await expect(button).not.checked();
 
-    const mutation = play.awaitMutation("UserCurrent");
+    const mutation = play.waitForResponseGraphql(UserQueryDoc);
     await button.click();
     await mutation;
     await expect(button).checked();
