@@ -3,24 +3,11 @@ description: For LLM-driven code cleanup. A separate file to avoid context rot.
 ---
 
 
-Code Style Detailed
-----------------------------------------
-
-### Every line of code is tech debt
-
-All code is tech debt. Either current or future, no fucking difference.
-
-Every redundant line MUST be removed. Every redundant word must be removed.
-
 ### Comments
 
 If there's a comment - human brain skips class/function naming (and whatever) to read the comments first.
 
 Hence a comment is not only the future tech debt - it is also the highest-level information noise, the damages code comprehension by its mere existence.
-
-### TODO comments
-
-See [todos.md](/docs/todos.md).
 
 ### Group related variables by domain in an object
 
@@ -71,7 +58,7 @@ const input = {
   ...data.review,
   parent: { id: response.data.create_post.id },
 };
-await mutate(input);
+await mutate({ input });
 
 // Good:
 await mutate({
@@ -84,18 +71,31 @@ await mutate({
 
 ### Naming
 
-Project-specific classes or functions are prefixed with `neuron`
-
 As `{category}? {noun} {verb} {adjective}`: `{category}` creates logical modules at a glance (eg in vertical list of files or vars).
+`{category}? {verb} {noun} {adjective}` is also ok when the `{verb}` is more important.
 
-For vars lean towards `{noun} {adjective}` - to let the brain create a `category` our of the `noun` - this is how brain works.
+For vars use `{noun} {adjective}` - to let the brain auto-create a `category` out of the `noun`. Eg `value_current`, not `current_value`.
 
-Examples:
-- `{noun}_{adjective}`: `value_current`, not `current_value`
-- `{category}_{noun}_{verb}`: `post_review_create`, not `create_post_review` 
+FYI: project-specific classes or functions are prefixed with `neuron`.
+
+### TODO comments
+
+See [todos.md](/docs/todos.md).
+
+
+Python
+----------------------------------------
+
+You should use the modern Python3.14 syntax, including:
+- ternary operator
+- match/case
+- `Enum`s
+- PEP 649 deferred evaluation of annotations - allows to write human-readable code from top-to-bottom
+- etc
+
 
 TypeScript
-========================================
+----------------------------------------
 
 - Always `ESNext`
 - Named exports only
