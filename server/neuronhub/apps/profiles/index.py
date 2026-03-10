@@ -4,8 +4,6 @@ See [[docs/architecture/Algolia.md]]
 
 import logging
 
-from algoliasearch_django import AlgoliaIndex
-from algoliasearch_django.decorators import register
 from django.conf import settings
 
 from neuronhub.apps.profiles.models import Profile
@@ -14,6 +12,8 @@ from neuronhub.apps.profiles.models import Profile
 logger = logging.getLogger(__name__)
 
 if settings.ALGOLIA["IS_ENABLED"]:
+    from algoliasearch_django import AlgoliaIndex
+    from algoliasearch_django.decorators import register
 
     @register(Profile)
     class ProfileIndex(AlgoliaIndex):

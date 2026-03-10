@@ -2,9 +2,6 @@
 See [[docs/architecture/Algolia.md]]
 """
 
-from algoliasearch.search.client import SearchClientSync
-from algoliasearch_django import AlgoliaIndex
-from algoliasearch_django.decorators import register
 from django.conf import settings
 
 from neuronhub.apps.posts.models import Post
@@ -17,6 +14,8 @@ def setup_virtual_replica_sorted_by_votes():
     """
     LLM claims Python lacks API for setting it in AlgoliaIndex. Doubtful, but ok for now. #AI
     """
+    from algoliasearch.search.client import SearchClientSync
+
     client = SearchClientSync(
         app_id=settings.ALGOLIA["APPLICATION_ID"], api_key=settings.ALGOLIA["API_KEY"]
     )
@@ -27,6 +26,8 @@ def setup_virtual_replica_sorted_by_votes():
 
 
 if settings.ALGOLIA["IS_ENABLED"]:
+    from algoliasearch_django import AlgoliaIndex
+    from algoliasearch_django.decorators import register
 
     @register(Post)
     class PostIndex(AlgoliaIndex):

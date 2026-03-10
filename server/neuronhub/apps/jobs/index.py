@@ -4,9 +4,6 @@ See [[docs/architecture/Algolia.md]]
 
 import logging
 
-from algoliasearch.search.client import SearchClientSync
-from algoliasearch_django import AlgoliaIndex
-from algoliasearch_django.decorators import register
 from django.conf import settings
 
 from neuronhub.apps.jobs.models import Job
@@ -16,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 def setup_virtual_replica_sorted_by_closes_at():
+    from algoliasearch.search.client import SearchClientSync
+
     client = SearchClientSync(
         app_id=settings.ALGOLIA["APPLICATION_ID"], api_key=settings.ALGOLIA["API_KEY"]
     )
@@ -31,6 +30,8 @@ algolia_replica_jobs_sorted_by_closes_at = (
 
 
 if settings.ALGOLIA["IS_ENABLED"]:
+    from algoliasearch_django import AlgoliaIndex
+    from algoliasearch_django.decorators import register
 
     @register(Job)
     class JobIndex(AlgoliaIndex):
@@ -77,13 +78,13 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ],
             "attributesForFaceting": [
                 "searchable(org.name)",
-                "searchable(tags_country.name)",
-                "searchable(tags_city.name)",
                 "is_remote",
                 "is_remote_friendly",
                 "is_visa_sponsor",
                 "salary_min",
                 "org.is_highlighted",
+                "searchable(tags_country.name)",
+                "searchable(tags_city.name)",
                 "searchable(tags_skill.name)",
                 "searchable(tags_area.name)",
                 "searchable(tags_education.name)",
