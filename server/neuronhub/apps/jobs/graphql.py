@@ -6,15 +6,21 @@ import strawberry_django
 from asgiref.sync import sync_to_async
 from django.db.models import QuerySet
 from strawberry import auto
+from strawberry_django.permissions import IsAuthenticated
+from strawberry_django.permissions import IsStaff
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
+from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
+from neuronhub.apps.jobs.services.serialize_to_md import serialize_job_to_markdown
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.posts.models import PostTag
+from neuronhub.apps.users.graphql.resolvers import get_user
 from neuronhub.apps.users.graphql.resolvers import get_user_maybe
 from neuronhub.apps.users.graphql.resolvers import get_user_sync
+from neuronhub.apps.users.models import User
 
 
 @strawberry_django.type(Org)
@@ -52,6 +58,7 @@ class JobType:
     tags_city: list[PostTagType]
 
     url_external: auto
+    is_published: auto
 
     posted_at: auto
     closes_at: auto
@@ -65,7 +72,7 @@ class JobType:
     @classmethod
     def get_queryset(cls, queryset: QuerySet[Job], info: strawberry.Info) -> QuerySet[Job]:
         user = get_user_sync(info)
-        return filter_jobs_by_user(user, jobs=queryset)
+        return filter_jobs_by_user(user, jobs=queryset.filter(is_published=True))
 
 
 @strawberry_django.type(JobAlert)
@@ -80,6 +87,15 @@ class JobAlertType:
     is_active: auto
     created_at: auto
     sent_count: auto
+
+
+@strawberry.type
+class JobVersionType:
+    id: strawberry.ID
+    draft_markdown: str
+    published_markdown: str
+    draft: JobType
+    published: JobType
 
 
 @strawberry.type(name="Query")
@@ -99,6 +115,36 @@ class JobsQuery:
             return []
         alerts = JobAlert.objects.filter(id_ext__in=job_alert_ids_ext).order_by("-created_at")
         return cast(list[JobAlertType], alerts)
+
+    @strawberry_django.field(extensions=[IsAuthenticated()])
+    async def job_versions_pending(self, info: strawberry.Info) -> list[JobVersionType]:
+        user = await get_user(info)
+        drafts = (
+            Job.objects.filter(is_published=False).select_related("org").order_by("-updated_at")
+        )
+        drafts = filter_jobs_by_user(user, jobs=drafts)
+        return [await _compose_job_version(user, draft) async for draft in drafts]
+
+
+async def _compose_job_version(user: User, job_draft: Job) -> JobVersionType | None:
+    """
+    #AI
+    """
+    jobs_published = Job.objects.filter(slug=job_draft.slug, is_published=True).select_related(
+        "org"
+    )
+    jobs_published = filter_jobs_by_user(user, jobs=jobs_published)
+    job_published = await jobs_published.afirst()
+    if not job_published:
+        return None
+
+    return JobVersionType(
+        id=strawberry.ID(str(job_draft.id)),
+        draft_markdown=await serialize_job_to_markdown(job_draft),
+        published_markdown=await serialize_job_to_markdown(job_published),
+        draft=job_draft,  # type: ignore[arg-type]  #bad-infer
+        published=job_published,  # type: ignore[arg-type]  #bad-infer
+    )
 
 
 @strawberry.type
@@ -143,6 +189,11 @@ class JobsMutation:
             return False
         await JobAlert.objects.filter(id_ext=id_ext).adelete()
         await _drop_session_job_alert(info, id_ext)
+        return True
+
+    @strawberry_django.field(extensions=[IsStaff()])
+    async def job_versions_approve(self, info: strawberry.Info, draft_ids: list[int]) -> bool:
+        await publish_job_versions(draft_ids)
         return True
 
     @strawberry.mutation

@@ -28,6 +28,7 @@ export const JobFragment = graphql(
         ...PostTagLeanFragment
       }
       url_external
+      is_published
       posted_at
       closes_at
 

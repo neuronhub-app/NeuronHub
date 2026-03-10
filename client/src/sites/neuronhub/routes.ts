@@ -28,6 +28,7 @@ export default [
       route("/faq", "./apps/jobs/faq/index.tsx"),
       route("/subscriptions", "./apps/jobs/subscriptions/index.tsx"),
       route("/subscriptions/remove/:id_ext", "./apps/jobs/subscriptions/remove.tsx"),
+      route("/versions", "./apps/jobs/versions/index.tsx"),
       route("/:slug", "./apps/jobs/list/slug.tsx"),
     ]),
     ...prefix("/tools", [

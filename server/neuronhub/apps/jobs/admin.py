@@ -12,6 +12,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
     list_display = [
         "title",
         "org",
+        "is_published",
         "salary_min",
         "is_remote",
         "posted_at",
@@ -67,6 +68,8 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
                     ("salary_min", "salary_max"),
                     # "salary_ranges",
                     "url_external",
+                    "is_published",
+                    "versions",
                     ("tags_country", "tags_city"),
                     "tags_skill",
                     "tags_area",

@@ -417,16 +417,22 @@ class ProfilesGen:
 class JobsGen:
     faker: UniqueProxy
 
-    async def job(self, org: Org | None = None) -> Job:
+    async def job(
+        self,
+        org: Org | None = None,
+        title: str = "",
+        is_published: bool = True,
+    ) -> Job:
         if not org:
             org, _ = await Org.objects.aget_or_create(
                 name=self.faker.company(),
                 defaults={"website": self.faker.domain_name()},
             )
         return await Job.objects.acreate(
-            title=self.faker.sentence(),
+            title=title or self.faker.sentence(),
             org=org,
             visibility=Visibility.PUBLIC,
+            is_published=is_published,
         )
 
     async def job_alert(self, email: str = "", is_active=True) -> JobAlert:

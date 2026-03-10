@@ -26,6 +26,7 @@
 
     "lucide-react": "^0.574.0",
     "react-icons": "^5.5.0",
+    "diff2html": "^3.4.56",
 
     "valtio": "^2.3.0",
     "zod": "^4.3.6",

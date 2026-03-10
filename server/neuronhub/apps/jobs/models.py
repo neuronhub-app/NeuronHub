@@ -89,6 +89,15 @@ class Job(AlgoliaModel):
 
     url_external = models.CharField(blank=True, max_length=1024, verbose_name="URL")
 
+    is_published = models.BooleanField(default=True)
+
+    versions = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
+        "self",
+        symmetrical=False,
+        blank=True,
+        related_name="version_of",
+    )
+
     bookmarked_by_users = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
         User, related_name=UserListName.jobs_bookmarked.value, blank=True
     )
@@ -105,8 +114,19 @@ class Job(AlgoliaModel):
 
     history = HistoricalRecords(excluded_fields=["slug"])
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["slug", "is_published"],
+                name="unique_job_slug_is_published",
+            ),
+        ]
+
     graphql_query_for_algolia: str = "JobsByIds"
     graphql_query_for_algolia_field: str = "jobs"
+
+    def is_in_algolia_index(self) -> bool:
+        return self.is_published
 
     def get_unix_posted_at(self) -> float | None:
         return self.posted_at.timestamp() if self.posted_at else None

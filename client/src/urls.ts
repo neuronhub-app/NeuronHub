@@ -62,6 +62,7 @@ export const urls = {
     slug(slug: string) {
       return `${this.list === "/" ? "" : this.list}/${slug}` as const;
     },
+    versions: env.VITE_SITE === "pg" ? "/versions" : "/jobs/versions",
     subscriptionsRemove(idExt: string) {
       return `${this.subscriptions}/remove/${idExt}` as const;
     },

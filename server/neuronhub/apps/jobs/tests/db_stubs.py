@@ -181,6 +181,29 @@ async def create_jobs_stubs() -> None:
                 tags = await _get_or_create_tags(tag_names, category)
                 await getattr(stub.job, f"tags_{category.value}").aset(tags)
 
+    await _create_draft_version(published=job_stubs[0].job)
+
+
+async def _create_draft_version(published: Job) -> Job:
+    """
+    #AI-slop
+    """
+    draft = await Job.objects.acreate(
+        title=f"{published.title} (updated)",
+        org=published.org,
+        url_external=published.url_external,
+        salary_min=(published.salary_min or 0) + 10_000,
+        is_remote=True,
+        posted_at=published.posted_at,
+        visibility=published.visibility,
+        is_published=False,
+    )
+    # Override slug to match published (AutoSlugField generates unique slugs)
+    draft.slug = published.slug
+    await draft.asave()
+    await published.versions.aadd(draft)
+    return draft
+
 
 async def _get_or_create_tags(tag_names: list[str], category: TagCategoryEnum) -> list[PostTag]:
     category_obj, _ = await PostTagCategory.objects.aget_or_create(name=category.value)

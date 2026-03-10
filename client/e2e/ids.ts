@@ -142,6 +142,13 @@ export namespace ids {
       emailInput: "job.alert.email-input",
       submitBtn: "job.alert.submit-btn",
     },
+    versions: {
+      container: "job.versions.container",
+      card: "job.versions.card",
+      selectAllCheckbox: "job.versions.select-all",
+      approveBtn: "job.versions.approve-btn",
+      emptyState: "job.versions.empty-state",
+    },
     subscriptions: {
       list: "job.subscriptions.list",
       card: "job.subscriptions.card",
