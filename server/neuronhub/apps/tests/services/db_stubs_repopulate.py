@@ -2,13 +2,15 @@ import asyncio
 import datetime
 import logging
 import textwrap
-from contextlib import ContextDecorator
 from dataclasses import dataclass
 
-from asgiref.sync import sync_to_async
-from django.conf import settings
 from django.utils import timezone
 
+from neuronhub.apps.algolia.services.algolia_reindex import AlgoliaModel
+from neuronhub.apps.algolia.services.algolia_reindex import algolia_reindex
+from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
+    disable_auto_indexing_if_enabled,
+)
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.highlighter.models import PostHighlight
 from neuronhub.apps.importer.models import PostSource
@@ -64,7 +66,7 @@ async def db_stubs_repopulate(
     E2E tests run on it, so it includes edge cases.
     """
 
-    with _disable_auto_indexing():
+    with disable_auto_indexing_if_enabled():
         if is_delete_posts_extra:
             for model in [
                 PostHighlight,
@@ -98,6 +100,7 @@ async def db_stubs_repopulate(
         if is_delete_jobs:
             await JobAlert.objects.all().adelete()
             await Job.objects.all().adelete()
+            await Org.objects.all().adelete()
 
         if is_delete_user_default:
             await User.objects.all().adelete()
@@ -136,51 +139,14 @@ async def db_stubs_repopulate(
         if is_create_jobs:
             await create_jobs_stubs()
 
-    if settings.ALGOLIA["IS_ENABLED"]:
-        await _algolia_reindex(
-            is_reindex_profiles=is_create_profiles,
-            is_reindex_jobs=is_create_jobs,
-        )
+    models_to_reindex = [AlgoliaModel.Post]
+    if is_create_profiles:
+        models_to_reindex.append(AlgoliaModel.Profile)
+    if is_create_jobs:
+        models_to_reindex.append(AlgoliaModel.Job)
+    await algolia_reindex(models_to_reindex)
 
     return gen
-
-
-# todo ! refac: move out
-async def _algolia_reindex(is_reindex_profiles: bool = True, is_reindex_jobs: bool = True):
-    from algoliasearch_django import reindex_all
-
-    from neuronhub.apps.jobs.index import setup_virtual_replica_sorted_by_closes_at
-    from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
-
-    await sync_to_async(reindex_all)(Post)
-    await sync_to_async(setup_virtual_replica_sorted_by_votes)()
-
-    if is_reindex_profiles:
-        await sync_to_async(reindex_all)(Profile)
-
-    if is_reindex_jobs:
-        await sync_to_async(reindex_all)(Job)
-        await sync_to_async(setup_virtual_replica_sorted_by_closes_at)()
-
-
-# todo ! refac-name: disable_algolia_indexing_if_enabled
-class _disable_auto_indexing(ContextDecorator):
-    """
-    Uses lazy imports, as algoliasearch_django crashes Django if settings.ALGOLIA_API_KEY is missing.
-    """
-
-    decorator: ContextDecorator
-
-    def __enter__(self):
-        if settings.ALGOLIA["IS_ENABLED"]:
-            from algoliasearch_django.decorators import disable_auto_indexing
-
-            self.decorator = disable_auto_indexing()
-            self.decorator.__enter__()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        if settings.ALGOLIA["IS_ENABLED"]:
-            self.decorator.__exit__(exc_type, exc_value, traceback)
 
 
 async def _create_users(gen: Gen):

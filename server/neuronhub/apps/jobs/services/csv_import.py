@@ -9,13 +9,15 @@ from datetime import UTC
 from datetime import datetime
 from pathlib import Path
 
+from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
+    disable_auto_indexing_if_enabled,
+)
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models import PostTagCategory
-from neuronhub.apps.tests.services.db_stubs_repopulate import _disable_auto_indexing
 
 
 @dataclass
@@ -27,7 +29,7 @@ class CsvSyncStats:
 async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncStats:
     stats = CsvSyncStats()
 
-    with _disable_auto_indexing():
+    with disable_auto_indexing_if_enabled():
         jobs_dict = _parse_jobs_csv(csv_path)
         for job_dict in jobs_dict[:limit] if limit else jobs_dict:
             if not job_dict:
@@ -46,7 +48,9 @@ async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncSt
                 }.get(category, _abbreviate_tag)
 
                 tags_by_field_name[tag_field_name] = await _get_or_create_tags(
-                    tag_fields=[abbreviate(val) for val in _list_split_and_strip(raw_values)],
+                    tag_params_list=[
+                        abbreviate(val) for val in _list_split_and_strip(raw_values)
+                    ],
                     category=category,
                 )
 
@@ -76,15 +80,15 @@ async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncSt
 
 
 async def _get_or_create_tags(
-    tag_fields: list[TagFields],
+    tag_params_list: list[TagParams],
     category: TagCategoryEnum,
 ) -> list[PostTag]:
     category_obj, _ = await PostTagCategory.objects.aget_or_create(name=category.value)
     tags = []
-    for tag_fields in tag_fields:
+    for tag_params in tag_params_list:
         tag, _ = await PostTag.objects.aget_or_create(
-            name=tag_fields.name,
-            defaults={"aliases": tag_fields.aliases},
+            name=tag_params.name,
+            defaults={"aliases": tag_params.aliases},
         )
         await tag.categories.aadd(category_obj)
         tags.append(tag)
@@ -92,7 +96,7 @@ async def _get_or_create_tags(
 
 
 @dataclass
-class TagFields:
+class TagParams:
     name: str
     aliases: list[str] = field(default_factory=list)
 
@@ -144,7 +148,7 @@ def _list_split_and_strip(str_raw: str) -> list[str]:
     return [tag.strip() for tag in str_raw.split(",") if tag.strip()]
 
 
-def _abbreviate_tag(name_raw: str) -> TagFields:
+def _abbreviate_tag(name_raw: str) -> TagParams:
     name = name_raw
     for old, new in [
         ("+ years experience", "y+"),
@@ -152,25 +156,25 @@ def _abbreviate_tag(name_raw: str) -> TagFields:
         ("Undergraduate", "Undergrad"),
     ]:
         name = name.replace(old, new)
-    return TagFields(name=name)
+    return TagParams(name=name)
 
 
-def _abbreviate_country(name_raw: str) -> TagFields:
+def _abbreviate_country(name_raw: str) -> TagParams:
     abbreviated = {
         "United States (USA)": "United States",
         "United Kingdom (UK)": "United Kingdom",
     }.get(name_raw)
     if abbreviated:
-        return TagFields(abbreviated, aliases=[name_raw])
-    return TagFields(name=name_raw)
+        return TagParams(abbreviated, aliases=[name_raw])
+    return TagParams(name=name_raw)
 
 
-def _abbreviate_city(name_raw: str) -> TagFields:
+def _abbreviate_city(name_raw: str) -> TagParams:
     if abbreviated := {"Washington D.C.": "Washington DC"}.get(name_raw):
-        return TagFields(abbreviated, aliases=[name_raw])
+        return TagParams(abbreviated, aliases=[name_raw])
 
     # Strip 2-letter code suffix: "Zurich CH" → "Zurich" (alias keeps original)
     parts = name_raw.rsplit(" ", 1)
     if len(parts) == 2 and len(parts[1]) == 2 and parts[1].isalpha():
-        return TagFields(parts[0], aliases=[name_raw])
-    return TagFields(name=name_raw)
+        return TagParams(parts[0], aliases=[name_raw])
+    return TagParams(name=name_raw)

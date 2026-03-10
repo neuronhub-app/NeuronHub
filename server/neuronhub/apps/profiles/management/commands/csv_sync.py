@@ -3,8 +3,10 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
+from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
+    disable_auto_indexing_if_enabled,
+)
 from neuronhub.apps.profiles.services.csv_import_optimized import csv_optimize_and_import
-from neuronhub.apps.tests.services.db_stubs_repopulate import _disable_auto_indexing
 
 
 class Command(BaseCommand):
@@ -17,20 +19,13 @@ class Command(BaseCommand):
             default=settings.CONF_CONFIG.eag_csv_path,
         )
         parser.add_argument(
-            "--dry-run",
-            action="store_true",
-        )
-        parser.add_argument(
             "--limit",
             type=int,
             help="Limit profile imports (for testing)",
         )
 
     def handle(self, *args, csv: Path, dry_run: bool, limit: int | None, **options):
-        if dry_run:
-            self.stdout.write("DRY RUN - no changes will be made")
-
-        with _disable_auto_indexing():
+        with disable_auto_indexing_if_enabled():
             stats = csv_optimize_and_import(csv, limit=limit, is_reindex_algolia=False)
 
         self.stdout.write(f"Created:   {stats.created}")

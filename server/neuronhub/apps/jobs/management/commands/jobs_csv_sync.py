@@ -5,7 +5,9 @@ from django.core.management.base import BaseCommand
 
 from neuronhub.apps.jobs.services.csv_import import csv_import_jobs
 from neuronhub.apps.jobs.services.csv_import_orgs import csv_import_orgs
-from neuronhub.apps.tests.services.db_stubs_repopulate import _disable_auto_indexing
+from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
+    disable_auto_indexing_if_enabled,
+)
 
 
 class Command(BaseCommand):
@@ -32,7 +34,7 @@ class Command(BaseCommand):
         **options,
     ):
 
-        with _disable_auto_indexing():
+        with disable_auto_indexing_if_enabled():
             if csv:
                 stats = async_to_sync(csv_import_jobs)(csv, limit=limit)
                 self.stdout.write(f"Jobs created:   {stats.created}")

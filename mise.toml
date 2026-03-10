@@ -210,14 +210,19 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     run = [
         "mise django:algolia-reindex:post",
         "mise django:algolia-reindex:profile",
+        "mise django:algolia-reindex:job",
     ]
 [tasks."django:algolia-reindex:profile"]
     dir = "server"
-    run = "uv run manage.py algolia_reindex_with_replica --model=Profile"
+    run = "uv run manage.py algolia_reindex_with_replicas --model=Profile"
 
 [tasks."django:algolia-reindex:post"]
     dir = "server"
-    run = "uv run manage.py algolia_reindex_with_replica --model=Post"
+    run = "uv run manage.py algolia_reindex_with_replicas --model=Post"
+
+[tasks."django:algolia-reindex:job"]
+    dir = "server"
+    run = "uv run manage.py algolia_reindex_with_replicas --model=Job"
 
 
 # typegen → format → lint

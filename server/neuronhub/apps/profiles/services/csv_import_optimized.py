@@ -2,16 +2,16 @@ import csv
 from dataclasses import dataclass
 from pathlib import Path
 
-from asgiref.sync import async_to_sync
-from django.conf import settings
-
+from neuronhub.apps.algolia.services.algolia_reindex import AlgoliaModel
+from neuronhub.apps.algolia.services.algolia_reindex import algolia_reindex_sync
+from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
+    disable_auto_indexing_if_enabled,
+)
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileGroup
 from neuronhub.apps.profiles.models import ProfileMatch
 from neuronhub.apps.profiles.services.csv_optimize_tokens import csv_normalize_for_db
-from neuronhub.apps.tests.services.db_stubs_repopulate import _algolia_reindex
-from neuronhub.apps.tests.services.db_stubs_repopulate import _disable_auto_indexing
 from neuronhub.apps.users.models import User
 
 
@@ -40,7 +40,7 @@ def csv_optimize_and_import(
     tag_parent, _ = PostTag.objects.get_or_create(name="Skill", tag_parent=None)
     profile_group, _ = ProfileGroup.objects.get_or_create(name=group_name)
 
-    with _disable_auto_indexing():
+    with disable_auto_indexing_if_enabled():
         for profile_row in rows[:limit] if limit else rows:
             if not profile_row:
                 continue
@@ -100,8 +100,8 @@ def csv_optimize_and_import(
             else:
                 stats.unchanged += 1
 
-    if settings.ALGOLIA["IS_ENABLED"] and is_reindex_algolia:
-        async_to_sync(_algolia_reindex)()
+    if is_reindex_algolia:
+        algolia_reindex_sync(model=AlgoliaModel.Profile)
 
     return stats
 

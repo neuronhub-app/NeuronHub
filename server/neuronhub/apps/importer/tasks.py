@@ -3,10 +3,13 @@ from typing import Literal
 from django_tasks import task
 from sentry_sdk import monitor
 
+from neuronhub.apps.algolia.services.algolia_reindex import AlgoliaModel
+from neuronhub.apps.algolia.services.algolia_reindex import algolia_reindex
+from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
+    disable_auto_indexing_if_enabled,
+)
 from neuronhub.apps.importer.services.hackernews import CategoryHackerNews
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
-from neuronhub.apps.tests.services.db_stubs_repopulate import _algolia_reindex
-from neuronhub.apps.tests.services.db_stubs_repopulate import _disable_auto_indexing
 
 
 @task()
@@ -32,8 +35,8 @@ async def import_hn_posts(
             "checkin_margin": 10,  # aka "Grace Period"
         },
     ):
-        with _disable_auto_indexing():
+        with disable_auto_indexing_if_enabled():
             importer = ImporterHackerNews(is_use_cache=is_use_cache)
             await importer.import_posts(category=CategoryHackerNews(category), limit=limit)
 
-        await _algolia_reindex()
+        await algolia_reindex(models=[AlgoliaModel.Profile])

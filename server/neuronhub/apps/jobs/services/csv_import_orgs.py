@@ -12,12 +12,14 @@ import requests
 from asgiref.sync import sync_to_async
 from django.core.files.base import ContentFile
 
-from neuronhub.apps.jobs.services.csv_import import TagFields
+from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
+    disable_auto_indexing_if_enabled,
+)
+from neuronhub.apps.jobs.services.csv_import import TagParams
 from neuronhub.apps.jobs.services.csv_import import _get_or_create_tags
 from neuronhub.apps.jobs.services.csv_import import _list_split_and_strip
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
-from neuronhub.apps.tests.services.db_stubs_repopulate import _disable_auto_indexing
 
 
 @dataclass
@@ -33,7 +35,7 @@ async def csv_import_orgs(
 ) -> OrgSyncStats:
     stats = OrgSyncStats()
 
-    with _disable_auto_indexing():
+    with disable_auto_indexing_if_enabled():
         orgs_dict = _parse_orgs_csv(csv_path)
         for org_dict in orgs_dict[:limit] if limit else orgs_dict:
             if not org_dict:
@@ -41,7 +43,7 @@ async def csv_import_orgs(
 
             tags_area_names = _list_split_and_strip(org_dict.pop("tags_area"))
             tags_area = await _get_or_create_tags(
-                tag_fields=[TagFields(name=name) for name in tags_area_names],
+                tag_params_list=[TagParams(name=name) for name in tags_area_names],
                 category=TagCategoryEnum.Area,
             )
 
