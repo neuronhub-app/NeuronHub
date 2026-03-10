@@ -1,7 +1,6 @@
 import logging
 from enum import Enum
 
-from asgiref.sync import async_to_sync
 from asgiref.sync import sync_to_async
 from django.conf import settings
 
@@ -21,9 +20,18 @@ class AlgoliaModel(Enum):
     Post = "post"
 
 
-async def algolia_reindex(models: list[AlgoliaModel] | None = None):
+async def algolia_reindex(models: list[AlgoliaModel] | None = None, limit: int | None = None):
+    await sync_to_async(algolia_reindex_sync)(models=models, limit=limit)
+
+
+def algolia_reindex_sync(models: list[AlgoliaModel] | None = None, limit: int | None = None):
     if not settings.ALGOLIA["IS_ENABLED"]:
         logger.debug("Skipping reindex - Algolia is disabled")
+        return
+
+    if limit:
+        for model in models or list(AlgoliaModel):
+            _partial_update_all(model=model, limit=limit)
         return
 
     from algoliasearch_django import reindex_all
@@ -31,14 +39,45 @@ async def algolia_reindex(models: list[AlgoliaModel] | None = None):
     for model in models or list(AlgoliaModel):
         match model:
             case AlgoliaModel.Profile:
-                await sync_to_async(reindex_all)(model=Profile)
+                reindex_all(model=Profile)
             case AlgoliaModel.Job:
-                await sync_to_async(reindex_all)(model=Job)
-                await sync_to_async(setup_virtual_replica_sorted_by_closes_at)()
+                reindex_all(model=Job)
+                setup_virtual_replica_sorted_by_closes_at()
             case AlgoliaModel.Post:
-                await sync_to_async(reindex_all)(model=Post)
-                await sync_to_async(setup_virtual_replica_sorted_by_votes)()
+                reindex_all(model=Post)
+                setup_virtual_replica_sorted_by_votes()
 
 
-def algolia_reindex_sync(model: AlgoliaModel):
-    async_to_sync(algolia_reindex)(models=[model])
+def _partial_update_all(model: AlgoliaModel, limit: int):
+    from algoliasearch_django import algolia_engine
+
+    django_model = {
+        AlgoliaModel.Profile: Profile,
+        AlgoliaModel.Job: Job,
+        AlgoliaModel.Post: Post,
+    }[model]
+    adapter = algolia_engine.get_adapter(model=django_model)
+
+    qs = adapter.get_queryset() if callable(adapter.get_queryset) else django_model.objects.all()
+
+    batch: list[dict] = []
+    for instance in qs[:limit]:
+        if not adapter._should_index(instance):
+            continue
+
+        batch.append(adapter.get_raw_record(instance))
+
+        if is_batch_reset_needed := len(batch) >= 1000:
+            algolia_engine.client.partial_update_objects(
+                index_name=adapter.index_name,
+                objects=batch,
+                wait_for_tasks=True,
+            )
+            batch = []
+
+    if batch:
+        algolia_engine.client.partial_update_objects(
+            index_name=adapter.index_name,
+            objects=batch,
+            wait_for_tasks=True,
+        )

@@ -11,12 +11,17 @@ Each Model ha an Index with env postfix: `{name}_{DJANGO_ENV.value}`. Mise adds 
 
 - `posts` - [[server/neuronhub/apps/posts/index.py]]
 - `jobs` - [[server/neuronhub/apps/jobs/index.py]]
+- `profiles` - [[server/neuronhub/apps/profiles/index.py]]
 
 FE index names are in [[client/src/utils/useAlgoliaSearchClient.ts]].
 
 ### Serialization
 
 We serialize models on BE using GraphQL queries (eg `PostsByIds`, `JobsByIds`) in `_get_graphql_field`. This keeps the single-place GraphQL [cache reset](/docs/architecture/frontend/GraphQL.md#cache-reset): on list pages, Algolia hits are enriched via [[useAlgoliaEnrichmentByGraphql.ts]] so `mutateAndRefetchMountedQueries` auto-refetches on mutations.
+
+### Virtual replicas
+
+For sorting both `posts` and `jobs` have replicas that need `client.set_settings` - hence we always use our `neuronhub.apps.algolia.services.algolia_reindex()` instead of Algolia's `reindex_all()`.
 
 ### Partial updates
 

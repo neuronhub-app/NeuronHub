@@ -101,7 +101,7 @@ def csv_optimize_and_import(
                 stats.unchanged += 1
 
     if is_reindex_algolia:
-        algolia_reindex_sync(model=AlgoliaModel.Profile)
+        algolia_reindex_sync(models=[AlgoliaModel.Profile])
 
     return stats
 

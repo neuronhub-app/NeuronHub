@@ -38,6 +38,8 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         ("tags_skill", DALFRelatedFieldAjaxMulti),
         ("tags_area", DALFRelatedFieldAjaxMulti),
         ("tags_workload", DALFRelatedFieldAjaxMulti),
+        ("tags_country", DALFRelatedFieldAjaxMulti),
+        ("tags_city", DALFRelatedFieldAjaxMulti),
         ("tags_experience", DALFRelatedFieldAjaxMulti),
         ("bookmarked_by_users", DALFRelatedFieldAjaxMulti),
         ("org", DALFRelatedFieldAjaxMulti),

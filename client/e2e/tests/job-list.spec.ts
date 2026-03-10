@@ -1,5 +1,4 @@
 import { test } from "@playwright/test";
-import { data } from "react-router";
 import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { expect } from "@/e2e/helpers/expect";

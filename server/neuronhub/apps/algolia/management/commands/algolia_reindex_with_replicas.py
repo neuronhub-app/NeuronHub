@@ -12,10 +12,15 @@ class Command(BaseCommand):
             default="",
             choices=["Profile", "Post", "Job"],
         )
+        parser.add_argument(
+            "--limit",
+            type=int,
+            default=None,
+            help="partial_update_objects on first N records instead of full reindex",
+        )
 
-    def handle(self, *args, model: str, **options):
-        if model:
-            algolia_reindex_sync(model=AlgoliaModel[model])
-        else:
-            for algolia_model in AlgoliaModel:
-                algolia_reindex_sync(model=algolia_model)
+    def handle(self, *args, model: str, limit: int | None, **options):
+        algolia_reindex_sync(
+            models=[AlgoliaModel[model]] if model else None,
+            limit=limit,
+        )
