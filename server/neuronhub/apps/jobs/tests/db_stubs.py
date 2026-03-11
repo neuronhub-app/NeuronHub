@@ -1,8 +1,9 @@
+import textwrap
 from dataclasses import dataclass
 from dataclasses import field
-from datetime import UTC
-from datetime import datetime
 from datetime import timedelta
+
+from django.utils import timezone
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
@@ -10,6 +11,7 @@ from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models import PostTagCategory
+from neuronhub.apps.tests.test_gen import Gen
 
 
 @dataclass
@@ -31,17 +33,30 @@ class JobStub:
     tags: JobTags = field(default_factory=JobTags)
 
 
-async def create_jobs_stubs() -> None:
+async def create_jobs_stubs(gen: Gen) -> None:
+    now = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
     job_stubs = [
         JobStub(
-            org=Org(name="Novafield Labs", website="novafield.ai", is_highlighted=True),
+            org=Org(
+                name="Novafield Labs",
+                website="novafield.ai",
+                description="Novafield Labs is an AI safety research lab focused on mechanistic interpretability and alignment. They develop tools and techniques for understanding the internal representations of neural networks.",
+                is_highlighted=True,
+            ),
             job=Job(
                 title="Research Scientist, Interpretability",
-                description="Support and empower AI safety researchers by helping drive impactful work forward and strengthening the overall MATS program.\nPartner with leading mentors to nurture mentees' research capabilities and shepherd AI safety projects through every stage of development.\nAdvise early-career researchers on promising research paths, written outputs, and long-term professional development.\nHelp scholars access key resources and introduce them to subject-matter experts who can advance their work.\nShape MATS strategic direction by leading internal initiatives and enhancing the program's operational foundations.",
+                description=textwrap.dedent("""
+                    - Support and empower AI safety researchers by helping drive impactful work forward
+                    - Partner with leading mentors to nurture mentees' research capabilities
+                    - Advise early-career researchers on promising research paths and professional development
+                    - Help scholars access key resources and connect with subject-matter experts
+                    - Shape MATS strategic direction by leading internal initiatives
+                """),
                 url_external="https://novafield.ai/careers/interpretability",
                 salary_min=180_000,
-                posted_at=datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
-                - timedelta(days=1),
+                salary_text="$155,741 – $163,529",
+                posted_at=now - timedelta(days=1),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
@@ -56,12 +71,24 @@ async def create_jobs_stubs() -> None:
             ),
         ),
         JobStub(
-            org=Org(name="ClearGrant Foundation", website="cleargrant.org", is_highlighted=True),
+            org=Org(
+                name="ClearGrant Foundation",
+                website="cleargrant.org",
+                description="ClearGrant Foundation is a philanthropic organisation that funds high-impact global health and development projects. They manage a portfolio of grants across multiple continents with a focus on measurable outcomes.",
+                is_highlighted=True,
+            ),
             job=Job(
                 title="Operations Associate",
+                description=textwrap.dedent("""
+                    - Coordinate day-to-day grant operations including scheduling, logistics, and vendor management
+                    - Maintain internal databases and reporting dashboards for active grants portfolio
+                    - Support the finance team with budget tracking, expense reconciliation, and quarterly reporting
+                    - Liaise with grantee organisations to ensure timely deliverables and compliance
+                """),
                 url_external="https://cleargrant.org/jobs/ops-associate",
                 salary_min=75_000,
-                posted_at=datetime(2026, 2, 1, tzinfo=UTC),
+                salary_text="$75,000 – $95,000",
+                posted_at=now - timedelta(days=37),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
@@ -78,15 +105,25 @@ async def create_jobs_stubs() -> None:
             org=Org(
                 name="Meridian Governance Institute",
                 website="meridiangovernance.org",
+                description="Meridian Governance Institute is a policy think tank that researches and advocates for responsible AI governance. They work with governments and international bodies to develop regulatory frameworks for advanced AI systems.",
                 is_highlighted=True,
             ),
             job=Job(
                 title="Policy Researcher, AI Governance",
-                description="The Meridian Governance Institute seeks a Policy Researcher to analyze emerging AI governance frameworks across jurisdictions, contribute to policy briefs and reports, and engage with governments and international organisations on AI regulation. Remote-friendly with occasional travel to our offices.",
+                description=textwrap.dedent("""
+                    - Analyze emerging AI governance frameworks across jurisdictions
+                    - Contribute to policy briefs and reports for governments and international organisations
+                    - Engage with policymakers on AI regulation and safety standards
+                    - Remote-friendly with occasional travel to offices
+                """),
                 url_external="https://meridiangovernance.org/vacancies/policy",
                 is_remote=True,
-                posted_at=datetime(2026, 1, 9, tzinfo=UTC),
-                closes_at=datetime(2026, 5, 15, tzinfo=UTC) + timedelta(days=10),
+                salary_text=textwrap.dedent("""
+                    - $50,000 – $140,000
+                    - £37,500 – £105,000
+                """),
+                posted_at=now - timedelta(days=60),
+                closes_at=now + timedelta(days=66),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
@@ -108,13 +145,23 @@ async def create_jobs_stubs() -> None:
         ),
         JobStub(
             org=Org(
-                name="BridgeFund International", website="bridgefund.io", is_highlighted=True
+                name="BridgeFund International",
+                website="bridgefund.io",
+                description="BridgeFund International is a development NGO that designs and implements health and education programmes across East and Southern Africa. They partner with local governments and community organisations to deliver sustainable interventions.",
+                is_highlighted=True,
             ),
             job=Job(
                 title="Country Director, East Africa Programs",
+                description=textwrap.dedent("""
+                    - Lead strategic planning and implementation of health and development programs across East Africa
+                    - Manage relationships with local government partners, NGOs, and community organisations
+                    - Oversee a team of 15+ programme managers and field staff across multiple country offices
+                    - Report directly to the VP of International Programs on budgets, impact metrics, and risk
+                """),
                 url_external="https://bridgefund.io/hiring/country-director",
                 salary_min=90_000,
-                posted_at=datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0),
+                salary_text="$90,000 – $120,000",
+                posted_at=now,
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
@@ -136,12 +183,23 @@ async def create_jobs_stubs() -> None:
             ),
         ),
         JobStub(
-            org=Org(name="Arclight Research Institute", website="arclightresearch.org"),
+            org=Org(
+                name="Arclight Research Institute",
+                website="arclightresearch.org",
+                description="Arclight Research Institute runs intensive fellowship programmes for aspiring alignment researchers. They provide mentorship, compute resources, and a collaborative environment for early-career scientists working on AI safety.",
+            ),
             job=Job(
                 title="Summer Research Fellowship",
+                description=textwrap.dedent("""
+                    - Join a 10-week intensive programme working on alignment and interpretability projects
+                    - Work alongside senior researchers with dedicated mentorship and compute resources
+                    - Present findings at an end-of-programme symposium
+                    - Open to undergrads, grad students, and early-career researchers from any discipline
+                """),
                 url_external="https://arclightresearch.org/fellowship",
-                posted_at=datetime(2026, 2, 15, tzinfo=UTC),
-                closes_at=datetime(2026, 3, 31, tzinfo=UTC) + timedelta(days=30),
+                salary_text="$10,000 stipend",
+                posted_at=now - timedelta(days=23),
+                closes_at=now + timedelta(days=21),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
@@ -155,12 +213,23 @@ async def create_jobs_stubs() -> None:
             ),
         ),
         JobStub(
-            org=Org(name="Sentient Metrics", website="sentientmetrics.org"),
+            org=Org(
+                name="Sentient Metrics",
+                website="sentientmetrics.org",
+                description="Sentient Metrics is a research nonprofit that collects and analyses data on farmed animal welfare outcomes worldwide. They produce open datasets and policy briefs used by advocacy organisations and regulators.",
+            ),
             job=Job(
                 title="Data Analyst, Animal Welfare Metrics",
+                description=textwrap.dedent("""
+                    - Build and maintain dashboards tracking welfare outcomes across farmed animal populations
+                    - Analyze large datasets from field surveys, audits, and partner organisations
+                    - Write reproducible analysis pipelines in Python and SQL
+                    - Collaborate with researchers to translate findings into policy recommendations
+                """),
                 url_external="https://sentientmetrics.org/careers/data-analyst",
                 is_remote=True,
-                posted_at=datetime(2026, 2, 20, tzinfo=UTC),
+                salary_text="$18 – $20 per hour",
+                posted_at=now - timedelta(days=18),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
@@ -194,6 +263,47 @@ async def create_jobs_stubs() -> None:
             await stub.job.tags_country_visa_sponsor.aset(country_tags)
 
     await _create_draft_version(published=job_stubs[0].job)
+    await _create_random_jobs(gen, now=now)
+
+
+async def _create_random_jobs(gen: Gen, now) -> None:
+    """
+    #AI
+    """
+    random = gen.random_gen_seeded
+    faker = gen.faker_non_unique
+
+    for _ in range(5):
+        org, _ = await Org.objects.aget_or_create(
+            name=faker.company(),
+            defaults={
+                "website": faker.domain_name(),
+                "description": faker.text(max_nb_chars=180),
+            },
+        )
+        job = await gen.jobs.job(
+            org=org,
+            title=faker.job() + ", " + faker.bs().title(),
+            description=faker.text(max_nb_chars=300),
+            salary_min=random.choice([None, 60_000, 80_000, 100_000, 120_000]),
+            is_remote=random.choice([None, True, False]),
+            posted_at=now - timedelta(days=random.randint(1, 90)),
+            closes_at=now + timedelta(days=random.randint(10, 120))
+            if random.random() > 0.5
+            else None,
+        )
+
+        countries_all = [value for value in vars(val.country).values() if isinstance(value, str)]
+        country_tags = await _get_or_create_tags(
+            random.sample(countries_all, k=random.randint(1, 3)), TagCategoryEnum.Country
+        )
+        await job.tags_country.aset(country_tags)
+
+        areas_all = [value for value in vars(val.area).values() if isinstance(value, str)]
+        area_tags = await _get_or_create_tags(
+            random.sample(areas_all, k=random.randint(1, 2)), TagCategoryEnum.Area
+        )
+        await job.tags_area.aset(area_tags)
 
 
 async def _create_draft_version(published: Job) -> Job:

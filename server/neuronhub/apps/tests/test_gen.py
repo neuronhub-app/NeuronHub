@@ -416,24 +416,44 @@ class ProfilesGen:
 @dataclass
 class JobsGen:
     faker: UniqueProxy
+    visibility_default: Visibility = Visibility.PUBLIC
 
     async def job(
         self,
         org: Org | None = None,
         title: str = "",
+        description: str = "",
+        url_external: str = "",
+        salary_min: int | None = None,
+        salary_text: str = "",
+        is_remote: bool | None = None,
+        posted_at=None,
+        closes_at=None,
+        visibility: Visibility = Visibility.PUBLIC,
         is_published: bool = True,
+        is_save: bool = True,
     ) -> Job:
         if not org:
             org, _ = await Org.objects.aget_or_create(
                 name=self.faker.company(),
                 defaults={"website": self.faker.domain_name()},
             )
-        return await Job.objects.acreate(
+        job = Job(
             title=title or self.faker.sentence(),
             org=org,
-            visibility=Visibility.PUBLIC,
+            description=description,
+            url_external=url_external,
+            salary_min=salary_min,
+            salary_text=salary_text,
+            is_remote=is_remote,
+            posted_at=posted_at,
+            closes_at=closes_at,
+            visibility=visibility,
             is_published=is_published,
         )
+        if is_save:
+            await job.asave()
+        return job
 
     async def job_alert(self, email: str = "", is_active=True) -> JobAlert:
         return await JobAlert.objects.acreate(

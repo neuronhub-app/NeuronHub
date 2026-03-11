@@ -49,6 +49,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "url_external",
             "is_remote",
             "salary_min",
+            "salary_text",
             ["get_visible_to", "visible_to"],
             # GraphQL compatibility
             ["get_tags_json_skill", "tags_skill"],

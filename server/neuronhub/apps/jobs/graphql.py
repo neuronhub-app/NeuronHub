@@ -51,6 +51,7 @@ class JobType:
     is_remote: auto
     is_remote_friendly: auto
     salary_min: auto
+    salary_text: auto
 
     tags_country: list[PostTagType]
     tags_city: list[PostTagType]

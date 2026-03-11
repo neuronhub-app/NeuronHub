@@ -137,7 +137,7 @@ async def db_stubs_repopulate(
             await create_profiles_stubs(gen)
 
         if is_create_jobs:
-            await create_jobs_stubs()
+            await create_jobs_stubs(gen)
 
     models_to_reindex = [AlgoliaModel.Post]
     if is_create_profiles:

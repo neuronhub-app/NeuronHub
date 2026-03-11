@@ -126,6 +126,7 @@ type JobType {
   is_remote: Boolean
   is_remote_friendly: Boolean
   salary_min: Int
+  salary_text: String!
   tags_country(filters: PostTagFilter): [PostTagType!]!
   tags_city(filters: PostTagFilter): [PostTagType!]!
   url_external: String!

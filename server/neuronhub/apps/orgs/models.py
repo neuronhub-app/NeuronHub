@@ -18,6 +18,7 @@ class Org(TimeStampedModel):
 
     website = models.CharField(max_length=1024, blank=True)
     jobs_page_url = models.CharField(max_length=1024, blank=True)
+    description = models.TextField(blank=True)
     is_highlighted = models.BooleanField(default=False)
     logo = models.ImageField(upload_to="orgs/logos/", blank=True, null=True)
 
