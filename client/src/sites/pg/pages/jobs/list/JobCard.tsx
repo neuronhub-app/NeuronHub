@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Flex,
+  FormatNumber,
   Heading,
   HStack,
   Icon,
@@ -20,7 +21,6 @@ import { Highlight } from "react-instantsearch";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
 import { datetime } from "@/utils/date-fns";
-import { format } from "@/utils/format";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { useStateValtio } from "@/utils/useStateValtio";
 
@@ -202,14 +202,23 @@ function JobExpanded(props: { job: JobFragmentType }) {
       </Stack>
       <Flex gap="gap.md" flexDirection={{ base: "column", md: "row" }}>
         <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
-          <Text fontSize="sm" color="fg.muted" fontWeight="medium">
-            Salary
-          </Text>
-          <Text fontSize="sm">
-            {props.job.salary_min
-              ? format.salary(props.job.salary_min, props.job.salary_max)
-              : "Not specified"}
-          </Text>
+          {props.job.salary_min && (
+            <>
+              <Text fontSize="sm" color="fg.muted" fontWeight="medium">
+                Salary
+              </Text>
+              <Text fontSize="sm">
+                <FormatNumber
+                  value={props.job.salary_min}
+                  style="currency"
+                  currency="USD"
+                  notation="compact"
+                  minimumFractionDigits={0}
+                />
+                +
+              </Text>
+            </>
+          )}
         </Stack>
         <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
           <Text fontSize="sm" color="fg.muted" fontWeight="medium">

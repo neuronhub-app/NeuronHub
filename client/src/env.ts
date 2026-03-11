@@ -26,6 +26,7 @@ const serverEnv = str({
 
 const envCleaned = cleanEnv(envRaw, {
   VITE_SITE: str({ default: "", choices: ["", "pg"] }),
+
   VITE_PROJECT_NAME: str({ default: "NeuronHub" }),
 
   NODE_ENV: serverEnv,

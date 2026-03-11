@@ -39,7 +39,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     PROJECT_NAME = "{{ env.PROJECT_NAME | default(value = 'neuronhub') }}"
     VITE_PROJECT_NAME = "NeuronHub" # for FE HTML
-    VITE_RELEASE_VERSION = "0.3.2.0-rc.2" # used in GitHub and Sentry
+    VITE_RELEASE_VERSION = "0.3.2.0-rc.4" # used in GitHub and Sentry
 
     DEPENDENCY_COOLDOWN_DAYS = 4
 

@@ -19,7 +19,6 @@ export const JobFragment = graphql(
       is_remote
       is_remote_friendly
       salary_min
-      salary_max
       tags_country {
         ...PostTagLeanFragment
       }

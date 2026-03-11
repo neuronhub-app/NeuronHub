@@ -1,7 +1,7 @@
 import { layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 // ViteNodeRunner can't resolve `@/` aliases — route config files must use inline strings
-export default [
+export const routes = [
   layout("./sites/neuronhub/NeuronLayout.tsx", [
     route("/", "./apps/home/index.tsx"),
     route("/login", "./apps/auth/login/index.tsx"),

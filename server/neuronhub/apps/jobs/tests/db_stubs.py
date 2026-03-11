@@ -51,7 +51,7 @@ async def create_jobs_stubs() -> None:
                 experience=[val.experience.Middle],
                 workload=[val.workload.FullTime],
                 country=[val.country.US],
-                city=[val.city.SF],
+                city=[val.city.SanFrancisco],
                 visa_countries=[val.country.US],
             ),
         ),
@@ -71,7 +71,7 @@ async def create_jobs_stubs() -> None:
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime],
                 country=[val.country.US],
-                city=[val.city.Oakland, val.city.SF],
+                city=[val.city.Oakland, val.city.SanFrancisco],
             ),
         ),
         JobStub(
@@ -114,7 +114,6 @@ async def create_jobs_stubs() -> None:
                 title="Country Director, East Africa Programs",
                 url_external="https://bridgefund.io/hiring/country-director",
                 salary_min=90_000,
-                salary_max=130_000,
                 posted_at=datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0),
                 visibility=Visibility.PUBLIC,
             ),
@@ -246,8 +245,8 @@ async def _create_visa_child_tags(country_names: list[str]) -> None:
 
 class val:
     class country:
-        US = "US"
-        UK = "UK"
+        US = "United States"
+        UK = "United Kingdom"
         Kenya = "Kenya"
         Uganda = "Uganda"
         Rwanda = "Rwanda"
@@ -258,7 +257,7 @@ class val:
         Remote = "Remote"
 
     class city:
-        SF = "SF"
+        SanFrancisco = "San Francisco"
         Oakland = "Oakland"
         Berkeley = "Berkeley"
         London = "London"

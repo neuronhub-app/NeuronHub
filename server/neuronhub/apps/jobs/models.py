@@ -38,7 +38,6 @@ class Job(AlgoliaModel):
     is_remote = models.BooleanField(blank=True, null=True)
     is_remote_friendly = models.BooleanField(blank=True, null=True)
     salary_min = models.PositiveIntegerField(blank=True, null=True)
-    salary_max = models.PositiveIntegerField(blank=True, null=True)
     # salary_ranges = models.TextField(
     #     blank=True, help_text="Orgs can specify multiple ranges for multiple locations."
     # )

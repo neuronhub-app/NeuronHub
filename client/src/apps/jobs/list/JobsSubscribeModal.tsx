@@ -129,7 +129,7 @@ export function JobsSubscribeModal() {
                   placeholder="your@email.com"
                   inputProps={{
                     type: "email",
-                    autofocus: true,
+                    autoFocus: true,
                     ...ids.set(ids.job.alert.emailInput),
                   }}
                 />
