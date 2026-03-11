@@ -16,7 +16,7 @@ export namespace datetime {
     return `${format(date, "yyyy-MM-dd kk:mm")} ${tzNameShort}`;
   }
 
-  export function relativeFull(dateRaw: DateRaw): string {
+  export function relativeRounded(dateRaw: DateRaw): string {
     const date = parseRaw(dateRaw);
     if (!date) {
       return "";

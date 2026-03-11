@@ -28,33 +28,7 @@ const style = {
   markHighlight: {
     "& mark": { bg: "yellow.200", color: "black", borderRadius: "2px", px: "1px" },
   },
-  tag: {
-    base: {
-      h: "6",
-      px: "gap.sm",
-      borderRadius: "sm",
-      fontSize: "sm",
-      fontWeight: "normal",
-      alignItems: "center",
-    } as const,
-    area: { bg: "green.subtle", fg: "green.fg" },
-    experience: { bg: "teal.subtle", fg: "teal.fg" },
-    education: { bg: "sky.subtle", fg: "sky.fg" },
-    workload: { bg: "orange.subtle", fg: "orange.fg" },
-    highlighted: { bg: "amber.subtle", fg: "amber.fg" },
-    internship: { bg: "rose.subtle", fg: "rose.fg" },
-  },
 } as const;
-
-type TagGroup = {
-  tags: { name: string }[];
-  attribute: string;
-  multipleLabel: string;
-  bg: string;
-  fg: string;
-};
-
-const tagsHidden = ["No education requirement", "Other", "Full-time", "Undergrad"];
 
 export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean }) {
   const isHighlightable = props.isSearchActive && "_highlightResult" in props.job;
@@ -142,7 +116,7 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
               color="fg.muted"
               whiteSpace="nowrap"
             >
-              {datetime.relativeFull(props.job.posted_at)}
+              {datetime.relativeRounded(props.job.posted_at)}
             </Flex>
           </Flex>
         </Flex>
@@ -201,9 +175,8 @@ function JobExpanded(props: { job: JobFragmentType }) {
         </Box>
       </Stack>
       <Flex gap="gap.md" flexDirection={{ base: "column", md: "row" }}>
-        <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
           {props.job.salary_min && (
-            <>
+            <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
               <Text fontSize="sm" color="fg.muted" fontWeight="medium">
                 Salary
               </Text>
@@ -217,9 +190,8 @@ function JobExpanded(props: { job: JobFragmentType }) {
                 />
                 +
               </Text>
-            </>
+            </Stack>
           )}
-        </Stack>
         <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
           <Text fontSize="sm" color="fg.muted" fontWeight="medium">
             Application Deadline
@@ -281,56 +253,76 @@ function JobTitleLink(props: {
   );
 }
 
+const tagStyle = {
+  base: {
+    h: "6",
+    px: "gap.sm",
+    borderRadius: "sm",
+    fontSize: "sm",
+    fontWeight: "normal",
+    alignItems: "center",
+  } as const,
+  area: { bg: "green.subtle", fg: "green.fg" },
+  experience: { bg: "teal.subtle", fg: "teal.fg" },
+  education: { bg: "sky.subtle", fg: "sky.fg" },
+  workload: { bg: "orange.subtle", fg: "orange.fg" },
+  highlighted: { bg: "amber.subtle", fg: "amber.fg" },
+  internship: { bg: "rose.subtle", fg: "rose.fg" },
+} as const;
+
 function JobTagGroups(props: {
   job: JobFragmentType;
   highlightable: string[];
   jobHit: Hit<BaseHit>;
   isOrgHighlighted?: boolean;
 }) {
-  const tagGroups: TagGroup[] = [
-    {
-      tags: props.job.tags_area,
-      attribute: "tags_area",
-      multipleLabel: "Multiple Cause Areas",
-      bg: style.tag.area.bg,
-      fg: style.tag.area.fg,
-    },
-    {
-      tags: props.job.tags_experience,
-      attribute: "tags_experience",
-      multipleLabel: "Multiple Experience Levels",
-      bg: style.tag.experience.bg,
-      fg: style.tag.experience.fg,
-    },
-    {
-      tags: props.job.tags_education,
-      attribute: "tags_education",
-      multipleLabel: "Multiple Education Requirements",
-      bg: style.tag.education.bg,
-      fg: style.tag.education.fg,
-    },
-    {
-      tags: props.job.tags_workload,
-      attribute: "tags_workload",
-      multipleLabel: "Multiple Role Types",
-      bg: style.tag.workload.bg,
-      fg: style.tag.workload.fg,
-    },
-  ].filter(group => group.tags?.length > 0);
+  const tagGroups = (
+    [
+      {
+        tags: props.job.tags_area,
+        attribute: "tags_area",
+        multipleLabel: "Multiple Cause Areas",
+        bg: tagStyle.area.bg,
+        fg: tagStyle.area.fg,
+      },
+      {
+        tags: props.job.tags_experience,
+        attribute: "tags_experience",
+        multipleLabel: "Multiple Experience Levels",
+        bg: tagStyle.experience.bg,
+        fg: tagStyle.experience.fg,
+      },
+      {
+        tags: props.job.tags_education,
+        attribute: "tags_education",
+        multipleLabel: "Multiple Education Requirements",
+        bg: tagStyle.education.bg,
+        fg: tagStyle.education.fg,
+      },
+      {
+        tags: props.job.tags_workload,
+        attribute: "tags_workload",
+        multipleLabel: "Multiple Role Types",
+        bg: tagStyle.workload.bg,
+        fg: tagStyle.workload.fg,
+      },
+    ] as const
+  ).filter(group => group.tags?.length > 0);
 
   return (
     <HStack gap={{ base: "gap.xs", md: "gap.md" }} flexWrap="wrap">
       {props.isOrgHighlighted && (
         <Badge
-          {...style.tag.base}
-          bg={style.tag.highlighted.bg}
-          color={style.tag.highlighted.fg}
+          {...tagStyle.base}
+          bg={tagStyle.highlighted.bg}
+          color={tagStyle.highlighted.fg}
           {...getOutlineBleedingProps("subtle")}
         >
           Highlighted Org
         </Badge>
       )}
       {tagGroups.map(tagGroup => {
+        const tagsHidden = ["No education requirement", "Other", "Full-time", "Undergrad"];
         const tags = tagGroup.tags.filter(tag => !tagsHidden.includes(tag.name));
         if (tags.length === 0) {
           return null;
@@ -340,7 +332,7 @@ function JobTagGroups(props: {
           return (
             <Badge
               key={tagGroup.attribute}
-              {...style.tag.base}
+              {...tagStyle.base}
               bg={tagGroup.bg}
               color={tagGroup.fg}
               {...getOutlineBleedingProps("subtle")}
@@ -355,7 +347,7 @@ function JobTagGroups(props: {
         return (
           <Badge
             key={tagGroup.attribute}
-            {...style.tag.base}
+            {...tagStyle.base}
             bg={tagGroup.bg}
             color={tagGroup.fg}
             {...getOutlineBleedingProps("subtle")}
