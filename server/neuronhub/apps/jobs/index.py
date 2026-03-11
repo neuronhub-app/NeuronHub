@@ -61,6 +61,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
         fields = [
             ["get_id_as_str", "id"],
             "title",
+            "description",
             ["get_org_json", "org"],
             "url_external",
             "is_remote",
@@ -69,6 +70,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ["get_visible_to", "visible_to"],
             # GraphQL compatibility
             *[(f"get_json_{field}", field) for field in tag_fields],
+            ["get_json_locations", "locations"],
             *[(f"get_iso_{field}", field) for field in datetime_fields],
             # unix for Algolia's sort/filter
             *[(f"get_unix_{field}", f"{field}_unix") for field in datetime_fields],
@@ -76,7 +78,12 @@ if settings.ALGOLIA["IS_ENABLED"]:
         settings = {
             "searchableAttributes": [
                 "title",
+                "description",
                 "org.name",
+                "locations.name",
+                "locations.city",
+                "locations.country",
+                "locations.region",
                 "tags_country.name",
                 "tags_country.aliases",
                 "tags_city.name",
@@ -87,6 +94,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "attributesForFaceting": [
                 "searchable(org.name)",
                 *[f"searchable({field}.name)" for field in tag_fields],
+                "searchable(locations.name)",
                 "is_remote",
                 "is_remote_friendly",
                 "salary_min",
@@ -125,5 +133,6 @@ if settings.ALGOLIA["IS_ENABLED"]:
                     "tags_country",
                     "tags_city",
                     "tags_country_visa_sponsor",
+                    "locations",
                 )
             )

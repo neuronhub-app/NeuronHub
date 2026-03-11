@@ -11,6 +11,7 @@ from strawberry_django.permissions import IsStaff
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
 from neuronhub.apps.jobs.services.serialize_to_md import serialize_job_to_markdown
@@ -23,6 +24,16 @@ from neuronhub.apps.users.graphql.resolvers import get_user_sync
 from neuronhub.apps.users.models import User
 
 
+@strawberry_django.type(JobLocation)
+class JobLocationType:
+    id: auto
+    name: auto
+    city: auto
+    country: auto
+    region: auto
+    is_remote: auto
+
+
 @strawberry_django.type(Org)
 class OrgType:
     id: auto
@@ -31,6 +42,7 @@ class OrgType:
     jobs_page_url: auto
     is_highlighted: auto
     logo: auto
+    description: auto
     tags_area: list[PostTagType]
 
 
@@ -53,6 +65,7 @@ class JobType:
     salary_min: auto
     salary_text: auto
 
+    locations: list[JobLocationType]
     tags_country: list[PostTagType]
     tags_city: list[PostTagType]
 

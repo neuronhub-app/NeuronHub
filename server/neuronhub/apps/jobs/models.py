@@ -17,6 +17,14 @@ from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
 
 
+class JobLocation(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    city = models.CharField(max_length=255, blank=True)
+    country = models.CharField(max_length=255, blank=True)
+    region = models.CharField(max_length=255, blank=True)
+    is_remote = models.BooleanField(default=False)
+
+
 class Job(AlgoliaModel):
     author = models.ForeignKey(
         User,
@@ -85,6 +93,11 @@ class Job(AlgoliaModel):
         "posts.PostTag",
         limit_choices_to={"categories__name": TagCategoryEnum.City},
         related_name=f"tags_job_{TagCategoryEnum.City.value}",
+        blank=True,
+    )
+
+    locations = models.ManyToManyField(
+        JobLocation,
         blank=True,
     )
 
@@ -162,6 +175,9 @@ class Job(AlgoliaModel):
 
     def get_json_tags_workload(self):
         return self._get_graphql_field("tags_workload")
+
+    def get_json_locations(self):
+        return self._get_graphql_field("locations")
 
     def get_json_tags_country(self):
         return self._get_graphql_field("tags_country")

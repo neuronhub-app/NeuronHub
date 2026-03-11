@@ -12,6 +12,7 @@ export const JobFragment = graphql(
         website
         jobs_page_url
         is_highlighted
+        description
         logo {
           url
         }
@@ -19,11 +20,20 @@ export const JobFragment = graphql(
       is_remote
       is_remote_friendly
       salary_min
+      salary_text
       tags_country {
         ...PostTagLeanFragment
       }
       tags_city {
         ...PostTagLeanFragment
+      }
+      locations {
+        id
+        name
+        city
+        country
+        region
+        is_remote
       }
       url_external
       is_published
