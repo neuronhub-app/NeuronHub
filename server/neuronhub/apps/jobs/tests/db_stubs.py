@@ -40,7 +40,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
         JobStub(
             org=Org(
                 name="Novafield Labs",
-                website="novafield.ai",
+                website="https://novafield.ai",
                 description="Novafield Labs is an AI safety research lab focused on mechanistic interpretability and alignment. They develop tools and techniques for understanding the internal representations of neural networks.",
                 is_highlighted=True,
             ),
@@ -73,7 +73,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
         JobStub(
             org=Org(
                 name="ClearGrant Foundation",
-                website="cleargrant.org",
+                website="https://cleargrant.org",
                 description="ClearGrant Foundation is a philanthropic organisation that funds high-impact global health and development projects. They manage a portfolio of grants across multiple continents with a focus on measurable outcomes.",
                 is_highlighted=True,
             ),
@@ -87,7 +87,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 """),
                 url_external="https://cleargrant.org/jobs/ops-associate",
                 salary_min=75_000,
-                salary_text="$75,000 – $95,000",
                 posted_at=now - timedelta(days=37),
                 visibility=Visibility.PUBLIC,
             ),
@@ -104,7 +103,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
         JobStub(
             org=Org(
                 name="Meridian Governance Institute",
-                website="meridiangovernance.org",
+                website="https://meridiangovernance.org",
                 description="Meridian Governance Institute is a policy think tank that researches and advocates for responsible AI governance. They work with governments and international bodies to develop regulatory frameworks for advanced AI systems.",
                 is_highlighted=True,
             ),
@@ -118,10 +117,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 """),
                 url_external="https://meridiangovernance.org/vacancies/policy",
                 is_remote=True,
-                salary_text=textwrap.dedent("""
-                    - $50,000 – $140,000
-                    - £37,500 – £105,000
-                """),
+                salary_text="$50,000 – $140,000; £37,500 – £105,000",
                 posted_at=now - timedelta(days=60),
                 closes_at=now + timedelta(days=66),
                 visibility=Visibility.PUBLIC,
@@ -146,21 +142,21 @@ async def create_jobs_stubs(gen: Gen) -> None:
         JobStub(
             org=Org(
                 name="BridgeFund International",
-                website="bridgefund.io",
+                website="https://bridgefund.io",
                 description="BridgeFund International is a development NGO that designs and implements health and education programmes across East and Southern Africa. They partner with local governments and community organisations to deliver sustainable interventions.",
                 is_highlighted=True,
             ),
             job=Job(
                 title="Country Director, East Africa Programs",
                 description=textwrap.dedent("""
-                    - Lead strategic planning and implementation of health and development programs across East Africa
-                    - Manage relationships with local government partners, NGOs, and community organisations
-                    - Oversee a team of 15+ programme managers and field staff across multiple country offices
-                    - Report directly to the VP of International Programs on budgets, impact metrics, and risk
+                    A research fellowship contributing to policy analysis on economic management and governance issues facing African countries.
+                    - Conduct policy-relevant research on macroeconomic management, fiscal policy, governance, or institutional reform in African contexts.
+                    - Contribute to ACET's advisory work supporting governments in their economic transformation strategies.
+                    - This is placeholder text generated using only the job title and organization as a guide.
                 """),
                 url_external="https://bridgefund.io/hiring/country-director",
-                salary_min=90_000,
-                salary_text="$90,000 – $120,000",
+                salary_min=84_984,
+                salary_text="$7,200; €6,100; £5,400 per month",
                 posted_at=now,
                 visibility=Visibility.PUBLIC,
             ),
@@ -185,7 +181,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
         JobStub(
             org=Org(
                 name="Arclight Research Institute",
-                website="arclightresearch.org",
+                website="https://arclightresearch.org",
                 description="Arclight Research Institute runs intensive fellowship programmes for aspiring alignment researchers. They provide mentorship, compute resources, and a collaborative environment for early-career scientists working on AI safety.",
             ),
             job=Job(
@@ -215,7 +211,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
         JobStub(
             org=Org(
                 name="Sentient Metrics",
-                website="sentientmetrics.org",
+                website="https://sentientmetrics.org",
                 description="Sentient Metrics is a research nonprofit that collects and analyses data on farmed animal welfare outcomes worldwide. They produce open datasets and policy briefs used by advocacy organisations and regulators.",
             ),
             job=Job(
@@ -263,7 +259,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
             await stub.job.tags_country_visa_sponsor.aset(country_tags)
 
     await _create_draft_version(published=job_stubs[0].job)
-    await _create_random_jobs(gen, now=now)
 
 
 async def _create_random_jobs(gen: Gen, now) -> None:

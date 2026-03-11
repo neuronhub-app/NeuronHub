@@ -19,6 +19,7 @@ export const JobFragment = graphql(
       is_remote
       is_remote_friendly
       salary_min
+      salary_text
       tags_country {
         ...PostTagLeanFragment
       }
