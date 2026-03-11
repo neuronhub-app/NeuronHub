@@ -22,6 +22,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
     autocomplete_fields = [
         "author",
         "org",
+        "versions",
         "tags_education",
         "tags_area",
         "tags_skill",
@@ -56,26 +57,41 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
 
     fieldsets = [
         (
-            "Profile",
+            "",
             {
                 "fields": [
                     "title",
                     "slug",
                     "org",
                     "is_remote",
-                    "is_remote_friendly",
-                    ("salary_min", "salary_max"),
+                    "salary_min",
                     # "salary_ranges",
                     "url_external",
                     "is_published",
                     "versions",
-                    ("tags_country", "tags_city"),
+                    "bookmarked_by_users",
+                ]
+            },
+        ),
+        (
+            "Tags",
+            {
+                "fields": [
+                    "tags_country",
+                    "tags_city",
                     "tags_skill",
                     "tags_area",
                     "tags_education",
                     "tags_experience",
                     "tags_workload",
-                    "bookmarked_by_users",
+                ]
+            },
+        ),
+        (
+            "Visibility",
+            {
+                "fields": [
+                    "visibility",
                     "visible_to_users",
                     "visible_to_groups",
                 ]
