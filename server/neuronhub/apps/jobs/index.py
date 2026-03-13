@@ -42,6 +42,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
         fields = [
             ["get_id_as_str", "id"],
             "title",
+            "description",
             ["get_org_json", "org"],
             ["get_tags_json_country", "tags_country"],
             ["get_tags_json_city", "tags_city"],
@@ -70,6 +71,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
         settings = {
             "searchableAttributes": [
                 "title",
+                "description",
                 "org.name",
                 "tags_country.name",
                 "tags_country.aliases",

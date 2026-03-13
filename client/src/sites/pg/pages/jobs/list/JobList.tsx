@@ -42,7 +42,9 @@ export function JobList(props: { slug?: string }) {
           "tags_city.name",
           "tags_skill.name",
           "tags_area.name",
+          "description",
         ]}
+        attributesToSnippet={["description:30"]}
       />
 
       <AlgoliaFacetsActive

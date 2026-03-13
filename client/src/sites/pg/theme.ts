@@ -2,11 +2,30 @@ import {
   createSystem,
   defaultConfig,
   defineConfig,
+  defineRecipe,
   defineTokens,
   mergeConfigs,
 } from "@chakra-ui/react";
 import { theme } from "@/sites/pg/colors";
 import { recipes, slotRecipes } from "@/theme/recipes";
+
+const pgRecipes = {
+  ...recipes,
+  button: defineRecipe({
+    ...recipes.button,
+    variants: {
+      ...recipes.button.variants,
+      variant: {
+        ...recipes.button.variants?.variant,
+        "pg-primary": {
+          bg: "brand.green.light",
+          color: "white",
+          _hover: { bg: "brand.green" },
+        },
+      },
+    },
+  }),
+};
 
 const tokens = defineTokens({
   radii: {
@@ -50,7 +69,7 @@ export const system = createSystem(
       },
 
       theme: {
-        recipes,
+        recipes: pgRecipes,
         slotRecipes,
         tokens,
         semanticTokens: {

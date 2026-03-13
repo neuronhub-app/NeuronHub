@@ -30,6 +30,7 @@ export const Prose = chakra("div", {
     "& p": {
       marginTop: padding,
       marginBottom: padding,
+      overflowWrap: "break-word",
     },
 
     // defaults
