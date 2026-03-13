@@ -158,12 +158,14 @@ class JobsMutation:
         is_orgs_highlighted: bool | None = None,
         is_remote: bool | None = None,
         salary_min: int | None = None,
+        tz: str | None = None,
     ) -> bool:
         alert = await JobAlert.objects.acreate(
             email=email,
             is_orgs_highlighted=is_orgs_highlighted,
             is_remote=is_remote,
             salary_min=salary_min,
+            tz=tz,
         )
         if tag_names:
             tags = PostTag.objects.filter(name__in=tag_names)

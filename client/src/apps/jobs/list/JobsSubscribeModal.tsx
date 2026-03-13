@@ -66,6 +66,7 @@ export function JobsSubscribeModal() {
         salaryRefinement?.refinements[0]?.value != null
           ? Number(salaryRefinement.refinements[0].value)
           : null,
+      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     if (result.success) {
       localStorage.setItem(emailStoreKey, fields.email);
@@ -212,6 +213,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
       $is_orgs_highlighted: Boolean
       $is_remote: Boolean
       $salary_min: Int
+      $tz: String
     ) {
       job_alert_subscribe(
         email: $email
@@ -219,6 +221,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
         is_orgs_highlighted: $is_orgs_highlighted
         is_remote: $is_remote
         salary_min: $salary_min
+        tz: $tz
       )
     }
   `),

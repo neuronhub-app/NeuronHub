@@ -1,3 +1,7 @@
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 
@@ -38,3 +42,27 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job()
         stats = await send_job_alert_emails()
         assert stats.sent == 0
+
+    async def test_sends_only_at_the_tz_hour(self):
+        await self.gen.jobs.job_alert(tz=settings.TIME_ZONE)
+        await self.gen.jobs.job()
+
+        hour_current = datetime.now(tz=ZoneInfo(settings.TIME_ZONE)).hour
+        hour_future = datetime.now(tz=ZoneInfo(settings.TIME_ZONE)).hour + 12
+
+        stats = await send_job_alert_emails(hour_local_to_send_at=hour_future)
+        assert stats.skipped_due_to_tz == 1
+        assert stats.sent == 0
+        assert len(mail.outbox) == 0
+
+        stats = await send_job_alert_emails(hour_local_to_send_at=hour_current)
+        assert stats.skipped_due_to_tz == 0
+        assert stats.sent == 1
+
+    async def test_sends_always_if_no_tz_is_defined(self):
+        await self.gen.jobs.job_alert(tz=None)
+        await self.gen.jobs.job()
+        hour_future = datetime.now(tz=ZoneInfo(settings.TIME_ZONE)).hour + 12
+        stats = await send_job_alert_emails(hour_local_to_send_at=hour_future)
+        assert stats.sent == 1
+        assert stats.skipped_due_to_tz == 0

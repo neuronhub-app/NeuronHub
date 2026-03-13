@@ -1,6 +1,8 @@
 import logging
 from dataclasses import dataclass
+from datetime import datetime
 
+import sentry_sdk
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.mail import send_mail
@@ -17,10 +19,17 @@ from neuronhub.apps.jobs.models import JobAlertLog
 logger = logging.getLogger(__name__)
 
 
-async def send_job_alert_emails(jobs: list[Job] | None = None) -> JobAlertsStats:
+async def send_job_alert_emails(
+    jobs: list[Job] | None = None,
+    hour_local_to_send_at: int = 8,
+) -> JobAlertsStats:
     stats = JobAlertsStats()
 
     async for alert in JobAlert.objects.filter(is_active=True):
+        if is_skip_hour := alert.tz and datetime.now(tz=alert.tz).hour != hour_local_to_send_at:
+            stats.skipped_due_to_tz += 1
+            continue
+
         try:
             is_sent = await _send_job_alert(alert=alert, jobs=jobs)
             if is_sent:
@@ -28,6 +37,10 @@ async def send_job_alert_emails(jobs: list[Job] | None = None) -> JobAlertsStats
             else:
                 stats.skipped += 1
         except Exception:
+            sentry_sdk.set_context(
+                "job_alert",
+                {"id_ext": alert.id_ext, "email_hash": JobAlertLog.hash_email(alert.email)},
+            )
             capture_exception()
             stats.failed += 1
 
@@ -88,9 +101,9 @@ async def _exclude_jobs_already_sent_using_alert_logs(
 
 
 async def _get_jobs_matching_qs(alert: JobAlert) -> list[Job]:
-    qs = Job.objects.select_related("org").all()
+    qs = Job.objects.select_related("org").filter(is_published=True)
 
-    if tag_ids := [tag.id async for tag in alert.tags.all()]:
+    if tag_ids := [tag_id async for tag_id in alert.tags.values_list("id", flat=True)]:
         q = Q()
         for field in [
             "tags_skill",
@@ -119,3 +132,4 @@ class JobAlertsStats:
     sent: int = 0
     failed: int = 0
     skipped: int = 0
+    skipped_due_to_tz: int = 0

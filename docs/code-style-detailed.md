@@ -76,6 +76,8 @@ As `{category}? {noun} {verb} {adjective}`: `{category}` creates logical modules
 
 For vars use `{noun} {adjective}` - to let the brain auto-create a `category` out of the `noun`. Eg `value_current`, not `current_value`.
 
+All boolean variable names start with `is`.
+
 FYI: project-specific classes or functions are prefixed with `neuron`.
 
 ### TODO comments
@@ -93,12 +95,16 @@ You should use the modern Python3.14 syntax, including:
 - PEP 649 deferred evaluation of annotations - allows to write human-readable code from top-to-bottom
 - etc
 
+When helpful, use the ternary operator to define an explanatory variable. Even if isn't used - it's better than a comment.
+
 
 TypeScript
 ----------------------------------------
 
-- Always `ESNext`
-- Named exports only
+- Always `ESNext`.
+- Named exports only.
+- Use `Boolean` instead of `!!`.
+- Never inline conditions as `if (condition) result;`.
 
 ### No destructing
 

@@ -455,8 +455,11 @@ class JobsGen:
             await job.asave()
         return job
 
-    async def job_alert(self, email: str = "", is_active=True) -> JobAlert:
+    async def job_alert(
+        self, email: str = "", is_active=True, tz: str | None = None
+    ) -> JobAlert:
         return await JobAlert.objects.acreate(
             email=email or self.faker.email(),
             is_active=is_active,
+            tz=tz,
         )

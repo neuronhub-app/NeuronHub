@@ -1,9 +1,11 @@
 import uuid
+from zoneinfo import ZoneInfo
 
 from django.db import models
 from django.utils.crypto import salted_hmac
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
+from timezone_field import TimeZoneField
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
 from neuronhub.apps.anonymizer.registry import anonymizable
@@ -193,6 +195,8 @@ class JobAlert(TimeStampedModel):
     is_orgs_highlighted = models.BooleanField(blank=True, null=True)
     is_remote = models.BooleanField(blank=True, null=True)
     salary_min = models.PositiveIntegerField(blank=True, null=True)
+
+    tz: ZoneInfo = TimeZoneField(blank=True, default="")
 
     is_active = models.BooleanField(default=True)
 

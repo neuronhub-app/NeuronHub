@@ -270,38 +270,38 @@ async def _create_random_jobs(gen: Gen, now) -> None:
     """
     #AI
     """
-    random = gen.random_gen_seeded
-    faker = gen.faker_non_unique
+    random_seeded = gen.random_gen_seeded
 
     for _ in range(5):
         org, _ = await Org.objects.aget_or_create(
-            name=faker.company(),
+            name=gen.faker.company(),
             defaults={
-                "website": faker.domain_name(),
-                "description": faker.text(max_nb_chars=180),
+                "website": gen.faker.domain_name(),
+                "description": gen.faker.text(max_nb_chars=180),
             },
         )
         job = await gen.jobs.job(
             org=org,
-            title=faker.job() + ", " + faker.bs().title(),
-            description=faker.text(max_nb_chars=300),
-            salary_min=random.choice([None, 60_000, 80_000, 100_000, 120_000]),
-            is_remote=random.choice([None, True, False]),
-            posted_at=now - timedelta(days=random.randint(1, 90)),
-            closes_at=now + timedelta(days=random.randint(10, 120))
-            if random.random() > 0.5
+            title=gen.faker.job(),
+            description=gen.faker.text(max_nb_chars=300),
+            salary_min=random_seeded.choice([None, 60_000, 80_000, 100_000, 120_000]),
+            is_remote=random_seeded.choice([None, True, False]),
+            posted_at=now - timedelta(days=random_seeded.randint(1, 90)),
+            closes_at=now + timedelta(days=random_seeded.randint(10, 120))
+            if random_seeded.random() > 0.5
             else None,
         )
 
         countries_all = [value for value in vars(val.country).values() if isinstance(value, str)]
         country_tags = await _get_or_create_tags(
-            random.sample(countries_all, k=random.randint(1, 3)), TagCategoryEnum.Country
+            random_seeded.sample(countries_all, k=random_seeded.randint(1, 3)),
+            TagCategoryEnum.Country,
         )
         await job.tags_country.aset(country_tags)
 
         areas_all = [value for value in vars(val.area).values() if isinstance(value, str)]
         area_tags = await _get_or_create_tags(
-            random.sample(areas_all, k=random.randint(1, 2)), TagCategoryEnum.Area
+            random_seeded.sample(areas_all, k=random_seeded.randint(1, 2)), TagCategoryEnum.Area
         )
         await job.tags_area.aset(area_tags)
 
