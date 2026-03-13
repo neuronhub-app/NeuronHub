@@ -16,7 +16,7 @@ export namespace datetime {
     return `${format(date, "yyyy-MM-dd kk:mm")} ${tzNameShort}`;
   }
 
-  export function relativeFull(dateRaw: DateRaw): string {
+  export function relativeRounded(dateRaw: DateRaw): string {
     const date = parseRaw(dateRaw);
     if (!date) {
       return "";
@@ -34,6 +34,12 @@ export namespace datetime {
     const date = parseRaw(dateRaw);
     if (!date) {
       return "";
+    }
+    if (isToday(date)) {
+      return "Today";
+    }
+    if (isYesterday(date)) {
+      return "Yesterday";
     }
     const distanceVerbose = formatDistanceToNowStrict(date);
     const distance = distanceVerbose

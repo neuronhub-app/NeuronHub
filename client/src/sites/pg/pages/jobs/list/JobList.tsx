@@ -1,27 +1,69 @@
-import { Box, Code, HStack, Separator, Skeleton, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Code,
+  Flex,
+  HStack,
+  Icon,
+  Link,
+  Separator,
+  Skeleton,
+  Text,
+} from "@chakra-ui/react";
 import type { ReactNode } from "react";
+import { GoComment, GoQuestion } from "react-icons/go";
 import { Configure } from "react-instantsearch";
+import { NavLink } from "react-router";
 import { JobsSubscribeModal } from "@/apps/jobs/list/JobsSubscribeModal";
-import { AlgoliaFacetAttribute } from "@/components/algolia/AlgoliaFacetAttribute";
-import { AlgoliaFacetBoolean } from "@/components/algolia/AlgoliaFacetBoolean";
-import { AlgoliaFacetDate } from "@/components/algolia/AlgoliaFacetDate";
-import { AlgoliaFacetSalary } from "@/components/algolia/AlgoliaFacetSalary";
-import { AlgoliaFacetsActive } from "@/components/algolia/AlgoliaFacetsActive";
-import { AlgoliaList } from "@/components/algolia/AlgoliaList";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
+import { PgFacetsSidebar } from "@/sites/pg/components/PgFacetsSidebar";
+import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
+import { urls } from "@/urls";
+import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function JobList(props: { slug?: string }) {
   const jobOpenPinned = useJobOpenPinned(props.slug);
+  const algolia = useAlgoliaSearchClient();
 
   return (
-    <AlgoliaList<JobFragmentType>
+    <PgAlgoliaList<JobFragmentType>
       index="indexNameJobs"
       label="job"
       cta={<JobsSubscribeModal />}
+      sort={
+        algolia.indexNameJobs && algolia.indexNameJobsSortedByClosesAt
+          ? {
+              items: [
+                { value: algolia.indexNameJobs, label: "Newest" },
+                { value: algolia.indexNameJobsSortedByClosesAt, label: "Closing" },
+              ],
+            }
+          : undefined
+      }
+      subheader={
+        <Flex gap="gap.md" pr="1" fontSize="xs">
+          <Link asChild>
+            <NavLink to={urls.jobs.faq}>
+              <Icon>
+                <GoComment />
+              </Icon>
+              Contact
+            </NavLink>
+          </Link>
+          <Link asChild>
+            <NavLink to={urls.jobs.faq}>
+              <Icon>
+                <GoQuestion />
+              </Icon>
+              FAQ
+            </NavLink>
+          </Link>
+        </Flex>
+      }
       hits={{
         enrichment: { query: JobsByIdsQuery, extractItems: data => data.jobs },
         renderHit: (job, ctx) => (
@@ -32,6 +74,15 @@ export function JobList(props: { slug?: string }) {
         listGap: "gap.md",
       }}
       searchInputTestId={ids.job.searchInput}
+      facetsActiveLabelsOverride={{
+        is_remote: "Remote",
+        "org.is_highlighted": "Highlighted",
+        posted_at_unix: "Posted",
+        salary_min: "Salary",
+      }}
+      facetsActiveDateAttributes={["posted_at_unix"]}
+      facetsTopbar={<PgFiltersTopbar />}
+      facets={<PgFacetsSidebar />}
     >
       <Configure
         hitsPerPage={20}
@@ -44,48 +95,7 @@ export function JobList(props: { slug?: string }) {
           "tags_area.name",
         ]}
       />
-
-      <AlgoliaFacetsActive
-        labelsOverride={{
-          is_remote: "Remote",
-          "org.is_highlighted": "Highlighted",
-          posted_at_unix: "Posted",
-          salary_min: "Salary",
-        }}
-        dateAttributes={["posted_at_unix"]}
-      />
-
-      <Stack gap="1">
-        <AlgoliaFacetBoolean attribute="is_remote" label="Remote" />
-        <AlgoliaFacetBoolean attribute="org.is_highlighted" label="Highlighted Organizations" />
-      </Stack>
-
-      <AlgoliaFacetAttribute attribute="tags_experience.name" label="Experience" />
-      <AlgoliaFacetAttribute
-        attribute="tags_country.name"
-        label="Country"
-        isSearchEnabled
-        showFirst={5}
-      />
-      <AlgoliaFacetAttribute
-        attribute="tags_city.name"
-        label="City"
-        isSearchEnabled
-        showFirst={5}
-      />
-      <AlgoliaFacetSalary attribute="salary_min" label="Salary" />
-      <AlgoliaFacetAttribute
-        attribute="tags_skill.name"
-        label="Skills"
-        isSearchEnabled
-        showFirst={7}
-      />
-      <AlgoliaFacetAttribute attribute="tags_area.name" label="Area" />
-      <AlgoliaFacetAttribute attribute="tags_workload.name" label="Workload" />
-      <AlgoliaFacetDate attribute="posted_at_unix" label="Posted" />
-      <AlgoliaFacetAttribute attribute="tags_education.name" label="Education" />
-      <AlgoliaFacetAttribute attribute="org.name" label="Organization" isSearchEnabled />
-    </AlgoliaList>
+    </PgAlgoliaList>
   );
 }
 
