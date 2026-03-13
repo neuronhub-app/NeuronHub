@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 @task()
 async def send_job_alert_emails_task():
     with monitor(
-        monitor_slug=send_job_alert_emails_task.__name__,
+        monitor_slug=send_job_alert_emails_task.name,
         monitor_config=MonitorConfig(
             {
                 "schedule": {"type": "interval", "value": 1, "unit": "hour"},
@@ -26,11 +26,11 @@ async def send_job_alert_emails_task():
             }
         ),
     ):
-        logger.info(f"{send_job_alert_emails_task.__name__} started")
+        logger.info(f"{send_job_alert_emails_task.name} started")
 
         stats = await send_job_alert_emails()
 
-        logger.info(f"{send_job_alert_emails_task.__name__} report: {asdict(stats)}")
+        logger.info(f"{send_job_alert_emails_task.name} report: {asdict(stats)}")
 
         for key, value in asdict(stats).items():
             sentry_sdk.metrics.gauge(f"job_alerts.{key}", value)

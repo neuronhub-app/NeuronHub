@@ -90,7 +90,6 @@ dependencies = [
     implicit_optional = true
     show_error_codes = true
     show_column_numbers = true # helps LLMs
-    show_absolute_path = true # enables TUI links in IDEA
     disable_error_code = [
         "import-untyped", # errors if the package has required type stub, but it's wrong. (The name sounds unrelated, but docs confirm it)
     ]
