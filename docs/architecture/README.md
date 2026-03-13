@@ -190,6 +190,7 @@ classDiagram
             is_remote: bool?
             salary_min: int?
             is_active: bool
+            tz: TimeZoneField?
             jobs_clicked: M2M~Job~
         }
 

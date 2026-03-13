@@ -1,4 +1,5 @@
 import logging
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -62,6 +63,7 @@ async def _send_job_alert(alert: JobAlert, jobs: list[Job] | None = None) -> boo
         context={
             "jobs": jobs,
             "alert": alert,
+            "alert_job_filters": await _get_alert_job_filters(alert),
             "client_url": settings.CLIENT_URL,
         },
     )
@@ -125,6 +127,25 @@ async def _get_jobs_matching_qs(alert: JobAlert) -> list[Job]:
         qs = qs.filter(salary_min__gte=alert.salary_min)
 
     return [job async for job in qs.order_by("-posted_at")]
+
+
+async def _get_alert_job_filters(alert: JobAlert) -> list[str]:
+    by_category: dict[str, list[str]] = defaultdict(list)
+    async for tag in alert.tags.prefetch_related("categories").all():
+        category = await tag.categories.afirst()
+        label = category.name.replace("_", " ").title() if category else "Other"
+        by_category[label].append(tag.name)
+
+    lines = [f"{category}: {', '.join(names)}" for category, names in by_category.items()]
+
+    if alert.is_orgs_highlighted:
+        lines.append("Highlighted orgs only")
+    if alert.is_remote:
+        lines.append("Remote")
+    if alert.salary_min:
+        lines.append(f"Min. salary: ${alert.salary_min:,}")
+
+    return lines
 
 
 @dataclass

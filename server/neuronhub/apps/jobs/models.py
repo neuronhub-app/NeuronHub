@@ -182,6 +182,7 @@ class Job(AlgoliaModel):
         return self.title
 
 
+# todo ? refac-name: JobEmailSubscription
 class JobAlert(TimeStampedModel):
     id_ext = models.UUIDField(default=uuid.uuid4)
 
@@ -210,6 +211,7 @@ class JobAlert(TimeStampedModel):
         return f"JobAlert({self.pk}, {self.email}, active={self.is_active})"
 
 
+# todo ? refac-name: JobEmailLog
 class JobAlertLog(TimeStampedModel):
     job_alert = models.ForeignKey(
         JobAlert,
