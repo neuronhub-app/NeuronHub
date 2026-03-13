@@ -175,23 +175,23 @@ function JobExpanded(props: { job: JobFragmentType }) {
         </Box>
       </Stack>
       <Flex gap="gap.md" flexDirection={{ base: "column", md: "row" }}>
-          {props.job.salary_min && (
-            <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
-              <Text fontSize="sm" color="fg.muted" fontWeight="medium">
-                Salary
-              </Text>
-              <Text fontSize="sm">
-                <FormatNumber
-                  value={props.job.salary_min}
-                  style="currency"
-                  currency="USD"
-                  notation="compact"
-                  minimumFractionDigits={0}
-                />
-                +
-              </Text>
-            </Stack>
-          )}
+        {props.job.salary_min && (
+          <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
+            <Text fontSize="sm" color="fg.muted" fontWeight="medium">
+              Salary
+            </Text>
+            <Text fontSize="sm">
+              <FormatNumber
+                value={props.job.salary_min}
+                style="currency"
+                currency="USD"
+                notation="compact"
+                minimumFractionDigits={0}
+              />
+              +
+            </Text>
+          </Stack>
+        )}
         <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
           <Text fontSize="sm" color="fg.muted" fontWeight="medium">
             Application Deadline
