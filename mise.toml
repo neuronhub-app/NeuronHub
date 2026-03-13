@@ -2,11 +2,11 @@
 redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
 [tools]
-	usage = "latest"
-
-    bun = "latest"
     uv = "latest"
+    bun = "latest"
     biome = "latest"
+
+	usage = "latest"
     rclone = "latest"
     killport = "latest"
 
@@ -262,10 +262,13 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     [tasks."typegen:client:gql-tada"]
         dir = "client"
-        run = [
-            "bun run gql-tada generate output",
-            "bun run gql-tada generate persisted --output ../server/persisted-queries.json",
-        ]
+        run = """
+            let file = "../server/persisted-queries.json"
+
+            bun run gql-tada generate output
+            bun run gql-tada generate persisted --output $file
+            open $file | sort | save --force $file
+        """
         sources = ["src/**/*", "e2e/**/*"]
         silent = true # quiet doesn't work
 
