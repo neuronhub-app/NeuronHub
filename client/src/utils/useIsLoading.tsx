@@ -1,4 +1,4 @@
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 /** A simple shorthand for an .isLoading state in a try/finally */
 export function useIsLoading<T>() {

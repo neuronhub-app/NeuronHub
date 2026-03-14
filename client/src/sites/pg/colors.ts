@@ -1,6 +1,6 @@
 // @ts-expect-error
 import type { SemanticTokenDefinition } from "@chakra-ui/react";
-import { theme as neuronTheme } from "@/theme/colors";
+import { theme as neuronTheme } from "@neuronhub/shared/theme/colors";
 
 export namespace theme {
   const primary = { value: { base: "#338050", _dark: "#4a9e66" } };

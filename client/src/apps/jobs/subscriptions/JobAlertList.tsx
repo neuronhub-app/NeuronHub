@@ -22,8 +22,8 @@ import { graphql, type ResultOf } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
-import { datetime } from "@/utils/date-fns";
-import { format } from "@/utils/format";
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { format } from "@neuronhub/shared/utils/format";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { useIsLoading } from "@/utils/useIsLoading";
 

@@ -32,15 +32,15 @@ import { RiRobot2Line } from "react-icons/ri";
 import { Highlight, Snippet } from "react-instantsearch";
 import { useDebouncedCallback } from "use-debounce";
 import { Button } from "@/components/ui/button";
-import { Prose } from "@/components/ui/prose";
+import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { Tag } from "@/components/ui/tag";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { markedConfigured } from "@/utils/marked-configured";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 const style = {
   collapseHeight: {

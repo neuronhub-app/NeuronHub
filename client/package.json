@@ -44,7 +44,9 @@
       "graphql": "~16.9.0",
 
     "algoliasearch": "^5.49.1",
-      "react-instantsearch": "^7.26.0"
+      "react-instantsearch": "^7.26.0",
+
+    "@neuronhub/shared": "workspace:*"
   },
   "devDependencies": {
     "@chakra-ui/cli": "^3.33.0",

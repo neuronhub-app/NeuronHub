@@ -10,15 +10,15 @@ import {
 import { type ComponentProps, useMemo } from "react";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import type { PostCommentTree } from "@/components/posts/PostDetail/useCommentTree";
-import { Prose } from "@/components/ui/prose";
+import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { PostAuthorFragment, type PostAuthorFragmentType } from "@/graphql/fragments/posts";
-import { datetime } from "@/utils/date-fns";
-import { markedConfigured } from "@/utils/marked-configured";
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 // todo ? refac-name: indicate it can load UserSource profile, eg as `PostAuthor{Clickable|Popover}`
 export function PostAuthor(props: {

@@ -1,12 +1,10 @@
 import { Checkbox, CheckboxGroup, Fieldset, For, Stack, Text } from "@chakra-ui/react";
 
-import { gap } from "@/theme/theme";
-
 // todo refac-name: PostListSidebar
 export function ReviewListSidebar() {
   return (
     <Stack
-      p={{ base: gap.md, md: gap.lg }}
+      p={{ base: "gap.md", md: "gap.lg" }}
       bg="bg.panel"
       align="flex-start"
       w="fit-content"

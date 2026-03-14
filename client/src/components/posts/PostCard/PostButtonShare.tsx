@@ -5,7 +5,7 @@ import { useSnapshot } from "valtio/react";
 import { user } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { ID } from "@/gql-tada";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import type { UserListName } from "~/graphql/enums";
 
 // todo ? refac-name: PostActionsShare

@@ -4,7 +4,7 @@ import type { PostListItemType } from "@/components/posts/ListContainer";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useInit } from "@/utils/useInit";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function usePostVoting(props: {
   postId: ID;

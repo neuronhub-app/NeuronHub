@@ -32,7 +32,7 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { PostFragment, type PostFragmentType } from "@/graphql/fragments/posts";
 import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
-import { gap } from "@/theme/theme";
+import { gap } from "@neuronhub/shared/theme/spacings";
 import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 import type { PostCategory } from "~/graphql/enums";

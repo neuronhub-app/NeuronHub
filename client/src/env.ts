@@ -2,7 +2,8 @@
  * Env single source of truth.
  */
 
-import { cleanEnv, port, str, url } from "envalid";
+import { port, str, url } from "envalid";
+import { createEnv } from "@neuronhub/shared/createEnv";
 
 /**
  * Envalid Options:
@@ -17,20 +18,10 @@ import { cleanEnv, port, str, url } from "envalid";
  * - bool | num | email
  *
  */
-const envRaw = typeof process === "undefined" ? import.meta.env : process.env;
-
-const serverEnv = str({
-  choices: ["development", "staging", "production"],
-  default: "development",
-});
-
-const envCleaned = cleanEnv(envRaw, {
+const envCleaned = createEnv({
   VITE_SITE: str({ default: "", choices: ["", "pg"] }),
 
   VITE_PROJECT_NAME: str({ default: "NeuronHub" }),
-
-  NODE_ENV: serverEnv,
-  MODE: serverEnv, // used by the Vite instead of NODE_ENV as a hack. We don't care re historical difference - hence the merge.
 
   VITE_SENTRY_DSN_FRONTEND: str({ default: "" }),
 

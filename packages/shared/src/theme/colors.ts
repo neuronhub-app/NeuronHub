@@ -1,5 +1,3 @@
-// Copied from [[client/src/theme/colors.ts]]
-
 // @ts-expect-error
 import type { SemanticTokenDefinition } from "@chakra-ui/react";
 
@@ -18,11 +16,56 @@ export namespace theme {
       "dark-friendly": {
         value: { _light: "fg", _dark: "{colors.gray.300/88}" },
       },
+      "muted-button": {
+        value: { _light: "{colors.slate.500}", _dark: "{colors.slate.500}" },
+      },
+      "fieldset-title": {
+        value: { _light: "{colors.slate.500}", _dark: "{colors.slate.500}" },
+      },
       primary,
+      "primary-muted": {
+        value: {
+          _light: `{colors.${colorPrimary}.400}`,
+          _dark: `{colors.${colorPrimary}.500}`,
+        },
+      },
       secondary: {
         value: {
           _light: `{colors.${colorSecondary}.600}`,
           _dark: `{colors.${colorSecondary}.500}`,
+        },
+      },
+    },
+
+    bg: {
+      light: {
+        value: { _light: "{colors.white}", _dark: "{colors.black}" },
+      },
+      medium: {
+        value: {
+          _light: "{colors.slate.subtle}",
+          _dark: "{colors.slate.subtle}",
+        },
+      },
+      solid: {
+        value: {
+          _light: "{colors.slate.muted}",
+          _dark: "{colors.slate.muted}",
+        },
+      },
+
+      secondary: {
+        light: {
+          value: {
+            _light: `{colors.${colorSecondary}.100}`,
+            _dark: `{colors.${colorSecondary}.950/70}`,
+          },
+        },
+        medium: {
+          value: {
+            _light: `{colors.${colorSecondary}.500/80}`,
+            _dark: `{colors.${colorSecondary}.800}`,
+          },
         },
       },
     },
@@ -99,6 +142,86 @@ export namespace theme {
       950: { value: "oklch(0.266 0.065 152.934)" },
       ...getChakraColorSemanticDefaults("green"),
     },
+    amber: {
+      50: { value: "oklch(0.987 0.022 95.277)" },
+      100: { value: "oklch(0.962 0.059 95.617)" },
+      200: { value: "oklch(0.924 0.12 95.746)" },
+      300: { value: "oklch(0.879 0.169 91.605)" },
+      400: { value: "oklch(0.828 0.189 84.429)" },
+      500: { value: "oklch(0.769 0.188 70.08)" },
+      600: { value: "oklch(0.666 0.179 58.318)" },
+      700: { value: "oklch(0.555 0.163 48.998)" },
+      800: { value: "oklch(0.473 0.137 46.201)" },
+      900: { value: "oklch(0.414 0.112 45.904)" },
+      950: { value: "oklch(0.279 0.077 45.635)" },
+      ...getChakraColorSemanticDefaults("amber"),
+    },
+    orange: {
+      50: { value: "oklch(0.98 0.016 73.684)" },
+      100: { value: "oklch(0.954 0.038 75.164)" },
+      200: { value: "oklch(0.901 0.076 70.697)" },
+      300: { value: "oklch(0.837 0.128 66.29)" },
+      400: { value: "oklch(0.75 0.183 55.934)" },
+      500: { value: "oklch(0.705 0.191 47.604)" },
+      600: { value: "oklch(0.646 0.222 41.116)" },
+      700: { value: "oklch(0.553 0.195 38.402)" },
+      800: { value: "oklch(0.47 0.157 37.304)" },
+      900: { value: "oklch(0.408 0.123 38.172)" },
+      950: { value: "oklch(0.266 0.079 36.259)" },
+      ...getChakraColorSemanticDefaults("orange"),
+    },
+    rose: {
+      50: { value: "oklch(0.969 0.015 12.422)" },
+      100: { value: "oklch(0.941 0.03 12.58)" },
+      200: { value: "oklch(0.892 0.058 10.001)" },
+      300: { value: "oklch(0.81 0.117 11.638)" },
+      400: { value: "oklch(0.712 0.194 13.428)" },
+      500: { value: "oklch(0.645 0.246 16.439)" },
+      600: { value: "oklch(0.586 0.253 17.585)" },
+      700: { value: "oklch(0.514 0.222 16.935)" },
+      800: { value: "oklch(0.455 0.188 13.697)" },
+      900: { value: "oklch(0.41 0.159 10.272)" },
+      950: { value: "oklch(0.271 0.105 12.094)" },
+      ...getChakraColorSemanticDefaults("rose"),
+    },
+    slate: {
+      50: { value: "oklch(0.984 0.003 247.858)" },
+      100: { value: "oklch(0.968 0.007 247.896)" },
+      200: { value: "oklch(0.929 0.013 255.508)" },
+      300: { value: "oklch(0.869 0.022 252.894)" },
+      400: { value: "oklch(0.704 0.04 256.788)" },
+      500: { value: "oklch(0.554 0.046 257.417)" },
+      600: { value: "oklch(0.446 0.043 257.281)" },
+      700: { value: "oklch(0.372 0.044 257.287)" },
+      800: { value: "oklch(0.279 0.041 260.031)" },
+      900: { value: "oklch(0.208 0.042 265.755)" },
+      950: { value: "oklch(0.129 0.042 264.695)" },
+      // based on Chakra's Gray
+      contrast: {
+        value: { _light: "{colors.white}", _dark: "{colors.black}" },
+      },
+      fg: {
+        value: { _light: "{colors.slate.800}", _dark: "{colors.slate.200}" },
+      },
+      subtle: {
+        // 100 → 200
+        // 900 → 800
+        value: { _light: "{colors.slate.200}", _dark: "{colors.slate.800}" },
+      },
+      muted: {
+        // 800 → 500
+        value: { _light: "{colors.slate.400}", _dark: "{colors.slate.500}" },
+      },
+      emphasized: {
+        value: { _light: "{colors.slate.300}", _dark: "{colors.slate.700}" },
+      },
+      solid: {
+        value: { _light: "{colors.slate.900}", _dark: "{colors.white}" },
+      },
+      focusRing: {
+        value: { _light: "{colors.slate.800}", _dark: "{colors.slate.200}" },
+      },
+    },
   };
 }
 
@@ -118,6 +241,7 @@ function getChakraColorSemanticDefaults(name: string) {
       value: { _light: `{colors.${name}.700}`, _dark: `{colors.${name}.300}` },
     },
     subtle: {
+      // chakra = 900, tailwind = 950
       value: { _light: `{colors.${name}.100}`, _dark: `{colors.${name}.950}` },
     },
     muted: {

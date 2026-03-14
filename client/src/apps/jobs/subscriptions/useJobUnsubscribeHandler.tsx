@@ -4,7 +4,7 @@ import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { useInit } from "@/utils/useInit";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function useJobUnsubscribeHandler(alertIdExt?: string) {
   const state = useStateValtio({

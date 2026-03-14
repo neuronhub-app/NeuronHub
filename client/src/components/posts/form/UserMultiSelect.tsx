@@ -16,7 +16,7 @@ import {
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export type UserSelectOption =
   | NonNullable<schemas.sharable.Schema["recommend_to"]>[number]

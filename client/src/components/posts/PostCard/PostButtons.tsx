@@ -10,7 +10,7 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { UserListName } from "~/graphql/enums";
 
 // this is overly complex & abstract for a child component

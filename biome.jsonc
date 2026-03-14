@@ -43,11 +43,10 @@
       },
     },
     "includes": [
-      "e2e/**",
-      "src/**",
       // exclude
-      "!src/components/ui/**",
-      "!src/apps/users/settings/profile/ThemeSelector.tsx",
+      "!client/src/components/ui/**",
+      "!packages/shared/src/ui/**",
+      "!client/src/apps/users/settings/profile/ThemeSelector.tsx",
     ],
   },
   "formatter": {
@@ -65,13 +64,17 @@
   },
   "files": {
     "includes": [
-      "src/**",
-      "e2e/**",
-      "!graphql", // generated code
+      "client/e2e/**",
+      "client/src/**",
+      "docs/e2e/**",
+      "docs/src/**",
+      "packages/shared/src/**",
+
+      "!client/graphql", // generated code
 
       "biome.jsonc",
-      "tsconfig.json",
-      "vite.config.ts",
+      "**/tsconfig.json",
+      "**/vite.config.ts",
     ],
   },
 }

@@ -1,7 +1,7 @@
 import { Flex, NumberInput, Slider, Stack, Text } from "@chakra-ui/react";
 import { useRange } from "react-instantsearch";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
-import { format } from "@/utils/format";
+import { format } from "@neuronhub/shared/utils/format";
 
 // #AI
 export function AlgoliaFacetSalary(props: { attribute: string; label: string }) {

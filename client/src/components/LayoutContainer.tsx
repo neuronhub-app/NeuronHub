@@ -4,7 +4,7 @@ import { LuAlignRight } from "react-icons/lu";
 import { Outlet, useLocation } from "react-router";
 
 import { HighlightActionBar } from "@/apps/highlighter/HighlightActionBar";
-import { LayoutSidebar, NeuronLogo } from "@/components/LayoutSidebar";
+import { LayoutSidebar, NeuronLogoLinked } from "@/components/LayoutSidebar";
 import {
   DrawerBackdrop,
   DrawerCloseTrigger,
@@ -54,7 +54,7 @@ function NavbarMobile() {
   return (
     <Container py="2.5" borderBottomWidth="1px" hideFrom={style.breakpoint}>
       <HStack justify="space-between">
-        <NeuronLogo />
+        <NeuronLogoLinked />
 
         <DrawerRoot placement="start">
           <DrawerTrigger asChild>

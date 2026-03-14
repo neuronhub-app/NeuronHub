@@ -1,13 +1,10 @@
 import {
-  Badge,
   Bleed,
   Box,
   Button,
   type ButtonProps,
   Collapsible,
-  Flex,
   HStack,
-  Icon,
   Separator,
   Stack,
   type StackProps,
@@ -24,7 +21,7 @@ import {
   GoTools,
 } from "react-icons/go";
 import { LuLogIn, LuLogOut } from "react-icons/lu";
-import { PiGraph } from "react-icons/pi";
+import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
 import { type LinkProps, NavLink, useLocation } from "react-router";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { useUser } from "@/apps/users/useUserCurrent";
@@ -44,7 +41,7 @@ const styles = {
     lg: "xl",
     xl: "2xl",
   },
-};
+} as const;
 
 export function LayoutSidebar(props: StackProps) {
   const { data } = useApolloQuery(JobAlertListQuery);
@@ -80,7 +77,7 @@ export function LayoutSidebar(props: StackProps) {
       {...ids.set(ids.layout.sidebar)}
     >
       <Stack as="nav" gap="gap.md">
-        <NeuronLogo />
+        <NeuronLogoLinked />
 
         <Stack as="ul" aria-label="Nav Menu" gap="gap.md">
           <Stack gap="gap.sm">
@@ -147,33 +144,13 @@ type SidebarLink = {
 /**
  * Also used in another mobile layout in [[LayoutContainer.tsx]]
  */
-export function NeuronLogo() {
+export function NeuronLogoLinked() {
   return (
     <NavLink aria-label="Logo Link" to={urls.posts.list}>
-      <Bleed
-        display="flex"
-        gap="gap.sm"
-        block="gap.sm"
-        inline="gap.sm"
-        p={{ base: "1px", [styles.breakpoint.lg]: "gap.sm" }}
-        _hover={{
-          bgColor: "colorPalette.subtle",
-        }}
-        borderRadius="sm"
-      >
-        <Flex alignSelf="start" align="center" gap="3" w="fit-content">
-          <Icon color="primary" size="xl">
-            <PiGraph />
-          </Icon>
-          <Text fontSize={{ base: "lg", [styles.breakpoint.lg]: "1.4rem" }} fontWeight="bold">
-            NeuronHub
-          </Text>
-        </Flex>
-
-        <Badge h="fit-content" size="xs" textTransform="uppercase">
-          Alpha
-        </Badge>
-      </Bleed>
+      <NeuronLogo
+        breakpoint={styles.breakpoint.xl}
+        chakra={{ alignSelf: "start", w: "fit-content" }}
+      />
     </NavLink>
   );
 }

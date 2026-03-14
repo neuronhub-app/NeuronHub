@@ -3,7 +3,6 @@ import { subscribe } from "valtio";
 import { useSnapshot } from "valtio/react";
 import { devtools, proxySet } from "valtio/utils";
 import { proxy } from "valtio/vanilla";
-import { env } from "@/env";
 
 /**
  * Used instead of useState by default.
@@ -22,7 +21,7 @@ export function useStateValtio<T extends object>(val: T, devtoolsName?: string) 
   const state = ref.current;
 
   useEffect(() => {
-    if (env.isDev) {
+    if (import.meta.env.DEV) {
       devtools(state, { name: devtoolsName, enabled: true });
     }
   }, []);
@@ -44,7 +43,7 @@ export function useStateValtioSet<T>(val: Iterable<T> | null, opts?: { devtoolsN
   const state = ref.current;
 
   useEffect(() => {
-    if (env.isDev) {
+    if (import.meta.env.DEV) {
       devtools(state, { name: opts?.devtoolsName, enabled: true });
     }
   }, []);

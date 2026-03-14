@@ -1,5 +1,8 @@
 export namespace format {
-  // #AI
+  /**
+   * @deprecated use chakra's <FormatNumber/>
+   * #AI
+   */
   export function money(value?: number | null, opts?: { roundDown10k: boolean }): string {
     if (value === null || value === undefined) {
       return "";

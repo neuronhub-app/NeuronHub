@@ -21,7 +21,7 @@ import {
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export default function LlmProfile() {
   const { data, isLoadingFirstTime, refetch } = useApolloQuery(MyLlmProfileQuery);

@@ -82,7 +82,7 @@ FYI: project-specific classes or functions are prefixed with `neuron`.
 
 ### TODO comments
 
-See [todos.md](/docs/todos.md).
+See [todos.md](/docs/src/pages/development/how-to/todos.mdx).
 
 
 Python

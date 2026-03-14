@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateDeleteAndResetStore } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
   const navigate = useNavigate();

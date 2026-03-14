@@ -8,12 +8,12 @@ import {
   type PostHighlight,
   removeHighlight,
 } from "@/apps/highlighter/useHighlighter";
-import { Prose } from "@/components/ui/prose";
+import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
-import { markedConfigured } from "@/utils/marked-configured";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export const highlight_attrs = {
   flag: "highlightable",

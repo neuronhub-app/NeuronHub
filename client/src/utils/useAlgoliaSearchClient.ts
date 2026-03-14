@@ -3,7 +3,7 @@ import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 const algoliaIndexNames = {
   indexName: undefined as undefined | string,

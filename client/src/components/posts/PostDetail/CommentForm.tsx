@@ -11,7 +11,7 @@ import { graphql, type ID } from "@/gql-tada";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { toast } from "@/utils/toast";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { PostTypeEnum, Visibility } from "~/graphql/enums";
 
 const schema = z

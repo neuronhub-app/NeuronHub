@@ -1,0 +1,7 @@
+{
+  "workspaces": ["client", "docs", "packages/*"],
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.7",
+		"@typescript/native-preview": "^7.0.0-dev.20260313.1"
+  }
+}

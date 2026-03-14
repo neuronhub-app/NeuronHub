@@ -1,16 +1,7 @@
-import { cleanEnv, str, url } from "envalid";
+import { url } from "envalid";
+import { createEnv } from "@neuronhub/shared/createEnv";
 
-const serverEnv = str({
-  choices: ["development", "staging", "production"],
-  default: "development",
-});
-
-const envRaw = typeof process === "undefined" ? import.meta.env : process.env;
-
-const envCleaned = cleanEnv(envRaw, {
-  NODE_ENV: serverEnv,
-  MODE: serverEnv,
-
+const envCleaned = createEnv({
   VITE_CLIENT_URL: url({ default: "http://localhost:3000" }),
 });
 

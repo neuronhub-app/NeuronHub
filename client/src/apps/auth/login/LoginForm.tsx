@@ -9,7 +9,7 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function LoginForm() {
   const navigate = useNavigate();

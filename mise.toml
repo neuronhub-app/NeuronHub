@@ -93,7 +93,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS = 1
     CLAUDE_CODE_DISABLE_AUTO_MEMORY = 1
     CLAUDE_CODE_DISABLE_CRON = 1
-#    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1
+    # broken since 2.1.75
+    #CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1
 
 
 # Dev servers
@@ -239,7 +240,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     depends = "typegen:server"
     run = [
         "mise typegen:client",
-        "mise typegen:docs",
+        "mise typegen:packages:chakra",
+        "mise typegen:docs:chakra",
     ]
     description = "Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries; @chakra-ui; etc"
     quiet = true
@@ -287,35 +289,48 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     [tasks."typegen:client:chakra:neuron"]
         dir = "client"
-        run = "npx @chakra-ui/cli typegen src/theme/theme.ts"
+        run = "bun run chakra typegen src/theme/theme.ts"
         sources = ["src/theme/**/*.ts"]
         silent = true # quiet doesn't work
 
     [tasks."typegen:client:chakra:pg"]
         dir = "client"
-        run = "npx @chakra-ui/cli typegen src/sites/pg/theme.ts"
+        run = "bun run chakra typegen src/sites/pg/theme.ts"
         sources = ["src/sites/theme/**/*.ts", "src/sites/pg/theme.ts"]
         silent = true # quiet doesn't work
 
-    [tasks."typegen:docs"]
-        depends = ["typegen:docs:react-router", "typegen:docs:chakra"]
-        quiet = true
-
-    [tasks."typegen:docs:react-router"]
-        dir = "docs"
-        run = "bun run react-router typegen"
-        sources = ["src/**/index.tsx", "src/routes.ts"]
+    [tasks."typegen:packages:chakra"]
+        run = "mise typegen:chakra --dir=packages/shared/"
+        sources = ["src/theme/**/*"]
         quiet = true
 
     [tasks."typegen:docs:chakra"]
-        dir = "docs"
-        run = "npx @chakra-ui/cli typegen src/theme/theme.ts"
-        sources = ["src/theme/**/*.ts"]
-        silent = true # quiet doesn't work
+        run = "mise typegen:chakra --dir=docs/"
+        sources = ["src/theme/**/*"]
+        quiet = true
 
+    [tasks."typegen:chakra"]
+        usage = """
+            flag "--dir <dir>"
+        """
+        # Bun dedups @chakra-ui/react (no nohoist) -> breaks client/ or shared/ -> --outdir helps
+        run = """
+            cd $env.usage_dir
 
-[tasks."format"]
-    depends = ["format:server", "format:client", "format:docs"]
+            let output_dir = ".chakra/types"
+            bun run chakra typegen src/theme/theme.ts --outdir $output_dir
+
+            # Generated .d.ts use rel imports `"../css.types"` -> breaks outside node_modules -> remap to #chakra-internal/ tsconfig path
+            glob $"($output_dir)/*.d.ts" | each { |file|
+                open $file --raw
+                | str replace --all 'from "../' 'from "#chakra-internal/'
+                | save --force $file
+            }
+        """
+        silent = true
+
+[tasks.format]
+    depends = ["format:server", "format:biome"]
     quiet = true
 
     [tasks."format:server"]
@@ -324,16 +339,15 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         sources = ["neuronhub/**/*.py"]
         quiet = true
 
-    [tasks."format:client"]
-        dir = "client"
-        run = "bun run biome format --write"
-        sources = ["src/**/*", "e2e/**/*"]
-        quiet = true
-
-    [tasks."format:docs"]
-        dir = "docs"
-        run = "bun run biome format --write"
-        sources = ["src/**/*", "e2e/**/*"]
+    [tasks."format:biome"]
+        run = "biome format --write"
+        sources = [
+            "packages/shared/src/**/*",
+            "client/src/**/*",
+            "client/e2e/**/*",
+            "docs/src/**/*",
+            "docs/e2e/**/*",
+        ]
         quiet = true
 
 
@@ -346,6 +360,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         "lint:server",
         "lint:client",
         "lint:docs",
+        "lint:packages",
     ]
     quiet = true
 
@@ -355,17 +370,33 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         sources = ["neuronhub/**/*.py"]
         quiet = true
 
-    [tasks."lint:client"]
-        dir = "client"
+    [tasks."lint:biome"]
         run = [
-            "bun run tsgo --noEmit --project tsconfig.quiet.json",
-            "bun run biome lint --write --unsafe",
+            "biome lint --write --unsafe",
         ]
-        sources = ["src/**/*", "e2e/**/*"]
+        sources = [
+            "packages/shared/src/**/*",
+            "client/src/**/*",
+            "client/e2e/**/*",
+            "docs/src/**/*",
+            "docs/e2e/**/*",
+        ]
+        quiet = true
+
+    [tasks."lint:client"]
+        dir = "client/"
+        run = "bun run tsgo --noEmit"
+        sources = ["src/**/*", "e2e/**/*", "tsconfig.json", "package.json"]
         quiet = true
 
     [tasks."lint:docs"]
-        dir = "docs"
-        run = "bun run biome lint --write --unsafe"
-        sources = ["src/**/*", "e2e/**/*"]
+        dir = "docs/"
+        run = "bun run tsgo --noEmit"
+        sources = ["src/**/*", "e2e/**/*", "tsconfig.json", "package.json"]
+        quiet = true
+
+    [tasks."lint:packages"]
+        dir = "packages/shared/"
+        run = "bun run tsgo --noEmit"
+        sources = ["src/**/*", "package.json"]
         quiet = true

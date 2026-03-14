@@ -12,7 +12,7 @@ import type { ResultOf } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtioSet } from "@/utils/useStateValtio";
+import { useStateValtioSet } from "@neuronhub/shared/utils/useStateValtio";
 import { JobVersionsApproveMutation, JobVersionsPendingQuery } from "./queries";
 
 export function JobVersionReview() {

@@ -32,7 +32,7 @@ import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 // Post.tags, .review_tags, .alternatives
 export interface SelectVotableOption {

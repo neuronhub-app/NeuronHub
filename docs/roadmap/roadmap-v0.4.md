@@ -17,7 +17,7 @@
 
 ### TBD
 
-- [refactor-pending](/docs/refactor-pending.md)
+- [refactor-pending](/docs/src/pages/development/reference/refactor-pending.mdx)
 - Post.tags voting on list pages
 - field `Review.review_experience`
 - Notifications for `PostHighlight` from User Connections

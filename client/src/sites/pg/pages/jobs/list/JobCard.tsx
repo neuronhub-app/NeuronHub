@@ -20,9 +20,9 @@ import { LuBuilding2, LuChevronDown } from "react-icons/lu";
 import { Highlight } from "react-instantsearch";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
-import { datetime } from "@/utils/date-fns";
+import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 const style = {
   markHighlight: {

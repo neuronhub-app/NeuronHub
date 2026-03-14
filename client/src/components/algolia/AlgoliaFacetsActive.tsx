@@ -5,7 +5,7 @@ import { LuX } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { Button } from "@/components/ui/button";
-import { datetime } from "@/utils/date-fns";
+import { datetime } from "@neuronhub/shared/utils/date-fns";
 
 export function AlgoliaFacetsActive(props: {
   labelsOverride?: Record<string, string>;

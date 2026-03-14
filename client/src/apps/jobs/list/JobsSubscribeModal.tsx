@@ -22,7 +22,7 @@ import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 const FormSchema = z.object({
   email: z.email("Invalid email address"),

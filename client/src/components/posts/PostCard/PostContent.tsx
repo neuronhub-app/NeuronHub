@@ -1,10 +1,10 @@
 import { Stack } from "@chakra-ui/react";
 import type { PostContentField, PostListItemType } from "@/components/posts/ListContainer";
-import { Prose } from "@/components/ui/prose";
+import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { Tag } from "@/components/ui/tag";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
-import { markedConfigured } from "@/utils/marked-configured";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 
 // todo refac-name: PostCardContent
 export function PostContent(props: { post: PostListItemType }) {

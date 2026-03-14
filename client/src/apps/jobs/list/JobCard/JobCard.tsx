@@ -23,8 +23,8 @@ import { Tag } from "@/components/ui/tag";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
-import { datetime } from "@/utils/date-fns";
-import { format } from "@/utils/format";
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { format } from "@neuronhub/shared/utils/format";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 const style = {

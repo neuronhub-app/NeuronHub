@@ -6,7 +6,7 @@ import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { useInit } from "@/utils/useInit";
-import { useStateValtio } from "@/utils/useStateValtio";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 /**
  * Note: in the future replace with @chakra-ui Combobox with render of .image & .content.
