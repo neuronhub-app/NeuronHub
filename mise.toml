@@ -1,4 +1,3 @@
-# env
 redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
 [tools]
@@ -94,7 +93,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS = 1
     CLAUDE_CODE_DISABLE_AUTO_MEMORY = 1
     CLAUDE_CODE_DISABLE_CRON = 1
-    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1
+#    CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1
 
 
 # Dev servers
@@ -192,6 +191,11 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
         env.IS_TASKS_BACKEND_IMMEDIATE = "false"
 
+    [tasks."test:e2e:docs"]
+        dir = "docs"
+        alias = "e2e:docs"
+        run = "bun run playwright test --config=e2e/playwright.config.ts"
+
 
 # Django
 # -----------------------------------------------------
@@ -233,7 +237,10 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
 [tasks."typegen"]
     depends = "typegen:server"
-    run = "mise typegen:client"
+    run = [
+        "mise typegen:client",
+        "mise typegen:docs",
+    ]
     description = "Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries; @chakra-ui; etc"
     quiet = true
 
@@ -290,9 +297,25 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         sources = ["src/sites/theme/**/*.ts", "src/sites/pg/theme.ts"]
         silent = true # quiet doesn't work
 
+    [tasks."typegen:docs"]
+        depends = ["typegen:docs:react-router", "typegen:docs:chakra"]
+        quiet = true
+
+    [tasks."typegen:docs:react-router"]
+        dir = "docs"
+        run = "bun run react-router typegen"
+        sources = ["src/**/index.tsx", "src/routes.ts"]
+        quiet = true
+
+    [tasks."typegen:docs:chakra"]
+        dir = "docs"
+        run = "npx @chakra-ui/cli typegen src/theme/theme.ts"
+        sources = ["src/theme/**/*.ts"]
+        silent = true # quiet doesn't work
+
 
 [tasks."format"]
-    depends = ["format:server", "format:client"]
+    depends = ["format:server", "format:client", "format:docs"]
     quiet = true
 
     [tasks."format:server"]
@@ -307,6 +330,12 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         sources = ["src/**/*", "e2e/**/*"]
         quiet = true
 
+    [tasks."format:docs"]
+        dir = "docs"
+        run = "bun run biome format --write"
+        sources = ["src/**/*", "e2e/**/*"]
+        quiet = true
+
 
 [tasks.lint]
     depends = [
@@ -316,6 +345,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     depends_post = [
         "lint:server",
         "lint:client",
+        "lint:docs",
     ]
     quiet = true
 
@@ -331,5 +361,11 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
             "bun run tsgo --noEmit --project tsconfig.quiet.json",
             "bun run biome lint --write --unsafe",
         ]
+        sources = ["src/**/*", "e2e/**/*"]
+        quiet = true
+
+    [tasks."lint:docs"]
+        dir = "docs"
+        run = "bun run biome lint --write --unsafe"
         sources = ["src/**/*", "e2e/**/*"]
         quiet = true

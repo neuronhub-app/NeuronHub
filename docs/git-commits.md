@@ -55,9 +55,10 @@ If you're unsure which `Type` to use - use the highest, as they're sorted by imp
 - `types` - TypeScript or Python typings
 - `admin` - Django Admin, ie no impact on the user-facing logic
 - `perf` - performance of SQL, UI, etc
+- `docs` - React static site generator in `docs/`
 
 Sites:
-- `PG` - for ProbablyGood.org specific changes in `client/src/sites/pg/`
+- `<Scope>/PG` - for ProbablyGood.org specific changes in `client/src/sites/pg/`
 
 `Scope`s only for Type `build` (as they shouldn't affect runtime):
 - `build(CI)` - GitHub CI

@@ -1,0 +1,39 @@
+---
+title: Analytics
+---
+
+### Jobs Subscription
+- `job__subscribe__open`
+    - `facets: list[str]`
+- `job__subscribe__click__submit`
+    - `is_success: boolean`
+    - `facets: list[str]`
+- `job__subscribe__click__email`
+    - `facets: list[str]`
+- `job__subscribe__click__close`
+    - `facets: list[str]`
+    - `button: Escape | CloseButton | OuterClick`
+- `job__subscribe__click__content`
+    - `facets: list[str]`
+
+### Job List
+- `job__list__click`
+- `job__list__sort`
+    - `value: "posted_at" | "closes_at"`
+- `job__list__facet_reset`
+    - `value: str`
+- `job__list__facet_all`
+    - `value: list[str]`
+- `job__list__facet`
+    - `attribute: str`
+    - `value: str`
+
+### Job Card
+- `job__card__click__content`
+    - `id: {job.id}`
+- `job__card__click__url`
+    - `id: {job.id}`
+    - `value: {org.domain}`
+- `job__card__click__org`
+    - `value: {domain}`
+    - `id: {job.id}`

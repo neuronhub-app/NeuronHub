@@ -1,3 +1,7 @@
+---
+title: Deploy
+---
+
 ## Docker Compose
 
 Replace all the `${{}}` placeholders below.
@@ -38,7 +42,7 @@ services:
 ```
 
 `.env` file
-```shell
+```bash
 # Django
 DJANGO_ENV=prod
 DATABASE_URL=postgresql://${{db_user}}:${{db_password}}@${{db_host}}:${{db_port}}/${{db_name}}
@@ -100,7 +104,7 @@ services:
 ```
 
 `.env` file
-```shell
+```bash
 ACCESS_KEY_ID=${{s3_key_id}}
 SECRET_ACCESS_KEY=${{s3_key_secret}}
 ```

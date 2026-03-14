@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "moduleResolution": "Bundler",
+
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noErrorTruncation": false,
+
+    "rootDirs": [".", "./.react-router/types"],
+
+    "paths": {
+      "@/*": ["./src/*"],
+      "~/react-router/*": ["./.react-router/types/src/*"],
+    },
+  },
+  "include": ["src", "vite.config.ts", ".react-router/types/**/*"],
+}
