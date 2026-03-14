@@ -4,6 +4,7 @@
 "use client";
 
 import {
+  Badge,
   Box,
   Button,
   Container,
@@ -12,15 +13,20 @@ import {
   Flex,
   Heading,
   HStack,
+  Icon,
   Portal,
   Span,
   Stack,
+  Tabs,
+  Text,
 } from "@chakra-ui/react";
-import { LuMenu } from "react-icons/lu";
-import { Outlet, useLocation } from "react-router";
-import { navGroups } from "./buildNavGroups";
-import { Prose } from "./Prose";
-import { Toc } from "./Toc";
+import { LuFolder, LuMenu, LuUser } from "react-icons/lu";
+import { PiGraph } from "react-icons/pi";
+import { Outlet, useLocation, useNavigate } from "react-router";
+import { env } from "@/env";
+import { type NavGroup, navGroups } from "@/components/buildNavGroups";
+import { Prose } from "@/components/Prose";
+import { Toc } from "@/components/Toc";
 
 export default function DocsLayout() {
   return (
@@ -76,40 +82,120 @@ const style = {
 
 function SidebarContent() {
   const pathname = useLocation().pathname;
+  const navigate = useNavigate();
+  const activeSection = pathname.startsWith("/development/") ? "development" : "user";
+  const groups = navGroups
+    .map(g => ({ ...g, items: g.items.filter(i => i.href.startsWith(`/${activeSection}/`)) }))
+    .filter(g => g.items.length > 0);
 
   return (
     <Box data-sidebar h="full" overflowY="auto" ps="2" pe="2" pt="4" pb="10">
       <Stack gap="6" align="flex-start">
-        <Box w="full" px="4">
-          <Heading size="lg">Docs</Heading>
+        <NeuronLogo />
+
+        <Box w="full" px="2">
+          <SectionTabs
+            value={activeSection}
+            onValueChange={section => {
+              const firstHref = sectionTabs[section].firstHref;
+              navigate(firstHref);
+            }}
+          />
         </Box>
 
-        <Stack w="full" gap="6">
-          {navGroups.map(group => (
-            <Stack key={group.title} gap="3">
-              <HStack px="4">
-                <Heading as="h5" textStyle="sm">
-                  {group.title}
-                </Heading>
-              </HStack>
-              <Stack px="4" gap="0">
-                {group.items.map(item => (
-                  <SideNavLink
-                    key={item.href}
-                    href={item.href}
-                    variant="line"
-                    size="md"
-                    data-current={pathname === item.href || undefined}
-                  >
-                    <Span flex="1">{item.title}</Span>
-                  </SideNavLink>
-                ))}
-              </Stack>
-            </Stack>
-          ))}
-        </Stack>
+        <NavGroupList pathname={pathname} groups={groups} />
       </Stack>
     </Box>
+  );
+}
+
+function NeuronLogo() {
+  return (
+    <chakra.a
+      href={env.VITE_CLIENT_URL}
+      aria-label="NeuronHub"
+      display="flex"
+      gap="3"
+      alignItems="center"
+      px="4"
+      py="2"
+      borderRadius="sm"
+      _hover={{ bg: "bg.subtle" }}
+    >
+      <Icon color="primary" size="xl">
+        <PiGraph />
+      </Icon>
+      <Text fontSize="1.4rem" fontWeight="bold">
+        NeuronHub
+      </Text>
+      <Badge h="fit-content" size="xs" textTransform="uppercase">
+        Alpha
+      </Badge>
+    </chakra.a>
+  );
+}
+
+function SectionTabs(props: { value: string; onValueChange: (value: string) => void }) {
+  return (
+    <Tabs.Root
+      value={props.value}
+      onValueChange={e => props.onValueChange(e.value)}
+      variant="plain"
+      size="sm"
+    >
+      <Tabs.List bg="bg.muted" rounded="l3" p="1" flex="1">
+        {Object.entries(sectionTabs).map(([key, section]) => (
+          <Tabs.Trigger key={key} value={key} minW="fit-content" flex="1">
+            <Icon>
+              <section.icon />
+            </Icon>
+            {section.label}
+          </Tabs.Trigger>
+        ))}
+        <Tabs.Indicator rounded="l2" />
+      </Tabs.List>
+    </Tabs.Root>
+  );
+}
+
+const sectionTabs: Record<
+  string,
+  { label: string; icon: React.ComponentType; firstHref: string }
+> = {
+  user: { label: "Usage", icon: LuUser, firstHref: "/user/how-to/algolia" },
+  development: {
+    label: "Development",
+    icon: LuFolder,
+    firstHref: "/development/how-to/git-commits",
+  },
+};
+
+function NavGroupList(props: { pathname: string; groups: Array<NavGroup> }) {
+  return (
+    <Stack w="full" gap="6">
+      {props.groups.map(group => (
+        <Stack key={group.title} gap="3">
+          <HStack px="4">
+            <Heading as="h5" textStyle="sm">
+              {group.title}
+            </Heading>
+          </HStack>
+          <Stack px="4" gap="0">
+            {group.items.map(item => (
+              <SideNavLink
+                key={item.href}
+                href={item.href}
+                variant="line"
+                size="md"
+                data-current={props.pathname === item.href || undefined}
+              >
+                <Span flex="1">{item.title}</Span>
+              </SideNavLink>
+            ))}
+          </Stack>
+        </Stack>
+      ))}
+    </Stack>
   );
 }
 

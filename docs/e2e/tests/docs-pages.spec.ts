@@ -8,6 +8,7 @@ const routes = [
   "/user/how-to/algolia",
   "/user/how-to/analytics",
   "/user/how-to/deploy",
+  "/development/how-to/git-commits",
   "/user/how-to/job-emails-sending",
   "/user/how-to/sentry",
   "/user/reference/job-subscription-emails",
@@ -108,4 +109,39 @@ test("Sidebar active link changes on navigation", async ({ page }) => {
 
   const sidebar = page.locator("[data-sidebar]");
   await expect(sidebar.locator("a[data-current]")).toHaveText("Sentry");
+});
+
+test("Sidebar shows NeuronHub logo linking to client URL", async ({ page }) => {
+  await page.goto("/");
+
+  const sidebar = page.locator("[data-sidebar]");
+  const logo = sidebar.locator("a[aria-label='NeuronHub']");
+  await expect(logo).toBeVisible();
+  await expect(logo).toHaveAttribute("href", /http/);
+  await expect(logo.locator("text=NeuronHub")).toBeVisible();
+  await expect(logo.locator("text=Alpha")).toBeVisible();
+});
+
+test("Sidebar shows Usage and Development tabs", async ({ page }) => {
+  await page.goto("/");
+
+  const sidebar = page.locator("[data-sidebar]");
+  await expect(sidebar.locator("button", { hasText: "Usage" })).toBeVisible();
+  await expect(sidebar.locator("button", { hasText: "Development" })).toBeVisible();
+});
+
+test("Sidebar tab switch navigates to first page of that section", async ({ page }) => {
+  await page.goto("/user/how-to/deploy");
+
+  const sidebar = page.locator("[data-sidebar]");
+  await expect(sidebar.locator("button", { hasText: "Usage" })).toHaveAttribute(
+    "data-selected",
+    "",
+  );
+
+  await sidebar.locator("button", { hasText: "Development" }).click();
+  await expect(page).toHaveURL(/\/development\/how-to\/git-commits$/);
+
+  await sidebar.locator("button", { hasText: "Usage" }).click();
+  await expect(page).toHaveURL(/\/user\/how-to\/algolia$/);
 });

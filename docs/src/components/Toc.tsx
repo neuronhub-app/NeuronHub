@@ -16,12 +16,12 @@ export function Toc() {
     return null;
   }
 
-  const depthMin = Math.min(...items.map(item => item.depth));
-
   function handleClick(id: string) {
     history.replaceState(null, "", `#${id}`);
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   }
+
+  const depthMin = Math.min(...items.map(item => item.depth));
 
   return (
     <Box as="nav" fontSize="sm">
@@ -77,11 +77,11 @@ function useScrollSpy(items: HeadingItem[]): Set<string> {
       let idLastPastTop = items[0].id;
 
       for (const item of items) {
-        const el = document.getElementById(item.id);
-        if (!el) {
+        const elem = document.getElementById(item.id);
+        if (!elem) {
           continue;
         }
-        const top = el.getBoundingClientRect().top;
+        const top = elem.getBoundingClientRect().top;
         if (top <= 0) {
           idLastPastTop = item.id;
         }
@@ -116,7 +116,7 @@ const TocLink = chakra("a", {
     py: "1.5",
     display: "flex",
     textStyle: "sm",
-    paddingInlineStart: "calc(var(--toc-depth) * 0.75rem)",
+    paddingInlineStart: "calc(var(--toc-depth) * {spacing.5} + {spacing.3})",
     borderStartWidth: "1px",
     borderStartColor: "bg.muted",
     transition: "all 0.15s ease",

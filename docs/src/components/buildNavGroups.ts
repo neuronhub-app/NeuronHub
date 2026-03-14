@@ -1,6 +1,7 @@
 /**
  * #AI
  */
+// @ts-expect-error
 const mdxModules = import.meta.glob("/src/pages/**/*.mdx", { eager: true }) as Record<
   string,
   { frontmatter?: { title?: string } }
@@ -10,8 +11,8 @@ export const navGroups = buildNavGroups(mdxModules);
 
 function buildNavGroups(
   modules: Record<string, { frontmatter?: { title?: string } }>,
-): Array<{ title: string; items: Array<{ title: string; href: string }> }> {
-  const groupsMap = new Map<string, Array<{ title: string; href: string }>>();
+): Array<NavGroup> {
+  const groupsMap = new Map<string, Array<Page>>();
 
   for (const [filePath, module] of Object.entries(modules)) {
     const stripped = filePath.replace(/^.*\/pages\//, "").replace(".mdx", "");
@@ -44,3 +45,6 @@ function toTitleCase(slug: string): string {
     .map(w => w[0].toUpperCase() + w.slice(1))
     .join(" ");
 }
+
+type Page = { title: string; href: string };
+export type NavGroup = { title: string; items: Array<Page> };

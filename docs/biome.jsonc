@@ -57,12 +57,6 @@
     },
   },
   "files": {
-    "includes": [
-      "src/**",
-      "e2e/**",
-      "biome.jsonc",
-      "tsconfig.json",
-      "vite.config.ts",
-    ],
+    "includes": ["src/**", "e2e/**", "biome.jsonc", "tsconfig.json", "vite.config.ts"],
   },
 }
