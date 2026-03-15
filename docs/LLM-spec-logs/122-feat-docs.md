@@ -32,6 +32,11 @@ An LLM did several passes - you focus on the last unchecked task.
     - [x] fix mise lint:docs
     - [x] fix @neuronhub/shared missing imports
     - [x] add chakra spacings from client/ to shared/
+- [x] code review
+
+The changes are in the 2 git commits:
+- `refac: simplify client/tsconfig.json`
+- `feat(docs): add /packages/shares and Bun Workspace #122`
 
 ### Related files
 - `docs/package.json`
@@ -59,62 +64,6 @@ An LLM did several passes - you focus on the last unchecked task.
 - `packages/shared/src/components/NeuronLogo.tsx`
 
 ## Exec-Plan
-
-- You must use red/green TDD.
-- Keep package.json formats (spaces, newlines).
-
-A plan by an LLM is below.
-
-### Bun workspaces + `packages/shared/`
-
-Dual React/emotion imports — docs/ would get its own React instance via client/'s deps, breaking hooks and style injection. `packages/shared/` avoids this with `peerDependencies`.
-
-#### 1. Root workspace setup
-- Create `package.json` at repo root:
-  ```jsonc
-  { "workspaces": ["client", "docs", "packages/*"] }
-  ```
-
-#### 2. Create `packages/shared/`
-- `package.json`:
-  ```jsonc
-  {
-    "name": "@neuronhub/shared",
-    "exports": { "./*": "./src/*.ts" },
-    "peerDependencies": { "react": "^19", "valtio": "^2", "@chakra-ui/react": "^3", "react-icons": "^5", "date-fns": "^4", "@date-fns/tz": "^1", "marked": "^15" },
-    "dependencies": { "envalid": "^8" }
-  }
-  ```
-- `tsconfig.json`: ESNext, paths `@neuronhub/shared/*` → `./src/*`
-
-#### 3. Move files into `packages/shared/src/` (preserve original paths)
-**`utils/`:**
-- `useStateValtio.ts` — from `client/src/utils/`. Replace `env.isDev` → `import.meta.env.DEV`
-- `format.ts` — from `client/src/utils/` (zero deps)
-- `date-fns.ts` — from `client/src/utils/` (only `date-fns` + `@date-fns/tz`)
-- `marked-configured.ts` — from `client/src/utils/` (only `marked`)
-
-**`theme/`:**
-- `colors.ts` — from `client/src/theme/` (type-only `@chakra-ui/react` → peerDep)
-
-**`components/`:**
-- `ui/prose.tsx` — from `client/src/components/ui/` (only `@chakra-ui/react` → peerDep). Delete docs/ copy
-- `NeuronLogo.tsx` — extract from `client/src/components/LayoutSidebar.tsx`. Parameterize: `props.href` instead of `urls.posts.list`. Deps: `@chakra-ui/react`, `react-icons/pi` → all peerDeps
-
-#### 4. Shared env: `packages/shared/src/createEnv.ts`
-```ts
-import { cleanEnv, str } from "envalid"
-
-const envRaw = typeof process === "undefined" ? import.meta.env : process.env
-const serverEnv = str({ choices: ["development", "staging", "production"], default: "development" })
-
-export function createEnv<T extends object>(siteSchema: T) {
-  return cleanEnv(envRaw, { NODE_ENV: serverEnv, MODE: serverEnv, ...siteSchema })
-}
-```
-- `envalid` becomes a direct dep of shared (not peer — it's not a UI lib)
-- Each site's `env.ts` calls `createEnv({ VITE_SERVER_URL: url(), ... })` with site-specific vars
-- `isDev`/`isProd` auto-added by envalid on all sites
 
 <LLM_unverified_report>
 
@@ -144,7 +93,7 @@ export function createEnv<T extends object>(siteSchema: T) {
 
 ## Decision-Log
 - Workspaces: /package.json; /packages/shared/
-- Fix/refac: NeuronLogo deduplicated
+- Fix: NeuronLogo deduplicated
 - Issue: `import.meta.env` in shared/
     - Fix: `/// <reference types="vite/client" />` to types.d.ts
 - Issue: trash rel include in client/tsconfig.json
@@ -164,3 +113,10 @@ export function createEnv<T extends object>(siteSchema: T) {
     - Root: `FlexProps` spread into `<Bleed>`
     - shared/tsconfig: added `#chakra-internal/*` path
       + `.chakra/types` include (for future)
+- Code Review
+    - Fix: inlined `serverEnv` in createEnv
+    - Fix: `sectionTabs` `as const satisfies` + `SectionKey` type
+    - Fix: removed redundant `isProd` getter in docs/env.ts
+    - Fix: mise sources paths lacked dir prefix
+    - Issue: dup valtio/react decl in client/ and shared/ types.d.ts
+        - Keep both: shared's not picked up by client tsgo

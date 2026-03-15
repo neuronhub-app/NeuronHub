@@ -81,7 +81,9 @@ const style = {
 function SidebarContent() {
   const pathname = useLocation().pathname;
   const navigate = useNavigate();
-  const activeSection = pathname.startsWith("/development/") ? "development" : "user";
+  const activeSection: SectionKey = pathname.startsWith("/development/")
+    ? "development"
+    : "user";
   const groups = navGroups
     .map(g => ({ ...g, items: g.items.filter(i => i.href.startsWith(`/${activeSection}/`)) }))
     .filter(g => g.items.length > 0);
@@ -104,11 +106,11 @@ function SidebarContent() {
   );
 }
 
-function SectionTabs(props: { value: string; onValueChange: (value: string) => void }) {
+function SectionTabs(props: { value: SectionKey; onValueChange: (value: SectionKey) => void }) {
   return (
     <Tabs.Root
       value={props.value}
-      onValueChange={e => props.onValueChange(e.value)}
+      onValueChange={e => props.onValueChange(e.value as SectionKey)}
       variant="plain"
       size="sm"
     >
@@ -127,17 +129,16 @@ function SectionTabs(props: { value: string; onValueChange: (value: string) => v
   );
 }
 
-const sectionTabs: Record<
-  string,
-  { label: string; icon: React.ComponentType; firstHref: string }
-> = {
+type SectionKey = keyof typeof sectionTabs;
+
+const sectionTabs = {
   user: { label: "Usage", icon: LuUser, firstHref: "/user/how-to/algolia" },
   development: {
     label: "Development",
     icon: LuFolder,
     firstHref: "/development/how-to/git-commits",
   },
-};
+} as const;
 
 function NavGroupList(props: { pathname: string; groups: Array<NavGroup> }) {
   return (
@@ -156,7 +157,7 @@ function NavGroupList(props: { pathname: string; groups: Array<NavGroup> }) {
                 href={item.href}
                 variant="line"
                 size="md"
-                data-current={props.pathname === item.href || undefined}
+                data-current={props.pathname === item.href ? "" : undefined}
               >
                 <Span flex="1">{item.title}</Span>
               </SideNavLink>

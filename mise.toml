@@ -300,11 +300,13 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         silent = true # quiet doesn't work
 
     [tasks."typegen:packages:chakra"]
+        dir = "packages/shared"
         run = "mise typegen:chakra --dir=packages/shared/"
         sources = ["src/theme/**/*"]
         quiet = true
 
     [tasks."typegen:docs:chakra"]
+        dir = "docs/"
         run = "mise typegen:chakra --dir=docs/"
         sources = ["src/theme/**/*"]
         quiet = true
