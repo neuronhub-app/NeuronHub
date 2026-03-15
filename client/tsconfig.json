@@ -5,10 +5,7 @@
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "moduleResolution": "Bundler",
 
-    "useDefineForClassFields": true,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "maxNodeModuleJsDepth": 10,
+    "skipLibCheck": true, // needed because of broken instantsearch and @types/node
 
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -23,7 +20,6 @@
     "noImplicitOverride": true, // for LLMs mistakes
 
     "rootDirs": [".", "./.react-router/types"], // from react-router docs
-    "noErrorTruncation": false,
 
     "paths": {
       "@/e2e/*": ["./e2e/*"],
