@@ -217,4 +217,5 @@ You must read each top-level doc before its children.
     - [How to use pytest](./backend/pytest.md)
     - [How to use Playwright](./frontend/Playwright.md)
 - [Algolia integration](./Algolia.md) - used on all FE list pages (posts, jobs, profiles) for InstantSearch, Facets, and Pagination.
-- [LLM spec logs](/docs/LLM-spec-logs/) - historical ticket-prompts LLM received and their Git history - ie it's complimentary to the Git log. Named as `{id}-{type}-{name}.md` - `#{id}` is from the Git logs.
+- [LLM spec logs](/docs/src/pages/development/reference/LLM-spec-logs/) - historical ticket-prompts LLM received and their Git history - ie it's complimentary to the Git log. Named as `{id}-{type}-{name}.mdx` - `#{id}` is from the Git logs.
+- [./frontend/docs-site](./frontend/docs-site.md) - the `docs/` site (docs.neuronhub.app)

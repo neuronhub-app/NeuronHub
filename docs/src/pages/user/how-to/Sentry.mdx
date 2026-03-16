@@ -1,10 +1,42 @@
 ---
-title: Sentry
+title: Error Monitoring
 ---
 
-Topics
-- Uptime
-- Crons
-- Feedback
-    - SMS
-- Replays
+import { ImageZoom } from "@/components/ImageZoom";
+import { LinkExt } from "@/components/LinkExt";
+
+## Issue Reports
+
+I recommend triaging the `backend` issues daily, and the `frontend` once in a few weeks.
+
+The <LinkExt href="https://sentry.io/issues/alerts/rules/">default Alerts settings</LinkExt> are configured by project:
+- Uptime - immediate email.
+- `backend` - immediate email.
+- `frontend` - if it affects 3+ users per month.
+
+## Feedback
+
+On error, a user is presented with a low-key popup to submit the Feedback report form:
+
+<LinkExt href="https://sentry.io/issues/feedback/">The reports</LinkExt> can be viewed for 90 days.
+
+Each sends an email alert. You can also enable <LinkExt href="https://sentry.io/issues/feedback/">Slack or SMS notifications</LinkExt>.
+
+## Replays
+
+When a user encounters an error an anonymized `Session Replay` is
+attached to the `Issue` report:
+
+<ImageZoom src="https://s3.stage.neuronhub.app/docs/sentry_issues_replays.avif" alt="Sentry Issue Replays" isDimmed />
+
+You can browse <LinkExt href="https://sentry.io/explore/replays">all Replays here</LinkExt>:
+
+<ImageZoom src="https://s3.stage.neuronhub.app/docs/sentry_explore_replays.avif" alt="Sentry Explore Replays" isDimmed />
+
+## Uptime
+
+...
+
+## Scheduled Tasks Monitor
+
+...

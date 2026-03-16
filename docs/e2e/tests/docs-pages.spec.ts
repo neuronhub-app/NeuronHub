@@ -83,7 +83,7 @@ test("TOC does not highlight off-screen headings", async ({ page }) => {
   );
 });
 
-test("Sidebar renders navigation groups from file structure", async ({ page }) => {
+test("Sidebar renders navigation tree from file structure", async ({ page }) => {
   await page.goto("/user/how-to/deploy");
 
   const sidebar = page.locator("[data-sidebar]");
@@ -144,4 +144,35 @@ test("Sidebar tab switch navigates to first page of that section", async ({ page
 
   await sidebar.locator("button", { hasText: "Usage" }).click();
   await expect(page).toHaveURL(/\/user\/how-to\/algolia$/);
+});
+
+test("Dir URL redirects to first child page", async ({ page }) => {
+  await page.goto("/development/how-to");
+  await expect(page).toHaveURL(/\/development\/how-to\/git-commits$/);
+});
+
+test("Dir URL with trailing slash redirects when no README", async ({ page }) => {
+  await page.goto("/development/how-to/");
+  await expect(page).toHaveURL(/\/development\/how-to\/git-commits$/);
+});
+
+test("Section dir URL redirects to first child page", async ({ page }) => {
+  await page.goto("/user");
+  await expect(page).toHaveURL(/\/user\/how-to\/algolia$/);
+});
+
+test("ImageZoom renders thumbnail and opens lightbox on click", async ({ page }) => {
+  await page.goto("/user/how-to/sentry");
+
+  const thumbnail = page.locator("img[alt='Sentry Explore Replays']");
+  await expect(thumbnail).toBeVisible();
+  await page.screenshot({ path: "e2e/test-results/image-zoom-thumbnail.png" });
+
+  await thumbnail.click();
+  const backdrop = page.locator("[data-scope='dialog'][data-part='backdrop']");
+  await expect(backdrop).toBeVisible();
+  await page.screenshot({ path: "e2e/test-results/image-zoom-lightbox.png" });
+
+  await page.keyboard.press("Escape");
+  await expect(backdrop).not.toBeVisible();
 });

@@ -4,6 +4,7 @@ import rehypeSlug from "rehype-slug";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
+import path from "node:path";
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
@@ -11,6 +12,10 @@ export default defineConfig({
   root: __dirname,
   server: {
     port: 2500,
+  },
+  resolve: {
+    // tsconfigPaths fails on `@/` in MDX
+    alias: { "@/": path.resolve(__dirname, "src") + "/" },
   },
   plugins: [
     mdx({

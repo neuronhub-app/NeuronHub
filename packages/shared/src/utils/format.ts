@@ -1,4 +1,15 @@
 export namespace format {
+  export function slugToTitle(slug: string): string {
+    return slug
+      .split("-")
+      .map(word => capitalize(word))
+      .join(" ");
+  }
+
+  export function capitalize<T extends string>(str: T): Capitalize<T> {
+    return (str[0].toUpperCase() + str.slice(1)) as Capitalize<T>;
+  }
+
   /**
    * @deprecated use chakra's <FormatNumber/>
    * #AI

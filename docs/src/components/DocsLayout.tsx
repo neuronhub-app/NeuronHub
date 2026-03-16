@@ -1,6 +1,3 @@
-/**
- * #AI
- */
 "use client";
 
 import {
@@ -17,13 +14,14 @@ import {
   Span,
   Stack,
   Tabs,
+  Text,
 } from "@chakra-ui/react";
 import { LuFolder, LuMenu, LuUser } from "react-icons/lu";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
 import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { env } from "@/env";
-import { type NavGroup, navGroups } from "@/components/buildNavGroups";
+import { type NavNode, navTree, findFirstChildHrefRecursively } from "@/components/buildNavTree";
 import { Toc } from "@/components/Toc";
 
 export default function DocsLayout() {
@@ -46,10 +44,10 @@ export default function DocsLayout() {
         </Box>
 
         <Box marginStart={{ lg: style.sidebar.width }} flex="1">
-          <Container maxW="7xl" py="12">
+          <Container maxW="7xl" py={style.p}>
             <Stack direction={{ base: "column-reverse", xl: "row" }} gap="8" flex="1">
               <Box flex="1">
-                <Prose data-toc-root pb="100vh">
+                <Prose data-toc-root pb="100vh" variant="content-main">
                   <Outlet />
                 </Prose>
               </Box>
@@ -73,6 +71,7 @@ export default function DocsLayout() {
 }
 
 const style = {
+  p: 6,
   sidebar: {
     width: "18rem",
   },
@@ -81,15 +80,14 @@ const style = {
 function SidebarContent() {
   const pathname = useLocation().pathname;
   const navigate = useNavigate();
+
   const activeSection: SectionKey = pathname.startsWith("/development/")
     ? "development"
     : "user";
-  const groups = navGroups
-    .map(g => ({ ...g, items: g.items.filter(i => i.href.startsWith(`/${activeSection}/`)) }))
-    .filter(g => g.items.length > 0);
+  const nodes = navTree.find(node => node.slug === activeSection)?.children ?? [];
 
   return (
-    <Box data-sidebar h="full" overflowY="auto" ps="2" pe="2" pt="4" pb="10" px="5">
+    <Box data-sidebar h="full" overflowY="auto" ps="2" pe="2" pt={style.p} pb="10" px="5">
       <Stack gap="6" align="flex-start">
         <chakra.a href={env.VITE_CLIENT_URL} aria-label="NeuronHub" display="flex">
           <NeuronLogo breakpoint="2xl" />
@@ -97,10 +95,14 @@ function SidebarContent() {
 
         <SectionTabs
           value={activeSection}
-          onValueChange={section => navigate(sectionTabs[section].firstHref)}
+          onValueChange={section => {
+            const node = navTree.find(node => node.slug === section);
+            const href = node ? findFirstChildHrefRecursively(node.children) : "/";
+            navigate(href ?? "/");
+          }}
         />
 
-        <NavGroupList pathname={pathname} groups={groups} />
+        <NavTreeList pathname={pathname} nodes={nodes} depth={0} />
       </Stack>
     </Box>
   );
@@ -132,40 +134,88 @@ function SectionTabs(props: { value: SectionKey; onValueChange: (value: SectionK
 type SectionKey = keyof typeof sectionTabs;
 
 const sectionTabs = {
-  user: { label: "Usage", icon: LuUser, firstHref: "/user/how-to/algolia" },
-  development: {
-    label: "Development",
-    icon: LuFolder,
-    firstHref: "/development/how-to/git-commits",
-  },
+  user: { label: "Usage", icon: LuUser },
+  development: { label: "Development", icon: LuFolder },
 } as const;
 
-function NavGroupList(props: { pathname: string; groups: Array<NavGroup> }) {
+function NavTreeList(props: { pathname: string; nodes: NavNode[]; depth: number }) {
   return (
-    <Stack w="full" gap="6">
-      {props.groups.map(group => (
-        <Stack key={group.title} gap="3">
-          <HStack>
-            <Heading as="h5" textStyle="sm">
-              {group.title}
-            </Heading>
-          </HStack>
-          <Stack gap="0">
-            {group.items.map(item => (
-              <SideNavLink
-                key={item.href}
-                href={item.href}
-                variant="line"
-                size="md"
-                data-current={props.pathname === item.href ? "" : undefined}
-              >
-                <Span flex="1">{item.title}</Span>
-              </SideNavLink>
-            ))}
-          </Stack>
-        </Stack>
+    <Stack w="full" gap={props.depth === 0 ? "6" : "0"}>
+      {props.nodes.map(node => (
+        <NavTreeNode key={node.slug} pathname={props.pathname} node={node} depth={props.depth} />
       ))}
     </Stack>
+  );
+}
+
+function NavTreeNode(props: { pathname: string; node: NavNode; depth: number }) {
+  const isLeaf = props.node.children.length === 0;
+
+  if (props.depth === 0) {
+    return (
+      <Stack gap="3">
+        {props.node.href ? (
+          <SideNavLink
+            href={props.node.href}
+            data-current={props.pathname === props.node.href ? "" : undefined}
+          >
+            <Heading as="h5" textStyle="sm">
+              {props.node.title}
+            </Heading>
+          </SideNavLink>
+        ) : (
+          <Heading as="h5" textStyle="sm">
+            {props.node.title}
+          </Heading>
+        )}
+        {props.node.children.length > 0 && (
+          <NavTreeList pathname={props.pathname} nodes={props.node.children} depth={1} />
+        )}
+      </Stack>
+    );
+  }
+
+  if (isLeaf || props.node.href) {
+    return (
+      <>
+        <SideNavLink
+          href={props.node.href}
+          variant="line"
+          size="md"
+          ps={4 + (props.depth - 1) * 3}
+          data-current={props.pathname === props.node.href ? "" : undefined}
+        >
+          <Span flex="1">{props.node.title}</Span>
+        </SideNavLink>
+        {props.node.children.length > 0 && (
+          <NavTreeList
+            pathname={props.pathname}
+            nodes={props.node.children}
+            depth={props.depth + 1}
+          />
+        )}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Text
+        textStyle="xs"
+        fontWeight="medium"
+        color="fg.muted"
+        ps={4 + (props.depth - 1) * 3}
+        pt="2"
+        pb="1"
+      >
+        {props.node.title}
+      </Text>
+      <NavTreeList
+        pathname={props.pathname}
+        nodes={props.node.children}
+        depth={props.depth + 1}
+      />
+    </>
   );
 }
 

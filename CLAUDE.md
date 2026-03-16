@@ -10,18 +10,18 @@
 
 <code_style>
 
-@docs/code-style.md
+@docs/src/pages/development/how-to/code-style.md
 
 </code_style>
 
 <mise_tasks>
 
-@docs/mise-tasks.md
+@docs/src/pages/development/intro/mise-taskfile.md
 
 </mise_tasks>
 
 <doc_roadmap>
 
-@docs/roadmap/roadmap-v0.3.md
+@docs/src/pages/development/reference/roadmap/roadmap-v0.3.md
 
 </doc_roadmap>

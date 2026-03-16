@@ -262,6 +262,26 @@ export const Prose = chakra("div", {
   },
   variants: {
     variant: {
+      "content-main": {
+        color: "fg",
+        // restore h1 & h2, that's small by default
+        "& h1": {
+          fontSize: "1.485em",
+          letterSpacing: "-0.01em",
+          marginBottom: "0.4em",
+          lineHeight: "1.5em",
+        },
+        "& h2": {
+          fontSize: "1.385em",
+          letterSpacing: "-0.01em",
+          marginTop: "1.5em",
+          marginBottom: "0.4em",
+          lineHeight: "1.5em",
+        },
+        "& h2:first-of-type": {
+          marginTop: 0,
+        },
+      },
       pros: {
         "& ul": {
           paddingInlineStart: "0.5em",

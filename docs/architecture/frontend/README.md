@@ -41,7 +41,7 @@ Note: `toast.error()` from [[client/src/utils/toast.tsx]] also calls `Sentry.cap
 
 ## Code Conventions
 
-- instead of `useState` use [[useStateValtio.ts]]. Unless there's a significant maintenance/performance benefit in the `useState`
+- instead of `useState` use [[packages/shared/src/utils/useStateValtio.ts]]. Unless there's a significant maintenance/performance benefit in the `useState`
 
 ## Constraints
 
@@ -60,3 +60,15 @@ Must read when working with any of those module.
 - [How to use Playwright](./Playwright.md)
 - [How to use Chakra UI](Chakra-UI.md)
 - [How to work with sub-sites as `VITE_SITE="pg"`](Sub-sites-with-VITE_SITE.md) from `src/sites/`
+
+## `packages/shared/` — Bun Workspace
+
+`@neuronhub/shared` (`workspace:*`) extracts code reused between `client/` and `docs/`:
+- `createEnv.ts` — typed `env` builder (wraps `envalid`)
+- `utils/useStateValtio.ts`, `utils/format.ts` (`slugToTitle`, `toTitleCase`), `utils/date-fns.ts`, `utils/marked-configured.ts`
+- `theme/` — `colors.ts`, `spacings.ts`, `theme.ts` (shared Chakra tokens)
+- `components/NeuronLogo.tsx`, `components/ui/prose.tsx`
+
+Import as `@neuronhub/shared/utils/format`, `@neuronhub/shared/components/NeuronLogo`, etc — the `exports` field maps `./*` → `./src/*.ts`.
+
+Chakra typegen runs separately for shared (`mise typegen:packages:chakra`) with `--outdir .chakra/types` and a post-process to rewrite import paths to `#chakra-internal/`.

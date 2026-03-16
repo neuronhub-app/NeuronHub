@@ -172,7 +172,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         run = """
             job spawn { mise dev:s3 }
 
-            let marks = if ($env.usage_include_all | into bool) { "" } else { $"-m ($env.usage_marks)" }
+            let marks = if ($env.usage_include_all | into bool) { "" } else { $"--markers ($env.usage_marks)" }
             let args = $"($env.usage_args)" | str replace "server/" ""
 
             uv run pytest $marks $args
@@ -315,7 +315,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         usage = """
             flag "--dir <dir>"
         """
-        # Bun dedups @chakra-ui/react (no nohoist) -> breaks client/ or shared/ -> --outdir helps
+        # chakra modifies node_modules -> Bun dedups @chakra-ui/react (no nohoist) -> chakra overrides client/ or shared/ types -> fixed by --outdir
         run = """
             cd $env.usage_dir
 
