@@ -1,10 +1,13 @@
 import { format } from "@neuronhub/shared/utils/format";
 import { frontmatter } from "@/components/frontmatter";
+import { ReactRouterPath } from "@/utils/types";
 
 const mdxModules = import.meta.glob("/src/pages/**/*.mdx", { eager: true }) as Record<
   string,
   { frontmatter?: frontmatter.SchemaType }
 >;
+
+export const pageLinks = new Map<ReactRouterPath, { title: string }>();
 
 export const navTree = buildNavTree();
 
@@ -51,6 +54,7 @@ function buildNavTree(): NavNode[] {
         order: file.order,
         children: [],
       };
+      pageLinks.set(file.href as unknown as ReactRouterPath, { title: file.title });
       if (parent) {
         parent.children.push(leaf);
       } else {

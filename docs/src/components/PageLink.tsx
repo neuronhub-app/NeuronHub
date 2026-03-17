@@ -1,11 +1,16 @@
+import { pageLinks } from "@/components/buildNavTree";
 import { LinkInt } from "@/components/LinkInt";
 import { ReactRouterPath } from "@/utils/types";
 
-export function PageLink(props: { id: keyof typeof links }) {
-  return <LinkInt path={links[props.id]}>{props.id}</LinkInt>;
+export function PageLink(props: { id: keyof typeof links; hash?: string }) {
+  const path = links[props.id];
+  return (
+    <LinkInt path={path} hash={props.hash}>
+      {pageLinks.get(path)?.title ?? props.id}
+    </LinkInt>
+  );
 }
 
-// todo ? refac: drop - use routes.ts
 const links = {
   "admin-panel": "/user/guides/admin-panel",
   JobAlert: "/user/reference/database-tables/jobalert",

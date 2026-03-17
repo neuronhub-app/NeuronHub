@@ -4,10 +4,16 @@ import { ReactNode } from "react";
 import { IconType } from "react-icons";
 import { NavLink as ReactRouterNavLink, href } from "react-router";
 
-export function LinkInt(props: { path: ReactRouterPath; children: ReactNode; icon?: IconType }) {
+export function LinkInt(props: {
+  path: ReactRouterPath;
+  hash?: string;
+  children: ReactNode;
+  icon?: IconType;
+}) {
+  const to = props.hash ? `${href(props.path)}#${props.hash}` : href(props.path);
   return (
     <Link asChild>
-      <ReactRouterNavLink to={href(props.path)}>
+      <ReactRouterNavLink to={to}>
         {props.icon && (
           <Icon>
             <props.icon />

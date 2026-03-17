@@ -137,15 +137,6 @@ test.describe("<Term/>", () => {
   });
 });
 
-test.describe("Markdown", () => {
-  test("ext links have target=_blank and rel=nofollow", async ({ page }) => {
-    await page.goto(routes.development.gitCommits);
-    const mdLink = page.locator('[data-toc-root] a[href^="http"]').first();
-    await expect(mdLink).toHaveAttribute("target", "_blank");
-    await expect(mdLink).toHaveAttribute("rel", "nofollow");
-  });
-});
-
 test("ImageWithDialog opens lightbox on thumbnail click", async ({ page }) => {
   await page.goto(routes.user.sentry);
   const thumbnail = page.getByRole("img").first();

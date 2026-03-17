@@ -12,31 +12,67 @@ An LLM did several passes - you focus on the last unchecked task.
     - [x] chakra typegen overrides (hoisted pkg)
     - [x] make biome.jsonc global
 - [x] make mdx files typed and enforce valid `path` in `LinkInt.tsx` by `mise lint` from react-router types
-- [x] add `hidden` frontmatter prop, eg to hide `reference/LLM-spec-logs/*`
+- [x] add `hidden` frontmatter prop
+- [ ] extend `<PageLink>` to allow section params as eg `#header`. Make it generated from existing code instead of the hardcoded `const` in there. The name also should be generated instead of its `props.id`.
 
 Don't read full mdx files - they're too large - read only the first 3-6 lines max.
 
 ## Relevant-Files
 
-- `docs/src/components/Term.tsx` - glossary popover component
-- `docs/src/components/LinkInt.tsx`, `LinkExt.tsx`
-- `docs/src/env.ts`
-- `docs/e2e/playwright.config.ts`
-- `docs/e2e/ids.ts`
-- `docs/src/utils/rehypeMdLinksNewTab.ts` - rehype plugin for MD link attrs
-- `docs/src/components/frontmatter.ts` - Zod schema with `hidden` prop
-- `docs/src/components/buildNavTree.ts` - nav tree builder, skips hidden entries
+- `docs/src/components/PageLink.tsx` - the component being refactored
+- `docs/src/components/LinkInt.tsx` - internal link, now has `hash` prop
+- `docs/src/components/buildNavTree.ts` - nav tree + `pageLinks` Map
+- `docs/src/pages/development/guides/git-commits.mdx:94` - uses `LinkInt` hash
+- `docs/src/pages/user/reference/Job-subscription-emails.mdx` - uses `PageLink` (4x)
+- `docs/src/pages/user/reference/database-tables/User.mdx` - uses `PageLink`
+- `docs/src/utils/types.ts` - `ReactRouterPath` type
+- `docs/e2e/tests/docs-pages.spec.ts` - removed ext-links test
+
+## Exec-Plan
+
+`<LLM_unverified_report>`
+
+### Requirements (clarified during session)
+
+1. `id` prop must stay short — MDX has no TS autocomplete
+2. `as ReactRouterPath` cast is forbidden — kills autocomplete in TS files
+3. No codegen scripts — "you literally have ReactRouterPath"
+4. Must not lose existing typing (`keyof typeof links`, `satisfies`)
+5. The hardcoded `const links` should be replaced with something
+   derived from existing code (navTree/routes)
+6. Display title should come from navTree, not `props.id`
+7. Support `hash` for `#section` anchors
+
+### What remains unsolved
+
+The `const links` in `PageLink.tsx` is still hardcoded. Every approach
+to eliminate it was rejected.
+
+The core tension: navTree produces strings at runtime, but
+`ReactRouterPath` is a compile-time union. Bridging them without
+cast or codegen was not solved. [it's created by typegen and placed in docs/.react-router/]
+
+Possible approaches not yet tried:
+- Template literal types extracting last segment from ReactRouterPath
+- A typed helper that maps ReactRouterPath values to short ids at
+  the type level
+
+`</LLM_unverified_report>`
 
 ## Decision-Log
 
 - Fix: chakra typegen `--outdir .chakra/types` + Nushell `str replace`
 - Fix: `docs/scripts/lint-mdx.ts` compiles MDX→TSX for type-checking
 - Fix: `skipLibCheck: true` for `@types/mdx` JSX ns conflict
-- Issue: color-mode hydration-mismatch on `<html>` [#AI-slop, will fix later]
+- Issue: color-mode hydration-mismatch on `<html>` [#AI-slop, to fix later]
     - Fix: `suppressHydrationWarning` on `<html>` in root.tsx
-    - e2e filter removed → test now asserts 0 errors
 - Fix: `hidden` frontmatter prop
-    - `frontmatter.ts`: added `hidden: z.boolean().optional()`
-    - `buildNavTree.ts`: 2-pass — collect hidden dirs from README, skip hidden files + dir children
-    - Applied `hidden: true` to `LLM-spec-logs/README.mdx`
     - Routes still accessible via direct URL (only nav hidden)
+- Issue: PageLink refactor
+    - Tried:
+      - `as ReactRouterPath` cast => rejected (kills autocomplete)
+      - codegen script => rejected (unnecessary)
+      - `path: ReactRouterPath` prop => rejected (MDX no TS), must use a short `id`
+      - drop const, `id: string` => rejected (loses typing)
+    - Partial: hash prop works, title from navTree works
+    - WIP: eliminate hardcoded `const links` without losing types
