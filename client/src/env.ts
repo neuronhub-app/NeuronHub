@@ -23,6 +23,8 @@ const envCleaned = createEnv({
 
   VITE_PROJECT_NAME: str({ default: "NeuronHub" }),
 
+  VITE_ADMIN_EMAIL: str({ default: "" }),
+
   VITE_SENTRY_DSN_FRONTEND: str({ default: "" }),
 
   VITE_SERVER_URL: url({ default: "http://localhost:8000" }),
