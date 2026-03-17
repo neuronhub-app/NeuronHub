@@ -1,3 +1,6 @@
+/**
+ * #AI
+ */
 import { ReactRouterPath } from "@/utils/types";
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { ids } from "@/e2e/ids";
@@ -17,6 +20,7 @@ const routes = {
   },
   development: {
     codeStyle: path("/development/guides/code-style"),
+    gitCommits: path("/development/guides/git-commits"),
     dirGuides: path("/development/guides"),
   },
 };
@@ -125,7 +129,16 @@ test.describe("<Term/>", () => {
   });
 });
 
-test("ImageZoom opens lightbox on thumbnail click", async ({ page }) => {
+test.describe("Markdown", () => {
+  test("ext links have target=_blank and rel=nofollow", async ({ page }) => {
+    await page.goto(routes.development.gitCommits);
+    const mdLink = page.locator('[data-toc-root] a[href^="http"]').first();
+    await expect(mdLink).toHaveAttribute("target", "_blank");
+    await expect(mdLink).toHaveAttribute("rel", "nofollow");
+  });
+});
+
+test("ImageWithDialog opens lightbox on thumbnail click", async ({ page }) => {
   await page.goto(routes.user.sentry);
   const thumbnail = page.getByRole("img").first();
   await expect(thumbnail).toBeVisible();

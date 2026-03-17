@@ -6,8 +6,8 @@ export function LinkExt(props: { href: string; children: ReactNode; isDecorated?
   return (
     <Link
       href={props.href}
+      rel="nofollow noopener noreferrer"
       target="_blank"
-      rel="nofollow"
       display="inline-flex"
       alignItems="center"
     >
