@@ -3,7 +3,7 @@
 ["docker:tag-and-push"]
     alias = "docker:push"
     usage = """
-        flag "--app <name>" { choices "server" "client" "coder" }
+        flag "--app <name>" { choices "server" "client" "docs" "coder" }
         flag "--tag_only"
         flag "--pre_release"
     """
@@ -18,14 +18,14 @@
 
 ["docker:rm"]
     usage = """
-        flag "--app <name>" { choices "server" "client" "coder" }
+        flag "--app <name>" { choices "server" "client" "docs" "coder" }
         flag "--version <version>" env="VITE_RELEASE_VERSION"
     """
     run = "sudo -E docker rmi ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)"
 
 ["docker:build"]
     usage = """
-        flag "--app <name>" { choices "server" "client" "coder" }
+        flag "--app <name>" { choices "server" "client" "docs" "coder" }
         flag "--version <version>" env="VITE_RELEASE_VERSION"
         flag "--no_cache" default=#false
     """
@@ -67,15 +67,15 @@
                 image: ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)
                 pull_policy: always
                 build:
-                  # client/Dockerfile requires the Bun workspace root bun.lock; and docs/, sort of
-                  # #AI #123
-                  context: (if $app == "client" { ".." } else { "." })
-                  dockerfile: (if $app == "client" { "client/Dockerfile" } else { "Dockerfile" })
+                  # client/ and docs/ Dockerfiles need Bun workspace root bun.lock #123 #124
+                  context: (if $app in ["client" "docs"] { ".." } else { "." })
+                  dockerfile: (if $app in ["client" "docs"] { $"($app)/Dockerfile" } else { "Dockerfile" })
                   args:
                     VITE_RELEASE_VERSION: ($env.usage_version)
 
                     # for React Router build
                     VITE_SERVER_URL: https://($server_domain)
+                    VITE_CLIENT_URL: {{ env.CLIENT_URL }}
 
                     # for Sentry
                     SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN }}

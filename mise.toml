@@ -49,6 +49,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     CLIENT_DOMAIN = "{{ env.CLIENT_DOMAIN | default(value = 'localhost') }}"
     CLIENT_PORT = "{{ env.CLIENT_PORT | default(value = 3000) }}"
     CLIENT_URL = "http://{{ env.CLIENT_DOMAIN }}:{{ env.CLIENT_PORT }}"
+    VITE_CLIENT_URL = "{{ env.CLIENT_URL }}"
 
     DOCS_DOMAIN = "{{ env.DOCS_DOMAIN | default(value = 'localhost') }}"
     DOCS_PORT = "{{ env.DOCS_PORT | default(value = 4000) }}"

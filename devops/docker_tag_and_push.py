@@ -13,7 +13,7 @@ from argparse import Namespace
 from typing import Literal
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--app", default="server", choices=["server", "client", "coder"])
+parser.add_argument("--app", default="server", choices=["server", "client", "docs", "coder"])
 parser.add_argument("--github_path")
 parser.add_argument("--version")
 parser.add_argument("--tag_only", action="store_true")
@@ -21,7 +21,7 @@ parser.add_argument("--pre_release", action="store_true")
 
 
 class NamespaceKwargs(Namespace):
-    app: Literal["server", "client", "coder"]
+    app: Literal["server", "client", "docs", "coder"]
     version: str
     github_path: str
     tag_only: bool

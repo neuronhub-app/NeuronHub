@@ -22,6 +22,17 @@ projects:
             - fromGroup: shared
             - fromGroup: stage
 
+        - name: neuronhub-docs-stage
+          type: web
+          plan: starter
+          runtime: image
+          image:
+            url: ghcr.io/neuronhub-app/neuronhub/docs:0.3.2.0-rc.5
+          domains:
+            - stage.docs.neuronhub.app
+          envVars:
+            - fromGroup: shared
+
         - name: neuronhub-backend-stage
           type: web
           plan: starter
