@@ -6,7 +6,7 @@ projects:
         databases:
           - name: neuronhub-db-stage
             postgresMajorVersion: "18"
-            plan: starter
+            plan: basic-256mb
 
         services:
 
