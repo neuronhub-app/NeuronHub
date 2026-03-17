@@ -16,18 +16,6 @@ Sent daily at `8am` in the user's timezone.
     - <Text color="fg.muted">`hourly` here means 24 times per day, at `XX:00` minutes.</Text>
 2. <Term id="backend" /> selects a <PageLink id="JobAlert"/> and sends the template to its `.email`.
     1. <Term id="backend" /> creates <PageLink id="JobAlertLog"/>.
-    2. <Term id="backend" /> send the Task to send email to its background worker - you can review the <PageLink id="TaskResult"/>s in the admin panel.
+    2. <Term id="backend" /> sends the Task to send email to its background worker - you can review the <PageLink id="TaskResult"/>s in the admin panel.
 
 Worst-case delay: max 23h.
-
-### Monitoring
-
-- `JobAlert`s at [admin/]
-- `JobAlertLog`s at [admin/]
-- Django logs at [admin/tasks]
-- Sentry
-    - Cron logs at [sentry.io/]
-    - Metrics at [sentry.io/]
-    - Logs at [sentry.io/]
-- Render
-    - [hourly Cron](http://render.com/cron)

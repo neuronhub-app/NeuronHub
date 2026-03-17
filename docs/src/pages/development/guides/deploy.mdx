@@ -1,8 +1,9 @@
 ---
-title: Deploy
+title: Deployment
+order: 0
 ---
 
-## Docker Compose
+## Using Docker Compose
 
 Replace all the `${{}}` placeholders below.
 
@@ -22,12 +23,12 @@ services:
     restart: always
     pull_policy: always
   server_db_worker:
-	image: ghcr.io/neuronhub-app/neuronhub/server:${{major_tag}}
+    image: ghcr.io/neuronhub-app/neuronhub/server:${{major_tag}}
     command: bash -c "uv run manage.py db_worker"
     env_file:
       - path: .env
     pull_policy: always
-	restart: always
+    restart: always
     depends_on:
       server:
         condition: service_started
@@ -37,7 +38,7 @@ services:
       - path: .env
     ports:
       - "${{client=3000}}:${{client=3000}}"
-	restart: always
+    restart: always
     pull_policy: always
 ```
 

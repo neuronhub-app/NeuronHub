@@ -79,8 +79,8 @@ const glossary = {
     help: () => (
       <TermHelp>
         <Text>
-          The web service hosted on <LinkInt path="/user/guides/deploy">Render</LinkInt> (eg at{" "}
-          <Code>{urls.backend}</Code>). <Term id="frontend" /> uses its API.
+          The web service hosted on <LinkInt path="/development/guides/deploy">Render</LinkInt>{" "}
+          (eg at <Code>{urls.backend}</Code>). <Term id="frontend" /> uses its API.
         </Text>
 
         <Text>
@@ -95,8 +95,9 @@ const glossary = {
     help: () => (
       <TermHelp>
         <Text>
-          The static website hosted on <LinkInt path="/user/guides/deploy">Render</LinkInt> (eg
-          at <Code>{urls.frontend}</Code>). Uses the API of <Term id="backend" />.
+          The static website hosted on{" "}
+          <LinkInt path="/development/guides/deploy">Render</LinkInt> (eg at{" "}
+          <Code>{urls.frontend}</Code>). Uses the API of <Term id="backend" />.
         </Text>
 
         <Text>
@@ -108,7 +109,7 @@ const glossary = {
   },
   algolia: {
     label: "Algolia",
-    pagePath: "/user/guides/algolia",
+    pagePath: "/usage/guides/algolia",
     help: () => (
       <TermHelp>
         <Text>
@@ -120,13 +121,13 @@ const glossary = {
   },
   sentry: {
     label: "Sentry",
-    pagePath: "/user/guides/sentry",
+    pagePath: "/usage/guides/sentry",
     help: () => <TermHelp>Error tracking and performance monitoring service.</TermHelp>,
   },
   user: {
     label: "User",
-    pagePath: "/user/reference/database-tables/user",
-    help: () => <TermHelp>Error tracking and performance monitoring service.</TermHelp>,
+    pagePath: "/usage/reference/database-tables/user",
+    help: () => <TermHelp>Admin user account for managing the platform.</TermHelp>,
   },
   mise: {
     label: "Mise",

@@ -1,0 +1,49 @@
+---
+title: Search Engine
+order: 1
+---
+
+
+import { ImageWithDialog } from "@/components/ImageWithDialog"
+import { Term } from "@/components/Term"
+import { LinkExt } from "@/components/LinkExt"
+
+Algolia is used on all list pages in the <Term id="frontend" />, with data indexed by the <Term id="backend" />.
+
+Indexes: `posts`, `jobs`, `profiles` - each suffixed with the environment name (eg `jobs_stage`).
+
+
+## Rules
+
+Rules follow `if -> then` - affecting both hits and filters (facets).
+
+They can be setup in the <LinkExt href="https://dashboard.algolia.com/apps/OJJMNNBR0H/rules/jobs_dev_viktor">Dashboard</LinkExt> using the visual editor.
+
+And then toggled by the UI, users, or anywhere using the URL params as `?enableRules=false`.
+
+### Hits pinning, re-ordering, hiding
+
+Eg by country + area filters:
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/Algolia-Rule-hits.avif" alt="Algolia Rule: Pin Hits" isDimmed />
+
+### Order Facets
+
+Pin facet values, eg:
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/Algolia-Rule-facets-pinning.avif" alt="Algolia Rule: Order Facets" isDimmed />
+
+
+## Debug Ranking
+
+To understand ranking logic, open the <LinkExt href="https://dashboard.algolia.com">Dashboard</LinkExt>
+and hover over the ranking icon on a hit:
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/Algolia-debug-ranking.avif" alt="Algolia Debug Ranking" isDimmed />
+
+
+## Analytics
+
+You can view the basic <LinkExt href="https://dashboard.algolia.com">Analytics</LinkExt> already.
+
+Advanced automatic analytics and LLM recommendations will be available once 10'000 tracking events are accumulated within 30 days.

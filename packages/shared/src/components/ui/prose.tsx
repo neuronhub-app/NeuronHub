@@ -33,7 +33,7 @@ export const Prose = chakra("div", {
     },
 
     // defaults
-    maxWidth: "65ch",
+    maxWidth: "73ch",
     lineHeight: "1.5em",
     "& em": {
       fontStyle: "italic",
@@ -285,7 +285,7 @@ export const Prose = chakra("div", {
           marginBottom: "0.4em",
           lineHeight: "1.5em",
         },
-        "& h2:first-of-type": {
+        "& h2:first-child": {
           marginTop: 0,
         },
       },

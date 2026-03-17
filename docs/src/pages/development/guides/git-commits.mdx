@@ -1,15 +1,15 @@
-import { LinkInt } from "@/components/LinkInt";
-import { Term } from "@/components/Term";
-
 ---
 title: Write Git Commits
-order: 1
+order: 5
 reviewed_at: 2026.01.13
 ---
 
+import { LinkInt } from "@/components/LinkInt";
+import { Term } from "@/components/Term";
+
 A good Git commit allows to quickly fix prod at 3am by eye-scanning the log, or searching commit bodies.
 
-We use an iteration over [conventionalcommits.org](https://www.conventionalcommits.org).
+We use an iteration over conventionalcommits.org.
 
 The main differences:
 - focus on visual comprehension, not release notes generation
@@ -72,6 +72,7 @@ Sites:
 - `build(Docker)` - Dockerfiles outside of Mise
 - `build(AI)` - Claude, Aider, etc
 - `build(Coder)` - mostly `devops/` dir changes for Coder.com
+- `build(Render)` - render.yaml
 
 `Scope`s only for Type `test` (as they must not affect prod):
 - `test(E2E)` - Playwright
@@ -91,7 +92,7 @@ Sites:
 
 ### Tags
 
-Added at the end of a commit first line. See [Tags](/docs/src/pages/development/how-to/code-style.mdx#Tags)
+Added at the end of a commit first line. See <LinkInt path="/development/guides/code-style" hash="tags">Tags</LinkInt>.
 
 ### Text style
 

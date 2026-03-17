@@ -12,8 +12,9 @@ export function PageLink(props: { id: keyof typeof links; hash?: string }) {
 }
 
 const links = {
-  "admin-panel": "/user/guides/admin-panel",
-  JobAlert: "/user/reference/database-tables/jobalert",
-  JobAlertLog: "/user/reference/database-tables/jobalertlog",
-  TaskResult: "/user/reference/database-tables/taskresult",
+  "admin-panel": "/usage/guides/admin-panel",
+  JobAlert: "/usage/reference/database-tables/jobalert",
+  JobAlertLog: "/usage/reference/database-tables/jobalertlog",
+  TaskResult: "/usage/reference/database-tables/taskresult",
+  User: "/usage/reference/database-tables/user",
 } satisfies Record<string, ReactRouterPath>;

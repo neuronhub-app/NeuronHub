@@ -9,10 +9,11 @@ export function LinkInt(props: {
   hash?: string;
   children: ReactNode;
   icon?: IconType;
+  textDecoration?: "underline" | "none";
 }) {
   const to = props.hash ? `${href(props.path)}#${props.hash}` : href(props.path);
   return (
-    <Link asChild>
+    <Link asChild textDecoration={props.textDecoration ?? "underline"}>
       <ReactRouterNavLink to={to}>
         {props.icon && (
           <Icon>

@@ -84,7 +84,7 @@ function SidebarContent() {
 
   const activeSection: SectionKey = pathname.startsWith("/development/")
     ? "development"
-    : "user";
+    : "usage";
   const nodes = navTree.find(node => node.slug === activeSection)?.children ?? [];
 
   return (
@@ -132,8 +132,21 @@ function SectionTabs(props: { value: SectionKey; onValueChange: (value: SectionK
       size="sm"
     >
       <Tabs.List bg="bg.muted" rounded="l3" p="1" flex="1">
-        {Object.entries(sectionTabs).map(([key, section]) => (
-          <Tabs.Trigger key={key} value={key} minW="fit-content" flex="1">
+        {Object.entries(sectionTabs).map(([value, section]) => (
+          <Tabs.Trigger
+            key={value}
+            value={value}
+            minW="fit-content"
+            flex="1"
+            _hover={{
+              bg:
+                props.value === value
+                  ? { _light: "bg.muted/30", _dark: "bg.muted/40" }
+                  : "bg/50",
+            }}
+            transition="backgrounds"
+            transitionDuration="faster"
+          >
             <Icon>
               <section.icon />
             </Icon>
@@ -149,7 +162,7 @@ function SectionTabs(props: { value: SectionKey; onValueChange: (value: SectionK
 type SectionKey = keyof typeof sectionTabs;
 
 const sectionTabs = {
-  user: { label: "Usage", icon: LuUser },
+  usage: { label: "Usage", icon: LuUser },
   development: { label: "Development", icon: LuFolder },
 } as const;
 
