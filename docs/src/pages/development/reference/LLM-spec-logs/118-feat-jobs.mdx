@@ -1,12 +1,10 @@
----
-title: Jobs (#118)
----
-
 ## Desc
 
 We're creating the new app `jobs`, taking `profiles` as the base, and importing the data from the real CSV of `.local/pg-jobs.csv` and `pg-orgs.csv`.
 
 The basic BE and FE works. Still a week worth of work, but we'll handle it one task at a time.
+
+Focus on the last unchecked Task below.
 
 ### `apps.jobs` files
 
@@ -66,10 +64,22 @@ FE
     - By the way think how to best keep it monitorable. We already have `JobAlertLog`, django-tasks admin, and will use Sentry's logging for cron and Python's HTTP server. But there could be more opportunities to make it well monitorable.
 - [x] JobAlert: list matched tags/filters at the bottom of an email
     - multiple tags of the same category list as `{name}: {value_1}, {value_2}.`
+- [x] Render
+    - [x] create webhook view at `/jobs/send-emails/<secret>/` + URL route + `DJANGO_CRON_WEBHOOK_SECRET` setting
+    - [x] add Algolia env vars to `worker` (add to `stage-backend` group)
 
-## Exec-Plan
+## Relevant-Files
 
-- Add `_get_alert_filters_display(alert)` in `send_alert_email.py` → groups tags by category + non-tag filters (remote, salary, highlighted orgs)
-- Pass `filters_display: list[str]` to template context
-- Render in `alert_email.html` below jobs, above unsubscribe
-- Test: create alert with tags + filters, assert email HTML contains filter lines
+- render.yaml - ALGOLIA vars moved to `stage-backend` group; cron service added
+- server/neuronhub/apps/jobs/views.py - webhook endpoint for cron
+- server/neuronhub/urls.py - `/jobs/send-emails/<secret>` route
+- server/neuronhub/settings.py - `DJANGO_CRON_WEBHOOK_SECRET`
+- server/neuronhub/apps/jobs/tasks.py - fixed `MonitorConfig` import
+- server/neuronhub/apps/jobs/views__test.py - webhook tests
+
+## Decision-Log
+
+- Fix: `MonitorConfig` runtime crash (sentry 2.53 TYPE_CHECKING-only)
+    - pass plain dict to `monitor(monitor_config={})`
+- Fix: ALGOLIA vars -> `stage-backend` group (worker needs them)
+- Fix: added `views__test.py` — valid/invalid secret tests pass

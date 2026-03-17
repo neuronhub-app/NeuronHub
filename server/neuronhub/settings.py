@@ -298,6 +298,11 @@ if DJANGO_ENV.is_dev():
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
 
 
+# Cron
+# ---------------------------------------------------------------------------------------------------------
+DJANGO_CRON_WEBHOOK_SECRET = env.str("DJANGO_CRON_WEBHOOK_SECRET", "")
+
+
 # Algolia
 # ---------------------------------------------------------------------------------------------------------
 class AlgoliaConfig(TypedDict):

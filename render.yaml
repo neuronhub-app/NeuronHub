@@ -4,12 +4,25 @@ projects:
       - name: stage
 
         databases:
-          - name: neuronhub
+          - name: neuronhub-db-stage
             postgresMajorVersion: "18"
             plan: free
 
         services:
-        - name: neuronhub-backend
+
+        - name: neuronhub-frontend-stage
+          type: web
+          plan: free
+          runtime: image
+          image:
+            url: ghcr.io/neuronhub-app/neuronhub/client:latest
+          domains:
+            - pg.stage.neuronhub.app
+          envVars:
+            - fromGroup: shared
+            - fromGroup: stage
+
+        - name: neuronhub-backend-stage
           type: web
           plan: starter
           runtime: image
@@ -22,11 +35,49 @@ projects:
           envVars:
             - key: DATABASE_URL
               fromDatabase:
-                name: neuronhub
+                name: neuronhub-db-stage
                 property: connectionString
+
+            - fromGroup: shared
+            - fromGroup: stage
+            - fromGroup: stage-backend
+
+        - name: neuronhub-worker-stage
+          type: worker
+          plan: starter
+          runtime: image
+          image:
+            url: ghcr.io/neuronhub-app/neuronhub/server:latest
+          dockerCommand: uv run manage.py db_worker
+          envVars:
+            - key: DATABASE_URL
+              fromDatabase:
+                name: neuronhub-db-stage
+                property: connectionString
+
+            - fromGroup: shared
+            - fromGroup: stage
+            - fromGroup: stage-backend
+
+        - name: neuronhub-cron-stage
+          type: cron
+          runtime: python
+          schedule: "@hourly"
+          startCommand: "curl https://$SERVER_DOMAIN/jobs/send-emails/$DJANGO_CRON_WEBHOOK_SECRET"
+          buildCommand: "true" # must be a string
+          envVars:
+            - fromGroup: stage
+            - fromGroup: stage-backend
+
+        envVarGroups:
+          - name: stage-backend
+            envVars:
             - key: SECRET_KEY
               generateValue: true
-
+            - key: DJANGO_ENV
+              value: stage
+            - key: DJANGO_CRON_WEBHOOK_SECRET
+              generateValue: true
             - key: ALGOLIA_IS_ENABLED
               value: "true"
             - key: ALGOLIA_API_KEY
@@ -36,26 +87,8 @@ projects:
             - key: ALGOLIA_SEARCH_API_KEY
               sync: false
 
-            - fromGroup: shared
-            - fromGroup: stage
-
-        - name: neuronhub-frontend
-          type: web
-          plan: free
-          runtime: image
-          image:
-            url: ghcr.io/neuronhub-app/neuronhub/client:latest
-          domains:
-            - pg.stage.neuronhub.app
-          envVars:
-            - fromGroup: shared
-            - fromGroup: stage
-
-        envVarGroups:
           - name: stage
             envVars:
-            - key: DJANGO_ENV
-              value: stage
             - key: SERVER_DOMAIN
               value: pg.stage.backend.neuronhub.app
             - key: SERVER_URL
@@ -74,6 +107,6 @@ envVarGroups:
   - name: shared
     envVars:
       - key: SENTRY_DSN_BACKEND
-        value: https://417078bf385cad9c59d41a020892e689@o4507887634284544.ingest.us.sentry.io/4510305221869575
+        value: https://a0837c6ac8e7918432c83deda566791b@o4511052792922112.ingest.de.sentry.io/4511052798492752
       - key: SENTRY_DSN_FRONTEND
-        value: https://97d9ce8ba2e7102f6ccfed17dd2e25aa@o4507887634284544.ingest.us.sentry.io/4510303776145408
+        value: https://700a8e2c33f6d03a0a3eb795d99d06b8@o4511052792922112.ingest.de.sentry.io/4511052796395600

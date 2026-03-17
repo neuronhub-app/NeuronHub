@@ -8,6 +8,7 @@ from django.views.static import serve
 from health_check.views import HealthCheckView
 from strawberry.django.views import AsyncGraphQLView
 
+from neuronhub.apps.jobs.views import send_emails_cron
 from neuronhub.apps.profiles.views import accept_invite
 from neuronhub.graphql import schema
 
@@ -34,6 +35,7 @@ urlpatterns = [
             ]
         ),
     ),
+    path("jobs/send-emails/<secret>", send_emails_cron, name="jobs_send_emails_cron"),
     path("profiles/accept-invite/<uuid:token>", accept_invite, name="profiles_accept_invite"),
     path(
         "healthcheck/",
