@@ -64,6 +64,7 @@ export function AlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
       indexName={indexName}
       routing
       future={{ preserveSharedStateOnUnmount: true }}
+      insights={true}
     >
       {props.typeFilter && <Configure filters={`type:${props.typeFilter}`} />}
 

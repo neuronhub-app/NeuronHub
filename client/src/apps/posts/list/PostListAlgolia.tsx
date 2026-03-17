@@ -54,6 +54,7 @@ export function PostListAlgolia(props: { category?: PostCategory }) {
       indexName={algolia.indexNameSortedByVotes}
       routing
       future={{ preserveSharedStateOnUnmount: true }}
+      insights={true}
     >
       <Stack gap="gap.lg">
         <HStack gap="gap.lg" flexWrap="wrap" justify="space-between">

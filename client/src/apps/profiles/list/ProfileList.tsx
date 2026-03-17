@@ -42,6 +42,7 @@ export function ProfileList() {
       indexName={algolia.indexNameProfiles}
       routing
       future={{ preserveSharedStateOnUnmount: true }}
+      insights={true}
     >
       <ProfileListInner sort={sort} setSort={setSort} />
     </InstantSearch>
