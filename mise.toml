@@ -61,6 +61,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     DB_VER = "17" # psql-17 (18 also works)
 
     ADMIN_EMAIL = "support@{{ env.CLIENT_DOMAIN }}"
+    VITE_ADMIN_EMAIL = "{{ env.ADMIN_EMAIL }}"
 
     GITHUB_PATH = "neuronhub-app/neuronhub"
 
@@ -78,6 +79,11 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     ALGOLIA_API_KEY = ""
     ALGOLIA_IS_ENABLED = "false"
     ALGOLIA_INDEX_POSTFIX_USER = "{{ env.USER | default(value = 'runner') }}" # to not clash dev indexes between users
+
+    # Analytics
+
+    VITE_POSTHOG_TOKEN = "phc_NUVnraDugjykU3o5c3w6RFTJ2MK4u4G0iprxPaRjuN5"
+    VITE_POSTHOG_HOST = "https://eu.i.posthog.com"
 
     # Dev
 
@@ -263,7 +269,6 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         depends = [
             "typegen:client:graphql-codegen",
             "typegen:client:gql-tada",
-            "typegen:client:react-router",
             "typegen:client:chakra:*",
         ]
         quiet = true
@@ -285,12 +290,6 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         """
         sources = ["src/**/*", "e2e/**/*"]
         silent = true # quiet doesn't work
-
-    [tasks."typegen:client:react-router"]
-        dir = "client"
-        run = "bun run react-router typegen"
-        sources = ["src/apps/**/index.tsx", "src/routes.ts"]
-        quiet = true
 
     [tasks."typegen:client:chakra:neuron"]
         dir = "client"

@@ -1,5 +1,5 @@
 /**
- * Env single source of truth.
+ * Env's single source of truth.
  */
 
 import { port, str, url } from "envalid";
@@ -30,6 +30,9 @@ const envCleaned = createEnv({
   VITE_SERVER_URL: url({ default: "http://localhost:8000" }),
 
   VITE_RELEASE_NAME: str(), // for Sentry Source Maps, defined in [[mise.toml]]
+
+  VITE_POSTHOG_TOKEN: str({ default: "" }),
+  VITE_POSTHOG_HOST: url({ default: "" }),
 
   CLIENT_PORT_E2E: port({ default: 3001 }),
 });
