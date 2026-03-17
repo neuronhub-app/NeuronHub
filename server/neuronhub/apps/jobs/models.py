@@ -148,28 +148,28 @@ class Job(AlgoliaModel):
     def get_iso_closes_at(self) -> str:
         return self.closes_at.isoformat() if self.closes_at else ""
 
-    def get_tags_json_skill(self):
+    def get_json_tags_skill(self):
         return self._get_graphql_field("tags_skill")
 
-    def get_tags_json_area(self):
+    def get_json_tags_area(self):
         return self._get_graphql_field("tags_area")
 
-    def get_tags_json_education(self):
+    def get_json_tags_education(self):
         return self._get_graphql_field("tags_education")
 
-    def get_tags_json_experience(self):
+    def get_json_tags_experience(self):
         return self._get_graphql_field("tags_experience")
 
-    def get_tags_json_workload(self):
+    def get_json_tags_workload(self):
         return self._get_graphql_field("tags_workload")
 
-    def get_tags_json_country(self):
+    def get_json_tags_country(self):
         return self._get_graphql_field("tags_country")
 
-    def get_tags_json_city(self):
+    def get_json_tags_city(self):
         return self._get_graphql_field("tags_city")
 
-    def get_tags_country_visa_sponsor_json(self):
+    def get_json_tags_country_visa_sponsor(self):
         """
         #AI-slop - should be _get_graphql_field
         """

@@ -39,33 +39,39 @@ if settings.ALGOLIA["IS_ENABLED"]:
 
         should_index = "is_in_algolia_index"
 
+        # todo ? refac: move out to AlgoliaModel the [for..in] and gen f"get_json_{field}" methods,
+        # and type the names `tag_fields` and `datetime_fields`; create apps.aloglia.AlgoliaModelIndex.
+        tag_fields = [
+            "tags_skill",
+            "tags_area",
+            "tags_education",
+            "tags_experience",
+            "tags_workload",
+            "tags_country",
+            "tags_city",
+            "tags_country_visa_sponsor",
+        ]
+        datetime_fields = [
+            "created_at",
+            "updated_at",
+            "posted_at",
+            "closes_at",
+        ]
+
         fields = [
             ["get_id_as_str", "id"],
             "title",
             ["get_org_json", "org"],
-            ["get_tags_json_country", "tags_country"],
-            ["get_tags_json_city", "tags_city"],
-            ["get_tags_country_visa_sponsor_json", "tags_country_visa_sponsor"],
             "url_external",
             "is_remote",
             "salary_min",
             "salary_text",
             ["get_visible_to", "visible_to"],
             # GraphQL compatibility
-            ["get_tags_json_skill", "tags_skill"],
-            ["get_tags_json_area", "tags_area"],
-            ["get_tags_json_education", "tags_education"],
-            ["get_tags_json_experience", "tags_experience"],
-            ["get_tags_json_workload", "tags_workload"],
-            ["get_iso_created_at", "created_at"],
-            ["get_iso_updated_at", "updated_at"],
-            ["get_iso_posted_at", "posted_at"],
-            ["get_iso_closes_at", "closes_at"],
-            # datetime - Unix for Algolia sorting/filtering
-            ["get_unix_created_at", "created_at_unix"],
-            ["get_unix_updated_at", "updated_at_unix"],
-            ["get_unix_posted_at", "posted_at_unix"],
-            ["get_unix_closes_at", "closes_at_unix"],
+            *[(f"get_json_{field}", field) for field in tag_fields],
+            *[(f"get_iso_{field}", field) for field in datetime_fields],
+            # unix for Algolia's sort/filter
+            *[(f"get_unix_{field}", f"{field}_unix") for field in datetime_fields],
         ]
         settings = {
             "searchableAttributes": [
@@ -80,18 +86,11 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ],
             "attributesForFaceting": [
                 "searchable(org.name)",
+                *[f"searchable({field}.name)" for field in tag_fields],
                 "is_remote",
                 "is_remote_friendly",
                 "salary_min",
                 "org.is_highlighted",
-                "searchable(tags_country.name)",
-                "searchable(tags_country_visa_sponsor.name)",
-                "searchable(tags_city.name)",
-                "searchable(tags_skill.name)",
-                "searchable(tags_area.name)",
-                "searchable(tags_education.name)",
-                "searchable(tags_experience.name)",
-                "searchable(tags_workload.name)",
                 "visible_to",
             ],
             "unretrievableAttributes": [
