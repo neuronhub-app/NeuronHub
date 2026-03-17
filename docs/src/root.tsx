@@ -17,7 +17,8 @@ export default function App() {
 
 export function Layout(props: { children: ReactNode }) {
   return (
-    <html lang="en">
+    // todo ! #AI-slop. fix and drop the supression.
+    <html lang="en" suppressHydrationWarning>
       <head>
         <title>NeuronHub Docs</title>
         <meta charSet="utf-8" />

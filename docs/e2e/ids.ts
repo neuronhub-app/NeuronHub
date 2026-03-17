@@ -1,5 +1,5 @@
 /**
- * #AI
+ * #AI, mimicking [[client/e2e/ids.ts]]
  */
 
 export type TestId = string;
@@ -16,6 +16,10 @@ export namespace ids {
 
   export const imageZoom = {
     backdrop: "image-zoom.backdrop",
+  } as const;
+
+  export const term = {
+    trigger: "term.trigger",
   } as const;
 
   export function selector<S extends TestId>(id: S): `[data-testid="${S}"]` {

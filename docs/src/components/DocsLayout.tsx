@@ -48,7 +48,7 @@ export default function DocsLayout() {
           <Container maxW="7xl" py={style.p}>
             <Stack direction={{ base: "column-reverse", xl: "row" }} gap="8" flex="1">
               <Box flex="1">
-                <Prose data-toc-root pb="100vh" variant="content-main">
+                <Prose data-toc-root pb="10vh" variant="content-main">
                   <Outlet />
                 </Prose>
               </Box>

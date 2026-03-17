@@ -2,8 +2,8 @@
 import type { SemanticTokenDefinition } from "@chakra-ui/react";
 
 export namespace theme {
-  const colorPrimary = "blue";
-  const colorSecondary = "teal";
+  export const colorPrimary = "blue";
+  export const colorSecondary = "teal";
 
   const primary = {
     value: { base: `{colors.${colorPrimary}.500}`, _dark: `{colors.${colorPrimary}.400}` },

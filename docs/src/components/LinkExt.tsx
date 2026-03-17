@@ -2,7 +2,7 @@ import { Icon, Link } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { FiExternalLink } from "react-icons/fi";
 
-export function LinkExt(props: { href: string; children: ReactNode }) {
+export function LinkExt(props: { href: string; children: ReactNode; isDecorated?: boolean }) {
   return (
     <Link
       href={props.href}
@@ -12,9 +12,11 @@ export function LinkExt(props: { href: string; children: ReactNode }) {
       alignItems="center"
     >
       {props.children}{" "}
-      <Icon boxSize="12px" color="fg.muted">
-        <FiExternalLink />
-      </Icon>
+      {(props.isDecorated ?? true) && (
+        <Icon boxSize="12px" color="fg.muted">
+          <FiExternalLink />
+        </Icon>
+      )}
     </Link>
   );
 }

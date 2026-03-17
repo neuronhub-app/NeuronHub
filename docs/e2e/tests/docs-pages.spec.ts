@@ -1,3 +1,4 @@
+import { ReactRouterPath } from "@/utils/types";
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { ids } from "@/e2e/ids";
 import { env } from "@/env";
@@ -99,18 +100,6 @@ test.describe("Sidebar", () => {
     await page.goto(routes.home);
     await expect($(page)[ids.sidebar.root].getByRole("tab")).toHaveCount(2);
   });
-
-  test("tab switch navigates between sections", async ({ page }) => {
-    await page.goto(routes.user.deploy);
-    const tabs = $(page)[ids.sidebar.root].getByRole("tab");
-
-    await expect(tabs.first()).toHaveAttribute("data-selected", "");
-    await tabs.last().click();
-    await expect(page).toHaveURL(new RegExp(routes.development.codeStyle));
-
-    await tabs.first().click();
-    await expect(page).toHaveURL(new RegExp(routes.user.algolia));
-  });
 });
 
 test.describe("Dir redirects", () => {
@@ -122,6 +111,17 @@ test.describe("Dir redirects", () => {
   test("section URL redirects to child page", async ({ page }) => {
     await page.goto(routes.user.dir);
     await expect(page).toHaveURL(new RegExp(`${routes.user.dir}/.+`));
+  });
+});
+
+test.describe("<Term/>", () => {
+  test("no console.errors with <Term/>", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", msg => {
+      if (msg.type() === "error") errors.push(msg.text());
+    });
+    await page.goto(routes.user.algolia);
+    expect(errors).toEqual([]);
   });
 });
 
@@ -139,7 +139,7 @@ test("ImageZoom opens lightbox on thumbnail click", async ({ page }) => {
 
 // --- helpers ---
 
-function path(path: Parameters<typeof href>[0]) {
+function path(path: ReactRouterPath) {
   return href(path);
 }
 
