@@ -21,7 +21,7 @@
     "rootDirs": [".", "./.react-router/types"],
 
     "paths": {
-      "@/e2e/*": ["./src/e2e/*"],
+      "@/e2e/*": ["./e2e/*"],
       "@/*": ["./src/*"],
       "#chakra-internal/*": ["./node_modules/@chakra-ui/react/dist/types/styled-system/*"], // #122
       "~/react-router/*": ["./.react-router/types/src/apps/*"],

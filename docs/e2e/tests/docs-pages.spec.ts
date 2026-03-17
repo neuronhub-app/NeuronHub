@@ -15,7 +15,7 @@ const routes = {
     dir: path("/user"),
   },
   development: {
-    gitCommits: path("/development/guides/git-commits"),
+    codeStyle: path("/development/guides/code-style"),
     dirGuides: path("/development/guides"),
   },
 };
@@ -106,7 +106,7 @@ test.describe("Sidebar", () => {
 
     await expect(tabs.first()).toHaveAttribute("data-selected", "");
     await tabs.last().click();
-    await expect(page).toHaveURL(new RegExp(routes.development.gitCommits));
+    await expect(page).toHaveURL(new RegExp(routes.development.codeStyle));
 
     await tabs.first().click();
     await expect(page).toHaveURL(new RegExp(routes.user.algolia));

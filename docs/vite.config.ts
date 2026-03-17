@@ -7,7 +7,6 @@ import remarkGfm from "remark-gfm";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import path from "node:path";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   root: __dirname,
@@ -15,8 +14,11 @@ export default defineConfig({
     port: env.DOCS_PORT_E2E,
   },
   resolve: {
-    // tsconfigPaths fails on `@/` in MDX
-    alias: { "@/": path.resolve(__dirname, "src") + "/" },
+    // tsconfigPaths fails on `@/` in MDX and few other files
+    alias: {
+      "@/e2e/": path.resolve(__dirname, "e2e") + "/",
+      "@/": path.resolve(__dirname, "src") + "/",
+    },
   },
   plugins: [
     mdx({
@@ -24,6 +26,5 @@ export default defineConfig({
       rehypePlugins: [rehypeSlug],
     }),
     reactRouter(),
-    tsconfigPaths(),
   ],
 });
