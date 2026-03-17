@@ -19,15 +19,23 @@ WORKDIR /app
 
 RUN npm install --global bun
 
+# Bun workspace: root config + lockfile, then each workspace's package.json #AI #123
 COPY package.json bun.lock ./
+COPY client/package.json ./client/
+COPY packages/shared/package.json ./packages/shared/
+COPY docs/package.json ./docs/
 
 RUN bun install --frozen-lockfile
 
-COPY . ./
+COPY client/ ./client/
+COPY packages/shared/ ./packages/shared/
 
 RUN apt-get update && apt-get install ca-certificates --yes # for Sentry Source Maps upload
 
-RUN npx react-router build --mode=$NODE_ENV --sourcemapClient
+ENV PATH="/app/client/node_modules/.bin:$PATH"
+WORKDIR /app/client
+
+RUN react-router build --mode=$NODE_ENV --sourcemapClient
 
 
 # Nginx
@@ -46,7 +54,7 @@ ENV CLIENT_PORT=3000
 
 RUN rm -rf /usr/share/nginx/html/*
 
-COPY --from=builder /app/build/client /usr/share/nginx/html
+COPY --from=builder /app/client/build/client /usr/share/nginx/html
 
 RUN cat > /etc/nginx/conf.d/default.conf <<EOF
 server {

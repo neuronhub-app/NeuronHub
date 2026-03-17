@@ -1,0 +1,41 @@
+## Desc
+
+`mise docker:build --app=client` broke after the Bun workspace migration (#122). The `bun.lock` moved to repo root,
+`client/` depends on `@neuronhub/shared` via `workspace:*`, and the Dockerfile's build context was `client/` - can't access anything outside it.
+
+### Next steps
+
+Get rid of Bun Workspace, or restructure the building pipeline. Likely the first.
+
+## Relevant-Files
+
+- `client/Dockerfile` - rewritten for repo-root build context
+- `client/package.json` - added transitive deps as direct deps for Docker
+- `client/vite.config.ts` - babel config needing preset + plugin
+- `devops/docker.mise.toml` - generates docker-compose.yaml, `context: ..` for client
+- `.dockerignore` - at repo root, excludes `**/node_modules/` and `**/.env*`
+- `package.json` (root) - `"workspaces": ["client", "docs", "packages/*"]`
+
+## Exec-Plan
+
+Done. Docker build succeeds: `client:0.3.2.0-rc.5` (64.9MB).
+
+Added 3 transitive deps as direct deps in `client/package.json`:
+- `@sentry/react` (transitive of `@sentry/react-router`, imported in ~15 files)
+- `diff` (transitive of `diff2html`, imported in `JobVersionReview.tsx`)
+- `@ark-ui/react` (transitive of `@chakra-ui/react`, imported in `theme/recipes.ts`)
+
+## Decision-Log
+
+- Issue: `COPY ../bun.lock` fails (outside build context)
+    - Fix: `context: ..` in [[docker.mise.toml]], `dockerfile: client/Dockerfile`
+- Issue: `npx react-router build` can't find binary
+    - Fix: `ENV PATH="/app/client/node_modules/.bin:$PATH"`
+- Issue: Bun workspace transitive deps unresolvable in Docker
+    - Root cause: Bun only symlinks DIRECT deps to
+      `client/node_modules/`; transitive deps in
+      `node_modules/.bun/` unreachable by Node/Rollup
+    - Fix: added `@babel/preset-typescript`, `@sentry/react`,
+      `diff`, `@ark-ui/react` as explicit deps
+    - Tradeoff: must manually promote any future transitive dep
+      that's directly imported in client code

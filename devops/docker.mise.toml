@@ -67,7 +67,10 @@
                 image: ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)
                 pull_policy: always
                 build:
-                  context: .
+                  # client/Dockerfile requires the Bun workspace root bun.lock; and docs/, sort of
+                  # #AI #123
+                  context: (if $app == "client" { ".." } else { "." })
+                  dockerfile: (if $app == "client" { "client/Dockerfile" } else { "Dockerfile" })
                   args:
                     VITE_RELEASE_VERSION: ($env.usage_version)
 

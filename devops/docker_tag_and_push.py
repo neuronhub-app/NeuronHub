@@ -44,9 +44,13 @@ def main(kwargs: NamespaceKwargs):
 
     for tag_version in tag_versions:
         container_path = f"ghcr.io/{kwargs.github_path}/{kwargs.app}"
-        tag_existing = f"{container_path}:{kwargs.version}"
         subprocess.run(
-            ["docker", "tag", tag_existing, f"{container_path}:{tag_version}"],
+            [
+                "docker",
+                "tag",
+                f"{container_path}:{kwargs.version}",
+                f"{container_path}:{tag_version}",
+            ],
             check=True,
         )
         is_push_to_registry = not kwargs.tag_only
