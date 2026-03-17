@@ -5,6 +5,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.jobs.models import JobAlertLog
 
 
 @admin.register(Job)
@@ -117,10 +118,31 @@ class JobAlertAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         "created_at",
     ]
     autocomplete_fields = ["tags", "jobs_clicked"]
+    search_fields = [
+        "email",
+    ]
     list_filter = [
         ("tags", DALFRelatedFieldAjaxMulti),
         "is_orgs_highlighted",
         "is_active",
+        "created_at",
+        "updated_at",
+    ]
+
+
+@admin.register(JobAlertLog)
+class JobAlertLogAdmin(SimpleHistoryAdmin, DALFModelAdmin):
+    list_display = [
+        "job_alert__email",
+        "job",
+        "email_hash",
+        "sent_at",
+    ]
+    autocomplete_fields = ["job", "job_alert"]
+    list_filter = [
+        ("job", DALFRelatedFieldAjaxMulti),
+        ("job_alert", DALFRelatedFieldAjaxMulti),
+        "sent_at",
         "created_at",
         "updated_at",
     ]

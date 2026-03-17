@@ -208,7 +208,10 @@ class JobAlert(TimeStampedModel):
     history = HistoricalRecords()
 
     def __str__(self):
-        return f"JobAlert({self.pk}, {self.email}, active={self.is_active})"
+        inactive_flag = ""
+        if not self.is_active:
+            inactive_flag = ", inactive"
+        return f"Alert(#{self.pk}, {self.email}{inactive_flag})"
 
 
 # todo ? refac-name: JobEmailLog
@@ -225,7 +228,7 @@ class JobAlertLog(TimeStampedModel):
         null=True,
         related_name="alert_logs",
     )
-    email_hash = models.CharField(max_length=128)
+    email_hash = models.CharField(max_length=128, blank=True)
     sent_at = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
