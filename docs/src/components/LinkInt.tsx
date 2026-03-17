@@ -13,7 +13,7 @@ export function LinkInt(props: {
 }) {
   const to = props.hash ? `${href(props.path)}#${props.hash}` : href(props.path);
   return (
-    <Link asChild textDecoration={props.textDecoration ?? "underline"}>
+    <Link asChild textDecorationLine={props.textDecoration ?? "underline"}>
       <ReactRouterNavLink to={to}>
         {props.icon && (
           <Icon>

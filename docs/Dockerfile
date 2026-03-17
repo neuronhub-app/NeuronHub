@@ -51,6 +51,7 @@ WORKDIR /app
 COPY --from=builder /app/docs/build ./build
 COPY --from=builder /app/docs/package.json ./
 
+# #AI-slop
 # Strip workspace:* dep (bundled by Vite at build time), then install runtime deps
 RUN node -e "const p=require('./package.json'); delete p.dependencies['@neuronhub/shared']; delete p.devDependencies; require('fs').writeFileSync('package.json',JSON.stringify(p,null,2))" \
     && npm install --omit=dev

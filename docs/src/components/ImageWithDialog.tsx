@@ -18,7 +18,7 @@ export function ImageWithDialog(props: { src: string; alt: string; isDimmed?: bo
             boxShadow="xl"
             cursor="zoom-in"
             filter={
-              props.isDimmed ? { _dark: "brightness(0.7)", _light: "brightness(0.9)" } : ""
+              props.isDimmed ? { _dark: "brightness(0.95)", _light: "brightness(0.98)" } : ""
             }
             _hover={{
               filter: "brightness(1)",

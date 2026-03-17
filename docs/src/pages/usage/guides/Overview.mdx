@@ -1,0 +1,34 @@
+---
+title: Overview
+order: 0
+---
+
+import { Heading, SimpleGrid, Stack, Text } from "@chakra-ui/react"
+import { LuSearch, LuShieldAlert, LuSettings } from "react-icons/lu"
+import { GuideCard } from "@/components/GuideCard"
+
+<Stack gap="gap.sm2">
+<Heading size="2xl">Documentation</Heading>
+<Text color="fg.muted">Welcome.</Text>
+</Stack>
+
+<SimpleGrid columns={{ base: 1, md: 3 }} gap="gap.md" mt="gap.md">
+  <GuideCard
+    icon={LuSearch}
+    title="Search Engine"
+    description="Algolia indexes, rules, and analytics."
+    path="/usage/guides/algolia"
+  />
+  <GuideCard
+    icon={LuShieldAlert}
+    title="Error Monitoring"
+    description="Sentry issues, replays, and uptime."
+    path="/usage/guides/sentry"
+  />
+  <GuideCard
+    icon={LuSettings}
+    title="Admin Panel"
+    description="Django admin for managing users and jobs."
+    path="/usage/guides/admin-panel"
+  />
+</SimpleGrid>
