@@ -106,6 +106,14 @@ test.describe("Sidebar", () => {
   });
 });
 
+test.describe("Hidden pages", () => {
+  test("hidden dir not in sidebar", async ({ page }) => {
+    await page.goto(routes.development.codeStyle);
+    const nav = $(page)[ids.sidebar.root];
+    await expect(nav.getByText("LLM Spec Logs")).not.toBeVisible();
+  });
+});
+
 test.describe("Dir redirects", () => {
   test("dir URL redirects to child page", async ({ page }) => {
     await page.goto(routes.development.dirGuides);

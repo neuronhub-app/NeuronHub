@@ -7,6 +7,7 @@ export namespace frontmatter {
     order: z.number().optional(),
     description: z.string().optional(),
     reviewed_at: z.string().optional(), // #AI
+    hidden: z.boolean().optional(),
   });
 
   export type SchemaType = z.infer<typeof schema>;

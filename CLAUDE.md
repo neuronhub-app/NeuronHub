@@ -10,7 +10,7 @@
 
 <code_style>
 
-@docs/src/pages/development/how-to/code-style.md
+@docs/src/pages/development/guides/code-style.md
 
 </code_style>
 

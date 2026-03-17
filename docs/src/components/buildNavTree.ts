@@ -12,8 +12,23 @@ export const navTree = buildNavTree();
 function buildNavTree(): NavNode[] {
   const navNodes: NavNode[] = [];
 
+  const dirsHidden = new Set<string>();
   for (const [filePath, module] of Object.entries(mdxModules)) {
     const file = parseFilePath(filePath, module.frontmatter);
+    if (file.isReadme && file.frontmatter.hidden) {
+      dirsHidden.add(file.dir.pathParts.join("/"));
+    }
+  }
+
+  for (const [filePath, module] of Object.entries(mdxModules)) {
+    const file = parseFilePath(filePath, module.frontmatter);
+
+    if (file.frontmatter.hidden) {
+      continue;
+    }
+    if (dirsHidden.has(file.dir.pathParts.join("/"))) {
+      continue;
+    }
 
     if (file.isReadme) {
       const parent = getOrCreateDirNode({ navNodes, pathParts: file.dir.pathParts });

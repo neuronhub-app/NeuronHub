@@ -12,21 +12,7 @@ An LLM did several passes - you focus on the last unchecked task.
     - [x] chakra typegen overrides (hoisted pkg)
     - [x] make biome.jsonc global
 - [x] make mdx files typed and enforce valid `path` in `LinkInt.tsx` by `mise lint` from react-router types
-- [x] add `<Term id="backend"/>` component that:
-    - renders a chakra ui `Popover` on hover
-    - renders as chakra `<Code>` but with some decoration to show it's special from other "``"
-    - it renders `Nested Popover` - read docs at https://chakra-ui.com/docs/components/popover.mdx using a sonnet subagent
-    - `id` is a union of static TS strings - it also must render the correct `.label` and `.help` props, eg:
-        - .id: backend
-          .label: Backend
-          .help: The web service hosted on <LinkInt path="/user/guides/render">Render</LinkInt> at the url `https://backend.neuronhub.app` (or `https://backend.jobs.probablygood.org`) and serves the <Term id="frontend"/>. It runs on [the Django Web Framework](https://djangoproject.com).
-        - .id: frontend
-          .label: Frontend
-          .help: The static hosted on <LinkInt path="/user/guides/render">Render</LinkInt> at the url `https://backend.neuronhub.app` (or `https://backend.jobs.probablygood.org`) and uses the <Term id="backend"/>. It runs on [the React Router framework](https://react-icons.github.io).
-    - if available - show a link to the respective MDX page in the footer of that popover (it will be later added for backend & frontend from the arch/ folder)
-    - feel free to improve the examples of ids and their content.
-    - [x] make the popover appear not fast enough to interrupt the user when they browse with the mouse
-    - [x] read the `Term.tsx` file and apply the code style guides
+- [x] add `hidden` frontmatter prop, eg to hide `reference/LLM-spec-logs/*`
 
 Don't read full mdx files - they're too large - read only the first 3-6 lines max.
 
@@ -34,88 +20,23 @@ Don't read full mdx files - they're too large - read only the first 3-6 lines ma
 
 - `docs/src/components/Term.tsx` - glossary popover component
 - `docs/src/components/LinkInt.tsx`, `LinkExt.tsx`
-- `docs/src/env.ts` - typed env (ports need defaults for browser eval)
-- `docs/e2e/playwright.config.ts` - timeout 10s
-- `docs/e2e/ids.ts` - `term.trigger` testid
-- `docs/e2e/tests/docs-pages.spec.ts` - 4 Term tests
-- `docs/src/pages/user/guides/Algolia.mdx` - Term usage example
-
-<LLM_unverified_report>
-
-## What was done
-
-Added `<Term id="backend"/>` glossary component per spec.
-5 terms: backend, frontend, algolia, mise, sentry.
-Renders as `<Code>` with dotted underline decoration.
-Hover opens Chakra Popover with help text + optional
-"Read more" footer link to related MDX page.
-Tested with 4 e2e tests, all 28 docs e2e pass.
-
-## Why nested Popovers don't work (depth>0 → plain Code)
-
-The spec says "Nested Popover" (Term inside Term's help).
-Chakra docs show nested Popover works if the inner one
-skips `<Portal>`. However two problems block it here:
-
-1. Circular glossary: backend.help references `<Term id="frontend">`
-   and frontend.help references `<Term id="backend">`. Rendering
-   both as Popovers creates infinite recursion during SSR
-   (react-dom-server stack overflow). Lazy `help()` fns solved
-   the eager-eval, but SSR still recurses infinitely since each
-   Popover body renders the other Term's full Popover tree.
-
-2. MDX paragraphs: Terms appear inside `<p>`. Popover.Positioner
-   renders `<div>`. During SSR, div-in-p is invalid HTML and
-   causes hydration errors. `lazyMount unmountOnExit` fixes this
-   for depth-0 (popover DOM only mounts on hover, after hydration).
-   But a nested Popover inside the already-open parent would
-   SSR-render the inner Positioner div immediately.
-
-Decision: depth>0 Terms render as styled `<Code>` without
-Popover. The dotted underline decoration still marks them as
-glossary terms visually.
-
-## Key decisions
-
-- Glossary `help` values are `() => ReactNode` (lazy) to avoid
-  circular JSX evaluation at module scope.
-- `TermDepthCtx` React context tracks nesting. depth>0 = no Popover.
-- `lazyMount unmountOnExit` prevents div-in-p SSR hydration error.
-- `env.ts` DOCS_PORT/DOCS_PORT_E2E need defaults because
-  `createEnv` evaluates in browser where only VITE_* vars exist.
-  Mise is source of truth; defaults are just browser-eval safety.
-- PW hover tests wait for `data-scope=popover` attr (= hydrated)
-  before hover, fixing flakiness under 16 workers.
-- Console error test filters pre-existing color-mode
-  hydration-mismatch (className="light" on `<html>`).
-
-## TODO for next pass
-
-- Drop autofocus from Popover (hover opens it, but Chakra
-  auto-focuses first focusable element inside — shows focus
-  outline on eg LinkInt). Use `autoFocus={false}` or
-  `initialFocusEl` to prevent.
-
-</LLM_unverified_report>
+- `docs/src/env.ts`
+- `docs/e2e/playwright.config.ts`
+- `docs/e2e/ids.ts`
+- `docs/src/utils/rehypeMdLinksNewTab.ts` - rehype plugin for MD link attrs
+- `docs/src/components/frontmatter.ts` - Zod schema with `hidden` prop
+- `docs/src/components/buildNavTree.ts` - nav tree builder, skips hidden entries
 
 ## Decision-Log
 
 - Fix: chakra typegen `--outdir .chakra/types` + Nushell `str replace`
 - Fix: `docs/scripts/lint-mdx.ts` compiles MDX→TSX for type-checking
 - Fix: `skipLibCheck: true` for `@types/mdx` JSX ns conflict
-- Issue: circular Term refs (backend↔frontend) SSR stack overflow
-    - Fix: TermHelpText component defers help() call
-    - lazyMount prevents render → no recursion
-    - depth>1 → plain Code (allows 1 nesting level)
-- Fix: `lazyMount unmountOnExit` prevents div-in-p SSR hydration
-- Fix: env.ts DOCS_PORT defaults (browser eval needs them)
-- Fix: PW config timeout 10s
-- Issue: color-mode hydration-mismatch on `<html>`
+- Issue: color-mode hydration-mismatch on `<html>` [#AI-slop, will fix later]
     - Fix: `suppressHydrationWarning` on `<html>` in root.tsx
     - e2e filter removed → test now asserts 0 errors
-- Issue: hover popover too eager + autofocus outline
-    - Fix: switch to click-to-open, uncontrolled Popover.Root
-- Fix: nested popover works (depth≤1 renders Popover)
-- Fix: e2e `clickTerm` waits for `data-scope=popover` (hydration)
-- Fix: exported `TermId`, static TS assertion in e2e
-- Fix: Term.tsx code style — vars below invocation, `termCode` → `style.code`
+- Fix: `hidden` frontmatter prop
+    - `frontmatter.ts`: added `hidden: z.boolean().optional()`
+    - `buildNavTree.ts`: 2-pass — collect hidden dirs from README, skip hidden files + dir children
+    - Applied `hidden: true` to `LLM-spec-logs/README.mdx`
+    - Routes still accessible via direct URL (only nav hidden)
