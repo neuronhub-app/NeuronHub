@@ -11,7 +11,7 @@ import { defineConfig } from "vite";
 export default defineConfig({
   root: __dirname,
   server: {
-    port: env.DOCS_PORT_E2E,
+    port: env.DOCS_PORT,
   },
   resolve: {
     // tsconfigPaths fails on `@/` in MDX and few other files

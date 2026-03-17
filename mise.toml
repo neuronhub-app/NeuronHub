@@ -89,7 +89,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     SERVER_PORT_E2E = "{{ env.SERVER_PORT_E2E | default(value = 8001) }}"
     CLIENT_PORT_E2E = "{{ env.CLIENT_PORT_E2E | default(value = 3001) }}"
-    DOCS_PORT_E2E = "{{ env.DOCS_PORT_E2E | default(value = 4001) }}"
+    DOCS_PORT_E2E = "{{ env.DOCS_PORT_E2E | default(value = 4010) }}"
 
     PYTEST_DB_NAME = "{{ env.PYTEST_DB_NAME | default(value = 'test_database') }}"
     E2E_DB_NAME = "{{ env.E2E_DB_NAME | default(value = 'test_neuronhub_e2e') }}"
