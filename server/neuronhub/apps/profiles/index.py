@@ -89,4 +89,5 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "unretrievableAttributes": [
                 "visible_to",
             ],
+            "advancedSyntax": True,
         }

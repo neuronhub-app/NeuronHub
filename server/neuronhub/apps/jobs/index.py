@@ -102,4 +102,5 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "replicas": [
                 algolia_replica_jobs_sorted_by_closes_at,
             ],
+            "advancedSyntax": True,
         }

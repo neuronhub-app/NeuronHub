@@ -105,4 +105,5 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "replicas": [
                 algolia_replica_sorted_by_votes,
             ],
+            "advancedSyntax": True,
         }
