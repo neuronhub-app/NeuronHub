@@ -9,7 +9,7 @@ export default defineConfig({
   workers: 16,
   outputDir: "./test-results/",
   webServer: {
-    command: "bun run dev",
+    command: `bun run dev --port=${env.DOCS_PORT_E2E}`,
     url: baseURL,
     reuseExistingServer: true,
   },
