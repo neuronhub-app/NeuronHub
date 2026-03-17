@@ -4,11 +4,13 @@ import { defineConfig } from "vite";
 import babel from "vite-plugin-babel";
 import devtoolsJson from "vite-plugin-devtools-json";
 import tsconfigPaths from "vite-tsconfig-paths";
+// noinspection ES6PreferShortImport: Vite loads before tsconfig.json
+import { env } from "./src/env";
 
 export default defineConfig(config => ({
   root: __dirname,
   server: {
-    port: 3000,
+    port: env.CLIENT_PORT,
     allowedHosts: [process.env.CLIENT_DOMAIN ?? "localhost"],
   },
   build: { sourcemap: true },
