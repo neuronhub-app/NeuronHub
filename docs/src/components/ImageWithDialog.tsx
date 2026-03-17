@@ -1,6 +1,7 @@
 import { Center, Dialog, Image, Portal } from "@chakra-ui/react";
+import { ids } from "@/e2e/ids";
 
-export function ImageZoom(props: { src: string; alt: string; isDimmed?: boolean }) {
+export function ImageWithDialog(props: { src: string; alt: string; isDimmed?: boolean }) {
   const style = {
     maxW: "94vw",
     maxH: "94vh",
@@ -28,7 +29,10 @@ export function ImageZoom(props: { src: string; alt: string; isDimmed?: boolean 
         </Center>
       </Dialog.Trigger>
       <Portal>
-        <Dialog.Backdrop bg={{ _dark: "blackAlpha.900/90", _light: "blackAlpha.600" }} />
+        <Dialog.Backdrop
+          {...ids.set(ids.imageZoom.backdrop)}
+          bg={{ _dark: "blackAlpha.900/90", _light: "blackAlpha.900" }}
+        />
         <Dialog.Positioner>
           <Dialog.Content>
             <Dialog.CloseTrigger />

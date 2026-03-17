@@ -1,8 +1,3 @@
----
-title: Docs (#122)
-slug: docs-122
----
-
 ## Desc
 
 We're setting up a docs.neuronhub.app website using React Router v7 (with SSR only in docs/, not client/), Chakra-UI Pro components, and MDX.
@@ -37,11 +32,10 @@ An LLM did several passes - you focus on the last unchecked task.
     - [x] fix mise lint:docs
     - [x] fix @neuronhub/shared missing imports
     - [x] add chakra spacings from client/ to shared/
-- [x] code review
+- [x] make mdx files typed and enforce valid `path` in `LinkInt.tsx` by `mise lint` from react-router types
+- [x] read e2e guidelines. read the example in e2e docs. read all code style. fix the tests to remove their ugly repetition, magic strings, and unmatchable strings.
 
-The changes are in the 2 git commits:
-- `refac: simplify client/tsconfig.json`
-- `feat(docs): add /packages/shares and Bun Workspace #122`
+Don't read full mdx files - they're too large - read only 3-6 first lines max.
 
 ### Related files
 - `docs/package.json`
@@ -53,7 +47,7 @@ The changes are in the 2 git commits:
 - `docs/src/components/DocsLayout.tsx`
 - `docs/src/components/Toc.tsx`
 - `docs/src/pages/user/{section}/{file}.mdx` - MDX doc drafts
-- `docs/src/pages/user/how-to/deploy.mdx` - longest file at the moment
+- `docs/src/pages/user/how-to/deploy.mdx` - the longest file at the moment
 - `docs/e2e/tests/docs-pages.spec.ts`
 - `docs/e2e/playwright.config.ts`
 - `package.json` - root Bun workspaces
@@ -66,62 +60,47 @@ The changes are in the 2 git commits:
 - `packages/shared/src/utils/marked-configured.ts`
 - `packages/shared/src/theme/colors.ts`
 - `packages/shared/src/components/ui/prose.tsx`
-- `packages/shared/src/components/NeuronLogo.tsx`
 
-## Exec-Plan
+## Relevant-Files
 
-`<LLM_unverified_report>`
-
-### CTO requirements (added/clarified during session)
-- Chakra spacing tokens must use standard string props (`gap="gap.sm"`), not variable imports
-- No `@ts-expect-error` for the Bleed.inline issue - the original code worked in client/ before the move to shared/
-- CTO says: "primitive issue - the rest of the chakra types (as colors) were working already. most likely something was messed up in the first few steps"
-- Must only run Mise tasks, never raw commands
-
-### What was done (prev sessions)
-1. `docs/tsconfig.json`: added `skipLibCheck: true` → `mise lint:docs` passes
-2. `client/src/components/LayoutSidebar.tsx`: fixed barrel import `from "@neuronhub/shared"` → `from "@neuronhub/shared/components/NeuronLogo"`
-3. Created `packages/shared/src/theme/spacings.ts` with `gap` tokens extracted from `client/src/theme/theme.ts`
-4. Created `packages/shared/src/theme/theme.ts` (minimal theme for typegen)
-5. Updated `docs/src/theme/theme.ts` to import `gap` and register spacing semantic tokens
-6. Updated `client/src/theme/theme.ts`: removed local `gap` definition, imports from shared
-7. Updated 3 client files to import `gap` from `@neuronhub/shared/theme/spacings` instead of `@/theme/theme`
-8. Added `typegen:packages:chakra` task to `mise.toml` (runs from client/ dir since shared has no chakra CLI)
-9. Fixed trailing commas in `packages/shared/package.json`
-
-### What was done (this session)
-10. NeuronLogo.tsx: `FlexProps` → `BleedProps`, string token props
-11. shared/tsconfig: `#chakra-internal/*` path + `.chakra/types` include
-12. DocsLayout.tsx: added `<SectionTabs>` call in SidebarContent
-
-`</LLM_unverified_report>`
+- `docs/scripts/lint-mdx.ts` - MDX→TSX compile + tsc type-check script
+- `docs/src/utils/findMdxFiles.ts` - shared between routes.ts and lint-mdx.ts
+- `docs/src/components/LinkInt.tsx` - `path: Parameters<typeof href>[0]` = `keyof Pages`
+- `docs/src/components/LinkExt.tsx` - `href: string` (was `keyof Register`)
+- `docs/src/routes.ts` - builds MDX routes → feeds `react-router typegen`
+- `docs/.react-router/types/+routes.ts` - generated `Pages` type
+- `mise.toml` - `lint:docs` runs tsc + lint-mdx.ts
 
 ## Decision-Log
-- Workspaces: /package.json; /packages/shared/
-- Fix: NeuronLogo deduplicated
-- Issue: `import.meta.env` in shared/
-    - Fix: `/// <reference types="vite/client" />` to types.d.ts
-- Issue: trash rel include in client/tsconfig.json
-    - Fix: dropped unused `"../packages/shared/src"`
-        - `@neuronhub/shared: workspace:*` covers it
+
+- Issue: .mdx JSX props not type-checked (tsc/tsgo skip MDX)
+    - Fix: `docs/scripts/lint-mdx.ts` compiles MDX→TSX via `@mdx-js/mdx`, runs tsc
+    - Noise suppression: strip `@jsxImportSource`, type `props: any`
+    - Wired into `lint:docs` as second run command
+- Fix: invalid paths in MDX files
+    - `Job-emails-sending.mdx`: `/docs/src/pages/...` → `/user/reference/job-subscription-emails`
+    - `git-commits.mdx`: `refactor-pending.mdx` → `/development/reference/refactor-pending`
+- Fix: `LinkExt.tsx` `href: keyof Register` → `string`
+- Issue: tsconfig `paths` not resolving from `.lint-mdx/`
+    - Fix: read parent tsconfig.json paths, prepend `../` to each
+- Issue: `.lint-mdx/*.tsx` not included by tsc
+    - Fix: `include: ["./**/*.tsx"]` instead of `["."]`
 - Issue: chakra typegen overrides (hoisted pkg)
-    - Fix: `--outdir .chakra/types` + Nushell post-process
-        - sed `from "../` → `from "#chakra-internal/`
+    - Fix: `--outdir .chakra/types` + Nushell `str replace`
 - Issue: `lint:docs` tsgo fails on `@types/mdx` JSX ns
-    - Fix/types: `skipLibCheck: true` to docs/tsconfig.json
-- Fix: LayoutSidebar barrel import → specific path
-- Issue: gap spacings must share across sites
-    - Fix: `typegen:packages:chakra` in mise.toml
-    - Fix: `spacings.ts` and `theme.ts`
-    - Fix: trailing comma in shared/package.json broke chakra
-- Issue: Bleed `inline` tsgo error in NeuronLogo.tsx
-    - Root: `FlexProps` spread into `<Bleed>`
-    - shared/tsconfig: added `#chakra-internal/*` path
-      + `.chakra/types` include (for future)
-- Code Review
-    - Fix: inlined `serverEnv` in createEnv
-    - Fix: `sectionTabs` `as const satisfies` + `SectionKey` type
-    - Fix: removed redundant `isProd` getter in docs/env.ts
-    - Fix: mise sources paths lacked dir prefix
-    - Issue: dup valtio/react decl in client/ and shared/ types.d.ts
-        - Keep both: shared's not picked up by client tsgo
+    - Fix: `skipLibCheck: true` to docs/tsconfig.json
+- Issue: 5 e2e failures
+    - Fix: MDX imports before frontmatter broke YAML parsing (order lost)
+        - Moved imports after `---` in git-commits, todos, Job-emails-sending
+- Fix: e2e test rewrite
+    - Routes type-checked via `href()`, split by `user`/`development`
+    - `$(page)[ids.x]` proxy (same as client/) replaces getByTestId
+    - `ids.ts` at `src/e2e/` (Vite alias `@/` → `src/`)
+    - Logo test uses `env.VITE_CLIENT_URL`
+    - Helpers below invocation per code style
+- Issue: vite.config.ts `@/env` can't resolve (alias not set before config loads)
+    - Fix: relative import `./src/env`
+- Issue: playwright config port 2500 ≠ mise `DOCS_PORT_E2E=4001`
+    - Fix: read port from `env.DOCS_PORT_E2E`
+- Issue: `@/e2e/ids` not found at runtime (Vite alias `@/` → `src/`)
+    - Fix: moved ids to `src/e2e/ids.ts`, updated tsconfig path

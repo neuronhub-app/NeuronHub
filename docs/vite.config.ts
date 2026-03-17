@@ -1,3 +1,4 @@
+import { env } from "./src/env";
 import mdx from "@mdx-js/rollup";
 import { reactRouter } from "@react-router/dev/vite";
 import rehypeSlug from "rehype-slug";
@@ -11,7 +12,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
   root: __dirname,
   server: {
-    port: 2500,
+    port: env.DOCS_PORT_E2E,
   },
   resolve: {
     // tsconfigPaths fails on `@/` in MDX

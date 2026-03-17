@@ -6,6 +6,7 @@
 import { Box, Stack, Text, chakra } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
+import { ids } from "@/e2e/ids";
 
 export function Toc() {
   const location = useLocation();
@@ -24,7 +25,7 @@ export function Toc() {
   const depthMin = Math.min(...items.map(item => item.depth));
 
   return (
-    <Box as="nav" fontSize="sm">
+    <Box as="nav" {...ids.set(ids.toc.root)} fontSize="sm">
       <Text fontWeight="semibold">On this page</Text>
       <Stack mt="3" gap="0">
         {items.map(item => (

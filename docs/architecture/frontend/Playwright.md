@@ -40,3 +40,7 @@ Replaces:
 - `mise e2e`: Django and Vite Mise servers are managed by Playwright from `playwright.config.ts`. Already `headless` - never modify browser CLI params.
 - `devops/e2e.mise.toml`: contains `dev:e2e:server`, `dev:e2e:server:db_worker`, etc
 - `devops/db.mise.toml`: contains `dev:db:e2e:setup` and `dev:db:e2e:rm`
+
+### Examples
+
+Clean example: [[vote-and-reading-list.spec.ts]].

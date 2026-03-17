@@ -47,8 +47,12 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     SERVER_URL = "http://{{ env.SERVER_DOMAIN }}:{{ env.SERVER_PORT }}"
 
     CLIENT_DOMAIN = "{{ env.CLIENT_DOMAIN | default(value = 'localhost') }}"
-    CLIENT_PORT = "{{ env.CLIENT_PORT | default(value = 300) }}"
+    CLIENT_PORT = "{{ env.CLIENT_PORT | default(value = 3000) }}"
     CLIENT_URL = "http://{{ env.CLIENT_DOMAIN }}:{{ env.CLIENT_PORT }}"
+
+    DOCS_DOMAIN = "{{ env.DOCS_DOMAIN | default(value = 'localhost') }}"
+    DOCS_PORT = "{{ env.DOCS_PORT | default(value = 4000) }}"
+    DOCS_URL = "http://{{ env.DOCS_DOMAIN }}:{{ env.DOCS_PORT }}"
 
     DB_USER = "{{ env.PROJECT_NAME }}"
     DB_NAME = "{{ env.PROJECT_NAME }}"
@@ -79,6 +83,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     SERVER_PORT_E2E = "{{ env.SERVER_PORT_E2E | default(value = 8001) }}"
     CLIENT_PORT_E2E = "{{ env.CLIENT_PORT_E2E | default(value = 3001) }}"
+    DOCS_PORT_E2E = "{{ env.DOCS_PORT_E2E | default(value = 4001) }}"
 
     PYTEST_DB_NAME = "{{ env.PYTEST_DB_NAME | default(value = 'test_database') }}"
     E2E_DB_NAME = "{{ env.E2E_DB_NAME | default(value = 'test_neuronhub_e2e') }}"

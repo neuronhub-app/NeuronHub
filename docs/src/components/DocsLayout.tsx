@@ -23,6 +23,7 @@ import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { env } from "@/env";
 import { type NavNode, navTree, findFirstChildHrefRecursively } from "@/components/buildNavTree";
 import { Toc } from "@/components/Toc";
+import { ids } from "@/e2e/ids";
 
 export default function DocsLayout() {
   return (
@@ -87,9 +88,23 @@ function SidebarContent() {
   const nodes = navTree.find(node => node.slug === activeSection)?.children ?? [];
 
   return (
-    <Box data-sidebar h="full" overflowY="auto" ps="2" pe="2" pt={style.p} pb="10" px="5">
+    <Box
+      {...ids.set(ids.sidebar.root)}
+      h="full"
+      overflowY="auto"
+      ps="2"
+      pe="2"
+      pt={style.p}
+      pb="10"
+      px="5"
+    >
       <Stack gap="6" align="flex-start">
-        <chakra.a href={env.VITE_CLIENT_URL} aria-label="NeuronHub" display="flex">
+        <chakra.a
+          href={env.VITE_CLIENT_URL}
+          {...ids.set(ids.sidebar.logo)}
+          aria-label="NeuronHub"
+          display="flex"
+        >
           <NeuronLogo breakpoint="2xl" />
         </chakra.a>
 
