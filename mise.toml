@@ -178,15 +178,15 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         usage = '''
             arg "<args>" default=""
             flag "-a --include-all" default=#false
-            flag "-m --marks <marks>" default="not slow_llm_api and not firebase_subscription"
+            flag "-m --markers <markers>" default="not slow_llm_api and not firebase_subscription"
         '''
         run = """
             job spawn { mise dev:s3 }
 
-            let marks = if ($env.usage_include_all | into bool) { "" } else { $"--markers ($env.usage_marks)" }
+            let markers = if ($env.usage_include_all | into bool) { "" } else { $"-m ($env.usage_markers)" }
             let args = $"($env.usage_args)" | str replace "server/" ""
 
-            uv run pytest $marks $args
+            uv run pytest $markers $args
         """
         alias = "pytest"
         env.DJANGO_ENV = "dev_test_unit"
