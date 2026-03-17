@@ -6,6 +6,8 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { type RouteConfig, layout, route } from "@react-router/dev/routes";
 import { parse as parseYaml } from "yaml";
+
+import { findMdxFiles } from "./utils/findMdxFiles";
 import { frontmatter } from "./components/frontmatter";
 
 const pagesDir = path.join(import.meta.dirname, "pages");
@@ -63,21 +65,6 @@ function readFrontmatter(file: string) {
     return frontmatter.schema.parse({});
   }
   return frontmatter.schema.parse(parseYaml(match[1]));
-}
-
-function findMdxFiles(dir: string): string[] {
-  const results: string[] = [];
-
-  for (const entry of readdirSync(dir)) {
-    const full = path.join(dir, entry);
-    if (statSync(full).isDirectory()) {
-      results.push(...findMdxFiles(full));
-    } else if (entry.endsWith(".mdx")) {
-      results.push(full);
-    }
-  }
-
-  return results;
 }
 
 function findDirsWithMdx(root: string): string[] {

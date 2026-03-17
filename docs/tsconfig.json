@@ -17,11 +17,23 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
 
+    // from react-router docs
+    "rootDirs": [".", "./.react-router/types"],
+
     "paths": {
-      "@/e2e/*": ["./e2e/*"],
+      "@/e2e/*": ["./src/e2e/*"],
       "@/*": ["./src/*"],
       "#chakra-internal/*": ["./node_modules/@chakra-ui/react/dist/types/styled-system/*"], // #122
+      "~/react-router/*": ["./.react-router/types/src/apps/*"],
     },
   },
-  "include": ["src", "e2e", "vite.config.ts", ".chakra/types"],
+  "include": [
+    "src",
+    "e2e",
+    "scripts",
+    "vite.config.ts",
+    ".chakra/types",
+    // from react-router docs
+    "./.react-router/types",
+  ],
 }

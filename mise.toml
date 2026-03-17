@@ -241,7 +241,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     run = [
         "mise typegen:client",
         "mise typegen:packages:chakra",
-        "mise typegen:docs:chakra",
+        "mise typegen:docs",
     ]
     description = "Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries; @chakra-ui; etc"
     quiet = true
@@ -305,10 +305,23 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         sources = ["src/theme/**/*"]
         quiet = true
 
+    [tasks."typegen:docs"]
+        depends = [
+            "typegen:docs:chakra",
+            "typegen:docs:react-router",
+        ]
+        quiet = true
+
     [tasks."typegen:docs:chakra"]
         dir = "docs/"
         run = "mise typegen:chakra --dir=docs/"
         sources = ["src/theme/**/*"]
+        quiet = true
+
+    [tasks."typegen:docs:react-router"]
+        dir = "docs"
+        run = "bun run react-router typegen"
+        sources = ["src/**/*.mdx"]
         quiet = true
 
     [tasks."typegen:chakra"]
@@ -393,8 +406,11 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     [tasks."lint:docs"]
         dir = "docs/"
-        run = "bun run tsgo --noEmit"
-        sources = ["src/**/*", "e2e/**/*", "tsconfig.json", "package.json"]
+        run = [
+            "bun run tsgo --noEmit",
+            "bun run scripts/lint-mdx.ts",
+        ]
+        sources = ["src/**/*", "e2e/**/*", "scripts/**/*", "tsconfig.json", "package.json"]
         quiet = true
 
     [tasks."lint:packages"]

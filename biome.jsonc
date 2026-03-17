@@ -68,6 +68,7 @@
       "client/src/**",
       "docs/e2e/**",
       "docs/src/**",
+      "docs/scripts/**",
       "packages/shared/src/**",
 
       "!client/graphql", // generated code

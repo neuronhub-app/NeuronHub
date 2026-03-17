@@ -1,7 +1,6 @@
 import { format } from "@neuronhub/shared/utils/format";
 import { frontmatter } from "@/components/frontmatter";
 
-// @ts-expect-error #bad-infer Vite import.meta.glob typing #AI
 const mdxModules = import.meta.glob("/src/pages/**/*.mdx", { eager: true }) as Record<
   string,
   { frontmatter?: frontmatter.SchemaType }
