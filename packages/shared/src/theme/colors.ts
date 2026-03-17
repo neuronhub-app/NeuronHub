@@ -30,9 +30,17 @@ export namespace theme {
         },
       },
       secondary: {
-        value: {
-          _light: `{colors.${colorSecondary}.600}`,
-          _dark: `{colors.${colorSecondary}.500}`,
+        DEFAULT: {
+          value: {
+            _light: `{colors.${colorSecondary}.600}`,
+            _dark: `{colors.${colorSecondary}.500}`,
+          },
+        },
+        hover: {
+          value: {
+            _light: `{colors.${colorSecondary}.700}`,
+            _dark: `{colors.${colorSecondary}.400}`,
+          },
         },
       },
     },
@@ -71,6 +79,21 @@ export namespace theme {
     },
 
     // tailwind
+
+    gray: {
+      50: { value: "lab(98.2596% -.247031 -.706708)" },
+      100: { value: "lab(96.1596% -.0823438 -1.13575)" },
+      200: { value: "lab(91.6229% -.159115 -2.26791)" },
+      300: { value: "lab(85.1236% -.612259 -3.7138)" },
+      400: { value: "lab(65.9269% -.832707 -8.17473)" },
+      500: { value: "lab(47.7841% -.393182 -10.0268)" },
+      600: { value: "lab(35.6337% -1.58697 -10.8425)" },
+      700: { value: "lab(27.1134% -.956401 -12.3224)" },
+      800: { value: "lab(16.1051% -1.18239 -11.7533)" },
+      900: { value: "lab(8.11897% .811279 -12.254)" },
+      950: { value: "lab(1.90334% .278696 -5.48866)" },
+      ...getChakraColorSemanticDefaults("gray"),
+    },
 
     blue: {
       50: { value: "oklch(0.97 0.014 254.604)" },

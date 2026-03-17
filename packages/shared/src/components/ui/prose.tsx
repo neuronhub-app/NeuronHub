@@ -12,7 +12,7 @@ export const Prose = chakra("div", {
 
     color: "fg.dark-friendly",
 
-    // silent giant H1/H2
+    // ignore H1/H2
     "& h1": {
       fontSize: "inherit",
       fontWeight: "bold",
@@ -45,12 +45,15 @@ export const Prose = chakra("div", {
       borderInlineStartWidth: "0.25em",
     },
     "& a": {
-      color: "fg",
+      color: "fg.secondary",
       textDecoration: "underline",
-      textUnderlineOffset: "3px",
+      textUnderlineOffset: "2px",
       textDecorationThickness: "2px",
       textDecorationColor: "border.muted",
       fontWeight: "500",
+      _hover: {
+        color: "fg.secondary.hover",
+      },
     },
     "& strong": {
       fontWeight: "600",
@@ -99,20 +102,24 @@ export const Prose = chakra("div", {
       fontFamily: "inherit",
       color: "fg.muted",
       "--shadow": "colors.border",
-      boxShadow: "0 0 0 1px var(--shadow),0 1px 0 1px var(--shadow)",
+      boxShadow: "0 0 0 1px var(--shadow), 0 1px 0 1px var(--shadow)",
     },
     "& code": {
-      fontSize: "0.925em",
-      letterSpacing: "-0.01em",
-      borderRadius: "md",
-      borderWidth: "1px",
-      padding: "0.25em",
+      minH: 5,
+      paddingInline: 1.5,
+      py: 0.5,
+      borderRadius: "l2",
+      lineHeight: "1rem",
+      fontSize: "sm",
+      fontFamily: "mono",
+      bg: "bg.emphasized",
     },
     "& pre code": {
+      bg: "none",
       fontSize: "inherit",
       letterSpacing: "inherit",
       borderWidth: "inherit",
-      padding: "0",
+      p: "0",
     },
     "& h2 code": {
       fontSize: "0.9em",
@@ -121,7 +128,7 @@ export const Prose = chakra("div", {
       fontSize: "0.8em",
     },
     "& pre": {
-      backgroundColor: "bg.subtle",
+      bg: "bg.subtle",
       marginTop: "1.6em",
       marginBottom: "1.6em",
       borderRadius: "md",
