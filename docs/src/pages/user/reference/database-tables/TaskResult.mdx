@@ -1,0 +1,11 @@
+import { LinkExt } from "@/components/LinkExt";
+import { LinkInt } from "@/components/LinkInt";
+import { Term } from "@/components/Term";
+import { env } from "@/env";
+
+Stores the result of each Task the <Term id="backend"/>'s background worker has processed.
+
+For `Jobs` application it's only the email alerts sending.
+
+### Links
+- <LinkInt path="/user/guides/admin-panel">Admin panel</LinkInt> list: <LinkExt href={`${env.VITE_SERVER_URL}/admin/django_tasks_database/dbtaskresult/`}>/admin/django_tasks_database/dbtaskresult/</LinkExt>
