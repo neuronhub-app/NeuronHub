@@ -13,7 +13,8 @@ export function Toc() {
   const items = useHeadingItems(location.pathname);
   const idsVisible = useScrollSpy(items);
 
-  if (items.length === 0) {
+  const isRedundant = items.length <= 1 || (items.length === 2 && idsVisible.size === 2);
+  if (isRedundant) {
     return null;
   }
 
@@ -86,7 +87,7 @@ function useScrollSpy(items: HeadingItem[]): Set<string> {
         if (top <= 0) {
           idLastPastTop = item.id;
         }
-        if (top >= 0 && top < window.innerHeight) {
+        if (top >= 0 && top < window.innerHeight && ids.size < 2) {
           ids.add(item.id);
         }
       }
