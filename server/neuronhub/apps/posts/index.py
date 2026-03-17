@@ -107,3 +107,22 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ],
             "advancedSyntax": True,
         }
+
+        # SQL perf fix
+        def get_queryset(self):
+            return (
+                Post.objects.exclude(type=Post.Type.Comment)
+                .select_related(
+                    "author",
+                    "parent",
+                    "post_source",
+                )
+                .prefetch_related(
+                    "author__connection_groups",
+                    "visible_to_users",
+                    "visible_to_groups",
+                    "tags",
+                    "votes",
+                    "review_tags",
+                )
+            )

@@ -104,3 +104,26 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ],
             "advancedSyntax": True,
         }
+
+        # SQL perf fix
+        def get_queryset(self):
+            return (
+                Job.objects.filter(is_published=True)
+                .select_related(
+                    "author",
+                    "org",
+                )
+                .prefetch_related(
+                    "author__connection_groups",
+                    "visible_to_users",
+                    "visible_to_groups",
+                    "tags_skill",
+                    "tags_area",
+                    "tags_education",
+                    "tags_experience",
+                    "tags_workload",
+                    "tags_country",
+                    "tags_city",
+                    "tags_country_visa_sponsor",
+                )
+            )

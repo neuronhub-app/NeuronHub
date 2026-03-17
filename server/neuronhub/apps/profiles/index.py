@@ -91,3 +91,21 @@ if settings.ALGOLIA["IS_ENABLED"]:
             ],
             "advancedSyntax": True,
         }
+
+        # SQL perf fix
+        def get_queryset(self):
+            return (
+                Profile.objects.all()
+                .select_related(
+                    "user",
+                    "match",
+                )
+                .prefetch_related(
+                    # todo ! fix: rename user -> author
+                    # "author__connection_groups",
+                    "visible_to_users",
+                    "visible_to_groups",
+                    "skills",
+                    "interests",
+                )
+            )

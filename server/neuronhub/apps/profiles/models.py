@@ -43,6 +43,7 @@ class CareerStage(models.TextChoices):
 
 
 class Profile(AlgoliaModel):
+    # todo ! rename to `author` or `AlgoliaModel.get_visible_to` will crash once any record adds `.visibility == Visibility.CONNECTIONS`
     user = models.OneToOneField(
         User, null=True, blank=True, on_delete=models.SET_NULL, related_name="profile"
     )
