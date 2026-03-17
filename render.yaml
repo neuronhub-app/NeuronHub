@@ -6,16 +6,16 @@ projects:
         databases:
           - name: neuronhub-db-stage
             postgresMajorVersion: "18"
-            plan: free
+            plan: starter
 
         services:
 
         - name: neuronhub-frontend-stage
           type: web
-          plan: free
+          plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/client:latest
+            url: ghcr.io/neuronhub-app/neuronhub/client:0.3.2.0-rc.5
           domains:
             - pg.stage.neuronhub.app
           envVars:
@@ -27,7 +27,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:latest
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.5
           dockerCommand: uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application
           preDeployCommand: uv run manage.py migrate
           domains:
@@ -47,7 +47,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:latest
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.5
           dockerCommand: uv run manage.py db_worker
           envVars:
             - key: DATABASE_URL
