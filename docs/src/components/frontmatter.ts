@@ -13,6 +13,7 @@ export namespace frontmatter {
   export type SchemaType = z.infer<typeof schema>;
 
   // #AI bad placement
+  // todo ? refac: add versions lowercased + .mdx
   export namespace consts {
     export const readme = "README";
   }

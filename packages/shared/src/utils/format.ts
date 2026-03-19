@@ -1,7 +1,7 @@
 export namespace format {
   export function slugToTitle(slug: string): string {
     return slug
-      .split("-")
+      .split(/[-_]/)
       .map(word => capitalize(word))
       .join(" ");
   }

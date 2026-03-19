@@ -92,6 +92,7 @@
         "@react-router/node": "^7.13.1",
         "@react-router/serve": "^7.13.1",
         "@sentry/react-router": "^10.40.0",
+        "algoliasearch": "^5.49.2",
         "date-fns": "^4.1.0",
         "envalid": "^8.1.1",
         "isbot": "^5.1.35",
@@ -99,11 +100,13 @@
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
         "react-icons": "^5.5.0",
+        "react-instantsearch": "^7.28.0",
         "react-router": "^7.13.1",
         "rehype-slug": "^6.0.0",
         "remark-frontmatter": "^5.0.0",
         "remark-gfm": "^4.0.1",
         "remark-mdx-frontmatter": "^5.2.0",
+        "shiki": "^4.0.2",
         "valtio": "^2.3.0",
         "yaml": "^2.7.1",
         "zod": "^4.3.6",
@@ -747,6 +750,8 @@
     "@shikijs/engine-oniguruma": ["@shikijs/engine-oniguruma@3.23.0", "", { "dependencies": { "@shikijs/types": "3.23.0", "@shikijs/vscode-textmate": "^10.0.2" } }, "sha512-1nWINwKXxKKLqPibT5f4pAFLej9oZzQTsby8942OTlsJzOBZ0MWKiwzMsd+jhzu8YPCHAswGnnN1YtQfirL35g=="],
 
     "@shikijs/langs": ["@shikijs/langs@3.23.0", "", { "dependencies": { "@shikijs/types": "3.23.0" } }, "sha512-2Ep4W3Re5aB1/62RSYQInK9mM3HsLeB91cHqznAJMuylqjzNVAVCMnNWRHFtcNHXsoNRayP9z1qj4Sq3nMqYXg=="],
+
+    "@shikijs/primitive": ["@shikijs/primitive@4.0.2", "", { "dependencies": { "@shikijs/types": "4.0.2", "@shikijs/vscode-textmate": "^10.0.2", "@types/hast": "^3.0.4" } }, "sha512-M6UMPrSa3fN5ayeJwFVl9qWofl273wtK1VG8ySDZ1mQBfhCpdd8nEx7nPZ/tk7k+TYcpqBZzj/AnwxT9lO+HJw=="],
 
     "@shikijs/themes": ["@shikijs/themes@3.23.0", "", { "dependencies": { "@shikijs/types": "3.23.0" } }, "sha512-5qySYa1ZgAT18HR/ypENL9cUSGOeI2x+4IvYJu4JgVJdizn6kG4ia5Q1jDEOi7gTbN4RbuYtmHh0W3eccOrjMA=="],
 
@@ -2206,6 +2211,8 @@
 
     "@sentry/cli/node-fetch": ["node-fetch@2.7.0", "", { "dependencies": { "whatwg-url": "^5.0.0" }, "peerDependencies": { "encoding": "^0.1.0" }, "optionalPeers": ["encoding"] }, "sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A=="],
 
+    "@shikijs/primitive/@shikijs/types": ["@shikijs/types@4.0.2", "", { "dependencies": { "@shikijs/vscode-textmate": "^10.0.2", "@types/hast": "^3.0.4" } }, "sha512-qzbeRooUTPnLE+sHD/Z8DStmaDgnbbc/pMrU203950aRqjX/6AFHeDYT+j00y2lPdz0ywJKx7o/7qnqTivtlXg=="],
+
     "accepts/negotiator": ["negotiator@0.6.3", "", {}, "sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg=="],
 
     "babel-plugin-macros/cosmiconfig": ["cosmiconfig@7.1.0", "", { "dependencies": { "@types/parse-json": "^4.0.0", "import-fresh": "^3.2.1", "parse-json": "^5.0.0", "path-type": "^4.0.0", "yaml": "^1.10.0" } }, "sha512-AdmX6xUzdNASswsFtmwSt7Vj8po9IuqXm0UXz7QKPuEUmPB4XyjGfaAr2PSuELMwkRMVH1EpIkX5bTZGRB3eCA=="],
@@ -2251,6 +2258,10 @@
     "morgan/debug": ["debug@2.6.9", "", { "dependencies": { "ms": "2.0.0" } }, "sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA=="],
 
     "morgan/on-finished": ["on-finished@2.3.0", "", { "dependencies": { "ee-first": "1.1.1" } }, "sha512-ikqdkGAAyf/X/gPhXGvfgAytDZtDbr+bkNUJ0N9h5MI/dmdgCs3l6hoHrcUv41sRKew3jIwrp4qQDXiK99Utww=="],
+
+    "neuronhub-docs/react-instantsearch": ["react-instantsearch@7.28.0", "", { "dependencies": { "@swc/helpers": "0.5.18", "instantsearch-ui-components": "0.22.0", "instantsearch.js": "4.92.0", "react-instantsearch-core": "7.28.0" }, "peerDependencies": { "algoliasearch": ">= 3.1 < 6", "react": ">= 16.8.0 < 20", "react-dom": ">= 16.8.0 < 20" } }, "sha512-jszv8vwSwngNrSvoWPnPlLDBa0Fsm55Mr7jUk5kJjpNHEj9JtlrX0IODvV9D+sF7GLwyv4aqx67PM3Ir/2zuRw=="],
+
+    "neuronhub-docs/shiki": ["shiki@4.0.2", "", { "dependencies": { "@shikijs/core": "4.0.2", "@shikijs/engine-javascript": "4.0.2", "@shikijs/engine-oniguruma": "4.0.2", "@shikijs/langs": "4.0.2", "@shikijs/themes": "4.0.2", "@shikijs/types": "4.0.2", "@shikijs/vscode-textmate": "^10.0.2", "@types/hast": "^3.0.4" } }, "sha512-eAVKTMedR5ckPo4xne/PjYQYrU3qx78gtJZ+sHlXEg5IHhhoQhMfZVzetTYuaJS0L2Ef3AcCRzCHV8T0WI6nIQ=="],
 
     "parse-entities/@types/unist": ["@types/unist@2.0.11", "", {}, "sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA=="],
 
@@ -2328,6 +2339,24 @@
 
     "morgan/debug/ms": ["ms@2.0.0", "", {}, "sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A=="],
 
+    "neuronhub-docs/react-instantsearch/instantsearch-ui-components": ["instantsearch-ui-components@0.22.0", "", { "dependencies": { "@swc/helpers": "0.5.18", "markdown-to-jsx": "^7.7.15", "zod": "^3.25.76 || ^4", "zod-to-json-schema": "3.24.6" } }, "sha512-28V7ZmGuPpYB/XWQdxXdgpUErSMj87gK9VoTwyLaZcNCL1Qxr/rJmbJpkTluYFMAYT/tIAehYAoL+1lNT2BRnw=="],
+
+    "neuronhub-docs/react-instantsearch/instantsearch.js": ["instantsearch.js@4.92.0", "", { "dependencies": { "@algolia/events": "^4.0.1", "@swc/helpers": "0.5.18", "@types/dom-speech-recognition": "^0.0.1", "@types/google.maps": "^3.55.12", "@types/hogan.js": "^3.0.0", "@types/qs": "^6.5.3", "algoliasearch-helper": "3.28.0", "hogan.js": "^3.0.2", "htm": "^3.0.0", "instantsearch-ui-components": "0.22.0", "preact": "^10.10.0", "qs": "^6.5.1", "react": ">= 0.14.0", "search-insights": "^2.17.2", "zod": "^3.25.76 || ^4", "zod-to-json-schema": "3.24.6" }, "peerDependencies": { "algoliasearch": ">= 3.1 < 6" } }, "sha512-mkbP3uPwk4NuW66vXRGFSRzOpWoztvIquQ1sh/gCa4BoiYQ27XFtj/5529nPLIdPAWYJyN0I6B+fs+wOmRPjOA=="],
+
+    "neuronhub-docs/react-instantsearch/react-instantsearch-core": ["react-instantsearch-core@7.28.0", "", { "dependencies": { "@swc/helpers": "0.5.18", "algoliasearch-helper": "3.28.0", "instantsearch.js": "4.92.0", "use-sync-external-store": "^1.0.0", "zod": "^3.25.76 || ^4", "zod-to-json-schema": "3.24.6" }, "peerDependencies": { "algoliasearch": ">= 3.1 < 6", "react": ">= 16.8.0 < 20" } }, "sha512-oOCh8ARtqRBcjFVes6UunDVu1FZVde67q5fklewxDP1pQ1w2l+YneeomoSNUw7Ua/uEqETUQGi5Oiipk2CE1hA=="],
+
+    "neuronhub-docs/shiki/@shikijs/core": ["@shikijs/core@4.0.2", "", { "dependencies": { "@shikijs/primitive": "4.0.2", "@shikijs/types": "4.0.2", "@shikijs/vscode-textmate": "^10.0.2", "@types/hast": "^3.0.4", "hast-util-to-html": "^9.0.5" } }, "sha512-hxT0YF4ExEqB8G/qFdtJvpmHXBYJ2lWW7qTHDarVkIudPFE6iCIrqdgWxGn5s+ppkGXI0aEGlibI0PAyzP3zlw=="],
+
+    "neuronhub-docs/shiki/@shikijs/engine-javascript": ["@shikijs/engine-javascript@4.0.2", "", { "dependencies": { "@shikijs/types": "4.0.2", "@shikijs/vscode-textmate": "^10.0.2", "oniguruma-to-es": "^4.3.4" } }, "sha512-7PW0Nm49DcoUIQEXlJhNNBHyoGMjalRETTCcjMqEaMoJRLljy1Bi/EGV3/qLBgLKQejdspiiYuHGQW6dX94Nag=="],
+
+    "neuronhub-docs/shiki/@shikijs/engine-oniguruma": ["@shikijs/engine-oniguruma@4.0.2", "", { "dependencies": { "@shikijs/types": "4.0.2", "@shikijs/vscode-textmate": "^10.0.2" } }, "sha512-UpCB9Y2sUKlS9z8juFSKz7ZtysmeXCgnRF0dlhXBkmQnek7lAToPte8DkxmEYGNTMii72zU/lyXiCB6StuZeJg=="],
+
+    "neuronhub-docs/shiki/@shikijs/langs": ["@shikijs/langs@4.0.2", "", { "dependencies": { "@shikijs/types": "4.0.2" } }, "sha512-KaXby5dvoeuZzN0rYQiPMjFoUrz4hgwIE+D6Du9owcHcl6/g16/yT5BQxSW5cGt2MZBz6Hl0YuRqf12omRfUUg=="],
+
+    "neuronhub-docs/shiki/@shikijs/themes": ["@shikijs/themes@4.0.2", "", { "dependencies": { "@shikijs/types": "4.0.2" } }, "sha512-mjCafwt8lJJaVSsQvNVrJumbnnj1RI8jbUKrPKgE6E3OvQKxnuRoBaYC51H4IGHePsGN/QtALglWBU7DoKDFnA=="],
+
+    "neuronhub-docs/shiki/@shikijs/types": ["@shikijs/types@4.0.2", "", { "dependencies": { "@shikijs/vscode-textmate": "^10.0.2", "@types/hast": "^3.0.4" } }, "sha512-qzbeRooUTPnLE+sHD/Z8DStmaDgnbbc/pMrU203950aRqjX/6AFHeDYT+j00y2lPdz0ywJKx7o/7qnqTivtlXg=="],
+
     "send/debug/ms": ["ms@2.0.0", "", {}, "sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A=="],
 
     "string-width/strip-ansi/ansi-regex": ["ansi-regex@5.0.1", "", {}, "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ=="],
@@ -2335,5 +2364,7 @@
     "wrap-ansi/string-width/emoji-regex": ["emoji-regex@10.6.0", "", {}, "sha512-toUI84YS5YmxW219erniWD0CIVOo46xGKColeNQRgOzDorgBi1v4D71/OFzgD9GO2UGKIv1C3Sp8DAn0+j5w7A=="],
 
     "@inquirer/core/wrap-ansi/strip-ansi/ansi-regex": ["ansi-regex@5.0.1", "", {}, "sha512-quJQXlTSUGL2LH9SUXo8VwsY4soanhgo6LNSm84E1LBcE8s3O0wpdiRzyR9z/ZZJMlMWv37qOOb9pdJlMUEKFQ=="],
+
+    "neuronhub-docs/react-instantsearch/instantsearch.js/qs": ["qs@6.15.0", "", { "dependencies": { "side-channel": "^1.1.0" } }, "sha512-mAZTtNCeetKMH+pSjrb76NAM8V9a05I9aBZOHztWy/UqcJdQYNsf59vrRKWnojAT9Y+GbIvoTBC++CPHqpDBhQ=="],
   }
 }

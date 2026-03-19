@@ -21,23 +21,22 @@ const routes = {
   },
   development: {
     codeStyle: path("/development/guides/code-style"),
+    codeStyleDetailed: path("/development/guides/code-style-detailed"),
     gitCommits: path("/development/guides/git-commits"),
     dirGuides: path("/development/guides"),
   },
 };
 
-const routesAll = [
-  routes.home,
-  ...Object.values(routes.usage),
-  ...Object.values(routes.development),
-];
-
-for (const url of routesAll) {
-  test(`${url} renders without errors`, async ({ page }) => {
+test("pages render without errors", async ({ page }) => {
+  for (const url of [
+    routes.home,
+    ...Object.values(routes.usage),
+    ...Object.values(routes.development),
+  ]) {
     await page.goto(url);
     await expect(page.getByText("Application Error")).not.toBeVisible();
-  });
-}
+  }
+});
 
 test.describe("TOC", () => {
   test("renders headings from MDX content", async ({ page }) => {

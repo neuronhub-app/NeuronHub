@@ -23,6 +23,8 @@ import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { env } from "@/env";
 import { type NavNode, navTree, findFirstChildHrefRecursively } from "@/components/buildNavTree";
 import { Toc } from "@/components/Toc";
+import { DocsSearch } from "@/components/DocsSearch";
+import { CodeBlockShikiAdapter } from "@/components/CodeBlockShikiAdapter";
 import { ids } from "@/e2e/ids";
 
 export default function DocsLayout() {
@@ -49,7 +51,9 @@ export default function DocsLayout() {
             <Stack direction={{ base: "column-reverse", xl: "row" }} gap="8" flex="1">
               <Box flex="1">
                 <Prose data-toc-root pb="10vh" variant="content-main">
-                  <Outlet />
+                  <CodeBlockShikiAdapter>
+                    <Outlet />
+                  </CodeBlockShikiAdapter>
                 </Prose>
               </Box>
 
@@ -60,6 +64,7 @@ export default function DocsLayout() {
                 overflowY="auto"
                 width={{ base: "full", xl: "xs" }}
                 maxH="calc(100vh - 3rem)"
+                hideBelow="xl"
               >
                 <Toc />
               </Box>
@@ -107,6 +112,8 @@ function SidebarContent() {
         >
           <NeuronLogo breakpoint="2xl" />
         </chakra.a>
+
+        <DocsSearch />
 
         <SectionTabs
           value={activeSection}

@@ -22,6 +22,12 @@ export namespace ids {
     trigger: "term.trigger",
   } as const;
 
+  export const search = {
+    trigger: "search.trigger",
+    dialog: "search.dialog",
+    input: "search.input",
+  } as const;
+
   export function selector<S extends TestId>(id: S): `[data-testid="${S}"]` {
     return `[data-testid="${id}"]`;
   }
