@@ -2,6 +2,7 @@ import {
   createSystem,
   defaultConfig,
   defineConfig,
+  defineRecipe,
   defineTokens,
   mergeConfigs,
 } from "@chakra-ui/react";
@@ -50,7 +51,10 @@ export const system = createSystem(
       },
 
       theme: {
-        recipes,
+        recipes: {
+          ...recipes,
+          container: defineRecipe({ base: { maxWidth: "1280px" } }),
+        },
         slotRecipes,
         tokens,
         semanticTokens: {
