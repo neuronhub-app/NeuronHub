@@ -1,0 +1,75 @@
+## Desc
+
+Our new `docs/` has a set of MDX I want to have in Algolia.
+
+It's mostly implemented now, but by an LLM.
+
+Firstly review the git diff for the high level issues.
+
+### Secs
+
+Unlike the standard Algolia's JS "dev documentation" popup, avoid:
+- it shows no snippets of what matches - only title/subtitle.
+- it's bad at fuzzy matching, or matching dev words as CamelCase or snake_case - and has no match snippet highlight.
+
+## Relevant-Files
+
+- docs/scripts/algolia-index-docs.ts - indexer: MDX->AST->records
+- docs/src/components/DocsSearch.tsx - SSR trigger button
+- docs/src/components/DocsSearchClient.tsx - Algolia Dialog UI
+- docs/src/components/DocsLayout.tsx - layout with Toc container
+- docs/src/components/Toc.tsx - table of contents (client-only)
+- docs/e2e/ids.ts - test IDs for search
+- docs/e2e/tests/docs-pages.spec.ts - 33 e2e tests (6 search)
+- docs/package.json - @mdx-js/mdx added as direct devDep
+- docs/src/env.ts - VITE_ALGOLIA_* vars
+- docs/src/components/frontmatter.ts - Zod schema for indexer
+- docs/src/utils/findMdxFiles.ts - MDX glob for indexer
+- packages/shared/src/components/ui/prose.tsx - content-main variant
+- mise.toml:82-85 - ALGOLIA env vars; :255 - reindex task
+
+## Exec-Plan
+
+Reviewed and fixed. E2E: 34/34. Lint: pre-existing `hast` only.
+
+Live Algolia verified: search returns hits with `<mark>`
+highlights. No CamelCase content exists in MDX (code blocks
+stripped) — `camelCaseAttributes` is preemptive for future.
+
+## Decision-Log
+
+- Approach: `docs_dev_{USER}` index + InstantSearch
+- 63 records from ~25 MDX pages (per-heading split)
+- Issue: `instantsearch.js` types not hoisted (Bun workspace)
+    - Fix: `@ts-expect-error` on Highlight/Snippet hit props
+- Pre-existing lint: `hast` module types
+- Issue: /overview 33px CLS (emotion SSR `<style>` siblings)
+    - Fix: `h2:first-of-type` + `h2 + style + *` in prose.tsx
+    - Regression test: layout-shift-investigation.spec.ts
+
+### Review fixes
+
+- Fix: `export default` → named export in DocsSearchClient
+- Fix: dup `slugToTitle` in indexer → `format.slugToTitle`
+    - Extended shared to split on `[-_]`
+- Fix: `frontmatter.consts.readme` → `frontmatter.readme`
+- Fix: `waitForTimeout(1000)` → `waitForFunction` in CLS test
+- Added e2e: "results with snippets" + "no results"
+- No CamelCase in indexed content (code blocks stripped)
+    - `camelCaseAttributes`/`separatorsToIndex` preemptive
+
+### Code style pass
+
+- `!!` → `Boolean()` in DocsSearch.tsx
+- `showFileName` → `isFileNameShown` (booleans start with `is`)
+- Removed what-comments, kept only why-comments
+- Removed `#AI` tags from reviewed code
+- Vars/consts below invocation where possible
+    - `isAlgoliaEnabled`, `algoliaClient`, `DocHit` moved below
+    - Indexer: `main()` + `buildRecords()` above helpers
+    - Constraint: `const` can't go below `await main()`
+      (TDZ — unlike `function`, not hoisted)
+- TSX props reordered per code-style-detailed:
+    bracket → function → component → chakra → styling
+    (position → display/box → effects → font → interactive)
+- E2E: 34/34 pass. Lint: only pre-existing `hast` error.

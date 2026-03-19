@@ -205,7 +205,9 @@ export const Prose = chakra("div", {
       marginTop: "2.25em",
       marginBottom: "2.25em",
     },
-    "& :is(h1,h2,h3,h4,h5,hr) + *": {
+    // #AI
+    // + style + * variant: `emotion` injects <style> siblings during SSR, breaking adjacency
+    "& :is(h1,h2,h3,h4,h5,hr) + *, & :is(h1,h2,h3,h4,h5,hr) + style + *": {
       marginTop: "0",
     },
     "& table": {
@@ -286,7 +288,7 @@ export const Prose = chakra("div", {
           marginBottom: "0.4em",
           lineHeight: "1.5em",
         },
-        "& h2:first-child": {
+        "& h2:first-of-type": {
           marginTop: 0,
         },
       },
