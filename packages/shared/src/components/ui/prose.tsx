@@ -275,13 +275,15 @@ export const Prose = chakra("div", {
       "content-main": {
         color: "fg",
         // restore h1 & h2, that's small by default
-        "& h1": {
-          fontSize: "1.485em",
+        "body & h1": {
+          fontSize: "1.6em",
+          fontWeight: "bolder",
           letterSpacing: "-0.01em",
           marginBottom: "0.4em",
           lineHeight: "1.5em",
+          color: "blue.800/75",
         },
-        "& h2": {
+        "body & h2": {
           fontSize: "1.385em",
           letterSpacing: "-0.01em",
           marginTop: "1.5em",
