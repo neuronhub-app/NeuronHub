@@ -1,3 +1,6 @@
+import { LinkInt } from "@/components/LinkInt"
+import { TagLg } from "@/components/TagLg"
+
 # Code Style
 
 ## Primary Directives
@@ -62,13 +65,13 @@ Comments:
 ## Tags
 
 Code blocks can be marked with:
-- `#AI` - not fully reviewed LLM code → consider dangerous.
-- `#AI-slop` - trash to drop.
-- `#bad-infer` - broken TS type inference - over time check if they fixed it.
-- `#prob-redundant` - may not be useful, but removal isn't a priority.
-- `#draft` - not tested, not working, or not ready for prod.
-- `#E2E-fails` - can be added to Git commit body (as we lack E2E CI atm).
+- <TagLg>#AI</TagLg> - not fully reviewed LLM code → consider dangerous.
+- <TagLg>#AI-slop</TagLg> - trash to drop.
+- <TagLg>#bad-infer</TagLg> - broken TS type inference - over time check if they fixed it.
+- <TagLg>#prob-redundant</TagLg> - may not be useful, but removal isn't a priority.
+- <TagLg>#draft</TagLg> - not tested, not working, or not ready for prod.
+- <TagLg>#E2E-fails</TagLg> - can be added to Git commit body (as we lack E2E CI atm).
 
 ## Detailed rules
 
-If you need to enforce the code style - read and use [code-style-detailed](/development/guides/code-style-detailed).
+If you need to enforce the code style - read and use <LinkInt path="/development/guides/code-style-detailed">Code Style Detailed</LinkInt>.
