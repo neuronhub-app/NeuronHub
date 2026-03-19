@@ -1,0 +1,25 @@
+## Desc
+
+To `docs/` add the H1 title on every page - it must match the page `title`. It must not be included in the Toc.tsx.
+
+## Relevant-Files
+
+- `docs/src/components/DocsLayout.tsx` - renders H1 from `pageLinks`
+- `docs/src/components/buildNavTree.ts` - added README pages to `pageLinks`
+- `docs/src/components/Toc.tsx` - unchanged, only picks `[id]` headings
+- `docs/src/pages/development/guides/code-style.mdx` - removed manual `# Code Style` H1
+
+## Exec-Plan
+
+1. Add README pages to `pageLinks` in buildNavTree.ts
+2. In DocsLayout, render `<Heading as="h1">` (no `id`) before `<Outlet />`
+3. Remove existing manual H1 from code-style.mdx
+4. Toc.tsx untouched — queries `h1[id]` so id-less H1 excluded automatically
+
+## Decision-Log
+
+- Fix: H1 injected in DocsLayout via `pageLinks.get(pathname)`
+    - No `id` attr → excluded from Toc.tsx `querySelectorAll("h1[id]")`
+- Fix: README pages added to `pageLinks` (were missing)
+- Fix: removed `# Code Style` from code-style.mdx (only page with manual H1)
+- Overview.mdx `<Heading size="2xl">Documentation</Heading>` kept as subtitle

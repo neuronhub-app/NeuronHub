@@ -21,13 +21,21 @@ import { Outlet, useLocation, useNavigate } from "react-router";
 import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
 import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { env } from "@/env";
-import { type NavNode, navTree, findFirstChildHrefRecursively } from "@/components/buildNavTree";
+import {
+  type NavNode,
+  navTree,
+  pageLinks,
+  findFirstChildHrefRecursively,
+} from "@/components/buildNavTree";
 import { Toc } from "@/components/Toc";
 import { DocsSearch } from "@/components/DocsSearch";
+import { ReactRouterPath } from "@/utils/types";
 import { CodeBlockShikiAdapter } from "@/components/CodeBlockShikiAdapter";
 import { ids } from "@/e2e/ids";
 
 export default function DocsLayout() {
+  const location = useLocation();
+
   return (
     <>
       <MobileNavbar />
@@ -51,6 +59,9 @@ export default function DocsLayout() {
             <Stack direction={{ base: "column-reverse", xl: "row" }} gap="8" flex="1">
               <Box flex="1">
                 <Prose data-toc-root pb="10vh" variant="content-main">
+                  <Heading as="h1">
+                    {pageLinks.get(location.pathname as ReactRouterPath)?.title}
+                  </Heading>
                   <CodeBlockShikiAdapter>
                     <Outlet />
                   </CodeBlockShikiAdapter>

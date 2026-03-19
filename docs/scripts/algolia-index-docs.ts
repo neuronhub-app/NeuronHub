@@ -26,6 +26,30 @@ import { format } from "@neuronhub/shared/utils/format";
 import { findMdxFiles } from "@/utils/findMdxFiles";
 import { frontmatter } from "@/components/frontmatter";
 
+const config = {
+  pagesDir: path.join(import.meta.dirname, "../src/pages"),
+  mdxProcessor: createProcessor({
+    remarkPlugins: [remarkGfm, remarkFrontmatter],
+  }),
+  env: {
+    appId: process.env.ALGOLIA_APPLICATION_ID,
+    apiKey: process.env.ALGOLIA_API_KEY,
+    indexName: process.env.ALGOLIA_INDEX_DOCS,
+  },
+  jsx_nodes: {
+    excluded: new Set([
+      "code",
+      "yaml",
+      "toml",
+      "table",
+      "mdxjsEsm",
+      "mdxFlowExpression",
+      "mdxTextExpression",
+    ]),
+    need_newlines_appended: new Set(["root", "paragraph", "heading", "listItem", "blockquote"]),
+  } as const,
+};
+
 await algoliaIndexDocs();
 
 async function algoliaIndexDocs() {
@@ -60,30 +84,6 @@ async function algoliaIndexDocs() {
 
   console.log(`Indexed ${records.length} records to "${config.env.indexName}"`);
 }
-
-const config = {
-  pagesDir: path.join(import.meta.dirname, "../src/pages"),
-  mdxProcessor: createProcessor({
-    remarkPlugins: [remarkGfm, remarkFrontmatter],
-  }),
-  env: {
-    appId: process.env.ALGOLIA_APPLICATION_ID,
-    apiKey: process.env.ALGOLIA_API_KEY,
-    indexName: process.env.ALGOLIA_INDEX_DOCS,
-  },
-  jsx_nodes: {
-    excluded: new Set([
-      "code",
-      "yaml",
-      "toml",
-      "table",
-      "mdxjsEsm",
-      "mdxFlowExpression",
-      "mdxTextExpression",
-    ]),
-    need_newlines_appended: new Set(["root", "paragraph", "heading", "listItem", "blockquote"]),
-  } as const,
-};
 
 function buildRecords(): DocRecord[] {
   const records: DocRecord[] = [];

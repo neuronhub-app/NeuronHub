@@ -33,6 +33,8 @@ function buildNavTree(): NavNode[] {
       continue;
     }
 
+    pageLinks.set(file.href as unknown as ReactRouterPath, { title: file.title });
+
     if (file.isReadme) {
       const parent = getOrCreateDirNode({ navNodes, pathParts: file.dir.pathParts });
       parent.href = file.href;
@@ -54,7 +56,6 @@ function buildNavTree(): NavNode[] {
         order: file.order,
         children: [],
       };
-      pageLinks.set(file.href as unknown as ReactRouterPath, { title: file.title });
       if (parent) {
         parent.children.push(leaf);
       } else {
