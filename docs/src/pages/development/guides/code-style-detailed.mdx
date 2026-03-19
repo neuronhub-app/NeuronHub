@@ -2,6 +2,8 @@
 description: For LLM-driven code cleanup. A separate file to avoid context rot.
 ---
 
+import { CodeBlockText } from "@/components/CodeBlockText"
+
 
 ### Comments
 
@@ -11,63 +13,63 @@ Hence a comment is not only the future tech debt - it is also the highest-level 
 
 ### Group related variables by domain in an object
 
-```ts
-// Bad
-const toolData = forms.tool.getValues();
-const reviewData = forms.review.getValues();
+<CodeBlockText lang="typescript">{`
+  // Bad
+  const toolData = forms.tool.getValues();
+  const reviewData = forms.review.getValues();
 
-// Good
-const data = {
-  tool: forms.tool.getValues(),
-  review: forms.review.getValues(),
-};
-```
+  // Good
+  const data = {
+    tool: forms.tool.getValues(),
+    review: forms.review.getValues(),
+  };
+`}</CodeBlockText>
 
 In Python use a lowercase-named dataclass / class, placed below invocation:
 
-```py
-# Bad
-POST_COUNT = 1
-FILE_PATH = Path(...)
+<CodeBlockText lang="python">{`
+  # Bad
+  POST_COUNT = 1
+  FILE_PATH = Path(...)
 
-def function():
-    if POST_COUNT:
-        data = [("key", "value"), ("key", "value")]
+  def function():
+      if POST_COUNT:
+          data = [("key", "value"), ("key", "value")]
 
 
-# Good
-def function():
-    if _conf.post_count:
-        params = [PostParam(users=[alex]), PostParam(users=[])]
+  # Good
+  def function():
+      if _conf.post_count:
+          params = [PostParam(users=[alex]), PostParam(users=[])]
 
-class _conf:
-    post_count = 1
-    file_path = Path(...)
+  class _conf:
+      post_count = 1
+      file_path = Path(...)
 
-@dataclass
-class PostParam:
-    users: list[User]
-```
+  @dataclass
+  class PostParam:
+      users: list[User]
+`}</CodeBlockText>
 
 
 ### Use function named parameters over redundant vars
 
-```ts
-// Bad:
-const input = {
-  ...data.review,
-  parent: { id: response.data.create_post.id },
-};
-await mutate({ input });
-
-// Good:
-await mutate({
-  input: {
+<CodeBlockText lang="typescript">{`
+  // Bad:
+  const input = {
     ...data.review,
     parent: { id: response.data.create_post.id },
-  }
-});
-```
+  };
+  await mutate({ input });
+
+  // Good:
+  await mutate({
+    input: {
+      ...data.review,
+      parent: { id: response.data.create_post.id },
+    }
+  });
+`}</CodeBlockText>
 
 ### Naming
 
@@ -114,12 +116,12 @@ Especially of React `props`. There are only 2 exceptions:
 
 ### Function declarations only
 
-```ts
-// Good
-function mutate(user: User) { }
-// Bad
-const mutate = (user: User) => { }
-```
+<CodeBlockText lang="typescript">{`
+  // Good
+  function mutate(user: User) { }
+  // Bad
+  const mutate = (user: User) => { }
+`}</CodeBlockText>
 
 ### TSX props ordering
 

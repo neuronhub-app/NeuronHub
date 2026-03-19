@@ -1,3 +1,5 @@
+import dedentDefault from "dedent";
+
 export namespace format {
   export function slugToTitle(slug: string): string {
     return slug
@@ -25,4 +27,14 @@ export namespace format {
     }
     return `$${thousands}k`;
   }
+
+  export const dedent = dedentDefault.withOptions({
+    // keeps the same indents on all lines - not just first vs others
+    alignValues: true,
+
+    // fuck this magic:
+    // - dedent(`$value`) -> true  -> `$value`
+    // - dedent`$value`   -> false -> `\$value`
+    escapeSpecialCharacters: true,
+  });
 }

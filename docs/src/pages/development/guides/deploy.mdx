@@ -3,78 +3,81 @@ title: Deployment
 order: 0
 ---
 
+import { CodeBlockText } from "@/components/CodeBlockText"
+
 ## Using Docker Compose
 
-Replace all the `${{}}` placeholders below.
+Replace all the `$` placeholders below.
 
 ### App
 
-```yaml
-name: neuronhub
+<CodeBlockText lang="yaml">{`
+  name: neuronhub
 
-services:
-  server:
-    image: ghcr.io/neuronhub-app/neuronhub/server:${{major_tag}}
-    command: bash -c "uv run manage.py migrate && uv run daphne --bind 0.0.0.0 --port ${{server=8000}} neuronhub.asgi:application"
-    env_file:
-      - path: .env
-    ports:
-      - "${{server=8000}}:${{server=8000}}"
-    restart: always
-    pull_policy: always
-  server_db_worker:
-    image: ghcr.io/neuronhub-app/neuronhub/server:${{major_tag}}
-    command: bash -c "uv run manage.py db_worker"
-    env_file:
-      - path: .env
-    pull_policy: always
-    restart: always
-    depends_on:
-      server:
-        condition: service_started
-  client:
-    image: ghcr.io/neuronhub-app/neuronhub/client:${{major_tag}}
-    env_file:
-      - path: .env
-    ports:
-      - "${{client=3000}}:${{client=3000}}"
-    restart: always
-    pull_policy: always
-```
+  services:
+    server:
+      image: ghcr.io/neuronhub-app/neuronhub/server:$major_tag
+      command: bash -c "uv run manage.py migrate && uv run daphne --bind 0.0.0.0 --port $server_port neuronhub.asgi:application"
+      env_file:
+        - path: .env
+      ports:
+        - "$server_port:$server_port"
+      restart: always
+      pull_policy: always
+    server_db_worker:
+      image: ghcr.io/neuronhub-app/neuronhub/server:$major_tag
+      command: bash -c "uv run manage.py db_worker"
+      env_file:
+        - path: .env
+      pull_policy: always
+      restart: always
+      depends_on:
+        server:
+          condition: service_started
+    client:
+      image: ghcr.io/neuronhub-app/neuronhub/client:$major_tag
+      env_file:
+        - path: .env
+      ports:
+        - "$client_port:$client_port"
+      restart: always
+      pull_policy: always
+`}</CodeBlockText>
 
 `.env` file
-```bash
-# Django
-DJANGO_ENV=prod
-DATABASE_URL=postgresql://${{db_user}}:${{db_password}}@${{db_host}}:${{db_port}}/${{db_name}}
-SECRET_KEY=${{django_secret}}
 
-SERVER_DOMAIN=backend.${{domain}}
-SERVER_URL=https://${{SERVER_DOMAIN}}
+<CodeBlockText lang="bash">{`
+  # Django
+  DJANGO_ENV=prod
+  DATABASE_URL=postgresql://$db_user:$db_password@$db_host:$db_port/$db_name
+  SECRET_KEY=$django_secret
 
-CLIENT_DOMAIN=${{domain}}
-CLIENT_URL=https://${{CLIENT_DOMAIN}}
+  SERVER_DOMAIN=backend.$domain
+  SERVER_URL=https://$SERVER_DOMAIN
 
-# S3
-AWS_S3_ENDPOINT_URL=${{host}}:${{s3_port}}
-AWS_ACCESS_KEY_ID=${{s3_key_id}}
-AWS_SECRET_ACCESS_KEY=${{s3_key_secret}}
+  CLIENT_DOMAIN=$domain
+  CLIENT_URL=https://$CLIENT_DOMAIN
 
-
-# Client
-VITE_SERVER_URL=https://backend.${{domain}}
+  # S3
+  AWS_S3_ENDPOINT_URL=$host:$s3_port
+  AWS_ACCESS_KEY_ID=$s3_key_id
+  AWS_SECRET_ACCESS_KEY=$s3_key_secret
 
 
-# Sentry
-SENTRY_DSN_BACKEND=${{dsn_backend}}
-SENTRY_DSN_FRONTEND=${{dsn_frontend}}
+  # Client
+  VITE_SERVER_URL=https://backend.$domain
 
-# Algolia
-ALGOLIA_IS_ENABLED="true"
-ALGOLIA_API_KEY="${{algolia_write_key}}"
-ALGOLIA_APPLICATION_ID="${{algolia_app_id}}"
-ALGOLIA_SEARCH_API_KEY="${{algolia_search_key}}"
-```
+
+  # Sentry
+  SENTRY_DSN_BACKEND=$dsn_backend
+  SENTRY_DSN_FRONTEND=$dsn_frontend
+
+  # Algolia
+  ALGOLIA_IS_ENABLED="true"
+  ALGOLIA_API_KEY="$algolia_write_key"
+  ALGOLIA_APPLICATION_ID="$algolia_app_id"
+  ALGOLIA_SEARCH_API_KEY="$algolia_search_key"
+`}</CodeBlockText>
 
 ### Postgres 18 database
 
@@ -88,34 +91,36 @@ To create Rclone "S3 bucket" you need to create a dir, eg `mkdir -p /srv/neuronh
 
 Note: `media` is the bucket name expected by Django's settings.py `env.str("S3_STORAGE_BUCKET_NAME", "media")`.
 
-```yaml
-services:
-  rclone:
-    image: rclone/rclone
-    volumes:
-      - /srv/neuronhub/media/config:/config/rclone
-      - /srv/neuronhub/media/data:/data
-    env_file:
-      - path: .env
-    command: serve s3 --auth-key ${ACCESS_KEY_ID},${SECRET_ACCESS_KEY} /data --addr :${{s3_port}}
-    ports:
-      - "${{s3_port}}:${{s3_port}}"
-    expose:
-      - "${{s3_port}}"
-```
+<CodeBlockText lang="yaml">{`
+  services:
+    rclone:
+      image: rclone/rclone
+      volumes:
+        - /srv/neuronhub/media/config:/config/rclone
+        - /srv/neuronhub/media/data:/data
+      env_file:
+        - path: .env
+      command: serve s3 --auth-key $ACCESS_KEY_ID,$SECRET_ACCESS_KEY /data --addr :$s3_port
+      ports:
+        - "$s3_port:$s3_port"
+      expose:
+        - "$s3_port"
+`}</CodeBlockText>
 
 `.env` file
-```bash
-ACCESS_KEY_ID=${{s3_key_id}}
-SECRET_ACCESS_KEY=${{s3_key_secret}}
-```
+
+<CodeBlockText lang="bash">{`
+  ACCESS_KEY_ID=$s3_key_id
+  SECRET_ACCESS_KEY=$s3_key_secret
+`}</CodeBlockText>
 
 ### Algolia setup
 
 I recommend creating `ALGOLIA_API_KEY` and `ALGOLIA_SEARCH_API_KEY` that are limited to `Indices: *_prod*` in [the key settings](https://dashboard.algolia.com/account/api-keys/restricted) instead of using the global Write/Search API keys.
 
 After the first deploy, connect to the `server` docker container, and run:
-- `cd /app/; uv run manage.py algolia_reindex`
+
+<CodeBlockText lang="bash">{"cd /app/; uv run manage.py algolia_reindex"}</CodeBlockText>
 
 ## Upgrades
 
