@@ -13,7 +13,7 @@ import type { ReactNode } from "react";
 import { GoComment, GoQuestion } from "react-icons/go";
 import { Configure } from "react-instantsearch";
 import { NavLink } from "react-router";
-import { JobsSubscribeModal } from "@/apps/jobs/list/JobsSubscribeModal";
+import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
@@ -36,16 +36,7 @@ export function JobList(props: { slug?: string }) {
     <PgAlgoliaList<JobFragmentType>
       index="indexNameJobs"
       label="job"
-      cta={
-        <JobsSubscribeModal
-          buttonProps={{
-            variant: "pg-primary",
-            w: "full",
-            borderRadius: { base: "md", md: "sm" },
-            h: "10",
-          }}
-        />
-      }
+      cta={<JobsSubscribeModal />}
       sort={
         algolia.indexNameJobs && algolia.indexNameJobsSortedByClosesAt
           ? {

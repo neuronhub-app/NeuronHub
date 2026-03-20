@@ -67,6 +67,9 @@ export const system = createSystem(
         html: {
           colorPalette: "green",
         },
+        "[data-part='backdrop']": {
+          bg: "bg.backdrop",
+        },
       },
 
       theme: {
