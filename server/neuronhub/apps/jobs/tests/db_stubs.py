@@ -7,6 +7,7 @@ from django.utils import timezone
 
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models import PostTag
@@ -31,6 +32,7 @@ class JobStub:
     job: Job
     org: Org
     tags: JobTags = field(default_factory=JobTags)
+    locations: list[str] = field(default_factory=list)
 
 
 async def create_jobs_stubs(gen: Gen) -> None:
@@ -40,7 +42,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
         JobStub(
             org=Org(
                 name="Novafield Labs",
-                website="novafield.ai",
+                website="https://novafield.ai",
                 description="Novafield Labs is an AI safety research lab focused on mechanistic interpretability and alignment. They develop tools and techniques for understanding the internal representations of neural networks.",
                 is_highlighted=True,
             ),
@@ -69,11 +71,12 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 city=[val.city.SanFrancisco],
                 visa_countries=[val.country.US],
             ),
+            locations=[val.location.SanFranciscoCA],
         ),
         JobStub(
             org=Org(
                 name="ClearGrant Foundation",
-                website="cleargrant.org",
+                website="https://cleargrant.org",
                 description="ClearGrant Foundation is a philanthropic organisation that funds high-impact global health and development projects. They manage a portfolio of grants across multiple continents with a focus on measurable outcomes.",
                 is_highlighted=True,
             ),
@@ -87,7 +90,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 """),
                 url_external="https://cleargrant.org/jobs/ops-associate",
                 salary_min=75_000,
-                salary_text="$75,000 – $95,000",
                 posted_at=now - timedelta(days=37),
                 visibility=Visibility.PUBLIC,
             ),
@@ -96,15 +98,20 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 area=[val.area.GlobalHealth, val.area.ProfitForGood],
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
-                workload=[val.workload.FullTime],
+                workload=[val.workload.FullTime, val.workload.PartTimeSub50],
                 country=[val.country.US],
                 city=[val.city.Oakland, val.city.SanFrancisco],
             ),
+            locations=[
+                val.location.OaklandCA,
+                val.location.SanFranciscoCA,
+                val.location.WashingtonDC,
+            ],
         ),
         JobStub(
             org=Org(
                 name="Meridian Governance Institute",
-                website="meridiangovernance.org",
+                website="https://meridiangovernance.org",
                 description="Meridian Governance Institute is a policy think tank that researches and advocates for responsible AI governance. They work with governments and international bodies to develop regulatory frameworks for advanced AI systems.",
             ),
             job=Job(
@@ -117,10 +124,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 """),
                 url_external="https://meridiangovernance.org/vacancies/policy",
                 is_remote=True,
-                salary_text=textwrap.dedent("""
-                    - $50,000 – $140,000
-                    - £37,500 – £105,000
-                """),
+                salary_text="$50,000 – $140,000; £37,500 – £105,000",
                 posted_at=now - timedelta(days=60),
                 closes_at=now + timedelta(days=66),
                 visibility=Visibility.PUBLIC,
@@ -130,7 +134,11 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 area=[val.area.AIS, val.area.Societal],
                 education=[val.education.Masters],
                 experience=[val.experience.Junior, val.experience.Middle],
-                workload=[val.workload.FullTime],
+                workload=[
+                    val.workload.FullTime,
+                    val.workload.PartTime50,
+                    val.workload.PartTimeSub50,
+                ],
                 country=[val.country.UK, val.country.US],
                 city=[
                     val.city.London,
@@ -141,24 +149,30 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 ],
                 visa_countries=[val.country.UK],
             ),
+            locations=[
+                val.location.LondonUK,
+                val.location.OxfordUK,
+                val.location.WashingtonDC,
+                val.location.RemoteUK,
+            ],
         ),
         JobStub(
             org=Org(
                 name="BridgeFund International",
-                website="bridgefund.io",
+                website="https://bridgefund.io",
                 description="BridgeFund International is a development NGO that designs and implements health and education programmes across East and Southern Africa. They partner with local governments and community organisations to deliver sustainable interventions.",
             ),
             job=Job(
                 title="Country Director, East Africa Programs",
                 description=textwrap.dedent("""
-                    - Lead strategic planning and implementation of health and development programs across East Africa
-                    - Manage relationships with local government partners, NGOs, and community organisations
-                    - Oversee a team of 15+ programme managers and field staff across multiple country offices
-                    - Report directly to the VP of International Programs on budgets, impact metrics, and risk
+                    A research fellowship contributing to policy analysis on economic management and governance issues facing African countries.
+                    - Conduct policy-relevant research on macroeconomic management, fiscal policy, governance, or institutional reform in African contexts.
+                    - Contribute to ACET's advisory work supporting governments in their economic transformation strategies.
+                    - This is placeholder text generated using only the job title and organization as a guide.
                 """),
                 url_external="https://bridgefund.io/hiring/country-director",
-                salary_min=90_000,
-                salary_text="$90,000 – $120,000",
+                salary_min=84_984,
+                salary_text="$7,200; €6,100; £5,400 per month",
                 posted_at=now,
                 visibility=Visibility.PUBLIC,
             ),
@@ -179,11 +193,17 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 ],
                 city=[val.city.Nairobi, val.city.Kampala, val.city.Kigali, val.city.DarEsSalaam],
             ),
+            locations=[
+                val.location.NairobiKenya,
+                val.location.LondonUK,
+                val.location.WashingtonDC,
+                val.location.SanFranciscoCA,
+            ],
         ),
         JobStub(
             org=Org(
                 name="Arclight Research Institute",
-                website="arclightresearch.org",
+                website="https://arclightresearch.org",
                 description="Arclight Research Institute runs intensive fellowship programmes for aspiring alignment researchers. They provide mentorship, compute resources, and a collaborative environment for early-career scientists working on AI safety.",
             ),
             job=Job(
@@ -205,15 +225,163 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 area=[val.area.AIS, val.area.CareerCapital],
                 education=[val.education.NoReq],
                 experience=[val.experience.Entry],
-                workload=[val.workload.Internship, val.workload.ThreeMonths],
+                workload=[val.workload.Fellowship],
                 country=[val.country.US],
                 city=[val.city.Berkeley],
             ),
+            locations=[val.location.BerkeleyCA],
+        ),
+        JobStub(
+            org=Org(
+                name="OpenPhil Grantmaking",
+                website="https://openphil.org",
+                description="Open Philanthropy is a grant-making organisation that funds research and projects across global health, AI safety, and biosecurity.",
+            ),
+            job=Job(
+                title="Research Analyst Grant (Funding Opportunity)",
+                url_external="https://openphil.org/grants/research-analyst",
+                posted_at=now - timedelta(days=5),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                area=[val.area.AIS],
+                workload=[val.workload.Funding],
+                country=[val.country.US],
+            ),
+            locations=[val.location.RemoteUSA],
+        ),
+        JobStub(
+            org=Org(
+                name="EA London",
+                website="https://ealon.org",
+                description="EA London runs community events, training programmes, and volunteer initiatives for the effective altruism community.",
+            ),
+            job=Job(
+                title="Community Volunteer Coordinator",
+                url_external="https://ealon.org/volunteer",
+                posted_at=now - timedelta(days=10),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                area=[val.area.Societal],
+                workload=[val.workload.Volunteer],
+                country=[val.country.UK],
+                city=[val.city.London],
+            ),
+            locations=[val.location.LondonUK],
+        ),
+        JobStub(
+            org=Org(
+                name="Future Leaders Institute",
+                website="https://futureleaders.org",
+                description="Future Leaders Institute runs graduate programmes and training courses for aspiring leaders in high-impact careers.",
+            ),
+            job=Job(
+                title="AI Safety Graduate Program",
+                url_external="https://futureleaders.org/graduate",
+                posted_at=now - timedelta(days=14),
+                closes_at=now + timedelta(days=30),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                area=[val.area.AIS],
+                workload=[val.workload.GraduateProgram],
+                country=[val.country.UK],
+                city=[val.city.Oxford],
+            ),
+            locations=[val.location.OxfordUK],
+        ),
+        JobStub(
+            org=Org(
+                name="Biosecurity Training Network",
+                website="https://bstn.org",
+                description="BSTN provides professional training in biosecurity, pandemic preparedness, and global health security.",
+            ),
+            job=Job(
+                title="Pandemic Preparedness Training Course",
+                url_external="https://bstn.org/training",
+                posted_at=now - timedelta(days=3),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                area=[val.area.GlobalHealth],
+                workload=[val.workload.Training],
+                country=[val.country.US, val.country.UK],
+            ),
+            locations=[val.location.RemoteUSA, val.location.RemoteUK, val.location.RemoteEurope],
+        ),
+        JobStub(
+            org=Org(
+                name="Humane Ventures",
+                website="https://humaneventures.org",
+                description="Humane Ventures is an animal welfare accelerator running an internship programme for students interested in high-impact careers.",
+            ),
+            job=Job(
+                title="Policy Internship",
+                url_external="https://humaneventures.org/internship",
+                salary_text="$2,000 per month",
+                posted_at=now - timedelta(days=8),
+                closes_at=now + timedelta(days=14),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                skill=[val.skill.Policy],
+                area=[val.area.AnimalWelfare],
+                workload=[val.workload.Internship],
+                country=[val.country.US],
+                city=[val.city.SanFrancisco],
+            ),
+            locations=[val.location.SanFranciscoCA],
+        ),
+        JobStub(
+            org=Org(
+                name="Rethink Priorities",
+                website="https://rethinkpriorities.org",
+                description="Rethink Priorities conducts research to inform effective giving and career decisions across multiple cause areas.",
+            ),
+            job=Job(
+                title="Research Associate (Expression of Interest)",
+                url_external="https://rethinkpriorities.org/eoi",
+                posted_at=now - timedelta(days=2),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                skill=[val.skill.Research],
+                area=[val.area.AIS, val.area.AnimalWelfare],
+                workload=[val.workload.ExpressionOfInterest],
+                country=[val.country.Remote],
+            ),
+            locations=[
+                val.location.RemoteGlobal,
+                val.location.RemoteUSA,
+                val.location.RemoteUK,
+                val.location.RemoteEurope,
+            ],
+        ),
+        JobStub(
+            org=Org(
+                name="Giving What We Can",
+                website="https://givingwhatwecan.org",
+                description="Giving What We Can is a community of effective givers, offering part-time research and advocacy roles.",
+            ),
+            job=Job(
+                title="Research Contributor (Part-Time)",
+                url_external="https://givingwhatwecan.org/roles/research",
+                posted_at=now - timedelta(days=6),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                skill=[val.skill.Research],
+                area=[val.area.GlobalHealth],
+                workload=[val.workload.PartTime50, val.workload.PartTimeSub50],
+                country=[val.country.Remote],
+            ),
+            locations=[val.location.RemoteGlobal],
         ),
         JobStub(
             org=Org(
                 name="Sentient Metrics",
-                website="sentientmetrics.org",
+                website="https://sentientmetrics.org",
                 description="Sentient Metrics is a research nonprofit that collects and analyses data on farmed animal welfare outcomes worldwide. They produce open datasets and policy briefs used by advocacy organisations and regulators.",
             ),
             job=Job(
@@ -235,9 +403,15 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 area=[val.area.AnimalWelfare, val.area.ProfitForGood],
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
-                workload=[val.workload.FullTime, val.workload.PartTime],
+                workload=[val.workload.FullTime, val.workload.PartTime50],
                 country=[val.country.US, val.country.UK, val.country.Remote],
             ),
+            locations=[
+                val.location.SanFranciscoCA,
+                val.location.LondonUK,
+                val.location.RemoteUSA,
+                val.location.RemoteUK,
+            ],
         ),
     ]
 
@@ -260,8 +434,11 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ]
             await stub.job.tags_country_visa_sponsor.aset(country_tags)
 
+        if stub.locations:
+            locations = await _get_or_create_locations(stub.locations)
+            await stub.job.locations.aset(locations)
+
     await _create_draft_version(published=job_stubs[0].job)
-    await _create_random_jobs(gen, now=now)
 
 
 async def _create_random_jobs(gen: Gen, now) -> None:
@@ -323,6 +500,16 @@ async def _create_draft_version(published: Job) -> Job:
     await draft.asave()
     await published.versions.aadd(draft)
     return draft
+
+
+async def _get_or_create_locations(location_names: list[str]) -> list[JobLocation]:
+    locations = []
+    for name in location_names:
+        loc, _ = await JobLocation.objects.aget_or_create(
+            name=name, defaults=_location_defaults[name]
+        )
+        locations.append(loc)
+    return locations
 
 
 async def _get_or_create_tags(tag_names: list[str], category: TagCategoryEnum) -> list[PostTag]:
@@ -410,8 +597,97 @@ class val:
         Middle = "Mid (5-9y)"
         Senior = "Senior (10y+)"
 
+    class location:
+        RemoteGlobal = "Remote, Global"
+        RemoteUSA = "Remote, USA"
+        RemoteUK = "Remote, UK"
+        RemoteEurope = "Remote, Europe"
+        SanFranciscoCA = "San Francisco CA, USA"
+        WashingtonDC = "Washington D.C., USA"
+        LondonUK = "London, UK"
+        NairobiKenya = "Nairobi, Kenya"
+        BerkeleyCA = "Berkeley CA, USA"
+        OaklandCA = "Oakland CA, USA"
+        OxfordUK = "Oxford, UK"
+
     class workload:
-        FullTime = "Full-time"
-        PartTime = "Part-time"
+        FullTime = "Full-Time"
+        PartTime50 = "Part-Time (50–80% FTE)"
+        PartTimeSub50 = "Part-Time (<50% FTE)"
         Internship = "Internship"
-        ThreeMonths = "3 months"
+        Fellowship = "Fellowship"
+        Volunteer = "Volunteer"
+        Funding = "Funding"
+        Training = "Training"
+        GraduateProgram = "Graduate Program"
+        ExpressionOfInterest = "Expression of Interest"
+
+
+_location_defaults: dict[str, dict] = {
+    val.location.RemoteGlobal: {
+        "city": "",
+        "country": "",
+        "region": "Global",
+        "is_remote": True,
+    },
+    val.location.RemoteUSA: {
+        "city": "",
+        "country": "United States",
+        "region": "North America",
+        "is_remote": True,
+    },
+    val.location.RemoteUK: {
+        "city": "",
+        "country": "United Kingdom",
+        "region": "Western Europe",
+        "is_remote": True,
+    },
+    val.location.RemoteEurope: {
+        "city": "",
+        "country": "",
+        "region": "Western Europe",
+        "is_remote": True,
+    },
+    val.location.SanFranciscoCA: {
+        "city": "San Francisco CA",
+        "country": "United States",
+        "region": "North America",
+        "is_remote": False,
+    },
+    val.location.WashingtonDC: {
+        "city": "Washington D.C.",
+        "country": "United States",
+        "region": "North America",
+        "is_remote": False,
+    },
+    val.location.LondonUK: {
+        "city": "London",
+        "country": "United Kingdom",
+        "region": "Western Europe",
+        "is_remote": False,
+    },
+    val.location.NairobiKenya: {
+        "city": "Nairobi",
+        "country": "Kenya",
+        "region": "Sub-Saharan Africa",
+        "is_remote": False,
+    },
+    val.location.BerkeleyCA: {
+        "city": "Berkeley CA",
+        "country": "United States",
+        "region": "North America",
+        "is_remote": False,
+    },
+    val.location.OaklandCA: {
+        "city": "Oakland CA",
+        "country": "United States",
+        "region": "North America",
+        "is_remote": False,
+    },
+    val.location.OxfordUK: {
+        "city": "Oxford",
+        "country": "United Kingdom",
+        "region": "Western Europe",
+        "is_remote": False,
+    },
+}

@@ -117,6 +117,15 @@ input JobFilter {
   DISTINCT: Boolean
 }
 
+type JobLocationType {
+  id: ID!
+  name: String!
+  city: String!
+  country: String!
+  region: String!
+  is_remote: Boolean!
+}
+
 type JobType {
   org: OrgType!
   id: ID!
@@ -127,6 +136,7 @@ type JobType {
   is_remote_friendly: Boolean
   salary_min: Int
   salary_text: String!
+  locations: [JobLocationType!]!
   tags_country(filters: PostTagFilter): [PostTagType!]!
   tags_city(filters: PostTagFilter): [PostTagType!]!
   url_external: String!
@@ -232,6 +242,7 @@ type OrgType {
   jobs_page_url: String!
   is_highlighted: Boolean!
   logo: DjangoImageType
+  description: String!
   tags_area(filters: PostTagFilter): [PostTagType!]!
 }
 
