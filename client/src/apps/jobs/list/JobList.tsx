@@ -39,7 +39,7 @@ export function JobList(props: { slug?: string }) {
     <AlgoliaList<JobFragmentType>
       index="indexNameJobs"
       label="job"
-      cta={<JobsSubscribeModal />}
+      cta={<JobsSubscribeModal buttonProps={{ size: "sm", borderRadius: "md" }} />}
       sort={
         algolia.indexNameJobs && algolia.indexNameJobsSortedByClosesAt
           ? {

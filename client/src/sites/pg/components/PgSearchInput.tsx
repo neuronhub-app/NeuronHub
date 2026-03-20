@@ -1,16 +1,20 @@
-import { CloseButton, Input, InputGroup } from "@chakra-ui/react";
+import { CloseButton, Icon, Input, InputGroup } from "@chakra-ui/react";
 import { useRef } from "react";
 import { LuSearch } from "react-icons/lu";
 import { useSearchBox } from "react-instantsearch";
 import { ids } from "@/e2e/ids";
 
-export function AlgoliaSearchInput(props: { testId?: string }) {
+export function PgSearchInput(props: { testId?: string }) {
   const searchBox = useSearchBox();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
     <InputGroup
-      startElement={<LuSearch />}
+      startElement={
+        <Icon color="brand.green.light" fontSize={{ base: "xl", md: "2xl" }}>
+          <LuSearch />
+        </Icon>
+      }
       endElement={
         searchBox.query ? (
           <CloseButton
@@ -23,8 +27,6 @@ export function AlgoliaSearchInput(props: { testId?: string }) {
           />
         ) : null
       }
-      w="full"
-      maxW="lg"
     >
       <Input
         ref={inputRef}
@@ -33,13 +35,12 @@ export function AlgoliaSearchInput(props: { testId?: string }) {
         type="search"
         placeholder="Search"
         {...(props.testId ? ids.set(props.testId) : {})}
-        bg="bg.panel"
+        bg="white"
+        ps={{ base: "10", md: "12" }}
         borderRadius="md"
-        border="1px solid"
-        borderColor="inherit"
-        _hover={{
-          borderColor: "border.emphasized",
-        }}
+        borderWidth="1px"
+        borderColor="brand.gray"
+        _placeholder={{ color: "brand.gray.muted", fontSize: "sm" }}
       />
     </InputGroup>
   );

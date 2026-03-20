@@ -61,7 +61,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             tags=JobTags(
                 skill=[val.skill.ML, val.skill.Research, val.skill.Python],
-                area=[val.area.AIS],
+                area=[val.area.AIS, val.area.CareerCapital],
                 education=[val.education.PhD],
                 experience=[val.experience.Middle],
                 workload=[val.workload.FullTime],
@@ -93,7 +93,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             tags=JobTags(
                 skill=[val.skill.Operations, val.skill.Finance],
-                area=[val.area.GlobalHealth],
+                area=[val.area.GlobalHealth, val.area.ProfitForGood],
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime],
@@ -106,7 +106,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 name="Meridian Governance Institute",
                 website="meridiangovernance.org",
                 description="Meridian Governance Institute is a policy think tank that researches and advocates for responsible AI governance. They work with governments and international bodies to develop regulatory frameworks for advanced AI systems.",
-                is_highlighted=True,
             ),
             job=Job(
                 title="Policy Researcher, AI Governance",
@@ -148,7 +147,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 name="BridgeFund International",
                 website="bridgefund.io",
                 description="BridgeFund International is a development NGO that designs and implements health and education programmes across East and Southern Africa. They partner with local governments and community organisations to deliver sustainable interventions.",
-                is_highlighted=True,
             ),
             job=Job(
                 title="Country Director, East Africa Programs",
@@ -204,7 +202,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             tags=JobTags(
                 skill=[val.skill.Research, val.skill.ML, val.skill.SWE],
-                area=[val.area.AIS],
+                area=[val.area.AIS, val.area.CareerCapital],
                 education=[val.education.NoReq],
                 experience=[val.experience.Entry],
                 workload=[val.workload.Internship, val.workload.ThreeMonths],
@@ -234,7 +232,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             tags=JobTags(
                 skill=[val.skill.Data, val.skill.Research, val.skill.SWE],
-                area=[val.area.AnimalWelfare],
+                area=[val.area.AnimalWelfare, val.area.ProfitForGood],
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime, val.workload.PartTime],
@@ -397,6 +395,8 @@ class val:
         GlobalHealth = "Global Health & Development"
         Societal = "Societal Improvements"
         AnimalWelfare = "Animal Welfare"
+        CareerCapital = "Career Capital"
+        ProfitForGood = "Profit for Good"
 
     class education:
         PhD = "PhD"

@@ -7,6 +7,7 @@ import { useCurrentRefinements } from "react-instantsearch";
 import { z } from "zod";
 
 import { useUser } from "@/apps/users/useUserCurrent";
+import { salaryFormatter } from "@/sites/pg/components/PgFacetSalary";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogBody,
@@ -21,6 +22,7 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { toast } from "@/utils/toast";
+import type { ButtonProps } from "@/components/ui/button";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
@@ -28,7 +30,7 @@ const FormSchema = z.object({
   email: z.email("Invalid email address"),
 });
 
-export function JobsSubscribeModal() {
+export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
   const user = useUser();
   const loading = useIsLoading();
 
@@ -47,7 +49,10 @@ export function JobsSubscribeModal() {
   const refinesCurrentReadableMap = refinesCurrent.items.flatMap(item =>
     item.refinements.map(refinement => ({
       attribute: ATTRIBUTE_LABELS[item.attribute] ?? item.attribute,
-      label: refinement.label,
+      label:
+        item.attribute === "salary_min"
+          ? `${salaryFormatter.format(refinement.value as number)}+`
+          : refinement.label,
     })),
   );
 
@@ -88,8 +93,7 @@ export function JobsSubscribeModal() {
           }
           state.mutable.isOpen = true;
         }}
-        size="sm"
-        borderRadius="md"
+        {...props.buttonProps}
         {...ids.set(ids.job.alert.subscribeBtn)}
       >
         <Icon boxSize="3.5">
