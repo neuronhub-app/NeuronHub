@@ -20,6 +20,9 @@ export namespace theme {
       gray: { value: "#DDDDDD" },
       "gray.muted": { value: "#767676" },
       "gray.backdrop": { value: "#8F9293" },
+      "footer.bg": { value: "#171616" },
+      "footer.text": { value: "#F3EDE7" },
+      "footer.heading": { value: "#A19B9B" },
     },
 
     primary,
