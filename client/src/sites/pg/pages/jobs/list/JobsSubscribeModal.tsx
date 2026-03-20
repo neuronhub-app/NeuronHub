@@ -59,7 +59,7 @@ export function JobsSubscribeModal() {
       is_orgs_highlighted: refinesCurrent.items.some(
         item => item.attribute === "org.is_highlighted",
       ),
-      is_remote: refinesCurrent.items.some(item => item.attribute === "is_remote"),
+      is_remote: refinesCurrent.items.some(item => item.attribute === "locations.name"),
       salary_min:
         salaryRefinement?.refinements[0]?.value != null
           ? Number(salaryRefinement.refinements[0].value)
@@ -226,7 +226,8 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_workload.name": "Role",
   "tags_country.name": "Location",
   "tags_city.name": "Location",
-  is_remote: "Remote",
+  "tags_country_visa_sponsor.name": "Visa Sponsor",
+  "locations.name": "Remote",
   "org.is_highlighted": "Highlighted",
   "org.name": "Organisation",
   salary_min: "Min Salary",

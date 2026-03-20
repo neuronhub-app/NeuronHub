@@ -1,9 +1,20 @@
-import { Flex, Grid, Switch } from "@chakra-ui/react";
+import { Flex, Grid, Stack, Switch } from "@chakra-ui/react";
 import { useRange, useRefinementList, useToggleRefinement } from "react-instantsearch";
+import { proxy, useSnapshot } from "valtio";
 import { PgFacetSalary, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
+
+export const otherFiltersState = proxy({
+  excludeCareerCapital: false,
+  excludeProfitForGood: false,
+});
+
+export function resetOtherFilters() {
+  otherFiltersState.excludeCareerCapital = false;
+  otherFiltersState.excludeProfitForGood = false;
+}
 
 type FacetOrder = { base?: number; lg?: number };
 
@@ -98,14 +109,15 @@ function SkillSetFacet(props: { order: FacetOrder }) {
   );
 }
 
+const REMOTE_LOCATION_NAMES = ["Remote, Global", "Remote, USA", "Remote, UK", "Remote, Europe"];
+
 function RemoteFacet(props: { order: FacetOrder }) {
-  const remote = useToggleRefinement({ attribute: "is_remote", on: true });
   return (
-    <PgFacetPopover label="Remote Roles" disabled={!remote.canRefine} order={props.order}>
-      <BooleanSwitch
+    <PgFacetPopover label="Remote Roles" order={props.order}>
+      <PgFacetAttribute
+        attribute="locations.name"
         label="Remote Roles"
-        checked={remote.value.isRefined}
-        onToggle={() => remote.refine(remote.value)}
+        allowedValues={REMOTE_LOCATION_NAMES}
       />
     </PgFacetPopover>
   );
@@ -131,13 +143,30 @@ function EducationFacet(props: { order: FacetOrder }) {
 
 function OtherFiltersFacet(props: { order: FacetOrder }) {
   const highlighted = useToggleRefinement({ attribute: "org.is_highlighted", on: true });
+  const snap = useSnapshot(otherFiltersState);
   return (
     <PgFacetPopover label="Other Filters" disabled={!highlighted.canRefine} order={props.order}>
-      <BooleanSwitch
-        label="Show only roles at highlighted orgs"
-        checked={highlighted.value.isRefined}
-        onToggle={() => highlighted.refine(highlighted.value)}
-      />
+      <Stack gap="gap.sm">
+        <BooleanSwitch
+          label="Show only roles at highlighted orgs"
+          checked={highlighted.value.isRefined}
+          onToggle={() => highlighted.refine(highlighted.value)}
+        />
+        <BooleanSwitch
+          label="Exclude career capital roles"
+          checked={snap.excludeCareerCapital}
+          onToggle={() => {
+            otherFiltersState.excludeCareerCapital = !otherFiltersState.excludeCareerCapital;
+          }}
+        />
+        <BooleanSwitch
+          label="Exclude Profit-for-Good roles"
+          checked={snap.excludeProfitForGood}
+          onToggle={() => {
+            otherFiltersState.excludeProfitForGood = !otherFiltersState.excludeProfitForGood;
+          }}
+        />
+      </Stack>
     </PgFacetPopover>
   );
 }

@@ -64,7 +64,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
             tags=JobTags(
                 skill=[val.skill.ML, val.skill.Research, val.skill.Python],
                 area=[val.area.AIS, val.area.CareerCapital],
-                education=[val.education.PhD],
+                education=[val.education.Masters],
                 experience=[val.experience.Middle],
                 workload=[val.workload.FullTime],
                 country=[val.country.US],
@@ -223,7 +223,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
             tags=JobTags(
                 skill=[val.skill.Research, val.skill.ML, val.skill.SWE],
                 area=[val.area.AIS, val.area.CareerCapital],
-                education=[val.education.NoReq],
+                education=[val.education.Undergrad],
                 experience=[val.experience.Entry],
                 workload=[val.workload.Fellowship],
                 country=[val.country.US],
@@ -239,12 +239,20 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             job=Job(
                 title="Research Analyst Grant (Funding Opportunity)",
+                description=textwrap.dedent("""
+                    - Conduct independent research on a topic within AI safety, biosecurity, or global health
+                    - Produce a written report or paper suitable for public dissemination
+                    - Engage with Open Philanthropy program staff for feedback and direction
+                    - Present findings at an end-of-grant seminar
+                """),
                 url_external="https://openphil.org/grants/research-analyst",
                 posted_at=now - timedelta(days=5),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
+                skill=[val.skill.Research],
                 area=[val.area.AIS],
+                experience=[val.experience.Junior],
                 workload=[val.workload.Funding],
                 country=[val.country.US],
             ),
@@ -258,12 +266,20 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             job=Job(
                 title="Community Volunteer Coordinator",
+                description=textwrap.dedent("""
+                    - Coordinate volunteer recruitment, onboarding, and scheduling for EA London events
+                    - Maintain relationships with regular volunteers and support their development
+                    - Help organise monthly meetups, workshops, and speaker events
+                    - Track volunteer hours and produce quarterly impact reports
+                """),
                 url_external="https://ealon.org/volunteer",
                 posted_at=now - timedelta(days=10),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
+                skill=[val.skill.Operations],
                 area=[val.area.Societal],
+                experience=[val.experience.Entry],
                 workload=[val.workload.Volunteer],
                 country=[val.country.UK],
                 city=[val.city.London],
@@ -278,13 +294,21 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             job=Job(
                 title="AI Safety Graduate Program",
+                description=textwrap.dedent("""
+                    - Complete a structured 12-month curriculum covering AI safety fundamentals and research methods
+                    - Work on a supervised research project with a senior mentor
+                    - Attend weekly seminars and reading groups with peers and faculty
+                    - Build professional networks across the AI safety community
+                """),
                 url_external="https://futureleaders.org/graduate",
                 posted_at=now - timedelta(days=14),
                 closes_at=now + timedelta(days=30),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
+                skill=[val.skill.Research],
                 area=[val.area.AIS],
+                experience=[val.experience.Entry],
                 workload=[val.workload.GraduateProgram],
                 country=[val.country.UK],
                 city=[val.city.Oxford],
@@ -299,12 +323,20 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             job=Job(
                 title="Pandemic Preparedness Training Course",
+                description=textwrap.dedent("""
+                    - Participate in an intensive 5-day training on pandemic risk assessment and response
+                    - Learn frameworks for outbreak detection, containment, and international coordination
+                    - Engage in tabletop exercises simulating real-world biosecurity scenarios
+                    - Network with public health professionals and policymakers from 20+ countries
+                """),
                 url_external="https://bstn.org/training",
                 posted_at=now - timedelta(days=3),
                 visibility=Visibility.PUBLIC,
             ),
             tags=JobTags(
-                area=[val.area.GlobalHealth],
+                skill=[val.skill.Policy],
+                area=[val.area.Biosecurity],
+                experience=[val.experience.Junior],
                 workload=[val.workload.Training],
                 country=[val.country.US, val.country.UK],
             ),
@@ -318,6 +350,12 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             job=Job(
                 title="Policy Internship",
+                description=textwrap.dedent("""
+                    - Support the policy team in tracking legislative developments relevant to animal welfare
+                    - Draft briefing documents, summaries, and stakeholder communications
+                    - Assist with research on regulatory frameworks across US states and federal agencies
+                    - Attend coalition meetings and take notes for internal distribution
+                """),
                 url_external="https://humaneventures.org/internship",
                 salary_text="$2,000 per month",
                 posted_at=now - timedelta(days=8),
@@ -327,6 +365,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
             tags=JobTags(
                 skill=[val.skill.Policy],
                 area=[val.area.AnimalWelfare],
+                experience=[val.experience.Entry],
                 workload=[val.workload.Internship],
                 country=[val.country.US],
                 city=[val.city.SanFrancisco],
@@ -341,6 +380,12 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             job=Job(
                 title="Research Associate (Expression of Interest)",
+                description=textwrap.dedent("""
+                    - Conduct quantitative and qualitative research across cause areas including animal welfare and AI safety
+                    - Write up findings in clear, accessible reports for a general EA audience
+                    - Collaborate with senior researchers on ongoing projects
+                    - Contribute to internal forecasting and prioritisation exercises
+                """),
                 url_external="https://rethinkpriorities.org/eoi",
                 posted_at=now - timedelta(days=2),
                 visibility=Visibility.PUBLIC,
@@ -348,8 +393,8 @@ async def create_jobs_stubs(gen: Gen) -> None:
             tags=JobTags(
                 skill=[val.skill.Research],
                 area=[val.area.AIS, val.area.AnimalWelfare],
+                experience=[val.experience.Junior],
                 workload=[val.workload.ExpressionOfInterest],
-                country=[val.country.Remote],
             ),
             locations=[
                 val.location.RemoteGlobal,
@@ -366,6 +411,12 @@ async def create_jobs_stubs(gen: Gen) -> None:
             ),
             job=Job(
                 title="Research Contributor (Part-Time)",
+                description=textwrap.dedent("""
+                    - Research and summarise evidence on charity effectiveness for the GWWC knowledge base
+                    - Write accessible articles and explainers for a general audience
+                    - Fact-check and update existing content based on new evidence
+                    - Collaborate asynchronously with the full-time research team
+                """),
                 url_external="https://givingwhatwecan.org/roles/research",
                 posted_at=now - timedelta(days=6),
                 visibility=Visibility.PUBLIC,
@@ -373,8 +424,8 @@ async def create_jobs_stubs(gen: Gen) -> None:
             tags=JobTags(
                 skill=[val.skill.Research],
                 area=[val.area.GlobalHealth],
+                experience=[val.experience.Entry],
                 workload=[val.workload.PartTime50, val.workload.PartTimeSub50],
-                country=[val.country.Remote],
             ),
             locations=[val.location.RemoteGlobal],
         ),
@@ -404,7 +455,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime, val.workload.PartTime50],
-                country=[val.country.US, val.country.UK, val.country.Remote],
+                country=[val.country.US, val.country.UK],
             ),
             locations=[
                 val.location.SanFranciscoCA,
@@ -412,6 +463,162 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 val.location.RemoteUSA,
                 val.location.RemoteUK,
             ],
+        ),
+        JobStub(
+            org=Org(
+                name="ClimateWorks Foundation",
+                website="https://climateworks.org",
+                description="ClimateWorks Foundation funds and accelerates solutions to the climate crisis, working with philanthropists and partners to mobilise resources for high-impact climate action.",
+                is_highlighted=True,
+            ),
+            job=Job(
+                title="Senior Communications Manager",
+                description=textwrap.dedent("""
+                    - Lead external communications strategy across digital, media, and stakeholder channels
+                    - Develop compelling narratives that translate complex climate science for general audiences
+                    - Manage relationships with journalists, partner organisations, and spokespeople
+                    - Oversee production of reports, press releases, and campaign materials
+                """),
+                url_external="https://climateworks.org/careers/senior-comms-manager",
+                salary_min=110_000,
+                salary_text="$110,000 – $130,000",
+                posted_at=now - timedelta(days=4),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                skill=[val.skill.Communications, val.skill.Writing],
+                area=[val.area.ClimateChange],
+                education=[val.education.Masters],
+                experience=[val.experience.Senior],
+                workload=[val.workload.FullTime],
+                country=[val.country.US],
+                city=[val.city.SanFrancisco],
+            ),
+            locations=[val.location.SanFranciscoCA, val.location.RemoteUSA],
+        ),
+        JobStub(
+            org=Org(
+                name="Center for Healthy Minds",
+                website="https://centerhealthyminds.org",
+                description="The Center for Healthy Minds investigates the science of wellbeing and develops evidence-based programmes to reduce suffering and promote flourishing at scale.",
+            ),
+            job=Job(
+                title="Research Engineer, Wellbeing Technology",
+                description=textwrap.dedent("""
+                    - Build and maintain data pipelines for large-scale wellbeing research studies
+                    - Develop software tools for ecological momentary assessment and mobile data collection
+                    - Collaborate with neuroscientists and psychologists to implement study protocols
+                    - Contribute to open-source tooling used across the research community
+                """),
+                url_external="https://centerhealthyminds.org/jobs/research-engineer",
+                salary_min=95_000,
+                salary_text="$95,000 – $115,000",
+                posted_at=now - timedelta(days=9),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                skill=[val.skill.Engineering, val.skill.SWE],
+                area=[val.area.MentalHealth],
+                education=[val.education.PhD],
+                experience=[val.experience.Middle],
+                workload=[val.workload.FullTime],
+                country=[val.country.US],
+                city=[val.city.CambridgeMA],
+            ),
+            locations=[val.location.RemoteUSA],
+        ),
+        JobStub(
+            org=Org(
+                name="Nuclear Threat Initiative",
+                website="https://nti.org",
+                description="NTI works to prevent catastrophic attacks and accidents with weapons of mass destruction and disruption — nuclear, biological, chemical, radiological, and now cyber.",
+                is_highlighted=True,
+            ),
+            job=Job(
+                title="Legal Counsel, Arms Control",
+                description=textwrap.dedent("""
+                    - Provide legal analysis on international arms control treaties and non-proliferation regimes
+                    - Draft policy memoranda and legal opinions for senior leadership and government partners
+                    - Monitor legislative and regulatory developments relevant to nuclear security
+                    - Support negotiation preparation for multilateral forums and UN bodies
+                """),
+                url_external="https://nti.org/careers/legal-counsel-arms-control",
+                salary_min=130_000,
+                salary_text="$130,000 – $155,000",
+                posted_at=now - timedelta(days=12),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                skill=[val.skill.Legal, val.skill.Policy],
+                area=[val.area.NuclearSecurity],
+                education=[val.education.PhD],
+                experience=[val.experience.Senior],
+                workload=[val.workload.FullTime],
+                country=[val.country.US],
+                city=[val.city.DC],
+            ),
+            locations=[val.location.WashingtonDC],
+        ),
+        JobStub(
+            org=Org(
+                name="Effective Giving UK",
+                website="https://effectivegiving.uk",
+                description="Effective Giving UK is a community-building organisation that runs outreach programmes, giving circles, and local chapters to grow the effective altruism community across the UK.",
+            ),
+            job=Job(
+                title="Community Builder, University Outreach",
+                description=textwrap.dedent("""
+                    - Launch and support EA chapters at UK universities
+                    - Run workshops, fellowships, and speaker events for students
+                    - Provide coaching and resources to student chapter leaders
+                    - Track engagement metrics and report on community growth
+                """),
+                url_external="https://effectivegiving.uk/jobs/community-builder",
+                posted_at=now - timedelta(days=7),
+                closes_at=now + timedelta(days=45),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                skill=[val.skill.Communications],
+                area=[val.area.CommunityBuilding],
+                education=[val.education.Undergrad],
+                experience=[val.experience.Entry],
+                workload=[val.workload.FullTime],
+                country=[val.country.UK],
+                city=[val.city.London, val.city.Oxford, val.city.Cambridge],
+            ),
+            locations=[val.location.LondonUK, val.location.OxfordUK],
+        ),
+        JobStub(
+            org=Org(
+                name="Founders Pledge",
+                website="https://founderspledge.com",
+                description="Founders Pledge helps entrepreneurs and investors maximise their impact by pledging to give a portion of their proceeds to effective causes.",
+            ),
+            job=Job(
+                title="Information Security Analyst",
+                description=textwrap.dedent("""
+                    - Monitor and respond to security events across cloud and on-premise infrastructure
+                    - Conduct vulnerability assessments and penetration testing on internal systems
+                    - Maintain security policies, incident response procedures, and staff training materials
+                    - Liaise with external auditors and ensure compliance with relevant data protection regulations
+                """),
+                url_external="https://founderspledge.com/careers/infosec-analyst",
+                salary_min=85_000,
+                salary_text="$85,000 – $100,000",
+                posted_at=now - timedelta(days=16),
+                visibility=Visibility.PUBLIC,
+            ),
+            tags=JobTags(
+                skill=[val.skill.InfoSec, val.skill.Engineering],
+                area=[val.area.Other],
+                education=[val.education.Undergrad],
+                experience=[val.experience.Junior],
+                workload=[val.workload.FullTime],
+                country=[val.country.UK],
+                city=[val.city.London],
+            ),
+            locations=[val.location.LondonUK, val.location.RemoteUK],
         ),
     ]
 
@@ -540,62 +747,72 @@ async def _create_visa_child_tags(country_names: list[str]) -> None:
 
 class val:
     class country:
-        US = "United States"
-        UK = "United Kingdom"
+        DRC = "Democratic Republic of the Congo"
         Kenya = "Kenya"
-        Uganda = "Uganda"
-        Rwanda = "Rwanda"
-        Tanzania = "Tanzania"
         Malawi = "Malawi"
         Mozambique = "Mozambique"
-        DRC = "DRC"
-        Remote = "Remote"
+        Rwanda = "Rwanda"
+        Tanzania = "Tanzania"
+        Uganda = "Uganda"
+        UK = "United Kingdom"
+        US = "United States"
 
     class city:
-        SanFrancisco = "San Francisco"
-        Oakland = "Oakland"
-        Berkeley = "Berkeley"
-        London = "London"
-        Oxford = "Oxford"
-        DC = "Washington DC"
-        Geneva = "Geneva"
+        Berkeley = "Berkeley CA"
         Brussels = "Brussels"
-        Nairobi = "Nairobi"
+        Cambridge = "Cambridge"
+        CambridgeMA = "Cambridge MA"
+        DarEsSalaam = "Dar es Salaam"
+        DC = "Washington D.C."
+        Geneva = "Geneva"
         Kampala = "Kampala"
         Kigali = "Kigali"
-        DarEsSalaam = "Dar es Salaam"
+        London = "London"
+        Nairobi = "Nairobi"
+        Oakland = "Oakland CA"
+        Oxford = "Oxford"
+        SanFrancisco = "San Francisco CA"
 
     class skill:
-        ML = "Machine Learning"
-        Research = "Research"
-        Python = "Python"
-        Operations = "Operations"
-        Finance = "Finance"
-        Policy = "Policy"
-        Writing = "Writing"
-        Management = "Management"
-        SWE = "Software Engineering"
+        Communications = "Communications & Outreach"
         Data = "Data"
+        Engineering = "Engineering"
+        Finance = "Finance"
+        InfoSec = "Information Security"
+        Legal = "Legal"
+        ML = "Machine Learning"
+        Management = "Management"
+        Operations = "Operations"
+        Policy = "Policy"
+        Python = "Python"
+        Research = "Research"
+        SWE = "Software Engineering"
+        Writing = "Writing"
 
     class area:
         AIS = "AI Safety & Policy"
-        GlobalHealth = "Global Health & Development"
-        Societal = "Societal Improvements"
         AnimalWelfare = "Animal Welfare"
+        Biosecurity = "Biosecurity"
         CareerCapital = "Career Capital"
+        ClimateChange = "Climate Change"
+        CommunityBuilding = "Community Building"
+        GlobalHealth = "Global Health & Development"
+        MentalHealth = "Mental Health & Wellbeing"
+        NuclearSecurity = "Nuclear Security & Conflict"
+        Other = "Other"
         ProfitForGood = "Profit for Good"
+        Societal = "Societal Improvements"
 
     class education:
-        PhD = "PhD"
-        Masters = "Master's degree"
-        Undergrad = "Undergrad"
-        NoReq = "No education requirement"
+        Undergrad = "Undergraduate Degree or Less"
+        Masters = "Master's Degree"
+        PhD = "Doctoral Degree"
 
     class experience:
-        Entry = "Entry-level"
-        Junior = "Junior (1-4y)"
-        Middle = "Mid (5-9y)"
-        Senior = "Senior (10y+)"
+        Entry = "Entry-Level"
+        Junior = "Junior (1-4 years experience)"
+        Middle = "Mid (5-9 years experience)"
+        Senior = "Senior (10+ years experience)"
 
     class location:
         RemoteGlobal = "Remote, Global"

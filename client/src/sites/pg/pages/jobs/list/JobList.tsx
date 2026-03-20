@@ -19,7 +19,11 @@ import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
-import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
+import {
+  PgFiltersTopbar,
+  otherFiltersState,
+  resetOtherFilters,
+} from "@/sites/pg/components/PgFiltersTopbar";
 import { resetSalaryFilter, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
 import { useSnapshot } from "valtio";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
@@ -30,8 +34,46 @@ export function JobList(props: { slug?: string }) {
   const jobOpenPinned = useJobOpenPinned(props.slug);
   const algolia = useAlgoliaSearchClient();
   const salarySnap = useSnapshot(salaryFilterState);
+  const otherSnap = useSnapshot(otherFiltersState);
 
-  const salaryFilter = salarySnap.excludeNoSalary ? "salary_min > 0" : undefined;
+  const filterParts: string[] = [];
+  if (salarySnap.excludeNoSalary) {
+    filterParts.push("salary_min > 0");
+  }
+  if (otherSnap.excludeCareerCapital) {
+    filterParts.push(`NOT tags_area.name:"Career Capital"`);
+  }
+  if (otherSnap.excludeProfitForGood) {
+    filterParts.push(`NOT tags_area.name:"Profit for Good"`);
+  }
+  const filters = filterParts.length > 0 ? filterParts.join(" AND ") : undefined;
+
+  const extraTags: Array<{ label: string; onRemove: () => void }> = [];
+  if (salarySnap.excludeNoSalary) {
+    extraTags.push({
+      label: "Exclude No Salary Roles",
+      onRemove: () => {
+        salaryFilterState.excludeNoSalary = false;
+      },
+    });
+  }
+  if (otherSnap.excludeCareerCapital) {
+    extraTags.push({
+      label: "Exclude Career Capital Roles",
+      onRemove: () => {
+        otherFiltersState.excludeCareerCapital = false;
+      },
+    });
+  }
+  if (otherSnap.excludeProfitForGood) {
+    extraTags.push({
+      label: "Exclude Profit-for-Good Roles",
+      onRemove: () => {
+        otherFiltersState.excludeProfitForGood = false;
+      },
+    });
+  }
+
   return (
     <PgAlgoliaList<JobFragmentType>
       index="indexNameJobs"
@@ -69,24 +111,16 @@ export function JobList(props: { slug?: string }) {
       facetsActiveSubFacetLabel={{
         "tags_country_visa_sponsor.name": "w/Visa",
       }}
-      facetsActiveExtraTags={
-        salarySnap.excludeNoSalary
-          ? [
-              {
-                label: "Exclude No Salary Roles",
-                onRemove: () => {
-                  salaryFilterState.excludeNoSalary = false;
-                },
-              },
-            ]
-          : undefined
-      }
+      facetsActiveExtraTags={extraTags}
       facetsTopbar={<PgFiltersTopbar />}
-      onClearAdditional={resetSalaryFilter}
+      onClearAdditional={() => {
+        resetSalaryFilter();
+        resetOtherFilters();
+      }}
     >
       <Configure
         hitsPerPage={20}
-        filters={salaryFilter}
+        filters={filters}
         attributesToHighlight={[
           "title",
           "org.name",

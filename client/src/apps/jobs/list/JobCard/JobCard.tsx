@@ -282,7 +282,7 @@ function JobTagGroups(props: {
     },
   ].filter(group => group.tags?.length > 0);
 
-  const tagsHidden = ["No education requirement", "Other", "Full-time"];
+  const tagsHidden = ["Undergraduate Degree or Less", "Full-time"];
 
   return (
     <HStack gap="gap.sm2" flexWrap="wrap">

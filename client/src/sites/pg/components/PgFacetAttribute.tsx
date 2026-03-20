@@ -13,6 +13,7 @@ export function PgFacetAttribute(props: {
   label: string;
   isSearchEnabled?: boolean;
   subFacet?: { attribute: string; label: string };
+  allowedValues?: string[];
 }) {
   const refinements = useRefinementList({
     attribute: props.attribute,
@@ -80,28 +81,30 @@ export function PgFacetAttribute(props: {
       )}
 
       <Stack gap="gap.sm" w="full">
-        {refinements.items.map(item => {
-          const subItem = props.subFacet
-            ? subRefinements.items.find(subRefinement => subRefinement.value === item.value)
-            : undefined;
-          return (
-            <Stack key={item.value} gap="gap.sm">
-              <FacetCheckboxItem
-                item={item}
-                onRefine={() => refineMain(item.value, item.isRefined)}
-              />
-              {subItem && (
+        {refinements.items
+          .filter(item => !props.allowedValues || props.allowedValues.includes(item.label))
+          .map(item => {
+            const subItem = props.subFacet
+              ? subRefinements.items.find(subRefinement => subRefinement.value === item.value)
+              : undefined;
+            return (
+              <Stack key={item.value} gap="gap.sm">
                 <FacetCheckboxItem
-                  item={{ ...subItem, isRefined: subItem.isRefined || item.isRefined }}
-                  labelOverride={props.subFacet!.label}
-                  onRefine={() => refineSub(item.value)}
-                  isSubItem
-                  disabled={item.isRefined}
+                  item={item}
+                  onRefine={() => refineMain(item.value, item.isRefined)}
                 />
-              )}
-            </Stack>
-          );
-        })}
+                {subItem && (
+                  <FacetCheckboxItem
+                    item={{ ...subItem, isRefined: subItem.isRefined || item.isRefined }}
+                    labelOverride={props.subFacet!.label}
+                    onRefine={() => refineSub(item.value)}
+                    isSubItem
+                    disabled={item.isRefined}
+                  />
+                )}
+              </Stack>
+            );
+          })}
       </Stack>
     </Stack>
   );
