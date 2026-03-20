@@ -7,7 +7,7 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import path from "node:path";
 import { defineConfig } from "vite";
 
-import { rehypeExternalMdLinksToTargetBlank } from "./src//utils/rehypeExternalMdLinksToTargetBlank";
+import { rehypeExternalMdLinksToTargetBlank } from "./src/utils/rehypeExternalMdLinksToTargetBlank";
 import { env } from "./src/env";
 
 export default defineConfig({
