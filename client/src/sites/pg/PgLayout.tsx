@@ -1,11 +1,9 @@
 import {
-  type BoxProps,
   type StackProps,
   Box,
   Container,
   Flex,
   Grid,
-  Heading,
   HStack,
   IconButton,
   Image,
@@ -23,7 +21,7 @@ export default function PgLayout() {
     <Flex flex="1" direction="column" bg="bg">
       <PgHeroHeader />
 
-      <Stack as="main" flex="1" alignItems="stretch">
+      <Stack as="main" flex="1" alignItems="stretch" overflow="hidden">
         <Container pb="gap.xl" px={{ base: "gap.sm", md: "6" }}>
           <Outlet />
         </Container>
@@ -35,11 +33,12 @@ export default function PgLayout() {
 
 function PgHeroHeader() {
   return (
-    <Box as="header" bg="brand.green" minH={{ base: "325px", md: "600px" }}>
+    <Box as="header" bg="brand.green">
       <PgNav />
       <Container
         px={{ base: "gap.sm", md: "88px" }}
-        py={{ base: "30px", md: "56px" }}
+        pt={{ base: "30px", md: "14" }}
+        pb={{ base: "50px", md: "20" }}
         color="brand.seashell"
         fontWeight="medium"
       >
@@ -168,27 +167,36 @@ function PgNav() {
   );
 }
 
-const FOOTER_LINKS = {
-  Content: [
-    { label: "Career Guide", href: "https://probablygood.org/career-guide/" },
-    { label: "Career Profiles", href: "https://probablygood.org/career-profiles/" },
-    { label: "Cause Areas", href: "https://probablygood.org/cause-areas/" },
-    { label: "Degree Paths", href: "https://probablygood.org/degree-paths/" },
-    { label: "Core Concepts", href: "https://probablygood.org/core-concepts/" },
-    { label: "Interviews", href: "https://probablygood.org/interviews/" },
-    { label: "Explore", href: "https://probablygood.org/explore/" },
-  ],
-  Services: [
-    { label: "1:1 Advising", href: "https://probablygood.org/advising/" },
-    { label: "Job Board", href: "https://jobs.probablygood.org/" },
-    { label: "Workshops", href: "https://probablygood.org/workshops/" },
-  ],
-  About: [
-    { label: "Learn more", href: "https://probablygood.org/about/" },
-    { label: "Get in touch", href: "https://probablygood.org/contact/" },
-    { label: "Donate", href: "https://probablygood.org/donate/" },
-  ],
-} as const;
+const FOOTER_LINKS = [
+  {
+    title: "Content",
+    links: [
+      { label: "Career Guide", href: "https://probablygood.org/career-guide/" },
+      { label: "Career Profiles", href: "https://probablygood.org/career-profiles/" },
+      { label: "Cause Areas", href: "https://probablygood.org/cause-areas/" },
+      { label: "Degree Paths", href: "https://probablygood.org/degree-paths/" },
+      { label: "Core Concepts", href: "https://probablygood.org/core-concepts/" },
+      { label: "Interviews", href: "https://probablygood.org/interviews/" },
+      { label: "Explore", href: "https://probablygood.org/explore/" },
+    ],
+  },
+  {
+    title: "Services",
+    links: [
+      { label: "1:1 Advising", href: "https://probablygood.org/advising/" },
+      { label: "Job Board", href: "https://jobs.probablygood.org/" },
+      { label: "Workshops", href: "https://probablygood.org/workshops/" },
+    ],
+  },
+  {
+    title: "About",
+    links: [
+      { label: "Learn more", href: "https://probablygood.org/about/" },
+      { label: "Get in touch", href: "https://probablygood.org/contact/" },
+      { label: "Donate", href: "https://probablygood.org/donate/" },
+    ],
+  },
+] as const;
 
 const FOOTER_BOTTOM_LINKS = [
   { label: "Privacy Policy", href: "https://probablygood.org/privacy-policy/" },
@@ -210,7 +218,6 @@ function PgFooter() {
     color: "brand.footer.text",
     _hover: { textDecoration: "underline" },
   } as const;
-  const currentYear = new Date().getFullYear();
 
   return (
     <Box as="footer" bg="brand.footer.bg" color="brand.seashell" minH={{ md: "450px" }}>
@@ -225,17 +232,14 @@ function PgFooter() {
         >
           <FooterDescription />
 
-          {Object.entries(FOOTER_LINKS).map((entry, index) => {
-            const mtBase = index === 0 ? "1.5" : "0";
-            return (
-              <FooterColumn
-                key={entry[0]}
-                title={entry[0]}
-                links={entry[1]}
-                chakra={{ mt: { base: mtBase, md: "0" } }}
-              />
-            );
-          })}
+          {FOOTER_LINKS.map((column, index) => (
+            <FooterColumn
+              key={column.title}
+              title={column.title}
+              links={column.links}
+              chakra={{ mt: { base: index === 0 ? "1.5" : "0", md: "0" } }}
+            />
+          ))}
         </Grid>
       </Container>
 
@@ -259,7 +263,7 @@ function PgFooter() {
           fontSize="sm"
         >
           <HStack gap="1">
-            <Text>© {currentYear} </Text>
+            <Text>© {new Date().getFullYear()} </Text>
             <Link href="https://probablygood.org/about/" {...footerLinkStyle}>
               Probably Good
             </Link>

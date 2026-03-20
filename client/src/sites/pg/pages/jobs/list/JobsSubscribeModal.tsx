@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Icon, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, Icon, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FaBell } from "react-icons/fa6";
@@ -56,9 +56,10 @@ export function JobsSubscribeModal() {
       tag_names: refinesCurrent.items
         .filter(item => item.attribute.startsWith("tags_"))
         .flatMap(item => item.refinements.map(tag => String(tag.value))),
-      is_orgs_highlighted:
-        refinesCurrent.items.some(item => item.attribute === "org.is_highlighted") ?? null,
-      is_remote: refinesCurrent.items.some(item => item.attribute === "is_remote") ?? null,
+      is_orgs_highlighted: refinesCurrent.items.some(
+        item => item.attribute === "org.is_highlighted",
+      ),
+      is_remote: refinesCurrent.items.some(item => item.attribute === "is_remote"),
       salary_min:
         salaryRefinement?.refinements[0]?.value != null
           ? Number(salaryRefinement.refinements[0].value)
@@ -87,7 +88,8 @@ export function JobsSubscribeModal() {
           }
           state.mutable.isOpen = true;
         }}
-        variant={"pg-primary" as "solid"}
+        variant="pg-primary"
+        w="full"
         {...ids.set(ids.job.alert.subscribeBtn)}
       >
         <Icon boxSize="3.5">
@@ -179,7 +181,7 @@ export function JobsSubscribeModal() {
               </Text>
               <Button
                 type="submit"
-                variant={"pg-primary" as "solid"}
+                variant="pg-primary"
                 loading={loading.isActive}
                 w="127px"
                 {...ids.set(ids.job.alert.submitBtn)}

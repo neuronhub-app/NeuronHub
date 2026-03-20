@@ -47,26 +47,7 @@ export function JobList(props: { slug?: string }) {
             }
           : undefined
       }
-      subheader={
-        <Flex gap="gap.md" pr="1" fontSize="xs">
-          <Link asChild>
-            <NavLink to={urls.jobs.faq}>
-              <Icon>
-                <GoComment />
-              </Icon>
-              Contact
-            </NavLink>
-          </Link>
-          <Link asChild>
-            <NavLink to={urls.jobs.faq}>
-              <Icon>
-                <GoQuestion />
-              </Icon>
-              FAQ
-            </NavLink>
-          </Link>
-        </Flex>
-      }
+      subheader={<PgSubheaderLinks />}
       hits={{
         enrichment: { query: JobsByIdsQuery, extractItems: data => data.jobs },
         renderHit: (job, ctx) => (
@@ -74,7 +55,6 @@ export function JobList(props: { slug?: string }) {
         ),
         hitOpenedPinned: jobOpenPinned,
         listTestId: ids.job.list,
-        listGap: "gap.md",
       }}
       searchInputTestId={ids.job.searchInput}
       facetsActiveLabelsOverride={{
@@ -87,7 +67,7 @@ export function JobList(props: { slug?: string }) {
       facetsActiveMoneyAttributes={["salary_min"]}
       facetsActiveSubFacetPairs={{ "tags_country_visa_sponsor.name": "tags_country.name" }}
       facetsActiveSubFacetLabel={{
-        "tags_country_visa_sponsor.name": "Confirmed can sponsor visas",
+        "tags_country_visa_sponsor.name": "w/Visa",
       }}
       facetsActiveExtraTags={
         salarySnap.excludeNoSalary
@@ -177,6 +157,33 @@ function JobOpenSeparator() {
     </HStack>
   );
 }
+
+function PgSubheaderLinks() {
+  return (
+    <Flex gap="gap.lg">
+      <Link asChild {...pgSubheaderLinkStyle}>
+        <NavLink to={urls.jobs.faq}>
+          <Icon>
+            <GoQuestion />
+          </Icon>
+          FAQ
+        </NavLink>
+      </Link>
+      <Link href="https://probablygood.org/contact/" {...pgSubheaderLinkStyle}>
+        <Icon>
+          <GoComment />
+        </Icon>
+        Contact
+      </Link>
+    </Flex>
+  );
+}
+
+const pgSubheaderLinkStyle = {
+  fontWeight: "medium",
+  fontSize: "sm",
+  color: "brand.green",
+} as const;
 
 const JobsByIdsQuery = graphql.persisted(
   "JobsByIds",
