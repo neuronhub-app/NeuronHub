@@ -27,7 +27,9 @@ export function Toc() {
 
   return (
     <Box as="nav" {...ids.set(ids.toc.root)} fontSize="sm">
-      <Text fontWeight="semibold">On this page</Text>
+      <Text fontWeight="semibold" hideBelow="xl">
+        On this page
+      </Text>
       <Stack mt="3" gap="0">
         {items.map(item => (
           <TocLink

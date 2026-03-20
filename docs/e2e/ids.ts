@@ -8,6 +8,7 @@ export namespace ids {
   export const sidebar = {
     root: "sidebar",
     logo: "sidebar.logo",
+    burgerBtn: "sidebar.burger-btn",
   } as const;
 
   export const toc = {

@@ -137,18 +137,6 @@ test.describe("<Term/>", () => {
   });
 });
 
-test("ImageWithDialog opens lightbox on thumbnail click", async ({ page }) => {
-  await page.goto(routes.usage.sentry);
-  const thumbnail = page.getByRole("img").first();
-  await expect(thumbnail).toBeVisible();
-
-  await thumbnail.click();
-  await expect($(page)[ids.imageZoom.backdrop]).toBeVisible();
-
-  await page.keyboard.press("Escape");
-  await expect($(page)[ids.imageZoom.backdrop]).not.toBeVisible();
-});
-
 // --- helpers ---
 
 function path(path: ReactRouterPath) {

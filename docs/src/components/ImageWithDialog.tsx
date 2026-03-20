@@ -14,7 +14,7 @@ export function ImageWithDialog(props: { src: string; alt: string; isDimmed?: bo
           <Image
             src={props.src}
             alt={props.alt}
-            maxW="550px"
+            maxW="min(550px, 100%)"
             boxShadow="xl"
             cursor="zoom-in"
             filter={

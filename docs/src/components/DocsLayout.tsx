@@ -19,7 +19,7 @@ import {
 import { LuFolder, LuMenu, LuUser } from "react-icons/lu";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
-import { Prose } from "@neuronhub/shared/components/ui/prose";
+import { getProseHeadingStyle, Prose } from "@neuronhub/shared/components/ui/prose";
 import { env } from "@/env";
 import {
   type NavNode,
@@ -54,30 +54,39 @@ export default function DocsLayout() {
           <SidebarContent />
         </Box>
 
-        <Box marginStart={{ lg: style.sidebar.width }} flex="1">
-          <Container maxW="7xl" py={style.p}>
-            <Stack direction={{ base: "column-reverse", xl: "row" }} gap="8" flex="1">
-              <Box flex="1">
-                <Prose data-toc-root pb="10vh" variant="content-main">
-                  <Heading as="h1">
-                    {pageLinks.get(location.pathname as ReactRouterPath)?.title}
-                  </Heading>
-                  <CodeBlockShikiAdapter>
-                    <Outlet />
-                  </CodeBlockShikiAdapter>
-                </Prose>
-              </Box>
-
+        <Box marginStart={{ lg: style.sidebar.width }} flex="1" overflowX="hidden">
+          <Container maxW="7xl" py={style.p} pt={{ base: 0, lg: style.p }}>
+            <Heading
+              as="h1"
+              {...getProseHeadingStyle()}
+              fontSize={{ base: "1.4em", xl: "1.6em" }}
+              color="blue.800/75"
+              fontWeight="bold"
+              letterSpacing="-0.01em"
+              lineHeight="1.5em"
+              marginBottom="0.4em"
+            >
+              {pageLinks.get(location.pathname as ReactRouterPath)?.title}
+            </Heading>
+            <Stack direction={{ base: "column", xl: "row" }} gap="8" flex="1">
               <Box
+                order={{ base: -1, xl: 1 }}
                 position={{ base: "unset", xl: "sticky" }}
                 top="6"
                 alignSelf="flex-start"
                 overflowY="auto"
                 width={{ base: "full", xl: "xs" }}
-                maxH="calc(100vh - 3rem)"
-                hideBelow="xl"
+                maxH={{ xl: "calc(100vh - 3rem)" }}
               >
                 <Toc />
+              </Box>
+
+              <Box flex="1" minW={0}>
+                <Prose data-toc-root pb="10vh" variant="content-main">
+                  <CodeBlockShikiAdapter>
+                    <Outlet />
+                  </CodeBlockShikiAdapter>
+                </Prose>
               </Box>
             </Stack>
           </Container>
@@ -270,17 +279,21 @@ function MobileNavbar() {
     <Drawer.Root placement="start">
       <Drawer.Trigger asChild>
         <Button
-          size="sm"
+          {...ids.set(ids.sidebar.burgerBtn)}
+          size="md"
           hideFrom="lg"
           variant="plain"
           colorPalette="gray"
           aria-label="Open menu"
           m="2"
+          px="1"
         >
           <HStack>
-            <LuMenu />
-            <Heading textStyle="sm" fontWeight="medium" color="fg">
-              Docs
+            <Icon size="lg">
+              <LuMenu />
+            </Icon>
+            <Heading textStyle="md" fontWeight="medium" color="fg">
+              NeuronHub
             </Heading>
           </HStack>
         </Button>
