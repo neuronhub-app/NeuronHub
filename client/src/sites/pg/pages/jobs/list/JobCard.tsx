@@ -315,7 +315,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
       {props.job.url_external && (
         <Button
           asChild
-          variant={"pg-primary" as "solid"}
+          variant="pg-primary"
           w={{ base: "150px", md: "190px" }}
           h="10"
           focusRingColor="transparent"

@@ -67,19 +67,10 @@ function SalaryExtras(props: { isSalarySelected: boolean }) {
         </Icon>
       </Flex>
       {snap.showInfo && (
-        <Stack {...textStyle} gap="0">
-          <Text>• Hourly, weekly or monthly salaries are annualised.</Text>
-          <Text>
-            • Excluding roles without salary information also excludes one-off payment schemes
-            such as grants and awards.
-          </Text>
-          <Text>
-            • Non-US salaries are converted to their USD equivalent using{" "}
-            <Link href="https://fxratesapi.com" target="_blank" color="brand.green.light">
-              FXRatesAPI.
-            </Link>
-          </Text>
-        </Stack>
+        <Text {...textStyle}>
+          • All hourly, weekly, and monthly rates are annualized and non-US salaries are
+          converted to their USD equivalent.
+        </Text>
       )}
     </>
   );

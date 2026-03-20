@@ -26,7 +26,12 @@ const pgRecipes = {
     },
   }),
   container: defineRecipe({ base: { maxWidth: "1280px" } }),
-  link: defineRecipe({ base: { "&:focus:not(:focus-visible)": { outline: "none" } } }),
+  link: defineRecipe({
+    base: {
+      "&:focus:not(:focus-visible)": { outline: "none" },
+      _hover: { textDecorationColor: "currentColor" },
+    },
+  }),
 };
 
 const tokens = defineTokens({

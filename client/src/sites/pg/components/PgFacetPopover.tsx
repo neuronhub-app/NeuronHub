@@ -9,6 +9,7 @@ export function PgFacetPopover(props: {
   disabled?: boolean;
   onClose?: () => void;
   contentMaxW?: string;
+  order?: { base?: number; lg?: number };
 }) {
   return (
     <Popover.Root
@@ -32,6 +33,7 @@ export function PgFacetPopover(props: {
           justifyContent="space-between"
           px="2.5"
           disabled={props.disabled}
+          order={props.order}
         >
           {props.label}
           <Icon
