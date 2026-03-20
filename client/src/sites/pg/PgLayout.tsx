@@ -21,8 +21,14 @@ export default function PgLayout() {
     <Flex flex="1" direction="column" bg="bg">
       <PgHeroHeader />
 
-      <Stack as="main" flex="1" alignItems="stretch" overflow="hidden">
-        <Container pb="gap.xl" px={{ base: "gap.sm", md: "6" }}>
+      <Stack
+        as="main"
+        flex="1"
+        alignItems="stretch"
+        overflow="hidden"
+        pb={{ base: "46px", md: "54px" }}
+      >
+        <Container px={{ base: "gap.sm", md: "6" }}>
           <Outlet />
         </Container>
       </Stack>
