@@ -9,6 +9,7 @@ from timezone_field import TimeZoneField
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
 from neuronhub.apps.anonymizer.registry import anonymizable
+from neuronhub.apps.db.fields import MarkdownField
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
@@ -236,6 +237,23 @@ class JobAlert(TimeStampedModel):
     def __str__(self):
         is_active_flag = "" if self.is_active else ", inactive"
         return f"Alert(#{self.pk}, {self.email}{is_active_flag})"
+
+
+class JobFaqQuestion(models.Model):
+    site = models.ForeignKey(
+        "sites.SiteConfig",
+        on_delete=models.CASCADE,
+        related_name="faq_questions",
+    )
+    question = models.CharField(max_length=512)
+    answer_md = MarkdownField()
+    order = models.PositiveIntegerField(default=0, db_index=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.question
 
 
 class JobAlertLog(TimeStampedModel):

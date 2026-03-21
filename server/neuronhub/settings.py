@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "strawberry_django",
     "health_check",
     "adminutils",
+    "adminsortable2",
     "dalf",
     "neuronhub.apps.db",
     "neuronhub.apps.algolia",

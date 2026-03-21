@@ -12,6 +12,7 @@ from strawberry_django.permissions import IsStaff
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.jobs.models import JobFaqQuestion
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
@@ -34,6 +35,14 @@ class JobLocationType:
     country: auto
     region: auto
     is_remote: auto
+
+
+@strawberry_django.type(JobFaqQuestion)
+class JobFaqQuestionType:
+    id: auto
+    question: auto
+    answer_md: auto
+    order: auto
 
 
 @strawberry_django.type(Org)
@@ -115,6 +124,7 @@ class JobVersionType:
 @strawberry.type(name="Query")
 class JobsQuery:
     jobs: list[JobType] = strawberry_django.field()
+    job_faq_questions: list[JobFaqQuestionType] = strawberry_django.field()
 
     @strawberry_django.field
     async def job_by_slug(self, info: strawberry.Info, slug: str) -> JobType | None:

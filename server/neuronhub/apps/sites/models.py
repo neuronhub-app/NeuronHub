@@ -8,6 +8,8 @@ from django.db.models import TextChoices
 from django_choices_field.fields import TextChoicesField
 from solo.models import SingletonModel
 
+from neuronhub.apps.db.fields import HtmlField
+
 
 class SiteSlug(TextChoices):
     Neuronhub = "neuronhub"
@@ -48,13 +50,13 @@ class SiteConfig(SingletonModel):
         help_text="URL for 'landed a role' / 'report placement' link in Job alert emails",
     )
 
-    email_template_job_alert = models.TextField(
+    email_template_job_alert = HtmlField(
         blank=True,
         default="",
         verbose_name="Template Job alert",
         help_text=f"Specify to override the jobs/job_alert.html email template. {_help_text}",
     )
-    email_template_job_alert_confirmation = models.TextField(
+    email_template_job_alert_confirmation = HtmlField(
         blank=True,
         default="",
         verbose_name="Template Job alert confirmation",

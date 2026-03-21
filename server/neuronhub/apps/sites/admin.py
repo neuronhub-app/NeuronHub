@@ -1,3 +1,5 @@
+from adminsortable2.admin import SortableAdminBase
+from adminsortable2.admin import SortableStackedInline
 from django.conf import settings
 from django.contrib import admin
 from django.contrib import messages
@@ -7,14 +9,22 @@ from django_object_actions import DjangoObjectActions
 from django_object_actions import action
 from solo.admin import SingletonModelAdmin
 
+from neuronhub.apps.jobs.models import JobFaqQuestion
 from neuronhub.apps.jobs.services.send_job_alerts import _get_email_context_test
 from neuronhub.apps.jobs.services.send_job_alerts import _render_email_html
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.users.models import User
 
 
+class JobFaqQuestionInline(SortableStackedInline):
+    model = JobFaqQuestion
+    extra = 0
+
+
 @admin.register(SiteConfig)
-class SiteConfigAdmin(DjangoObjectActions, SingletonModelAdmin):
+class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmin):
+    inlines = [JobFaqQuestionInline]
+
     change_actions = [
         "send_test_job_alert_email",
         "send_test_job_alert_confirmation_email",

@@ -109,6 +109,13 @@ type JobAlertType {
   sent_count: Int!
 }
 
+type JobFaqQuestionType {
+  id: ID!
+  question: String!
+  answer_md: String!
+  order: Int!
+}
+
 input JobFilter {
   id: IDBaseFilterLookup
   AND: JobFilter
@@ -819,6 +826,7 @@ type Query {
   profile_match_stats: ProfileMatchStatsType! @IsAuthenticated
   profile_user_llm_md: String! @IsAuthenticated
   jobs(filters: JobFilter): [JobType!]!
+  job_faq_questions: [JobFaqQuestionType!]!
   job_by_slug(slug: String!): JobType
   job_alerts: [JobAlertType!]!
   job_versions_pending: [JobVersionType!]! @IsAuthenticated

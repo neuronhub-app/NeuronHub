@@ -338,6 +338,9 @@ function JobExpanded(props: { job: JobFragmentType }) {
 }
 
 function locationTags(locations: JobFragmentType["locations"]): string[] {
+  if (!locations) {
+    return [];
+  }
   if (locations.length <= 3) {
     return locations.map(loc => loc.name);
   }

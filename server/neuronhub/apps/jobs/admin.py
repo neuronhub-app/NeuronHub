@@ -6,6 +6,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobAlertLog
+from neuronhub.apps.jobs.models import JobFaqQuestion
 
 
 @admin.register(Job)
