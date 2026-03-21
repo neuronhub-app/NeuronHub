@@ -31,6 +31,7 @@ import { Toc } from "@/components/Toc";
 import { DocsSearch } from "@/components/DocsSearch";
 import { ReactRouterPath } from "@/utils/types";
 import { CodeBlockShikiAdapter } from "@/components/CodeBlockShikiAdapter";
+import { BadgeNew } from "@/components/BadgeNew";
 import { ids } from "@/e2e/ids";
 
 export default function DocsLayout() {
@@ -38,7 +39,7 @@ export default function DocsLayout() {
 
   return (
     <>
-      <MobileNavbar />
+      <MobileMenuDrawer />
       <Flex flex="1">
         <Box
           width={style.sidebar.width}
@@ -144,7 +145,7 @@ function SidebarContent() {
           }}
         />
 
-        <NavTreeList pathname={pathname} nodes={nodes} depth={0} />
+        <MenuLeft pathname={pathname} nodes={nodes} depth={0} />
       </Stack>
     </Box>
   );
@@ -193,17 +194,22 @@ const sectionTabs = {
   development: { label: "Development", icon: LuFolder },
 } as const;
 
-function NavTreeList(props: { pathname: string; nodes: NavNode[]; depth: number }) {
+function MenuLeft(props: { pathname: string; nodes: NavNode[]; depth: number }) {
   return (
     <Stack w="full" gap={props.depth === 0 ? "6" : "0"}>
       {props.nodes.map(node => (
-        <NavTreeNode key={node.slug} pathname={props.pathname} node={node} depth={props.depth} />
+        <MenuLeftNode
+          key={node.slug}
+          pathname={props.pathname}
+          node={node}
+          depth={props.depth}
+        />
       ))}
     </Stack>
   );
 }
 
-function NavTreeNode(props: { pathname: string; node: NavNode; depth: number }) {
+function MenuLeftNode(props: { pathname: string; node: NavNode; depth: number }) {
   const isLeaf = props.node.children.length === 0;
 
   if (props.depth === 0) {
@@ -213,18 +219,24 @@ function NavTreeNode(props: { pathname: string; node: NavNode; depth: number }) 
           <SideNavLink
             href={props.node.href}
             data-current={props.pathname === props.node.href ? "" : undefined}
+            w="fit-content"
           >
             <Heading as="h5" textStyle="sm">
               {props.node.title}
             </Heading>
+
+            {props.node.isNewBadge && <BadgeNew />}
           </SideNavLink>
         ) : (
-          <Heading as="h5" textStyle="sm">
-            {props.node.title}
-          </Heading>
+          <HStack w="fit-content">
+            <Heading as="h5" textStyle="sm">
+              {props.node.title}
+            </Heading>
+            {props.node.isNewBadge && <BadgeNew />}
+          </HStack>
         )}
         {props.node.children.length > 0 && (
-          <NavTreeList pathname={props.pathname} nodes={props.node.children} depth={1} />
+          <MenuLeft pathname={props.pathname} nodes={props.node.children} depth={1} />
         )}
       </Stack>
     );
@@ -237,13 +249,17 @@ function NavTreeNode(props: { pathname: string; node: NavNode; depth: number }) 
           href={props.node.href}
           variant="line"
           size="md"
+          w="fit-content"
           ps={4 + (props.depth - 1) * 3}
           data-current={props.pathname === props.node.href ? "" : undefined}
         >
           <Span flex="1">{props.node.title}</Span>
+
+          {props.node.isNewBadge && <BadgeNew />}
         </SideNavLink>
+
         {props.node.children.length > 0 && (
-          <NavTreeList
+          <MenuLeft
             pathname={props.pathname}
             nodes={props.node.children}
             depth={props.depth + 1}
@@ -265,16 +281,13 @@ function NavTreeNode(props: { pathname: string; node: NavNode; depth: number }) 
       >
         {props.node.title}
       </Text>
-      <NavTreeList
-        pathname={props.pathname}
-        nodes={props.node.children}
-        depth={props.depth + 1}
-      />
+
+      <MenuLeft pathname={props.pathname} nodes={props.node.children} depth={props.depth + 1} />
     </>
   );
 }
 
-function MobileNavbar() {
+function MobileMenuDrawer() {
   return (
     <Drawer.Root placement="start">
       <Drawer.Trigger asChild>

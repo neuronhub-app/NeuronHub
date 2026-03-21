@@ -102,6 +102,7 @@ function buildRecords(): DocRecord[] {
     const dirName = path.basename(path.dirname(file));
     const fileBaseName = isReadme ? dirName : fileName;
     const pageTitle = fm.title ?? format.slugToTitle(fileBaseName);
+    const isNewBadge = fm.is_new ?? false;
 
     const sections = splitByHeadings(raw);
     const isHasIntro = sections.length > 0 && !sections[0].heading && sections[0].body;
@@ -117,6 +118,7 @@ function buildRecords(): DocRecord[] {
         content: "",
         url: pageSlug,
         sectionIndex: -1,
+        isNewBadge,
       });
     }
 
@@ -137,6 +139,7 @@ function buildRecords(): DocRecord[] {
         content: section.body,
         url: `${pageSlug}${anchor}`,
         sectionIndex: index,
+        isNewBadge,
       });
     }
   }
@@ -255,4 +258,5 @@ type DocRecord = {
   content: string;
   url: string;
   sectionIndex: number;
+  isNewBadge: boolean;
 };

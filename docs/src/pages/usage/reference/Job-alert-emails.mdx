@@ -1,11 +1,13 @@
 ---
 order: 0
+is_new: true
 ---
 
 import { Text } from "@chakra-ui/react";
 import { Term } from "@/components/Term"
 import { PageLink } from "@/components/PageLink"
 import { AdminLink } from "@/components/AdminLink"
+import { BadgeNew } from "@/components/BadgeNew"
 
 
 Sent daily at `8am` in the user's timezone.
@@ -25,7 +27,7 @@ Sent daily at `8am` in the user's timezone.
 
 Worst-case delay: max 23h.
 
-### Email Templates
+### Email Templates <BadgeNew isHeading />
 
 You can override the default `jobs/job_alert.html` and `jobs/job_alert_confirmation.html` in
 <AdminLink id="SiteConfig">the admin panel's Site Config</AdminLink>.

@@ -44,6 +44,9 @@ function buildNavTree(): NavNode[] {
       if (file.frontmatter.order !== undefined) {
         parent.order = file.order;
       }
+      if (file.frontmatter.is_new) {
+        parent.isNewBadge = true;
+      }
     } else {
       const parent =
         file.dir.pathParts.length > 0
@@ -54,6 +57,7 @@ function buildNavTree(): NavNode[] {
         title: file.title,
         href: file.href,
         order: file.order,
+        isNewBadge: file.frontmatter.is_new,
         children: [],
       };
       if (parent) {
@@ -73,6 +77,7 @@ export type NavNode = {
   title: string;
   href?: string;
   order: number;
+  isNewBadge?: boolean;
   children: NavNode[];
 };
 

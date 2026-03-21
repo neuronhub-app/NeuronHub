@@ -8,6 +8,7 @@ export namespace frontmatter {
     description: z.string().optional(),
     reviewed_at: z.string().optional(), // #AI
     hidden: z.boolean().optional(),
+    is_new: z.boolean().optional(),
   });
 
   export type SchemaType = z.infer<typeof schema>;

@@ -1,12 +1,14 @@
 ---
 title: Error Monitoring
 order: 2
+is_new: true
 ---
 
 import { ImageWithDialog } from "@/components/ImageWithDialog";
 import { LinkExt } from "@/components/LinkExt";
 import { Term } from "@/components/Term"
 import { PageLink } from "@/components/PageLink"
+import { BadgeNew } from "@/components/BadgeNew"
 
 ## Issue Reports
 
@@ -36,7 +38,7 @@ You can browse <LinkExt href="https://sentry.io/explore/replays">all Replays her
 
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry_explore_replays.avif" alt="Explore Replays" isDimmed />
 
-## Logs
+## Logs <BadgeNew isHeading />
 
 All logs from the <Term id="backend" />, <Term id="frontend" />, and <Term id="worker" /> are sent to
 <LinkExt href="https://sentry.io/explore/logs/">the Sentry Logs dashboard</LinkExt>.

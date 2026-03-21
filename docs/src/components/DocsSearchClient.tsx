@@ -9,6 +9,7 @@ import { LuArrowDown, LuArrowUp, LuCornerDownLeft } from "react-icons/lu";
 import { liteClient } from "algoliasearch/lite";
 import { Highlight, InstantSearch, Snippet, useHits, useSearchBox } from "react-instantsearch";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { BadgeNew } from "@/components/BadgeNew";
 import { env } from "@/env";
 import { ids } from "@/e2e/ids";
 import { NavLink, useNavigate } from "react-router";
@@ -239,6 +240,9 @@ function HitItem(props: {
               {/* @ts-expect-error #bad-infer instantsearch.js Hit<BaseHit> not hoisted in Bun workspace */}
               <Highlight attribute="pageTitle" hit={props.hit} />
             </Text>
+
+            {props.hit.isNewBadge && <BadgeNew />}
+
             {isFileNameShown && (
               <Text flexShrink={0} color="fg.subtle" textStyle="xs">
                 {props.hit.fileName}
@@ -300,4 +304,5 @@ type DocHit = {
   headingPath: string;
   content: string;
   url: string;
+  isNewBadge?: boolean;
 };

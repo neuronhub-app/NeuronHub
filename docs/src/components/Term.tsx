@@ -180,7 +180,7 @@ const style = {
     return {
       fontSize: opts.isTermInTerm ? this.fontSize : "",
       cursor: "help",
-      colorPalette: theme.colorPrimary,
+      colorPalette: theme.colorSecondary,
       bg: "colorPalette.subtle",
       transition: "background",
       transitionDuration: "fast",

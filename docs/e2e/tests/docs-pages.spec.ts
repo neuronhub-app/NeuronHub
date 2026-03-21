@@ -16,7 +16,7 @@ const routes = {
     jobEmails: path("/usage/guides/job-emails-sending"),
     sentry: path("/usage/guides/sentry"),
     adminPanel: path("/usage/guides/admin-panel"),
-    jobSubscription: path("/usage/reference/job-subscription-emails"),
+    jobAlertEmails: path("/usage/reference/job-alert-emails"),
     dir: path("/usage"),
   },
   development: {
