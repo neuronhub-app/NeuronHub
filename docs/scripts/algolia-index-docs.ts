@@ -223,14 +223,27 @@ function extractText(node: MdNode): string {
   if (config.jsx_nodes.excluded.has(node.type)) {
     return "";
   }
-  if (node.children) {
+  if (node.children?.length) {
     const text = node.children.map(extractText).join("");
     return config.jsx_nodes.need_newlines_appended.has(node.type) ? `${text}\n` : text;
+  }
+  // Self-closing JSX (eg <PageLink id="SiteConfig" />) => use `id` prop as text
+  if (node.attributes?.length) {
+    const id = node.attributes.find(a => a.name === "id");
+    if (id?.value) {
+      return String(id.value);
+    }
   }
   return "";
 }
 
-type MdNode = { type: string; value?: string; depth?: number; children?: MdNode[] };
+type MdNode = {
+  type: string;
+  value?: string;
+  depth?: number;
+  children?: MdNode[];
+  attributes?: Array<{ name: string; value?: string | boolean | null }>;
+};
 
 type DocRecord = {
   objectID: string;

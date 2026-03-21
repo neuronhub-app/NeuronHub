@@ -4,14 +4,16 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('sites', '0003_remove_siteconfig_email_template_subscription_confirmation_html_and_more'),
+        (
+            "sites",
+            "0003_remove_siteconfig_email_template_subscription_confirmation_html_and_more",
+        ),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='siteconfig',
-            name='logo',
+            model_name="siteconfig",
+            name="logo",
         ),
     ]
