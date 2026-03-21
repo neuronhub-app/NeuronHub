@@ -1,4 +1,3 @@
-import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 import { z } from "zod/v4";
 
@@ -15,10 +14,6 @@ export namespace frontmatter {
   });
 
   export type SchemaType = z.infer<typeof schema>;
-
-  export function parseFile(file: string) {
-    return parse(readFileSync(file, "utf-8"));
-  }
 
   export function parse(raw: string) {
     const match = raw.match(/^---\s*\n([\s\S]*?)\n---/);

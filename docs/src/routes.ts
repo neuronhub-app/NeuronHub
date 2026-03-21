@@ -2,7 +2,7 @@
  * #AI
  */
 // Vite build: runs before aliases - requires node:fs and relative imports (no @/, no Bun)
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { type RouteConfig, layout, route } from "@react-router/dev/routes";
 import { findMdxFiles } from "./utils/findMdxFiles";
@@ -45,7 +45,7 @@ function buildDirRedirects() {
 function fileToSlug(file: string): string {
   const rel = path.relative(pagesDir, file).replace(".mdx", "").toLowerCase();
   const dirPath = path.dirname(rel);
-  const fm = frontmatter.parseFile(file);
+  const fm = frontmatter.parse(readFileSync(file, "utf-8"));
 
   if (fm.slug) {
     return `/${dirPath}/${fm.slug}`;

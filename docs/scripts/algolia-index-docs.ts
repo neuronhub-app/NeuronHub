@@ -191,7 +191,11 @@ function isHiddenByParent(file: string): boolean {
   let dir = path.dirname(file);
   while (dir.startsWith(config.pagesDir) && dir !== config.pagesDir) {
     try {
-      if (frontmatter.parseFile(path.join(dir, `${frontmatter.consts.readme}.mdx`)).hidden) {
+      if (
+        frontmatter.parse(
+          readFileSync(path.join(dir, `${frontmatter.consts.readme}.mdx`), "utf-8"),
+        ).hidden
+      ) {
         return true;
       }
     } catch {
