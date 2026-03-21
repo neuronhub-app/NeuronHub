@@ -5,15 +5,17 @@ order: 2
 
 import { ImageWithDialog } from "@/components/ImageWithDialog";
 import { LinkExt } from "@/components/LinkExt";
+import { Term } from "@/components/Term"
+import { PageLink } from "@/components/PageLink"
 
 ## Issue Reports
 
-I recommend triaging the `backend` issues daily, and the `frontend` once in a few weeks.
+I recommend triaging the <Term id="backend" /> issues daily, and the <Term id="frontend" /> once in a few weeks.
 
 The <LinkExt href="https://sentry.io/issues/alerts/rules/">default Alerts settings</LinkExt> are configured by project:
 - Uptime - immediate email.
-- `backend` - immediate email.
-- `frontend` - if it affects 3+ users per month.
+- <Term id="backend" /> - immediate email.
+- <Term id="frontend" /> - if it affects 3+ users per month.
 
 ## Feedback
 
@@ -25,19 +27,39 @@ Each sends an email alert. You can also enable <LinkExt href="https://sentry.io/
 
 ## Replays
 
-When a user encounters an error an anonymized `Session Replay` is
+When a user encounters an error, an anonymized `Session Replay` is
 attached to the `Issue` report:
 
-<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry_issues_replays.avif" alt="Sentry Issue Replays" isDimmed />
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry_issues_replays.avif" alt="Issue Replays" isDimmed />
 
 You can browse <LinkExt href="https://sentry.io/explore/replays">all Replays here</LinkExt>:
 
-<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry_explore_replays.avif" alt="Sentry Explore Replays" isDimmed />
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry_explore_replays.avif" alt="Explore Replays" isDimmed />
+
+## Logs
+
+All logs from the <Term id="backend" />, <Term id="frontend" />, and <Term id="worker" /> are sent to
+<LinkExt href="https://sentry.io/explore/logs/">the Sentry Logs dashboard</LinkExt>.
+
+As a non-developer you shouldn't need them, but if you want to double-check any background processes or
+find out why a user encountered an issue - that's a good place to quickly check.
+
+You can use complex filters to either search or aggregate the logs data:
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/logs.avif" alt="Logs" isDimmed />
 
 ## Uptime
 
-TBD
+Sentry monitors the uptime of your <Term id="backend" /> and <Term id="frontend" /> every 5 minutes,
+and logs downtime if the response took more than 10 seconds. You'll receive email alerts if it detects any downtime.
+
+You can view the statistics in the <LinkExt href="https://probably-good.sentry.io/issues/alerts/rules/uptime/">uptime dashboard</LinkExt>.
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/uptime.avif" alt="Uptime" isDimmed />
 
 ## Scheduled Tasks Monitor
 
-TBD
+Similar to Uptime, Sentry monitors each run of your scheduled tasks (`crons`), eg hourly <PageLink id="job-alert-emails" />,
+and sends you email alerts if any task run failed to report its successful execution within 5 minutes of its start.
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/crons.avif" alt="Crons" isDimmed />

@@ -6,19 +6,23 @@ order: 4
 import { LinkExt } from "@/components/LinkExt"
 import { PageLink } from "@/components/PageLink"
 import { Term } from "@/components/Term"
+import { AdminLink } from "@/components/AdminLink"
 import { env } from "@/env"
 
 The <Term id="backend" /> runs a <LinkExt href="https://docs.djangoproject.com/en/5.2/ref/contrib/admin/">Django Admin</LinkExt> panel
-at <LinkExt href={`${env.VITE_SERVER_URL}/admin/`}>/admin/</LinkExt>.
+at <LinkExt href={`${env.VITE_SERVER_URL}/admin/`}>{env.VITE_SERVER_URL}/admin/</LinkExt>.
 
-Only `superusers` (<PageLink id="User" hash="links" />) can log in.
+Only <PageLink id="User" hash="links" />s with the flags `is_staff = true` or `is_superuser = true` can access it.
+
+It's mostly generated based on the source code defining the SQL Database Tables, but I added a number of admin-level actions.
 
 
-## Models
+## Database Tables
 
 | Model                         | Admin path                                                                                                            |
 |-------------------------------|-----------------------------------------------------------------------------------------------------------------------|
 | <PageLink id="User" />        | <LinkExt href={`${env.VITE_SERVER_URL}/admin/users/user/`}>/admin/users/user/</LinkExt>                               |
 | <PageLink id="JobAlert" />    | <LinkExt href={`${env.VITE_SERVER_URL}/admin/jobs/jobalert/`}>/admin/jobs/jobalert/</LinkExt>                         |
 | <PageLink id="JobAlertLog" /> | <LinkExt href={`${env.VITE_SERVER_URL}/admin/jobs/jobalertlog/`}>/admin/jobs/jobalertlog/</LinkExt>                   |
+| <PageLink id="SiteConfig" />  | <AdminLink id="SiteConfig">/admin/sites/siteconfig</AdminLink>                                                        |
 | <PageLink id="TaskResult" />  | <LinkExt href={`${env.VITE_SERVER_URL}/admin/django_tasks_database/dbtaskresult/`}>/admin/.../dbtaskresult/</LinkExt> |

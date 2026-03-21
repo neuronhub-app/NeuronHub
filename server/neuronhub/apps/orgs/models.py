@@ -13,7 +13,7 @@ from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 class Org(TimeStampedModel):
     name = models.CharField(max_length=255)
     slug = AutoSlugField(populate_from="name", unique=True)
-    domain = models.CharField(max_length=255, blank=True, default="", unique=False)
+    domain = models.CharField(max_length=255, blank=True, default="")
     tz: ZoneInfo = TimeZoneField(default="America/Los_Angeles")
 
     website = models.CharField(max_length=1024, blank=True)

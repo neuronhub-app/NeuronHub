@@ -74,6 +74,7 @@ INSTALLED_APPS = [
     "dalf",
     "neuronhub.apps.db",
     "neuronhub.apps.algolia",
+    "neuronhub.apps.sites",
     "neuronhub.apps.users",
     "neuronhub.apps.orgs",
     "neuronhub.apps.posts",
@@ -248,6 +249,8 @@ ANYMAIL = {
     "POSTMARK_SERVER_TOKEN": env.str("POSTMARK_SERVER_TOKEN", ""),
 }
 ADMIN_EMAIL = env.str("ADMIN_EMAIL", "")
+DEFAULT_FROM_EMAIL = ADMIN_EMAIL
+SERVER_EMAIL = ADMIN_EMAIL
 if not ADMIN_EMAIL:
     logger.warning("env.ADMIN_EMAIL is missing")
 

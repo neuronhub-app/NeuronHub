@@ -1,6 +1,7 @@
 import uuid
 from typing import cast
 
+import sentry_sdk
 import strawberry
 import strawberry_django
 from asgiref.sync import sync_to_async
@@ -14,6 +15,7 @@ from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
+from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.serialize_to_md import serialize_job_to_markdown
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
@@ -162,6 +164,11 @@ async def _compose_job_version(user: User, job_draft: Job) -> JobVersionType | N
 
 @strawberry.type
 class JobsMutation:
+    @strawberry_django.field(extensions=[IsStaff()])
+    async def job_versions_approve(self, info: strawberry.Info, draft_ids: list[int]) -> bool:
+        await publish_job_versions(draft_ids)
+        return True
+
     @strawberry.mutation
     async def job_alert_subscribe(
         self,
@@ -185,6 +192,10 @@ class JobsMutation:
             await alert.tags.aset([tag async for tag in tags])
 
         await _save_session_job_alert(info=info, alert_id_ext=alert.id_ext)
+        try:
+            await send_job_alert_confirmation_email(alert)
+        except Exception:
+            sentry_sdk.capture_exception()
         return True
 
     @strawberry.mutation
@@ -204,11 +215,6 @@ class JobsMutation:
             return False
         await JobAlert.objects.filter(id_ext=id_ext).adelete()
         await _drop_session_job_alert(info, id_ext)
-        return True
-
-    @strawberry_django.field(extensions=[IsStaff()])
-    async def job_versions_approve(self, info: strawberry.Info, draft_ids: list[int]) -> bool:
-        await publish_job_versions(draft_ids)
         return True
 
     @strawberry.mutation

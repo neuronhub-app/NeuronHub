@@ -92,7 +92,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     SERVER_PORT_E2E = "{{ env.SERVER_PORT_E2E | default(value = 8001) }}"
     CLIENT_PORT_E2E = "{{ env.CLIENT_PORT_E2E | default(value = 3001) }}"
-    DOCS_PORT_E2E = "{{ env.DOCS_PORT_E2E | default(value = 4010) }}"
+    DOCS_PORT_E2E = "{{ env.DOCS_PORT_E2E | default(value = 4001) }}"
 
     PYTEST_DB_NAME = "{{ env.PYTEST_DB_NAME | default(value = 'test_database') }}"
     E2E_DB_NAME = "{{ env.E2E_DB_NAME | default(value = 'test_neuronhub_e2e') }}"
@@ -104,10 +104,16 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     IS_POSTGRES_MACOS = "{{ env.IS_POSTGRES_EXTERNAL }}"
     POSTGRES_EXTERNAL_SHELL_MSG = "Skipping Postgres operation, as using non-Mise db (ie on GitHub CI)"
 
+    # Claude
+
     CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS = 1
     CLAUDE_CODE_DISABLE_AUTO_MEMORY = 1
-    CLAUDE_CODE_DISABLE_CRON = 1
+
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1
+    CLAUDE_CODE_DISABLE_CRON = 1
+    CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = 1
+    DISABLE_ERROR_REPORTING = 1
+    DISABLE_BUG_COMMAND = 1
 
 
 # Dev servers

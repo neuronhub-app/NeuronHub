@@ -135,6 +135,17 @@ class Job(AlgoliaModel):
 
     history = HistoricalRecords(excluded_fields=["slug"])
 
+    tag_category_to_field = {
+        TagCategoryEnum.Skill: "tags_skill",
+        TagCategoryEnum.Area: "tags_area",
+        TagCategoryEnum.Education: "tags_education",
+        TagCategoryEnum.Experience: "tags_experience",
+        TagCategoryEnum.Workload: "tags_workload",
+        TagCategoryEnum.Country: "tags_country",
+        TagCategoryEnum.City: "tags_city",
+        TagCategoryEnum.VisaSponsorship: "tags_country_visa_sponsor",
+    }
+
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -198,7 +209,6 @@ class Job(AlgoliaModel):
         return self.title
 
 
-# todo ? refac-name: JobEmailSubscription
 class JobAlert(TimeStampedModel):
     id_ext = models.UUIDField(default=uuid.uuid4)
 
@@ -224,13 +234,10 @@ class JobAlert(TimeStampedModel):
     history = HistoricalRecords()
 
     def __str__(self):
-        inactive_flag = ""
-        if not self.is_active:
-            inactive_flag = ", inactive"
-        return f"Alert(#{self.pk}, {self.email}{inactive_flag})"
+        is_active_flag = "" if self.is_active else ", inactive"
+        return f"Alert(#{self.pk}, {self.email}{is_active_flag})"
 
 
-# todo ? refac-name: JobEmailLog
 class JobAlertLog(TimeStampedModel):
     job_alert = models.ForeignKey(
         JobAlert,

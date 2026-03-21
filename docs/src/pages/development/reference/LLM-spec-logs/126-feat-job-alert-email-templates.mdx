@@ -1,0 +1,50 @@
+## Desc
+
+Replace `server/neuronhub/apps/jobs/templates/jobs/alert_email.html` with the new template. Add the confirmation template.
+
+For red/green TDD you must establish a feedback loop: take screenshots of the new and existing template - use it while you work to make sure you changes make sense.
+
+- I created `apps.sites` with `SiteConfig` model - use it instead of `Org`. Add all needed fields for ProbablyGood and NeuronHub to it.
+- make the .html files overridable by `SiteConfig` - create 2 fields there; by default use the html files.
+    - to make it testable in the admin add an edit view django action to send the email to yourself.
+
+Refactor the `test_matches_by_*` tests to use `gen` as folowing example:
+```python
+tag_us_visa = self.gen.posts.tag("US visa", TagCategoryEnum.VisaSponsorship)
+self.gen.jobs.job(tags=[tag_us_visa])
+self.gen.jobs.job_alert(tags=[tag_us_visa])
+```
+
+## Relevant-Files
+
+- `server/neuronhub/apps/sites/models.py` - SiteConfig with template override fields
+- `server/neuronhub/apps/sites/admin.py` - admin with send-test-email actions
+- `server/neuronhub/apps/jobs/templates/jobs/job_alert.html` - uses `{{ site_name }}`, `{{ site_domain }}`
+- `server/neuronhub/apps/jobs/templates/jobs/job_alert_confirmation.html`
+- `server/neuronhub/apps/jobs/services/send_job_alerts.py` - `_render_email_html` with override support
+- `server/neuronhub/apps/jobs/services/send_job_alerts__test.py`
+
+## Decision-Log
+
+- Re-inline CSS: Gmail compat > maintainability for email HTML
+- Two standalone templates (no `{% extends %}`)
+- `feedback_url`/`report_placement_url`: empty strings for now
+- Feedback loop: `test_saves_alert_html_to_tmp` writes `/tmp/email_*.html`
+- Replaced `Org.address_canspam` → `SiteConfig.address`
+- Template override: `_render_email_html()` uses `Template(html).render()` if SiteConfig field populated
+- SiteConfig admin: `django_object_actions` for send-test-email; uses `obj` (= SiteConfig singleton) directly
+- Templates parameterized: `{{ site_name }}`, `{{ site_domain }}` from SiteConfig (default "NeuronHub"/"neuronhub.app")
+- `feedback_url` → `feedback_form_url`, `report_placement_url` → `submit_job_url` (SiteConfig URLFields)
+- Fixed pre-existing: `sentry_sdk._types.MonitorConfig` removed in sentry 2.x → `dict` annotation
+- Fix: pre-existing mypy errors
+    - `get_solo`: `# type: ignore[override]` (async override of sync supertype)
+    - `_send_job_alerts`: `jobs` param `list[Job] | None` (matches caller)
+    - `admin.py`: `assert isinstance(request.user, User)` (narrows union)
+- Fix: `_get_jobs_matching_qs` missing tags_country, tags_city, tags_country_visa_sponsor
+    - Also added visa_sponsorship to `_get_alert_filters_dict`
+    - 3 new tests: test_matches_by_{country,city,country_visa_sponsor}_tag
+- Refac: `test_matches_by_*` → use `gen` helpers
+    - `PostsGen.tag()`: added `category: TagCategoryEnum` param
+    - `JobsGen.job()`: added `tags: list[PostTag]` param (auto-routes to M2M field via category)
+    - `JobsGen.job_alert()`: added `tags: list[PostTag]` param
+    - `Job.TAG_CATEGORY_TO_FIELD`: category→field mapping dict on model

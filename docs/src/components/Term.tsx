@@ -1,5 +1,6 @@
 "use client";
 
+import { PageLink } from "@/components/PageLink";
 import { Code, CodeProps, Popover, Portal, Text, VStack } from "@chakra-ui/react";
 import { theme } from "@neuronhub/shared/theme/colors";
 import { type ReactNode, createContext, useContext } from "react";
@@ -79,8 +80,8 @@ const glossary = {
     help: () => (
       <TermHelp>
         <Text>
-          The web service hosted on <LinkInt path="/development/guides/deploy">Render</LinkInt>{" "}
-          (eg at <Code>{urls.backend}</Code>). <Term id="frontend" /> uses its API.
+          The web service hosted on <LinkInt path="/usage/guides/render">Render</LinkInt> (eg at{" "}
+          <Code>{urls.backend}</Code>). <Term id="frontend" /> uses its API.
         </Text>
 
         <Text>
@@ -95,9 +96,8 @@ const glossary = {
     help: () => (
       <TermHelp>
         <Text>
-          The static website hosted on{" "}
-          <LinkInt path="/development/guides/deploy">Render</LinkInt> (eg at{" "}
-          <Code>{urls.frontend}</Code>). Uses the API of <Term id="backend" />.
+          The static website hosted on <LinkInt path="/usage/guides/render">Render</LinkInt> (eg
+          at <Code>{urls.frontend}</Code>). Uses the API of <Term id="backend" />.
         </Text>
 
         <Text>
@@ -123,6 +123,21 @@ const glossary = {
     label: "Sentry",
     pagePath: "/usage/guides/sentry",
     help: () => <TermHelp>Error tracking and performance monitoring service.</TermHelp>,
+  },
+  worker: {
+    label: "Background Worker",
+    help: () => (
+      <TermHelp>
+        <Text>
+          The backend background worker hosted on{" "}
+          <LinkInt path="/usage/guides/render">Render</LinkInt>. <Term id="backend" /> uses it to
+          execute schedule-based or time-consuming tasks, eg sending emails to users (see details
+          in <PageLink id="job-alert-emails" />
+          ).
+        </Text>
+      </TermHelp>
+    ),
+    pagePath: undefined,
   },
   user: {
     label: "User",

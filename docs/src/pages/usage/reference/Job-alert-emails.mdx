@@ -1,0 +1,37 @@
+---
+order: 0
+---
+
+import { Text } from "@chakra-ui/react";
+import { Term } from "@/components/Term"
+import { PageLink } from "@/components/PageLink"
+import { AdminLink } from "@/components/AdminLink"
+
+
+Sent daily at `8am` in the user's timezone.
+
+### User Story
+
+1. <Term id="backend" /> reviews every hour the new Jobs and which active <PageLink id="JobAlert"/>s
+   haven't been notified about the newly created `Jobs`.
+    - <Text color="fg.muted">`hourly` here means 24 times per day, at `XX:00` minutes.</Text>
+2. <Term id="backend" /> selects a <PageLink id="JobAlert"/> and sends the template to its `.email`.
+    1. <Term id="backend" /> creates <PageLink id="JobAlertLog"/>.
+    2. <Term id="backend" /> sends the Task to send email to its background worker.
+        - The admin panel allows you to view the <PageLink id="TaskResult"/>s success/failure.
+        - The <PageLink id="Sentry" hash="scheduled-tasks-monitor">Sentry's Scheduled Tasks Monitor</PageLink>
+          lets you view all scheduled successful/failed executions.
+
+
+Worst-case delay: max 23h.
+
+### Email Templates
+
+You can override the default `jobs/job_alert.html` and `jobs/job_alert_confirmation.html` in
+<AdminLink id="SiteConfig">the admin panel's Site Config</AdminLink>.
+
+There you can also test the emails by using the following buttons:
+- `Send test alert email to yourself`
+- `Send test confirm email to yourself`
+
+Reference: <PageLink id="SiteConfig" />.

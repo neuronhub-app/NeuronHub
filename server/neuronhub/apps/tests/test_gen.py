@@ -1,7 +1,10 @@
 from dataclasses import dataclass
+from datetime import datetime
 from random import Random
+from zoneinfo import ZoneInfo
 
 from asgiref.sync import sync_to_async
+from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from faker import Faker
 from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
@@ -10,9 +13,11 @@ from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.orgs.models import Org
+from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models import PostCategory
 from neuronhub.apps.posts.models import PostTag
+from neuronhub.apps.posts.models import PostTagCategory
 from neuronhub.apps.posts.models.types import PostTypeEnum
 from neuronhub.apps.profiles.models import CareerStage
 from neuronhub.apps.profiles.models import Profile
@@ -35,6 +40,7 @@ class Gen:
     @classmethod
     async def create(
         cls,
+        user_default: User | None,
         is_user_default_superuser: bool = True,
     ):
         self = cls()
@@ -49,12 +55,19 @@ class Gen:
         self.users = await UsersGen.create(
             faker=self.faker,
             is_user_default_superuser=is_user_default_superuser,
+            user_default=user_default,
         )
         self.posts = PostsGen(faker=self.faker, user=self.users.user_default)
         self.profiles = ProfilesGen(faker=self.faker, user=self.users.user_default)
         self.jobs = JobsGen(faker=self.faker)
 
         return self
+
+    @staticmethod
+    def datetime_now(timezone: str = "") -> datetime:
+        return datetime.now(
+            tz=ZoneInfo(timezone or settings.TIME_ZONE),
+        )
 
     def image(self, content=b"image_content") -> SimpleUploadedFile:
         return SimpleUploadedFile(name="image.jpg", content=content, content_type="image/jpeg")
@@ -67,17 +80,21 @@ class UsersGen:
     user_default: User
 
     _user_username = "admin"
-    _user_email_domain = "neuronhub.io"
+    _user_email_domain = "neuronhub.app"
     _user_email = f"{_user_username}@{_user_email_domain}"
     _user_password = "admin"
 
     @classmethod
-    async def create(cls, faker: UniqueProxy, is_user_default_superuser: bool = True):
+    async def create(
+        cls,
+        faker: UniqueProxy,
+        is_user_default_superuser: bool = True,
+        user_default: User | None = None,
+    ):
         self = cls(
             faker=faker,
-            user_default=await cls.get_or_create_user_default(
-                is_superuser=is_user_default_superuser
-            ),
+            user_default=user_default
+            or await cls.get_or_create_user_default(is_superuser=is_user_default_superuser),
         )
         assert self.user_default, "UsersGen.create() failed"
         return self
@@ -91,7 +108,6 @@ class UsersGen:
         first_name: str = None,
         last_name: str = None,
         is_get_or_create: bool = False,
-        is_attach_org: bool = True,
     ) -> User:
         from neuronhub.apps.users.models import User
 
@@ -243,6 +259,7 @@ class PostsGen:
     async def tag(
         self,
         name: str = None,
+        category: TagCategoryEnum | None = None,
         post: Post = None,
         author: User = None,
         is_important: bool = False,
@@ -253,6 +270,9 @@ class PostsGen:
             name=name or self.faker.word(),
             defaults=dict(author=author or self.user, is_important=is_important),
         )
+        if category:
+            cat, _ = await PostTagCategory.objects.aget_or_create(name=category)
+            await tag.categories.aadd(cat)
         if post:
             await post.tags.aadd(tag)
         return tag
@@ -432,6 +452,7 @@ class JobsGen:
         visibility: Visibility = Visibility.PUBLIC,
         is_published: bool = True,
         is_save: bool = True,
+        tags: list[PostTag] | None = None,
     ) -> Job:
         if not org:
             org, _ = await Org.objects.aget_or_create(
@@ -453,13 +474,26 @@ class JobsGen:
         )
         if is_save:
             await job.asave()
+        if tags:
+            for tag in tags:
+                category = await tag.categories.afirst()
+                assert category, f"Add category to '{tag.name}' tag."
+                field_name = Job.tag_category_to_field[category.name]
+                await getattr(job, field_name).aadd(tag)
         return job
 
     async def job_alert(
-        self, email: str = "", is_active=True, tz: str | None = None
+        self,
+        email: str = "",
+        is_active: bool = True,
+        tz: str | None = None,
+        tags: list[PostTag] | None = None,
     ) -> JobAlert:
-        return await JobAlert.objects.acreate(
+        alert = await JobAlert.objects.acreate(
             email=email or self.faker.email(),
             is_active=is_active,
             tz=tz,
         )
+        if tags:
+            await alert.tags.aset(tags)
+        return alert

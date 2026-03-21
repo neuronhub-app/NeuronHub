@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Your {{ site_name }} job alert is set up</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;600&family=DM+Sans:wght@400;500;700&display=swap');
+
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+    .ReadMsgBody { width: 100%; } .ExternalClass { width: 100%; }
+    .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font,
+    .ExternalClass td, .ExternalClass div { line-height: 100%; }
+
+    @media screen and (max-width: 620px) {
+      .wrapper { width: 100% !important; }
+      .pad-outer { padding: 16px 0 !important; }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .body-bg { background-color: #1a1a1a !important; }
+      .card { background-color: #242424 !important; border-color: #2e3a2e !important; }
+      .filter-box { background-color: #2a2420 !important; border-color: #3a3028 !important; }
+    }
+  </style>
+</head>
+<body class="body-bg" style="margin:0;padding:0;background-color:#FFFDF5;">
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" class="body-bg" style="background-color:#FFFDF5;">
+  <tr>
+    <td class="pad-outer" align="center" style="padding:32px 12px;">
+
+      <table role="presentation" class="wrapper card" width="600" cellpadding="0" cellspacing="0" border="0"
+             style="background-color:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #dde8dd;">
+
+        <!-- HEADER -->
+        <tr>
+          <td style="background-color:#338050;padding:14px 36px 12px 36px;text-align:center;">
+            <span style="font-family:'IBM Plex Serif',Georgia,'Times New Roman',serif;font-weight:600;font-size:22px;color:#fff;letter-spacing:0.5px;">{{ site_name }}</span>
+          </td>
+        </tr>
+
+        <!-- INTRO -->
+        <tr>
+          <td style="padding:28px 36px 6px 36px;">
+            <p style="font-family:'IBM Plex Serif',Georgia,'Times New Roman',serif;font-size:19px;font-weight:600;color:#343232;margin:0 0 16px 0;line-height:1.35;font-variant-numeric:lining-nums;">
+              Your job alert is active
+            </p>
+            <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:13px;color:#343232;margin:0;line-height:1.7;">
+              You'll receive an email when there are new roles that match your applied filters. You can
+              <a href="{{ job_alerts_management_url }}" style="color:#338050;text-decoration:underline;">modify or pause this alert</a>
+              at any time.
+            </p>
+          </td>
+        </tr>
+
+        <!-- FILTER SUMMARY -->
+        {% if has_filters %}
+        <tr>
+          <td style="padding:20px 36px 0 36px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                   class="filter-box" style="background-color:#FFF7F0;border-radius:8px;border:1px solid #f0e0d0;">
+              <tr>
+                <td style="padding:16px 20px;">
+                  <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;color:#338050;letter-spacing:1.4px;text-transform:uppercase;margin:0 0 10px 0;">
+                    <a href="{{ job_alerts_management_url }}" style="color:#338050;text-decoration:none;font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;">Your Active Filters</a>
+                  </p>
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                    {% for label, value in filters.items %}
+                    {% if value %}
+                    <tr>
+                      <td style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:12px;color:#777;padding:2px 0;width:116px;vertical-align:top;white-space:nowrap;">{{ label }}</td>
+                      <td style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:12px;color:#343232;padding:2px 0 2px 10px;vertical-align:top;">{{ value }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                  </table>
+                  <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:12px;color:#777;margin:20px 0 0 0;line-height:1.6;">
+                    You can <a href="{{ job_alerts_management_url }}" style="color:#338050;text-decoration:underline;">modify these filters</a> at any time.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td style="padding:20px 36px 0 36px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                   class="filter-box" style="background-color:#FFF7F0;border-radius:8px;border:1px solid #f0e0d0;">
+              <tr>
+                <td style="padding:16px 20px;">
+                  <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:13px;color:#343232;margin:0;line-height:1.6;">
+                    The alert you created doesn't use any filters, so you'll receive every new role posted on the job board.
+                    You can <a href="{{ job_alerts_management_url }}" style="color:#338050;text-decoration:underline;">modify this alert</a> to narrow your results.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        {% endif %}
+
+        <!-- ABOUT -->
+        <tr>
+          <td style="padding:30px 36px 0 36px;">
+            <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:13px;color:#343232;margin:0;line-height:1.7;">
+              <a href="{{ client_url }}" style="color:#338050;text-decoration:underline;">{{ site_name }}</a> is a privacy-first directory for jobs, tools, and professional profiles.
+              Browse the <a href="{{ client_url }}/jobs" style="color:#338050;text-decoration:underline;">full job board</a>.
+            </p>
+          </td>
+        </tr>
+
+        <!-- M&E SECTION -->
+        <tr>
+          <td style="padding:18px 36px 18px 36px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="border-top:1px solid #eaeaea;font-size:0;line-height:0;padding-bottom:18px;">&nbsp;</td></tr>
+            </table>
+            <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:15px;font-weight:700;color:#343232;margin:0 0 6px 0;line-height:1.5;">
+              If you find and land a role, please {% if submit_job_url %}<a href="{{ submit_job_url }}" style="color:#338050;text-decoration:underline;">let us know.</a>{% else %}let us know.{% endif %}
+            </p>
+            <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:13px;color:#343232;margin:0 0 18px 0;line-height:1.6;">
+              A quick update from you makes a huge difference to our ability to keep providing this service for free.
+            </p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+              <tr><td style="border-top:1px solid #eaeaea;font-size:0;line-height:0;">&nbsp;</td></tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- FOOTER -->
+        <tr>
+          <td style="padding:0 36px 28px 36px;">
+            <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:11px;color:#777;margin:0 0 8px 0;line-height:1.8;text-align:left;">
+              You're receiving this because you signed up for a job alert at
+              <a href="{{ client_url }}" style="color:#777;text-decoration:underline;">{{ site_domain }}</a>.<br>
+              {% if submit_job_url %}<a href="{{ submit_job_url }}" style="color:#777;text-decoration:underline;">Got the job? Let us know!</a>
+              &nbsp;&bull;&nbsp;{% endif %}
+              <a href="{{ job_alerts_management_url }}" style="color:#777;text-decoration:underline;">Modify this alert</a>
+              {% if feedback_form_url %}&nbsp;&bull;&nbsp;
+              <a href="{{ feedback_form_url }}" style="color:#777;text-decoration:underline;">Give feedback</a>{% endif %}
+              &nbsp;&bull;&nbsp;
+              <a href="{{ unsubscribe_url }}" style="color:#777;text-decoration:underline;">Unsubscribe</a>
+            </p>
+
+            {% if address %}
+            <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:11px;color:#777;margin:0 0 10px 0;line-height:1.6;text-align:left;">
+              {{ address }}
+            </p>
+            {% endif %}
+
+            <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:11px;color:#777;margin:0;line-height:1.6;text-align:left;">
+              Using Gmail? This alert may arrive in your Promotions tab.
+              To move it to Primary, drag this email there once and click "Yes" when asked if you always want to do this.
+            </p>
+          </td>
+        </tr>
+
+      </table>
+    </td>
+  </tr>
+</table>
+
+</body>
+</html>
