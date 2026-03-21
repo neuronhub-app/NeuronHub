@@ -4,6 +4,7 @@
 "use client";
 
 import { Box, Stack, Text, chakra } from "@chakra-ui/react";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
 import { ids } from "@/e2e/ids";
@@ -13,7 +14,7 @@ export function Toc() {
   const items = useHeadingItems(location.pathname);
   const idsVisible = useScrollSpy(items);
 
-  const isRedundant = items.length <= 1 || (items.length === 2 && idsVisible.size === 2);
+  const isRedundant = items.length <= 1 || (items.length === 3 && idsVisible.size === 2);
   if (isRedundant) {
     return null;
   }
@@ -47,25 +48,26 @@ export function Toc() {
 }
 
 function useHeadingItems(pathname: string): HeadingItem[] {
-  const state = useState<HeadingItem[]>([]);
+  const state = useStateValtio({
+    items: [] as HeadingItem[],
+  });
 
   useEffect(() => {
     const root = document.querySelector("[data-toc-root]");
     if (!root) {
-      state[1]([]);
+      state.mutable.items = [];
       return;
     }
+
     const elements = root.querySelectorAll("h1[id], h2[id], h3[id], h4[id]");
-    state[1](
-      Array.from(elements).map(el => ({
-        id: el.id,
-        text: el.textContent ?? "",
-        depth: Number.parseInt(el.tagName[1], 10),
-      })),
-    );
+    state.mutable.items = Array.from(elements).map(el => ({
+      id: el.id,
+      text: el.textContent ?? "",
+      depth: Number.parseInt(el.tagName[1], 10),
+    }));
   }, [pathname]);
 
-  return state[0];
+  return state.snap.items;
 }
 
 function useScrollSpy(items: HeadingItem[]): Set<string> {
