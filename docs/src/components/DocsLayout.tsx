@@ -55,13 +55,16 @@ export default function DocsLayout() {
           <SidebarContent />
         </Box>
 
-        <Box marginStart={{ lg: style.sidebar.width }} flex="1" overflowX="hidden">
+        <Box
+          marginStart={{ lg: style.sidebar.width }}
+          flex="1"
+          overflowX={{ base: "hidden", xl: "clip" }}
+        >
           <Container maxW="7xl" py={style.p} pt={{ base: 0, lg: style.p }}>
             <Heading
               as="h1"
               {...getProseHeadingStyle()}
               fontSize={{ base: "1.4em", xl: "1.6em" }}
-              color="blue.800/75"
               fontWeight="bold"
               letterSpacing="-0.01em"
               lineHeight="1.5em"

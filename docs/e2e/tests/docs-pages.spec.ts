@@ -40,9 +40,9 @@ test("pages render without errors", async ({ page }) => {
 
 test.describe("TOC", () => {
   test("renders headings from MDX content", async ({ page }) => {
-    await page.goto(routes.usage.analytics);
+    await page.goto(routes.usage.deploy);
     await expect($(page)[ids.toc.root]).toBeVisible();
-    await expect(tocLinks(page)).toHaveCount(3);
+    await expect(tocLinks(page)).toHaveCount(9);
   });
 
   test("highlights first heading on page load", async ({ page }) => {
