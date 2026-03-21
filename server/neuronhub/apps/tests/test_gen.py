@@ -40,7 +40,7 @@ class Gen:
     @classmethod
     async def create(
         cls,
-        user_default: User | None,
+        user_default: User | None = None,
         is_user_default_superuser: bool = True,
     ):
         self = cls()
