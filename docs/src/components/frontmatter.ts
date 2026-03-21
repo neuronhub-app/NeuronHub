@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { parse as parseYaml } from "yaml";
 import { z } from "zod/v4";
 
 export namespace frontmatter {
@@ -8,13 +10,26 @@ export namespace frontmatter {
     description: z.string().optional(),
     reviewed_at: z.string().optional(), // #AI
     hidden: z.boolean().optional(),
+    is_lintable: z.boolean().optional(),
     is_new: z.boolean().optional(),
   });
 
   export type SchemaType = z.infer<typeof schema>;
 
-  // #AI bad placement
-  // todo ? refac: add versions lowercased + .mdx
+  export function parseFile(file: string) {
+    return parse(readFileSync(file, "utf-8"));
+  }
+
+  export function parse(raw: string) {
+    const match = raw.match(/^---\s*\n([\s\S]*?)\n---/);
+    if (!match) {
+      return schema.parse({});
+    }
+    return schema.parse(parseYaml(match[1]));
+  }
+
+  // #AI-slop bad placement
+  // todo ? refac: add versions lowercased + .mdx (used in few places by now)
   export namespace consts {
     export const readme = "README";
   }

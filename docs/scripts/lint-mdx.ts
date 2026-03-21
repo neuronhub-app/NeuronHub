@@ -13,6 +13,7 @@ import path from "node:path";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
+import { frontmatter } from "@/components/frontmatter";
 import { findMdxFiles } from "@/utils/findMdxFiles";
 
 const docsDir = path.resolve(import.meta.dirname, "..");
@@ -45,6 +46,10 @@ async function compileMdxFiles() {
   for (const file of findMdxFiles(pagesDir)) {
     const relPath = path.relative(pagesDir, file);
     const content = readFileSync(file, "utf-8");
+
+    if (frontmatter.parse(content).is_lintable === false) {
+      continue;
+    }
 
     try {
       const compiled = await compile(content, {
@@ -82,6 +87,7 @@ async function main() {
   const tsconfig = {
     extends: "../tsconfig.json",
     compilerOptions: {
+      types: ["node", "bun"],
       noImplicitAny: false,
       rootDirs: ["..", "../.react-router/types", "."],
       paths: readParentPaths(),

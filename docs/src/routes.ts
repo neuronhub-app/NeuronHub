@@ -2,11 +2,9 @@
  * #AI
  */
 // Vite build: runs before aliases - requires node:fs and relative imports (no @/, no Bun)
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { type RouteConfig, layout, route } from "@react-router/dev/routes";
-import { parse as parseYaml } from "yaml";
-
 import { findMdxFiles } from "./utils/findMdxFiles";
 import { frontmatter } from "./components/frontmatter";
 
@@ -47,7 +45,7 @@ function buildDirRedirects() {
 function fileToSlug(file: string): string {
   const rel = path.relative(pagesDir, file).replace(".mdx", "").toLowerCase();
   const dirPath = path.dirname(rel);
-  const fm = readFrontmatter(file);
+  const fm = frontmatter.parseFile(file);
 
   if (fm.slug) {
     return `/${dirPath}/${fm.slug}`;
@@ -56,15 +54,6 @@ function fileToSlug(file: string): string {
     return `/${dirPath}/`;
   }
   return `/${rel}`;
-}
-
-function readFrontmatter(file: string) {
-  const content = readFileSync(file, "utf-8");
-  const match = content.match(/^---\s*\n([\s\S]*?)\n---/);
-  if (!match) {
-    return frontmatter.schema.parse({});
-  }
-  return frontmatter.schema.parse(parseYaml(match[1]));
 }
 
 function findDirsWithMdx(root: string): string[] {

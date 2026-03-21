@@ -21,7 +21,6 @@ import { createProcessor } from "@mdx-js/mdx";
 import { algoliasearch } from "algoliasearch";
 import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
-import { parse as parseYaml } from "yaml";
 import { format } from "@neuronhub/shared/utils/format";
 import { findMdxFiles } from "@/utils/findMdxFiles";
 import { frontmatter } from "@/components/frontmatter";
@@ -90,7 +89,7 @@ function buildRecords(): DocRecord[] {
 
   for (const file of findMdxFiles(config.pagesDir)) {
     const raw = readFileSync(file, "utf-8");
-    const fm = readFrontmatter(raw);
+    const fm = frontmatter.parse(raw);
 
     if (fm.hidden || isHiddenByParent(file)) {
       continue;
@@ -147,14 +146,6 @@ function buildRecords(): DocRecord[] {
   return records;
 }
 
-function readFrontmatter(raw: string) {
-  const match = raw.match(/^---\s*\n([\s\S]*?)\n---/);
-  if (!match) {
-    return frontmatter.schema.parse({});
-  }
-  return frontmatter.schema.parse(parseYaml(match[1]));
-}
-
 function fileToSlug(file: string, fm: frontmatter.SchemaType): string {
   const rel = path.relative(config.pagesDir, file).replace(".mdx", "").toLowerCase();
   const dirPath = path.dirname(rel);
@@ -200,8 +191,7 @@ function isHiddenByParent(file: string): boolean {
   let dir = path.dirname(file);
   while (dir.startsWith(config.pagesDir) && dir !== config.pagesDir) {
     try {
-      const raw = readFileSync(path.join(dir, `${frontmatter.consts.readme}.mdx`), "utf-8");
-      if (readFrontmatter(raw).hidden) {
+      if (frontmatter.parseFile(path.join(dir, `${frontmatter.consts.readme}.mdx`)).hidden) {
         return true;
       }
     } catch {
