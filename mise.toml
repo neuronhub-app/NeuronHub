@@ -307,7 +307,12 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     [tasks."typegen:client:chakra:neuron"]
         dir = "client"
-        run = "bun run chakra typegen src/theme/theme.ts"
+        run = """
+            let is_overrides_shared_node_modules = $env.VITE_SITE == "pg"; # see #123
+            if not $is_overrides_shared_node_modules {
+                bun run chakra typegen src/theme/theme.ts
+            }
+        """
         sources = ["src/theme/**/*.ts"]
         silent = true # quiet doesn't work
 
