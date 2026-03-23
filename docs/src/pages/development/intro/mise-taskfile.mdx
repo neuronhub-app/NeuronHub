@@ -1,19 +1,25 @@
 `mise.toml` is the single source of truth of envs and configuration.
 
+Mise is using Nushell for all tasks.
+
 ### Primary Tasks
 
 - `mise pytest` - server/ pytest only
-    - You must remember that by default it excludes `pytest --markers "not slow_llm_api and not firebase_subscription"`.
-      When you need to test those 2 `markers` - run `test:pytest:all`.
-    - Note: The `slow_llm_api` marker fails if executed inside `claude` (`claude` prevents invoking `claude`).
-- `mise e2e` - Playwright on `client/`. It starts its own Django and Vite servers. You should only pass test cases to run - never add flags as `headless`.
+    - Note: by default it excludes `pytest --markers "not slow_llm_api and not firebase_subscription"`.
+      If needed run `test:pytest:all`.
+    - Note: The `slow_llm_api` marker fails if executed inside `claude`, because `claude` forbids child `claude` process.
+- `mise e2e` - Playwright on `client/`.
+    - It starts its own Django and Vite servers on each run.
+    - At first only run test cases you need, as full suite takes 10+ minutes.
+    - Never add flags as `headless`.
+    - `devops/db.mise.toml` - contains `dev:db:e2e:{setup|rm}` - helps to fix corrupted e2e db.
+    - `devops/e2e.mise.toml` - just `runserver`, `db_worker`, and `react-router dev`.
 - `mise e2e:docs` - for `docs/e2e/`.
-- `mise lint` - (you can drop its cache with `touch mise.toml`). It runs:
+- `mise lint` runs:
     - `format` - Ruff, Biome
-    - `typegen` - Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries (aka backend whitelist); @chakra-ui; etc
+    - `typegen` - Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries (aka Backend whitelist); @chakra-ui; etc
     - `lint:biome` - for `client/`, `docs/`, and `packages/shared/`
     - `lint:client`, `lint:docs`, `lint:packages` - tsgo
+    - Note: it's cached. Force reset can be done by `touch mise.toml`.
 - `mise django:migrate`
 - `mise django:makemigrations`
-- `mise django:db-stubs-repopulate` - drops the db data, and calls `db_stubs_repopulate`
-  with `apps/{app}/tests/db_stubs.py`
