@@ -326,6 +326,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
           <Link
             href={props.job.url_external}
             target="_blank"
+            rel="noopener noreferrer"
             textDecoration="none"
             _hover={{ textDecoration: "none" }}
           >
@@ -385,6 +386,7 @@ function JobOrgLink(props: {
       <Link
         href={props.job.org.website}
         target="_blank"
+        rel="noopener noreferrer"
         fontSize={{ base: "13px", md: "md" }}
         lineHeight={{ base: "18px", md: "24px" }}
         fontWeight="medium"
