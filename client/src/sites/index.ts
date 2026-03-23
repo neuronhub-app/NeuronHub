@@ -4,6 +4,7 @@ import { system } from "@/theme/theme";
 
 export type SiteConfig = {
   theme: typeof system;
+  forcedColorMode?: "light" | "dark";
   favicon: {
     svg: string;
     png96: string;
@@ -27,6 +28,7 @@ const neuronConfig: SiteConfig = {
 
 const pgConfig: SiteConfig = {
   theme: pgSystem,
+  forcedColorMode: "light",
   googleFontsHref:
     "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap",
   favicon: {

@@ -24,7 +24,10 @@ function AppProviders(props: { children: ReactNode }) {
   return (
     <ApolloProvider client={client}>
       <ChakraProvider value={siteConfig.theme}>
-        <ColorModeProvider enableSystem={true}>
+        <ColorModeProvider
+          enableSystem={!siteConfig.forcedColorMode}
+          forcedTheme={siteConfig.forcedColorMode}
+        >
           {props.children}
 
           <Toaster position="bottom-center" gutter={8} />
@@ -60,7 +63,7 @@ function LayoutHead() {
     <>
       <meta charSet="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta name="color-scheme" content="light dark" />
+      <meta name="color-scheme" content={siteConfig.forcedColorMode ?? "light dark"} />
 
       {siteConfig.googleFontsHref && (
         <>
