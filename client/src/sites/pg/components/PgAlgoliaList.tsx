@@ -6,6 +6,7 @@ import {
   HStack,
   Icon,
   NativeSelect,
+  Skeleton,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -65,12 +66,9 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
   const algolia = useAlgoliaSearchClient();
   const pgFilterCardIsOpenRef = useRef(false);
 
-  if (algolia.loading) {
-    return <p>Loading Algolia...</p>;
-  }
   const indexName = algolia[props.index];
-  if (!algolia.client || !indexName) {
-    return <p>Search not available</p>;
+  if (algolia.loading || !algolia.client || !indexName) {
+    return <PgAlgoliaListSkeleton />;
   }
 
   const labelPlural = `${props.label}s`;
@@ -223,7 +221,7 @@ function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(props: {
 
       <Stack data-testid={props.listTestId} gap="gap.md">
         {!hits.results ? (
-          <Text color="fg.subtle">Loading...</Text>
+          <PgHitSkeletons />
         ) : hasNoResults ? (
           <Text>No {props.label ?? "results"} found.</Text>
         ) : (
@@ -417,11 +415,18 @@ function PgSearchStats(props: { label: string; indexName: string; textAlign?: "c
       });
   }, [algolia.client, props.indexName]);
 
+  // #AI
+  const isFirstSearchPending = stats.nbHits === 0 && stats.processingTimeMS === 0;
+
   return (
     <Text fontSize="sm" fontWeight="medium" textAlign={props.textAlign}>
       Showing{" "}
       <Text as="span" color="primary" fontWeight="medium">
-        {stats.nbHits}
+        {isFirstSearchPending ? (
+          <Skeleton as="span" display="inline-block" h="4" w="4ch" verticalAlign="middle" />
+        ) : (
+          stats.nbHits
+        )}
       </Text>
       {state.snap.total !== null && ` out of ${state.snap.total}`} {props.label}
     </Text>
@@ -489,5 +494,112 @@ function ClearAllFiltersButton(props: { onClear?: () => void }) {
       </Icon>
       Clear all filters
     </Flex>
+  );
+}
+
+// #AI
+function PgAlgoliaListSkeleton() {
+  return (
+    <Stack gap="gap.sm" w="full">
+      <PgFilterCardWithSplitBg isOpenRef={{ current: false }}>
+        <Box
+          hideFrom="md"
+          borderWidth="1px"
+          borderColor="fg"
+          borderRadius="lg"
+          p="gap.sm"
+          bg="bg"
+        >
+          <Stack gap="gap.sm">
+            <Skeleton h="10" borderRadius="md" />
+            <Skeleton h="5" w="40" mx="auto" borderRadius="sm" />
+          </Stack>
+        </Box>
+
+        <Box
+          hideBelow="md"
+          borderWidth="1px"
+          borderColor="fg"
+          borderRadius="lg"
+          p="gap.md"
+          bg="bg"
+        >
+          <Grid templateColumns="repeat(5, 1fr)" gap="gap.md">
+            <Box gridColumn="span 4">
+              <Skeleton h="10" borderRadius="md" />
+            </Box>
+            <Skeleton h="10" borderRadius="md" />
+
+            <Box gridColumn="span 5">
+              <Grid
+                templateColumns={{ md: "repeat(2, 1fr)", lg: "repeat(5, 1fr)" }}
+                columnGap="gap.md"
+                rowGap={{ md: "2" }}
+              >
+                {Array.from({ length: 10 }, (_, i) => (
+                  <Skeleton key={i} h="10" borderRadius="sm" />
+                ))}
+              </Grid>
+            </Box>
+
+            <Box gridColumn="span 5">
+              <Skeleton h="5" w="48" borderRadius="sm" />
+            </Box>
+          </Grid>
+        </Box>
+      </PgFilterCardWithSplitBg>
+
+      <HStack
+        justify="space-between"
+        pt={{ base: "3", md: "gap.xl" }}
+        pb="0"
+        px={{ base: "0", md: "26px" }}
+      >
+        <Skeleton h="5" w="20" borderRadius="sm" />
+        <HStack gap="gap.lg">
+          <Skeleton h="5" w="12" borderRadius="sm" />
+          <Skeleton h="5" w="16" borderRadius="sm" />
+        </HStack>
+      </HStack>
+
+      <PgHitSkeletons />
+    </Stack>
+  );
+}
+
+// #AI
+function PgHitSkeletons() {
+  return (
+    <>
+      {Array.from({ length: 4 }, (_, i) => (
+        <Stack
+          key={i}
+          gap="gap.sm"
+          p={{ base: "gap.md", md: "gap.xl" }}
+          borderRadius="lg"
+          borderWidth="1px"
+          borderColor="subtle"
+        >
+          <Flex gap={{ base: "gap.sm", md: "gap.lg" }}>
+            <Skeleton
+              w={{ base: "60px", md: "90px" }}
+              h={{ base: "60px", md: "90px" }}
+              flexShrink="0"
+              borderRadius="sm"
+            />
+            <Stack gap="gap.xs" flex="1">
+              <Skeleton h="6" w="70%" borderRadius="sm" />
+              <Skeleton h="5" w="40%" borderRadius="sm" />
+              <Skeleton h="5" w="50%" borderRadius="sm" />
+            </Stack>
+          </Flex>
+          <HStack gap="gap.sm">
+            <Skeleton h="6" w="24" borderRadius="sm" />
+            <Skeleton h="6" w="28" borderRadius="sm" />
+            <Skeleton h="6" w="20" borderRadius="sm" />
+          </HStack>
+        </Stack>
+      ))}
+    </>
   );
 }

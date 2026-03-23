@@ -46,6 +46,8 @@ export default function PgLayout() {
         flex="1"
         alignItems="stretch"
         overflow="hidden"
+        // #AI
+        minH="100vh"
         pb={{ base: "46px", md: "54px" }}
       >
         <Container px={{ base: "gap.sm", md: "6" }}>
