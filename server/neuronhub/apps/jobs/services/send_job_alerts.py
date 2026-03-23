@@ -85,6 +85,12 @@ async def _send_job_notification(
 
     site = await SiteConfig.get_solo()
     filters = await _get_alert_filters_dict(alert)
+
+    client_jobs_url = f"{settings.CLIENT_URL}/jobs"
+    is_probably_good_site = settings.VITE_SITE == "pg"
+    if is_probably_good_site:
+        client_jobs_url = f"{settings.CLIENT_URL}"
+
     html = await sync_to_async(_render_email_html)(
         template_name="jobs/job_alert.html",
         context={
@@ -92,7 +98,9 @@ async def _send_job_notification(
             "jobs": jobs,
             "jobs_matched_count": len(jobs),
             "jobs_total_count": jobs_total_count,
-            "search_results_url": f"{settings.CLIENT_URL}/jobs",
+            "client_jobs_url": client_jobs_url,
+            # todo !! fix
+            "client_jobs_matched_url": client_jobs_url,
         },
         template_override=site.email_template_job_alert,
     )

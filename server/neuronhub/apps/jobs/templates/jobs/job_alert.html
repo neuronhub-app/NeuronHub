@@ -68,7 +68,7 @@
         {% for job in jobs %}
         <tr>
           <td style="padding:0 36px;">
-            <a href="{{ client_url }}/jobs/{{ job.slug }}" style="display:block;text-decoration:none;">
+            <a href="{{ client_jobs_url }}/{{ job.slug }}" style="display:block;text-decoration:none;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #eaeaea;">
               <tr><td style="padding:16px 0;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -113,8 +113,8 @@
           <td style="padding:22px 36px 0 36px;">
             <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:13px;color:#343232;margin:0 0 10px 0;line-height:1.7;text-align:left;">
               Click any role to view its details.
-              View <a href="{{ search_results_url }}" style="color:#338050;text-decoration:underline;">all the roles that match your alert</a>
-              or <a href="{{ client_url }}/jobs" style="color:#338050;text-decoration:underline;">all the roles on the job board</a>.
+              View <a href="{{ client_jobs_matched_url }}" style="color:#338050;text-decoration:underline;">all the roles that match your alert</a>
+              or <a href="{{ client_jobs_url }}" style="color:#338050;text-decoration:underline;">all the roles on the job board</a>.
             </p>
           </td>
         </tr>
@@ -171,7 +171,7 @@
           <td style="padding:30px 36px 0 36px;">
             <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:13px;color:#343232;margin:0;line-height:1.7;">
               <a href="{{ client_url }}" style="color:#338050;text-decoration:underline;">{{ site_name }}</a> is a privacy-first directory for jobs, tools, and professional profiles.
-              Browse the <a href="{{ client_url }}/jobs" style="color:#338050;text-decoration:underline;">full job board</a>.
+              Browse the <a href="{{ client_jobs_url }}" style="color:#338050;text-decoration:underline;">full job board</a>.
             </p>
           </td>
         </tr>

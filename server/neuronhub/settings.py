@@ -432,3 +432,9 @@ rich.traceback.install(
 class CONF_CONFIG:
     eag_csv_path: Path | None = env.path("PROFILES_CSV_PATH", None)
     eag_group: str = "EAG-SF-2026"
+
+
+# apps.jobs
+# ---------------------------------------------------------------------------------------------------------
+# see [[Sub-sites-with-VITE_SITE.md]]
+VITE_SITE = env.str("VITE_SITE", "")
