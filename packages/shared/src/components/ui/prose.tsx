@@ -22,6 +22,10 @@ export const Prose = chakra("div", {
         "& h2:first-of-type": {
           marginTop: 0,
         },
+        // todo ? UI fix
+        // "body & h2:first-child": {
+        //   marginTop: 2,
+        // },
       },
       pros: {
         "& ul": {
@@ -86,7 +90,7 @@ export function getProseHeadingStyle(): RecipeDefinition["base"] {
     letterSpacing: "-0.01em",
     marginBottom: "0.4em",
     lineHeight: "1.5em",
-    color: "blue.800/75",
+    color: { _light: "blue.800/75", _dark: "blue.300" },
   };
 }
 

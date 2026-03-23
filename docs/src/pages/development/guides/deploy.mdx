@@ -4,14 +4,15 @@ order: 0
 ---
 
 import { CodeBlockText } from "@/components/CodeBlockText"
+import { Notice } from "@/components/Notice";
 
 ## Using Docker Compose
 
-Replace all the `$` placeholders below.
+Replace all the `$variable` placeholders below.
 
 ### App
 
-<CodeBlockText lang="yaml">{`
+<CodeBlockText lang="yaml" title="docker-compose.yaml">{`
   name: neuronhub
 
   services:
@@ -44,9 +45,9 @@ Replace all the `$` placeholders below.
       pull_policy: always
 `}</CodeBlockText>
 
-`.env` file
+<br/>
 
-<CodeBlockText lang="bash">{`
+<CodeBlockText lang="bash" title=".env">{`
   # Django
   DJANGO_ENV=prod
   DATABASE_URL=postgresql://$db_user:$db_password@$db_host:$db_port/$db_name
@@ -85,13 +86,19 @@ At your discretion.
 
 ### S3 server
 
+I recommend Cloudflare R2 - the free tier is 10M GET operations with unlimited data transfer.
+
 #### Rclone
 
-To create Rclone "S3 bucket" you need to create a dir, eg `mkdir -p /srv/neuronhub/media/data/media`.
+Not prod-ready, but will work. Unlike the dead MinIO.
 
-Note: `media` is the bucket name expected by Django's settings.py `env.str("S3_STORAGE_BUCKET_NAME", "media")`.
+To create an Rclone "S3 bucket" create dir, eg `mkdir -p /srv/neuronhub/media/data/media`.
 
-<CodeBlockText lang="yaml">{`
+<Notice>
+  `media` is the bucket name expected by Django's `settings.py` through the env `env.str("S3_STORAGE_BUCKET_NAME", "media")`.
+</Notice>
+
+<CodeBlockText lang="yaml" title="docker-compose.yaml">{`
   services:
     rclone:
       image: rclone/rclone
@@ -107,9 +114,9 @@ Note: `media` is the bucket name expected by Django's settings.py `env.str("S3_S
         - "$s3_port"
 `}</CodeBlockText>
 
-`.env` file
+<br/>
 
-<CodeBlockText lang="bash">{`
+<CodeBlockText lang="bash" title=".env">{`
   ACCESS_KEY_ID=$s3_key_id
   SECRET_ACCESS_KEY=$s3_key_secret
 `}</CodeBlockText>

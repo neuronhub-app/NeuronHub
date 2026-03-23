@@ -29,6 +29,10 @@ export const system = createSystem(
         html: {
           colorPalette: theme.colorPrimary,
         },
+        ".ais-Snippet-highlighted, .ais-Highlight-highlighted": {
+          bgColor: `{colors.violet.emphasized}`,
+          color: "fg",
+        },
       },
       theme: {
         recipes,

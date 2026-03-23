@@ -10,10 +10,16 @@ export function LinkExt(props: { href: string; children: ReactNode; isDecorated?
       target="_blank"
       display="inline-flex"
       alignItems="center"
+      mr="0.5"
     >
       {props.children}{" "}
       {(props.isDecorated ?? true) && (
-        <Icon boxSize="12px" color="fg.muted">
+        <Icon
+          boxSize="13px"
+          color={{ _dark: "fg.subtle", _light: "fg.muted" }}
+          mt="-3px"
+          ml="-0.5"
+        >
           <FiExternalLink />
         </Icon>
       )}
