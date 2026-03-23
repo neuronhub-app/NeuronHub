@@ -29,6 +29,8 @@ const style = {
     fontSize: "13px",
     lineHeight: "19px",
     color: "brand.green.light",
+    textDecoration: "none",
+    _hover: { textDecoration: "underline", textDecorationColor: "brand.green.light" },
   },
 } as const;
 
@@ -76,6 +78,7 @@ export function JobFaqPage() {
 
             <Accordion.ItemContent px="gap.sm" pt="0" pb="gap.sm">
               <Prose
+                maxW="none"
                 css={{ ...style.answer, "& a": style.link }}
                 // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
                 dangerouslySetInnerHTML={{

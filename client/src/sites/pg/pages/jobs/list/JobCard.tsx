@@ -283,6 +283,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
         </Text>
         <Prose
           size="sm"
+          maxW="none"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
           dangerouslySetInnerHTML={{
             __html: markedConfigured.parse(props.job.description ?? ""),

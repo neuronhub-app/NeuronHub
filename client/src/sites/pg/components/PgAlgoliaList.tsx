@@ -77,7 +77,20 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
     <InstantSearch
       searchClient={algolia.client}
       indexName={indexName}
-      routing
+      routing={{
+        stateMapping: {
+          stateToRoute: uiState => {
+            const indexState = uiState[indexName] ?? {};
+            const urlState = Object.fromEntries(
+              Object.entries(indexState).filter(
+                entry => entry[0] !== "page" && entry[0] !== "configure",
+              ),
+            );
+            return { [indexName]: urlState };
+          },
+          routeToState: routeState => routeState,
+        },
+      }}
       future={{ preserveSharedStateOnUnmount: true }}
     >
       {props.children}
@@ -231,7 +244,7 @@ function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(props: {
         )}
       </Stack>
 
-      {!hits.isLastPage && <Box ref={sentinelRef} h="1" />}
+      <Box ref={sentinelRef} h="1" display={hits.isLastPage ? "none" : "block"} />
     </Stack>
   );
 }

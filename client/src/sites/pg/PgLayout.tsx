@@ -16,8 +16,9 @@ import {
 } from "@chakra-ui/react";
 import { NavLink, Outlet } from "react-router";
 import { LuMenu, LuMail } from "react-icons/lu";
+import { SlEnvolope } from "react-icons/sl";
 import {
-  FaLinkedinIn,
+  FaLinkedin,
   FaGithub,
   FaYoutube,
   FaTwitter,
@@ -268,13 +269,9 @@ function PgFooter(props: { footer: FooterData; isLoading: boolean }) {
 }
 
 function FooterDescription(props: { socialLinks: FooterSection["links"]; isLoading: boolean }) {
-  // todo ! fix: restore from Figma design (or fix UI to match)
-  // { src: "/email-icon.svg" },
-  // { src: "/linkedin-icon.svg" },
-
   const icons = {
-    [FooterLinkIcon.Email]: <LuMail />,
-    [FooterLinkIcon.Linkedin]: <FaLinkedinIn />,
+    [FooterLinkIcon.Email]: <SlEnvolope />,
+    [FooterLinkIcon.Linkedin]: <FaLinkedin />,
     [FooterLinkIcon.Github]: <FaGithub />,
     [FooterLinkIcon.Youtube]: <FaYoutube />,
     [FooterLinkIcon.Twitter]: <FaTwitter />,
@@ -313,9 +310,18 @@ function FooterDescription(props: { socialLinks: FooterSection["links"]; isLoadi
                 transition="transform 0.2s"
                 _hover={{ transform: "scale(1.1)" }}
               >
-                <Icon w="8" h="8" color="brand.seashell">
-                  {icons[link.icon as FooterLinkIcon] ?? <LuMail />}
-                </Icon>
+                <Flex
+                  w="9"
+                  h="9"
+                  borderRadius="full"
+                  bg="brand.black"
+                  align="center"
+                  justify="center"
+                >
+                  <Icon fontSize="lg" color="brand.seashell">
+                    {icons[link.icon as FooterLinkIcon]}
+                  </Icon>
+                </Flex>
               </Link>
             ))}
       </HStack>
