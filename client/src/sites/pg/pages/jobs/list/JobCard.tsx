@@ -44,6 +44,7 @@ const style = {
     education: { bg: "#E1F3F9", fg: "#2C5E6E" },
     workload: { bg: "#F0EBEC", fg: "#7D4D57" },
   },
+  duration: "slow",
 } as const;
 
 type TagGroup = {
@@ -200,6 +201,8 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
           base: cardState !== CardState.Closed ? "gap.md" : "0",
           md: cardState !== CardState.Closed ? "gap.lg" : "0",
         }}
+        transition="margin"
+        transitionDuration={style.duration}
       >
         <JobTagGroups
           job={props.job}
@@ -208,6 +211,7 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
           isOrgHighlighted={props.job.org?.is_highlighted}
         />
       </Box>
+
       {cardState === CardState.OpenBySearchPreview && (
         <Stack gap="gap.sm" mb={{ base: "gap.md", md: "gap.lg" }}>
           <Text fontSize="sm" color="fg.muted" fontWeight="medium">
@@ -218,11 +222,13 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
           </Box>
         </Stack>
       )}
+
       <Collapsible.Root open={cardState === CardState.OpenByUser}>
-        <Collapsible.Content animationDuration="slow">
+        <Collapsible.Content animationDuration={style.duration}>
           {props.job.description && <JobExpanded job={props.job} />}
         </Collapsible.Content>
       </Collapsible.Root>
+
       {props.job.description && (
         <Box
           pos="absolute"
