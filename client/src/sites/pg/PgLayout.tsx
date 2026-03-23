@@ -306,6 +306,8 @@ function FooterDescription(props: { socialLinks: FooterSection["links"]; isLoadi
               <Link
                 key={link.label}
                 href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 transition="transform 0.2s"
                 _hover={{ transform: "scale(1.1)" }}
               >
