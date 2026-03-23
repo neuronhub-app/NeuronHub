@@ -139,6 +139,7 @@ export namespace ids {
     },
     alert: {
       subscribeBtn: "job.alert.subscribe-btn",
+      subscribeBtnMobile: "job.alert.subscribe-btn-mobile",
       emailInput: "job.alert.email-input",
       submitBtn: "job.alert.submit-btn",
     },

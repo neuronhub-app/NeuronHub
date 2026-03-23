@@ -11,7 +11,9 @@ export const routes = [
     route("/:slug", "./sites/pg/pages/jobs/list/slug.tsx"),
   ]),
 
+  // #AI
   // NHA-only routes under unreachable prefix — for react-router +types generation
+  // todo !! refac: drop. I don't see how this is "unreachable"
   ...prefix("/_nha", [
     layout("./sites/neuronhub/NeuronLayout.tsx", [
       route("/", "./apps/home/index.tsx"),

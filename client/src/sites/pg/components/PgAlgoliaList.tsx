@@ -60,6 +60,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
   onClearAdditional?: () => void;
   children?: ReactNode;
   cta?: ReactNode;
+  ctaMobile?: ReactNode;
 }) {
   const algolia = useAlgoliaSearchClient();
   const pgFilterCardIsOpenRef = useRef(false);
@@ -96,7 +97,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
             <Stack gap="gap.sm">
               <PgSearchInput testId={props.searchInputTestId} />
               <PgMobileCollapsible
-                cta={props.cta}
+                cta={props.ctaMobile ?? props.cta}
                 label={labelPlural}
                 indexName={indexName}
                 facetsTopbar={props.facetsTopbar}

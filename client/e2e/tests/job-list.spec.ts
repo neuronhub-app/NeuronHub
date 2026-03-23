@@ -36,7 +36,9 @@ test.describe("JobList", () => {
 
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
+    const mutationSubscribe = play.waitForResponseGraphql(JobAlertSubscribeMutation);
     await play.click(ids.job.alert.submitBtn);
+    await mutationSubscribe;
 
     if (!isSiteProbablyGood) {
       await expect($[ids.layout.sidebar]).toHaveText("Subscriptions (1)");

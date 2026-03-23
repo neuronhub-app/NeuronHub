@@ -27,7 +27,7 @@ const FormSchema = z.object({
   email: z.email("Invalid email address"),
 });
 
-export function JobsSubscribeModal() {
+export function JobsSubscribeModal(props: { testId?: string }) {
   const user = useUser();
   const loading = useIsLoading();
 
@@ -90,7 +90,7 @@ export function JobsSubscribeModal() {
         }}
         variant="pg-primary"
         w="full"
-        {...ids.set(ids.job.alert.subscribeBtn)}
+        {...(props.testId ? ids.set(props.testId) : {})}
       >
         <Icon boxSize="3.5">
           <FaBell />

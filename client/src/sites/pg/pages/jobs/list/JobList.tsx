@@ -78,7 +78,8 @@ export function JobList(props: { slug?: string }) {
     <PgAlgoliaList<JobFragmentType>
       index="indexNameJobs"
       label="job"
-      cta={<JobsSubscribeModal />}
+      cta={<JobsSubscribeModal testId={ids.job.alert.subscribeBtn} />}
+      ctaMobile={<JobsSubscribeModal testId={ids.job.alert.subscribeBtnMobile} />}
       sort={
         algolia.indexNameJobs && algolia.indexNameJobsSortedByClosesAt
           ? {
