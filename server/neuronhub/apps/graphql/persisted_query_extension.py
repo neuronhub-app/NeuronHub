@@ -76,37 +76,36 @@ def _get_operation_name(doc: DocumentNode) -> str | None:
     return None
 
 
-_persisted_file_name = "persisted-queries.json"
-_persisted_file_cache: dict[str, str] | None = None
-_persisted_file_cache_timestamp: datetime | None = None
+class whitelist_file:
+    name = "persisted-queries.json"  # todo ! refac: use a Mise env
+    cache_in_RAM: dict[str, str] | None = None
+    cache_in_RAM_timestamp: datetime | None = None
 
 
 def _error_msg(query_name: str, error: str = "") -> str:
-    msg_base = f"query not in {_persisted_file_name} or `graphql_whitelist_BE`: `{query_name}`"
+    msg_base = f"query not in {whitelist_file.name} or `graphql_whitelist_BE`: `{query_name}`"
     if error:
         return f"{msg_base}: error '{error}'"
     return msg_base
 
 
 def _load_client_persisted_queries_json() -> dict[str, str]:
-    global _persisted_file_cache, _persisted_file_cache_timestamp
+    whitelist_path = settings.BASE_DIR / whitelist_file.name
+    assert whitelist_path.exists()
 
-    persisted_path = settings.BASE_DIR / _persisted_file_name
-    assert persisted_path.exists()
-
-    file_timestamp = datetime.fromtimestamp(persisted_path.stat().st_mtime)
+    file_timestamp = datetime.fromtimestamp(whitelist_path.stat().st_mtime)
     is_rebuild_needed = (
-        _persisted_file_cache is None
-        or _persisted_file_cache_timestamp is None
-        or file_timestamp > _persisted_file_cache_timestamp
+        whitelist_file.cache_in_RAM is None
+        or whitelist_file.cache_in_RAM_timestamp is None
+        or file_timestamp > whitelist_file.cache_in_RAM_timestamp
     )
     if is_rebuild_needed:
-        with open(persisted_path) as file:
-            _persisted_file_cache = json.load(file)
-        _persisted_file_cache_timestamp = file_timestamp
+        with open(whitelist_path) as file:
+            whitelist_file.cache_in_RAM = json.load(file)
+        whitelist_file.cache_in_RAM_timestamp = file_timestamp
 
-    assert _persisted_file_cache
-    return _persisted_file_cache
+    assert whitelist_file.cache_in_RAM
+    return whitelist_file.cache_in_RAM
 
 
 def _normalize_query(query_string: str) -> DocumentNode:
