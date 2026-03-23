@@ -3,6 +3,7 @@ order: 0
 is_new: true
 ---
 
+import { JobEmailTesting } from "@/components/content/job-email-testing";
 import { Text } from "@chakra-ui/react";
 import { Term } from "@/components/Term"
 import { PageLink } from "@/components/PageLink"
@@ -16,7 +17,7 @@ Sent daily at `8am` in the user's timezone.
 
 1. <Term id="backend" /> reviews every hour the new Jobs and which active <PageLink id="JobAlert"/>s
    haven't been notified about the newly created `Jobs`.
-    - <Text color="fg.muted">`hourly` here means 24 times per day, at `XX:00` minutes.</Text>
+    - <Text color="fg.muted">`hourly` is 24 times per day at `XX:00` minutes.</Text>
 2. <Term id="backend" /> selects a <PageLink id="JobAlert"/> and sends the template to its `.email`.
     1. <Term id="backend" /> creates <PageLink id="JobAlertLog"/>.
     2. <Term id="backend" /> sends the Task to send email to its background worker.
@@ -25,15 +26,13 @@ Sent daily at `8am` in the user's timezone.
           lets you view all scheduled successful/failed executions.
 
 
-Worst-case delay: max 23h.
+Worst-case delay is 23h.
 
 ### Email Templates <BadgeNew isHeading />
 
 You can override the default `jobs/job_alert.html` and `jobs/job_alert_confirmation.html` in
 <AdminLink id="SiteConfig">the admin panel's Site Config</AdminLink>.
 
-There you can also test the emails by using the following buttons:
-- `Send test alert email to yourself`
-- `Send test confirm email to yourself`
+<JobEmailTesting />
 
-Reference: <PageLink id="SiteConfig" />.
+See details in: <PageLink id="SiteConfig" />.

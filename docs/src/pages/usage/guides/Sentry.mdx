@@ -12,7 +12,7 @@ import { BadgeNew } from "@/components/BadgeNew"
 
 ## Issue Reports
 
-I recommend triaging the <Term id="backend" /> issues daily, and the <Term id="frontend" /> once in a few weeks.
+I recommend triaging the <Term id="backend" /> issues daily, and the <Term id="frontend" /> once every few weeks.
 
 The <LinkExt href="https://sentry.io/issues/alerts/rules/">default Alerts settings</LinkExt> are configured by project:
 - Uptime - immediate email.
@@ -25,7 +25,7 @@ On error, a user is presented with a low-key popup to submit the Feedback report
 
 <LinkExt href="https://sentry.io/issues/feedback/">The reports</LinkExt> can be viewed for 90 days.
 
-Each sends an email alert. You can also enable <LinkExt href="https://sentry.io/issues/feedback/">Slack or SMS notifications</LinkExt>.
+Each sends an email alert. You can also setup Slack or SMS.
 
 ## Replays
 
@@ -50,16 +50,16 @@ You can use complex filters to either search or aggregate the logs data:
 
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/logs.avif" alt="Logs" isDimmed />
 
-## Uptime
+## Uptime <BadgeNew isHeading />
 
 Sentry monitors the uptime of your <Term id="backend" /> and <Term id="frontend" /> every 5 minutes,
 and logs downtime if the response took more than 10 seconds. You'll receive email alerts if it detects any downtime.
 
-You can view the statistics in the <LinkExt href="https://probably-good.sentry.io/issues/alerts/rules/uptime/">uptime dashboard</LinkExt>.
+You can view the statistics in the <LinkExt href="https://sentry.io/insights/uptime/">uptime dashboard</LinkExt>.
 
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/uptime.avif" alt="Uptime" isDimmed />
 
-## Scheduled Tasks Monitor
+## Scheduled Tasks Monitor <BadgeNew isHeading />
 
 Similar to Uptime, Sentry monitors each run of your scheduled tasks (`crons`), eg hourly <PageLink id="job-alert-emails" />,
 and sends you email alerts if any task run failed to report its successful execution within 5 minutes of its start.
