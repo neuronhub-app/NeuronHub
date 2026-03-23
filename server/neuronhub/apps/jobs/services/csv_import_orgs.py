@@ -92,6 +92,7 @@ def _parse_orgs_csv(csv_path: Path) -> list[dict]:
             "website": website,
             "domain": _extract_domain(website),
             "jobs_page_url": row.get("Jobs Page", "").strip(),
+            "description": row.get("Org Description", "").strip(),
             "is_highlighted": row.get("Impact Tags", "").strip() == "Highlighted Org",
             "tags_area": row.get("Org Cause Area", ""),
             "logo_raw": row.get("Logo", "").strip(),

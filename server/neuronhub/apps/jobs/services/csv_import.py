@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from datetime import UTC
 from datetime import datetime
+from io import StringIO
 from pathlib import Path
 
 from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
@@ -14,6 +15,7 @@ from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
 )
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models import PostTag
@@ -42,23 +44,18 @@ async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncSt
                 if not raw_values:
                     continue
 
-                abbreviate = {
-                    TagCategoryEnum.Country: _abbreviate_country,
-                    TagCategoryEnum.City: _abbreviate_city,
-                }.get(category, _abbreviate_tag)
-
                 tags_by_field_name[tag_field_name] = await _get_or_create_tags(
                     tag_params_list=[
-                        abbreviate(val) for val in _list_split_and_strip(raw_values)
+                        TagParams(name=val) for val in _list_split_and_strip(raw_values)
                     ],
                     category=category,
                 )
 
             is_visa_sponsorship = job_dict.pop("_has_visa_sponsorship", False)
+            location_names: list[str] = job_dict.pop("_location_names", [])
 
             org_name = job_dict.pop("org_name", "").replace('"', "")
-            is_broken_job_org = not org_name
-            if is_broken_job_org:
+            if not org_name:
                 org_name = job_dict["title"]
             org, _ = await Org.objects.aget_or_create(name=org_name)
 
@@ -77,6 +74,12 @@ async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncSt
 
             for tag_field_name, tags in tags_by_field_name.items():
                 await getattr(job, tag_field_name).aset(tags)
+
+            locations = []
+            for loc_name in location_names:
+                loc, _ = await JobLocation.objects.aget_or_create(name=loc_name)
+                locations.append(loc)
+            await job.locations.aset(locations)
 
             if is_visa_sponsorship:
                 country_tags = tags_by_field_name.get("tags_country", [])
@@ -108,6 +111,50 @@ class TagParams:
     aliases: list[str] = field(default_factory=list)
 
 
+# #AI
+def _parse_location_field(raw: str) -> ParsedLocations:
+    if not raw:
+        return ParsedLocations(cities=[], countries=[], is_remote=False, raw_locations=[])
+
+    # Location(s) is a quoted-CSV field: "City, Country","City2, Country2"
+    locations_raw = next(csv.reader(StringIO(raw)), [])
+
+    cities: list[str] = []
+    countries: list[str] = []
+    is_remote = False
+
+    for location_raw in locations_raw:
+        location_raw = location_raw.strip()
+        if not location_raw:
+            continue
+        city_and_country = location_raw.rsplit(", ", 1)
+        if len(city_and_country) != 2:
+            continue
+        city_name, country_name = city_and_country[0].strip(), city_and_country[1].strip()
+        if city_name == "Remote":
+            is_remote = True
+            if country_name != "Global":
+                countries.append(country_name)
+        else:
+            cities.append(city_name)
+            countries.append(country_name)
+
+    return ParsedLocations(
+        cities=list(dict.fromkeys(cities)),
+        countries=list(dict.fromkeys(countries)),
+        is_remote=is_remote,
+        raw_locations=[loc.strip() for loc in locations_raw if loc.strip()],
+    )
+
+
+@dataclass
+class ParsedLocations:
+    cities: list[str]
+    countries: list[str]
+    is_remote: bool
+    raw_locations: list[str]
+
+
 def _parse_jobs_csv(csv_path: Path) -> list[dict]:
     with open(csv_path, newline="", encoding="utf-8-sig") as file:
         reader = csv.DictReader(file)
@@ -115,29 +162,34 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
 
     jobs_dict = []
     for row in job_rows:
-        job = {}
+        job: dict = {}
 
         for name_csv, name_django in {
             "Job Title": "title",
             "Organization": "org_name",
             "Job Link": "url_external",
-            "Country": "tags_country",
-            "City / State": "tags_city",
             "Cause Area(s)": "tags_area",
-            "Role Types": "tags_workload",
+            "Role Type": "tags_workload",
             "Education": "tags_education",
             "Experience": "tags_experience",
             "Skill Sets": "tags_skill",
         }.items():
             job[name_django] = row.get(name_csv, "").strip()
 
-        job["is_remote"] = "Remote" == row.get("Remote? ", "").strip()
+        location = _parse_location_field(row.get("Location(s)", ""))
+        job["tags_country"] = ",".join(location.countries)
+        job["tags_city"] = ",".join(location.cities)
+        job["is_remote"] = location.is_remote
+        job["_location_names"] = location.raw_locations
 
-        presented_location = row.get("Presented Location", "").strip()
-        job["_has_visa_sponsorship"] = "visa sponsorship" in presented_location.lower()
+        job_desc = row.get("Job Description", "").strip()
+        job["description"] = job_desc
+        job["_has_visa_sponsorship"] = "visa" in job_desc.lower()
 
-        if salary_raw := row.get("Minimum Salary", ""):
+        if salary_raw := row.get("Min Salary (USD)", ""):
             job["salary_min"] = int(float(salary_raw))
+        if salary_text := row.get("Salary Range", "").strip():
+            job["salary_text"] = salary_text
 
         if closes_at_raw := row.get("Deadline", ""):
             job["closes_at"] = datetime.strptime(closes_at_raw, "%Y-%m-%d").replace(tzinfo=UTC)
@@ -156,38 +208,6 @@ def _list_split_and_strip(str_raw: str) -> list[str]:
     if not str_raw:
         return []
     return [tag.strip() for tag in str_raw.split(",") if tag.strip()]
-
-
-def _abbreviate_tag(name_raw: str) -> TagParams:
-    name = name_raw
-    for old, new in [
-        ("+ years experience", "y+"),
-        (" years experience", "y"),
-        ("Undergraduate", "Undergrad"),
-    ]:
-        name = name.replace(old, new)
-    return TagParams(name=name)
-
-
-def _abbreviate_country(name_raw: str) -> TagParams:
-    abbreviated = {
-        "United States (USA)": "United States",
-        "United Kingdom (UK)": "United Kingdom",
-    }.get(name_raw)
-    if abbreviated:
-        return TagParams(abbreviated, aliases=[name_raw])
-    return TagParams(name=name_raw)
-
-
-def _abbreviate_city(name_raw: str) -> TagParams:
-    if abbreviated := {"Washington D.C.": "Washington DC"}.get(name_raw):
-        return TagParams(abbreviated, aliases=[name_raw])
-
-    # Strip 2-letter code suffix: "Zurich CH" → "Zurich" (alias keeps original)
-    parts = name_raw.rsplit(" ", 1)
-    if len(parts) == 2 and len(parts[1]) == 2 and parts[1].isalpha():
-        return TagParams(parts[0], aliases=[name_raw])
-    return TagParams(name=name_raw)
 
 
 async def _create_visa_child_tags(country_names: list[str]) -> None:
