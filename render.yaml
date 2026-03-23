@@ -97,6 +97,10 @@ projects:
               sync: false
             - key: ALGOLIA_SEARCH_API_KEY
               sync: false
+            - key: POSTMARK_SERVER_TOKEN
+              sync: false
+            - key: ADMIN_EMAIL
+              sync: false
 
           - name: stage
             envVars:
