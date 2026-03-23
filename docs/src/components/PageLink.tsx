@@ -23,7 +23,7 @@ const links = {
   Sentry: "/usage/guides/sentry",
   Algolia: "/usage/guides/algolia",
   JobAlertLog: "/usage/reference/database-tables/jobalertlog",
-  SiteConfig: "/usage/reference/database-tables/siteconfig",
+  SiteConfig: "/usage/guides/siteconfig",
   TaskResult: "/usage/reference/database-tables/taskresult",
   User: "/usage/reference/database-tables/user",
 } satisfies Record<string, ReactRouterPath>;

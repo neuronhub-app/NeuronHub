@@ -74,6 +74,42 @@ type DjangoModelType {
   pk: ID!
 }
 
+enum FooterLinkIcon {
+  Email
+  Linkedin
+  Matrix
+  Discord
+  Mastodon
+  Github
+  Youtube
+  Substack
+  Twitter
+  Facebook
+  Instagram
+}
+
+type FooterLinkType {
+  id: ID!
+  label: String!
+  href: String!
+  icon: FooterLinkIcon
+  order: Int!
+}
+
+enum FooterSectionKind {
+  Column
+  Social
+  Bottom
+}
+
+type FooterSectionType {
+  id: ID!
+  kind: FooterSectionKind!
+  title: String!
+  order: Int!
+  links: [FooterLinkType!]!
+}
+
 input IDBaseFilterLookup {
   """Exact match. Filter will be skipped on `null` value"""
   exact: ID
@@ -217,6 +253,13 @@ type Mutation {
   job_alert_toggle_active(id_ext: UUID!): Boolean!
   job_alert_remove(id_ext: UUID!): Boolean!
   job_alert_unsubscribe(id_ext: UUID!): Boolean!
+}
+
+type NavbarLinkType {
+  id: ID!
+  label: String!
+  href: String!
+  order: Int!
 }
 
 type OffsetPaginationInfo {
@@ -830,6 +873,12 @@ type Query {
   job_by_slug(slug: String!): JobType
   job_alerts: [JobAlertType!]!
   job_versions_pending: [JobVersionType!]! @IsAuthenticated
+  site: SiteType!
+}
+
+type SiteType {
+  nav_links: [NavbarLinkType!]!
+  footer_sections: [FooterSectionType!]!
 }
 
 input StrFilterLookup {

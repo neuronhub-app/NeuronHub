@@ -1,4 +1,4 @@
-import { Accordion, Spinner, Stack, Text } from "@chakra-ui/react";
+import { Accordion, Skeleton, Stack, Text } from "@chakra-ui/react";
 
 import { graphql } from "@/gql-tada";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
@@ -24,13 +24,28 @@ const style = {
     lineHeight: "19px",
     color: "brand.black",
   },
+  link: {
+    fontWeight: "medium",
+    fontSize: "13px",
+    lineHeight: "19px",
+    color: "brand.green.light",
+  },
 } as const;
 
 export function JobFaqPage() {
   const query = useApolloQuery(JobFaqQuestionsQuery);
 
   if (query.isLoadingFirstTime) {
-    return <Spinner />;
+    return (
+      <Stack gap="gap.lg" w="full" pt="30px">
+        <Text {...style.heading}>FAQ</Text>
+        <Stack gap="gap.sm">
+          {[1, 2, 3, 4, 5].map(index => (
+            <Skeleton key={index} height="52px" borderRadius="md" />
+          ))}
+        </Stack>
+      </Stack>
+    );
   }
 
   return (
@@ -58,8 +73,10 @@ export function JobFaqPage() {
               {item.question}
               <Accordion.ItemIndicator color="brand.black" boxSize="4" />
             </Accordion.ItemTrigger>
-            <Accordion.ItemContent px="gap.sm" pt="0" pb="gap.sm" {...style.answer}>
+
+            <Accordion.ItemContent px="gap.sm" pt="0" pb="gap.sm">
               <Prose
+                css={{ ...style.answer, "& a": style.link }}
                 // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
                 dangerouslySetInnerHTML={{
                   __html: markedConfigured.parse(item.answer_md),

@@ -21,6 +21,7 @@ from neuronhub.apps.jobs.services.serialize_to_md import serialize_job_to_markdo
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.posts.models import PostTag
+from neuronhub.apps.sites.graphql import get_list_cached
 from neuronhub.apps.users.graphql.resolvers import get_user
 from neuronhub.apps.users.graphql.resolvers import get_user_maybe
 from neuronhub.apps.users.graphql.resolvers import get_user_sync
@@ -124,7 +125,13 @@ class JobVersionType:
 @strawberry.type(name="Query")
 class JobsQuery:
     jobs: list[JobType] = strawberry_django.field()
-    job_faq_questions: list[JobFaqQuestionType] = strawberry_django.field()
+
+    class CacheKey:
+        Faq = "JobFaqQuestions"
+
+    @strawberry_django.field
+    async def job_faq_questions(self) -> list[JobFaqQuestionType]:
+        return await get_list_cached(JobFaqQuestion, cache_key=JobsQuery.CacheKey.Faq)
 
     @strawberry_django.field
     async def job_by_slug(self, info: strawberry.Info, slug: str) -> JobType | None:

@@ -3,6 +3,7 @@ See [[Sub-sites-with-VITE_SITE.md]]
 """
 
 from asgiref.sync import sync_to_async
+from django.core.cache import cache
 from django.db import models
 from django.db.models import TextChoices
 from django_choices_field.fields import TextChoicesField
@@ -70,3 +71,90 @@ class SiteConfig(SingletonModel):
     async def get_solo(cls) -> SiteConfig:  # type: ignore[override]
         # noinspection PyTypeChecker
         return await sync_to_async(super().get_solo)()
+
+
+class FooterSectionKind(TextChoices):
+    Column = "column"
+    Social = "social"
+    Bottom = "bottom"
+
+
+class FooterLinkIcon(TextChoices):
+    Email = "email"
+    Linkedin = "linkedin"
+    Matrix = "matrix"
+    Discord = "discord"
+    Mastodon = "mastodon"
+    Github = "github"
+    Youtube = "youtube"
+    Substack = "substack"
+    Twitter = "twitter"
+    Facebook = "facebook"
+    Instagram = "instagram"
+
+
+class NavbarLink(models.Model):
+    site = models.ForeignKey(
+        SiteConfig,
+        on_delete=models.CASCADE,
+        related_name="nav_links",
+    )
+    label = models.CharField(max_length=255)
+    href = models.URLField(max_length=512)
+    order = models.PositiveIntegerField(default=0, db_index=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.label
+
+
+class FooterSection(models.Model):
+    site = models.ForeignKey(
+        SiteConfig,
+        on_delete=models.CASCADE,
+        related_name="footer_sections",
+    )
+    kind = TextChoicesField(choices_enum=FooterSectionKind, default=FooterSectionKind.Column)
+    title = models.CharField(max_length=255, blank=True, default="")
+    order = models.PositiveIntegerField(default=0, db_index=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.title
+
+
+class FooterLink(models.Model):
+    section = models.ForeignKey(
+        FooterSection,
+        on_delete=models.CASCADE,
+        related_name="links",
+    )
+    label = models.CharField(max_length=255)
+    href = models.URLField(max_length=512)
+    icon = TextChoicesField(choices_enum=FooterLinkIcon, blank=True, null=True, default=None)
+    order = models.PositiveIntegerField(default=0, db_index=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return ""
+
+
+def _on_change_invalidate_cache(**kwargs):
+    from neuronhub.apps.sites.graphql import SitesQuery
+
+    cache.delete(SitesQuery.CacheKey.NavLinks)
+    cache.delete(SitesQuery.CacheKey.FooterSections)
+
+
+models.signals.post_save.connect(_on_change_invalidate_cache, sender=NavbarLink)
+models.signals.post_delete.connect(_on_change_invalidate_cache, sender=NavbarLink)
+models.signals.post_save.connect(_on_change_invalidate_cache, sender=FooterSection)
+models.signals.post_delete.connect(_on_change_invalidate_cache, sender=FooterSection)
+models.signals.post_save.connect(_on_change_invalidate_cache, sender=FooterLink)
+models.signals.post_delete.connect(_on_change_invalidate_cache, sender=FooterLink)

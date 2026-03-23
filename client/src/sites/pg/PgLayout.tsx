@@ -5,21 +5,41 @@ import {
   Flex,
   Grid,
   HStack,
+  Icon,
   IconButton,
   Image,
   Link,
   Separator,
+  Skeleton,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { NavLink, Outlet } from "react-router";
-import { LuMenu } from "react-icons/lu";
+import { LuMenu, LuMail } from "react-icons/lu";
+import {
+  FaLinkedinIn,
+  FaGithub,
+  FaYoutube,
+  FaTwitter,
+  FaFacebookF,
+  FaInstagram,
+  FaDiscord,
+  FaMastodon,
+} from "react-icons/fa";
+import { SiMatrix, SiSubstack } from "react-icons/si";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { FooterLinkIcon, FooterSectionKind } from "~/graphql/enums";
+import { graphql, type ResultOf } from "@/gql-tada";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 export default function PgLayout() {
+  const { data, isLoadingFirstTime } = useApolloQuery(SiteConfigQuery);
+
+  const footer = useFooterSections(data?.site?.footer_sections);
+
   return (
     <Flex flex="1" direction="column" bg="bg">
-      <PgHeroHeader />
+      <PgHeroHeader navLinks={data?.site?.nav_links ?? []} isLoading={isLoadingFirstTime} />
 
       <Stack
         as="main"
@@ -32,15 +52,17 @@ export default function PgLayout() {
           <Outlet />
         </Container>
       </Stack>
-      <PgFooter />
+
+      <PgFooter footer={footer} isLoading={isLoadingFirstTime} />
     </Flex>
   );
 }
 
-function PgHeroHeader() {
+function PgHeroHeader(props: { navLinks: SiteConfig["nav_links"]; isLoading: boolean }) {
   return (
     <Box as="header" bg="brand.green">
-      <PgNav />
+      <PgNav navLinks={props.navLinks} isLoading={props.isLoading} />
+
       <Container
         px={{ base: "gap.sm", md: "88px" }}
         pt={{ base: "30px", md: "14" }}
@@ -80,21 +102,8 @@ function PgHeroHeader() {
   );
 }
 
-const NAV_LINKS = [
-  { label: "Career Guide", href: "https://probablygood.org/career-guide/" },
-  { label: "Career Profiles", href: "https://probablygood.org/career-profiles/" },
-  { label: "Job Board", href: "https://jobs.probablygood.org/" },
-  { label: "Explore", href: "https://probablygood.org/explore/" },
-  { label: "Advising", href: "https://probablygood.org/advising/" },
-  { label: "About", href: "https://probablygood.org/about/" },
-] as const;
-
-function PgNav() {
+function PgNav(props: { navLinks: SiteConfig["nav_links"]; isLoading: boolean }) {
   const state = useStateValtio({ isMenuOpen: false });
-
-  function toggleMenu() {
-    state.mutable.isMenuOpen = !state.mutable.isMenuOpen;
-  }
 
   const isMenuOpen = state.snap.isMenuOpen;
 
@@ -116,25 +125,31 @@ function PgNav() {
             variant="ghost"
             color="white"
             _icon={{ w: "35px", h: "35px" }}
-            onClick={toggleMenu}
+            onClick={() => {
+              state.mutable.isMenuOpen = !state.mutable.isMenuOpen;
+            }}
           >
             <LuMenu />
           </IconButton>
 
           <HStack as="nav" gap="9" display={{ base: "none", md: "flex" }}>
-            {NAV_LINKS.map(link => (
-              <Link
-                key={link.label}
-                href={link.href}
-                fontWeight="medium"
-                fontSize="sm"
-                letterSpacing="0.5px"
-                color="white"
-                _hover={{ textDecoration: "underline", textDecorationColor: "white" }}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {props.isLoading
+              ? Array.from({ length: 6 }, (_, i) => (
+                  <Skeleton key={i} height="20px" width="80px" />
+                ))
+              : props.navLinks.map(link => (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    fontWeight="medium"
+                    fontSize="sm"
+                    letterSpacing="0.5px"
+                    color="white"
+                    _hover={{ textDecoration: "underline", textDecorationColor: "white" }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
           </HStack>
         </HStack>
       </Container>
@@ -153,7 +168,7 @@ function PgNav() {
         pointerEvents={isMenuOpen ? "auto" : "none"}
         transition="opacity 0.2s ease, transform 0.2s ease"
       >
-        {NAV_LINKS.map(link => (
+        {props.navLinks.map(link => (
           <Link
             key={link.label}
             href={link.href}
@@ -173,53 +188,7 @@ function PgNav() {
   );
 }
 
-const FOOTER_LINKS = [
-  {
-    title: "Content",
-    links: [
-      { label: "Career Guide", href: "https://probablygood.org/career-guide/" },
-      { label: "Career Profiles", href: "https://probablygood.org/career-profiles/" },
-      { label: "Cause Areas", href: "https://probablygood.org/cause-areas/" },
-      { label: "Degree Paths", href: "https://probablygood.org/degree-paths/" },
-      { label: "Core Concepts", href: "https://probablygood.org/core-concepts/" },
-      { label: "Interviews", href: "https://probablygood.org/interviews/" },
-      { label: "Explore", href: "https://probablygood.org/explore/" },
-    ],
-  },
-  {
-    title: "Services",
-    links: [
-      { label: "1:1 Advising", href: "https://probablygood.org/advising/" },
-      { label: "Job Board", href: "https://jobs.probablygood.org/" },
-      { label: "Workshops", href: "https://probablygood.org/workshops/" },
-    ],
-  },
-  {
-    title: "About",
-    links: [
-      { label: "Learn more", href: "https://probablygood.org/about/" },
-      { label: "Get in touch", href: "https://probablygood.org/contact/" },
-      { label: "Donate", href: "https://probablygood.org/donate/" },
-    ],
-  },
-] as const;
-
-const FOOTER_BOTTOM_LINKS = [
-  { label: "Privacy Policy", href: "https://probablygood.org/privacy-policy/" },
-  { label: "Terms of Service", href: "https://probablygood.org/terms-of-service/" },
-  { label: "Cookie Preferences", href: "https://probablygood.org/about/#manage_cookies" },
-] as const;
-
-const SOCIAL_LINKS = [
-  { href: "https://probablygood.org/newsletter/", src: "/email-icon.svg", alt: "Email" },
-  {
-    href: "https://www.linkedin.com/company/probably-good/",
-    src: "/linkedin-icon.svg",
-    alt: "LinkedIn",
-  },
-] as const;
-
-function PgFooter() {
+function PgFooter(props: { footer: FooterData; isLoading: boolean }) {
   const footerLinkStyle = {
     color: "brand.footer.text",
     _hover: { textDecoration: "underline" },
@@ -233,16 +202,23 @@ function PgFooter() {
         pt={{ base: "22px", md: "46px" }}
       >
         <Grid
-          templateColumns={{ base: "1fr", md: "2fr 1fr 1fr 1fr" }}
+          templateColumns={{
+            base: "1fr",
+            md: `2fr${" 1fr".repeat(props.footer.columns.length)}`,
+          }}
           gap={{ base: "gap.sm", md: "30px" }}
         >
-          <FooterDescription />
+          <FooterDescription
+            isLoading={props.isLoading}
+            socialLinks={props.footer.socialLinks}
+          />
 
-          {FOOTER_LINKS.map((column, index) => (
-            <FooterColumn
-              key={column.title}
-              title={column.title}
-              links={column.links}
+          {props.footer.columns.map((section, index) => (
+            <FooterSectionColumn
+              key={section.id}
+              title={section.title}
+              links={section.links}
+              isLoading={props.isLoading}
               chakra={{ mt: { base: index === 0 ? "1.5" : "0", md: "0" } }}
             />
           ))}
@@ -275,12 +251,12 @@ function PgFooter() {
             </Link>
             <Text>|</Text>
           </HStack>
-          {FOOTER_BOTTOM_LINKS.map((link, index) => (
+          {props.footer.bottomLinks.map((link, index) => (
             <HStack key={link.label} gap="1">
               <Link href={link.href} {...footerLinkStyle}>
                 {link.label}
               </Link>
-              {index < FOOTER_BOTTOM_LINKS.length - 1 && <Text>|</Text>}
+              {index < props.footer.bottomLinks.length - 1 && <Text>|</Text>}
             </HStack>
           ))}
         </HStack>
@@ -289,7 +265,25 @@ function PgFooter() {
   );
 }
 
-function FooterDescription() {
+function FooterDescription(props: { socialLinks: FooterSection["links"]; isLoading: boolean }) {
+  // todo ! fix: restore from Figma design (or fix UI to match)
+  // { src: "/email-icon.svg" },
+  // { src: "/linkedin-icon.svg" },
+
+  const icons = {
+    [FooterLinkIcon.Email]: <LuMail />,
+    [FooterLinkIcon.Linkedin]: <FaLinkedinIn />,
+    [FooterLinkIcon.Github]: <FaGithub />,
+    [FooterLinkIcon.Youtube]: <FaYoutube />,
+    [FooterLinkIcon.Twitter]: <FaTwitter />,
+    [FooterLinkIcon.Facebook]: <FaFacebookF />,
+    [FooterLinkIcon.Instagram]: <FaInstagram />,
+    [FooterLinkIcon.Discord]: <FaDiscord />,
+    [FooterLinkIcon.Mastodon]: <FaMastodon />,
+    [FooterLinkIcon.Matrix]: <SiMatrix />,
+    [FooterLinkIcon.Substack]: <SiSubstack />,
+  } as const;
+
   return (
     <Stack gap="3.5">
       <Text fontFamily="heading" fontWeight="medium" fontSize={{ base: "20px", md: "26px" }}>
@@ -304,24 +298,31 @@ function FooterDescription() {
       </Text>
 
       <HStack gap="3.5">
-        {SOCIAL_LINKS.map(link => (
-          <Link
-            key={link.alt}
-            href={link.href}
-            transition="transform 0.2s"
-            _hover={{ transform: "scale(1.1)" }}
-          >
-            <Image src={link.src} alt={link.alt} w="8" h="8" />
-          </Link>
-        ))}
+        {props.isLoading
+          ? [1, 2].map(index => (
+              <Skeleton key={index} width="8" height="8" borderRadius="full" />
+            ))
+          : props.socialLinks.map(link => (
+              <Link
+                key={link.label}
+                href={link.href}
+                transition="transform 0.2s"
+                _hover={{ transform: "scale(1.1)" }}
+              >
+                <Icon w="8" h="8" color="brand.seashell">
+                  {icons[link.icon as FooterLinkIcon] ?? <LuMail />}
+                </Icon>
+              </Link>
+            ))}
       </HStack>
     </Stack>
   );
 }
 
-function FooterColumn(props: {
+function FooterSectionColumn(props: {
   title: string;
-  links: ReadonlyArray<{ label: string; href: string }>;
+  links: FooterSection["links"];
+  isLoading: boolean;
   chakra?: StackProps;
 }) {
   const style = {
@@ -347,12 +348,66 @@ function FooterColumn(props: {
       </Text>
 
       <Stack gap={{ base: "gap.xs", md: "3" }}>
-        {props.links.map(link => (
-          <Link key={link.label} href={link.href} {...style.link}>
-            {link.label}
-          </Link>
-        ))}
+        {props.isLoading
+          ? [1, 2, 3].map(index => <Skeleton key={index} height="26px" width="120px" />)
+          : props.links.map(link => (
+              <Link key={link.label} href={link.href} {...style.link}>
+                {link.label}
+              </Link>
+            ))}
       </Stack>
     </Stack>
   );
 }
+
+function useFooterSections(sections?: FooterSection[]): FooterData {
+  const sectionsByEnum = {} as Record<FooterSectionKind, FooterSection[]>;
+
+  for (const enumValue of Object.values(FooterSectionKind)) {
+    sectionsByEnum[enumValue] = [];
+  }
+  for (const section of sections ?? []) {
+    sectionsByEnum[section.kind as FooterSectionKind]?.push(section);
+  }
+  return {
+    columns: sectionsByEnum[FooterSectionKind.Column],
+    socialLinks: sectionsByEnum[FooterSectionKind.Social]?.[0]?.links ?? [],
+    bottomLinks: sectionsByEnum[FooterSectionKind.Bottom]?.[0]?.links ?? [],
+  };
+}
+
+const SiteConfigQuery = graphql.persisted(
+  "SiteConfigQuery",
+  graphql(`
+    query SiteConfigQuery {
+      site {
+        nav_links {
+          id
+          label
+          href
+        }
+        footer_sections {
+          id
+          kind
+          title
+          links {
+            id
+            label
+            href
+            icon
+          }
+        }
+      }
+    }
+  `),
+);
+
+type SiteConfig = NonNullable<ResultOf<typeof SiteConfigQuery>["site"]>;
+
+type FooterSection = SiteConfig["footer_sections"][number];
+
+type FooterData = {
+  columns: FooterSection[];
+  socialLinks: FooterSection["links"];
+  bottomLinks: FooterSection["links"];
+};

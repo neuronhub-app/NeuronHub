@@ -1,3 +1,23 @@
+export enum FooterLinkIcon {
+  Discord = 'Discord',
+  Email = 'Email',
+  Facebook = 'Facebook',
+  Github = 'Github',
+  Instagram = 'Instagram',
+  Linkedin = 'Linkedin',
+  Mastodon = 'Mastodon',
+  Matrix = 'Matrix',
+  Substack = 'Substack',
+  Twitter = 'Twitter',
+  Youtube = 'Youtube'
+}
+
+export enum FooterSectionKind {
+  Bottom = 'Bottom',
+  Column = 'Column',
+  Social = 'Social'
+}
+
 export enum ImportDomain {
   HackerNews = 'HackerNews'
 }

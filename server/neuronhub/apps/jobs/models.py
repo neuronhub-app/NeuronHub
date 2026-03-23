@@ -1,6 +1,7 @@
 import uuid
 from zoneinfo import ZoneInfo
 
+from django.core.cache import cache
 from django.db import models
 from django.utils.crypto import salted_hmac
 from django_extensions.db.fields import AutoSlugField
@@ -254,6 +255,16 @@ class JobFaqQuestion(models.Model):
 
     def __str__(self):
         return self.question
+
+
+def _on_change_invalidate_cache_job_faq(**kwargs):
+    from neuronhub.apps.jobs.graphql import JobsQuery
+
+    cache.delete(JobsQuery.CacheKey.Faq)
+
+
+models.signals.post_save.connect(_on_change_invalidate_cache_job_faq, sender=JobFaqQuestion)
+models.signals.post_delete.connect(_on_change_invalidate_cache_job_faq, sender=JobFaqQuestion)
 
 
 class JobAlertLog(TimeStampedModel):

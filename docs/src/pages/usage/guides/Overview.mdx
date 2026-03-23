@@ -4,6 +4,7 @@ order: 0
 ---
 
 import { Heading, SimpleGrid, Stack, Text } from "@chakra-ui/react"
+import { FiLayout } from "react-icons/fi";
 import { LuSearch, LuShieldAlert, LuSettings } from "react-icons/lu"
 import { GuideCard } from "@/components/GuideCard"
 
@@ -14,15 +15,21 @@ import { GuideCard } from "@/components/GuideCard"
 
 <SimpleGrid columns={{ base: 1, md: 3 }} gap="gap.md" mt="gap.md">
   <GuideCard
+    icon={FiLayout}
+    title="Site Config"
+    description="CMS for Emails, Header, Footer, and FAQ."
+    path="/usage/guides/siteconfig"
+  />
+  <GuideCard
     icon={LuSearch}
     title="Search Engine"
-    description="Algolia indexes, rules, and analytics."
+    description="Algolia.com indexes, rules, and analytics."
     path="/usage/guides/algolia"
   />
   <GuideCard
     icon={LuShieldAlert}
     title="Error Monitoring"
-    description="Sentry issues, replays, and uptime."
+    description="Sentry.io issues, replays, and uptime."
     path="/usage/guides/sentry"
   />
   <GuideCard

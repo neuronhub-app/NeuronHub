@@ -1,0 +1,62 @@
+---
+is_new: true
+order: 0
+title: Site Config CMS
+---
+
+import { AdminLink } from "@/components/AdminLink";
+import { ImageWithDialog } from "@/components/ImageWithDialog";
+import { LinkExt } from "@/components/LinkExt";
+import { PageLink } from "@/components/PageLink";
+import { Notice } from "@/components/Notice";
+import { JobEmailTesting } from "@/components/content/job-email-testing";
+
+
+This primitive CMS allows to customize a few elements.
+
+In the admin you can re-order all sections/links by drag-and-drop, and then pressing the `Save` button.
+
+
+<Notice>
+  Django Admin has poor UI, as it's auto-generated.<br />
+  Yet it's easy to extend, and has no maintenance cost.
+</Notice>
+
+
+### Job Alert Email Templates
+
+<AdminLink id="SiteConfig">Configure</AdminLink> the email HTML templates.
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/site-config/job-alert-email-templates.avif" alt="email-templates" isDimmed />
+
+<JobEmailTesting/>
+
+For more, see <PageLink id="job-alert-emails"/>.
+
+
+### Jobs FAQ
+
+<AdminLink id="SiteConfig">Configure</AdminLink> the `/faq` content and order with Markdown.
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/site-config/faq.avif" alt="faq" isDimmed />
+
+<Notice>
+  For syntax details see <LinkExt href="https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax">Markdown specification</LinkExt>.
+</Notice>
+
+
+### Navbar
+
+<AdminLink id="SiteConfig">Configure</AdminLink> links: `label`, `href`, and order.
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/site-config/navbar.avif" alt="navbar" isDimmed />
+
+
+### Footer
+
+<AdminLink id="SiteConfig">Configure</AdminLink>:
+- `Column`s - `title`, links, and order.
+- `Bottom` line - Privacy Policy, ToS, etc.
+- `Social` - the left side social links.
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/site-config/footer.avif" alt="footer" isDimmed />

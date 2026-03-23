@@ -120,7 +120,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
 # Dev servers
 # -----------------------------------------------------
-[tasks."dev"]
+[tasks.dev]
     depends = ["dev:server", "dev:client", "dev:db", "dev:s3"]
 
     [tasks."dev:server"]
@@ -173,7 +173,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 # Tests
 # -----------------------------------------------------
 
-[tasks."test"]
+[tasks.test]
     dir = "server"
     depends = "dev:db"
     run = """
@@ -261,7 +261,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 # typegen → format → lint
 # -----------------------------------------------------
 
-[tasks."typegen"]
+[tasks.typegen]
     depends = "typegen:server"
     run = [
         "mise typegen:client",

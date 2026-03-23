@@ -15,8 +15,9 @@ class PostGraphqlTypesTest(NeuronTestCase):
         reviews = await asyncio.gather(*[self.gen.posts.review() for _ in range(5)])
         await asyncio.gather(*[self.gen.posts.tag(post=review) for review in reviews])
 
-        await sync_to_async(self._assert_num_queries)(number=13)
+        await self._assert_num_queries(number=13)
 
+    @sync_to_async
     def _assert_num_queries(self, number: int):
         with self.assertNumQueries(number):
             async_to_sync(self.graphql_query)(  # FYI async_to_sync in assertNumQueries() is PITA

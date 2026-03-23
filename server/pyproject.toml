@@ -142,7 +142,7 @@ dependencies = [
     ]
     console_output_style = "classic" # reduce LLM context rot
     addopts = [
-        "--no-migrations",
+        "--reuse-db",
         "--color=yes",
         "--no-header", # reduce LLM context rot
     ]
