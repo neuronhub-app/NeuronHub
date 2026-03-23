@@ -1,12 +1,14 @@
 ---
+reviewed_at: 2026.03.18
 paths:
-  - "**/*.tsx"
+  - "**/*.tsx?"
 ---
+
 
 ### Persisted Queries
 
-You must define queries on the module top level for gql-tada CLI to put it in the whitelist, eg:
-```tsx
+You must define queries on the top module level for gql-tada CLI to detect them, and update the whitelist on `mise lint`, eg:
+```ts
 import { graphql } from "@/gql-tada";
 
 const PostListQuery = graphql.persisted(
@@ -15,20 +17,38 @@ const PostListQuery = graphql.persisted(
 );
 ```
 
+
 ### Types
 
-Always use `gql-tada.FragmentOf` instead of hand-writing types, or fragment sub types as `PostCommentType["votes"]`. See current fragments in `client/src/graphql/fragments/*`.
+Instead of writing types by hand, uou must use `gql-tada.ResultOf` or `FragmentOf`, eg:
 
-### Cache reset
+```ts
+type PostList = ResultOf<typeof PostListQuery>;
+export type Post = NonNullable<PostList["posts"]>[number];
+```
 
-You must use [[mutateAndRefetchMountedQueries.tsx]] function instead of `client.mutate` to mitigate Apollo's dysfunctional caching. It also has `mutateDeleteAndResetStore()`, as `client.refetchQueries({ include: "all" })` does not refetch all queries.
+If need to narrow the type - utilize the `is` keyword, eg: 
+`function isPost(post: Post | unkonwn): post is Post { return post.__typename === "PostType" }`.
 
-Note: errors it already sends to `Sentry.captureException`.
 
-Exceptions when to use `client.mutate` or `client.query`:
-1. If rerender can have extreme performance consequences - eg in `posts` we avoid rerender of 1000 comments on upvotes or text highlights.
-2. If when you're modifying an obvious GraphQL query - eg in `jobs` subscriptions we specify `refetch: [JobAlertsQuery]`, to avoid UX disruptions.
+### Reset the cache on every mutation
 
-### useApolloQuery
+You must use [[mutateAndRefetchMountedQueries.tsx]] function instead of `client.mutate`, to mitigate Apollo's dysfunctional caching. It also has `mutateDeleteAndResetStore()`, as `client.refetchQueries({ include: "all" })` does not refetch all queries.
 
-For query loading - you MUST use `[[useApolloQuery.ts]]`, and instead of its `loading` var use `isLoadingFirstTime` - which doesn't trigger the loading when we call `mutateAndRefetchMountedQueries()` - ie when we refetch rather than load first time.
+By default it calls `refetchQueries({ include: "active" })`, but you can configure it with `options` as:
+- `{ isRefetchAll: true }` -> `client.refetchQueries({ include: "all" })`
+- `{ isResetAndRefetchAll: true }` -> `client.resetStore(); client.refetchQueries({ include: "all" })`
+
+Note: errors they already send to `Sentry.captureException` - no need to duplicate it.
+
+#### Exceptions for using `client.mutate`
+
+1. If re-renders can have extreme performance consequences - eg in `posts` we avoid re-rendering 1000 comments on upvotes or content highlights.
+2. If you're mutating a single known (obvious) GraphQL query - eg when creating `JobAlert`s we simply specify `refetch: [JobAlertsQuery]` to avoid UX disruptions. In this case you must `import` the `query` - and never use its magic string name.
+
+
+### Use `useApolloQuery` instead of `apollo.useQuery`
+
+Always use `[[useApolloQuery.ts]]` instead of the Apollo's `useQuery`.
+
+And instead of its `.loading` var use `.isLoadingFirstTime` - which doesn't activate when we call `mutateAndRefetch*()` - ie when we soft-refetch the data, instead of being blocked by its first load.
