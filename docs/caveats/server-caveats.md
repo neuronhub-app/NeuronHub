@@ -2,12 +2,16 @@
 
 ### Strawberry
 
-In custom fields like below or other instance methods of `@strawberry.type` its `self` is almost never of the instance, but either the Django `Model` or `None`. Sounds fucked up.
+In custom fields of `@strawberry.type` or `@strawberry_django.type` - its `self` is never the actually class, but:
+- the Django `Model` instance, eg when it returns it.
+- `None` - for all other cases.
+
+Treat this `self` as non-existent. Or type it as the model instance if you're sure.
 
 ```py
 @strawberry.type()
 class Query:
-    @strawberry.field()
+    @strawberry_django.field()
     async def post_highlights(self, ids: list[ID], info: Info) -> list[...]:
 		...
 ```
