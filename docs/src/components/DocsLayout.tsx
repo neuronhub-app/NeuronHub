@@ -16,6 +16,7 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
+import { GoCommandPalette, GoPerson } from "react-icons/go";
 import { LuFolder, LuMenu, LuUser } from "react-icons/lu";
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
@@ -39,7 +40,7 @@ export default function DocsLayout() {
 
   return (
     <>
-      <MobileMenuDrawer />
+      <SidebarMobileDrawer />
       <Flex flex="1">
         <Box
           width={style.sidebar.width}
@@ -111,10 +112,7 @@ function SidebarContent() {
   const pathname = useLocation().pathname;
   const navigate = useNavigate();
 
-  const activeSection: SectionKey = pathname.startsWith("/development/")
-    ? "development"
-    : "usage";
-  const nodes = navTree.find(node => node.slug === activeSection)?.children ?? [];
+  const sectionActive = pathname.startsWith("/development/") ? "development" : "usage";
 
   return (
     <Box
@@ -139,8 +137,8 @@ function SidebarContent() {
 
         <DocsSearch />
 
-        <SectionTabs
-          value={activeSection}
+        <SidebarTabs
+          value={sectionActive}
           onValueChange={section => {
             const node = navTree.find(node => node.slug === section);
             const href = node ? findFirstChildHrefRecursively(node.children) : "/";
@@ -148,22 +146,36 @@ function SidebarContent() {
           }}
         />
 
-        <MenuLeft pathname={pathname} nodes={nodes} depth={0} />
+        <SidebarLeft
+          pathname={pathname}
+          nodes={navTree.find(node => node.slug === sectionActive)?.children ?? []}
+          depth={0}
+        />
       </Stack>
     </Box>
   );
 }
 
-function SectionTabs(props: { value: SectionKey; onValueChange: (value: SectionKey) => void }) {
+const sidebarTabs = {
+  usage: { label: "Usage", icon: GoPerson },
+  development: { label: "Development", icon: GoCommandPalette },
+} as const;
+
+type SidebarTabId = keyof typeof sidebarTabs;
+
+function SidebarTabs(props: {
+  value: SidebarTabId;
+  onValueChange: (value: SidebarTabId) => void;
+}) {
   return (
     <Tabs.Root
       value={props.value}
-      onValueChange={e => props.onValueChange(e.value as SectionKey)}
+      onValueChange={details => props.onValueChange(details.value as SidebarTabId)}
       variant="plain"
       size="sm"
     >
       <Tabs.List bg="bg.muted" rounded="l3" p="1" flex="1">
-        {Object.entries(sectionTabs).map(([value, section]) => (
+        {Object.entries(sidebarTabs).map(([value, section]) => (
           <Tabs.Trigger
             key={value}
             value={value}
@@ -190,18 +202,11 @@ function SectionTabs(props: { value: SectionKey; onValueChange: (value: SectionK
   );
 }
 
-type SectionKey = keyof typeof sectionTabs;
-
-const sectionTabs = {
-  usage: { label: "Usage", icon: LuUser },
-  development: { label: "Development", icon: LuFolder },
-} as const;
-
-function MenuLeft(props: { pathname: string; nodes: NavNode[]; depth: number }) {
+function SidebarLeft(props: { pathname: string; nodes: NavNode[]; depth: number }) {
   return (
     <Stack w="full" gap={props.depth === 0 ? "6" : "0"}>
       {props.nodes.map(node => (
-        <MenuLeftNode
+        <SidebarLeftNode
           key={node.slug}
           pathname={props.pathname}
           node={node}
@@ -212,14 +217,14 @@ function MenuLeft(props: { pathname: string; nodes: NavNode[]; depth: number }) 
   );
 }
 
-function MenuLeftNode(props: { pathname: string; node: NavNode; depth: number }) {
+function SidebarLeftNode(props: { pathname: string; node: NavNode; depth: number }) {
   const isLeaf = props.node.children.length === 0;
 
   if (props.depth === 0) {
     return (
       <Stack gap="3">
         {props.node.href ? (
-          <SideNavLink
+          <SidebarLink
             href={props.node.href}
             data-current={props.pathname === props.node.href ? "" : undefined}
             w="fit-content"
@@ -229,7 +234,7 @@ function MenuLeftNode(props: { pathname: string; node: NavNode; depth: number })
             </Heading>
 
             {props.node.isNewBadge && <BadgeNew />}
-          </SideNavLink>
+          </SidebarLink>
         ) : (
           <HStack w="fit-content">
             <Heading as="h5" textStyle="sm">
@@ -239,7 +244,7 @@ function MenuLeftNode(props: { pathname: string; node: NavNode; depth: number })
           </HStack>
         )}
         {props.node.children.length > 0 && (
-          <MenuLeft pathname={props.pathname} nodes={props.node.children} depth={1} />
+          <SidebarLeft pathname={props.pathname} nodes={props.node.children} depth={1} />
         )}
       </Stack>
     );
@@ -248,7 +253,7 @@ function MenuLeftNode(props: { pathname: string; node: NavNode; depth: number })
   if (isLeaf || props.node.href) {
     return (
       <>
-        <SideNavLink
+        <SidebarLink
           href={props.node.href}
           variant="line"
           size="md"
@@ -259,10 +264,10 @@ function MenuLeftNode(props: { pathname: string; node: NavNode; depth: number })
           <Span flex="1">{props.node.title}</Span>
 
           {props.node.isNewBadge && <BadgeNew />}
-        </SideNavLink>
+        </SidebarLink>
 
         {props.node.children.length > 0 && (
-          <MenuLeft
+          <SidebarLeft
             pathname={props.pathname}
             nodes={props.node.children}
             depth={props.depth + 1}
@@ -285,12 +290,16 @@ function MenuLeftNode(props: { pathname: string; node: NavNode; depth: number })
         {props.node.title}
       </Text>
 
-      <MenuLeft pathname={props.pathname} nodes={props.node.children} depth={props.depth + 1} />
+      <SidebarLeft
+        pathname={props.pathname}
+        nodes={props.node.children}
+        depth={props.depth + 1}
+      />
     </>
   );
 }
 
-function MobileMenuDrawer() {
+function SidebarMobileDrawer() {
   return (
     <Drawer.Root placement="start">
       <Drawer.Trigger asChild>
@@ -326,7 +335,7 @@ function MobileMenuDrawer() {
   );
 }
 
-const SideNavLink = chakra("a", {
+const SidebarLink = chakra("a", {
   base: {
     gap: "3",
     display: "flex",
