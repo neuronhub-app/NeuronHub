@@ -27,7 +27,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/docs:0.3.2.0-rc.5
+            url: ghcr.io/neuronhub-app/neuronhub/docs:0.3.2.0-rc.6
           domains:
             - stage.docs.neuronhub.app
           envVars:
