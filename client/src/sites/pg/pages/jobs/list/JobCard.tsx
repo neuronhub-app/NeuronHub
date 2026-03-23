@@ -86,15 +86,10 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
         : CardState.Closed;
 
   function onCardClick(e: { target: EventTarget | null }) {
-    if (props.job.url_external && !(e.target as HTMLElement).closest("a, button")) {
-      window.open(props.job.url_external, "_blank");
+    if (!(e.target as HTMLElement).closest("a, button")) {
+      mutable.card =
+        mutable.card === CardState.OpenByUser ? CardState.Closed : CardState.OpenByUser;
     }
-  }
-
-  function onToggleClick(e: { stopPropagation: () => void }) {
-    e.stopPropagation();
-    mutable.card =
-      mutable.card === CardState.OpenByUser ? CardState.Closed : CardState.OpenByUser;
   }
 
   return (
@@ -237,7 +232,6 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
           bottom="0"
           w={{ base: "12", md: "16" }}
           borderRadius="lg"
-          onClick={onToggleClick}
           cursor="pointer"
           userSelect="none"
         >
