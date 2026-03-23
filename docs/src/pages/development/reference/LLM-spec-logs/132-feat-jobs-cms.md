@@ -2,7 +2,7 @@
 
 We're adding a primitive CMS for Jobs FAQ and site Header.
 
-Focus on the unchecked task.
+Focus on the unchecked tasks.
 
 ### Tasks
 - [x] replace `NavLinkSection.Footer*` with `NavLinkSection.FooterColumn` and a shared model `SiteFooterColumn` that has `SiteNavLink` inlines with `FooterSection.*`, and a field `.title: str`. Use adminsortable2.
@@ -23,16 +23,30 @@ Focus on the unchecked task.
 - [x] add `adminsortable2` to `FooterSection`
 - [x] refactor: add `FooterSection` as inline to `SiteConfig`. Remove FK to `SiteConfig`.
 - [x] debug the pytest error of `server/neuronhub/apps/sites/graphql__test.py`
+- [x] for VITE_SITE=pg hardcode the `light` theme, and ignore the system theme
+- [x] fix JobCard invisible links - instead make the JobCard open
+- [x] hover on JobCard, facets, "clear all filters", search input
+- [x] reduce the CLS on PgAlgoliaList
+    - it shows "Search not available" - but must show skeletons to match and remove the shit.
+    - use docs/e2e/tests/content-layout-shift.spec.ts as a base. Expect almost 0 CLS.
+- [x] `Showing 0 out of 18 jobs` - replace `0` with SkeletonText, 4 numbers-wide.
+- [x] make JobCard hover with light border
+
+Create a feedback loop through E2E and target-sized screenshots -> make a subagent review the screenshots and report.
 
 ## Relevant-Files
 
-- server/neuronhub/apps/jobs/models.py - JobFaqQuestion (MarkdownField, order, FK to `site`)
-- server/neuronhub/apps/jobs/graphql.py - JobFaqQuestionType + query
-- server/neuronhub/apps/sites/models.py
-- server/neuronhub/apps/sites/admin.py
-- client/src/apps/jobs/faq/JobFaqPage.tsx - GraphQL + Prose + markedConfigured
-- client/src/sites/pg/components/PgAlgoliaList.tsx - `ctaMobile` prop
-- docs/src/pages/usage/reference/database-tables/JobFaqQuestion.mdx - docs
+- client/src/sites/pg/components/PgAlgoliaList.tsx - skeleton, CLS fix, ClearAllFiltersButton hover
+- client/src/sites/pg/components/PgFiltersTopbar.tsx - 10 facets in Grid(5,1fr) layout
+- client/src/sites/pg/components/PgSearchInput.tsx - search input (h="10")
+- client/src/sites/pg/components/PgFacetPopover.tsx - facet trigger Button(size="md")
+- client/src/sites/pg/pages/jobs/list/JobCard.tsx - card open/hover, external links
+- client/src/sites/pg/pages/jobs/list/JobList.tsx - PgAlgoliaList consumer, Contact link
+- client/src/sites/pg/PgLayout.tsx - nav/footer links, external link attrs
+- client/src/utils/useAlgoliaSearchClient.ts - algolia init, loading state
+- client/src/utils/useInit.ts - has bug: finally{} resets isLoading immediately
+- client/e2e/tests/nav-links-CLS.spec.ts - CLS e2e test (currently has debug code)
+- docs/e2e/tests/content-layout-shift.spec.ts - reference CLS test
 
 ## Decision-Log
 
@@ -52,4 +66,16 @@ Focus on the unchecked task.
 - Refac: drop `FooterLink.site` FK
 - Fix: replace pytest `--no-migrations` with `--reuse-db`
     - `no-migrations` creates db by inspecting models - ie skips `RunPython()`
-- Fix: User.mdx hardcoded URL -> `env.VITE_SERVER_URL`
+- Fix: JobCard click opens card instead of `window.open(url_external)`
+    - "Job Details" button in expanded card handles external nav
+- Fix: hover `_hover={{ borderColor: "fg.muted" }}` on JobCard, facets, search
+- Issue: CLS on PgAlgoliaList
+    - Root: skeleton->real transition caused footer to bounce in/out of viewport
+    - Fix: `minH="100vh"` on `<Stack as="main">` in PgLayout [quiet stupid]
+      => footer stays below viewport during transitions, CLS 0.35 -> 0.006
+    - Fix: `useInit` bug — `finally{}` reset `isLoading` for async [I confirmed the issue]
+    - Fix: `PgSearchStats` — `Skeleton` for "Showing 0" initial load
+    - Fix: CLS e2e test — follows docs/ pattern, no debug code
+- Fix: PgSearchStats "Showing 0" CLS
+    - `stats.processingTimeMS === 0` detects pre-first-search state
+    - Skeleton `w="4ch"` reserves space for number
