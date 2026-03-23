@@ -28,6 +28,7 @@ export function PgFacetPopover(props: {
           bg="bg.card"
           color="fg"
           borderColor="brand.gray"
+          _hover={{ borderColor: "fg.muted" }}
           _open={{ borderColor: "fg" }}
           borderRadius="sm"
           justifyContent="space-between"

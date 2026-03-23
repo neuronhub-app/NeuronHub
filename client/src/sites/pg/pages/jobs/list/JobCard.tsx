@@ -109,6 +109,9 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
       bg="bg.card"
       fontFamily="body"
       cursor="pointer"
+      _hover={{
+        borderColor: cardState === CardState.OpenByUser ? "brand.black" : "fg.subtle",
+      }}
       css={style.markHighlight}
       {...ids.set(ids.job.card.container)}
       data-id={props.job.id}

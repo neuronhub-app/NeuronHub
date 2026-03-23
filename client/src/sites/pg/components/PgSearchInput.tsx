@@ -40,6 +40,7 @@ export function PgSearchInput(props: { testId?: string }) {
         borderRadius="md"
         borderWidth="1px"
         borderColor="brand.gray"
+        _hover={{ borderColor: "fg.muted" }}
         _placeholder={{ color: "brand.gray.muted", fontSize: "sm" }}
       />
     </InputGroup>

@@ -482,6 +482,7 @@ function ClearAllFiltersButton(props: { onClear?: () => void }) {
       fontSize="sm"
       fontWeight="medium"
       cursor="pointer"
+      _hover={{ color: "brand.green.light" }}
     >
       <Icon boxSize="3.5">
         <LuSquareX />
