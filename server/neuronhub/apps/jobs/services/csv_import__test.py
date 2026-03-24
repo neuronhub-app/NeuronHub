@@ -1,6 +1,7 @@
 """
 #AI-slop
 """
+
 from pathlib import Path
 
 import pytest

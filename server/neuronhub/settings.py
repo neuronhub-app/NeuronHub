@@ -3,6 +3,7 @@ import warnings
 from enum import Enum
 from logging import getLogger
 from pathlib import Path
+from typing import Literal
 from typing import TypedDict
 
 import dj_database_url
@@ -250,7 +251,7 @@ ANYMAIL = {
     "POSTMARK_SERVER_TOKEN": env.str("POSTMARK_SERVER_TOKEN", ""),
 }
 ADMIN_EMAIL = env.str("ADMIN_EMAIL", "")
-DEFAULT_FROM_EMAIL = ADMIN_EMAIL
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", ADMIN_EMAIL)
 SERVER_EMAIL = ADMIN_EMAIL
 if not ADMIN_EMAIL:
     logger.warning("env.ADMIN_EMAIL is missing")
@@ -437,4 +438,5 @@ class CONF_CONFIG:
 # apps.jobs
 # ---------------------------------------------------------------------------------------------------------
 # see [[Sub-sites-with-VITE_SITE.md]]
-VITE_SITE = env.str("VITE_SITE", "")
+VITE_SITE: Literal["", "pg"] = env.str("VITE_SITE", "")
+CLIENT_URL_JOBS_PREFIX = "" if VITE_SITE == "pg" else "/jobs"

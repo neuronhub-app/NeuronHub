@@ -86,10 +86,7 @@ async def _send_job_notification(
     site = await SiteConfig.get_solo()
     filters = await _get_alert_filters_dict(alert)
 
-    client_jobs_url = f"{settings.CLIENT_URL}/jobs"
-    is_probably_good_site = settings.VITE_SITE == "pg"
-    if is_probably_good_site:
-        client_jobs_url = f"{settings.CLIENT_URL}"
+    client_jobs_url = f"{settings.CLIENT_URL}{settings.CLIENT_URL_JOBS_PREFIX}"
 
     html = await sync_to_async(_render_email_html)(
         template_name="jobs/job_alert.html",
@@ -151,12 +148,14 @@ async def _get_email_context(
     if filters is None:
         filters = await _get_alert_filters_dict(alert)
 
+    subs_url = f"{settings.CLIENT_URL}{settings.CLIENT_URL_JOBS_PREFIX}/subscriptions"
+
     return {
         "site_name": site.name,
         "site_domain": site.domain,
         "client_url": settings.CLIENT_URL,
-        "unsubscribe_url": f"{settings.CLIENT_URL}/jobs/subscriptions/remove/{alert.id_ext}",
-        "job_alerts_management_url": f"{settings.CLIENT_URL}/jobs/subscriptions/{alert.id_ext}",
+        "unsubscribe_url": f"{subs_url}/remove/{alert.id_ext}",
+        "job_alerts_management_url": f"{subs_url}/{alert.id_ext}",
         "filters": filters,
         "has_filters": any(filters.values()),
         "feedback_form_url": site.feedback_form_url,

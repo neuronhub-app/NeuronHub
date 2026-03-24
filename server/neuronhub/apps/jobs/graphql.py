@@ -235,6 +235,20 @@ class JobsMutation:
         return True
 
     @strawberry.mutation
+    async def job_alert_access_session_by_id_ext(
+        self, id_ext: uuid.UUID, info: strawberry.Info
+    ) -> bool:
+        """
+        Access JobAlerts by .id_ext
+        """
+        if not await JobAlert.objects.filter(id_ext=id_ext).aexists():
+            return False
+        session_ids = await _read_session_job_alerts(info)
+        if str(id_ext) not in session_ids:
+            await _save_session_job_alert(info=info, alert_id_ext=id_ext)
+        return True
+
+    @strawberry.mutation
     async def job_alert_unsubscribe(self, id_ext: uuid.UUID, info: strawberry.Info) -> bool:
         # No session check/login - .id_ext is enough
         alert = await JobAlert.objects.filter(id_ext=id_ext).afirst()

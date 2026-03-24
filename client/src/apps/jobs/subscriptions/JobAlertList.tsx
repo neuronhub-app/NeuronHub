@@ -25,12 +25,26 @@ import { urls } from "@/urls";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { format } from "@neuronhub/shared/utils/format";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
+import { useInit } from "@/utils/useInit";
 import { useIsLoading } from "@/utils/useIsLoading";
 
-export function JobAlertList(props: { unsubscribeAlertIdExt?: string }) {
+export function JobAlertList(props: {
+  unsubscribeByIdExt?: string;
+  accessSessionByIdExt?: string;
+}) {
+  useInit({
+    isReady: props.accessSessionByIdExt,
+    onInit: async () => {
+      await mutateAndRefetchMountedQueries(JobAlertAccessSessionByIdMutation, {
+        id_ext: props.accessSessionByIdExt!,
+      });
+    },
+    dependencies: [props.accessSessionByIdExt],
+  });
+
   const { data, isLoadingFirstTime } = useApolloQuery(JobAlertListQuery);
 
-  const unsubscribe = useJobUnsubscribeHandler(props.unsubscribeAlertIdExt);
+  const unsubscribe = useJobUnsubscribeHandler(props.unsubscribeByIdExt);
 
   if (isLoadingFirstTime) {
     return <Text color="fg.muted">Loading subscriptions...</Text>;
@@ -228,6 +242,15 @@ const JobAlertRemoveMutation = graphql.persisted(
   graphql(`
     mutation JobAlertRemove($id_ext: UUID!) {
       job_alert_remove(id_ext: $id_ext)
+    }
+  `),
+);
+
+const JobAlertAccessSessionByIdMutation = graphql.persisted(
+  "JobAlertAccessSessionById",
+  graphql(`
+    mutation JobAlertAccessSessionById($id_ext: UUID!) {
+      job_alert_access_session_by_id_ext(id_ext: $id_ext)
     }
   `),
 );

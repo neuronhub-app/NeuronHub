@@ -63,6 +63,9 @@ export const urls = {
       return `${this.list === "/" ? "" : this.list}/${slug}` as const;
     },
     versions: env.VITE_SITE === "pg" ? "/versions" : "/jobs/versions",
+    subscriptionsManage(idExt: string) {
+      return `${this.subscriptions}/${idExt}` as const;
+    },
     subscriptionsRemove(idExt: string) {
       return `${this.subscriptions}/remove/${idExt}` as const;
     },

@@ -6,6 +6,7 @@ export const routes = [
   layout("./sites/pg/PgLayout.tsx", [
     route("/", "./sites/pg/pages/jobs/list/index.tsx"),
     route("/subscriptions", "./apps/jobs/subscriptions/index.tsx"),
+    route("/subscriptions/:id_ext", "./apps/jobs/subscriptions/access-session-by-id-ext.tsx"),
     route("/subscriptions/remove/:id_ext", "./apps/jobs/subscriptions/remove.tsx"),
     route("/versions", "./apps/jobs/versions/index.tsx"),
     route("/:slug", "./sites/pg/pages/jobs/list/slug.tsx"),

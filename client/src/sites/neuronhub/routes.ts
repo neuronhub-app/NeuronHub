@@ -27,6 +27,7 @@ export const routes = [
       route("/", "./apps/jobs/list/index.tsx"),
       route("/faq", "./apps/jobs/faq/index.tsx"),
       route("/subscriptions", "./apps/jobs/subscriptions/index.tsx"),
+      route("/subscriptions/:id_ext", "./apps/jobs/subscriptions/access-session-by-id-ext.tsx"),
       route("/subscriptions/remove/:id_ext", "./apps/jobs/subscriptions/remove.tsx"),
       route("/versions", "./apps/jobs/versions/index.tsx"),
       route("/:slug", "./apps/jobs/list/slug.tsx"),

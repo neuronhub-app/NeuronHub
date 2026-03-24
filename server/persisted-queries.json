@@ -5,6 +5,7 @@
   "CreateOrUpdatePostTagVote": "mutation CreateOrUpdatePostTagVote($post_id: ID!, $tag_id: ID!, $is_vote_positive: Boolean) {\n  post_tag_vote_create_or_update(\n    post_id: $post_id\n    tag_id: $tag_id\n    is_vote_positive: $is_vote_positive\n  )\n}",
   "HighlighterCreate": "mutation HighlighterCreate($id: ID!, $text: String!, $text_prefix: String, $text_postfix: String) {\n  post_highlight_create(\n    data: {post: {set: $id}, text: $text, text_postfix: $text_postfix, text_prefix: $text_prefix}\n  )\n}",
   "HighlighterDelete": "mutation HighlighterDelete($id: ID!) {\n  post_highlight_delete(data: {id: $id})\n}",
+  "JobAlertAccessSessionById": "mutation JobAlertAccessSessionById($id_ext: UUID!) {\n  job_alert_access_session_by_id_ext(id_ext: $id_ext)\n}",
   "JobAlertList": "query JobAlertList {\n  job_alerts {\n    id\n    id_ext\n    email\n    tags {\n      name\n      category_name\n    }\n    is_orgs_highlighted\n    is_remote\n    salary_min\n    is_active\n    created_at\n    sent_count\n  }\n}",
   "JobAlertRemove": "mutation JobAlertRemove($id_ext: UUID!) {\n  job_alert_remove(id_ext: $id_ext)\n}",
   "JobAlertSubscribe": "mutation JobAlertSubscribe($email: String!, $tag_names: [String!], $is_orgs_highlighted: Boolean, $is_remote: Boolean, $salary_min: Int, $tz: String) {\n  job_alert_subscribe(\n    email: $email\n    tag_names: $tag_names\n    is_orgs_highlighted: $is_orgs_highlighted\n    is_remote: $is_remote\n    salary_min: $salary_min\n    tz: $tz\n  )\n}",

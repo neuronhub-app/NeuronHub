@@ -9,7 +9,7 @@ import { urls } from "@/urls";
 
 const isSiteProbablyGood = env.VITE_SITE === "pg";
 
-test.describe("JobList", () => {
+test.describe("Job Alert", () => {
   let play: PlaywrightHelper;
   let $: LocatorMapToGetFirstById;
 
@@ -23,16 +23,21 @@ test.describe("JobList", () => {
     });
   });
 
-  // todo ! refac: #AI-slop, trash matchers, magic strings, no testid
-  // replace "Subscriptions (1)" and "Subscriptions" with some `data-{}` attribute and testid usage
-  test("subscribe to JobAlert, toggle and remove on /jobs/subscriptions/", async ({ page }) => {
+  // todo ! refac: #AI-slop - magic strings wo testid
+  // replace "Subscriptions (1)" with a `data-{}` & testid
+  test("subscribe => .is_active to false => clearCookies => 'auth' by /jobs/subscriptions/:id_ext => delete", async ({
+    page,
+    context,
+  }) => {
     await play.navigate(urls.jobs.list);
 
+    const sidebarSubsLabel = "Subscriptions";
+
     if (!isSiteProbablyGood) {
-      await expect($[ids.layout.sidebar]).not.toHaveText("Subscriptions");
+      await expect($[ids.layout.sidebar]).not.toHaveText(sidebarSubsLabel);
     }
 
-    const testEmail = "e2e@test.com";
+    const testEmail = "e2e@neuronhub.app";
 
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
@@ -41,23 +46,35 @@ test.describe("JobList", () => {
     await mutationSubscribe;
 
     if (!isSiteProbablyGood) {
-      await expect($[ids.layout.sidebar]).toHaveText("Subscriptions (1)");
+      await expect($[ids.layout.sidebar]).toHaveText(`${sidebarSubsLabel} (1)`);
     }
 
+    const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);
     await play.navigate(urls.jobs.subscriptions);
+    const alertsRes = await alertsQuery;
     await expect($[ids.job.subscriptions.card]).toHaveText(testEmail);
 
-    // Pause & delete JobAlert
+    // .is_active to false
     await play.click(ids.job.subscriptions.toggleBtn);
     await expect($[ids.job.subscriptions.status.inactive]).toBeVisible();
+
+    // 'auth' by /jobs/subscriptions/:id_ext
+    await context.clearCookies();
+    const alert = alertsRes.data.job_alerts!.find(a => a.email === testEmail)!;
+    await page.goto(urls.jobs.subscriptionsManage(alert.id_ext));
+    await play.waitForNetworkIdle();
+    await expect($[ids.job.subscriptions.card]).toBeVisible();
+    await expect($[ids.job.subscriptions.card]).toHaveText(testEmail);
+
+    // delete
     await play.click(ids.job.subscriptions.removeBtn);
     await expect(page).not.toHaveText(testEmail);
   });
 
-  test("subscribe & call /jobs/subscriptions/remove/:id_ext", async ({ page }) => {
+  test("subscribe => delete by /jobs/subscriptions/remove/:id_ext", async ({ page }) => {
     await play.navigate(urls.jobs.list);
 
-    const testEmail = "e2e@test.com";
+    const testEmail = "e2e@neuronhub.app";
 
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
