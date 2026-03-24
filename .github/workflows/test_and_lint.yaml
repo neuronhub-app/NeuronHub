@@ -65,7 +65,7 @@ jobs:
       - run: mise run install-deps:server
 
       - name: Pytest
-        run: mise run test:pytest --marks="not slow_llm_api and not firebase_subscription and not profiles_csv_import"
+        run: mise run test:pytest --markers="not slow_llm_api and not firebase_subscription"
 
       - run: mise run install-deps:client
 
