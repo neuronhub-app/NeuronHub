@@ -114,12 +114,16 @@ async def _send_job_notification(
                 job_alert=alert,
                 job=job,
                 email_hash=JobAlertLog.hash_email(alert.email),
+                jobs_notified_count=len(jobs),
             )
             for job in jobs
         ]
     )
 
-    await JobAlert.objects.filter(id=alert.id).aupdate(sent_count=F("sent_count") + 1)
+    await JobAlert.objects.filter(id=alert.id).aupdate(
+        sent_count=F("sent_count") + 1,
+        jobs_notified_count=F("jobs_notified_count") + len(jobs),
+    )
     return True
 
 

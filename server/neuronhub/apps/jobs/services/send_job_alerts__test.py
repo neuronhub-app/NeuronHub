@@ -89,6 +89,22 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert test_name in email_html
         assert test_addr in email_html
 
+    async def test_jobs_notified_count_increment(self):
+        alert = await self.gen.jobs.job_alert()
+        await self.gen.jobs.job()
+        await self.gen.jobs.job()
+
+        await send_job_alerts()
+
+        await alert.arefresh_from_db()
+        assert alert.jobs_notified_count == 2
+
+        await self.gen.jobs.job()
+        await send_job_alerts()
+
+        await alert.arefresh_from_db()
+        assert alert.jobs_notified_count == 3
+
     # tags_* filters
     # ----------------------------------------------------------------------------
     # todo ? refac: parametrize to dedup

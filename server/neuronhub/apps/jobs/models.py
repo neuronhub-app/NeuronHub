@@ -230,10 +230,11 @@ class JobAlert(TimeStampedModel):
     is_active = models.BooleanField(default=True)
 
     sent_count = models.PositiveIntegerField(default=0)
+    jobs_notified_count = models.PositiveIntegerField(default=0)
     jobs_clicked_count = models.PositiveIntegerField(default=0)
     jobs_clicked = models.ManyToManyField(Job, blank=True)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(excluded_fields=["jobs_notified_count"])
 
     def __str__(self):
         is_active_flag = "" if self.is_active else ", inactive"
@@ -281,6 +282,7 @@ class JobAlertLog(TimeStampedModel):
         related_name="alert_logs",
     )
     email_hash = models.CharField(max_length=128, blank=True)
+    jobs_notified_count = models.PositiveIntegerField(default=0)
     sent_at = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
