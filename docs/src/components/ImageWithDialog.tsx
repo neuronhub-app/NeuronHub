@@ -1,7 +1,7 @@
 import { Center, Dialog, Image, Portal } from "@chakra-ui/react";
 import { ids } from "@/e2e/ids";
 
-export function ImageWithDialog(props: { src: string; alt: string; isDimmed?: boolean }) {
+export function ImageWithDialog(props: { src: string; alt?: string; isDimmed?: boolean }) {
   const style = {
     maxW: "94vw",
     maxH: "94vh",
@@ -13,7 +13,11 @@ export function ImageWithDialog(props: { src: string; alt: string; isDimmed?: bo
         <Center>
           <Image
             src={props.src}
-            alt={props.alt}
+            alt={
+              props.alt
+                ? props.alt
+                : props.src.match(/(?<name>[\w-]+).(avif|png|jpe?g)/)?.groups?.name
+            }
             maxW="min(550px, 100%)"
             boxShadow="xl"
             cursor="zoom-in"
