@@ -3,8 +3,14 @@ title: Deployment
 order: 0
 ---
 
-import { CodeBlockText } from "@/components/CodeBlockText"
-import { Notice } from "@/components/Notice";
+import {
+  CodeBlockText,
+  LinkExt,
+  Notice,
+  PageLink,
+  BadgeNew, ImageWithDialog,
+} from "@/components";
+
 
 ## Using Docker Compose
 
@@ -123,20 +129,57 @@ To create an Rclone "S3 bucket" create dir, eg `mkdir -p /srv/neuronhub/media/da
 
 ### Algolia setup
 
-I recommend creating `ALGOLIA_API_KEY` and `ALGOLIA_SEARCH_API_KEY` that are limited to `Indices: *_prod*` in [the key settings](https://dashboard.algolia.com/account/api-keys/restricted) instead of using the global Write/Search API keys.
+I recommend creating `ALGOLIA_API_KEY` and `ALGOLIA_SEARCH_API_KEY` that are limited to `Indices: *_prod*` in <LinkExt href="https://dashboard.algolia.com/account/api-keys/restricted">the key settings</LinkExt> instead of using the global Write/Search API keys.
 
 After the first deploy, connect to the `server` docker container, and run:
 
 <CodeBlockText lang="bash">{"cd /app/; uv run manage.py algolia_reindex"}</CodeBlockText>
 
+
 ## Upgrades
 
 Watch out for the `BREAKING CHANGE` notes in the release descriptions - it's specifically for self-hosting.
 
-You may use `:latest` docker tag, but I advice to hardcode the non-breaking release eg `1.1`, as the two last numbers are for non-breaking changes, ie `1.1.2.2` won't break your deployment.
+You may use `:latest` docker tag, but I advise to hardcode the non-breaking release eg `1.1`, as the two last numbers are for non-breaking changes, ie `1.1.2.2` won't break your deployment.
+
 
 ## Caveats
 
 ### Vite prod is using a wrong VITE_SERVER_URL
 
 During the `docker build` step, the `npx react-router build` hardcodes `VITE_SERVER_URL`, ie it ignores the runtime envs as `SERVER_URL` and others.
+
+
+## Integrations Checklist
+
+### Sentry
+
+#### Settings
+
+In <LinkExt href="https://sentry.io/settings/security-and-privacy/">Security</LinkExt> enable:
+- `Require Two-Factor Authentication`
+- `Enhanced Privacy`
+- `Prevent Storing of IP Addresses`
+
+#### Github
+
+- Connect GitHub on the <LinkExt href="https://sentry.io/settings/integrations/">Integrations page</LinkExt>.
+- Press `Configure` to open the page as `/settings/integrations/github/{id}/`, type `neuronhub` to trigger the search and select it.
+- Check `Sync Sentry Comments to GitHub`.
+- Press `Code Mappings` -> `Add Code Mapping`, values:
+    - `neuronhub-backend`:
+        - `master`
+        - `neuronhub/`
+        - `server/neuronhub/`
+    - `neuronhub-frontend`:
+        - `master`
+        - `client/`
+        - `client/src/`
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/integration-github.avif" />
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/integration-github-code-map-backend.avif" />
+
+#### Slack <BadgeNew />
+
+- Connect Slack on the <LinkExt href="https://sentry.io/settings/integrations/slack/">Integrations page</LinkExt> by `Add Workspace`.
+- I advise to add Alerts for `neuronhub-backend`, as frontend is too noisy. For more read <PageLink id="Sentry" />.
