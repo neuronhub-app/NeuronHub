@@ -110,10 +110,13 @@ class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmi
             "Job alert emails".upper(),
             {
                 "fields": [
-                    "email_template_job_alert",
-                    "email_template_job_alert_confirmation",
+                    "logo_url",
                     "feedback_form_url",
                     "submit_job_url",
+                    "email_template_job_alert",
+                    "email_template_job_alert_confirmation",
+                    "email_html_about_us",
+                    "email_html_feedback_request",
                 ],
                 "classes": ["collapse"],
             },

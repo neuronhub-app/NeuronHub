@@ -86,8 +86,6 @@ async def _send_job_notification(
     site = await SiteConfig.get_solo()
     filters = await _get_alert_filters_dict(alert)
 
-    client_jobs_url = f"{settings.CLIENT_URL}{settings.CLIENT_URL_JOBS_PREFIX}"
-
     html = await sync_to_async(_render_email_html)(
         template_name="jobs/job_alert.html",
         context={
@@ -95,9 +93,8 @@ async def _send_job_notification(
             "jobs": jobs,
             "jobs_matched_count": len(jobs),
             "jobs_total_count": jobs_total_count,
-            "client_jobs_url": client_jobs_url,
             # todo !! fix
-            "client_jobs_matched_url": client_jobs_url,
+            "client_jobs_matched_url": f"{settings.CLIENT_URL}{settings.CLIENT_URL_JOBS_PREFIX}",
         },
         template_override=site.email_template_job_alert,
     )
@@ -162,9 +159,13 @@ async def _get_email_context(
         "job_alerts_management_url": f"{subs_url}/{alert.id_ext}",
         "filters": filters,
         "has_filters": any(filters.values()),
+        "logo_url": site.logo_url,
         "feedback_form_url": site.feedback_form_url,
         "submit_job_url": site.submit_job_url,
         "address": site.address,
+        "client_jobs_url": f"{settings.CLIENT_URL}{settings.CLIENT_URL_JOBS_PREFIX}",
+        "email_html_about_us": site.email_html_about_us,
+        "email_html_feedback_request": site.email_html_feedback_request,
     }
 
 

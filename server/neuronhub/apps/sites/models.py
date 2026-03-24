@@ -31,6 +31,13 @@ class SiteConfig(SingletonModel):
         help_text="Identifier. Also matches /client/src/sites/{directory}/",
     )
 
+    logo_url = models.URLField(
+        max_length=512,
+        blank=True,
+        default="",
+        help_text="Absolute URL to the site logo PNG (exported at 2-3x for retina). Displayed at width=180px in email headers. Leave blank for text-only header.",
+    )
+
     address = models.CharField(
         max_length=512,
         blank=True,
@@ -49,6 +56,17 @@ class SiteConfig(SingletonModel):
         blank=True,
         default="",
         help_text="URL for 'landed a role' / 'report placement' link in Job alert emails",
+    )
+
+    email_html_about_us = models.TextField(
+        blank=True,
+        default="",
+        help_text="HTML for the 'About' paragraph in job alert emails. Supports inline-styled <a> tags. Leave blank for generic text.",
+    )
+    email_html_feedback_request = HtmlField(
+        blank=True,
+        default="",
+        help_text="HTML for the 'landed a role' section. Supports inline-styled <a> tags. Leave blank for generic text.",
     )
 
     email_template_job_alert = HtmlField(
