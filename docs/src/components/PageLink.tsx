@@ -21,6 +21,7 @@ const links = {
   "job-alert-emails": "/usage/reference/job-alert-emails",
   JobAlert: "/usage/reference/database-tables/jobalert",
   Sentry: "/usage/guides/sentry",
+  Linear: "/usage/guides/linear",
   Algolia: "/usage/guides/algolia",
   JobAlertLog: "/usage/reference/database-tables/jobalertlog",
   SiteConfig: "/usage/guides/siteconfig",

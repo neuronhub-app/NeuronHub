@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 
-from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_matching_qs
+from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_qs_by_alert
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
@@ -12,6 +12,14 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class TestSendJobAlertEmails(NeuronTestCase):
+    async def test_skips_jobs_created_before_subscription(self):
+        await self.gen.jobs.job()
+        alert = await self.gen.jobs.job_alert()
+
+        stats = await send_job_alerts()
+        assert stats.skipped == 1
+        assert len(mail.outbox) == 0
+
     async def test_skips_already_notified(self):
         await self.gen.jobs.job_alert()
         await self.gen.jobs.job_alert()
@@ -89,32 +97,32 @@ class TestSendJobAlertEmails(NeuronTestCase):
         tag_uk = await self.gen.posts.tag("UK", Category.Country)
         tag_de = await self.gen.posts.tag("Germany", Category.Country)
 
+        alert = await self.gen.jobs.job_alert(tags=[tag_uk])
+
         await self.gen.jobs.job(tags=[tag_uk])
         await self.gen.jobs.job(tags=[tag_de])
 
-        alert = await self.gen.jobs.job_alert(tags=[tag_uk])
-
-        assert 1 == len(await _get_jobs_matching_qs(alert))
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
     async def test_matches_by_city_tag(self):
         tag_london = await self.gen.posts.tag("London", Category.City)
 
+        alert = await self.gen.jobs.job_alert(tags=[tag_london])
+
         await self.gen.jobs.job(tags=[tag_london])
         await self.gen.jobs.job()
 
-        alert = await self.gen.jobs.job_alert(tags=[tag_london])
-
-        assert 1 == len(await _get_jobs_matching_qs(alert))
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
     async def test_matches_by_country_visa_sponsor_tag(self):
         tag_us_visa = await self.gen.posts.tag("US Visa", Category.VisaSponsorship)
 
+        alert = await self.gen.jobs.job_alert(tags=[tag_us_visa])
+
         await self.gen.jobs.job(tags=[tag_us_visa])
         await self.gen.jobs.job()
 
-        alert = await self.gen.jobs.job_alert(tags=[tag_us_visa])
-
-        assert 1 == len(await _get_jobs_matching_qs(alert))
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
 
 Category = TagCategoryEnum

@@ -74,7 +74,7 @@ async def _send_job_notification(
     jobs: list[Job] | None,
     jobs_total_count: int,
 ) -> bool:
-    jobs = jobs or await _get_jobs_matching_qs(alert)
+    jobs = jobs or await _get_jobs_qs_by_alert(alert)
 
     if not jobs:
         return False
@@ -200,10 +200,13 @@ async def _exclude_already_emailed_jobs_using_email_logs(
     return [job for job in jobs if job.id not in sent_ids]
 
 
-async def _get_jobs_matching_qs(subscription: JobAlert) -> list[Job]:
-    qs = Job.objects.select_related("org").filter(is_published=True)
+async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
+    qs = Job.objects.select_related("org").filter(
+        is_published=True,
+        created_at__gte=alert.created_at,
+    )
 
-    if tag_ids := [tag_id async for tag_id in subscription.tags.values_list("id", flat=True)]:
+    if tag_ids := [tag_id async for tag_id in alert.tags.values_list("id", flat=True)]:
         q_obj = Q()
         for field in [
             "tags_skill",
@@ -218,14 +221,14 @@ async def _get_jobs_matching_qs(subscription: JobAlert) -> list[Job]:
             q_obj |= Q(**{f"{field}__id__in": tag_ids})
         qs = qs.filter(q_obj).distinct()
 
-    if subscription.is_orgs_highlighted:
+    if alert.is_orgs_highlighted:
         qs = qs.filter(org__is_highlighted=True)
 
-    if subscription.is_remote:
+    if alert.is_remote:
         qs = qs.filter(is_remote=True)
 
-    if subscription.salary_min:
-        qs = qs.filter(salary_min__gte=subscription.salary_min)
+    if alert.salary_min:
+        qs = qs.filter(salary_min__gte=alert.salary_min)
 
     return [job async for job in qs.order_by("-posted_at")]
 
