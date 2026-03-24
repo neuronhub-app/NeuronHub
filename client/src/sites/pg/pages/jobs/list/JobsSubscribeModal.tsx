@@ -230,7 +230,7 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "locations.name": "Remote",
   "org.is_highlighted": "Highlighted",
   "org.name": "Organisation",
-  salary_min: "Min Salary",
+  salary_min: "Minimum Salary",
   posted_at: "Posted",
   posted_at_unix: "Posted",
 };

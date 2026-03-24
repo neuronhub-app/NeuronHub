@@ -3,8 +3,49 @@ import { useRange, useRefinementList, useToggleRefinement } from "react-instants
 import { proxy, useSnapshot } from "valtio";
 import { PgFacetSalary, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
+import type { UseRefinementListProps } from "react-instantsearch";
 import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
+
+const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
+
+const roleTypeOrder = [
+  "Full-Time",
+  "Part-Time (50–80% FTE)",
+  "Part-Time (<50% FTE)",
+  "Internship",
+  "Fellowship",
+  "Volunteer",
+  "Funding",
+  "Training",
+  "Graduate Program",
+  "Expression of Interest",
+];
+
+const educationOrder = ["Undergraduate Degree or Less", "Master's Degree", "Doctoral Degree"];
+
+function sortByCustomOrder<T extends { label: string }>(items: T[], order: string[]): T[] {
+  return items.toSorted((a, b) => {
+    const indexA = order.indexOf(a.label);
+    const indexB = order.indexOf(b.label);
+    if (indexA === -1 && indexB === -1) {
+      return 0;
+    }
+    if (indexA === -1) {
+      return 1;
+    }
+    if (indexB === -1) {
+      return -1;
+    }
+    return indexA - indexB;
+  });
+}
+
+const transformRoleType: UseRefinementListProps["transformItems"] = items =>
+  sortByCustomOrder(items, roleTypeOrder);
+
+const transformEducation: UseRefinementListProps["transformItems"] = items =>
+  sortByCustomOrder(items, educationOrder);
 
 export const otherFiltersState = proxy({
   excludeCareerCapital: false,
@@ -43,7 +84,7 @@ function CauseAreaFacet(props: { order: FacetOrder }) {
   const causeArea = useRefinementList({ attribute: "tags_area.name" });
   return (
     <PgFacetPopover label="Cause Area" disabled={!causeArea.canRefine} order={props.order}>
-      <PgFacetAttribute attribute="tags_area.name" label="Cause Area" />
+      <PgFacetAttribute attribute="tags_area.name" label="Cause Area" sortBy={sortAlpha} />
     </PgFacetPopover>
   );
 }
@@ -52,7 +93,11 @@ function RoleTypeFacet(props: { order: FacetOrder }) {
   const roleType = useRefinementList({ attribute: "tags_workload.name" });
   return (
     <PgFacetPopover label="Role Type" disabled={!roleType.canRefine} order={props.order}>
-      <PgFacetAttribute attribute="tags_workload.name" label="Role Type" />
+      <PgFacetAttribute
+        attribute="tags_workload.name"
+        label="Role Type"
+        transformItems={transformRoleType}
+      />
     </PgFacetPopover>
   );
 }
@@ -87,7 +132,7 @@ function SalaryFacet(props: { order: FacetOrder }) {
   const salary = useRange({ attribute: "salary_min" });
   return (
     <PgFacetPopover
-      label="Salary"
+      label="Minimum Salary"
       disabled={!salary.canRefine}
       onClose={() => {
         salaryFilterState.showInfo = false;
@@ -104,12 +149,17 @@ function SkillSetFacet(props: { order: FacetOrder }) {
   const skillSet = useRefinementList({ attribute: "tags_skill.name" });
   return (
     <PgFacetPopover label="Skill Set" disabled={!skillSet.canRefine} order={props.order}>
-      <PgFacetAttribute attribute="tags_skill.name" label="Skill Set" isSearchEnabled />
+      <PgFacetAttribute
+        attribute="tags_skill.name"
+        label="Skill Set"
+        isSearchEnabled
+        sortBy={sortAlpha}
+      />
     </PgFacetPopover>
   );
 }
 
-const REMOTE_LOCATION_NAMES = ["Remote, Global", "Remote, USA", "Remote, UK", "Remote, Europe"];
+const remoteLocationNames = ["Remote, Global", "Remote, USA", "Remote, UK", "Remote, Europe"];
 
 function RemoteFacet(props: { order: FacetOrder }) {
   return (
@@ -117,7 +167,7 @@ function RemoteFacet(props: { order: FacetOrder }) {
       <PgFacetAttribute
         attribute="locations.name"
         label="Remote Roles"
-        allowedValues={REMOTE_LOCATION_NAMES}
+        allowedValues={remoteLocationNames}
       />
     </PgFacetPopover>
   );
@@ -136,7 +186,11 @@ function EducationFacet(props: { order: FacetOrder }) {
   const education = useRefinementList({ attribute: "tags_education.name" });
   return (
     <PgFacetPopover label="Education" disabled={!education.canRefine} order={props.order}>
-      <PgFacetAttribute attribute="tags_education.name" label="Education" />
+      <PgFacetAttribute
+        attribute="tags_education.name"
+        label="Education"
+        transformItems={transformEducation}
+      />
     </PgFacetPopover>
   );
 }
