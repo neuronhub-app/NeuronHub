@@ -5,6 +5,14 @@
     ALGOLIA_SEARCH_API_KEY = "73e0fded909b86d55105cac456370c53"
     ALGOLIA_INDEX_POSTFIX_USER = "{{ env.USER }}"
 
-[tools]
-    claude = "latest"
-    node = "24"
+    # For a peer project clone on the same machine:
+    # ------------------------
+    # DB_NAME = "neuronhub2"
+    # DB_PORT = "5431"
+    # ALGOLIA_INDEX_POSTFIX_USER = "{{ env.DB_NAME }}"
+    # SERVER_PORT = 7998
+    # CLIENT_PORT = 2998
+    # DOCS_PORT = 3998
+    # SERVER_PORT_E2E = 8002
+    # CLIENT_PORT_E2E = 3002
+    # DOCS_PORT_E2E = 4002
