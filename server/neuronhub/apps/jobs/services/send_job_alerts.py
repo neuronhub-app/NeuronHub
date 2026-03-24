@@ -29,20 +29,25 @@ logger = logging.getLogger(__name__)
 async def send_job_alerts(
     jobs: list[Job] | None = None,
     hour_local_to_send_at: int = 8,
+    alert_ids: list[int] | None = None,
 ) -> JobAlertStats:
     stats = JobAlertStats()
     jobs_total_count = await Job.objects.filter(is_published=True).acount()
 
-    async for job_sub in JobAlert.objects.filter(is_active=True):
+    alerts_qs = JobAlert.objects.filter(is_active=True)
+    if alert_ids is not None:
+        alerts_qs = alerts_qs.filter(id__in=alert_ids)
+
+    async for alert in alerts_qs:
         if is_wrong_hour_if_alert_has_tz := (
-            job_sub.tz and hour_local_to_send_at != datetime.now(tz=job_sub.tz).hour
+            alert.tz and hour_local_to_send_at != datetime.now(tz=alert.tz).hour
         ):
             stats.skipped_due_to_tz += 1
             continue
 
         try:
-            is_sent = await _send_job_notification(
-                alert=job_sub,
+            is_sent = await _send_job_alert(
+                alert=alert,
                 jobs=jobs,
                 jobs_total_count=jobs_total_count,
             )
@@ -53,7 +58,7 @@ async def send_job_alerts(
         except Exception:
             sentry_sdk.set_context(
                 "job_alert",
-                {"id_ext": job_sub.id_ext, "email_hash": JobAlertLog.hash_email(job_sub.email)},
+                {"id_ext": alert.id_ext, "email_hash": JobAlertLog.hash_email(alert.email)},
             )
             capture_exception()
             stats.failed += 1
@@ -69,7 +74,7 @@ class JobAlertStats:
     skipped_due_to_tz: int = 0
 
 
-async def _send_job_notification(
+async def _send_job_alert(
     alert: JobAlert,
     jobs: list[Job] | None,
     jobs_total_count: int,

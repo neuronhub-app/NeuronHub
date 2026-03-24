@@ -39,3 +39,10 @@ async def send_job_alert_emails_task():
 
         for key, value in asdict(stats).items():
             sentry_sdk.metrics.gauge(f"job_alerts.{key}", value)
+
+
+@task()
+async def send_job_alert_emails_by_ids_task(alert_ids: list[int]):
+    logger.info(f"send_job_alert_emails_by_ids_task started for {len(alert_ids)} alerts")
+    stats = await send_job_alerts(alert_ids=alert_ids)
+    logger.info(f"send_job_alert_emails_by_ids_task report: {asdict(stats)}")

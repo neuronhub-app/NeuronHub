@@ -140,5 +140,15 @@ class TestSendJobAlertEmails(NeuronTestCase):
 
         assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
+    async def test_send_alerts_by_id(self):
+        alert_1 = await self.gen.jobs.job_alert()
+        alert_2 = await self.gen.jobs.job_alert()
+        alert_3 = await self.gen.jobs.job_alert(is_active=False)
+        await self.gen.jobs.job()
+
+        stats = await send_job_alerts(alert_ids=[alert_1.id])
+        assert stats.sent == 1
+        assert len(mail.outbox) == 1
+
 
 Category = TagCategoryEnum

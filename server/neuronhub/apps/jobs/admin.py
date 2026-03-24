@@ -1,12 +1,17 @@
+from asgiref.sync import async_to_sync
 from dalf.admin import DALFModelAdmin
 from dalf.admin import DALFRelatedFieldAjaxMulti
 from django.contrib import admin
+from django.db.models import QuerySet
+from django.http import HttpRequest
+from django.http import HttpResponseForbidden
+from django.utils.safestring import mark_safe
 from simple_history.admin import SimpleHistoryAdmin
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobAlertLog
-from neuronhub.apps.jobs.models import JobFaqQuestion
+from neuronhub.apps.jobs.tasks import send_job_alert_emails_by_ids_task
 
 
 @admin.register(Job)
@@ -129,6 +134,26 @@ class JobAlertAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         "created_at",
         "updated_at",
     ]
+    actions = [
+        "trigger_send_job_alerts",
+    ]
+
+    @admin.action(
+        description="Send emails for Alerts (won't duplicate; if Alert has TZ - will work only at 8:00-8:59am)"
+    )
+    def trigger_send_job_alerts(self, request: HttpRequest, queryset: QuerySet):
+        if not request.user.is_staff:
+            return HttpResponseForbidden()
+
+        alert_ids = list(queryset.values_list("id", flat=True))
+        send_job_alert_emails_by_ids_task.enqueue(alert_ids)
+        self.message_user(
+            request,
+            mark_safe(f"""
+                Enqueued job alerts task for {len(alert_ids)} alert(s).
+                <a href="https://docs.neuronhub.app/usage/reference/job-alert-emails">Docs</a>
+            """),
+        )
 
 
 @admin.register(JobAlertLog)
