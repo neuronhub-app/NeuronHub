@@ -104,7 +104,7 @@ export function JobList(props: { slug?: string }) {
         is_remote: "Remote",
         "org.is_highlighted": "Highlighted",
         posted_at_unix: "Posted",
-        salary_min: "Salary",
+        salary_min: "Minimum Salary",
       }}
       facetsActiveDateAttributes={["posted_at_unix"]}
       facetsActiveMoneyAttributes={["salary_min"]}

@@ -1,12 +1,13 @@
 import {
   Box,
   Collapsible,
+  createListCollection,
   Flex,
   FormatNumber,
   Grid,
   HStack,
   Icon,
-  NativeSelect,
+  Select,
   Skeleton,
   SkeletonText,
   Stack,
@@ -323,27 +324,57 @@ function PgFilterCardWithSplitBg(props: { children: ReactNode; isOpenRef: RefObj
 
 function PgAlgoliaSortSelect(props: { items: Array<{ value: string; label: string }> }) {
   const sort = useSortBy({ items: props.items });
+  const collection = createListCollection({ items: props.items });
 
   return (
-    <NativeSelect.Root variant="plain" size="xs" w="fit-content">
-      <NativeSelect.Field
-        value={sort.currentRefinement}
-        onChange={event => sort.refine(event.target.value)}
-        ps="0"
-        w="fit-content"
-        fontWeight="500"
-        fontSize="sm"
-        color="brand.black"
-        _focusVisible={{ outline: "none", boxShadow: "none" }}
-      >
-        {sort.options.map(option => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </NativeSelect.Field>
-      <NativeSelect.Indicator ms="gap.sm" color="brand.black" />
-    </NativeSelect.Root>
+    <Select.Root
+      collection={collection}
+      value={[sort.currentRefinement]}
+      onValueChange={details => sort.refine(details.value[0]!)}
+      variant="ghost"
+      size="xs"
+      w="fit-content"
+    >
+      <Select.HiddenSelect />
+      <Select.Control>
+        <Select.Trigger
+          ps="0"
+          fontWeight="500"
+          fontSize="sm"
+          color="brand.black"
+          cursor="pointer"
+          _focusVisible={{ outline: "none", boxShadow: "none" }}
+        >
+          <Select.ValueText />
+          <Select.Indicator ms="gap.sm" color="brand.black" />
+        </Select.Trigger>
+      </Select.Control>
+      <Select.Positioner>
+        <Select.Content
+          bg="bg"
+          borderColor="fg"
+          borderWidth="1px"
+          borderRadius="sm"
+          p="3"
+          w="fit-content"
+          minW="unset"
+        >
+          {collection.items.map(item => (
+            <Select.Item
+              key={item.value}
+              item={item}
+              fontSize="sm"
+              color="fg"
+              cursor="pointer"
+              bg="transparent"
+              _highlighted={{ bg: "transparent", color: "brand.green.light" }}
+            >
+              {item.label}
+            </Select.Item>
+          ))}
+        </Select.Content>
+      </Select.Positioner>
+    </Select.Root>
   );
 }
 
