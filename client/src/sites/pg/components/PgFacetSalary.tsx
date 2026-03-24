@@ -68,8 +68,8 @@ function SalaryExtras(props: { isSalarySelected: boolean }) {
       </Flex>
       {snap.showInfo && (
         <Text {...textStyle}>
-          • All hourly, weekly, and monthly rates are annualized and non-US salaries are
-          converted to their USD equivalent.
+          All hourly, weekly, and monthly rates are annualized and non-US salaries are converted
+          to their USD equivalent.
         </Text>
       )}
     </>
@@ -120,12 +120,11 @@ export function PgFacetSalary() {
       </NumberInput.Root>
 
       <Slider.Root
-        value={[valueCurrent, slider.max]}
+        value={[valueCurrent]}
         min={slider.min}
         max={slider.max}
         step={slider.step}
         onValueChange={details => refine(details.value[0])}
-        thumbCollisionBehavior="push"
         size="sm"
       >
         <Slider.Control>
