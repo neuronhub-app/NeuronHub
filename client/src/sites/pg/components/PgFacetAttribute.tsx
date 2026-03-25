@@ -1,5 +1,5 @@
 import { Checkbox, Flex, Icon, Input, InputGroup, Stack, Text } from "@chakra-ui/react";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { LuX } from "react-icons/lu";
 import { useRefinementList } from "react-instantsearch";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
@@ -26,7 +26,7 @@ export function PgFacetAttribute(props: {
     sortBy: ["count:desc", "name:asc"],
     // Keep <Checkbox>s order fixed - don't move selected on top, and don't hide count=0.
     // Refs #137, ENG-56
-    transformItems(items: FacetItem[]) {
+    transformItems: useCallback((items: FacetItem[]) => {
       const result = new Map(facetValuesInitialRef.current);
       for (const facetValue of result.values()) {
         result.set(facetValue.value, { ...facetValue, count: 0 });
@@ -36,7 +36,7 @@ export function PgFacetAttribute(props: {
       }
       facetValuesInitialRef.current = result;
       return Array.from(result.values());
-    },
+    }, []),
   });
   const subRefinements = useRefinementList({
     attribute: props.subFacet?.attribute ?? props.attribute,
