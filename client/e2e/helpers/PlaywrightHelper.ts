@@ -175,7 +175,9 @@ export class PlaywrightHelper {
   async screenshot(name: string = "screenshot", { fullPage = false, maxH = 3000 } = {}) {
     this.screenshotCounter += 1;
     return this.page.screenshot({
-      path: `e2e/screenshots/${this.screenshotCounter}-${name}.png`,
+      path: `e2e/screenshots/${this.screenshotCounter}-${name}.jpeg`,
+      type: "jpeg",
+      quality: 80,
       caret: "initial",
       fullPage,
       clip: { x: 0, y: 0, height: maxH, width: 1280 },
