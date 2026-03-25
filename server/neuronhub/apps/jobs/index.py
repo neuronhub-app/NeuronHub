@@ -71,6 +71,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
             # GraphQL compatibility
             *[(f"get_json_{field}", field) for field in tag_fields],
             ["get_json_locations", "locations"],
+            ["get_locations_facet", "locations_facet"],
             *[(f"get_iso_{field}", field) for field in datetime_fields],
             # unix for Algolia's sort/filter
             *[(f"get_unix_{field}", f"{field}_unix") for field in datetime_fields],
@@ -95,6 +96,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "searchable(org.name)",
                 *[f"searchable({field}.name)" for field in tag_fields],
                 "searchable(locations.name)",
+                "searchable(locations_facet)",
                 "is_remote",
                 "is_remote_friendly",
                 "salary_min",

@@ -18,19 +18,43 @@ export function PgFacetAttribute(props: {
   allowedValues?: string[];
   sortBy?: UseRefinementListProps["sortBy"];
   transformItems?: UseRefinementListProps["transformItems"];
+  operator?: UseRefinementListProps["operator"];
 }) {
   type FacetItem = ReturnType<typeof useRefinementList>["items"][number];
 
   const facetValuesInitialRef = useRef<Map<string, FacetItem>>(new Map());
+  const searchQueryRef = useRef("");
 
   const refinements = useRefinementList({
     attribute: props.attribute,
-    limit: 100,
+    limit: 1000,
     sortBy: props.sortBy ?? ["count:desc", "name:asc"],
+    operator: props.operator,
     // Keep <Checkbox>s order fixed - don't move selected on top, and don't hide count=0.
     // Refs #137, ENG-56
     transformItems: useCallback(
       (items: FacetItem[], metadata) => {
+        const applyTransform = (fixed: FacetItem[]) =>
+          props.transformItems ? props.transformItems(fixed, metadata) : fixed;
+
+        if (props.allowedValues) {
+          const algoliaValues = new Set(items.map(item => item.value));
+          const fixed = [...items];
+          const query = searchQueryRef.current.toLowerCase();
+          for (const value of props.allowedValues) {
+            if (!algoliaValues.has(value) && (!query || value.toLowerCase().includes(query))) {
+              fixed.push({
+                value,
+                label: value,
+                count: 0,
+                isRefined: false,
+                highlighted: value,
+              } as FacetItem);
+            }
+          }
+          return applyTransform(fixed);
+        }
+
         const result = new Map(facetValuesInitialRef.current);
         for (const facetValue of result.values()) {
           result.set(facetValue.value, { ...facetValue, count: 0 });
@@ -39,10 +63,9 @@ export function PgFacetAttribute(props: {
           result.set(item.value, item);
         }
         facetValuesInitialRef.current = result;
-        const fixed = Array.from(result.values());
-        return props.transformItems ? props.transformItems(fixed, metadata) : fixed;
+        return applyTransform(Array.from(result.values()));
       },
-      [props.transformItems],
+      [props.transformItems, props.allowedValues],
     ),
   });
   const subRefinements = useRefinementList({
@@ -52,6 +75,7 @@ export function PgFacetAttribute(props: {
 
   function search(value: string) {
     state.mutable.query = value;
+    searchQueryRef.current = value;
     refinements.searchForItems(value);
   }
 
