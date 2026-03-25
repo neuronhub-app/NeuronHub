@@ -502,7 +502,13 @@ function PgSearchStats(props: { label: string; indexName: string; fontSize?: "2x
   );
 
   return (
-    <Flex gap="1" align="center" fontSize="xs" color="fg.subtle" whiteSpace="nowrap">
+    <Flex
+      gap="1"
+      align="center"
+      fontSize={{ base: "xs", lg: "sm" }}
+      color="brand.gray.muted"
+      whiteSpace="nowrap"
+    >
       {isFirstSearchPending ? SkeletonText4 : <FormatNumber value={stats.nbHits} />}
       {state.snap.total ? (
         <Flex gap="1">
