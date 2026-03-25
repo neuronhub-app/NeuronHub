@@ -34,11 +34,8 @@ test.describe("JobVersionReview", () => {
     await expect($[ids.job.versions.container]).toBeVisible();
     await expect($[ids.job.versions.card]).toBeVisible();
 
-    await play.screenshot("job-versions-pending", { fullPage: true });
-
     // Select all and approve
     await play.click(ids.job.versions.selectAllCheckbox);
-    await play.screenshot("job-versions-selected");
 
     const mutationApprove = play.waitForResponseGraphql(JobVersionsApproveMutation);
     await play.click(ids.job.versions.approveBtn);
@@ -46,6 +43,5 @@ test.describe("JobVersionReview", () => {
 
     // After approval, list should be empty
     await expect($[ids.job.versions.emptyState]).toBeVisible();
-    await play.screenshot("job-versions-approved-empty");
   });
 });
