@@ -1,10 +1,14 @@
-import { CloseButton, Icon, Input, InputGroup } from "@chakra-ui/react";
-import { useRef } from "react";
+import { CloseButton, Flex, Icon, Input, InputGroup, Collapsible } from "@chakra-ui/react";
+import { ReactNode, useRef } from "react";
 import { LuSearch } from "react-icons/lu";
 import { useSearchBox } from "react-instantsearch";
 import { ids } from "@/e2e/ids";
 
-export function PgSearchInput(props: { testId?: string }) {
+export function PgSearchInput(props: {
+  endElementText: ReactNode;
+  testId?: string;
+  isHideResetBtn?: boolean;
+}) {
   const searchBox = useSearchBox();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -16,16 +20,29 @@ export function PgSearchInput(props: { testId?: string }) {
         </Icon>
       }
       endElement={
-        searchBox.query ? (
-          <CloseButton
-            size="xs"
-            onClick={() => {
-              searchBox.refine("");
-              inputRef.current?.focus();
-            }}
-            me="-2"
-          />
-        ) : null
+        <Flex align="center" gap="1">
+          {props.endElementText}
+
+          <Collapsible.Root open={Boolean(searchBox.query)}>
+            <Collapsible.Content
+              _open={{
+                animationName: "expand-width, fade-in",
+              }}
+              _closed={{
+                animationName: "collapse-width, fade-in",
+              }}
+            >
+              <CloseButton
+                size="xs"
+                onClick={() => {
+                  searchBox.refine("");
+                  inputRef.current?.focus();
+                }}
+                me="-2"
+              />
+            </Collapsible.Content>
+          </Collapsible.Root>
+        </Flex>
       }
     >
       <Input

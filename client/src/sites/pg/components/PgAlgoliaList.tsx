@@ -2,16 +2,19 @@ import {
   Box,
   Collapsible,
   Flex,
+  FormatNumber,
   Grid,
   HStack,
   Icon,
   NativeSelect,
   Skeleton,
+  SkeletonText,
   Stack,
+  SystemStyleObject,
   Text,
 } from "@chakra-ui/react";
 import type { TadaDocumentNode } from "gql.tada";
-import React, { useEffect, useRef, type ReactNode, type RefObject } from "react";
+import React, { useEffect, useRef, type ReactNode, type RefObject, ComponentProps } from "react";
 import { LuChevronDown, LuSquareX } from "react-icons/lu";
 import {
   InstantSearch,
@@ -98,7 +101,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
       <Stack gap="gap.sm" w="full">
         <PgFilterCardWithSplitBg isOpenRef={pgFilterCardIsOpenRef}>
           <Box
-            hideFrom="md"
+            hideFrom={style.breakpoint}
             borderWidth="1px"
             borderColor="fg"
             borderRadius="lg"
@@ -128,7 +131,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
           </Box>
 
           <Box
-            hideBelow="md"
+            hideBelow={style.breakpoint}
             borderWidth="1px"
             borderColor="fg"
             borderRadius="lg"
@@ -412,10 +415,13 @@ function PgMobileCollapsible(
   );
 }
 
-function PgSearchStats(props: { label: string; indexName: string; textAlign?: "center" }) {
-  const stats = useStats();
+function PgSearchStats(props: { label: string; indexName: string; fontSize?: "2xs" | "xs" }) {
   const algolia = useAlgoliaSearchClient();
-  const state = useStateValtio({ total: null as number | null });
+  const stats = useStats();
+
+  const state = useStateValtio({
+    total: 0,
+  });
 
   useEffect(() => {
     if (!algolia.client) {
@@ -431,18 +437,23 @@ function PgSearchStats(props: { label: string; indexName: string; textAlign?: "c
   // #AI
   const isFirstSearchPending = stats.nbHits === 0 && stats.processingTimeMS === 0;
 
+  const SkeletonText4 = (
+    <SkeletonText noOfLines={1} w={{ base: "30px", [style.breakpoint]: "35.5px" }} />
+  );
+
   return (
-    <Text fontSize="sm" fontWeight="medium" textAlign={props.textAlign}>
-      Showing{" "}
-      <Text as="span" color="primary" fontWeight="medium">
-        {isFirstSearchPending ? (
-          <Skeleton as="span" display="inline-block" h="4" w="4ch" verticalAlign="middle" />
-        ) : (
-          stats.nbHits
-        )}
-      </Text>
-      {state.snap.total !== null && ` out of ${state.snap.total}`} {props.label}
-    </Text>
+    <Flex gap="1" align="center" fontSize="xs" color="fg.subtle" whiteSpace="nowrap">
+      {isFirstSearchPending ? SkeletonText4 : <FormatNumber value={stats.nbHits} />}
+      {state.snap.total ? (
+        <Flex gap="1">
+          <Text>/</Text>
+          <FormatNumber value={state.snap.total} />
+        </Flex>
+      ) : (
+        SkeletonText4
+      )}
+      <Text hideBelow={style.breakpoint}>{props.label}</Text>
+    </Flex>
   );
 }
 
@@ -505,7 +516,7 @@ function ClearAllFiltersButton(props: { onClear?: () => void }) {
       <Icon boxSize="3.5">
         <LuSquareX />
       </Icon>
-      Clear all filters
+      Clear all
     </Flex>
   );
 }
@@ -516,7 +527,7 @@ function PgAlgoliaListSkeleton() {
     <Stack gap="gap.sm" w="full">
       <PgFilterCardWithSplitBg isOpenRef={{ current: false }}>
         <Box
-          hideFrom="md"
+          hideFrom={style.breakpoint}
           borderWidth="1px"
           borderColor="fg"
           borderRadius="lg"
@@ -530,7 +541,7 @@ function PgAlgoliaListSkeleton() {
         </Box>
 
         <Box
-          hideBelow="md"
+          hideBelow={style.breakpoint}
           borderWidth="1px"
           borderColor="fg"
           borderRadius="lg"
@@ -545,9 +556,9 @@ function PgAlgoliaListSkeleton() {
 
             <Box gridColumn="span 5">
               <Grid
-                templateColumns={{ md: "repeat(2, 1fr)", lg: "repeat(5, 1fr)" }}
+                templateColumns={{ [style.breakpoint]: "repeat(2, 1fr)", lg: "repeat(5, 1fr)" }}
                 columnGap="gap.md"
-                rowGap={{ md: "2" }}
+                rowGap={{ [style.breakpoint]: "2" }}
               >
                 {Array.from({ length: 10 }, (_, i) => (
                   <Skeleton key={i} h="10" borderRadius="sm" />
@@ -564,9 +575,9 @@ function PgAlgoliaListSkeleton() {
 
       <HStack
         justify="space-between"
-        pt={{ base: "3", md: "gap.xl" }}
+        pt={{ base: "3", [style.breakpoint]: "gap.xl" }}
         pb="0"
-        px={{ base: "0", md: "26px" }}
+        px={{ base: "0", [style.breakpoint]: "26px" }}
       >
         <Skeleton h="5" w="20" borderRadius="sm" />
         <HStack gap="gap.lg">
@@ -588,15 +599,15 @@ function PgHitSkeletons() {
         <Stack
           key={i}
           gap="gap.sm"
-          p={{ base: "gap.md", md: "gap.xl" }}
+          p={{ base: "gap.md", [style.breakpoint]: "gap.xl" }}
           borderRadius="lg"
           borderWidth="1px"
           borderColor="subtle"
         >
-          <Flex gap={{ base: "gap.sm", md: "gap.lg" }}>
+          <Flex gap={{ base: "gap.sm", [style.breakpoint]: "gap.lg" }}>
             <Skeleton
-              w={{ base: "60px", md: "90px" }}
-              h={{ base: "60px", md: "90px" }}
+              w={{ base: "60px", [style.breakpoint]: "90px" }}
+              h={{ base: "60px", [style.breakpoint]: "90px" }}
               flexShrink="0"
               borderRadius="sm"
             />
@@ -616,3 +627,7 @@ function PgHitSkeletons() {
     </>
   );
 }
+
+const style = {
+  breakpoint: "md" satisfies SystemStyleObject["hideBelow"],
+} as const;
