@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import { useUser } from "@/apps/users/useUserCurrent";
 import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
+import { locationRemoteNames } from "@/sites/pg/components/PgFiltersTopbar";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogCloseTrigger,
@@ -59,7 +60,12 @@ export function JobsSubscribeModal(props: { testId?: string }) {
       is_orgs_highlighted: refinesCurrent.items.some(
         item => item.attribute === "org.is_highlighted",
       ),
-      is_remote: refinesCurrent.items.some(item => item.attribute === "locations.name"),
+      is_remote:
+        refinesCurrent.items
+          .find(item => item.attribute === "locations_facet")
+          ?.refinements.some(refinement =>
+            locationRemoteNames.includes(String(refinement.value)),
+          ) ?? false,
       salary_min:
         salaryRefinement?.refinements[0]?.value != null
           ? Number(salaryRefinement.refinements[0].value)
@@ -228,6 +234,7 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_city.name": "Location",
   "tags_country_visa_sponsor.name": "Visa Sponsor",
   "locations.name": "Remote",
+  locations_facet: "Location",
   "org.is_highlighted": "Highlighted",
   "org.name": "Organisation",
   salary_min: "Minimum Salary",
