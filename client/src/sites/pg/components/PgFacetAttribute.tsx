@@ -101,7 +101,11 @@ export function PgFacetAttribute(props: {
 
       <Stack gap="gap.sm" w="full">
         {refinements.items
-          .filter(item => !props.allowedValues || props.allowedValues.includes(item.label))
+          .filter(
+            item =>
+              item.value !== "Other" &&
+              (!props.allowedValues || props.allowedValues.includes(item.label)),
+          )
           .map(item => {
             const subItem = props.subFacet
               ? subRefinements.items.find(subRefinement => subRefinement.value === item.value)

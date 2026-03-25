@@ -108,10 +108,6 @@ export function JobList(props: { slug?: string }) {
       }}
       facetsActiveDateAttributes={["posted_at_unix"]}
       facetsActiveMoneyAttributes={["salary_min"]}
-      facetsActiveSubFacetPairs={{ "tags_country_visa_sponsor.name": "tags_country.name" }}
-      facetsActiveSubFacetLabel={{
-        "tags_country_visa_sponsor.name": "w/Visa",
-      }}
       facetsActiveExtraTags={extraTags}
       facetsTopbar={<PgFiltersTopbar />}
       onClearAdditional={() => {
