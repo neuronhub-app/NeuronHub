@@ -70,10 +70,16 @@ const CardState = {
 } as const;
 type CardState = (typeof CardState)[keyof typeof CardState];
 
-export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean }) {
+export function JobCard(props: {
+  job: JobFragmentType;
+  isSearchActive?: boolean;
+  isInitiallyOpen?: boolean;
+}) {
   const { results } = useInstantSearch();
 
-  const { mutable, snap } = useStateValtio<{ card: CardState }>({ card: CardState.Closed });
+  const { mutable, snap } = useStateValtio<{ card: CardState }>({
+    card: props.isInitiallyOpen ? CardState.OpenByUser : CardState.Closed,
+  });
 
   const isHighlightable = !!props.isSearchActive && "_highlightResult" in props.job;
   const jobHit = props.job as unknown as Hit<BaseHit>;
