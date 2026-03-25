@@ -67,9 +67,11 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
   ctaMobile?: ReactNode;
 }) {
   const algolia = useAlgoliaSearchClient();
+
   const pgFilterCardIsOpenRef = useRef(false);
 
   const indexName = algolia[props.index];
+
   if (algolia.loading || !algolia.client || !indexName) {
     return <PgAlgoliaListSkeleton />;
   }
@@ -100,6 +102,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
 
       <Stack gap="gap.sm" w="full">
         <PgFilterCardWithSplitBg isOpenRef={pgFilterCardIsOpenRef}>
+          {/* Mobile */}
           <Box
             hideFrom={style.breakpoint}
             borderWidth="1px"
@@ -109,7 +112,11 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
             bg="bg"
           >
             <Stack gap="gap.sm">
-              <PgSearchInput testId={props.searchInputTestId} />
+              <PgSearchInput
+                testId={props.searchInputTestId}
+                endElementText={<PgSearchStats label={labelPlural} indexName={indexName} />}
+                isHideResetBtn={true}
+              />
               <PgMobileCollapsible
                 cta={props.ctaMobile ?? props.cta}
                 label={labelPlural}
@@ -130,6 +137,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
             </Stack>
           </Box>
 
+          {/* Desktop */}
           <Box
             hideBelow={style.breakpoint}
             borderWidth="1px"
@@ -140,29 +148,18 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
           >
             <Grid templateColumns="repeat(5, 1fr)" gap="gap.md">
               <Box gridColumn="span 4">
-                <PgSearchInput testId={props.searchInputTestId} />
+                <PgSearchInput
+                  testId={props.searchInputTestId}
+                  endElementText={<PgSearchStats label={labelPlural} indexName={indexName} />}
+                />
               </Box>
+
               <Box>{props.cta}</Box>
 
+              {/* @ts-expect-error #bad-infer not worth it. */}
+              <PgFacetsActive {...props} />
+
               <Box gridColumn="span 5">{props.facetsTopbar}</Box>
-
-              <PgAlgoliaFacetsActiveRow
-                variant="desktop"
-                labelsOverride={props.facetsActiveLabelsOverride}
-                dateAttributes={props.facetsActiveDateAttributes}
-                moneyAttributes={props.facetsActiveMoneyAttributes}
-                formatAttribute={props.facetsActiveFormatAttribute}
-                subFacetPairs={props.facetsActiveSubFacetPairs}
-                subFacetLabel={props.facetsActiveSubFacetLabel}
-                extraTags={props.facetsActiveExtraTags}
-              />
-
-              <Box gridColumn="span 5">
-                <HStack justify="space-between">
-                  <PgSearchStats label={labelPlural} indexName={indexName} />
-                  <ClearAllFiltersButton onClear={props.onClearAdditional} />
-                </HStack>
-              </Box>
             </Grid>
           </Box>
         </PgFilterCardWithSplitBg>
@@ -171,11 +168,12 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
           <HStack
             justify="space-between"
             position="relative"
-            pt={{ base: "3", md: "gap.xl" }}
+            pt={{ base: "3", [style.breakpoint]: "gap.xl" }}
             pb="0"
-            px={{ base: "0", md: "26px" }}
+            px={{ base: "0", [style.breakpoint]: "26px" }}
           >
             {props.sort && <PgAlgoliaSortSelect items={props.sort.items} />}
+
             {props.subheader}
           </HStack>
         )}
@@ -183,6 +181,33 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
         <PgInfiniteHits label={labelPlural} {...props.hits} />
       </Stack>
     </InstantSearch>
+  );
+}
+
+function PgFacetsActive(props: ComponentProps<typeof PgAlgoliaList>) {
+  const clear = useClearRefinements();
+  if (!clear.canRefine) {
+    return null;
+  }
+  return (
+    <Collapsible.Root open={clear.canRefine} gridColumn="span 5">
+      <Collapsible.Content>
+        <HStack gap="gap.md">
+          <ClearAllFiltersButtonConditional onClear={props.onClearAdditional} />
+
+          <PgAlgoliaFacetsActiveRow
+            variant="desktop"
+            labelsOverride={props.facetsActiveLabelsOverride}
+            dateAttributes={props.facetsActiveDateAttributes}
+            moneyAttributes={props.facetsActiveMoneyAttributes}
+            formatAttribute={props.facetsActiveFormatAttribute}
+            subFacetPairs={props.facetsActiveSubFacetPairs}
+            subFacetLabel={props.facetsActiveSubFacetLabel}
+            extraTags={props.facetsActiveExtraTags}
+          />
+        </HStack>
+      </Collapsible.Content>
+    </Collapsible.Root>
   );
 }
 
@@ -373,25 +398,29 @@ function PgMobileCollapsible(
       <Collapsible.Content>
         <Stack gap="gap.sm">
           {props.cta}
-          <PgAlgoliaFacetsActiveRow
-            variant="mobile"
-            labelsOverride={props.labelsOverride}
-            dateAttributes={props.dateAttributes}
-            moneyAttributes={props.moneyAttributes}
-            formatAttribute={props.formatAttribute}
-            subFacetPairs={props.subFacetPairs}
-            subFacetLabel={props.subFacetLabel}
-            extraTags={props.extraTags}
-          />
-          <ClearAllFiltersButtonConditional
-            onClear={props.onClearAdditional}
-            extraTags={props.extraTags}
-          />
+
+          <Flex gap="gap.sm">
+            <ClearAllFiltersButtonConditional
+              onClear={props.onClearAdditional}
+              extraTags={props.extraTags}
+            />
+            <PgAlgoliaFacetsActiveRow
+              variant="mobile"
+              labelsOverride={props.labelsOverride}
+              dateAttributes={props.dateAttributes}
+              moneyAttributes={props.moneyAttributes}
+              formatAttribute={props.formatAttribute}
+              subFacetPairs={props.subFacetPairs}
+              subFacetLabel={props.subFacetLabel}
+              extraTags={props.extraTags}
+            />
+          </Flex>
+
           <Box pt="1">{props.facetsTopbar}</Box>
+
           <Stack gap="gap.xs">
-            <PgSearchStats label={props.label} indexName={props.indexName} textAlign="center" />
             <HStack justify="space-between">
-              <ClearAllFiltersButton onClear={props.onClearAdditional} />
+              <ClearAllFiltersButtonConditional onClear={props.onClearAdditional} />
               <Collapsible.Trigger>
                 <Flex
                   align="center"
