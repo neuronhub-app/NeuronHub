@@ -17,7 +17,7 @@ export function PgFacetPopover(props: {
         placement: "bottom-start",
         offset: { mainAxis: 4, crossAxis: 0 },
         flip: false,
-        listeners: false, // fix CLS when `PgAlgoliaFacetsActive` above add DOM nodes (ENG-56)
+        listeners: { ancestorResize: false, elementResize: false, ancestorScroll: true }, // fix CLS when `PgAlgoliaFacetsActive` above add DOM nodes (ENG-56)
       }}
       onOpenChange={details => {
         if (!details.open) {
