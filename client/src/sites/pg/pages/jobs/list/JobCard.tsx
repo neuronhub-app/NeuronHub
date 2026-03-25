@@ -56,7 +56,7 @@ type TagGroup = {
   fg: string;
 };
 
-const tagsHidden = ["Undergraduate Degree or Less", "Full-Time"];
+const tagsHidden = ["Undergraduate Degree or Less", "Full-Time", "Other"];
 
 function hasDescriptionMatch(jobHit: Hit<BaseHit>): boolean {
   // @ts-expect-error #bad-infer Algolia _highlightResult is untyped
