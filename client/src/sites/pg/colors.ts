@@ -28,13 +28,17 @@ export namespace theme {
 
     primary,
     subtle: { value: { _light: "{colors.brand.gray}", _dark: "{colors.slate.700}" } },
-    bg: { value: { _light: "{colors.brand.seashell}", _dark: "{colors.stone.950}" } },
+
+    // todo !! fix: don't override the mandatory `bg.*` obj, or add all required `bg.*` keys
+    // bg: { value: { _light: "{colors.brand.seashell}", _dark: "{colors.stone.950}" } },
+
     fg: {
       DEFAULT: { value: { _light: "{colors.brand.black}", _dark: "{colors.slate.200}" } },
       muted: { value: { _light: "{colors.brand.gray.muted}", _dark: "{colors.stone.400}" } },
       secondary: {
         value: { _light: "{colors.brand.black.secondary}", _dark: "{colors.slate.400}" },
       },
+      // todo !! fix: add required keys for `fg.*`
     },
     "bg.card": { value: { _light: "white", _dark: "{colors.slate.800}" } },
     "bg.inverted": { value: { _light: "{colors.black}", _dark: "{colors.white}" } },
