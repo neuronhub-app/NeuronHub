@@ -5,7 +5,7 @@ import { useCurrentRefinements, useInfiniteHits, useSearchBox } from "react-inst
 import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
 import type { ID } from "@/gql-tada";
 
-export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(props: {
+export type PgInfiniteHitsProps<TItem extends { id: ID }, TData = unknown> = {
   enrichment: {
     query: TadaDocumentNode<TData, { ids: ID[] }>;
     extractItems: (data: Record<string, TItem[]>) => TItem[];
@@ -15,9 +15,14 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(props:
     ctx: { isSearchActive: boolean; isEnrichedByGraphql: boolean },
   ) => ReactNode;
   hitOpenedPinned?: { node?: ReactNode; id?: ID };
+  noResultsNode?: ReactNode;
   label?: string;
   listTestId?: string;
-}) {
+};
+
+export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
+  props: PgInfiniteHitsProps<TItem, TData>,
+) {
   const search = useSearchBox();
   const refinements = useCurrentRefinements();
   const hits = useInfiniteHits<TItem>();
@@ -60,7 +65,7 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(props:
         {!hits.results ? (
           <PgHitSkeletons />
         ) : hasNoResults ? (
-          <Text>No {props.label ?? "results"} found.</Text>
+          (props.noResultsNode ?? <Text>No {props.label ?? "results"} found.</Text>)
         ) : (
           filteredItems.map(item =>
             props.renderHit(item, { isSearchActive, isEnrichedByGraphql }),

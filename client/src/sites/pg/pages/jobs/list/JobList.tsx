@@ -1,6 +1,7 @@
 import {
   Box,
   Flex,
+  Grid,
   HStack,
   Icon,
   Link,
@@ -97,6 +98,7 @@ export function JobList(props: { slug?: string }) {
           <JobCard key={job.id} job={job} isSearchActive={ctx.isSearchActive} />
         ),
         hitOpenedPinned: jobOpenPinned,
+        noResultsNode: <JobNoResultsCard />,
         listTestId: ids.job.list,
       }}
       searchInputTestId={ids.job.searchInput}
@@ -132,6 +134,34 @@ export function JobList(props: { slug?: string }) {
         attributesToSnippet={["description:30"]}
       />
     </PgAlgoliaList>
+  );
+}
+
+function JobNoResultsCard() {
+  return (
+    <Stack
+      p={{ base: "gap.sm", md: "gap.md" }}
+      borderRadius="lg"
+      borderWidth="1px"
+      borderColor="subtle"
+      bg="bg.card"
+      gap="gap.md"
+    >
+      <Text fontWeight="semibold" color="fg" textAlign="center">
+        No jobs found
+      </Text>
+      <Grid templateColumns={{ base: "1fr", md: "repeat(5, 1fr)" }} gap="gap.md">
+        <Box gridColumn={{ md: "span 4" }}>
+          <Text fontSize="sm" color="fg.muted">
+            No jobs match this combination of filters right now, but you can set a job alert so
+            you'll know as soon as any matching roles are posted.
+          </Text>
+        </Box>
+        <Box>
+          <JobsSubscribeModal />
+        </Box>
+      </Grid>
+    </Stack>
   );
 }
 

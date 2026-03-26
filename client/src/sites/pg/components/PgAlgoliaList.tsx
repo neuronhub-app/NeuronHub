@@ -1,5 +1,4 @@
 import { Box, Grid, HStack, Stack } from "@chakra-ui/react";
-import type { TadaDocumentNode } from "gql.tada";
 import { useRef, type ReactNode } from "react";
 import { InstantSearch } from "react-instantsearch";
 import type { ID } from "@/gql-tada";
@@ -9,7 +8,10 @@ import {
   PgFacetsActive,
   PgMobileCollapsible,
 } from "@/sites/pg/components/PgAlgoliaFilterCard";
-import { PgInfiniteHits } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
+import {
+  PgInfiniteHits,
+  type PgInfiniteHitsProps,
+} from "@/sites/pg/components/PgAlgoliaInfiniteHits";
 import { PgAlgoliaListSkeleton } from "@/sites/pg/components/PgAlgoliaListSkeleton";
 import { PgAlgoliaSearchStats } from "@/sites/pg/components/PgAlgoliaSearchStats";
 import { PgAlgoliaSortSelect } from "@/sites/pg/components/PgAlgoliaSortSelect";
@@ -20,18 +22,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
   index: AlgoliaIndexKey;
   label: string;
   searchInputTestId?: string;
-  hits: {
-    enrichment: {
-      query: TadaDocumentNode<TData, { ids: ID[] }>;
-      extractItems: (data: Record<string, TItem[]>) => TItem[];
-    };
-    renderHit: (
-      item: TItem,
-      ctx: { isSearchActive: boolean; isEnrichedByGraphql: boolean },
-    ) => ReactNode;
-    hitOpenedPinned?: { node?: ReactNode; id?: ID };
-    listTestId?: string;
-  };
+  hits: Omit<PgInfiniteHitsProps<TItem, TData>, "label">;
   sort?: { items: Array<{ value: string; label: string }> };
   subheader?: ReactNode;
   facetsTopbar: ReactNode;
