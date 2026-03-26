@@ -87,7 +87,7 @@ async function main() {
   const tsconfig = {
     extends: "../tsconfig.json",
     compilerOptions: {
-      types: ["node", "bun"],
+      types: ["node"],
       noImplicitAny: false,
       rootDirs: ["..", "../.react-router/types", "."],
       paths: readParentPaths(),
@@ -98,7 +98,7 @@ async function main() {
   writeFileSync(path.join(outDir, "tsconfig.json"), JSON.stringify(tsconfig, null, 2));
 
   try {
-    execSync("bun run tsgo --noEmit --project .lint-mdx/tsconfig.json", {
+    execSync("pnpm exec tsgo --noEmit --project .lint-mdx/tsconfig.json", {
       cwd: docsDir,
       stdio: "inherit",
     });

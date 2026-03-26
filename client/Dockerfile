@@ -19,25 +19,23 @@ ARG VITE_SENTRY_DSN_FRONTEND
 
 WORKDIR /app
 
-RUN npm install --global bun
+RUN corepack enable pnpm
 
-# Bun workspace: root config + lockfile, then each workspace's package.json #AI #123
-COPY package.json bun.lock ./
+COPY .npmrc pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY client/package.json ./client/
 COPY packages/shared/package.json ./packages/shared/
 COPY docs/package.json ./docs/
 
-RUN bun install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 COPY client/ ./client/
 COPY packages/shared/ ./packages/shared/
 
 RUN apt-get update && apt-get install ca-certificates --yes # for Sentry Source Maps upload
 
-ENV PATH="/app/client/node_modules/.bin:$PATH"
 WORKDIR /app/client
 
-RUN react-router build --mode=$NODE_ENV --sourcemapClient
+RUN pnpm exec react-router build --mode=$NODE_ENV --sourcemapClient
 
 
 # Nginx

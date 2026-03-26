@@ -1,5 +1,5 @@
 # #AI
-# ------------------------------------------------
+# ================================================
 
 # Build react-router (SSR)
 # ------------------------------------------------
@@ -16,25 +16,27 @@ ARG VITE_ALGOLIA_APPLICATION_ID
 ARG VITE_ALGOLIA_SEARCH_API_KEY
 ARG VITE_ALGOLIA_INDEX_DOCS
 
+ARG DEPLOY_DIR=/deploy
+
 WORKDIR /app
 
-RUN npm install --global bun
+RUN corepack enable pnpm
 
-# Bun workspace: root config + lockfile, then each workspace's package.json #124
-COPY package.json bun.lock ./
+COPY .npmrc pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY docs/package.json ./docs/
 COPY packages/shared/package.json ./packages/shared/
 COPY client/package.json ./client/
 
-RUN bun install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 COPY docs/ ./docs/
 COPY packages/shared/ ./packages/shared/
 
-ENV PATH="/app/docs/node_modules/.bin:$PATH"
 WORKDIR /app/docs
 
-RUN react-router build
+RUN pnpm exec react-router build
+
+RUN pnpm deploy --filter=neuronhub-docs --prod $DEPLOY_DIR
 
 
 # Serve (SSR needs Node.js)
@@ -44,6 +46,7 @@ FROM node:24-slim
 
 ARG VITE_RELEASE_VERSION
 ARG GITHUB_PATH
+ARG DEPLOY_DIR=/deploy
 
 LABEL org.opencontainers.image.description="React Router SSR docs site"
 LABEL org.opencontainers.image.source="https://github.com/${GITHUB_PATH}/blob/${VITE_RELEASE_VERSION}/docs/Dockerfile"
@@ -53,13 +56,7 @@ ENV DOCS_PORT=3000
 
 WORKDIR /app
 
-COPY --from=builder /app/docs/build ./build
-COPY --from=builder /app/docs/package.json ./
-
-# #AI-slop
-# Strip workspace:* dep (bundled by Vite at build time), then install runtime deps
-RUN node -e "const p=require('./package.json'); delete p.dependencies['@neuronhub/shared']; delete p.devDependencies; require('fs').writeFileSync('package.json',JSON.stringify(p,null,2))" \
-    && npm install --omit=dev
+COPY --from=builder $DEPLOY_DIR ./
 
 EXPOSE ${DOCS_PORT}
 

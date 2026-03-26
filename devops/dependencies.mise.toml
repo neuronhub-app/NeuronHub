@@ -10,19 +10,17 @@
     run = "uv sync"
 
 ["install-deps:client"]
-    dir = "client"
-    run = "bun install --frozen-lockfile"
+    run = "pnpm install --frozen-lockfile"
 
 ["install-deps:playwright"]
     dir = "client"
     run = [
-        "bunx playwright install",
-        "bunx playwright install chromium --with-deps",
+        "pnpm exec playwright install",
+        "pnpm exec playwright install chromium --with-deps",
     ]
 
 ["install-deps:client:new"]
-    dir = "client"
-    run = "bun install"
+    run = "pnpm install"
 
 
 # Upgrades
@@ -66,15 +64,15 @@
 
         let $upgrade_json_flag = if ($dry_run == false) { "--upgrade" } else { "" }
 
-        bun run ncu --packageManager bun --reject=graphql --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} $upgrade_json_flag
+        pnpm exec ncu --packageManager pnpm --reject=graphql --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} $upgrade_json_flag
 
         print "\n---\n"
 
         if ($dry_run) {
             print "Potential upgrades with cooldown=0:\n"
-            bun run ncu --packageManager bun --cooldown=0
+            pnpm exec ncu --packageManager pnpm --cooldown=0
         } else {
-            bun install
+            pnpm install
         }
         """
     ]
@@ -82,4 +80,4 @@
 
 ["upgrade-deps:playwright"]
     dir = "client"
-    run = "bun update playwright"
+    run = "pnpm update @playwright/test"

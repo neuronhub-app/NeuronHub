@@ -9,11 +9,7 @@ The annotations (`//`) specs are in [[pyproject.toml]]
 
 `graphql` is frozen on ~16.9, because `gql.tada` devs inappropriately copy-pasted chunks of `graphql` types into its codebase (eg Document.Kind), and upgrading `graphql` to latest (eg 16.12 or 16.13) breaks all `graphql.persisted()` typing.
 
-### Promoted transitive deps (for Docker) #AI #123
-
-Bun Workspace only symlinks **direct** deps to `client/node_modules/`. Transitive deps in `node_modules/.bun/` are unreachable by Node/Rollup/Babel in Docker. These are promoted from transitive to direct:
-
-- `@ark-ui/react` — transitive of `@chakra-ui/react`, imported in `theme/recipes.ts`
-- `@sentry/react` — transitive of `@sentry/react-router`, imported in ~15 files
-- `diff` — transitive of `diff2html`, imported in `JobVersionReview.tsx`
-- `@babel/preset-typescript` (dev) — transitive of `@vitejs/plugin-react`, resolved by babel at runtime
+// #AI
+`react-hook-form` is frozen on 7.71.2 (no caret). 7.72.0 introduced stricter `Control` 
+generic variance -> breaks `PostFields.tsx` where `Control<PostAbstract>` is passed to `ImageUpload` 
+expecting `Control<Tool>`.

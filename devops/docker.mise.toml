@@ -31,18 +31,8 @@
     """
 
     run = """
-        # Set working dir
-        # ------------------------------
-
-        let app = $env.usage_app
-        if $env.usage_app == "coder" {
-          cd devops/($env.usage_app)
-        } else {
-          cd ($env.usage_app)
-        }
-
-        # Sentry PROJECT_NAME mapping
-        # ------------------------------
+        # Sentry env.PROJECT_NAME mapping
+        # ------------------------------------------------------------
 
         let sentry_project = if $env.usage_app == "client" {
           "{{ env.PROJECT_NAME }}-frontend"
@@ -58,24 +48,38 @@
         }
 
         # Force-pass Mise env & tag to the Docker build
-        # ------------------------------
+        # ------------------------------------------------------------
 
-        let compose_file = "docker-compose.yaml"
+        let compose_file = $"docker-compose.build.($env.usage_app).yaml"
         let compose_content = $"
             services:
               ($env.usage_app):
                 image: ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)
                 pull_policy: always
                 build:
-                  # client/ and docs/ Dockerfiles need Bun workspace root bun.lock #123 #124
-                  context: (if $app in ["client" "docs"] { ".." } else { "." })
-                  dockerfile: (if $app in ["client" "docs"] { $"($app)/Dockerfile" } else { "Dockerfile" })
+                  context: (
+                    match $env.usage_app {
+                      "coder" => "devops/coder",
+                      "server" => "server",
+
+                      # pnpm root
+                      "client" => ".",
+                      "docs" => ".",
+                    }
+                  )
+                  dockerfile: (
+                    if $env.usage_app in ["coder", "server"] {
+                      "Dockerfile"
+                    } else {
+                      $"($env.usage_app)/Dockerfile"
+                    }
+                  )
                   args:
                     VITE_RELEASE_VERSION: ($env.usage_version)
 
-                    # for React Router build
-                    # must match the `{client|docs}/Dockerfile` ARGs
-                    VITE_SITE: {{ env.VITE_SITE }}
+                    # for React Router build: Must match the {client|docs}/Dockerfile ARG names
+
+                    VITE_SITE: {{ env.VITE_SITE | default(value="''") }}
                     VITE_SERVER_URL: https://($server_domain)
                     VITE_CLIENT_URL: {{ env.CLIENT_URL }}
                     VITE_ALGOLIA_APPLICATION_ID: {{ env.VITE_ALGOLIA_APPLICATION_ID }}
@@ -83,13 +87,14 @@
                     VITE_ALGOLIA_INDEX_DOCS: {{ env.VITE_ALGOLIA_INDEX_DOCS }}
 
                     # for Sentry
+
+                    PROJECT_NAME: {{ env.PROJECT_NAME }}
+                    VITE_RELEASE_NAME: {{ env.VITE_RELEASE_NAME }}
                     SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN }}
                     SENTRY_ORG: {{ env.SENTRY_ORG }}
                     SENTRY_PROJECT: ($sentry_project)
                     SENTRY_DSN_BACKEND: {{ env.SENTRY_DSN_BACKEND }}
                     VITE_SENTRY_DSN_FRONTEND: {{ env.SENTRY_DSN_FRONTEND }}
-                    VITE_RELEASE_NAME: {{ env.VITE_RELEASE_NAME }}
-                    PROJECT_NAME: {{ env.PROJECT_NAME }}
 "
 
         $compose_content | save --force $compose_file
@@ -97,15 +102,15 @@
         print $compose_content
 
         # Build
-        # ------------------------------
+        # ------------------------------------------------------------
 
-        # local needs sudo
+        # local needs `sudo -E`
         let docker_cmd = if $env.CI? == "true" { "docker" } else { "sudo -E docker" }
 
         if $env.usage_no_cache == "true" {
-          nu -c $"($docker_cmd) compose --progress=plain build --no-cache"
+          nu -c $"($docker_cmd) compose --file ($compose_file) --progress=plain build --no-cache"
         } else {
-          nu -c $"($docker_cmd) compose --progress=plain build"
+          nu -c $"($docker_cmd) compose --file ($compose_file) --progress=plain build"
         }
 
         rm $compose_file

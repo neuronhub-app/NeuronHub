@@ -1,7 +1,7 @@
 ## Tech Stack
 
 - Server: Django v5.2, Strawberry GraphQL, PostgreSQL, pytest, uv, mypy
-- Client: React Router v7, @chakra-ui v3, react-hook-form, Zod, Valtio, Apollo, gql-tada, Bun, Biome
+- Client: React Router v7, @chakra-ui v3, react-hook-form, Zod, Valtio, Apollo, gql-tada, pnpm, Biome
 - Search: Algolia
 - DevOps: Mise, GitHub CI, Docker, Sentry
 

@@ -61,7 +61,7 @@ Must read when working with any of those module.
 - [How to use Chakra UI](Chakra-UI.md)
 - [How to work with sub-sites as `VITE_SITE="pg"`](Sub-sites-with-VITE_SITE.md) from `src/sites/`
 
-## `packages/shared/` — Bun Workspace
+## `packages/shared/` — pnpm Workspace
 
 `@neuronhub/shared` (`workspace:*`) extracts code reused between `client/` and `docs/`:
 - `createEnv.ts` — typed `env` builder (wraps `envalid`)
@@ -69,6 +69,7 @@ Must read when working with any of those module.
 - `theme/` — `colors.ts`, `spacings.ts`, `theme.ts` (shared Chakra tokens)
 - `components/NeuronLogo.tsx`, `components/ui/prose.tsx`
 
-Import as `@neuronhub/shared/utils/format`, `@neuronhub/shared/components/NeuronLogo`, etc — the `exports` field maps `./*` → `./src/*.ts`.
+Import as `@neuronhub/shared/utils/format`, etc.
 
-Chakra typegen runs separately for shared (`mise typegen:packages:chakra`) with `--outdir .chakra/types` and a post-process to rewrite import paths to `#chakra-internal/`.
+Chakra typegen runs separately for shared (`mise typegen:packages:chakra`) 
+with `--outdir .chakra/types` and a post-process to rewrite import paths to `#chakra-internal/`.
