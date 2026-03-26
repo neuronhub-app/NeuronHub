@@ -15,7 +15,7 @@ import {
 } from "@chakra-ui/react";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { IoLocationSharp } from "react-icons/io5";
-import { LuBuilding2, LuChevronDown, LuExternalLink } from "react-icons/lu";
+import { LuChevronDown, LuExternalLink, LuShare2 } from "react-icons/lu";
 import { Highlight, Snippet, useInstantSearch } from "react-instantsearch";
 import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -25,6 +25,7 @@ import type { JobFragmentType } from "@/graphql/fragments/jobs";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
+import { toast } from "@/utils/toast";
 
 const style = {
   markHighlight: {
@@ -77,8 +78,9 @@ export function JobCard(props: {
 }) {
   const { results } = useInstantSearch();
 
-  const { mutable, snap } = useStateValtio<{ card: CardState }>({
+  const { mutable, snap } = useStateValtio<{ card: CardState; isHovering: boolean }>({
     card: props.isInitiallyOpen ? CardState.OpenByUser : CardState.Closed,
+    isHovering: false,
   });
 
   const isHighlightable = !!props.isSearchActive && "_highlightResult" in props.job;
@@ -92,12 +94,19 @@ export function JobCard(props: {
         ? CardState.OpenBySearchPreview
         : CardState.Closed;
 
-  function onCardClick(e: { target: EventTarget | null }) {
-    if (!(e.target as HTMLElement).closest("a, button")) {
-      mutable.card =
-        mutable.card === CardState.OpenByUser ? CardState.Closed : CardState.OpenByUser;
-    }
+  function toggleCard() {
+    mutable.card =
+      mutable.card === CardState.OpenByUser ? CardState.Closed : CardState.OpenByUser;
   }
+
+  const hoverHandlers = {
+    onMouseEnter: () => {
+      mutable.isHovering = true;
+    },
+    onMouseLeave: () => {
+      mutable.isHovering = false;
+    },
+  };
 
   return (
     <Stack
@@ -111,14 +120,12 @@ export function JobCard(props: {
       borderColor={cardState === CardState.OpenByUser ? "brand.black" : "subtle"}
       bg="bg.card"
       fontFamily="body"
-      cursor="pointer"
       _hover={{
         borderColor: cardState === CardState.OpenByUser ? "brand.black" : "fg.subtle",
       }}
       css={style.markHighlight}
       {...ids.set(ids.job.card.container)}
       data-id={props.job.id}
-      onClick={onCardClick}
     >
       <Stack
         gap="gap.sm"
@@ -141,12 +148,15 @@ export function JobCard(props: {
               h={{ base: "60px", md: "90px" }}
               flexShrink="0"
               borderRadius="sm"
-              bg="subtle"
+              bg="brand.green.light"
               align="center"
               justify="center"
-              color="fg.muted"
+              color="white"
+              fontSize={{ base: "xl", md: "3xl" }}
+              fontWeight="bold"
+              fontFamily="heading"
             >
-              <LuBuilding2 size={32} />
+              {props.job.org?.name?.charAt(0)?.toUpperCase()}
             </Flex>
           )}
 
@@ -158,7 +168,12 @@ export function JobCard(props: {
             >
               <JobTitleLink job={props.job} isHighlightable={isHighlightable} jobHit={jobHit} />
 
-              <JobOrgLink job={props.job} isHighlightable={isHighlightable} jobHit={jobHit} />
+              <JobOrgLink
+                job={props.job}
+                isHighlightable={isHighlightable}
+                jobHit={jobHit}
+                isCollapsed={cardState === CardState.Closed}
+              />
 
               <Flex
                 display={{ base: "none", md: "flex" }}
@@ -203,12 +218,10 @@ export function JobCard(props: {
           base: cardState !== CardState.Closed ? "gap.md" : "0",
           md: cardState !== CardState.Closed ? "gap.lg" : "0",
         }}
-        transition="margin"
-        transitionDuration={style.duration}
       >
         <JobTagGroups
           job={props.job}
-          highlightable={["tags_area"]}
+          highlightable={isHighlightable ? ["tags_area"] : []}
           jobHit={jobHit}
           isOrgHighlighted={props.job.org?.is_highlighted}
         />
@@ -241,6 +254,8 @@ export function JobCard(props: {
           borderRadius="lg"
           cursor="pointer"
           userSelect="none"
+          onClick={toggleCard}
+          {...hoverHandlers}
         >
           <Tooltip
             content={datetime.full(props.job.posted_at)}
@@ -265,7 +280,8 @@ export function JobCard(props: {
             pos="absolute"
             bottom={{ base: "8px", md: "gap.md" }}
             right={{ base: "gap.sm", md: "gap.lg" }}
-            color="fg.muted"
+            color={snap.isHovering ? "brand.green.light" : "fg.muted"}
+            transition="color 0.2s ease"
           >
             <LuChevronDown
               size={24}
@@ -276,6 +292,29 @@ export function JobCard(props: {
             />
           </Flex>
         </Box>
+      )}
+
+      <Box
+        pos="absolute"
+        bottom="0"
+        left="0"
+        right={{ base: "12", md: "16" }}
+        h="12"
+        borderBottomLeftRadius="lg"
+        cursor="pointer"
+        onClick={toggleCard}
+        {...hoverHandlers}
+      />
+
+      {cardState === CardState.Closed && (
+        <Box
+          display={{ base: "block", md: "none" }}
+          pos="absolute"
+          inset="0"
+          borderRadius="lg"
+          zIndex="1"
+          onClick={toggleCard}
+        />
       )}
     </Stack>
   );
@@ -323,28 +362,46 @@ function JobExpanded(props: { job: JobFragmentType }) {
           <Text fontSize="sm">{props.job.org.description}</Text>
         </Stack>
       )}
-      {props.job.url_external && (
-        <Button
-          asChild
-          variant="pg-primary"
-          w={{ base: "150px", md: "190px" }}
-          h="10"
-          focusRingColor="transparent"
-        >
-          <Link
-            href={appendUtmSource(props.job.url_external)}
-            target="_blank"
-            rel="noopener noreferrer"
-            textDecoration="none"
-            _hover={{ textDecoration: "none" }}
+      <Flex gap="gap.md" align="center" w="fit-content" pos="relative" zIndex="1">
+        {props.job.url_external && (
+          <Button
+            asChild
+            variant="pg-primary"
+            w={{ base: "150px", md: "190px" }}
+            h="10"
+            focusRingColor="transparent"
           >
-            Job Details
-            <Icon boxSize="4" position="relative" top="-1px">
-              <LuExternalLink />
+            <Link
+              href={appendUtmSource(props.job.url_external)}
+              target="_blank"
+              rel="noopener noreferrer"
+              textDecoration="none"
+              _hover={{ textDecoration: "none" }}
+            >
+              Job Details
+              <Icon boxSize="4" position="relative" top="-1px">
+                <LuExternalLink />
+              </Icon>
+            </Link>
+          </Button>
+        )}
+        <Tooltip content="Copy link" positioning={{ placement: "right" }}>
+          <Button
+            variant="ghost"
+            h="10"
+            w="10"
+            aria-label="Share"
+            onClick={async () => {
+              await navigator.clipboard.writeText(`${window.location.origin}/${props.job.slug}`);
+              toast.success("Link copied");
+            }}
+          >
+            <Icon boxSize="4">
+              <LuShare2 />
             </Icon>
-          </Link>
-        </Button>
-      )}
+          </Button>
+        </Tooltip>
+      </Flex>
     </Stack>
   );
 }
@@ -369,11 +426,33 @@ function locationTags(locations: JobFragmentType["locations"]): string[] {
   return ["Multiple Locations", "Remote, Multiple Locations"];
 }
 
+function LocationDot() {
+  return (
+    <Box
+      as="span"
+      display="inline-block"
+      w="3px"
+      h="3px"
+      mx="gap.xs"
+      borderRadius="full"
+      bg="fg.muted"
+      verticalAlign="middle"
+      pos="relative"
+      top="-1px"
+    />
+  );
+}
+
 function JobLocations(props: { job: JobFragmentType }) {
   const tags = locationTags(props.job.locations);
   return (
     <Text overflow="hidden" minW="0" fontSize="sm" textOverflow="ellipsis" whiteSpace="nowrap">
-      {tags.join(" · ")}
+      {tags.map((tag, index) => (
+        <span key={tag}>
+          {index > 0 && <LocationDot />}
+          {tag}
+        </span>
+      ))}
     </Text>
   );
 }
@@ -382,6 +461,7 @@ function JobOrgLink(props: {
   job: JobFragmentType;
   isHighlightable: boolean;
   jobHit: Hit<BaseHit>;
+  isCollapsed: boolean;
 }) {
   const orgName = props.isHighlightable ? (
     <Highlight attribute={["org", "name"]} hit={props.jobHit} />
@@ -389,31 +469,28 @@ function JobOrgLink(props: {
     props.job.org?.name
   );
 
-  return props.job.org?.website ? (
+  const textStyle = {
+    fontSize: { base: "13px", md: "md" },
+    lineHeight: { base: "18px", md: "24px" },
+    fontWeight: "medium",
+    color: "fg",
+  } as const;
+
+  if (!props.job.org?.website) {
+    return <Flex {...textStyle}>{orgName}</Flex>;
+  }
+
+  return (
     <Flex align="center" gap="gap.xs">
       <Link
         href={appendUtmSource(props.job.org.website)}
         target="_blank"
         rel="noopener noreferrer"
-        fontSize={{ base: "13px", md: "md" }}
-        lineHeight={{ base: "18px", md: "24px" }}
-        fontWeight="medium"
-        color="fg"
-        textDecoration="none"
-        _hover={{ textDecoration: "underline", textDecorationColor: "fg" }}
-        focusRingColor="transparent"
+        {...textStyle}
+        pointerEvents={{ base: props.isCollapsed ? "none" : "auto", md: "auto" }}
       >
         {orgName}
       </Link>
-    </Flex>
-  ) : (
-    <Flex
-      fontSize={{ base: "13px", md: "md" }}
-      lineHeight={{ base: "18px", md: "24px" }}
-      fontWeight="medium"
-      color="fg"
-    >
-      {orgName}
     </Flex>
   );
 }
