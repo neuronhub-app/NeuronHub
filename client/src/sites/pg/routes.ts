@@ -5,9 +5,12 @@ export const routes = [
 
   layout("./sites/pg/PgLayout.tsx", [
     route("/", "./sites/pg/pages/jobs/list/index.tsx"),
-    route("/subscriptions", "./apps/jobs/subscriptions/index.tsx"),
-    route("/subscriptions/:id_ext", "./apps/jobs/subscriptions/access-session-by-id-ext.tsx"),
-    route("/subscriptions/remove/:id_ext", "./apps/jobs/subscriptions/remove.tsx"),
+    route("/subscriptions", "./sites/pg/pages/jobs/subscriptions/index.tsx"),
+    route(
+      "/subscriptions/:id_ext",
+      "./sites/pg/pages/jobs/subscriptions/access-session-by-id-ext.tsx",
+    ),
+    route("/subscriptions/remove/:id_ext", "./sites/pg/pages/jobs/subscriptions/remove.tsx"),
     route("/versions", "./apps/jobs/versions/index.tsx"),
     route("/:slug", "./sites/pg/pages/jobs/list/slug.tsx"),
   ]),
@@ -35,6 +38,14 @@ export const routes = [
         route("/:id", "./apps/posts/detail/index.tsx"),
         route("/create", "./apps/posts/create/index.tsx"),
         route("/:id/edit", "./apps/posts/edit/index.tsx"),
+      ]),
+      ...prefix("/jobs", [
+        route("/subscriptions", "./apps/jobs/subscriptions/index.tsx"),
+        route(
+          "/subscriptions/:id_ext",
+          "./apps/jobs/subscriptions/access-session-by-id-ext.tsx",
+        ),
+        route("/subscriptions/remove/:id_ext", "./apps/jobs/subscriptions/remove.tsx"),
       ]),
       ...prefix("/profiles", [route("/", "./apps/profiles/list/index.tsx")]),
       ...prefix("/tools", [

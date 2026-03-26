@@ -228,7 +228,7 @@ export const JobAlertListQuery = graphql.persisted(
   `),
 );
 
-const JobAlertToggleActiveMutation = graphql.persisted(
+export const JobAlertToggleActiveMutation = graphql.persisted(
   "JobAlertToggleActive",
   graphql(`
     mutation JobAlertToggleActive($id_ext: UUID!) {
@@ -237,7 +237,7 @@ const JobAlertToggleActiveMutation = graphql.persisted(
   `),
 );
 
-const JobAlertRemoveMutation = graphql.persisted(
+export const JobAlertRemoveMutation = graphql.persisted(
   "JobAlertRemove",
   graphql(`
     mutation JobAlertRemove($id_ext: UUID!) {
@@ -246,7 +246,7 @@ const JobAlertRemoveMutation = graphql.persisted(
   `),
 );
 
-const JobAlertAccessSessionByIdMutation = graphql.persisted(
+export const JobAlertAccessSessionByIdMutation = graphql.persisted(
   "JobAlertAccessSessionById",
   graphql(`
     mutation JobAlertAccessSessionById($id_ext: UUID!) {
