@@ -209,8 +209,8 @@ function HitsList(props: {
   );
 }
 
-// #bad-infer instantsearch.js Hit<BaseHit> not hoisted in Bun workspace — Record<string, any> widens to satisfy Highlight/Snippet
 function HitItem(props: {
+  // #bad-infer untyped instantsearch
   hit: DocHit & Record<string, any>;
   isActive: boolean;
   onMouseEnter: () => void;
@@ -237,7 +237,7 @@ function HitItem(props: {
         <Box flex="1" minW="0">
           <HStack gap="2" alignItems="baseline">
             <Text fontWeight="medium" textStyle="sm">
-              {/* @ts-expect-error #bad-infer instantsearch.js Hit<BaseHit> not hoisted in Bun workspace */}
+              {/* @ts-expect-error #bad-infer untyped instantsearch */}
               <Highlight attribute="pageTitle" hit={props.hit} />
             </Text>
 
@@ -251,13 +251,13 @@ function HitItem(props: {
           </HStack>
           {isSection && (
             <Text mt="0.5" color="fg.muted" textStyle="xs">
-              {/* @ts-expect-error #bad-infer instantsearch.js Hit<BaseHit> not hoisted in Bun workspace */}
+              {/* @ts-expect-error #bad-infer untyped instantsearch */}
               <Highlight attribute="heading" hit={props.hit} />
             </Text>
           )}
           {props.hit.content && (
             <Text mt="0.5" color="fg.muted" lineClamp={2} textStyle="xs">
-              {/* @ts-expect-error #bad-infer instantsearch.js Hit<BaseHit> not hoisted in Bun workspace */}
+              {/* @ts-expect-error #bad-infer untyped instantsearch */}
               <Snippet attribute="content" hit={props.hit} />
             </Text>
           )}

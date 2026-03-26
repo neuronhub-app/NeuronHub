@@ -22,5 +22,8 @@ mise.local.toml
 mise.*.local.toml
 **/.env*
 
+# docker
+/docker-compose.build.*.yaml
+
 # s3
 server/media/

@@ -28,5 +28,5 @@
 
 ["dev:e2e:client"]
     dir = "client"
-    run = "bun run react-router dev --host --port={{ env.CLIENT_PORT_E2E }}"
+    run = "pnpm exec react-router dev --host --port={{ env.CLIENT_PORT_E2E }}"
     env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"

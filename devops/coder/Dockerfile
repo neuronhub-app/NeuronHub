@@ -73,7 +73,7 @@ RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 # Mise tools
 # -----------------------------------
 RUN sudo apt install --yes gpg-agent # for node
-RUN mise install uv bun biome node claude
+RUN mise install uv pnpm biome node claude
 
 RUN mise exec node --command "npx playwright install-deps"
 RUN mise exec node --command "npx playwright install chromium --with-deps"
@@ -84,7 +84,7 @@ RUN mise exec node --command "npx playwright install chromium --with-deps"
 ENV CONTEXT7_CACHE_DIR=$XDG_DATA_HOME/context7/cache
 ENV CONTEXT7_DOCS_DIR=$XDG_DATA_HOME/context7/docs
 RUN mkdir -p $XDG_DATA_HOME/context7/{cache,docs}
-RUN mise exec bun --command "bun install --global @upstash/context7-mcp@latest"
+RUN mise exec node --command "npm install --global @upstash/context7-mcp@latest"
 
 # For tweakcc
 RUN sudo apt install --yes xdg-utils

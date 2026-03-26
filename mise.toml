@@ -2,7 +2,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
 [tools]
     uv = "latest"
-    bun = "latest"
+    pnpm = "latest"
     biome = "latest"
 
 	usage = "latest"
@@ -135,7 +135,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     [tasks."dev:client"]
         depends = "dev:db"
         dir = "client"
-        run = "bun run react-router dev --host --port={{ env.CLIENT_PORT }}"
+        run = "pnpm exec react-router dev --host --port={{ env.CLIENT_PORT }}"
         env.VITE_SERVER_URL = "{{ env.SERVER_URL }}"
 
     [tasks."dev:s3"]
@@ -206,7 +206,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     [tasks."test:e2e"]
         dir = "client"
         alias = "e2e"
-        run = "bun run playwright test --config=e2e/playwright.config.ts"
+        run = "pnpm exec playwright test --config=e2e/playwright.config.ts"
         # duplicate $env with `dev:e2e:server`, as Playwright resets $env when it starts Mise from [[playwright.config.ts]]
         env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
@@ -215,7 +215,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     [tasks."test:e2e:docs"]
         dir = "docs"
         alias = "e2e:docs"
-        run = "bun run playwright test --config=e2e/playwright.config.ts"
+        run = "pnpm exec playwright test --config=e2e/playwright.config.ts"
 
 
 # Django
@@ -254,7 +254,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     run = "uv run manage.py algolia_reindex_with_replicas --model=Job"
 
 [tasks."algolia-reindex:docs"]
-    run = "bun docs/scripts/algolia-index-docs.ts"
+    dir = "docs"
+    run = "pnpm exec tsx scripts/algolia-index-docs.ts"
 
 
 # typegen → format → lint
@@ -288,7 +289,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     [tasks."typegen:client:graphql-codegen"]
         dir = "client"
-        run = "bun run graphql-codegen --errors-only --silent --config src/codegen.ts"
+        run = "pnpm exec graphql-codegen --errors-only --silent --config src/codegen.ts"
         sources = ["../schema.graphql"]
         quiet = true
 
@@ -297,8 +298,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         run = """
             let file = "../server/persisted-queries.json"
 
-            bun run gql-tada generate output
-            bun run gql-tada generate persisted --output $file
+            pnpm exec gql-tada generate output
+            pnpm exec gql-tada generate persisted --output $file
             open $file | sort | save --force $file
         """
         sources = ["src/**/*", "e2e/**/*"]
@@ -307,10 +308,10 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     [tasks."typegen:client:chakra:neuron"]
         dir = "client"
         run = """
-            let is_overrides_shared_node_modules = $env.VITE_SITE == "pg"; # see #123
+            let is_overrides_shared_node_modules = ($env.VITE_SITE? | default "") == "pg"; # see #123
             if not $is_overrides_shared_node_modules {
                 # todo ! fix: still clashes with `pg`, ignoring for now
-                bun run chakra typegen src/theme/theme.ts | ignore
+                pnpm exec chakra typegen src/theme/theme.ts | ignore
             }
         """
         sources = ["src/theme/**/*.ts"]
@@ -318,7 +319,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     [tasks."typegen:client:chakra:pg"]
         dir = "client"
-        run = "bun run chakra typegen src/sites/pg/theme.ts"
+        run = "pnpm exec chakra typegen src/sites/pg/theme.ts"
         sources = ["src/sites/theme/**/*.ts", "src/sites/pg/theme.ts"]
         silent = true # quiet doesn't work
 
@@ -343,7 +344,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     [tasks."typegen:docs:react-router"]
         dir = "docs"
-        run = "bun run react-router typegen"
+        run = "pnpm exec react-router typegen"
         sources = ["src/**/*.mdx"]
         quiet = true
 
@@ -351,12 +352,12 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         usage = """
             flag "--dir <dir>"
         """
-        # chakra modifies node_modules -> Bun dedups @chakra-ui/react (no nohoist) -> chakra overrides client/ or shared/ types -> fixed by --outdir
+        # chakra modifies node_modules -> pnpm dedups @chakra-ui/react -> chakra overrides client/ or shared/ types -> fixed by --outdir
         run = """
             cd $env.usage_dir
 
             let output_dir = ".chakra/types"
-            bun run chakra typegen src/theme/theme.ts --outdir $output_dir
+            pnpm exec chakra typegen src/theme/theme.ts --outdir $output_dir
 
             # Generated .d.ts use rel imports `"../css.types"` -> breaks outside node_modules -> remap to #chakra-internal/ tsconfig path
             glob $"($output_dir)/*.d.ts" | each { |file|
@@ -424,21 +425,21 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     [tasks."lint:client"]
         dir = "client/"
-        run = "bun run tsgo --noEmit"
+        run = "pnpm exec tsgo --noEmit"
         sources = ["src/**/*", "e2e/**/*", "tsconfig.json", "package.json"]
         quiet = true
 
     [tasks."lint:docs"]
         dir = "docs/"
         run = [
-            "bun run tsgo --noEmit",
-            "bun run scripts/lint-mdx.ts",
+            "pnpm exec tsgo --noEmit",
+            "pnpm exec tsx scripts/lint-mdx.ts",
         ]
         sources = ["src/**/*", "e2e/**/*", "scripts/**/*", "tsconfig.json", "package.json"]
         quiet = true
 
     [tasks."lint:packages"]
         dir = "packages/shared/"
-        run = "bun run tsgo --noEmit"
+        run = "pnpm exec tsgo --noEmit"
         sources = ["src/**/*", "package.json"]
         quiet = true

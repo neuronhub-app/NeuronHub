@@ -1,7 +1,7 @@
 /**
  * #AI
  */
-// Vite build: runs before aliases - requires node:fs and relative imports (no @/, no Bun)
+// Vite build: runs before aliases - requires node:fs and relative imports (no @/)
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 import { type RouteConfig, layout, route } from "@react-router/dev/routes";
