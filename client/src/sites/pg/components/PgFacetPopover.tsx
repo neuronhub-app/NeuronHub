@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 export function PgFacetPopover(props: {
   label: string;
   children: ReactNode;
-  disabled?: boolean;
   onClose?: () => void;
   contentMaxW?: string;
   order?: { base?: number; lg?: number };
@@ -39,7 +38,6 @@ export function PgFacetPopover(props: {
           borderRadius="sm"
           justifyContent="space-between"
           px="2.5"
-          disabled={props.disabled}
           order={props.order}
         >
           <Flex align="center" gap="gap.sm">
