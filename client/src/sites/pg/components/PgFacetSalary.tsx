@@ -2,7 +2,6 @@ import {
   Flex,
   FormatNumber,
   Icon,
-  Link,
   NumberInput,
   Slider,
   Stack,

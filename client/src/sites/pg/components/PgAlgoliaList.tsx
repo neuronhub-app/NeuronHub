@@ -15,7 +15,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import type { TadaDocumentNode } from "gql.tada";
-import React, { useEffect, useRef, type ReactNode, type RefObject, ComponentProps } from "react";
+import React, { useEffect, useRef, type ReactNode, type RefObject } from "react";
 import { LuChevronDown, LuSquareX } from "react-icons/lu";
 import {
   InstantSearch,
@@ -116,7 +116,6 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
               <PgSearchInput
                 testId={props.searchInputTestId}
                 endElementText={<PgSearchStats label={labelPlural} indexName={indexName} />}
-                isHideResetBtn={true}
               />
               <PgMobileCollapsible
                 cta={props.ctaMobile ?? props.cta}
@@ -157,8 +156,16 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
 
               <Box>{props.cta}</Box>
 
-              {/* @ts-expect-error #bad-infer not worth it. */}
-              <PgFacetsActive {...props} />
+              <PgFacetsActive
+                labelsOverride={props.facetsActiveLabelsOverride}
+                dateAttributes={props.facetsActiveDateAttributes}
+                moneyAttributes={props.facetsActiveMoneyAttributes}
+                formatAttribute={props.facetsActiveFormatAttribute}
+                subFacetPairs={props.facetsActiveSubFacetPairs}
+                subFacetLabel={props.facetsActiveSubFacetLabel}
+                extraTags={props.facetsActiveExtraTags}
+                onClearAdditional={props.onClearAdditional}
+              />
 
               <Box gridColumn="span 5">{props.facetsTopbar}</Box>
             </Grid>
@@ -185,7 +192,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
   );
 }
 
-function PgFacetsActive(props: ComponentProps<typeof PgAlgoliaList>) {
+function PgFacetsActive(props: FacetsActiveProps & { onClearAdditional?: () => void }) {
   const clear = useClearRefinements();
   if (!clear.canRefine) {
     return null;
@@ -198,13 +205,13 @@ function PgFacetsActive(props: ComponentProps<typeof PgAlgoliaList>) {
 
           <PgAlgoliaFacetsActiveRow
             variant="desktop"
-            labelsOverride={props.facetsActiveLabelsOverride}
-            dateAttributes={props.facetsActiveDateAttributes}
-            moneyAttributes={props.facetsActiveMoneyAttributes}
-            formatAttribute={props.facetsActiveFormatAttribute}
-            subFacetPairs={props.facetsActiveSubFacetPairs}
-            subFacetLabel={props.facetsActiveSubFacetLabel}
-            extraTags={props.facetsActiveExtraTags}
+            labelsOverride={props.labelsOverride}
+            dateAttributes={props.dateAttributes}
+            moneyAttributes={props.moneyAttributes}
+            formatAttribute={props.formatAttribute}
+            subFacetPairs={props.subFacetPairs}
+            subFacetLabel={props.subFacetLabel}
+            extraTags={props.extraTags}
           />
         </HStack>
       </Collapsible.Content>
@@ -244,7 +251,9 @@ function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(props: {
       return;
     }
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry!.isIntersecting) showMoreRef.current();
+      if (entry!.isIntersecting) {
+        showMoreRef.current();
+      }
     });
     observer.observe(sentinelEl);
     return () => observer.disconnect();

@@ -8,7 +8,7 @@ import { z } from "zod";
 
 import { useUser } from "@/apps/users/useUserCurrent";
 import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
-import { locationRemoteNames } from "@/sites/pg/components/PgFiltersTopbar";
+import { locationRemoteNames } from "@/sites/pg/locations";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogCloseTrigger,

@@ -44,21 +44,6 @@ export namespace theme {
       backdrop: { value: "{colors.brand.gray.backdrop}/50" },
     },
 
-    bg: {
-      DEFAULT: { value: { _light: "{colors.brand.seashell}", _dark: "{colors.stone.950}" } },
-      subtle: { value: { _light: "{colors.gray.50}", _dark: "{colors.gray.950}" } },
-      muted: { value: { _light: "{colors.gray.100}", _dark: "{colors.gray.900}" } },
-      emphasized: { value: { _light: "{colors.gray.200}", _dark: "{colors.gray.800}" } },
-      inverted: { value: { _light: "{colors.black}", _dark: "{colors.white}" } },
-      panel: { value: { _light: "{colors.white}", _dark: "{colors.gray.950}" } },
-      error: { value: { _light: "{colors.red.50}", _dark: "{colors.red.950}" } },
-      warning: { value: { _light: "{colors.orange.50}", _dark: "{colors.orange.950}" } },
-      success: { value: { _light: "{colors.green.50}", _dark: "{colors.green.950}" } },
-      info: { value: { _light: "{colors.blue.50}", _dark: "{colors.blue.950}" } },
-      card: { value: { _light: "white", _dark: "{colors.slate.800}" } },
-      backdrop: { value: "{colors.brand.gray.backdrop}/50" },
-    },
-
     fg: {
       DEFAULT: { value: { _light: "{colors.brand.black}", _dark: "{colors.slate.200}" } },
       muted: { value: { _light: "{colors.brand.gray.muted}", _dark: "{colors.stone.400}" } },
