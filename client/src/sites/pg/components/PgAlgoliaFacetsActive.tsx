@@ -24,7 +24,7 @@ const tagStyle = {
   css: { "&:hover .close-icon": { color: "red" } },
 } as const;
 
-export function PgAlgoliaFacetsActive(props: {
+export type FacetsActiveConfig = {
   labelsOverride?: Record<string, string>;
   dateAttributes?: string[];
   moneyAttributes?: string[];
@@ -32,17 +32,19 @@ export function PgAlgoliaFacetsActive(props: {
   subFacetPairs?: Record<string, string>;
   subFacetLabel?: Record<string, string>;
   extraTags?: Array<{ label: string; onRemove: () => void }>;
-  tagsGap?: string;
-}) {
+  onClearAdditional?: () => void;
+};
+
+export function PgAlgoliaFacetsActive(props: { config: FacetsActiveConfig; tagsGap?: string }) {
   const refinementsCurrent = useCurrentRefinements();
   const refinementsClear = useClearRefinements();
 
-  if (!refinementsClear.canRefine && !props.extraTags?.length) {
+  if (!refinementsClear.canRefine && !props.config.extraTags?.length) {
     return null;
   }
 
   function isSubFacetHidden(attribute: string, label: string) {
-    const mainAttr = props.subFacetPairs?.[attribute];
+    const mainAttr = props.config.subFacetPairs?.[attribute];
     if (!mainAttr) {
       return false;
     }
@@ -54,18 +56,18 @@ export function PgAlgoliaFacetsActive(props: {
   }
 
   function renderLabel(attribute: string, refinement: RefinementActive) {
-    if (props.subFacetPairs?.[attribute] !== undefined) {
-      return `${refinement.label} (${props.subFacetLabel?.[attribute] ?? attribute})`;
+    if (props.config.subFacetPairs?.[attribute] !== undefined) {
+      return `${refinement.label} (${props.config.subFacetLabel?.[attribute] ?? attribute})`;
     }
 
-    const label = props.labelsOverride?.[attribute] ?? refinement.label;
-    if (props.dateAttributes?.includes(attribute)) {
+    const label = props.config.labelsOverride?.[attribute] ?? refinement.label;
+    if (props.config.dateAttributes?.includes(attribute)) {
       return `${label} ${refinement.operator} ${datetime.relative(fromUnixTime(refinement.value as number))}`;
     }
-    if (props.moneyAttributes?.includes(attribute)) {
+    if (props.config.moneyAttributes?.includes(attribute)) {
       return `${label}: ${salaryFormatter.format(refinement.value as number)}+`;
     }
-    return props.formatAttribute?.[attribute]?.(refinement) ?? label;
+    return props.config.formatAttribute?.[attribute]?.(refinement) ?? label;
   }
 
   return (
@@ -81,7 +83,7 @@ export function PgAlgoliaFacetsActive(props: {
             />
           )),
       )}
-      {props.extraTags?.map(tag => (
+      {props.config.extraTags?.map(tag => (
         <FilterTag key={tag.label} label={tag.label} onRemove={tag.onRemove} />
       ))}
     </Wrap>

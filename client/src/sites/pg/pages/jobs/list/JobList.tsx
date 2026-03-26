@@ -100,19 +100,21 @@ export function JobList(props: { slug?: string }) {
         listTestId: ids.job.list,
       }}
       searchInputTestId={ids.job.searchInput}
-      facetsActiveLabelsOverride={{
-        is_remote: "Remote",
-        "org.is_highlighted": "Highlighted",
-        posted_at_unix: "Posted",
-        salary_min: "Minimum Salary",
-      }}
-      facetsActiveDateAttributes={["posted_at_unix"]}
-      facetsActiveMoneyAttributes={["salary_min"]}
-      facetsActiveExtraTags={extraTags}
       facetsTopbar={<PgFiltersTopbar />}
-      onClearAdditional={() => {
-        resetSalaryFilter();
-        resetOtherFilters();
+      facetsActive={{
+        labelsOverride: {
+          is_remote: "Remote",
+          "org.is_highlighted": "Highlighted",
+          posted_at_unix: "Posted",
+          salary_min: "Minimum Salary",
+        },
+        dateAttributes: ["posted_at_unix"],
+        moneyAttributes: ["salary_min"],
+        extraTags,
+        onClearAdditional: () => {
+          resetSalaryFilter();
+          resetOtherFilters();
+        },
       }}
     >
       <Configure
@@ -151,7 +153,7 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
     return {
       id: undefined,
       node: (
-        <Box position="relative" zIndex="1">
+        <Box>
           <Stack
             as="article"
             p={{ base: "gap.md", md: "gap.xl" }}
@@ -192,7 +194,7 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
 
 function JobOpenSeparator() {
   return (
-    <HStack mt="gap.xl" position="relative" zIndex="1">
+    <HStack mt="gap.xl">
       <Separator flex="1" borderColor="brand.gray" />
       <Text color="brand.gray.muted" fontSize="sm" fontWeight="medium">
         All jobs
