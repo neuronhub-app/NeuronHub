@@ -10,6 +10,7 @@ export function PgFacetPopover(props: {
   onClose?: () => void;
   contentMaxW?: string;
   order?: { base?: number; lg?: number };
+  icon?: ReactNode;
 }) {
   return (
     <Popover.Root
@@ -41,7 +42,10 @@ export function PgFacetPopover(props: {
           disabled={props.disabled}
           order={props.order}
         >
-          {props.label}
+          <Flex align="center" gap="gap.sm">
+            {props.icon && <Icon boxSize="3.5">{props.icon}</Icon>}
+            {props.label}
+          </Flex>
           <Icon
             boxSize="4"
             css={{ transition: "rotate 0.2s", "[data-state=open] &": { rotate: "180deg" } }}
