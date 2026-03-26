@@ -25,27 +25,14 @@ import type { JobFragmentType } from "@/graphql/fragments/jobs";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
+import { pgTagStyle } from "@/sites/pg/pgTagStyle";
 import { toast } from "@/utils/toast";
 
 const style = {
   markHighlight: {
     "& mark": { bg: "yellow.200", color: "black", borderRadius: "2px", px: "1px" },
   },
-  tag: {
-    base: {
-      h: "6",
-      px: "gap.sm",
-      borderRadius: "sm",
-      fontSize: "sm",
-      fontWeight: "normal",
-      alignItems: "center",
-    } as const,
-    highlighted: { bg: "#FCEFAC", fg: "#7A6A1E" },
-    area: { bg: "#DBEADD", fg: "#1F6B29" },
-    experience: { bg: "#E1EFEE", fg: "#1A6860" },
-    education: { bg: "#E1F3F9", fg: "#2C5E6E" },
-    workload: { bg: "#F0EBEC", fg: "#7D4D57" },
-  },
+  tag: pgTagStyle,
   duration: "slow",
 } as const;
 
