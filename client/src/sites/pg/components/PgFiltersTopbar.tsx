@@ -106,15 +106,7 @@ function CountryFacet(props: { order: FacetOrder }) {
   const country = useRefinementList({ attribute: "tags_country.name" });
   return (
     <PgFacetPopover label="Country" disabled={!country.canRefine} order={props.order}>
-      <PgFacetAttribute
-        attribute="tags_country.name"
-        label="Country"
-        isSearchEnabled
-        subFacet={{
-          attribute: "tags_country_visa_sponsor.name",
-          label: "Confirmed can sponsor visas",
-        }}
-      />
+      <PgFacetAttribute attribute="tags_country.name" label="Country" isSearchEnabled />
     </PgFacetPopover>
   );
 }
