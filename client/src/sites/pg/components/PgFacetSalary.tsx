@@ -9,6 +9,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { PiInfoFill } from "react-icons/pi";
+import { useRef } from "react";
 import { proxy, useSnapshot } from "valtio";
 import { useRange } from "react-instantsearch";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
@@ -81,13 +82,20 @@ export function resetSalaryFilter() {
 
 export function PgFacetSalary() {
   const range = useRange({ attribute: "salary_min" });
+  // Cache last valid bounds to prevent flicker when Algolia returns null during refinement changes
+  const lastRangeRef = useRef<{ min: number; max: number } | null>(null);
 
-  if (!range.range.min || !range.range.max) {
+  if (range.range.min && range.range.max) {
+    lastRangeRef.current = { min: range.range.min, max: range.range.max };
+  }
+
+  const bounds = lastRangeRef.current;
+  if (!bounds) {
     return null;
   }
 
   const valueStart = range.start[0];
-  const slider = { step: 1000, min: range.range.min, max: range.range.max };
+  const slider = { step: 1000, min: bounds.min, max: bounds.max };
 
   function refine(value: number) {
     if (value <= slider.min) {

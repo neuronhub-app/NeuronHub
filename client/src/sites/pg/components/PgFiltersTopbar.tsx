@@ -1,5 +1,5 @@
 import { Flex, Grid, Stack, Switch } from "@chakra-ui/react";
-import { useRange, useRefinementList, useToggleRefinement } from "react-instantsearch";
+import { useToggleRefinement } from "react-instantsearch";
 import { proxy, useSnapshot } from "valtio";
 import { PgFacetSalary, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
@@ -87,18 +87,16 @@ export function PgFiltersTopbar() {
 }
 
 function CauseAreaFacet(props: { order: FacetOrder }) {
-  const causeArea = useRefinementList({ attribute: "tags_area.name" });
   return (
-    <PgFacetPopover label="Cause Area" disabled={!causeArea.canRefine} order={props.order}>
+    <PgFacetPopover label="Cause Area" order={props.order}>
       <PgFacetAttribute attribute="tags_area.name" label="Cause Area" sortBy={sortAlpha} />
     </PgFacetPopover>
   );
 }
 
 function RoleTypeFacet(props: { order: FacetOrder }) {
-  const roleType = useRefinementList({ attribute: "tags_workload.name" });
   return (
-    <PgFacetPopover label="Role Type" disabled={!roleType.canRefine} order={props.order}>
+    <PgFacetPopover label="Role Type" order={props.order}>
       <PgFacetAttribute
         attribute="tags_workload.name"
         label="Role Type"
@@ -123,20 +121,17 @@ function CountryFacet(props: { order: FacetOrder }) {
 }
 
 function ExperienceFacet(props: { order: FacetOrder }) {
-  const experience = useRefinementList({ attribute: "tags_experience.name" });
   return (
-    <PgFacetPopover label="Experience" disabled={!experience.canRefine} order={props.order}>
+    <PgFacetPopover label="Experience" order={props.order}>
       <PgFacetAttribute attribute="tags_experience.name" label="Experience" />
     </PgFacetPopover>
   );
 }
 
 function SalaryFacet(props: { order: FacetOrder }) {
-  const salary = useRange({ attribute: "salary_min" });
   return (
     <PgFacetPopover
       label="Minimum Salary"
-      disabled={!salary.canRefine}
       onClose={() => {
         salaryFilterState.showInfo = false;
       }}
@@ -149,9 +144,8 @@ function SalaryFacet(props: { order: FacetOrder }) {
 }
 
 function SkillSetFacet(props: { order: FacetOrder }) {
-  const skillSet = useRefinementList({ attribute: "tags_skill.name" });
   return (
-    <PgFacetPopover label="Skill Set" disabled={!skillSet.canRefine} order={props.order}>
+    <PgFacetPopover label="Skill Set" order={props.order}>
       <PgFacetAttribute
         attribute="tags_skill.name"
         label="Skill Set"
@@ -190,9 +184,8 @@ function CityFacet(props: { order: FacetOrder }) {
 }
 
 function EducationFacet(props: { order: FacetOrder }) {
-  const education = useRefinementList({ attribute: "tags_education.name" });
   return (
-    <PgFacetPopover label="Education" disabled={!education.canRefine} order={props.order}>
+    <PgFacetPopover label="Education" order={props.order}>
       <PgFacetAttribute
         attribute="tags_education.name"
         label="Education"
@@ -206,7 +199,7 @@ function OtherFiltersFacet(props: { order: FacetOrder }) {
   const highlighted = useToggleRefinement({ attribute: "org.is_highlighted", on: true });
   const snap = useSnapshot(otherFiltersState);
   return (
-    <PgFacetPopover label="Other Filters" disabled={!highlighted.canRefine} order={props.order}>
+    <PgFacetPopover label="Other Filters" order={props.order}>
       <Stack gap="gap.sm">
         <BooleanSwitch
           label="Show only roles at highlighted orgs"
