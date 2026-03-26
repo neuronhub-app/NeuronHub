@@ -1,12 +1,12 @@
 import {
   Box,
-  Code,
   Flex,
   HStack,
   Icon,
   Link,
   Separator,
   Skeleton,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import type { ReactNode } from "react";
@@ -151,10 +151,23 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
     return {
       id: undefined,
       node: (
-        <Box>
-          <Text>
-            Job not found: <Code>{slug}</Code>
-          </Text>
+        <Box position="relative" zIndex="1">
+          <Stack
+            as="article"
+            p={{ base: "gap.md", md: "gap.xl" }}
+            borderRadius="lg"
+            borderWidth="1px"
+            borderColor="subtle"
+            bg="bg.card"
+            align="center"
+          >
+            <Text fontWeight="semibold" color="fg">
+              Job not found
+            </Text>
+            <Text fontSize="sm" color="fg.muted">
+              Job matching "/{slug}" was not found.
+            </Text>
+          </Stack>
           <JobOpenSeparator />
         </Box>
       ),
@@ -168,7 +181,7 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
         {isLoading ? (
           <Skeleton h="32" w="full" />
         ) : (
-          <JobCard job={job!} isSearchActive={false} />
+          <JobCard job={job!} isSearchActive={false} isInitiallyOpen={true} />
         )}
 
         <JobOpenSeparator />
@@ -179,12 +192,12 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
 
 function JobOpenSeparator() {
   return (
-    <HStack mt="gap.md2">
-      <Separator flex="1" />
-      <Text flexShrink="0" color="fg.muted" fontSize="sm">
+    <HStack mt="gap.xl" position="relative" zIndex="1">
+      <Separator flex="1" borderColor="brand.gray" />
+      <Text color="brand.gray.muted" fontSize="sm" fontWeight="medium">
         All jobs
       </Text>
-      <Separator flex="1" />
+      <Separator flex="1" borderColor="brand.gray" />
     </HStack>
   );
 }
