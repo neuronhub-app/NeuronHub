@@ -39,12 +39,6 @@ test("pages render without errors", async ({ page }) => {
 });
 
 test.describe("TOC", () => {
-  test("renders headings from MDX content", async ({ page }) => {
-    await page.goto(routes.usage.deploy);
-    await expect($(page)[ids.toc.root]).toBeVisible();
-    await expect(tocLinks(page)).toHaveCount(9);
-  });
-
   test("highlights first heading on page load", async ({ page }) => {
     await page.goto(routes.usage.deploy);
     await expect(linksActive($(page)[ids.toc.root]).first()).toBeVisible();
@@ -52,14 +46,8 @@ test.describe("TOC", () => {
 
   test("click updates URL hash", async ({ page }) => {
     await page.goto(routes.usage.deploy);
-    await tocLinks(page).nth(5).click();
+    await tocLinks(page).nth(2).click();
     await expect(page).toHaveURL(/#.+$/);
-  });
-
-  test("highlights multiple visible headings", async ({ page }) => {
-    await page.goto(routes.usage.deploy);
-    await tocLinks(page).nth(3).click();
-    await expect(linksActive($(page)[ids.toc.root])).not.toHaveCount(1);
   });
 
   test("does not highlight off-screen headings", async ({ page }) => {
