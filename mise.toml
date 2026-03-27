@@ -161,6 +161,10 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
             }
         """
 
+    [tasks."dev:docs"]
+        dir = "docs"
+        run = "bun dev"
+
     [tasks."dev:stop"]
         dir = "devops"
         run = [
