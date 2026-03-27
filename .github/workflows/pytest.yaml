@@ -1,4 +1,4 @@
-name: Test and lint
+name: Pytest
 
 on:
   push:
@@ -20,8 +20,6 @@ jobs:
 
     runs-on: ubuntu-latest
     environment: test
-    container:
-      image: mcr.microsoft.com/playwright:v1.58.2-noble
 
     services:
       db:
@@ -49,7 +47,7 @@ jobs:
 
     steps:
       - name: Run Git checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Mise
         uses: jdx/mise-action@v3
@@ -60,19 +58,7 @@ jobs:
           enable-cache: true
           working-directory: ${{ github.workspace }}/server
 
-      - run: npm install -g nushell
-
       - run: mise run install-deps:server
 
       - name: Pytest
-        run: mise run test:pytest --markers="not slow_llm_api and not firebase_subscription"
-
-      - run: mise run install-deps:client
-
-      # Playwright isn't stable yet - always fails first tests with timeouts (cold db cache), but even a 15+ sec timeout is useless in GitHub CI
-      #- run: mise run test:e2e
-      #  env:
-      #    E2E_DB_NAME: neuronhub # override default, as calling `psql "CREATE DATABASE ..."` in Playwright image is PITA
-
-      - run: mise run format
-      - run: mise run lint
+        run: mise run pytest --markers="not slow_llm_api and not firebase_subscription"
