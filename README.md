@@ -18,17 +18,16 @@ Development Setup
 ### Linux & Docker
 
 1. Install <a href="https://mise.jdx.dev/getting-started" rel="nofollow">Mise</a>, eg `curl https://mise.run | sh`
-2. Install <a href="https://nushell.sh" rel="nofollow">Nushell</a>, eg `brew install nushell`
-3. `git clone {url}`
-4. `cd neuronhub`
-5. ```shell
-	mise trust
-	mise install
-	mise run install-deps
-	mise run dev:db:setup # FYI slow due to db_stubs_repopulate 
-	mise run dev:db:e2e:setup 
-	mise run dev
-	```
+2. `git clone {url}`
+3. `cd neuronhub`
+4. ```shell
+    mise trust
+    mise install
+    mise run install-deps
+    mise run dev:db:setup # FYI slow due to db_stubs_repopulate 
+    mise run dev:db:e2e:setup 
+    mise run dev
+    ```
 
 dev URLs:
 - http://localhost:8000/admin
