@@ -24,6 +24,7 @@ import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { appendUtmSource } from "@/sites/pg/siteConfigState";
 
 const style = {
   markHighlight: {
@@ -325,7 +326,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
           focusRingColor="transparent"
         >
           <Link
-            href={props.job.url_external}
+            href={appendUtmSource(props.job.url_external)}
             target="_blank"
             rel="noopener noreferrer"
             textDecoration="none"
@@ -385,7 +386,7 @@ function JobOrgLink(props: {
   return props.job.org?.website ? (
     <Flex align="center" gap="gap.xs">
       <Link
-        href={props.job.org.website}
+        href={appendUtmSource(props.job.org.website)}
         target="_blank"
         rel="noopener noreferrer"
         fontSize={{ base: "13px", md: "md" }}

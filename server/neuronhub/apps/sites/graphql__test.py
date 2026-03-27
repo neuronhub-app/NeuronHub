@@ -1,6 +1,6 @@
 from asgiref.sync import async_to_sync
 from asgiref.sync import sync_to_async
-from django.core.cache import cache
+from django.conf import settings
 
 from neuronhub.apps.sites.graphql import SitesQuery
 from neuronhub.apps.sites.models import NavbarLink
@@ -10,8 +10,8 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 class NavLinksCacheTest(NeuronTestCase):
     def setUp(self):
-        cache.delete(SitesQuery.CacheKey.NavLinks)
-        cache.delete(SitesQuery.CacheKey.FooterSections)
+        settings.CACHE_RAM.delete(SitesQuery.CacheKey.NavLinks)
+        settings.CACHE_RAM.delete(SitesQuery.CacheKey.FooterSections)
 
     async def test_cached_after_first_query(self):
         result = await self.graphql_query(self.site_query)
@@ -55,4 +55,4 @@ class NavLinksCacheTest(NeuronTestCase):
 
 
 async def _get_cache():
-    return await cache.aget(SitesQuery.CacheKey.NavLinks)
+    return await settings.CACHE_RAM.aget(SitesQuery.CacheKey.NavLinks)

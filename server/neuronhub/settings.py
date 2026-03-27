@@ -12,6 +12,7 @@ import django_stubs_ext
 import rich.traceback
 import sentry_sdk
 from corsheaders.defaults import default_headers
+from django.utils.functional import SimpleLazyObject
 from environs import Env
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import strawberry_django_settings
@@ -158,6 +159,7 @@ if DJANGO_ENV is DjangoEnv.COLLECTSTATIC:
     }
 
 
+_cache_key_ram = "ram"
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
@@ -167,7 +169,23 @@ CACHES = {
             "TIMEOUT": None,  # only for tests atm, no need to expire
         },
     },
+    _cache_key_ram: {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "neuronhub-ram",
+    },
 }
+
+SOLO_CACHE = _cache_key_ram
+SOLO_CACHE_TIMEOUT = 4 * 60 * 60  # 4h
+
+
+def _get_ram_cache():
+    from django.core.cache import caches
+
+    return caches[_cache_key_ram]
+
+
+CACHE_RAM = SimpleLazyObject(_get_ram_cache)
 
 TEMPLATES = [
     {

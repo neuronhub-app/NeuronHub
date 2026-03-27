@@ -2,13 +2,14 @@ from typing import cast
 
 import strawberry
 import strawberry_django
-from django.core.cache import cache
+from django.conf import settings
 from django.db.models import Model
 from strawberry import auto
 
 from neuronhub.apps.sites.models import FooterLink
 from neuronhub.apps.sites.models import FooterSection
 from neuronhub.apps.sites.models import NavbarLink
+from neuronhub.apps.sites.models import SiteConfig
 
 
 @strawberry_django.type(NavbarLink)
@@ -40,6 +41,11 @@ class FooterSectionType:
 @strawberry.type
 class SiteType:
     @strawberry_django.field()
+    async def jobs_url_utm_source(self) -> str:
+        site_config = await SiteConfig.get_solo()
+        return site_config.jobs_url_utm_source
+
+    @strawberry_django.field()
     async def nav_links(self) -> list[NavbarLinkType]:
         return await get_list_cached(NavbarLink, cache_key=SitesQuery.CacheKey.NavLinks)
 
@@ -68,7 +74,7 @@ async def get_list_cached[Return: type](
     cache_key: str,
     prefetch_related: list[str] = None,
 ) -> list[Return]:
-    items_cached = await cache.aget(cache_key)
+    items_cached = await settings.CACHE_RAM.aget(cache_key)
     if items_cached is not None:
         return items_cached
 
@@ -77,6 +83,6 @@ async def get_list_cached[Return: type](
         items_qs = items_qs.prefetch_related(*prefetch_related)
     items = [link async for link in items_qs]
 
-    await cache.aset(cache_key, items)
+    await settings.CACHE_RAM.aset(cache_key, items)
 
     return cast(list[Return], items)

@@ -30,17 +30,24 @@ import {
 import { SiMatrix, SiSubstack } from "react-icons/si";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { FooterLinkIcon, FooterSectionKind } from "~/graphql/enums";
-import { graphql, type ResultOf } from "@/gql-tada";
-import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { useSnapshot } from "valtio";
+import {
+  siteConfigState,
+  type SiteConfigData,
+  type FooterSection,
+} from "@/sites/pg/siteConfigState";
 
 export default function PgLayout() {
-  const { data, isLoadingFirstTime } = useApolloQuery(SiteConfigQuery);
+  const configSnap = useSnapshot(siteConfigState);
 
-  const footer = useFooterSections(data?.site?.footer_sections);
+  const footer = useFooterSections(configSnap.data?.footer_sections);
 
   return (
     <Flex flex="1" direction="column" bg="bg">
-      <PgHeroHeader navLinks={data?.site?.nav_links ?? []} isLoading={isLoadingFirstTime} />
+      <PgHeroHeader
+        navLinks={configSnap.data?.nav_links ?? []}
+        isLoading={configSnap.isLoading}
+      />
 
       <Stack
         as="main"
@@ -56,12 +63,12 @@ export default function PgLayout() {
         </Container>
       </Stack>
 
-      <PgFooter footer={footer} isLoading={isLoadingFirstTime} />
+      <PgFooter footer={footer} isLoading={configSnap.isLoading} />
     </Flex>
   );
 }
 
-function PgHeroHeader(props: { navLinks: SiteConfig["nav_links"]; isLoading: boolean }) {
+function PgHeroHeader(props: { navLinks: SiteConfigData["nav_links"]; isLoading: boolean }) {
   return (
     <Box as="header" bg="brand.green">
       <PgNav navLinks={props.navLinks} isLoading={props.isLoading} />
@@ -105,7 +112,7 @@ function PgHeroHeader(props: { navLinks: SiteConfig["nav_links"]; isLoading: boo
   );
 }
 
-function PgNav(props: { navLinks: SiteConfig["nav_links"]; isLoading: boolean }) {
+function PgNav(props: { navLinks: SiteConfigData["nav_links"]; isLoading: boolean }) {
   const state = useStateValtio({ isMenuOpen: false });
 
   const isMenuOpen = state.snap.isMenuOpen;
@@ -370,7 +377,7 @@ function FooterSectionColumn(props: {
   );
 }
 
-function useFooterSections(sections?: FooterSection[]): FooterData {
+function useFooterSections(sections?: readonly FooterSection[]): FooterData {
   const sectionsByEnum = {} as Record<FooterSectionKind, FooterSection[]>;
 
   for (const enumValue of Object.values(FooterSectionKind)) {
@@ -385,36 +392,6 @@ function useFooterSections(sections?: FooterSection[]): FooterData {
     bottomLinks: sectionsByEnum[FooterSectionKind.Bottom]?.[0]?.links ?? [],
   };
 }
-
-const SiteConfigQuery = graphql.persisted(
-  "SiteConfigQuery",
-  graphql(`
-    query SiteConfigQuery {
-      site {
-        nav_links {
-          id
-          label
-          href
-        }
-        footer_sections {
-          id
-          kind
-          title
-          links {
-            id
-            label
-            href
-            icon
-          }
-        }
-      }
-    }
-  `),
-);
-
-type SiteConfig = NonNullable<ResultOf<typeof SiteConfigQuery>["site"]>;
-
-type FooterSection = SiteConfig["footer_sections"][number];
 
 type FooterData = {
   columns: FooterSection[];
