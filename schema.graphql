@@ -254,6 +254,7 @@ type Mutation {
   job_alert_remove(id_ext: UUID!): Boolean!
   job_alert_access_session_by_id_ext(id_ext: UUID!): Boolean!
   job_alert_unsubscribe(id_ext: UUID!): Boolean!
+  send_contact_message(message: String!, name: String = null, email: String = null): Boolean!
 }
 
 type NavbarLinkType {
