@@ -1,6 +1,10 @@
 import { CodeBlock, Float, IconButton } from "@chakra-ui/react";
 
-export function CodeBlockText(props: { children: string; lang: string; title?: string }) {
+export function CodeBlockText(props: {
+  children: string;
+  lang: "typescript" | "python" | "bash" | string;
+  title?: string;
+}) {
   return (
     <CodeBlock.Root code={props.children.trim()} language={props.lang} pos="relative">
       {props.title ? (

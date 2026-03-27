@@ -1,13 +1,60 @@
 ---
 order: 1
+is_new: true
 ---
 
 import {
 	LinkExt,
-	LinkInt,
+	SourceLink,
+	AdminLink,
+	BadgeNew,
+	PageLink,
+	CodeBlockText,
 } from "@/components"
 import { env } from "@/env";
 
+### Deletion <BadgeNew isHeading />
+
+Deleting a `JobAlert` keeps its `django-simple-history` record (same for `Job`s), but it becomes invisible in the admin.
+You can access it in the SQL table `jobs_historicaljobalert`.
+
+Once its deleted by the user on the `/subscriptions/` page (or by an admin) - its admin details url will return a 404 error (eg `/admin/jobs/jobalert/13/change/`).
+Yet if you open its `/{id}/history/` url directly (eg `/admin/jobs/jobalert/13/history/`) - you'll see the history of changes and the deletion event log.
+
+
+#### Data deletion requests
+
+If you receive a deletion requests, you will need to delete the historical records by User.
+Eg by connecting to Render.com database with `ssh` and running:
+
+<CodeBlockText lang="bash">{`
+  cd /app/
+  uv run manage.py shell
+`}</CodeBlockText>
+
+Then:
+
+<CodeBlockText lang="python">{`
+from neuronhub.apps.users.models import User
+from neuronhub.apps.jobs.models import JobAlert
+
+user = User.objects.get(email="{name}@{domain}")
+JobAlert.history.filter(user=user).delete()
+`}</CodeBlockText>
+
+If you get more than a couple of deletion requests - we can add an `/admin/` panel button for executing this cleanup script.
+Or simply disable the historical records saving for `JobAlert`s.
+
+
+#### Database cleanup
+
+If, somehow, your `*_historical*` SQL tables grew too large, you can use the cleanup commands:
+- `uv run manage.py clean_duplicate_history --auto`
+- `uv run manage.py clean_old_history --days 60 --auto`
+
+For more - <LinkExt href="https://django-simple-history.readthedocs.io/en/stable/utils.html">read the docs</LinkExt> of `django-simple-history`.
+
+
 ### Links
-- <LinkInt path="/usage/guides/admin-panel">Admin panel</LinkInt> list: <LinkExt href={`${env.VITE_SERVER_URL}/admin/jobs/jobalert/`}>/admin/jobs/jobalert/</LinkExt>
-- Source code: <LinkExt href="https://github.com/neuronhub-app/NeuronHub/blob/master/server/neuronhub/apps/jobs/models.py#L214">server/neuronhub/apps/jobs/models.py</LinkExt>
+- <PageLink id="admin-panel"/> list: <AdminLink id="JobAlert" />
+- `JobAlert`'s <SourceLink id="jobs">source code</SourceLink>
