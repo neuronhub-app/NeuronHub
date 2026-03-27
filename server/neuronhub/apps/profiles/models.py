@@ -100,7 +100,7 @@ class Profile(AlgoliaModel):
         User, related_name=UserListName.profiles_bookmarked.value, blank=True
     )
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     profile_for_llm_md = models.TextField(blank=True)
     is_profile_custom = models.BooleanField(default=False)
@@ -281,7 +281,7 @@ class ProfileMatch(AnonimazableTimeStampedModel):
     match_batch_id = models.CharField(max_length=128, blank=True)
     match_processed_at = models.DateTimeField(null=True, blank=True)
 
-    history = HistoricalRecords()
+    history = HistoricalRecords(cascade_delete_history=True)
 
     def __str__(self):
         return f"Match: {self.user} → {self.profile}"
