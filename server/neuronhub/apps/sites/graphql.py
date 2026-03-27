@@ -2,7 +2,10 @@ from typing import cast
 
 import strawberry
 import strawberry_django
+from asgiref.sync import sync_to_async
+from django.conf import settings
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.db.models import Model
 from strawberry import auto
 
@@ -61,6 +64,32 @@ class SitesQuery:
     @strawberry.field()
     def site(self) -> SiteType:
         return SiteType()
+
+
+@strawberry.type(name="Mutation")
+class SitesMutation:
+    @strawberry.mutation
+    async def send_contact_message(
+        self,
+        message: str,
+        name: str | None = None,
+        email: str | None = None,
+    ) -> bool:
+        subject = "Contact form"
+        if name:
+            subject += f" from {name}"
+
+        body = message
+        if email:
+            body += f"\n\nReply to: {email}"
+
+        await sync_to_async(send_mail)(
+            subject=subject,
+            message=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.ADMIN_EMAIL],
+        )
+        return True
 
 
 async def get_list_cached[Return: type](
