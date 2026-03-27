@@ -11,6 +11,7 @@ export { LinkExt } from "@/components/LinkExt";
 export { LinkInt } from "@/components/LinkInt";
 export { Notice } from "@/components/Notice";
 export { PageLink } from "@/components/PageLink";
+export { SourceLink } from "@/components/SourceLink";
 export { TagLg } from "@/components/TagLg";
 export { Term } from "@/components/Term";
 export { Toc } from "@/components/Toc";

@@ -1,7 +1,6 @@
 ---
 title: Error Monitoring
 order: 2
-is_new: true
 ---
 
 import {
@@ -40,7 +39,7 @@ You can browse <LinkExt href="https://sentry.io/explore/replays">all Replays her
 
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry_explore_replays.avif" alt="Explore Replays" isDimmed />
 
-## Logs <BadgeNew isHeading />
+## Logs
 
 All logs from the <Term id="backend" />, <Term id="frontend" />, and <Term id="worker" /> are sent to
 <LinkExt href="https://sentry.io/explore/logs/">the Sentry Logs dashboard</LinkExt>.
@@ -52,7 +51,7 @@ You can use complex filters to either search or aggregate the logs data:
 
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/logs.avif" alt="Logs" isDimmed />
 
-## Uptime <BadgeNew isHeading />
+## Uptime
 
 Sentry monitors the uptime of your <Term id="backend" /> and <Term id="frontend" /> every 5 minutes,
 and logs downtime if the response took more than 10 seconds. You'll receive email alerts if it detects any downtime.
@@ -61,7 +60,7 @@ You can view the statistics in the <LinkExt href="https://sentry.io/insights/upt
 
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/uptime.avif" alt="Uptime" isDimmed />
 
-## Scheduled Tasks Monitor <BadgeNew isHeading />
+## Scheduled Tasks Monitor
 
 Similar to Uptime, Sentry monitors each run of your scheduled tasks (`crons`), eg hourly <PageLink id="job-alert-emails" />,
 and sends you email alerts if any task run failed to report its successful execution within 5 minutes of its start.

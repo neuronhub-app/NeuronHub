@@ -12,5 +12,6 @@ export function AdminLink(props: { id: keyof typeof links; children?: ReactNode 
 
 const links = {
   Home: "/admin/",
-  SiteConfig: "/admin/sites/siteconfig",
+  SiteConfig: "/admin/sites/siteconfig/",
+  JobAlert: "/admin/jobs/jobalert/",
 } as const;
