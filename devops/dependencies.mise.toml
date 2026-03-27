@@ -53,7 +53,6 @@
     usage = """
         flag "-d --dry-run" default=#false
     """
-    dir = "client"
     run = [
         # We freeze "graphql", due to "gql.tada" bugs with 16.12,
         # See [[package.json.md]] and [[.local/issues/closed/103-gql-tada-Persisted-Queries.md]]
