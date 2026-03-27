@@ -14,34 +14,16 @@ on:
       - master
 
 jobs:
-  test_and_lint:
+  lint:
     name: Test and lint
     if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
     environment: test
+    permissions:
+      contents: read
 
-    services:
-      db:
-        image: postgres:18-alpine
-        env:
-          POSTGRES_DB: neuronhub
-          POSTGRES_USER: neuronhub
-          POSTGRES_PASSWORD: neuronhub
-        options: >-
-          --health-cmd "pg_isready --username neuronhub"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      s3:
-        image: adobe/s3mock:latest
-        ports:
-          - 9090:9090
-        env:
-          initialBuckets: media
     env:
-      DB_HOST: db
-      AWS_S3_ENDPOINT_URL: http://s3:9090
       # todo ! fix: run for both both VITE_SITE="" and "pg"
       VITE_SITE: pg
 
