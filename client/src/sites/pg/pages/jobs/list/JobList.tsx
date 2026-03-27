@@ -1,10 +1,10 @@
 import {
   Box,
+  Button,
   Flex,
   Grid,
   HStack,
   Icon,
-  Link,
   Separator,
   Skeleton,
   Stack,
@@ -13,22 +13,22 @@ import {
 import type { ReactNode } from "react";
 import { GoComment, GoQuestion } from "react-icons/go";
 import { Configure } from "react-instantsearch";
-import { NavLink } from "react-router";
-import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
+import { useSnapshot } from "valtio";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
+import { resetSalaryFilter, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
 import {
-  PgFiltersTopbar,
   otherFiltersState,
+  PgFiltersTopbar,
   resetOtherFilters,
 } from "@/sites/pg/components/PgFiltersTopbar";
-import { resetSalaryFilter, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
-import { useSnapshot } from "valtio";
+import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
+import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
-import { urls } from "@/urls";
+import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function JobList(props: { slug?: string }) {
@@ -237,28 +237,33 @@ function JobOpenSeparator() {
 function PgSubheaderLinks() {
   return (
     <Flex gap="gap.lg">
-      <Link asChild {...pgSubheaderLinkStyle}>
-        <NavLink to={urls.jobs.faq}>
+      <FaqModal>
+        <Button variant="plain" {...pgSubheaderButtonStyle}>
           <Icon>
             <GoQuestion />
           </Icon>
           FAQ
-        </NavLink>
-      </Link>
-      <Link href="https://probablygood.org/contact/" {...pgSubheaderLinkStyle}>
-        <Icon>
-          <GoComment />
-        </Icon>
-        Contact
-      </Link>
+        </Button>
+      </FaqModal>
+      <ContactModal>
+        <Button variant="plain" {...pgSubheaderButtonStyle}>
+          <Icon>
+            <GoComment />
+          </Icon>
+          Contact
+        </Button>
+      </ContactModal>
     </Flex>
   );
 }
 
-const pgSubheaderLinkStyle = {
+const pgSubheaderButtonStyle = {
   fontWeight: "medium",
   fontSize: "sm",
   color: "brand.green",
+  p: "0",
+  h: "auto",
+  _hover: { color: "brand.green.light" },
 } as const;
 
 const JobsByIdsQuery = graphql.persisted(
