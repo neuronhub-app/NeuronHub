@@ -2,7 +2,10 @@ from typing import cast
 
 import strawberry
 import strawberry_django
+from asgiref.sync import sync_to_async
+from django.conf import settings
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.db.models import Model
 from strawberry import auto
 
@@ -17,6 +20,7 @@ class NavbarLinkType:
     label: auto
     href: auto
     order: auto
+    children: list["NavbarLinkType"]
 
 
 @strawberry_django.type(FooterLink)
@@ -41,7 +45,12 @@ class FooterSectionType:
 class SiteType:
     @strawberry_django.field()
     async def nav_links(self) -> list[NavbarLinkType]:
-        return await get_list_cached(NavbarLink, cache_key=SitesQuery.CacheKey.NavLinks)
+        return await get_list_cached(
+            NavbarLink,
+            cache_key=SitesQuery.CacheKey.NavLinks,
+            prefetch_related=["children"],
+            filter_by={"parent__isnull": True},
+        )
 
     @strawberry_django.field()
     async def footer_sections(self) -> list[FooterSectionType]:
@@ -63,16 +72,45 @@ class SitesQuery:
         return SiteType()
 
 
+@strawberry.type(name="Mutation")
+class SitesMutation:
+    @strawberry.mutation
+    async def send_contact_message(
+        self,
+        message: str,
+        name: str | None = None,
+        email: str | None = None,
+    ) -> bool:
+        subject = "Contact form"
+        if name:
+            subject += f" from {name}"
+
+        body = message
+        if email:
+            body += f"\n\nReply to: {email}"
+
+        await sync_to_async(send_mail)(
+            subject=subject,
+            message=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.ADMIN_EMAIL],
+        )
+        return True
+
+
 async def get_list_cached[Return: type](
     model: type[Model],
     cache_key: str,
-    prefetch_related: list[str] = None,
+    prefetch_related: list[str] | None = None,
+    filter_by: dict | None = None,
 ) -> list[Return]:
     items_cached = await cache.aget(cache_key)
     if items_cached is not None:
         return items_cached
 
     items_qs = model.objects.all()  # type: ignore[attr-defined] #bad-infer
+    if filter_by:
+        items_qs = items_qs.filter(**filter_by)
     if prefetch_related:
         items_qs = items_qs.prefetch_related(*prefetch_related)
     items = [link async for link in items_qs]

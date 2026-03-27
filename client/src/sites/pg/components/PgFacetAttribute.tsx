@@ -2,6 +2,7 @@ import { Checkbox, Flex, Icon, Input, InputGroup, Stack, Text } from "@chakra-ui
 import { useCallback, useRef } from "react";
 import { LuX } from "react-icons/lu";
 import { useRefinementList } from "react-instantsearch";
+import type { UseRefinementListProps } from "react-instantsearch";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 const style = {
@@ -15,28 +16,57 @@ export function PgFacetAttribute(props: {
   isSearchEnabled?: boolean;
   subFacet?: { attribute: string; label: string };
   allowedValues?: string[];
+  sortBy?: UseRefinementListProps["sortBy"];
+  transformItems?: UseRefinementListProps["transformItems"];
+  operator?: UseRefinementListProps["operator"];
 }) {
   type FacetItem = ReturnType<typeof useRefinementList>["items"][number];
 
   const facetValuesInitialRef = useRef<Map<string, FacetItem>>(new Map());
+  const searchQueryRef = useRef("");
 
   const refinements = useRefinementList({
     attribute: props.attribute,
-    limit: 100,
-    sortBy: ["count:desc", "name:asc"],
+    limit: 1000,
+    sortBy: props.sortBy ?? ["count:desc", "name:asc"],
+    operator: props.operator,
     // Keep <Checkbox>s order fixed - don't move selected on top, and don't hide count=0.
     // Refs #137, ENG-56
-    transformItems: useCallback((items: FacetItem[]) => {
-      const result = new Map(facetValuesInitialRef.current);
-      for (const facetValue of result.values()) {
-        result.set(facetValue.value, { ...facetValue, count: 0 });
-      }
-      for (const item of items) {
-        result.set(item.value, item);
-      }
-      facetValuesInitialRef.current = result;
-      return Array.from(result.values());
-    }, []),
+    transformItems: useCallback(
+      (items: FacetItem[], metadata) => {
+        const applyTransform = (fixed: FacetItem[]) =>
+          props.transformItems ? props.transformItems(fixed, metadata) : fixed;
+
+        if (props.allowedValues) {
+          const algoliaValues = new Set(items.map(item => item.value));
+          const fixed = [...items];
+          const query = searchQueryRef.current.toLowerCase();
+          for (const value of props.allowedValues) {
+            if (!algoliaValues.has(value) && (!query || value.toLowerCase().includes(query))) {
+              fixed.push({
+                value,
+                label: value,
+                count: 0,
+                isRefined: false,
+                highlighted: value,
+              } as FacetItem);
+            }
+          }
+          return applyTransform(fixed);
+        }
+
+        const result = new Map(facetValuesInitialRef.current);
+        for (const facetValue of result.values()) {
+          result.set(facetValue.value, { ...facetValue, count: 0 });
+        }
+        for (const item of items) {
+          result.set(item.value, item);
+        }
+        facetValuesInitialRef.current = result;
+        return applyTransform(Array.from(result.values()));
+      },
+      [props.transformItems, props.allowedValues],
+    ),
   });
   const subRefinements = useRefinementList({
     attribute: props.subFacet?.attribute ?? props.attribute,
@@ -45,6 +75,7 @@ export function PgFacetAttribute(props: {
 
   function search(value: string) {
     state.mutable.query = value;
+    searchQueryRef.current = value;
     refinements.searchForItems(value);
   }
 
@@ -101,7 +132,11 @@ export function PgFacetAttribute(props: {
 
       <Stack gap="gap.sm" w="full">
         {refinements.items
-          .filter(item => !props.allowedValues || props.allowedValues.includes(item.label))
+          .filter(
+            item =>
+              item.value !== "Other" &&
+              (!props.allowedValues || props.allowedValues.includes(item.label)),
+          )
           .map(item => {
             const subItem = props.subFacet
               ? subRefinements.items.find(subRefinement => subRefinement.value === item.value)

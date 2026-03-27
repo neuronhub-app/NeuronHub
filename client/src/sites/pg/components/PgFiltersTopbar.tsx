@@ -1,10 +1,57 @@
 import { Flex, Grid, Stack, Switch } from "@chakra-ui/react";
-import { useRange, useRefinementList, useToggleRefinement } from "react-instantsearch";
+import { useToggleRefinement } from "react-instantsearch";
 import { proxy, useSnapshot } from "valtio";
 import { PgFacetSalary, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
+import type { UseRefinementListProps } from "react-instantsearch";
 import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
+import { LuMapPin } from "react-icons/lu";
+import {
+  locationCityNames,
+  locationCountryNames,
+  locationRemoteNames,
+} from "@/sites/pg/locations";
+
+const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
+
+const roleTypeOrder = [
+  "Full-Time",
+  "Part-Time (50–80% FTE)",
+  "Part-Time (<50% FTE)",
+  "Internship",
+  "Fellowship",
+  "Volunteer",
+  "Funding",
+  "Training",
+  "Graduate Program",
+  "Expression of Interest",
+];
+
+function sortByCustomOrder<T extends { label: string }>(items: T[], order: string[]): T[] {
+  return items.toSorted((a, b) => {
+    const indexA = order.indexOf(a.label);
+    const indexB = order.indexOf(b.label);
+    if (indexA === -1 && indexB === -1) {
+      return 0;
+    }
+    if (indexA === -1) {
+      return 1;
+    }
+    if (indexB === -1) {
+      return -1;
+    }
+    return indexA - indexB;
+  });
+}
+
+const transformRoleType: UseRefinementListProps["transformItems"] = items =>
+  sortByCustomOrder(items, roleTypeOrder);
+
+const educationOrder = ["Undergraduate Degree or Less", "Master's Degree", "Doctoral Degree"];
+
+const transformEducation: UseRefinementListProps["transformItems"] = items =>
+  sortByCustomOrder(items, educationOrder);
 
 export const otherFiltersState = proxy({
   excludeCareerCapital: false,
@@ -27,11 +74,11 @@ export function PgFiltersTopbar() {
     >
       <CauseAreaFacet order={{ base: 1, lg: 1 }} />
       <RoleTypeFacet order={{ base: 3, lg: 2 }} />
-      <CountryFacet order={{ base: 5, lg: 3 }} />
-      <ExperienceFacet order={{ base: 7, lg: 4 }} />
-      <SalaryFacet order={{ base: 9, lg: 5 }} />
-      <SkillSetFacet order={{ base: 2, lg: 6 }} />
-      <RemoteFacet order={{ base: 4, lg: 7 }} />
+      <ExperienceFacet order={{ base: 7, lg: 3 }} />
+      <SalaryFacet order={{ base: 9, lg: 4 }} />
+      <SkillSetFacet order={{ base: 2, lg: 5 }} />
+      <RemoteFacet order={{ base: 4, lg: 6 }} />
+      <CountryFacet order={{ base: 5, lg: 7 }} />
       <CityFacet order={{ base: 6, lg: 8 }} />
       <EducationFacet order={{ base: 8, lg: 9 }} />
       <OtherFiltersFacet order={{ base: 10 }} />
@@ -40,55 +87,51 @@ export function PgFiltersTopbar() {
 }
 
 function CauseAreaFacet(props: { order: FacetOrder }) {
-  const causeArea = useRefinementList({ attribute: "tags_area.name" });
   return (
-    <PgFacetPopover label="Cause Area" disabled={!causeArea.canRefine} order={props.order}>
-      <PgFacetAttribute attribute="tags_area.name" label="Cause Area" />
+    <PgFacetPopover label="Cause Area" order={props.order}>
+      <PgFacetAttribute attribute="tags_area.name" label="Cause Area" sortBy={sortAlpha} />
     </PgFacetPopover>
   );
 }
 
 function RoleTypeFacet(props: { order: FacetOrder }) {
-  const roleType = useRefinementList({ attribute: "tags_workload.name" });
   return (
-    <PgFacetPopover label="Role Type" disabled={!roleType.canRefine} order={props.order}>
-      <PgFacetAttribute attribute="tags_workload.name" label="Role Type" />
+    <PgFacetPopover label="Role Type" order={props.order}>
+      <PgFacetAttribute
+        attribute="tags_workload.name"
+        label="Role Type"
+        transformItems={transformRoleType}
+      />
     </PgFacetPopover>
   );
 }
 
 function CountryFacet(props: { order: FacetOrder }) {
-  const country = useRefinementList({ attribute: "tags_country.name" });
   return (
-    <PgFacetPopover label="Country" disabled={!country.canRefine} order={props.order}>
+    <PgFacetPopover label="Country" order={props.order} icon={<LuMapPin />}>
       <PgFacetAttribute
-        attribute="tags_country.name"
+        attribute="locations_facet"
         label="Country"
         isSearchEnabled
-        subFacet={{
-          attribute: "tags_country_visa_sponsor.name",
-          label: "Confirmed can sponsor visas",
-        }}
+        operator="or"
+        allowedValues={locationCountryNames}
       />
     </PgFacetPopover>
   );
 }
 
 function ExperienceFacet(props: { order: FacetOrder }) {
-  const experience = useRefinementList({ attribute: "tags_experience.name" });
   return (
-    <PgFacetPopover label="Experience" disabled={!experience.canRefine} order={props.order}>
+    <PgFacetPopover label="Experience" order={props.order}>
       <PgFacetAttribute attribute="tags_experience.name" label="Experience" />
     </PgFacetPopover>
   );
 }
 
 function SalaryFacet(props: { order: FacetOrder }) {
-  const salary = useRange({ attribute: "salary_min" });
   return (
     <PgFacetPopover
-      label="Salary"
-      disabled={!salary.canRefine}
+      label="Minimum Salary"
       onClose={() => {
         salaryFilterState.showInfo = false;
       }}
@@ -101,42 +144,53 @@ function SalaryFacet(props: { order: FacetOrder }) {
 }
 
 function SkillSetFacet(props: { order: FacetOrder }) {
-  const skillSet = useRefinementList({ attribute: "tags_skill.name" });
   return (
-    <PgFacetPopover label="Skill Set" disabled={!skillSet.canRefine} order={props.order}>
-      <PgFacetAttribute attribute="tags_skill.name" label="Skill Set" isSearchEnabled />
+    <PgFacetPopover label="Skill Set" order={props.order}>
+      <PgFacetAttribute
+        attribute="tags_skill.name"
+        label="Skill Set"
+        isSearchEnabled
+        sortBy={sortAlpha}
+      />
     </PgFacetPopover>
   );
 }
 
-const REMOTE_LOCATION_NAMES = ["Remote, Global", "Remote, USA", "Remote, UK", "Remote, Europe"];
-
 function RemoteFacet(props: { order: FacetOrder }) {
   return (
-    <PgFacetPopover label="Remote Roles" order={props.order}>
+    <PgFacetPopover label="Remote" order={props.order} icon={<LuMapPin />}>
       <PgFacetAttribute
-        attribute="locations.name"
-        label="Remote Roles"
-        allowedValues={REMOTE_LOCATION_NAMES}
+        attribute="locations_facet"
+        label="Remote"
+        operator="or"
+        allowedValues={locationRemoteNames}
       />
     </PgFacetPopover>
   );
 }
 
 function CityFacet(props: { order: FacetOrder }) {
-  const city = useRefinementList({ attribute: "tags_city.name" });
   return (
-    <PgFacetPopover label="City" disabled={!city.canRefine} order={props.order}>
-      <PgFacetAttribute attribute="tags_city.name" label="City" isSearchEnabled />
+    <PgFacetPopover label="City" order={props.order} icon={<LuMapPin />}>
+      <PgFacetAttribute
+        attribute="locations_facet"
+        label="City"
+        isSearchEnabled
+        operator="or"
+        allowedValues={locationCityNames}
+      />
     </PgFacetPopover>
   );
 }
 
 function EducationFacet(props: { order: FacetOrder }) {
-  const education = useRefinementList({ attribute: "tags_education.name" });
   return (
-    <PgFacetPopover label="Education" disabled={!education.canRefine} order={props.order}>
-      <PgFacetAttribute attribute="tags_education.name" label="Education" />
+    <PgFacetPopover label="Education" order={props.order}>
+      <PgFacetAttribute
+        attribute="tags_education.name"
+        label="Education"
+        transformItems={transformEducation}
+      />
     </PgFacetPopover>
   );
 }
@@ -145,7 +199,7 @@ function OtherFiltersFacet(props: { order: FacetOrder }) {
   const highlighted = useToggleRefinement({ attribute: "org.is_highlighted", on: true });
   const snap = useSnapshot(otherFiltersState);
   return (
-    <PgFacetPopover label="Other Filters" disabled={!highlighted.canRefine} order={props.order}>
+    <PgFacetPopover label="Other Filters" order={props.order}>
       <Stack gap="gap.sm">
         <BooleanSwitch
           label="Show only roles at highlighted orgs"

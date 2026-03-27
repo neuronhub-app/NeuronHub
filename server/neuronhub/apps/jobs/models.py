@@ -192,6 +192,18 @@ class Job(AlgoliaModel):
     def get_json_locations(self):
         return self._get_graphql_field("locations")
 
+    def get_locations_facet(self) -> list[str]:
+        result = []
+        for loc in self.locations.all():
+            if loc.is_remote:
+                result.append(loc.name)
+                continue
+            if loc.country:
+                result.append(loc.country)
+            if loc.city:
+                result.append(loc.city)
+        return list(dict.fromkeys(result))
+
     def get_json_tags_country(self):
         return self._get_graphql_field("tags_country")
 

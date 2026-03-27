@@ -1,33 +1,34 @@
 import {
   Box,
-  Code,
+  Button,
   Flex,
+  Grid,
   HStack,
   Icon,
-  Link,
   Separator,
   Skeleton,
+  Stack,
   Text,
 } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { GoComment, GoQuestion } from "react-icons/go";
 import { Configure } from "react-instantsearch";
-import { NavLink } from "react-router";
-import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
+import { useSnapshot } from "valtio";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
+import { resetSalaryFilter, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
 import {
-  PgFiltersTopbar,
   otherFiltersState,
+  PgFiltersTopbar,
   resetOtherFilters,
 } from "@/sites/pg/components/PgFiltersTopbar";
-import { resetSalaryFilter, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
-import { useSnapshot } from "valtio";
+import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
+import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
-import { urls } from "@/urls";
+import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function JobList(props: { slug?: string }) {
@@ -97,26 +98,25 @@ export function JobList(props: { slug?: string }) {
           <JobCard key={job.id} job={job} isSearchActive={ctx.isSearchActive} />
         ),
         hitOpenedPinned: jobOpenPinned,
+        noResultsNode: <JobNoResultsCard />,
         listTestId: ids.job.list,
       }}
       searchInputTestId={ids.job.searchInput}
-      facetsActiveLabelsOverride={{
-        is_remote: "Remote",
-        "org.is_highlighted": "Highlighted",
-        posted_at_unix: "Posted",
-        salary_min: "Salary",
-      }}
-      facetsActiveDateAttributes={["posted_at_unix"]}
-      facetsActiveMoneyAttributes={["salary_min"]}
-      facetsActiveSubFacetPairs={{ "tags_country_visa_sponsor.name": "tags_country.name" }}
-      facetsActiveSubFacetLabel={{
-        "tags_country_visa_sponsor.name": "w/Visa",
-      }}
-      facetsActiveExtraTags={extraTags}
       facetsTopbar={<PgFiltersTopbar />}
-      onClearAdditional={() => {
-        resetSalaryFilter();
-        resetOtherFilters();
+      facetsActive={{
+        labelsOverride: {
+          is_remote: "Remote",
+          "org.is_highlighted": "Highlighted",
+          posted_at_unix: "Posted",
+          salary_min: "Minimum Salary",
+        },
+        dateAttributes: ["posted_at_unix"],
+        moneyAttributes: ["salary_min"],
+        extraTags,
+        onClearAdditional: () => {
+          resetSalaryFilter();
+          resetOtherFilters();
+        },
       }}
     >
       <Configure
@@ -134,6 +134,34 @@ export function JobList(props: { slug?: string }) {
         attributesToSnippet={["description:30"]}
       />
     </PgAlgoliaList>
+  );
+}
+
+function JobNoResultsCard() {
+  return (
+    <Stack
+      p={{ base: "gap.sm", md: "gap.md" }}
+      borderRadius="lg"
+      borderWidth="1px"
+      borderColor="subtle"
+      bg="bg.card"
+      gap="gap.md"
+    >
+      <Text fontWeight="semibold" color="fg" textAlign="center">
+        No jobs found
+      </Text>
+      <Grid templateColumns={{ base: "1fr", md: "repeat(5, 1fr)" }} gap="gap.md">
+        <Box gridColumn={{ md: "span 4" }}>
+          <Text fontSize="sm" color="fg.muted">
+            No jobs match this combination of filters right now, but you can set a job alert so
+            you'll know as soon as any matching roles are posted.
+          </Text>
+        </Box>
+        <Box>
+          <JobsSubscribeModal />
+        </Box>
+      </Grid>
+    </Stack>
   );
 }
 
@@ -156,9 +184,22 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
       id: undefined,
       node: (
         <Box>
-          <Text>
-            Job not found: <Code>{slug}</Code>
-          </Text>
+          <Stack
+            as="article"
+            p={{ base: "gap.md", md: "gap.xl" }}
+            borderRadius="lg"
+            borderWidth="1px"
+            borderColor="subtle"
+            bg="bg.card"
+            align="center"
+          >
+            <Text fontWeight="semibold" color="fg">
+              Job not found
+            </Text>
+            <Text fontSize="sm" color="fg.muted">
+              Job matching "/{slug}" was not found.
+            </Text>
+          </Stack>
           <JobOpenSeparator />
         </Box>
       ),
@@ -172,7 +213,7 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
         {isLoading ? (
           <Skeleton h="32" w="full" />
         ) : (
-          <JobCard job={job!} isSearchActive={false} />
+          <JobCard job={job!} isSearchActive={false} isInitiallyOpen={true} />
         )}
 
         <JobOpenSeparator />
@@ -183,12 +224,12 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
 
 function JobOpenSeparator() {
   return (
-    <HStack mt="gap.md2">
-      <Separator flex="1" />
-      <Text flexShrink="0" color="fg.muted" fontSize="sm">
+    <HStack mt="gap.xl">
+      <Separator flex="1" borderColor="brand.gray" />
+      <Text color="brand.gray.muted" fontSize="sm" fontWeight="medium">
         All jobs
       </Text>
-      <Separator flex="1" />
+      <Separator flex="1" borderColor="brand.gray" />
     </HStack>
   );
 }
@@ -196,28 +237,33 @@ function JobOpenSeparator() {
 function PgSubheaderLinks() {
   return (
     <Flex gap="gap.lg">
-      <Link asChild {...pgSubheaderLinkStyle}>
-        <NavLink to={urls.jobs.faq}>
+      <FaqModal>
+        <Button variant="plain" {...pgSubheaderButtonStyle}>
           <Icon>
             <GoQuestion />
           </Icon>
           FAQ
-        </NavLink>
-      </Link>
-      <Link href="https://probablygood.org/contact/" {...pgSubheaderLinkStyle}>
-        <Icon>
-          <GoComment />
-        </Icon>
-        Contact
-      </Link>
+        </Button>
+      </FaqModal>
+      <ContactModal>
+        <Button variant="plain" {...pgSubheaderButtonStyle}>
+          <Icon>
+            <GoComment />
+          </Icon>
+          Contact
+        </Button>
+      </ContactModal>
     </Flex>
   );
 }
 
-const pgSubheaderLinkStyle = {
+const pgSubheaderButtonStyle = {
   fontWeight: "medium",
   fontSize: "sm",
   color: "brand.green",
+  p: "0",
+  h: "auto",
+  _hover: { color: "brand.green.light" },
 } as const;
 
 const JobsByIdsQuery = graphql.persisted(

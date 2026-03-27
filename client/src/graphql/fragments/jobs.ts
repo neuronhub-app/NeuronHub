@@ -6,6 +6,7 @@ export const JobFragment = graphql(
     fragment JobFragment on JobType {
       id
       title
+      slug
       org {
         id
         name

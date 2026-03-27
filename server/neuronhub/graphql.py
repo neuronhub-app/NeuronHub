@@ -32,6 +32,7 @@ from neuronhub.apps.posts.graphql.mutations import PostsMutation
 from neuronhub.apps.posts.graphql.resolvers import PostsQuery
 from neuronhub.apps.profiles.graphql import ProfilesMutation
 from neuronhub.apps.profiles.graphql import ProfilesQuery
+from neuronhub.apps.sites.graphql import SitesMutation
 from neuronhub.apps.sites.graphql import SitesQuery
 from neuronhub.apps.tests.graphql.mutations import TestsMutation
 from neuronhub.apps.users.graphql.mutations import UserMutation
@@ -60,6 +61,7 @@ class Mutation(
     ImporterMutation,
     ProfilesMutation,
     JobsMutation,
+    SitesMutation,
 ):
     pass
 

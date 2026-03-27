@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 export function PgFacetPopover(props: {
   label: string;
   children: ReactNode;
-  disabled?: boolean;
   onClose?: () => void;
   contentMaxW?: string;
   order?: { base?: number; lg?: number };
+  icon?: ReactNode;
 }) {
   return (
     <Popover.Root
@@ -17,7 +17,7 @@ export function PgFacetPopover(props: {
         placement: "bottom-start",
         offset: { mainAxis: 4, crossAxis: 0 },
         flip: false,
-        listeners: false, // fix CLS when `PgAlgoliaFacetsActive` above add DOM nodes (ENG-56)
+        listeners: { ancestorResize: false, elementResize: false, ancestorScroll: true }, // fix CLS when `PgAlgoliaFacetsActive` above add DOM nodes (ENG-56)
       }}
       onOpenChange={details => {
         if (!details.open) {
@@ -38,10 +38,12 @@ export function PgFacetPopover(props: {
           borderRadius="sm"
           justifyContent="space-between"
           px="2.5"
-          disabled={props.disabled}
           order={props.order}
         >
-          {props.label}
+          <Flex align="center" gap="gap.sm">
+            {props.icon && <Icon boxSize="3.5">{props.icon}</Icon>}
+            {props.label}
+          </Flex>
           <Icon
             boxSize="4"
             css={{ transition: "rotate 0.2s", "[data-state=open] &": { rotate: "180deg" } }}

@@ -4,11 +4,7 @@ import { LuSearch } from "react-icons/lu";
 import { useSearchBox } from "react-instantsearch";
 import { ids } from "@/e2e/ids";
 
-export function PgSearchInput(props: {
-  endElementText: ReactNode;
-  testId?: string;
-  isHideResetBtn?: boolean;
-}) {
+export function PgSearchInput(props: { endElementText: ReactNode; testId?: string }) {
   const searchBox = useSearchBox();
   const inputRef = useRef<HTMLInputElement | null>(null);
 
