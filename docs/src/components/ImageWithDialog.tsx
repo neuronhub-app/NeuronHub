@@ -1,12 +1,12 @@
-import { Center, Dialog, Image, Portal } from "@chakra-ui/react";
+import { Center, Dialog, Image, Portal, SystemStyleObject } from "@chakra-ui/react";
 import { ids } from "@/e2e/ids";
 
-export function ImageWithDialog(props: { src: string; alt?: string; isDimmed?: boolean }) {
-  const style = {
-    maxW: "94vw",
-    maxH: "94vh",
-  } as const;
-
+export function ImageWithDialog(props: {
+  src: string;
+  alt?: string;
+  isDimmed?: boolean;
+  maxH?: SystemStyleObject["maxH"];
+}) {
   return (
     <Dialog.Root placement="center">
       <Dialog.Trigger asChild>
@@ -19,6 +19,7 @@ export function ImageWithDialog(props: { src: string; alt?: string; isDimmed?: b
                 : props.src.match(/(?<name>[\w-]+).(avif|png|jpe?g)/)?.groups?.name
             }
             maxW="min(550px, 100%)"
+            maxH={props.maxH}
             boxShadow="xl"
             cursor="zoom-in"
             filter={
@@ -43,13 +44,14 @@ export function ImageWithDialog(props: { src: string; alt?: string; isDimmed?: b
             <Dialog.Body display="flex" justifyContent="center" alignItems="center" p="0">
               <Dialog.CloseTrigger asChild>
                 <Image
+                  maxH="94vh"
+                  maxW="94vw"
                   src={props.src}
                   alt={props.alt}
                   pos="initial"
                   objectFit="contain"
                   cursor="zoom-out"
                   rounded="lg"
-                  {...style}
                 />
               </Dialog.CloseTrigger>
             </Dialog.Body>

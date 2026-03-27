@@ -11,9 +11,35 @@ import {
 } from "@/components"
 
 
-## Specification Management
+## Monitoring Progress
 
-Linear is the single source of truth for all specification.
+
+### Projects
+
+This is your main page for monitoring progress.
+
+Projects allow to group `Milestones` with ETAs into a single goal.
+
+`Favorite` <LinkExt href="https://linear.app/probablygood/project/go-live-38f83acd2475/overview">the current Project</LinkExt>.
+
+
+Estimates on issues allow to view the Progress Chart:
+
+<ImageWithDialog maxH="60" src="https://s3.stage.neuronhub.app/docs/linear/progress-chart.avif" />
+
+
+### Search
+
+Linear search isn't usable beyond the issue titles.
+
+Instead use <Kbd keys="Meta J" /> to open `Ask Linear` - and ask for complex queries re user activity, issue descriptions, comments, etc. Examples:
+- What was @viktor working in the last 2 days?
+- Is there a task for fixing the UTM parameters?
+
+
+## Managing Specification
+
+Linear is the single source of truth for the specification.
 
 
 ### Only the Issue Description is specification
@@ -36,7 +62,30 @@ And they will be attached to their Issue or Project.
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/linear/document-comments.avif" />
 
 
-## Usage
+### Issue detail
+
+To keep the history readable:
+- Use `Collapsible Section` in the text editor to collapse screenshots.
+- Mark your Comment Threads as `Resolved` to collapse them.
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/linear/resolve-thread-with-comment.avif" />
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/linear/resolve-thread-with-comment-applied.avif" />
+
+Explore the `Issue version history`.
+
+
+### Issue Relations
+
+Whenever you transfer part of a Comment or Issue Description to another Issue - mention
+the new Issue by `@{id}` - it'll be automatically `Marked as - Related to`.
+
+Use <Kbd keys="Meta K" /> to mark it as:
+- `Duplicate of {id}`
+- `Sub-issue of {id}`
+- etc
+
+
+### Usage
 
 Linear is built around keyboard shortcuts - using them is essential for an efficient workflow.
 
@@ -52,7 +101,7 @@ Use `All Issues` as your entry point:
 - Add it to your browser's Bookmarks Bar - always keep it one click away.
 
 
-### Issue list
+#### Issue list
 
 Press any arrow key to enter the keyboard navigation mode:
 - <Kbd keys="Shift D" /> - set `Due date` => type words `3d`, `1month`, `1w`  => <Kbd keys="Enter" />.
@@ -69,41 +118,6 @@ Right-click on Issue -> start typing to enter the `Filter` mode.
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/linear/context-filter.avif" />
 
 
-#### Relations
-
-You need to use <Kbd keys="Meta K" /> to mark an Issues as:
-- `Duplicate of {id}`
-- `Sub-issue of {id}`
-
-Whenever you transfer part of a Comment or Issue Description - mention
-the new issue by `@{id}` - it'll be automatically `Marked as - Related to`.
-
-
-### Projects
-
-Projects allow to group `Milestones` into a single goal.
-
-`Favorite` <LinkExt href="https://linear.app/probablygood/project/go-live-38f83acd2475/overview">the current Project</LinkExt>.
-
-Use the number keys to open its:
-- <Kbd keys="1" /> -> `Overview`
-- <Kbd keys="2" /> -> `Updates`
-- <Kbd keys="3" /> -> `Issues`
-
-
-### Issue detail
-
-To keep the history readable:
-- Use `Collapsible Section` in the text editor to collapse screenshots.
-- Mark your Comment Threads as `Resolved` to collapse them.
-
-<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/linear/resolve-thread-with-comment.avif" />
-<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/linear/resolve-thread-with-comment-applied.avif" />
-
-
-Explore the `Issue version history`.
-
-
 ### Mobile App
 
 Install <LinkExt href="https://linear.app/mobile">the mobile app</LinkExt> on <LinkExt href="https://apps.apple.com/us/app/linear-mobile/id1645587184">iOS</LinkExt>
@@ -118,17 +132,3 @@ to `Mentions` only. For everything else, email or `Inbox` works better.
 
 Reserve emojis for Comment content and reactions - don't use them in Documents, Projects, or other structured fields,
 as they don't work well as pictograms.
-
-
-## First Setup
-
-When you first create a Workspace, in `Settings` -> `Team` -> `General` enable:
-- `Issue estimation` -> `T-Shirt`
-    - `Allow zero estimates`
-- `Enable detailed issue history`
-
-### GitHub issues linking with `Refs` and `Closes`
-
-1. <LinkExt href="https://linear.app/settings/integrations/github">In Linear</LinkExt> enable `Link commits to issues with magic words`
-2. <LinkExt href="https://github.com/neuronhub-app/NeuronHub/settings/hooks/new">In Github create a new webhook</LinkExt>
-3. Copy `Payload URL` and `Secret` to Github.

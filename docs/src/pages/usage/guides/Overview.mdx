@@ -3,17 +3,22 @@ title: Overview
 order: 0
 ---
 
-import { Heading, SimpleGrid, Stack, Text } from "@chakra-ui/react"
+import { SimpleGrid, Text } from "@chakra-ui/react"
 import { FiLayout } from "react-icons/fi";
+import { SiLinear } from "react-icons/si";
 import { LuSearch, LuShieldAlert, LuSettings } from "react-icons/lu"
 import { GuideCard } from "@/components"
 
-<Stack gap="gap.sm2">
-<Heading size="2xl">Documentation</Heading>
+
 <Text color="fg.muted">Welcome.</Text>
-</Stack>
 
 <SimpleGrid columns={{ base: 1, md: 3 }} gap="gap.md" mt="gap.md">
+  <GuideCard
+    icon={SiLinear}
+    title="Linear"
+    description="The single source of truth for specification."
+    path="/usage/guides/linear"
+  />
   <GuideCard
     icon={FiLayout}
     title="Site Config"

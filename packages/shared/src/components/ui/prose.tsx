@@ -13,11 +13,14 @@ export const Prose = chakra("div", {
         // restore h1 & h2, that's small by default
         "body & h1": getProseHeadingStyle(),
         "body & h2": {
-          fontSize: "1.385em",
+          w: "100%",
+          fontSize: "1.5em",
           letterSpacing: "-0.01em",
           marginTop: "1.5em",
           marginBottom: "0.4em",
           lineHeight: "1.5em",
+          pb: "0.3em",
+          borderBottom: "2px solid {colors.border}",
         },
         "& h2:first-of-type": {
           marginTop: 0,
@@ -85,7 +88,7 @@ export const Prose = chakra("div", {
 export function getProseHeadingStyle(): RecipeDefinition["base"] {
   return {
     // restore h1 & h2, that's small by default
-    fontSize: "1.6em",
+    fontSize: "1.65em",
     fontWeight: "bolder",
     letterSpacing: "-0.01em",
     marginBottom: "0.4em",
@@ -168,7 +171,8 @@ export function getProseBaseStyle<P extends RecipeVariantRecord>(): RecipeDefini
         lineHeight: "1.5em",
       },
       "& h4": {
-        marginTop: "1.4em",
+        marginTop: "1.1em",
+        fontSize: "1.15em",
         marginBottom: "0.5em",
         letterSpacing: "-0.01em",
         lineHeight: "1.5em",

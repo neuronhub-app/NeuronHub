@@ -8,7 +8,8 @@ import {
   LinkExt,
   Notice,
   PageLink,
-  BadgeNew, ImageWithDialog,
+  BadgeNew,
+  ImageWithDialog,
 } from "@/components";
 
 
@@ -179,7 +180,21 @@ In <LinkExt href="https://sentry.io/settings/security-and-privacy/">Security</Li
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/integration-github.avif" />
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/sentry/integration-github-code-map-backend.avif" />
 
-#### Slack <BadgeNew />
+#### Slack <BadgeNew isHeading />
 
 - Connect Slack on the <LinkExt href="https://sentry.io/settings/integrations/slack/">Integrations page</LinkExt> by `Add Workspace`.
 - I advise to add Alerts for `neuronhub-backend`, as frontend is too noisy. For more read <PageLink id="Sentry" />.
+
+
+### Linear
+
+When you first create a Workspace, in `Settings` -> `Team` -> `General` enable:
+- `Issue estimation` -> `T-Shirt`
+    - `Allow zero estimates`
+- `Enable detailed issue history`
+
+#### GitHub issues linking with `Refs` and `Closes`
+
+1. <LinkExt href="https://linear.app/settings/integrations/github">In Linear</LinkExt> enable `Link commits to issues with magic words`
+2. <LinkExt href="https://github.com/neuronhub-app/NeuronHub/settings/hooks/new">In Github create a new webhook</LinkExt>
+3. Copy `Payload URL` and `Secret` to Github.
