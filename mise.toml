@@ -11,8 +11,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     rclone = "latest"
     killport = "latest"
 
-    claude = "latest"
-        node = "latest"
+    node = "25"
 
 [settings]
     # use Nushell for everything
