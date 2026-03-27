@@ -12,6 +12,11 @@ const SiteConfigQuery = graphql.persisted(
           id
           label
           href
+          children {
+            id
+            label
+            href
+          }
         }
         footer_sections {
           id

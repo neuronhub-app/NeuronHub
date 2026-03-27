@@ -260,41 +260,6 @@ function useFooterSections(sections?: readonly FooterSection[]): FooterData {
   };
 }
 
-const SiteConfigQuery = graphql.persisted(
-  "SiteConfigQuery",
-  graphql(`
-    query SiteConfigQuery {
-      site {
-        nav_links {
-          id
-          label
-          href
-          children {
-            id
-            label
-            href
-          }
-        }
-        footer_sections {
-          id
-          kind
-          title
-          links {
-            id
-            label
-            href
-            icon
-          }
-        }
-      }
-    }
-  `),
-);
-
-type SiteConfig = NonNullable<ResultOf<typeof SiteConfigQuery>["site"]>;
-
-type FooterSection = SiteConfig["footer_sections"][number];
-
 type FooterData = {
   columns: FooterSection[];
   socialLinks: FooterSection["links"];
