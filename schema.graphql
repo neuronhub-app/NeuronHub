@@ -878,6 +878,7 @@ type Query {
 }
 
 type SiteType {
+  jobs_url_utm_source: String!
   nav_links: [NavbarLinkType!]!
   footer_sections: [FooterSectionType!]!
 }

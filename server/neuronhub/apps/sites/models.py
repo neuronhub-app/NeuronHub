@@ -3,7 +3,6 @@ See [[Sub-sites-with-VITE_SITE.md]]
 """
 
 from asgiref.sync import sync_to_async
-from django.core.cache import cache
 from django.db import models
 from django.db.models import TextChoices
 from django_choices_field.fields import TextChoicesField
@@ -58,6 +57,13 @@ class SiteConfig(SingletonModel):
         help_text="URL for 'landed a role' / 'report placement' link in Job alert emails",
     )
 
+    jobs_url_utm_source = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="UTM source param appended to external job/org URLs on the frontend, eg `{url}?utm_source=probablygood_board`",
+    )
+
     email_html_about_us = models.TextField(
         blank=True,
         default="",
@@ -86,9 +92,10 @@ class SiteConfig(SingletonModel):
         return self.name
 
     @classmethod
-    async def get_solo(cls) -> SiteConfig:  # type: ignore[override]
+    @sync_to_async
+    def get_solo(cls) -> SiteConfig:  # type: ignore[override]
         # noinspection PyTypeChecker
-        return await sync_to_async(super().get_solo)()
+        return super().get_solo()
 
 
 class FooterSectionKind(TextChoices):
@@ -164,10 +171,12 @@ class FooterLink(models.Model):
 
 
 def _on_change_invalidate_cache(**kwargs):
+    from django.conf import settings
+
     from neuronhub.apps.sites.graphql import SitesQuery
 
-    cache.delete(SitesQuery.CacheKey.NavLinks)
-    cache.delete(SitesQuery.CacheKey.FooterSections)
+    settings.CACHE_RAM.delete(SitesQuery.CacheKey.NavLinks)
+    settings.CACHE_RAM.delete(SitesQuery.CacheKey.FooterSections)
 
 
 models.signals.post_save.connect(_on_change_invalidate_cache, sender=NavbarLink)
