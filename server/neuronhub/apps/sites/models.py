@@ -124,6 +124,13 @@ class NavbarLink(models.Model):
         on_delete=models.CASCADE,
         related_name="nav_links",
     )
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="children",
+    )
     label = models.CharField(max_length=255)
     href = models.URLField(max_length=512)
     order = models.PositiveIntegerField(default=0, db_index=True)

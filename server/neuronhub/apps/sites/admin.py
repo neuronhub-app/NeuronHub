@@ -39,7 +39,7 @@ class NavbarLinkInline(SortableTabularInline):
             None,
             {
                 "fields": [
-                    ("label", "href", "order"),
+                    ("label", "href", "parent", "order"),
                 ],
             },
         )
