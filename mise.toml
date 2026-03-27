@@ -59,7 +59,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     DB_NAME = "{{ env.PROJECT_NAME }}"
     DB_PASS = "{{ env.PROJECT_NAME }}"
     DB_PORT = "5432"
-    DB_VER = "17" # psql-17 (18 also works)
+    DB_VER = "18" # for macos `psql-18`
 
     ADMIN_EMAIL = "support@{{ env.CLIENT_DOMAIN }}"
     VITE_ADMIN_EMAIL = "{{ env.ADMIN_EMAIL }}"
