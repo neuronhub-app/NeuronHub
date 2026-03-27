@@ -4,11 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('sites', '0009_alter_siteconfig_email_html_about_us_and_more'),
-        ('sites', '0009_siteconfig_jobs_url_utm_source_and_more'),
+        ("sites", "0009_alter_siteconfig_email_html_about_us_and_more"),
+        ("sites", "0009_siteconfig_jobs_url_utm_source_and_more"),
     ]
 
-    operations = [
-    ]
+    operations = []

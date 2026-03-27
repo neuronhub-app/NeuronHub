@@ -3,6 +3,7 @@ import warnings
 from enum import Enum
 from logging import getLogger
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Literal
 from typing import TypedDict
 
@@ -16,6 +17,10 @@ from django.utils.functional import SimpleLazyObject
 from environs import Env
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import strawberry_django_settings
+
+
+if TYPE_CHECKING:
+    from django.core.cache.backends.base import BaseCache
 
 
 logger = getLogger(__name__)
@@ -185,7 +190,7 @@ def _get_ram_cache():
     return caches[_cache_key_ram]
 
 
-CACHE_RAM = SimpleLazyObject(_get_ram_cache)
+CACHE_RAM: BaseCache = SimpleLazyObject(_get_ram_cache)  # type: ignore[assignment] #bad-infer lacks types
 
 TEMPLATES = [
     {
