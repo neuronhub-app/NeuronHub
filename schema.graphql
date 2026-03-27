@@ -262,6 +262,7 @@ type NavbarLinkType {
   label: String!
   href: String!
   order: Int!
+  children: [NavbarLinkType!]!
 }
 
 type OffsetPaginationInfo {

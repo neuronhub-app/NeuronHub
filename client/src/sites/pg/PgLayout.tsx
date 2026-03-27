@@ -6,16 +6,13 @@ import {
   Grid,
   HStack,
   Icon,
-  IconButton,
-  Image,
   Link,
   Separator,
   Skeleton,
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { NavLink, Outlet } from "react-router";
-import { LuMenu, LuMail } from "react-icons/lu";
+import { Outlet } from "react-router";
 import { SlEnvolope } from "react-icons/sl";
 import {
   FaLinkedin,
@@ -28,7 +25,6 @@ import {
   FaMastodon,
 } from "react-icons/fa";
 import { SiMatrix, SiSubstack } from "react-icons/si";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { FooterLinkIcon, FooterSectionKind } from "~/graphql/enums";
 import { useSnapshot } from "valtio";
 import {
@@ -36,6 +32,7 @@ import {
   type SiteConfigData,
   type FooterSection,
 } from "@/sites/pg/siteConfigState";
+import { PgHeroHeader } from "@/sites/pg/components/PgHeader";
 
 export default function PgLayout() {
   const configSnap = useSnapshot(siteConfigState);
@@ -68,139 +65,9 @@ export default function PgLayout() {
   );
 }
 
-function PgHeroHeader(props: { navLinks: SiteConfigData["nav_links"]; isLoading: boolean }) {
-  return (
-    <Box as="header" bg="brand.green">
-      <PgNav navLinks={props.navLinks} isLoading={props.isLoading} />
-
-      <Container
-        px={{ base: "gap.sm", md: "88px" }}
-        pt={{ base: "30px", md: "14" }}
-        pb={{ base: "50px", md: "20" }}
-        color="brand.seashell"
-        fontWeight="medium"
-      >
-        <Text
-          as="h1"
-          fontFamily="heading"
-          fontSize={{ base: "26px", md: "6xl" }}
-          lineHeight={{ base: "32px", md: "1.2" }}
-        >
-          Find a job that&apos;s good,
-          <br />
-          for you{" "}
-          <Box
-            as="span"
-            fontFamily="heading"
-            fontStyle="italic"
-            fontSize={{ base: "26px", md: "6xl" }}
-            lineHeight={{ base: "32px", md: "1.2" }}
-          >
-            and
-          </Box>{" "}
-          for the world.
-        </Text>
-        <Text
-          fontSize={{ base: "19px", md: "23px" }}
-          lineHeight={{ base: "25px", md: "1.4" }}
-          mt={{ base: "4", md: "12" }}
-        >
-          Curated high-impact jobs for people who want to make a difference.
-        </Text>
-      </Container>
-    </Box>
-  );
-}
-
-function PgNav(props: { navLinks: SiteConfigData["nav_links"]; isLoading: boolean }) {
-  const state = useStateValtio({ isMenuOpen: false });
-
-  const isMenuOpen = state.snap.isMenuOpen;
-
-  return (
-    <Box position="relative">
-      <Container
-        px={{ base: "gap.sm", md: "38px" }}
-        pt={{ base: "gap.sm", md: "gap.md" }}
-        pb={{ md: "gap.md" }}
-      >
-        <HStack justify="space-between" align="center">
-          <NavLink to="/">
-            <Image src="/ProbablyGoodLogo.svg" alt="Probably Good" w="121px" h="60px" />
-          </NavLink>
-
-          <IconButton
-            display={{ base: "flex", md: "none" }}
-            aria-label="Menu"
-            variant="ghost"
-            color="white"
-            _icon={{ w: "35px", h: "35px" }}
-            onClick={() => {
-              state.mutable.isMenuOpen = !state.mutable.isMenuOpen;
-            }}
-          >
-            <LuMenu />
-          </IconButton>
-
-          <HStack as="nav" gap="9" display={{ base: "none", md: "flex" }}>
-            {props.isLoading
-              ? Array.from({ length: 6 }, (_, i) => (
-                  <Skeleton key={i} height="20px" width="80px" />
-                ))
-              : props.navLinks.map(link => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    fontWeight="medium"
-                    fontSize="sm"
-                    letterSpacing="0.5px"
-                    color="white"
-                    _hover={{ textDecoration: "underline", textDecorationColor: "white" }}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-          </HStack>
-        </HStack>
-      </Container>
-
-      <Box
-        display={{ md: "none" }}
-        position="absolute"
-        left="0"
-        right="0"
-        bg="brand.seashell"
-        px="gap.sm"
-        py="2"
-        zIndex="10"
-        opacity={isMenuOpen ? 1 : 0}
-        transform={isMenuOpen ? "translateY(0)" : "translateY(-8px)"}
-        pointerEvents={isMenuOpen ? "auto" : "none"}
-        transition="opacity 0.2s ease, transform 0.2s ease"
-      >
-        {props.navLinks.map(link => (
-          <Link
-            key={link.label}
-            href={link.href}
-            display="block"
-            fontWeight="medium"
-            fontSize="sm"
-            letterSpacing="0.5px"
-            color="brand.black"
-            py="3"
-            _hover={{ textDecoration: "underline", textDecorationColor: "brand.black" }}
-          >
-            {link.label}
-          </Link>
-        ))}
-      </Box>
-    </Box>
-  );
-}
-
 function PgFooter(props: { footer: FooterData; isLoading: boolean }) {
   const footerLinkStyle = {
-    color: "brand.footer.text",
+    color: "brand.beige",
     _hover: { textDecoration: "underline" },
   } as const;
 
@@ -251,7 +118,7 @@ function PgFooter(props: { footer: FooterData; isLoading: boolean }) {
           h={{ base: "70px", md: "55px" }}
           px={{ base: "gap.sm", md: "50px" }}
           pb={{ base: "22px", md: "0" }}
-          color="brand.footer.text"
+          color="brand.beige"
           fontSize="sm"
         >
           <HStack gap="1">
@@ -359,7 +226,7 @@ function FooterSectionColumn(props: {
         fontWeight="semibold"
         fontSize="19px"
         lineHeight="30.24px"
-        color="brand.footer.heading"
+        color="brand.gray.warm"
       >
         {props.title}
       </Text>
@@ -392,6 +259,41 @@ function useFooterSections(sections?: readonly FooterSection[]): FooterData {
     bottomLinks: sectionsByEnum[FooterSectionKind.Bottom]?.[0]?.links ?? [],
   };
 }
+
+const SiteConfigQuery = graphql.persisted(
+  "SiteConfigQuery",
+  graphql(`
+    query SiteConfigQuery {
+      site {
+        nav_links {
+          id
+          label
+          href
+          children {
+            id
+            label
+            href
+          }
+        }
+        footer_sections {
+          id
+          kind
+          title
+          links {
+            id
+            label
+            href
+            icon
+          }
+        }
+      }
+    }
+  `),
+);
+
+type SiteConfig = NonNullable<ResultOf<typeof SiteConfigQuery>["site"]>;
+
+type FooterSection = SiteConfig["footer_sections"][number];
 
 type FooterData = {
   columns: FooterSection[];
