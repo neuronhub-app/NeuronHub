@@ -20,6 +20,10 @@ from neuronhub.apps.users.models import UserConnectionGroup
 
 
 class JobLocation(models.Model):
+    """
+    Initially was handled by tags_country & tags_city - but UX is better when it's a single "field".
+    """
+
     name = models.CharField(max_length=255, unique=True)
     city = models.CharField(max_length=255, blank=True)
     country = models.CharField(max_length=255, blank=True)
@@ -135,7 +139,24 @@ class Job(AlgoliaModel):
         models.ManyToManyField(UserConnectionGroup, related_name="jobs_visible", blank=True),
     )
 
-    history = HistoricalRecords(excluded_fields=["slug"])
+    history = HistoricalRecords(
+        excluded_fields=["slug"],
+        m2m_fields=[
+            versions,
+            locations,
+            visible_to_users,
+            visible_to_groups,
+            # tags
+            tags_skill,
+            tags_area,
+            tags_education,
+            tags_experience,
+            tags_workload,
+            tags_country,
+            tags_city,
+            tags_country_visa_sponsor,
+        ],
+    )
 
     tag_category_to_field = {
         TagCategoryEnum.Skill: "tags_skill",
@@ -161,6 +182,9 @@ class Job(AlgoliaModel):
 
     def is_in_algolia_index(self) -> bool:
         return self.is_published
+
+    def get_json_locations(self):
+        return self._get_graphql_field("locations")
 
     def get_unix_posted_at(self) -> float | None:
         return self.posted_at.timestamp() if self.posted_at else None
@@ -188,9 +212,6 @@ class Job(AlgoliaModel):
 
     def get_json_tags_workload(self):
         return self._get_graphql_field("tags_workload")
-
-    def get_json_locations(self):
-        return self._get_graphql_field("locations")
 
     def get_json_tags_country(self):
         return self._get_graphql_field("tags_country")
@@ -234,7 +255,11 @@ class JobAlert(TimeStampedModel):
     jobs_clicked_count = models.PositiveIntegerField(default=0)
     jobs_clicked = models.ManyToManyField(Job, blank=True)
 
-    history = HistoricalRecords(excluded_fields=["jobs_notified_count"])
+    # Note: minimal, as the rest is tracked by [[JobAlertLog]]
+    history = HistoricalRecords(
+        excluded_fields=["jobs_notified_count"],
+        m2m_fields=[tags],
+    )
 
     def __str__(self):
         is_active_flag = "" if self.is_active else ", inactive"
