@@ -44,6 +44,8 @@ jobs:
     env:
       DB_HOST: db
       AWS_S3_ENDPOINT_URL: http://s3:9090
+      # todo ! fix: run for both both VITE_SITE="" and "pg"
+      VITE_SITE: pg
 
     steps:
       - name: Run Git checkout
@@ -51,8 +53,6 @@ jobs:
 
       - name: Setup Mise
         uses: jdx/mise-action@v3
-        with:
-          experimental: true
 
       - name: Setup uv
         uses: astral-sh/setup-uv@v6
