@@ -49,10 +49,6 @@ export function PgAlgoliaListSkeleton() {
                 ))}
               </Grid>
             </Box>
-
-            <Box gridColumn="span 5">
-              <Skeleton h="5" w="48" borderRadius="sm" />
-            </Box>
           </Grid>
         </Box>
       </PgFilterCardWithSplitBg>

@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Flex,
-  Grid,
   HStack,
   Icon,
   Separator,
@@ -12,7 +11,7 @@ import {
 } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { GoComment, GoQuestion } from "react-icons/go";
-import { Configure } from "react-instantsearch";
+import { Configure, useClearRefinements } from "react-instantsearch";
 import { useSnapshot } from "valtio";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
@@ -149,18 +148,50 @@ function JobNoResultsCard() {
       <Text fontWeight="semibold" color="fg" textAlign="center">
         No jobs found
       </Text>
-      <Grid templateColumns={{ base: "1fr", md: "repeat(5, 1fr)" }} gap="gap.md">
-        <Box gridColumn={{ md: "span 4" }}>
-          <Text fontSize="sm" color="fg.muted">
-            No jobs match this combination of filters right now, but you can set a job alert so
-            you'll know as soon as any matching roles are posted.
-          </Text>
-        </Box>
-        <Box>
-          <JobsSubscribeModal />
-        </Box>
-      </Grid>
+      <Flex align="center" gap="gap.md" direction={{ base: "column", md: "row" }}>
+        <Text fontSize="sm" color="fg.muted" flex="1">
+          No jobs match this combination of filters right now.{" "}
+          <JobsSubscribeModal
+            trigger={
+              <Text
+                as="span"
+                fontSize="md"
+                fontWeight="medium"
+                color="brand.green"
+                _hover={{ color: "brand.green.light" }}
+              >
+                Set a job alert
+              </Text>
+            }
+          />{" "}
+          to be notified when matching roles are posted.
+        </Text>
+        <ResetFiltersButton />
+      </Flex>
     </Stack>
+  );
+}
+
+function ResetFiltersButton() {
+  const clear = useClearRefinements();
+
+  if (!clear.canRefine) {
+    return null;
+  }
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={() => {
+        clear.refine();
+        resetSalaryFilter();
+        resetOtherFilters();
+      }}
+      flexShrink="0"
+    >
+      Reset filters
+    </Button>
   );
 }
 

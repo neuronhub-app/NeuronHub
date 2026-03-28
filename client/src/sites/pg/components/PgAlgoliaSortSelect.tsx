@@ -20,8 +20,10 @@ export function PgAlgoliaSortSelect(props: { items: Array<{ value: string; label
           ps="0"
           fontWeight="500"
           fontSize="sm"
+          bg="bg"
           color="brand.black"
           cursor="pointer"
+          _hover={{ bg: "bg" }}
           _focusVisible={{ outline: "none", boxShadow: "none" }}
         >
           <Select.ValueText />

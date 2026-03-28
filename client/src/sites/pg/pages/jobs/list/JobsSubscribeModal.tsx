@@ -28,7 +28,7 @@ const FormSchema = z.object({
   email: z.email("Invalid email address"),
 });
 
-export function JobsSubscribeModal(props: { testId?: string }) {
+export function JobsSubscribeModal(props: { testId?: string; trigger?: React.ReactNode }) {
   const user = useUser();
   const loading = useIsLoading();
 
@@ -82,25 +82,33 @@ export function JobsSubscribeModal(props: { testId?: string }) {
 
   const hasFilters = refinesCurrentReadableMap.length > 0;
 
+  function openModal() {
+    const email = user?.email ?? localStorage.getItem(emailStoreKey) ?? "";
+    if (email && !form.getValues("email")) {
+      form.setValue("email", email);
+    }
+    state.mutable.isOpen = true;
+  }
+
   return (
     <>
-      <Button
-        onClick={() => {
-          const email = user?.email ?? localStorage.getItem(emailStoreKey) ?? "";
-          if (email && !form.getValues("email")) {
-            form.setValue("email", email);
-          }
-          state.mutable.isOpen = true;
-        }}
-        variant="pg-primary"
-        w="full"
-        {...(props.testId ? ids.set(props.testId) : {})}
-      >
-        <Icon boxSize="3.5">
-          <FaBell />
-        </Icon>
-        Get job alerts
-      </Button>
+      {props.trigger ? (
+        <Box as="button" onClick={openModal} cursor="pointer" display="inline">
+          {props.trigger}
+        </Box>
+      ) : (
+        <Button
+          onClick={openModal}
+          variant="pg-primary"
+          w="full"
+          {...(props.testId ? ids.set(props.testId) : {})}
+        >
+          <Icon boxSize="3.5">
+            <FaBell />
+          </Icon>
+          Get job alerts
+        </Button>
+      )}
 
       <DialogRoot
         open={state.snap.isOpen}
