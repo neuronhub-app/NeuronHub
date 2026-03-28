@@ -4,6 +4,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { useCurrentRefinements, useInfiniteHits, useSearchBox } from "react-instantsearch";
 import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
 import type { ID } from "@/gql-tada";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export type PgInfiniteHitsProps<TItem extends { id: ID }, TData = unknown> = {
   enrichment: {
@@ -29,6 +30,14 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
   const showMoreCallback = useRef(hits.showMore);
   showMoreCallback.current = hits.showMore;
   const scrollSentinelRef = useRef<HTMLDivElement>(null);
+  const state = useStateValtio({ isLoadingMore: false, prevCount: 0 });
+
+  useEffect(() => {
+    if (hits.items.length !== state.mutable.prevCount || hits.isLastPage) {
+      state.mutable.isLoadingMore = false;
+      state.mutable.prevCount = hits.items.length;
+    }
+  }, [hits.items.length, hits.isLastPage]);
   const { items, isEnrichedByGraphql } = useAlgoliaEnrichmentByGraphql(
     hits.items,
     props.enrichment.query,
@@ -42,7 +51,8 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
       return;
     }
     const observer = new IntersectionObserver(([entry]) => {
-      if (entry!.isIntersecting) {
+      if (entry!.isIntersecting && !state.mutable.isLoadingMore) {
+        state.mutable.isLoadingMore = true;
         showMoreCallback.current();
       }
     });
@@ -71,6 +81,7 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
             props.renderHit(item, { isSearchActive, isEnrichedByGraphql }),
           )
         )}
+        {state.snap.isLoadingMore && <PgHitSkeletons />}
       </Stack>
 
       <Box ref={scrollSentinelRef} h="1" display={hits.isLastPage ? "none" : "block"} />
