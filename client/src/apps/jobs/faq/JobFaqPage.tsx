@@ -54,7 +54,13 @@ export function JobFaqPage() {
     <Stack gap="gap.lg" w="full" pt="30px">
       <Text {...style.heading}>FAQ</Text>
 
-      <Accordion.Root collapsible display="flex" flexDirection="column" gap="gap.sm">
+      <Accordion.Root
+        collapsible
+        multiple={true}
+        display="flex"
+        flexDirection="column"
+        gap="gap.sm"
+      >
         {query.data?.job_faq_questions.map(item => (
           <Accordion.Item
             key={item.id}
