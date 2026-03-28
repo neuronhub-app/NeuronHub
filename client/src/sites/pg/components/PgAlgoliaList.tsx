@@ -126,7 +126,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
           <HStack
             justify="space-between"
             position="relative"
-            pt={{ base: "3", md: "gap.xl" }}
+            pt={{ base: "3", md: "2px" }}
             pb="0"
             px={{ base: "0", md: "26px" }}
           >
