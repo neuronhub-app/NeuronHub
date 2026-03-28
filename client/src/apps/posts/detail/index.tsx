@@ -5,9 +5,8 @@ import { graphql } from "@/gql-tada";
 import { PostDetailFragment } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { ErrorNotFound } from "@/root";
-import type { Route } from "~/react-router/posts/detail/+types/index";
 
-export default function PostDetailRoute(props: Route.ComponentProps) {
+export default function PostDetailRoute(props: { params: { id: string } }) {
   const { data, error, isLoadingFirstTime } = useApolloQuery(PostDetailQuery, {
     pk: props.params.id,
   });

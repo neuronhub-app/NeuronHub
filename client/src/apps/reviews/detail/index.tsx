@@ -5,9 +5,8 @@ import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
 import { PostReviewDetailFragment } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import type { Route } from "~/react-router/reviews/detail/+types";
 
-export default function PostReviewDetailRoute(props: Route.ComponentProps) {
+export default function PostReviewDetailRoute(props: { params: { id: string } }) {
   const { data, error, isLoadingFirstTime } = useApolloQuery(PostReviewDetailQuery, {
     pk: props.params.id,
   });

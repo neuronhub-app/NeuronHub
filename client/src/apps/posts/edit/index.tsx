@@ -4,9 +4,8 @@ import { PostCreateForm } from "@/apps/posts/create/PostCreateForm";
 import { graphql } from "@/gql-tada";
 import { PostEditFragment } from "@/graphql/fragments/posts";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import type { Route } from "~/react-router/posts/edit/+types/index";
 
-export default function PostEditRoute(props: Route.ComponentProps) {
+export default function PostEditRoute(props: { params: { id: string } }) {
   const { data, error, isLoadingFirstTime } = useApolloQuery(PostEditQuery, {
     id: props.params.id,
   });

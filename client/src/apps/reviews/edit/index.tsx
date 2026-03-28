@@ -4,9 +4,8 @@ import { PostReviewForm } from "@/apps/reviews/create/PostReviewForm";
 import { graphql } from "@/gql-tada";
 import { PostReviewEditFragment } from "@/graphql/fragments/reviews";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import type { Route } from "~/react-router/reviews/edit/+types/index";
 
-export default function PostReviewEditRoute(props: Route.ComponentProps) {
+export default function PostReviewEditRoute(props: { params: { id: string } }) {
   const { data, error, isLoadingFirstTime } = useApolloQuery(PostReviewEditQuery, {
     pk: props.params.id,
   });
