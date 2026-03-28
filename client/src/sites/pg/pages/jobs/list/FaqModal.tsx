@@ -45,7 +45,13 @@ export function FaqModal(props: { children: ReactNode }) {
             ))}
           </Stack>
         ) : (
-          <Accordion.Root collapsible display="flex" flexDirection="column" gap="gap.sm">
+          <Accordion.Root
+            collapsible
+            multiple
+            display="flex"
+            flexDirection="column"
+            gap="gap.sm"
+          >
             {query.data?.job_faq_questions.map(item => (
               <Accordion.Item key={item.id} value={item.id} {...style.item}>
                 <Accordion.ItemTrigger {...style.itemTrigger}>
