@@ -1,5 +1,4 @@
-import type { ExpectMatcherState, Locator } from "@playwright/test";
-import type { MatcherReturnType } from "playwright/types/test";
+import type { ExpectMatcherState, Locator, MatcherReturnType } from "@playwright/test";
 
 /**
  * Mostly a copy-paste of [the docs example](https://playwright.dev/docs/test-assertions#add-custom-matchers-using-expectextend)
