@@ -34,7 +34,6 @@ export function PgSearchInput(props: { endElementText: ReactNode; testId?: strin
                   searchBox.refine("");
                   inputRef.current?.focus();
                 }}
-                me="-2"
               />
             </Collapsible.Content>
           </Collapsible.Root>

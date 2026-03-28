@@ -58,7 +58,7 @@ export function PgFacetsActive(props: { facetsActive: FacetsActiveConfig }) {
   return (
     <Collapsible.Root open={isActive} gridColumn="span 5">
       <Collapsible.Content>
-        <HStack gap="gap.md">
+        <HStack gap="gap.md" align="flex-start">
           <PgAlgoliaClearButton
             onClear={props.facetsActive.onClearAdditional}
             extraTags={props.facetsActive.extraTags}
@@ -109,38 +109,35 @@ export function PgMobileCollapsible(props: {
         <Stack gap="gap.sm">
           {props.cta}
 
-          <Flex gap="gap.sm">
+          <Flex gap="gap.sm" align="flex-start">
             <PgAlgoliaClearButton
               onClear={props.facetsActive.onClearAdditional}
               extraTags={props.facetsActive.extraTags}
             />
-            <Box py="1">
-              <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm" />
-            </Box>
+            <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm" />
           </Flex>
 
           <Box pt="1">{props.facetsTopbar}</Box>
 
-          <Stack gap="gap.xs">
-            <HStack justify="space-between">
-              <PgAlgoliaClearButton onClear={props.facetsActive.onClearAdditional} />
-              <Collapsible.Trigger>
-                <Flex
-                  align="center"
-                  gap="gap.xs"
-                  color="primary"
-                  fontSize="sm"
-                  fontWeight="medium"
-                  cursor="pointer"
-                >
-                  Close Filters & Alerts
-                  <Box transform="rotate(180deg)">
-                    <LuChevronDown />
-                  </Box>
-                </Flex>
-              </Collapsible.Trigger>
-            </HStack>
-          </Stack>
+          <HStack>
+            <PgAlgoliaClearButton onClear={props.facetsActive.onClearAdditional} />
+            <Collapsible.Trigger asChild>
+              <Flex
+                align="center"
+                gap="gap.xs"
+                color="primary"
+                fontSize="sm"
+                fontWeight="medium"
+                cursor="pointer"
+                ml="auto"
+              >
+                Close Filters & Alerts
+                <Box transform="rotate(180deg)">
+                  <LuChevronDown />
+                </Box>
+              </Flex>
+            </Collapsible.Trigger>
+          </HStack>
         </Stack>
       </Collapsible.Content>
     </Collapsible.Root>
