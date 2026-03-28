@@ -106,9 +106,7 @@ export function JobCard(props: {
       borderColor={cardState === CardState.OpenByUser ? "brand.black" : "subtle"}
       bg="bg.card"
       fontFamily="body"
-      _hover={{
-        borderColor: cardState === CardState.OpenByUser ? "brand.black" : "fg.subtle",
-      }}
+      _hover={{ borderColor: cardState === CardState.OpenByUser ? "brand.black" : "subtle" }}
       css={style.markHighlight}
       {...ids.set(ids.job.card.container)}
       data-id={props.job.id}
@@ -204,7 +202,22 @@ export function JobCard(props: {
           base: cardState !== CardState.Closed ? "gap.md" : "0",
           md: cardState !== CardState.Closed ? "gap.lg" : "0",
         }}
+        pr={{ base: "12", md: "16" }}
+        pos="relative"
       >
+        {props.job.description && (
+          <Box
+            pos="absolute"
+            top="0"
+            h={{ base: "10", md: "12" }}
+            left={{ base: "-4", md: "-6" }}
+            right="0"
+            zIndex="0"
+            cursor="pointer"
+            onClick={toggleCard}
+            {...hoverHandlers}
+          />
+        )}
         <JobTagGroups
           job={props.job}
           highlightable={isHighlightable ? ["tags_area"] : []}
@@ -279,18 +292,6 @@ export function JobCard(props: {
           </Flex>
         </Box>
       )}
-
-      <Box
-        pos="absolute"
-        bottom="0"
-        left="0"
-        right={{ base: "12", md: "16" }}
-        h="12"
-        borderBottomLeftRadius="lg"
-        cursor="pointer"
-        onClick={toggleCard}
-        {...hoverHandlers}
-      />
 
       {cardState === CardState.Closed && (
         <Box

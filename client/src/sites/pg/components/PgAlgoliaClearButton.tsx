@@ -26,6 +26,8 @@ export function PgAlgoliaClearButton(props: {
       fontWeight="medium"
       cursor="pointer"
       _hover={{ color: "brand.green.light" }}
+      whiteSpace="nowrap"
+      h="6"
     >
       <Icon boxSize="3.5">
         <LuSquareX />

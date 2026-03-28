@@ -5,15 +5,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('sites', '0009_alter_siteconfig_email_html_about_us_and_more'),
+        ("sites", "0009_alter_siteconfig_email_html_about_us_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='navbarlink',
-            name='parent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='sites.navbarlink'),
+            model_name="navbarlink",
+            name="parent",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="children",
+                to="sites.navbarlink",
+            ),
         ),
     ]

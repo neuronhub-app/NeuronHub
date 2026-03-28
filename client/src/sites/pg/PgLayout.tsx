@@ -116,7 +116,11 @@ function PgFooter(props: { footer: FooterData; isLoading: boolean }) {
         >
           <HStack gap="1">
             <Text>© {new Date().getFullYear()} </Text>
-            <Link href="https://probablygood.org/about/" {...footerLinkStyle}>
+            <Link
+              href="https://probablygood.org/about/"
+              rel="noopener noreferrer"
+              {...footerLinkStyle}
+            >
               Probably Good
             </Link>
             <Text>|</Text>
