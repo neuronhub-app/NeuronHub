@@ -12,7 +12,7 @@ const SiteConfigQuery = graphql.persisted(
           id
           label
           href
-          children {
+          links {
             id
             label
             href

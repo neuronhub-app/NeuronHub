@@ -86,7 +86,7 @@ const style = {
 } as const;
 
 export type NavLinkChild = { id: string; label: string; href: string };
-export type NavLink = { id: string; label: string; href: string; children: NavLinkChild[] };
+export type NavLink = { id: string; label: string; href: string; links: NavLinkChild[] };
 
 export function PgHeroHeader(props: { navLinks: NavLink[]; isLoading: boolean }) {
   return (
@@ -177,7 +177,7 @@ function PgNav(props: { navLinks: NavLink[]; isLoading: boolean }) {
                   <Skeleton key={i} height="20px" width="80px" mx="5" />
                 ))
               : props.navLinks.map(link =>
-                  link.children.length > 0 ? (
+                  link.links.length > 0 ? (
                     <PgNavDropdown key={link.label} link={link} />
                   ) : (
                     <PgNavLink key={link.label} label={link.label} href={link.href} />
@@ -215,7 +215,7 @@ function PgNavDropdown(props: { link: NavLink }) {
       <Portal>
         <HoverCard.Positioner>
           <HoverCard.Content {...style.dropdown.container}>
-            {props.link.children.map(child => (
+            {props.link.links.map(child => (
               <Link
                 key={child.label}
                 href={child.href}
@@ -251,7 +251,7 @@ function PgMobileMenu(props: { isOpen: boolean; navLinks: NavLink[] }) {
       overflow="hidden"
     >
       {props.navLinks.map(link =>
-        link.children.length > 0 ? (
+        link.links.length > 0 ? (
           <PgMobileCollapsibleSection
             key={link.label}
             link={link}
@@ -315,7 +315,7 @@ function PgMobileCollapsibleSection(props: {
       </Collapsible.Trigger>
       <Collapsible.Content>
         <Stack gap="0">
-          {props.link.children.map(child => (
+          {props.link.links.map(child => (
             <Link
               key={child.label}
               href={child.href}

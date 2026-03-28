@@ -64,7 +64,7 @@ class SiteConfig(SingletonModel):
         help_text="UTM source param appended to external job/org URLs on the frontend, eg `{url}?utm_source=probablygood_board`",
     )
 
-    email_html_about_us = models.TextField(
+    email_html_about_us = HtmlField(
         blank=True,
         default="",
         help_text="HTML for the 'About' paragraph in job alert emails. Supports inline-styled <a> tags. Leave blank for generic text.",
@@ -118,18 +118,28 @@ class FooterLinkIcon(TextChoices):
     Instagram = "instagram"
 
 
-class NavbarLink(models.Model):
+class NavbarLinkSection(models.Model):
     site = models.ForeignKey(
         SiteConfig,
         on_delete=models.CASCADE,
         related_name="nav_links",
     )
-    parent = models.ForeignKey(
-        "self",
-        null=True,
-        blank=True,
+    label = models.CharField(max_length=255)
+    href = models.URLField(max_length=512)
+    order = models.PositiveIntegerField(default=0, db_index=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.label
+
+
+class NavbarLink(models.Model):
+    section = models.ForeignKey(
+        NavbarLinkSection,
         on_delete=models.CASCADE,
-        related_name="children",
+        related_name="links",
     )
     label = models.CharField(max_length=255)
     href = models.URLField(max_length=512)
@@ -186,6 +196,8 @@ def _on_change_invalidate_cache(**kwargs):
     settings.CACHE_RAM.delete(SitesQuery.CacheKey.FooterSections)
 
 
+models.signals.post_save.connect(_on_change_invalidate_cache, sender=NavbarLinkSection)
+models.signals.post_delete.connect(_on_change_invalidate_cache, sender=NavbarLinkSection)
 models.signals.post_save.connect(_on_change_invalidate_cache, sender=NavbarLink)
 models.signals.post_delete.connect(_on_change_invalidate_cache, sender=NavbarLink)
 models.signals.post_save.connect(_on_change_invalidate_cache, sender=FooterSection)

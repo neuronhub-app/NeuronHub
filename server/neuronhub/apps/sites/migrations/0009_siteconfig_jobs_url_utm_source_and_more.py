@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="siteconfig",
             name="email_html_about_us",
-            field=models.TextField(
+            field=neuronhub.apps.db.fields.HtmlField(
                 blank=True,
                 default="",
                 help_text="HTML for the 'About' paragraph in job alert emails. Supports inline-styled <a> tags. Leave blank for generic text.",
