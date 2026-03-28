@@ -12,6 +12,7 @@ from strawberry import auto
 from neuronhub.apps.sites.models import FooterLink
 from neuronhub.apps.sites.models import FooterSection
 from neuronhub.apps.sites.models import NavbarLink
+from neuronhub.apps.sites.models import NavbarLinkSection
 from neuronhub.apps.sites.models import SiteConfig
 
 
@@ -21,7 +22,15 @@ class NavbarLinkType:
     label: auto
     href: auto
     order: auto
-    children: list["NavbarLinkType"]
+
+
+@strawberry_django.type(NavbarLinkSection)
+class NavbarLinkSectionType:
+    id: auto
+    label: auto
+    href: auto
+    order: auto
+    links: list[NavbarLinkType]
 
 
 @strawberry_django.type(FooterLink)
@@ -50,12 +59,11 @@ class SiteType:
         return site_config.jobs_url_utm_source
 
     @strawberry_django.field()
-    async def nav_links(self) -> list[NavbarLinkType]:
+    async def nav_links(self) -> list[NavbarLinkSectionType]:
         return await get_list_cached(
-            NavbarLink,
+            NavbarLinkSection,
             cache_key=SitesQuery.CacheKey.NavLinks,
-            prefetch_related=["children"],
-            filter_by={"parent__isnull": True},
+            prefetch_related=["links"],
         )
 
     @strawberry_django.field()
@@ -108,15 +116,12 @@ async def get_list_cached[Return: type](
     model: type[Model],
     cache_key: str,
     prefetch_related: list[str] | None = None,
-    filter_by: dict | None = None,
 ) -> list[Return]:
     items_cached = await settings.CACHE_RAM.aget(cache_key)
     if items_cached is not None:
         return items_cached
 
     items_qs = model.objects.all()  # type: ignore[attr-defined] #bad-infer
-    if filter_by:
-        items_qs = items_qs.filter(**filter_by)
     if prefetch_related:
         items_qs = items_qs.prefetch_related(*prefetch_related)
     items = [link async for link in items_qs]

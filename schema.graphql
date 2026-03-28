@@ -257,12 +257,19 @@ type Mutation {
   send_contact_message(message: String!, name: String = null, email: String = null): Boolean!
 }
 
+type NavbarLinkSectionType {
+  id: ID!
+  label: String!
+  href: String!
+  order: Int!
+  links: [NavbarLinkType!]!
+}
+
 type NavbarLinkType {
   id: ID!
   label: String!
   href: String!
   order: Int!
-  children: [NavbarLinkType!]!
 }
 
 type OffsetPaginationInfo {
@@ -881,7 +888,7 @@ type Query {
 
 type SiteType {
   jobs_url_utm_source: String!
-  nav_links: [NavbarLinkType!]!
+  nav_links: [NavbarLinkSectionType!]!
   footer_sections: [FooterSectionType!]!
 }
 

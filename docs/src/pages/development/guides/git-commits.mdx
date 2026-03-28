@@ -49,16 +49,18 @@ If you're unsure which `Type` to use - use the highest, as they're sorted by imp
 
 ### Scopes
 
-- `post-form` - the most complex `react-hook-form`s for `Post` creation/editing
-- `tags` - `PostTag` logic
-- `comment` - re create, edit, vote, etc
-- `importer` - for `apps.importer`
-- `profile` - for `apps.profiles`
-- `jobs` - for `apps.jobs`
-- `profile/score` - ProfileMatch scoring by LLM
+- `apps`
+  - `auth` - `apps.users`, models, permissions, etc
+  - `post-form` - the most complex `react-hook-form`s for `Post` creation/editing
+  - `tags` - `PostTag` logic
+  - `comment` - re create, edit, vote, etc
+  - `importer` - for `apps.importer`
+  - `jobs` - for `apps.jobs`
+  - `profile` - for `apps.profiles`
+  - `profile/score` - ProfileMatch scoring by LLM
+  - `site` - `apps.sites`
 - `upgrade[<uv|pnpm>]` - pyproject.toml, package.json, lock files, or related changes
 - `API` - API layers: Apollo GraphQL, Strawberry resolvers, etc
-- `auth` - `apps.users`, models, permissions, etc
 - `sec` - security, unrelated to `apps.users`
 - `Algol` - <Term id="algolia"/>'s integration
 - `monitor` - eg Sentry

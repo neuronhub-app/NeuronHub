@@ -20,6 +20,7 @@ from neuronhub.apps.sites.models import FooterLink
 from neuronhub.apps.sites.models import FooterSection
 from neuronhub.apps.sites.models import FooterSectionKind
 from neuronhub.apps.sites.models import NavbarLink
+from neuronhub.apps.sites.models import NavbarLinkSection
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.users.models import User
 
@@ -33,17 +34,32 @@ class JobFaqQuestionInline(SortableStackedInline):
 class NavbarLinkInline(SortableTabularInline):
     model = NavbarLink
     extra = 0
+
+
+class NavbarLinkSectionInline(SortableTabularInline):
+    model = NavbarLinkSection
+    extra = 0
     classes = ["collapse"]
-    fieldsets = [
-        (
-            None,
-            {
-                "fields": [
-                    ("label", "href", "parent", "order"),
-                ],
-            },
-        )
+    fields = [
+        "label",
+        "href",
+        "links_edit_form",
+        "order",
     ]
+    readonly_fields = ["links_edit_form"]
+
+    @admin.display(description="Links")
+    def links_edit_form(self, obj: NavbarLinkSection) -> str:
+        if not obj.pk:
+            return ""
+        url = reverse("admin:sites_navbarlinksection_change", args=[obj.pk])
+        return mark_safe(f'<a href="{url}" class="button">Edit Links ›</a>')
+
+
+@admin.register(NavbarLinkSection)
+class NavbarLinkSectionAdmin(SortableAdminMixin, SortableAdminBase, admin.ModelAdmin):
+    list_display = ["label", "href"]
+    inlines = [NavbarLinkInline]
 
 
 class FooterSectionLinkInline(SortableTabularInline):
@@ -91,7 +107,7 @@ class FooterSectionAdmin(SortableAdminMixin, SortableAdminBase, admin.ModelAdmin
 class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmin):
     inlines = [
         JobFaqQuestionInline,
-        NavbarLinkInline,
+        NavbarLinkSectionInline,
         FooterSectionInline,
     ]
 

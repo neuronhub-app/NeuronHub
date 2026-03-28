@@ -3,7 +3,7 @@ from asgiref.sync import sync_to_async
 from django.conf import settings
 
 from neuronhub.apps.sites.graphql import SitesQuery
-from neuronhub.apps.sites.models import NavbarLink
+from neuronhub.apps.sites.models import NavbarLinkSection
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
@@ -30,7 +30,7 @@ class NavLinksCacheTest(NeuronTestCase):
         assert await _get_cache()
 
         site = await SiteConfig.get_solo()
-        link = await NavbarLink.objects.acreate(
+        link = await NavbarLinkSection.objects.acreate(
             site=site, label="test", href="https://mastodon.social"
         )
         assert await _get_cache() is None
