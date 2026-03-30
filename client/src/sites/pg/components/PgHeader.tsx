@@ -244,6 +244,7 @@ function PgMobileMenu(props: { isOpen: boolean; navLinks: NavLink[] }) {
       pointerEvents={props.isOpen ? "auto" : "none"}
       transition="opacity 0.2s ease, transform 0.2s ease"
       overflow="hidden"
+      border="1px solid {colors.brand.black}"
     >
       {props.navLinks.map(link =>
         link.links.length > 0 ? (
@@ -308,7 +309,8 @@ function PgMobileCollapsibleSection(props: {
           </Flex>
         </Flex>
       </Collapsible.Trigger>
-      <Collapsible.Content>
+
+      <Collapsible.Content borderColor="black">
         <Stack gap="0">
           {props.link.links.map(child => (
             <Link key={child.label} href={child.href} {...style.mobile.childLink}>
