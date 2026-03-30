@@ -1,11 +1,11 @@
 ---
 title: TODO comments format
 description: How to interpret our TODO comments syntax.
-reviewed_at: 2026.01.14
+reviewed_at: 2026.03.29
 hidden: true
 ---
 
-import { LinkInt } from "@/components";
+import { PageLink } from "@/components";
 
 The classic `todo <task>` leads to over-saturation and perceptual blindness.
 
@@ -21,12 +21,12 @@ Examples:
 - `!` - needed, but not now
 - `?` - a nice-to-have, might never be needed
 
-`<type>` see the <LinkInt path="/development/guides/git-commits" hash="types">Git commit Types</LinkInt>
+`<type>` see the <PageLink id="git-commits" hash="types">Git commit Types</PageLink>
 
-`<scope>` see the <LinkInt path="/development/guides/git-commits" hash="scopes">Git commit Scopes</LinkInt>.
+`<scope>` see the <PageLink id="git-commits" hash="scopes">Git commit Scopes</PageLink>.
 For `todo` we have few extras:
 - `refac-name` - renaming, postponed as Git log lacks file diff, ie to do separate commits.
 - `UX` - an annoyance, real or potential
 - `review`
 
-`<tags>` see the <LinkInt path="/development/guides/code-style" hash="tags">code-style Tags</LinkInt>.
+`<tags>` see the <PageLink id="code-style" hash="tags">code-style Tags</PageLink>.

@@ -86,8 +86,11 @@ type AlertType = NonNullable<ResultOf<typeof JobAlertListQuery>["job_alerts"]>[n
 function PgAlertCard(props: { alert: AlertType }) {
   const loading = useIsLoading();
 
+  // #quality-1%
+  // todo ! refac: useClearRefinements().canRefine
   const isHasFilters =
     props.alert.tags.length > 0 ||
+    props.alert.locations.length > 0 ||
     props.alert.is_orgs_highlighted ||
     props.alert.is_remote ||
     props.alert.salary_min != null;
@@ -177,6 +180,16 @@ function PgAlertCard(props: { alert: AlertType }) {
               Min Salary: {format.money(props.alert.salary_min)}
             </Badge>
           )}
+          {props.alert.locations.map(loc => (
+            <Badge
+              key={loc.name}
+              {...pgTagStyle.base}
+              bg={pgTagStyle.education.bg}
+              color={pgTagStyle.education.fg}
+            >
+              {loc.name}
+            </Badge>
+          ))}
           {props.alert.tags.map(tag => {
             const colors = tagColorByCategory(tag.category_name);
             return (

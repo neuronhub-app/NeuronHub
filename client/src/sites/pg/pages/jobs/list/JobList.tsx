@@ -105,7 +105,6 @@ export function JobList(props: { slug?: string }) {
       facetsTopbar={<PgFiltersTopbar />}
       facetsActive={{
         labelsOverride: {
-          is_remote: "Remote",
           "org.is_highlighted": "Highlighted",
           posted_at_unix: "Posted",
           salary_min: "Minimum Salary",
@@ -125,8 +124,8 @@ export function JobList(props: { slug?: string }) {
         attributesToHighlight={[
           "title",
           "org.name",
-          "tags_country.name",
-          "tags_city.name",
+          "locations.country",
+          "locations.city",
           "tags_skill.name",
           "tags_area.name",
           "description",

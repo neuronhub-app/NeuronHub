@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.crypto import salted_hmac
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
+from strawberry_django.descriptors import model_cached_property
 from timezone_field import TimeZoneField
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
@@ -31,6 +32,10 @@ class JobLocation(models.Model):
     region = models.CharField(max_length=255, blank=True)
     is_remote = models.BooleanField(default=False)
 
+    @model_cached_property
+    def remote_name(self) -> str:
+        return self.name if self.is_remote else ""
+
 
 class Job(AlgoliaModel):
     author = models.ForeignKey(
@@ -52,8 +57,6 @@ class Job(AlgoliaModel):
         related_name="jobs",
     )
 
-    is_remote = models.BooleanField(blank=True, null=True)
-    is_remote_friendly = models.BooleanField(blank=True, null=True)
     salary_min = models.PositiveIntegerField(blank=True, null=True)
     salary_text = models.TextField(
         blank=True, help_text="Orgs can specify multiple ranges for multiple locations."
@@ -87,19 +90,6 @@ class Job(AlgoliaModel):
         "posts.PostTag",
         limit_choices_to={"categories__name": TagCategoryEnum.Workload},
         related_name=f"tags_job_{TagCategoryEnum.Workload.value}",
-        blank=True,
-    )
-
-    tags_country = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
-        "posts.PostTag",
-        limit_choices_to={"categories__name": TagCategoryEnum.Country},
-        related_name=f"tags_job_{TagCategoryEnum.Country.value}",
-        blank=True,
-    )
-    tags_city = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
-        "posts.PostTag",
-        limit_choices_to={"categories__name": TagCategoryEnum.City},
-        related_name=f"tags_job_{TagCategoryEnum.City.value}",
         blank=True,
     )
 
@@ -158,8 +148,6 @@ class Job(AlgoliaModel):
             tags_education,
             tags_experience,
             tags_workload,
-            tags_country,
-            tags_city,
             tags_country_visa_sponsor,
         ],
     )
@@ -170,8 +158,6 @@ class Job(AlgoliaModel):
         TagCategoryEnum.Education: "tags_education",
         TagCategoryEnum.Experience: "tags_experience",
         TagCategoryEnum.Workload: "tags_workload",
-        TagCategoryEnum.Country: "tags_country",
-        TagCategoryEnum.City: "tags_city",
         TagCategoryEnum.VisaSponsorship: "tags_country_visa_sponsor",
     }
 
@@ -191,9 +177,6 @@ class Job(AlgoliaModel):
 
     def get_json_locations(self):
         return self._get_graphql_field("locations")
-
-    def get_locations_facet(self) -> list[str]:
-        return [loc.name for loc in self.locations.all()]
 
     def get_unix_posted_at(self) -> float | None:
         return self.posted_at.timestamp() if self.posted_at else None
@@ -222,12 +205,6 @@ class Job(AlgoliaModel):
     def get_json_tags_workload(self):
         return self._get_graphql_field("tags_workload")
 
-    def get_json_tags_country(self):
-        return self._get_graphql_field("tags_country")
-
-    def get_json_tags_city(self):
-        return self._get_graphql_field("tags_city")
-
     def get_json_tags_country_visa_sponsor(self):
         """
         #AI-slop - should be _get_graphql_field
@@ -252,6 +229,10 @@ class JobAlert(TimeStampedModel):
         blank=True,
     )
     is_orgs_highlighted = models.BooleanField(blank=True, null=True)
+    locations = models.ManyToManyField(
+        JobLocation,
+        blank=True,
+    )
     is_remote = models.BooleanField(blank=True, null=True)
     salary_min = models.PositiveIntegerField(blank=True, null=True)
 

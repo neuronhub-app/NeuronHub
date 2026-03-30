@@ -7,51 +7,8 @@ import type { UseRefinementListProps } from "react-instantsearch";
 import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 import { LuMapPin } from "react-icons/lu";
-import {
-  locationCityNames,
-  locationCountryNames,
-  locationRemoteNames,
-} from "@/sites/pg/locations";
 
 const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
-
-const roleTypeOrder = [
-  "Full-Time",
-  "Part-Time (50–80% FTE)",
-  "Part-Time (<50% FTE)",
-  "Internship",
-  "Fellowship",
-  "Volunteer",
-  "Funding",
-  "Training",
-  "Graduate Program",
-  "Expression of Interest",
-];
-
-function sortByCustomOrder<T extends { label: string }>(items: T[], order: string[]): T[] {
-  return items.toSorted((a, b) => {
-    const indexA = order.indexOf(a.label);
-    const indexB = order.indexOf(b.label);
-    if (indexA === -1 && indexB === -1) {
-      return 0;
-    }
-    if (indexA === -1) {
-      return 1;
-    }
-    if (indexB === -1) {
-      return -1;
-    }
-    return indexA - indexB;
-  });
-}
-
-const transformRoleType: UseRefinementListProps["transformItems"] = items =>
-  sortByCustomOrder(items, roleTypeOrder);
-
-const educationOrder = ["Undergraduate Degree or Less", "Master's Degree", "Doctoral Degree"];
-
-const transformEducation: UseRefinementListProps["transformItems"] = items =>
-  sortByCustomOrder(items, educationOrder);
 
 export const otherFiltersState = proxy({
   excludeCareerCapital: false,
@@ -100,7 +57,20 @@ function RoleTypeFacet(props: { order: FacetOrder }) {
       <PgFacetAttribute
         attribute="tags_workload.name"
         label="Role Type"
-        transformItems={transformRoleType}
+        transformItems={items =>
+          sortByCustomOrder(items, [
+            "Full-Time",
+            "Part-Time (50–80% FTE)",
+            "Part-Time (<50% FTE)",
+            "Internship",
+            "Fellowship",
+            "Volunteer",
+            "Funding",
+            "Training",
+            "Graduate Program",
+            "Expression of Interest",
+          ])
+        }
       />
     </PgFacetPopover>
   );
@@ -110,11 +80,11 @@ function CountryFacet(props: { order: FacetOrder }) {
   return (
     <PgFacetPopover label="Country" order={props.order} icon={<LuMapPin />}>
       <PgFacetAttribute
-        attribute="locations_facet"
+        attribute="locations.country"
         label="Country"
         isSearchEnabled
         operator="or"
-        allowedValues={locationCountryNames}
+        isFreezeTotalFacetCount
       />
     </PgFacetPopover>
   );
@@ -160,10 +130,10 @@ function RemoteFacet(props: { order: FacetOrder }) {
   return (
     <PgFacetPopover label="Remote" order={props.order} icon={<LuMapPin />}>
       <PgFacetAttribute
-        attribute="locations_facet"
+        attribute="locations.remote_name"
         label="Remote"
         operator="or"
-        allowedValues={locationRemoteNames}
+        isFreezeTotalFacetCount
       />
     </PgFacetPopover>
   );
@@ -173,11 +143,11 @@ function CityFacet(props: { order: FacetOrder }) {
   return (
     <PgFacetPopover label="City" order={props.order} icon={<LuMapPin />}>
       <PgFacetAttribute
-        attribute="locations_facet"
+        attribute="locations.city"
         label="City"
         isSearchEnabled
         operator="or"
-        allowedValues={locationCityNames}
+        isFreezeTotalFacetCount
       />
     </PgFacetPopover>
   );
@@ -189,7 +159,13 @@ function EducationFacet(props: { order: FacetOrder }) {
       <PgFacetAttribute
         attribute="tags_education.name"
         label="Education"
-        transformItems={transformEducation}
+        transformItems={items =>
+          sortByCustomOrder(items, [
+            "Undergraduate Degree or Less",
+            "Master's Degree",
+            "Doctoral Degree",
+          ])
+        }
       />
     </PgFacetPopover>
   );
@@ -237,4 +213,21 @@ function BooleanSwitch(props: { label: string; checked: boolean; onToggle: () =>
       </Flex>
     </Switch.Root>
   );
+}
+
+function sortByCustomOrder<T extends { label: string }>(items: T[], orderAs: string[]): T[] {
+  return items.toSorted((a, b) => {
+    const indexA = orderAs.indexOf(a.label);
+    const indexB = orderAs.indexOf(b.label);
+    if (indexA === -1 && indexB === -1) {
+      return 0;
+    }
+    if (indexA === -1) {
+      return 1;
+    }
+    if (indexB === -1) {
+      return -1;
+    }
+    return indexA - indexB;
+  });
 }

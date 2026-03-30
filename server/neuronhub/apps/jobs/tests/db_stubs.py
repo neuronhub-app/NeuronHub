@@ -1,3 +1,7 @@
+"""
+#quality-21% #AI-slop
+"""
+
 import textwrap
 from dataclasses import dataclass
 from dataclasses import field
@@ -15,6 +19,15 @@ from neuronhub.apps.posts.models import PostTagCategory
 from neuronhub.apps.tests.test_gen import Gen
 
 
+@dataclass(frozen=True)
+class LocationVal:
+    name: str
+    city: str = ""
+    country: str = ""
+    region: str = ""
+    is_remote: bool = False
+
+
 @dataclass
 class JobTags:
     skill: list[str] = field(default_factory=list)
@@ -22,8 +35,6 @@ class JobTags:
     education: list[str] = field(default_factory=list)
     experience: list[str] = field(default_factory=list)
     workload: list[str] = field(default_factory=list)
-    country: list[str] = field(default_factory=list)
-    city: list[str] = field(default_factory=list)
     visa_countries: list[str] = field(default_factory=list)
 
 
@@ -32,7 +43,7 @@ class JobStub:
     job: Job
     org: Org
     tags: JobTags = field(default_factory=JobTags)
-    locations: list[str] = field(default_factory=list)
+    locations: list[LocationVal] = field(default_factory=list)
 
 
 async def create_jobs_stubs(gen: Gen) -> None:
@@ -67,8 +78,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.Masters],
                 experience=[val.experience.Middle],
                 workload=[val.workload.FullTime],
-                country=[val.country.US],
-                city=[val.city.SanFrancisco],
                 visa_countries=[val.country.US],
             ),
             locations=[val.location.SanFranciscoCA],
@@ -99,8 +108,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime, val.workload.PartTimeSub50],
-                country=[val.country.US],
-                city=[val.city.Oakland, val.city.SanFrancisco],
             ),
             locations=[
                 val.location.OaklandCA,
@@ -123,7 +130,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     - Remote-friendly with occasional travel to offices
                 """),
                 url_external="https://meridiangovernance.org/vacancies/policy",
-                is_remote=True,
                 salary_text="$50,000 – $140,000; £37,500 – £105,000",
                 posted_at=now - timedelta(days=60),
                 closes_at=now + timedelta(days=66),
@@ -138,14 +144,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     val.workload.FullTime,
                     val.workload.PartTime50,
                     val.workload.PartTimeSub50,
-                ],
-                country=[val.country.UK, val.country.US],
-                city=[
-                    val.city.London,
-                    val.city.Oxford,
-                    val.city.DC,
-                    val.city.Geneva,
-                    val.city.Brussels,
                 ],
                 visa_countries=[val.country.UK],
             ),
@@ -182,16 +180,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Senior],
                 workload=[val.workload.FullTime],
-                country=[
-                    val.country.Kenya,
-                    val.country.Uganda,
-                    val.country.Rwanda,
-                    val.country.Tanzania,
-                    val.country.Malawi,
-                    val.country.Mozambique,
-                    val.country.DRC,
-                ],
-                city=[val.city.Nairobi, val.city.Kampala, val.city.Kigali, val.city.DarEsSalaam],
             ),
             locations=[
                 val.location.NairobiKenya,
@@ -226,8 +214,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Entry],
                 workload=[val.workload.Fellowship],
-                country=[val.country.US],
-                city=[val.city.Berkeley],
             ),
             locations=[val.location.BerkeleyCA],
         ),
@@ -254,7 +240,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 area=[val.area.AIS],
                 experience=[val.experience.Junior],
                 workload=[val.workload.Funding],
-                country=[val.country.US],
             ),
             locations=[val.location.RemoteUSA],
         ),
@@ -281,8 +266,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 area=[val.area.Societal],
                 experience=[val.experience.Entry],
                 workload=[val.workload.Volunteer],
-                country=[val.country.UK],
-                city=[val.city.London],
             ),
             locations=[val.location.LondonUK],
         ),
@@ -310,8 +293,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 area=[val.area.AIS],
                 experience=[val.experience.Entry],
                 workload=[val.workload.GraduateProgram],
-                country=[val.country.UK],
-                city=[val.city.Oxford],
             ),
             locations=[val.location.OxfordUK],
         ),
@@ -338,7 +319,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 area=[val.area.Biosecurity],
                 experience=[val.experience.Junior],
                 workload=[val.workload.Training],
-                country=[val.country.US, val.country.UK],
             ),
             locations=[val.location.RemoteUSA, val.location.RemoteUK, val.location.RemoteEurope],
         ),
@@ -367,8 +347,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 area=[val.area.AnimalWelfare],
                 experience=[val.experience.Entry],
                 workload=[val.workload.Internship],
-                country=[val.country.US],
-                city=[val.city.SanFrancisco],
             ),
             locations=[val.location.SanFranciscoCA],
         ),
@@ -444,7 +422,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     - Collaborate with researchers to translate findings into policy recommendations
                 """),
                 url_external="https://sentientmetrics.org/careers/data-analyst",
-                is_remote=True,
                 salary_text="$18 – $20 per hour",
                 posted_at=now - timedelta(days=18),
                 visibility=Visibility.PUBLIC,
@@ -455,7 +432,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime, val.workload.PartTime50],
-                country=[val.country.US, val.country.UK],
             ),
             locations=[
                 val.location.SanFranciscoCA,
@@ -491,8 +467,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.Masters],
                 experience=[val.experience.Senior],
                 workload=[val.workload.FullTime],
-                country=[val.country.US],
-                city=[val.city.SanFrancisco],
             ),
             locations=[val.location.SanFranciscoCA, val.location.RemoteUSA],
         ),
@@ -522,8 +496,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.PhD],
                 experience=[val.experience.Middle],
                 workload=[val.workload.FullTime],
-                country=[val.country.US],
-                city=[val.city.CambridgeMA],
             ),
             locations=[val.location.RemoteUSA],
         ),
@@ -554,8 +526,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.PhD],
                 experience=[val.experience.Senior],
                 workload=[val.workload.FullTime],
-                country=[val.country.US],
-                city=[val.city.DC],
             ),
             locations=[val.location.WashingtonDC],
         ),
@@ -584,8 +554,6 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Entry],
                 workload=[val.workload.FullTime],
-                country=[val.country.UK],
-                city=[val.city.London, val.city.Oxford, val.city.Cambridge],
             ),
             locations=[val.location.LondonUK, val.location.OxfordUK],
         ),
@@ -615,40 +583,45 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 education=[val.education.Undergrad],
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime],
-                country=[val.country.UK],
-                city=[val.city.London],
             ),
             locations=[val.location.LondonUK, val.location.RemoteUK],
         ),
     ]
 
     orgs = await Org.objects.abulk_create([stub.org for stub in job_stubs])
-    for stub, org in zip(job_stubs, orgs):
-        stub.job.org = org
+    for job_stub, org in zip(job_stubs, orgs):
+        job_stub.job.org = org
     await Job.objects.abulk_create([stub.job for stub in job_stubs])
 
-    for stub in job_stubs:
-        for category in TagCategoryEnum:
-            if tag_names := getattr(stub.tags, category.value, None):
-                tags = await _get_or_create_tags(tag_names, category)
-                await getattr(stub.job, f"tags_{category.value}").aset(tags)
+    # todo ! refac: trash comp in comp; give normal names as in code-style-detailed.md
+    location_vals_all = {loc_val for stub in job_stubs for loc_val in stub.locations}
+    locations_by_val = await _create_locations(location_vals_all)
 
-        if stub.tags.visa_countries:
-            await _create_visa_child_tags(stub.tags.visa_countries)
+    for job_stub in job_stubs:
+        for category, tag_field_name in Job.tag_category_to_field.items():
+            if tag_names := getattr(job_stub.tags, category.value, None):
+                tags = await _get_or_create_tags(tag_names, category)
+                await getattr(job_stub.job, tag_field_name).aset(tags)
+
+        if job_stub.tags.visa_countries:
+            # Country tags must exist for visa child tags
+            await _get_or_create_tags(job_stub.tags.visa_countries, TagCategoryEnum.Country)
+            await _create_visa_child_tags(job_stub.tags.visa_countries)
             country_tags = [
                 await PostTag.objects.aget(name=name, tag_parent=None)
-                for name in stub.tags.visa_countries
+                for name in job_stub.tags.visa_countries
             ]
-            await stub.job.tags_country_visa_sponsor.aset(country_tags)
+            await job_stub.job.tags_country_visa_sponsor.aset(country_tags)
 
-        if stub.locations:
-            locations = await _get_or_create_locations(stub.locations)
-            await stub.job.locations.aset(locations)
+        if job_stub.locations:
+            await job_stub.job.locations.aset(
+                [locations_by_val[loc_val] for loc_val in job_stub.locations]
+            )
 
     await _create_draft_version(published=job_stubs[0].job)
 
 
-async def _create_random_jobs(gen: Gen, now) -> None:
+async def _create_jobs(gen: Gen, now) -> None:
     """
     #AI
     """
@@ -667,19 +640,11 @@ async def _create_random_jobs(gen: Gen, now) -> None:
             title=gen.faker.job(),
             description=gen.faker.text(max_nb_chars=300),
             salary_min=random_seeded.choice([None, 60_000, 80_000, 100_000, 120_000]),
-            is_remote=random_seeded.choice([None, True, False]),
             posted_at=now - timedelta(days=random_seeded.randint(1, 90)),
             closes_at=now + timedelta(days=random_seeded.randint(10, 120))
             if random_seeded.random() > 0.5
             else None,
         )
-
-        countries_all = [value for value in vars(val.country).values() if isinstance(value, str)]
-        country_tags = await _get_or_create_tags(
-            random_seeded.sample(countries_all, k=random_seeded.randint(1, 3)),
-            TagCategoryEnum.Country,
-        )
-        await job.tags_country.aset(country_tags)
 
         areas_all = [value for value in vars(val.area).values() if isinstance(value, str)]
         area_tags = await _get_or_create_tags(
@@ -697,7 +662,6 @@ async def _create_draft_version(published: Job) -> Job:
         org=published.org,
         url_external=published.url_external,
         salary_min=(published.salary_min or 0) + 10_000,
-        is_remote=True,
         posted_at=published.posted_at,
         visibility=published.visibility,
         is_published=False,
@@ -709,14 +673,23 @@ async def _create_draft_version(published: Job) -> Job:
     return draft
 
 
-async def _get_or_create_locations(location_names: list[str]) -> list[JobLocation]:
-    locations = []
-    for name in location_names:
-        loc, _ = await JobLocation.objects.aget_or_create(
-            name=name, defaults=_location_defaults[name]
-        )
-        locations.append(loc)
-    return locations
+async def _create_locations(location_vals: set[LocationVal]) -> dict[LocationVal, JobLocation]:
+    await JobLocation.objects.abulk_create(
+        [
+            JobLocation(
+                name=lv.name,
+                city=lv.city,
+                country=lv.country,
+                region=lv.region,
+                is_remote=lv.is_remote,
+            )
+            for lv in location_vals
+        ],
+        ignore_conflicts=True,
+    )
+    names = [lv.name for lv in location_vals]
+    db_by_name = {loc.name: loc async for loc in JobLocation.objects.filter(name__in=names)}
+    return {lv: db_by_name[lv.name] for lv in location_vals}
 
 
 async def _get_or_create_tags(tag_names: list[str], category: TagCategoryEnum) -> list[PostTag]:
@@ -745,412 +718,21 @@ async def _create_visa_child_tags(country_names: list[str]) -> None:
         await tag_child.categories.aadd(visa_category)
 
 
-class val:
-    class country:
-        Afghanistan = "Afghanistan"
-        Albania = "Albania"
-        Algeria = "Algeria"
-        Angola = "Angola"
-        Argentina = "Argentina"
-        Armenia = "Armenia"
-        Australia = "Australia"
-        Austria = "Austria"
-        Bahamas = "Bahamas"
-        Bangladesh = "Bangladesh"
-        Barbados = "Barbados"
-        Belgium = "Belgium"
-        Belize = "Belize"
-        Benin = "Benin"
-        Bolivia = "Bolivia"
-        Bosnia = "Bosnia"
-        BosniaAndHerzegovina = "Bosnia and Herzegovina"
-        Botswana = "Botswana"
-        Brazil = "Brazil"
-        Bulgaria = "Bulgaria"
-        BurkinaFaso = "Burkina Faso"
-        Burundi = "Burundi"
-        Cambodia = "Cambodia"
-        Cameroon = "Cameroon"
-        Canada = "Canada"
-        CentralAfricanRepublic = "Central African Republic"
-        Chad = "Chad"
-        Chile = "Chile"
-        China = "China"
-        Colombia = "Colombia"
-        CostaRica = "Costa Rica"
-        CoteDIvoire = "Côte d'Ivoire"
-        Czechia = "Czechia"
-        DRC = "Democratic Republic of the Congo"
-        Denmark = "Denmark"
-        Djibouti = "Djibouti"
-        DominicanRepublic = "Dominican Republic"
-        Ecuador = "Ecuador"
-        Egypt = "Egypt"
-        ElSalvador = "El Salvador"
-        EquatorialGuinea = "Equatorial Guinea"
-        Estonia = "Estonia"
-        Eswatini = "Eswatini"
-        Ethiopia = "Ethiopia"
-        Fiji = "Fiji"
-        Finland = "Finland"
-        France = "France"
-        Gaza = "Gaza"
-        Germany = "Germany"
-        Ghana = "Ghana"
-        Greece = "Greece"
-        Guatemala = "Guatemala"
-        Guinea = "Guinea"
-        GuineaBissau = "Guinea-Bissau"
-        Guyana = "Guyana"
-        Haiti = "Haiti"
-        Honduras = "Honduras"
-        HongKong = "Hong Kong"
-        Hungary = "Hungary"
-        Iceland = "Iceland"
-        India = "India"
-        Indonesia = "Indonesia"
-        Ireland = "Ireland"
-        Israel = "Israel"
-        Italy = "Italy"
-        Jamaica = "Jamaica"
-        Japan = "Japan"
-        Jordan = "Jordan"
-        Kazakhstan = "Kazakhstan"
-        Kenya = "Kenya"
-        Kiribati = "Kiribati"
-        Laos = "Laos"
-        Lebanon = "Lebanon"
-        Lesotho = "Lesotho"
-        Liberia = "Liberia"
-        Libya = "Libya"
-        Lithuania = "Lithuania"
-        Luxembourg = "Luxembourg"
-        Madagascar = "Madagascar"
-        Malawi = "Malawi"
-        Malaysia = "Malaysia"
-        Mali = "Mali"
-        MarshallIslands = "Marshall Islands"
-        Mauritania = "Mauritania"
-        Mauritius = "Mauritius"
-        Mexico = "Mexico"
-        Mongolia = "Mongolia"
-        Morocco = "Morocco"
-        Mozambique = "Mozambique"
-        MultipleLocationsAfrica = "Multiple Locations: Africa"
-        MultipleLocationsAPAC = "Multiple Locations: APAC Region"
-        MultipleLocationsEurope = "Multiple Locations: Europe"
-        MultipleLocationsLatinAmerica = "Multiple Locations: Latin America"
-        Myanmar = "Myanmar"
-        Namibia = "Namibia"
-        Nepal = "Nepal"
-        Netherlands = "Netherlands"
-        NewZealand = "New Zealand"
-        Niger = "Niger"
-        Nigeria = "Nigeria"
-        Norway = "Norway"
-        Pakistan = "Pakistan"
-        Palestine = "Palestine"
-        Panama = "Panama"
-        PapuaNewGuinea = "Papua New Guinea"
-        Paraguay = "Paraguay"
-        Peru = "Peru"
-        Philippines = "Philippines"
-        Poland = "Poland"
-        Portugal = "Portugal"
-        Romania = "Romania"
-        Rwanda = "Rwanda"
-        SaintLucia = "Saint Lucia"
-        SaudiArabia = "Saudi Arabia"
-        Senegal = "Senegal"
-        Serbia = "Serbia"
-        SierraLeone = "Sierra Leone"
-        Singapore = "Singapore"
-        Slovakia = "Slovakia"
-        Somalia = "Somalia"
-        SouthAfrica = "South Africa"
-        SouthKorea = "South Korea"
-        SouthSudan = "South Sudan"
-        Spain = "Spain"
-        SriLanka = "Sri Lanka"
-        Sudan = "Sudan"
-        Suriname = "Suriname"
-        Sweden = "Sweden"
-        Switzerland = "Switzerland"
-        Syria = "Syria"
-        Taiwan = "Taiwan"
-        Tajikistan = "Tajikistan"
-        Tanzania = "Tanzania"
-        Thailand = "Thailand"
-        TheGambia = "The Gambia"
-        TimorLeste = "Timor-Leste"
-        Togo = "Togo"
-        Tonga = "Tonga"
-        TrinidadAndTobago = "Trinidad and Tobago"
-        Tunisia = "Tunisia"
-        Turkey = "Turkey"
-        Uganda = "Uganda"
-        Ukraine = "Ukraine"
-        UAE = "United Arab Emirates"
-        UK = "United Kingdom"
-        US = "United States"
-        Uruguay = "Uruguay"
-        Uzbekistan = "Uzbekistan"
-        Venezuela = "Venezuela"
-        Vietnam = "Vietnam"
-        Zambia = "Zambia"
-        Zimbabwe = "Zimbabwe"
+class _country:
+    US = "United States"
+    UK = "United Kingdom"
+    Kenya = "Kenya"
 
-    class city:
-        Abidjan = "Abidjan"
-        Abuja = "Abuja"
-        Accra = "Accra"
-        AddisAbaba = "Addis Ababa"
-        Allschwil = "Allschwil"
-        Amdjarass = "Amdjarass"
-        Amman = "Amman"
-        Amsterdam = "Amsterdam"
-        AndhraPradesh = "Andhra Pradesh"
-        Antananarivo = "Antananarivo"
-        ArlingtonVA = "Arlington VA"
-        AtlantaGA = "Atlanta GA"
-        AtlanticCityNJ = "Atlantic City NJ"
-        AustinTX = "Austin TX"
-        BaltimoreMD = "Baltimore MD"
-        Bamako = "Bamako"
-        Bangalore = "Bangalore"
-        Bangkok = "Bangkok"
-        Bangui = "Bangui"
-        Banjul = "Banjul"
-        Barcelona = "Barcelona"
-        Basel = "Basel"
-        Beijing = "Beijing"
-        Beirut = "Beirut"
-        Bengaluru = "Bengaluru"
-        Berkeley = "Berkeley CA"
-        Berlin = "Berlin"
-        Bern = "Bern"
-        BethesdaMD = "Bethesda MD"
-        Bhopal = "Bhopal"
-        Bilthoven = "Bilthoven"
-        Birmingham = "Birmingham"
-        BirnKebbi = "Birnin Kebbi"
-        Bitkine = "Bitkine"
-        Bocaranga = "Bocaranga"
-        Bogota = "Bogotá"
-        Bonn = "Bonn"
-        BostonMA = "Boston MA"
-        BoulderCO = "Boulder CO"
-        Brisbane = "Brisbane"
-        BrisbaneCA = "Brisbane CA"
-        BrooklynNY = "Brooklyn NY"
-        BroomfieldCO = "Broomfield CO"
-        Brussels = "Brussels"
-        BryanTX = "Bryan TX"
-        Budapest = "Budapest"
-        BuenosAires = "Buenos Aires"
-        Buhumuza = "Buhumuza"
-        Bujumbura = "Bujumbura"
-        Bukavu = "Bukavu"
-        Burunga = "Burunga"
-        Cairo = "Cairo"
-        Cambridge = "Cambridge"
-        CambridgeMA = "Cambridge MA"
-        CapeTown = "Cape Town"
-        Cardiff = "Cardiff"
-        ChicagoIL = "Chicago IL"
-        Christchurch = "Christchurch"
-        Coimbatore = "Coimbatore"
-        Conakry = "Conakry"
-        Copenhagen = "Copenhagen"
-        Cotonou = "Cotonou"
-        CovinaCA = "Covina CA"
-        Dakar = "Dakar"
-        DarEsSalaam = "Dar es Salaam"
-        Darlington = "Darlington"
-        DecaturGA = "Decatur GA"
-        Delhi = "Delhi"
-        Dhaka = "Dhaka"
-        Dodoma = "Dodoma"
-        Dublin = "Dublin"
-        DurhamNC = "Durham NC"
-        Edinburgh = "Edinburgh"
-        Edmonton = "Edmonton"
-        EmeryvilleCA = "Emeryville CA"
-        Entebbe = "Entebbe"
-        Florence = "Florence"
-        FortLuptonCO = "Fort Lupton CO"
-        FortDeFrance = "Fort-de-France"
-        Freetown = "Freetown"
-        GaithersburgMD = "Gaithersburg MD"
-        Gebze = "Gebze"
-        Geneva = "Geneva"
-        Ghent = "Ghent"
-        Gicumbi = "Gicumbi"
-        Gitega = "Gitega"
-        Grenoble = "Grenoble"
-        GuatemalaCity = "Guatemala City"
-        Gujarat = "Gujarat"
-        Gutersloh = "Gütersloh"
-        Guwahati = "Guwahati"
-        Hamburg = "Hamburg"
-        Hanoi = "Hanoi"
-        Harare = "Harare"
-        HaywardsHeath = "Haywards Heath"
-        Heidelberg = "Heidelberg"
-        HimachalPradesh = "Himachal Pradesh"
-        Hinxton = "Hinxton"
-        HoChiMinh = "Ho Chi Minh"
-        HoustonTX = "Houston TX"
-        HpaAn = "Hpa-An"
-        Huehuetenango = "Huehuetenango"
-        Hyderabad = "Hyderabad"
-        Islamabad = "Islamabad"
-        Jabi = "Jabi"
-        Jakarta = "Jakarta"
-        Johannesburg = "Johannesburg"
-        Juba = "Juba"
-        Kabul = "Kabul"
-        Kadiogo = "Kadiogo"
-        Kaduna = "Kaduna"
-        Kambia = "Kambia"
-        Kampala = "Kampala"
-        Karachi = "Karachi"
-        Karnataka = "Karnataka"
-        Karongi = "Karongi"
-        Kathmandu = "Kathmandu"
-        Katsina = "Katsina"
-        Kebbi = "Kebbi"
-        Kigali = "Kigali"
-        Kinshasa = "Kinshasa"
-        KirklandWA = "Kirkland WA"
-        Koch = "Koch"
-        Kolkata = "Kolkata"
-        Kyiv = "Kyiv"
-        Lagos = "Lagos"
-        Lahore = "Lahore"
-        Lilongwe = "Lilongwe"
-        LincolnNE = "Lincoln NE"
-        Lisbon = "Lisbon"
-        LivermoreCA = "Livermore CA"
-        London = "London"
-        LosAngelesCA = "Los Angeles CA"
-        Lucknow = "Lucknow"
-        Lusaka = "Lusaka"
-        Maharashtra = "Maharashtra"
-        Mainz = "Mainz"
-        MakatiCity = "Makati City"
-        Manakara = "Manakara"
-        Manchester = "Manchester"
-        Manila = "Manila"
-        Maputo = "Maputo"
-        MarylandMD = "Maryland MD"
-        Mbale = "Mbale"
-        Mbarara = "Mbarara"
-        Mekelle = "Mekelle"
-        Melbourne = "Melbourne"
-        MiltonPark = "Milton Park"
-        Mogadishu = "Mogadishu"
-        Moka = "Moka"
-        Monguno = "Monguno"
-        Monrovia = "Monrovia"
-        MontereyCA = "Monterey CA"
-        MontgomeryCountyMD = "Montgomery County MD"
-        Montpellier = "Montpellier"
-        Montreal = "Montreal"
-        Montserrado = "Montserrado"
-        MountainViewCA = "Mountain View CA"
-        Mumbai = "Mumbai"
-        Munich = "Munich"
-        NDjamena = "N'Djamena"
-        Nairobi = "Nairobi"
-        Nalanda = "Nalanda"
-        Nashik = "Nashik"
-        NewDelhi = "New Delhi"
-        NewHavenCT = "New Haven CT"
-        NewYork = "New York"
-        NewYorkNY = "New York NY"
-        Ngororero = "Ngororero"
-        Niamey = "Niamey"
-        NigerState = "Niger State"
-        Norwich = "Norwich"
-        Nyabihu = "Nyabihu"
-        Oakland = "Oakland CA"
-        Opfikon = "Opfikon"
-        Oslo = "Oslo"
-        Ottawa = "Ottawa"
-        Ouagadougou = "Ouagadougou"
-        Oxford = "Oxford"
-        PaloAltoCA = "Palo Alto CA"
-        PanamaCityFL = "Panama City FL"
-        Paris = "Paris"
-        Patna = "Patna"
-        PhnomPenh = "Phnom Penh"
-        PittsburghPA = "Pittsburgh PA"
-        PortSudan = "Port Sudan"
-        PortAuPrince = "Port-au-Prince"
-        Prague = "Prague"
-        Pretoria = "Pretoria"
-        PrincetonNJ = "Princeton NJ"
-        Provence = "Provence"
-        Pune = "Pune"
-        Quebec = "Quebec"
-        QuezonCity = "Quezon City"
-        Rabat = "Rabat"
-        Rajasthan = "Rajasthan"
-        RamatGan = "Ramat Gan"
-        Ranchi = "Ranchi"
-        Remscheid = "Remscheid"
-        RioDeJaneiro = "Rio de Janeiro"
-        Rome = "Rome"
-        Rotterdam = "Rotterdam"
-        SacramentoCA = "Sacramento CA"
-        SaltLakeCityUT = "Salt Lake City UT"
-        Sambalpur = "Sambalpur"
-        SanDiegoCA = "San Diego CA"
-        SanFrancisco = "San Francisco CA"
-        SanJoseCA = "San Jose CA"
-        SanMateoCA = "San Mateo CA"
-        SantaMonicaCA = "Santa Monica CA"
-        SaoPaulo = "São Paulo"
-        SeattleWA = "Seattle WA"
-        Sejong = "Sejong"
-        Seoul = "Seoul"
-        Shanghai = "Shanghai"
-        Sheffield = "Sheffield"
-        SilverSpringMD = "Silver Spring MD"
-        Singapore = "Singapore"
-        Sokoto = "Sokoto"
-        SomervilleMA = "Somerville MA"
-        Steyning = "Steyning"
-        Stockholm = "Stockholm"
-        Stuttgart = "Stuttgart"
-        Sydney = "Sydney"
-        Tallinn = "Tallinn"
-        TelAviv = "Tel Aviv"
-        Thane = "Thane"
-        Tharparkar = "Tharparkar"
-        TheHague = "The Hague"
-        Thies = "Thiès"
-        Tokyo = "Tokyo"
-        Toronto = "Toronto"
-        Tripoli = "Tripoli"
-        Tubingen = "Tübingen"
-        Ujjain = "Ujjain"
-        Uppsala = "Uppsala"
-        Utrecht = "Utrecht"
-        UttarPradesh = "Uttar Pradesh"
-        VancouverWA = "Vancouver WA"
-        Vienna = "Vienna"
-        Vijayawada = "Vijayawada"
-        Vilnius = "Vilnius"
-        Visakhapatnam = "Visakhapatnam"
-        Warsaw = "Warsaw"
-        DC = "Washington D.C."
-        WestSussex = "West Sussex"
-        Wolverhampton = "Wolverhampton"
-        Yangon = "Yangon"
-        Yaounde = "Yaoundé"
-        Zurich = "Zurich"
+
+class _region:
+    Global = "Global"
+    NA = "North America"
+    EU = "Western Europe"
+    SubSaharanAfrica = "Sub-Saharan Africa"
+
+
+class val:
+    country = _country
 
     class skill:
         Communications = "Communications & Outreach"
@@ -1194,17 +776,50 @@ class val:
         Senior = "Senior (10+ years experience)"
 
     class location:
-        RemoteGlobal = "Remote, Global"
-        RemoteUSA = "Remote, USA"
-        RemoteUK = "Remote, UK"
-        RemoteEurope = "Remote, Europe"
-        SanFranciscoCA = "San Francisco CA, USA"
-        WashingtonDC = "Washington D.C., USA"
-        LondonUK = "London, UK"
-        NairobiKenya = "Nairobi, Kenya"
-        BerkeleyCA = "Berkeley CA, USA"
-        OaklandCA = "Oakland CA, USA"
-        OxfordUK = "Oxford, UK"
+        RemoteGlobal = LocationVal("Remote, Global", region=_region.Global, is_remote=True)
+        RemoteUSA = LocationVal(
+            "Remote, USA", country=_country.US, region=_region.NA, is_remote=True
+        )
+        RemoteUK = LocationVal(
+            "Remote, UK", country=_country.UK, region=_region.EU, is_remote=True
+        )
+        RemoteEurope = LocationVal("Remote, Europe", region=_region.EU, is_remote=True)
+        SanFranciscoCA = LocationVal(
+            "San Francisco CA, USA",
+            city="San Francisco CA",
+            country=_country.US,
+            region=_region.NA,
+        )
+        WashingtonDC = LocationVal(
+            "Washington DC, USA",
+            city="Washington D.C.",
+            country=_country.US,
+            region=_region.NA,
+        )
+        LondonUK = LocationVal(
+            "London, UK", city="London", country=_country.UK, region=_region.EU
+        )
+        NairobiKenya = LocationVal(
+            "Nairobi, Kenya",
+            city="Nairobi",
+            country=_country.Kenya,
+            region=_region.SubSaharanAfrica,
+        )
+        BerkeleyCA = LocationVal(
+            "Berkeley CA, USA",
+            city="Berkeley CA",
+            country=_country.US,
+            region=_region.NA,
+        )
+        OaklandCA = LocationVal(
+            "Oakland CA, USA",
+            city="Oakland CA",
+            country=_country.US,
+            region=_region.NA,
+        )
+        OxfordUK = LocationVal(
+            "Oxford, UK", city="Oxford", country=_country.UK, region=_region.EU
+        )
 
     class workload:
         FullTime = "Full-Time"
@@ -1217,73 +832,3 @@ class val:
         Training = "Training"
         GraduateProgram = "Graduate Program"
         ExpressionOfInterest = "Expression of Interest"
-
-
-_location_defaults: dict[str, dict] = {
-    val.location.RemoteGlobal: {
-        "city": "",
-        "country": "",
-        "region": "Global",
-        "is_remote": True,
-    },
-    val.location.RemoteUSA: {
-        "city": "",
-        "country": "United States",
-        "region": "North America",
-        "is_remote": True,
-    },
-    val.location.RemoteUK: {
-        "city": "",
-        "country": "United Kingdom",
-        "region": "Western Europe",
-        "is_remote": True,
-    },
-    val.location.RemoteEurope: {
-        "city": "",
-        "country": "",
-        "region": "Western Europe",
-        "is_remote": True,
-    },
-    val.location.SanFranciscoCA: {
-        "city": "San Francisco CA",
-        "country": "United States",
-        "region": "North America",
-        "is_remote": False,
-    },
-    val.location.WashingtonDC: {
-        "city": "Washington D.C.",
-        "country": "United States",
-        "region": "North America",
-        "is_remote": False,
-    },
-    val.location.LondonUK: {
-        "city": "London",
-        "country": "United Kingdom",
-        "region": "Western Europe",
-        "is_remote": False,
-    },
-    val.location.NairobiKenya: {
-        "city": "Nairobi",
-        "country": "Kenya",
-        "region": "Sub-Saharan Africa",
-        "is_remote": False,
-    },
-    val.location.BerkeleyCA: {
-        "city": "Berkeley CA",
-        "country": "United States",
-        "region": "North America",
-        "is_remote": False,
-    },
-    val.location.OaklandCA: {
-        "city": "Oakland CA",
-        "country": "United States",
-        "region": "North America",
-        "is_remote": False,
-    },
-    val.location.OxfordUK: {
-        "city": "Oxford",
-        "country": "United Kingdom",
-        "region": "Western Europe",
-        "is_remote": False,
-    },
-}

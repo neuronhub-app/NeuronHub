@@ -1,5 +1,10 @@
 """
-#AI (refactored 2 times)
+#quality-62% #AI (refactored 4 times)
+
+Issues:
+- job_parsed `_*` fields -> return as a Dataclass, not pop()
+- no Job field types verification
+- magic strings
 """
 
 import csv
@@ -17,7 +22,7 @@ from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.orgs.models import Org
-from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
+from neuronhub.apps.posts.graphql.types_lazy import TagCategory
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models import PostTagCategory
 
@@ -32,37 +37,34 @@ async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncSt
     stats = CsvSyncStats()
 
     with disable_auto_indexing_if_enabled():
-        jobs_dict = _parse_jobs_csv(csv_path)
-        for job_dict in jobs_dict[:limit] if limit else jobs_dict:
-            if not job_dict:
+        jobs_parsed = _parse_jobs_csv(csv_path)
+        for job_parsed in jobs_parsed[:limit] if limit else jobs_parsed:
+            if not job_parsed:
                 continue
 
-            tags_by_field_name: dict[str, list[PostTag]] = {}
-            for category in TagCategoryEnum:
-                tag_field_name = f"tags_{category.value}"
-                raw_values = job_dict.pop(tag_field_name, "")
-                if not raw_values:
-                    continue
+            is_visa_sponsor = job_parsed.pop(col_key.visa_sponsor, False)
+            locs_parsed: list[LocationParsed] = job_parsed.pop(col_key.loc_parsed, [])
 
-                tags_by_field_name[tag_field_name] = await _get_or_create_tags(
-                    tag_params_list=[
-                        TagParams(name=val) for val in _list_split_and_strip(raw_values)
-                    ],
+            tags_by_field_name: dict[str, list[PostTag]] = {}
+            for category, tag_field_name in Job.tag_category_to_field.items():
+                tags_raw = job_parsed.pop(tag_field_name, "")
+                if not tags_raw:
+                    continue
+                tags_by_field_name[tag_field_name] = await _sync_tags(
+                    params_list=[TagParams(name=tag) for tag in _list_split_and_strip(tags_raw)],
                     category=category,
                 )
 
-            is_visa_sponsorship = job_dict.pop("_has_visa_sponsorship", False)
-            location_names: list[str] = job_dict.pop("_location_names", [])
-
-            org_name = job_dict.pop("org_name", "").replace('"', "")
+            # strip of `"` is #AI
+            org_name = job_parsed.pop(col_key.org_name, "").replace('"', "")
             if not org_name:
-                org_name = job_dict["title"]
+                org_name = job_parsed["title"]
             org, _ = await Org.objects.aget_or_create(name=org_name)
 
             job, is_created = await Job.objects.aupdate_or_create(
-                url_external=job_dict["url_external"],
+                url_external=job_parsed["url_external"],
                 defaults={
-                    **job_dict,
+                    **job_parsed,
                     "org": org,
                     "visibility": Visibility.PUBLIC,
                 },
@@ -75,27 +77,63 @@ async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncSt
             for tag_field_name, tags in tags_by_field_name.items():
                 await getattr(job, tag_field_name).aset(tags)
 
-            locations = []
-            for loc_name in location_names:
-                loc, _ = await JobLocation.objects.aget_or_create(name=loc_name)
-                locations.append(loc)
-            await job.locations.aset(locations)
+            await job.locations.aset(await _sync_locations(locs_parsed))
 
-            if is_visa_sponsorship:
-                country_tags = tags_by_field_name.get("tags_country", [])
-                await _create_visa_child_tags([t.name for t in country_tags])
-                await job.tags_country_visa_sponsor.aset(country_tags)
+            if is_visa_sponsor:
+                await job.tags_country_visa_sponsor.aset(
+                    await _sync_tags_visa(locs_parsed),
+                )
 
     return stats
 
 
-async def _get_or_create_tags(
-    tag_params_list: list[TagParams],
-    category: TagCategoryEnum,
-) -> list[PostTag]:
+async def _sync_locations(locs_parsed: list[LocationParsed]) -> list[JobLocation]:
+    locs = []
+    for loc_parsed in locs_parsed:
+        loc, _ = await JobLocation.objects.aget_or_create(
+            name=loc_parsed.name,
+            defaults={
+                "city": loc_parsed.city,
+                "country": loc_parsed.country,
+                "is_remote": loc_parsed.is_remote,
+            },
+        )
+        locs.append(loc)
+    return locs
+
+
+async def _sync_tags_visa(locs_parsed: list[LocationParsed]) -> list[PostTag]:
+    locs_onsite_with_country = [loc for loc in locs_parsed if loc.country and not loc.is_remote]
+    countries_onsite = list(dict.fromkeys(loc.country for loc in locs_onsite_with_country))
+
+    tags_country = await _sync_tags(
+        params_list=[TagParams(name=country) for country in countries_onsite],
+        category=TagCategory.Country,
+    )
+
+    tag_category_visa, _ = await PostTagCategory.objects.aget_or_create(
+        name=TagCategory.VisaSponsorship.value
+    )
+    for tag_country in tags_country:
+        tag_child, _ = await PostTag.objects.aget_or_create(
+            name=f"can sponsor visas ({tag_country.name})",
+            tag_parent=tag_country,
+        )
+        await tag_child.categories.aadd(tag_category_visa)
+
+    return tags_country
+
+
+def _list_split_and_strip(str_list_raw: str) -> list[str]:
+    if not str_list_raw:
+        return []
+    return [str_raw.strip() for str_raw in str_list_raw.split(",") if str_raw.strip()]
+
+
+async def _sync_tags(params_list: list[TagParams], category: TagCategory) -> list[PostTag]:
     category_obj, _ = await PostTagCategory.objects.aget_or_create(name=category.value)
     tags = []
-    for tag_params in tag_params_list:
+    for tag_params in params_list:
         tag, _ = await PostTag.objects.aget_or_create(
             name=tag_params.name,
             defaults={"aliases": tag_params.aliases},
@@ -111,17 +149,14 @@ class TagParams:
     aliases: list[str] = field(default_factory=list)
 
 
-# #AI
-def _parse_location_field(raw: str) -> ParsedLocations:
+# #quality-28% #AI
+def _parse_location_field(raw: str) -> list[LocationParsed]:
     if not raw:
-        return ParsedLocations(cities=[], countries=[], is_remote=False, raw_locations=[])
+        return []
 
     # Location(s) is a quoted-CSV field: "City, Country","City2, Country2"
     locations_raw = next(csv.reader(StringIO(raw)), [])
-
-    cities: list[str] = []
-    countries: list[str] = []
-    is_remote = False
+    locations: list[LocationParsed] = []
 
     for location_raw in locations_raw:
         location_raw = location_raw.strip()
@@ -132,27 +167,39 @@ def _parse_location_field(raw: str) -> ParsedLocations:
             continue
         city_name, country_name = city_and_country[0].strip(), city_and_country[1].strip()
         if city_name == "Remote":
-            is_remote = True
-            if country_name != "Global":
-                countries.append(country_name)
+            locations.append(
+                LocationParsed(
+                    name=location_raw,
+                    city="",
+                    country=country_name,
+                    is_remote=True,
+                )
+            )
         else:
-            cities.append(city_name)
-            countries.append(country_name)
+            locations.append(
+                LocationParsed(
+                    name=location_raw,
+                    city=city_name,
+                    country=country_name,
+                    is_remote=False,
+                )
+            )
 
-    return ParsedLocations(
-        cities=list(dict.fromkeys(cities)),
-        countries=list(dict.fromkeys(countries)),
-        is_remote=is_remote,
-        raw_locations=[loc.strip() for loc in locations_raw if loc.strip()],
-    )
+    return locations
 
 
 @dataclass
-class ParsedLocations:
-    cities: list[str]
-    countries: list[str]
+class LocationParsed:
+    name: str
+    city: str
+    country: str
     is_remote: bool
-    raw_locations: list[str]
+
+
+class col_key:
+    loc_parsed = "_locs_parsed"
+    visa_sponsor = "_has_visa_sponsorship"
+    org_name = "_org_name"
 
 
 def _parse_jobs_csv(csv_path: Path) -> list[dict]:
@@ -162,11 +209,11 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
 
     jobs_dict = []
     for row in job_rows:
-        job: dict = {}
+        job = {}
 
         for name_csv, name_django in {
             "Job Title": "title",
-            "Organization": "org_name",
+            "Organization": col_key.org_name,
             "Job Link": "url_external",
             "Cause Area(s)": "tags_area",
             "Role Type": "tags_workload",
@@ -176,17 +223,11 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
         }.items():
             job[name_django] = row.get(name_csv, "").strip()
 
-        job["url_external_with_utm"] = row.get("UTM Job Link", "").strip()
-
-        location = _parse_location_field(row.get("Location(s)", ""))
-        job["tags_country"] = ",".join(location.countries)
-        job["tags_city"] = ",".join(location.cities)
-        job["is_remote"] = location.is_remote
-        job["_location_names"] = location.raw_locations
+        job[col_key.loc_parsed] = _parse_location_field(row.get("Location(s)", ""))
 
         job_desc = row.get("Job Description", "").strip()
         job["description"] = job_desc
-        job["_has_visa_sponsorship"] = "visa" in job_desc.lower()
+        job[col_key.visa_sponsor] = "visa" in job_desc.lower()
 
         if salary_raw := row.get("Min Salary (USD)", ""):
             job["salary_min"] = int(float(salary_raw))
@@ -204,27 +245,3 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
         jobs_dict.append(job)
 
     return jobs_dict
-
-
-def _list_split_and_strip(str_raw: str) -> list[str]:
-    if not str_raw:
-        return []
-    return [tag.strip() for tag in str_raw.split(",") if tag.strip()]
-
-
-async def _create_visa_child_tags(country_names: list[str]) -> None:
-    """
-    #AI
-    """
-    visa_cat, _ = await PostTagCategory.objects.aget_or_create(
-        name=TagCategoryEnum.VisaSponsorship.value
-    )
-    for country_name in country_names:
-        parent_tag = await PostTag.objects.filter(name=country_name, tag_parent=None).afirst()
-        if not parent_tag:
-            continue
-        child_tag, _ = await PostTag.objects.aget_or_create(
-            name=f"can sponsor visas ({country_name})",
-            tag_parent=parent_tag,
-        )
-        await child_tag.categories.aadd(visa_cat)

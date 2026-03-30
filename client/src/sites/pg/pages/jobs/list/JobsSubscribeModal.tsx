@@ -1,4 +1,5 @@
-import { Box, Button, Flex, HStack, Icon, Stack, Text } from "@chakra-ui/react";
+import { location_fields, LocationFacet } from "@/utils/useAlgoliaSearchClient";
+import { Box, Button, Flex, Icon, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { FaBell } from "react-icons/fa6";
@@ -8,7 +9,6 @@ import { z } from "zod";
 
 import { useUser } from "@/apps/users/useUserCurrent";
 import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
-import { locationRemoteNames } from "@/sites/pg/locations";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogCloseTrigger,
@@ -57,15 +57,13 @@ export function JobsSubscribeModal(props: { testId?: string }) {
       tag_names: refinesCurrent.items
         .filter(item => item.attribute.startsWith("tags_"))
         .flatMap(item => item.refinements.map(tag => String(tag.value))),
+      location_names: refinesCurrent.items
+        .filter(item => location_fields.all.includes(item.attribute as LocationFacet))
+        .flatMap(item => item.refinements.map(r => String(r.value))),
       is_orgs_highlighted: refinesCurrent.items.some(
         item => item.attribute === "org.is_highlighted",
       ),
-      is_remote:
-        refinesCurrent.items
-          .find(item => item.attribute === "locations_facet")
-          ?.refinements.some(refinement =>
-            locationRemoteNames.includes(String(refinement.value)),
-          ) ?? false,
+      is_remote: refinesCurrent.items.some(item => item.attribute === "locations.remote_name"),
       salary_min:
         salaryRefinement?.refinements[0]?.value != null
           ? Number(salaryRefinement.refinements[0].value)
@@ -230,11 +228,10 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_experience.name": "Experience",
   "tags_education.name": "Degree",
   "tags_workload.name": "Role",
-  "tags_country.name": "Location",
-  "tags_city.name": "Location",
   "tags_country_visa_sponsor.name": "Visa Sponsor",
-  "locations.name": "Remote",
-  locations_facet: "Location",
+  "locations.remote_name": "Remote",
+  "locations.country": "Country",
+  "locations.city": "City",
   "org.is_highlighted": "Highlighted",
   "org.name": "Organisation",
   salary_min: "Minimum Salary",

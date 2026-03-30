@@ -12,6 +12,7 @@ from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models import Post
@@ -446,13 +447,13 @@ class JobsGen:
         url_external: str = "",
         salary_min: int | None = None,
         salary_text: str = "",
-        is_remote: bool | None = None,
         posted_at=None,
         closes_at=None,
         visibility: Visibility = Visibility.PUBLIC,
         is_published: bool = True,
         is_save: bool = True,
         tags: list[PostTag] | None = None,
+        locations: list[JobLocation] | None = None,
     ) -> Job:
         if not org:
             org, _ = await Org.objects.aget_or_create(
@@ -466,7 +467,6 @@ class JobsGen:
             url_external=url_external,
             salary_min=salary_min,
             salary_text=salary_text,
-            is_remote=is_remote,
             posted_at=posted_at,
             closes_at=closes_at,
             visibility=visibility,
@@ -480,6 +480,8 @@ class JobsGen:
                 assert category, f"Add category to '{tag.name}' tag."
                 field_name = Job.tag_category_to_field[category.name]
                 await getattr(job, field_name).aadd(tag)
+        if locations:
+            await job.locations.aset(locations)
         return job
 
     async def job_alert(
@@ -488,6 +490,7 @@ class JobsGen:
         is_active: bool = True,
         tz: str | None = None,
         tags: list[PostTag] | None = None,
+        locations: list[JobLocation] | None = None,
     ) -> JobAlert:
         alert = await JobAlert.objects.acreate(
             email=email or self.faker.email(),
@@ -496,4 +499,6 @@ class JobsGen:
         )
         if tags:
             await alert.tags.aset(tags)
+        if locations:
+            await alert.locations.aset(locations)
         return alert

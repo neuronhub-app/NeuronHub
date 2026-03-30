@@ -19,16 +19,8 @@ export const JobFragment = graphql(
           url
         }
       }
-      is_remote
-      is_remote_friendly
       salary_min
       salary_text
-      tags_country {
-        ...PostTagLeanFragment
-      }
-      tags_city {
-        ...PostTagLeanFragment
-      }
       locations {
         id
         name
@@ -36,6 +28,7 @@ export const JobFragment = graphql(
         country
         region
         is_remote
+        remote_name
       }
       url_external
       url_external_with_utm

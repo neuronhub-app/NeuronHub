@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 
+from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_qs_by_alert
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
@@ -109,27 +110,6 @@ class TestSendJobAlertEmails(NeuronTestCase):
     # ----------------------------------------------------------------------------
     # todo ? refac: parametrize to dedup
 
-    async def test_matches_by_country_tag(self):
-        tag_uk = await self.gen.posts.tag("UK", Category.Country)
-        tag_de = await self.gen.posts.tag("Germany", Category.Country)
-
-        alert = await self.gen.jobs.job_alert(tags=[tag_uk])
-
-        await self.gen.jobs.job(tags=[tag_uk])
-        await self.gen.jobs.job(tags=[tag_de])
-
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
-
-    async def test_matches_by_city_tag(self):
-        tag_london = await self.gen.posts.tag("London", Category.City)
-
-        alert = await self.gen.jobs.job_alert(tags=[tag_london])
-
-        await self.gen.jobs.job(tags=[tag_london])
-        await self.gen.jobs.job()
-
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
-
     async def test_matches_by_country_visa_sponsor_tag(self):
         tag_us_visa = await self.gen.posts.tag("US Visa", Category.VisaSponsorship)
 
@@ -149,6 +129,60 @@ class TestSendJobAlertEmails(NeuronTestCase):
         stats = await send_job_alerts(alert_ids=[alert_1.id])
         assert stats.sent == 1
         assert len(mail.outbox) == 1
+
+    # #quality-20% #AI
+    #
+    # use self.gen & django-countries
+    # ----------------------------------------------------------------------------
+
+    async def test_matches_by_remote_via_is_remote_flag(self):
+        loc_remote = await JobLocation.objects.acreate(name="Remote, Global", is_remote=True)
+        loc_onsite = await JobLocation.objects.acreate(
+            name="London, UK", city="London", country="UK"
+        )
+
+        alert = await self.gen.jobs.job_alert()
+        alert.is_remote = True
+        await alert.asave()
+
+        await self.gen.jobs.job(locations=[loc_remote])
+        await self.gen.jobs.job(locations=[loc_onsite])
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_matches_by_location(self):
+        loc_london = await JobLocation.objects.acreate(
+            name="London, UK", city="London", country="UK"
+        )
+        loc_berlin = await JobLocation.objects.acreate(
+            name="Berlin, DE", city="Berlin", country="DE"
+        )
+
+        alert = await self.gen.jobs.job_alert(locations=[loc_london])
+
+        await self.gen.jobs.job(locations=[loc_london])
+        await self.gen.jobs.job(locations=[loc_berlin])
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_matches_by_multiple_locations(self):
+        loc_london = await JobLocation.objects.acreate(
+            name="London, UK", city="London", country="UK"
+        )
+        loc_berlin = await JobLocation.objects.acreate(
+            name="Berlin, DE", city="Berlin", country="DE"
+        )
+        loc_paris = await JobLocation.objects.acreate(
+            name="Paris, FR", city="Paris", country="FR"
+        )
+
+        alert = await self.gen.jobs.job_alert(locations=[loc_london, loc_berlin])
+
+        await self.gen.jobs.job(locations=[loc_london])
+        await self.gen.jobs.job(locations=[loc_berlin])
+        await self.gen.jobs.job(locations=[loc_paris])
+
+        assert 2 == len(await _get_jobs_qs_by_alert(alert))
 
 
 Category = TagCategoryEnum

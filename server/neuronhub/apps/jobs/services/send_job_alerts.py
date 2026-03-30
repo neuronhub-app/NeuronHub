@@ -19,7 +19,6 @@ from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobAlertLog
 from neuronhub.apps.sites.models import SiteConfig
-from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.users.models import User
 
 
@@ -176,6 +175,8 @@ async def _get_email_context(
 
 @async_to_sync
 async def _get_email_context_test(site: SiteConfig, user: User) -> dict:
+    from neuronhub.apps.tests.test_gen import Gen
+
     gen = await Gen.create(is_user_default_superuser=False, user_default=user)
     jobs = [await gen.jobs.job(), await gen.jobs.job(), await gen.jobs.job()]
     return {
@@ -224,8 +225,6 @@ async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
             "tags_education",
             "tags_experience",
             "tags_workload",
-            "tags_country",
-            "tags_city",
             "tags_country_visa_sponsor",
         ]:
             q_obj |= Q(**{f"{field}__id__in": tag_ids})
@@ -234,8 +233,8 @@ async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
     if alert.is_orgs_highlighted:
         qs = qs.filter(org__is_highlighted=True)
 
-    if alert.is_remote:
-        qs = qs.filter(is_remote=True)
+    if location_ids := [loc_id async for loc_id in alert.locations.values_list("id", flat=True)]:
+        qs = qs.filter(locations__id__in=location_ids).distinct()
 
     if alert.salary_min:
         qs = qs.filter(salary_min__gte=alert.salary_min)
@@ -264,6 +263,9 @@ async def _get_alert_filters_dict(alert: JobAlert) -> dict[str, str]:
         if filter_names := filters_by_category.get(category_key):
             filters[label] = ", ".join(filter_names)
 
+    location_names = [loc.name async for loc in alert.locations.all()]
+    if location_names:
+        filters["Locations"] = ", ".join(location_names)
     if alert.is_remote:
         filters["Remote Roles"] = "Yes"
     if alert.salary_min:

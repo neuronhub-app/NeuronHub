@@ -137,6 +137,7 @@ type JobAlertType {
   id_ext: UUID!
   email: String!
   tags(filters: PostTagFilter): [PostTagType!]!
+  locations: [JobLocationType!]!
   is_orgs_highlighted: Boolean
   is_remote: Boolean
   salary_min: Int
@@ -167,6 +168,7 @@ type JobLocationType {
   country: String!
   region: String!
   is_remote: Boolean!
+  remote_name: String!
 }
 
 type JobType {
@@ -175,13 +177,9 @@ type JobType {
   title: String!
   slug: String!
   description: String!
-  is_remote: Boolean
-  is_remote_friendly: Boolean
   salary_min: Int
   salary_text: String!
   locations: [JobLocationType!]!
-  tags_country(filters: PostTagFilter): [PostTagType!]!
-  tags_city(filters: PostTagFilter): [PostTagType!]!
   url_external: String!
   url_external_with_utm: String!
   is_published: Boolean!
@@ -250,7 +248,7 @@ type Mutation {
   profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku", include_reprocessing: Boolean! = true, is_dry: Boolean! = false): ProgressType! @IsAuthenticated
   profile_matches_cancel_llm: Boolean! @IsAuthenticated
   job_versions_approve(draft_ids: [Int!]!): Boolean! @IsStaff
-  job_alert_subscribe(email: String!, tag_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null, tz: String = null): Boolean!
+  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null, tz: String = null): Boolean!
   job_alert_toggle_active(id_ext: UUID!): Boolean!
   job_alert_remove(id_ext: UUID!): Boolean!
   job_alert_access_session_by_id_ext(id_ext: UUID!): Boolean!

@@ -1,3 +1,4 @@
+import { location_fields, LocationFacet } from "@/utils/useAlgoliaSearchClient";
 import { Badge, Button, Flex, Group, Icon, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -64,6 +65,9 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
       tag_names: refinesCurrent.items
         .filter(item => item.attribute.startsWith("tags_"))
         .flatMap(item => item.refinements.map(tag => String(tag.value))),
+      location_names: refinesCurrent.items
+        .filter(item => location_fields.all.includes(item.attribute as unknown as LocationFacet))
+        .flatMap(item => item.refinements.map(ref => String(ref.value))),
       is_orgs_highlighted:
         refinesCurrent.items.some(item => item.attribute === "org.is_highlighted") ?? null,
       is_remote: refinesCurrent.items.some(item => item.attribute === "is_remote") ?? null,
@@ -199,8 +203,6 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_experience.name": "Experience",
   "tags_education.name": "Education",
   "tags_workload.name": "Workload",
-  "tags_country.name": "Country",
-  "tags_city.name": "City",
   is_remote: "Remote",
   "org.is_highlighted": "Highlighted",
   "org.name": "Organization",
@@ -214,6 +216,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
     mutation JobAlertSubscribe(
       $email: String!
       $tag_names: [String!]
+      $location_names: [String!]
       $is_orgs_highlighted: Boolean
       $is_remote: Boolean
       $salary_min: Int
@@ -222,6 +225,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
       job_alert_subscribe(
         email: $email
         tag_names: $tag_names
+        location_names: $location_names
         is_orgs_highlighted: $is_orgs_highlighted
         is_remote: $is_remote
         salary_min: $salary_min

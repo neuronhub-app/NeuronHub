@@ -80,7 +80,17 @@ For vars use `{noun} {adjective}` - to let the brain auto-create a `category` ou
 
 All boolean variable names start with `is`.
 
-FYI: project-specific classes or functions are prefixed with `neuron`.
+
+#### Existing Conventions
+
+- functions using `get_or_create` -> `sync`
+- pre-parsed -> `*_raw` postfix
+- post-parsed -> `*_parsed`
+- site-specific classes/functions:
+    - NHA -> `Neuronhub` prefix
+    - PG -> `Probablygood`
+
+CamelCase in JS. snake_case in Python.
 
 ### TODO comments
 

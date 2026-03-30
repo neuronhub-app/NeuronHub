@@ -87,6 +87,7 @@ function AlertCard(props: { alert: AlertType }) {
   const loading = useIsLoading();
   const isHasFilters =
     props.alert.tags.length > 0 ||
+    props.alert.locations.length > 0 ||
     props.alert.is_orgs_highlighted ||
     props.alert.is_remote ||
     props.alert.salary_min != null;
@@ -176,6 +177,11 @@ function AlertCard(props: { alert: AlertType }) {
                   <Badge variant="solid">{format.money(props.alert.salary_min)}</Badge>
                 </Group>
               )}
+              {props.alert.locations.map(loc => (
+                <Badge key={loc.name} variant="subtle" colorPalette="purple">
+                  {loc.name}
+                </Badge>
+              ))}
               {props.alert.tags.map(tag => (
                 <Group key={tag.name} attached colorPalette="teal">
                   {tag.category_name && <Badge>{tag.category_name}</Badge>}
@@ -216,6 +222,9 @@ export const JobAlertListQuery = graphql.persisted(
         tags {
           name
           category_name
+        }
+        locations {
+          name
         }
         is_orgs_highlighted
         is_remote

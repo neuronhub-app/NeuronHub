@@ -78,6 +78,12 @@ Code blocks can be marked with:
 - <TagLg>#prob-redundant</TagLg> - but removal isn't a priority.
 - <TagLg>#draft</TagLg> - not tested, not working, or not ready for prod.
 - <TagLg>#E2E-fails</TagLg> - may be in Git commit body, because we still lack E2E CI.
+- <TagLg>#quality-[0-100]%</TagLg> - the amount of review & refactors as a percentage, eg:
+    - 0-20 - #AI-slop
+    - 20-40 - #AI, ie verified/reviewed #AI-slop
+    - 40-60 - low quality, eg reviewed or lightly refactored #AI
+    - ...
+    - 80-100 - core business logic, security-sensitive, an important code example, etc
 
 ## Detailed rules
 

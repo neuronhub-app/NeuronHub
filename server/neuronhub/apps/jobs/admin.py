@@ -21,7 +21,6 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         "org",
         "is_published",
         "salary_min",
-        "is_remote",
         "posted_at",
         "closes_at",
     ]
@@ -35,8 +34,6 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         "tags_skill",
         "tags_workload",
         "tags_experience",
-        "tags_country",
-        "tags_city",
         "bookmarked_by_users",
         "visible_to_users",
         "visible_to_groups",
@@ -47,8 +44,6 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         ("tags_skill", DALFRelatedFieldAjaxMulti),
         ("tags_area", DALFRelatedFieldAjaxMulti),
         ("tags_workload", DALFRelatedFieldAjaxMulti),
-        ("tags_country", DALFRelatedFieldAjaxMulti),
-        ("tags_city", DALFRelatedFieldAjaxMulti),
         ("tags_experience", DALFRelatedFieldAjaxMulti),
         ("bookmarked_by_users", DALFRelatedFieldAjaxMulti),
         ("org", DALFRelatedFieldAjaxMulti),
@@ -70,7 +65,6 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
                     "title",
                     "slug",
                     "org",
-                    "is_remote",
                     "salary_min",
                     "salary_text",
                     "url_external",
@@ -85,8 +79,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
             "Tags",
             {
                 "fields": [
-                    "tags_country",
-                    "tags_city",
+                    "locations",
                     "tags_skill",
                     "tags_area",
                     "tags_education",

@@ -2,19 +2,21 @@ from neuronhub.apps.jobs.models import Job
 
 
 async def serialize_job_to_markdown(job: Job) -> str:
+    locations = [loc async for loc in job.locations.all()]
+    is_remote = any(loc.is_remote for loc in locations)
+    location_names = [loc.name for loc in locations if not loc.is_remote]
+
     lines = [
         f"## {job.title}",
         f"- Org: {job.org.name}",
         f"- URL: {job.url_external}",
-        f"- Remote: {job.is_remote}",
-        f"- Remote-friendly: {job.is_remote_friendly}",
+        f"- Remote: {is_remote}",
+        *([f"- Locations: {', '.join(location_names)}"] if location_names else []),
         f"- Salary: {job.salary_min}",
         f"- Posted: {job.posted_at}",
         f"- Closes: {job.closes_at}",
     ]
 
-    await _append_tags(lines, label="Country", manager=job.tags_country)
-    await _append_tags(lines, label="City", manager=job.tags_city)
     await _append_tags(lines, label="Area", manager=job.tags_area)
     await _append_tags(lines, label="Skill", manager=job.tags_skill)
     await _append_tags(lines, label="Education", manager=job.tags_education)

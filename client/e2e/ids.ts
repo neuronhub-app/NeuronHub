@@ -191,6 +191,12 @@ export namespace ids {
     },
   } as const;
 
+  export const facet = {
+    checkbox(value: string) {
+      return `facet.checkbox.${value}` as TestId;
+    },
+  };
+
   export const auth = {
     login: {
       username: "auth.login.username",

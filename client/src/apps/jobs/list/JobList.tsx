@@ -85,7 +85,9 @@ export function JobList(props: { slug?: string }) {
         attributesToHighlight={[
           "title",
           "org.name",
-          "tags_country.name",
+          "location.country",
+          "location.city",
+          "location.remote_name",
           "tags_city.name",
           "tags_skill.name",
           "tags_area.name",

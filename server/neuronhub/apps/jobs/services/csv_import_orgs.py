@@ -16,8 +16,8 @@ from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
     disable_auto_indexing_if_enabled,
 )
 from neuronhub.apps.jobs.services.csv_import import TagParams
-from neuronhub.apps.jobs.services.csv_import import _get_or_create_tags
 from neuronhub.apps.jobs.services.csv_import import _list_split_and_strip
+from neuronhub.apps.jobs.services.csv_import import _sync_tags
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 
@@ -42,8 +42,8 @@ async def csv_import_orgs(
                 continue
 
             tags_area_names = _list_split_and_strip(org_dict.pop("tags_area"))
-            tags_area = await _get_or_create_tags(
-                tag_params_list=[TagParams(name=name) for name in tags_area_names],
+            tags_area = await _sync_tags(
+                params_list=[TagParams(name=name) for name in tags_area_names],
                 category=TagCategoryEnum.Area,
             )
 

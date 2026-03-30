@@ -1,33 +1,29 @@
 import { Checkbox, Flex, Icon, Input, InputGroup, Stack, Text } from "@chakra-ui/react";
 import { useCallback, useRef } from "react";
 import { LuX } from "react-icons/lu";
-import { useRefinementList } from "react-instantsearch";
+import { useRefinementList, useClearRefinements } from "react-instantsearch";
 import type { UseRefinementListProps } from "react-instantsearch";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-
-const style = {
-  label: { fontSize: "13px", color: "fg", _groupHover: { color: "brand.green.light" } },
-  count: { fontSize: "13px", color: "fg.muted", _groupHover: { color: "brand.green.light" } },
-} as const;
+import { ids } from "@/e2e/ids";
 
 export function PgFacetAttribute(props: {
   attribute: string;
   label: string;
   isSearchEnabled?: boolean;
   subFacet?: { attribute: string; label: string };
-  allowedValues?: string[];
   sortBy?: UseRefinementListProps["sortBy"];
   transformItems?: UseRefinementListProps["transformItems"];
   operator?: UseRefinementListProps["operator"];
+  isFreezeTotalFacetCount?: boolean;
 }) {
-  type FacetItem = ReturnType<typeof useRefinementList>["items"][number];
-
   const facetValuesInitialRef = useRef<Map<string, FacetItem>>(new Map());
   const searchQueryRef = useRef("");
 
+  type FacetItem = ReturnType<typeof useRefinementList>["items"][number];
+
   const refinements = useRefinementList({
     attribute: props.attribute,
-    limit: 1000,
+    limit: 100,
     sortBy: props.sortBy ?? ["count:desc", "name:asc"],
     operator: props.operator,
     // Keep <Checkbox>s order fixed - don't move selected on top, and don't hide count=0.
@@ -36,24 +32,6 @@ export function PgFacetAttribute(props: {
       (items: FacetItem[], metadata) => {
         const applyTransform = (fixed: FacetItem[]) =>
           props.transformItems ? props.transformItems(fixed, metadata) : fixed;
-
-        if (props.allowedValues) {
-          const algoliaValues = new Set(items.map(item => item.value));
-          const fixed = [...items];
-          const query = searchQueryRef.current.toLowerCase();
-          for (const value of props.allowedValues) {
-            if (!algoliaValues.has(value) && (!query || value.toLowerCase().includes(query))) {
-              fixed.push({
-                value,
-                label: value,
-                count: 0,
-                isRefined: false,
-                highlighted: value,
-              } as FacetItem);
-            }
-          }
-          return applyTransform(fixed);
-        }
 
         const result = new Map(facetValuesInitialRef.current);
         for (const facetValue of result.values()) {
@@ -65,7 +43,7 @@ export function PgFacetAttribute(props: {
         facetValuesInitialRef.current = result;
         return applyTransform(Array.from(result.values()));
       },
-      [props.transformItems, props.allowedValues],
+      [props.transformItems],
     ),
   });
   const subRefinements = useRefinementList({
@@ -96,6 +74,8 @@ export function PgFacetAttribute(props: {
     subRefinements.refine(itemValue);
     search("");
   }
+
+  const clear = useClearRefinements();
 
   return (
     <Stack align="flex-start">
@@ -132,11 +112,7 @@ export function PgFacetAttribute(props: {
 
       <Stack gap="gap.sm" w="full">
         {refinements.items
-          .filter(
-            item =>
-              item.value !== "Other" && // todo ! refac: drop after outdated "Other" PostTags are dropped from Algolia #AI
-              (!props.allowedValues || props.allowedValues.includes(item.label)),
-          )
+          .filter(item => item.value !== "Other")
           .map(item => {
             const subItem = props.subFacet
               ? subRefinements.items.find(subRefinement => subRefinement.value === item.value)
@@ -146,6 +122,8 @@ export function PgFacetAttribute(props: {
                 <FacetCheckboxItem
                   item={item}
                   onRefine={() => refineMain(item.value, item.isRefined)}
+                  isFreezeTotalFacetCount={props.isFreezeTotalFacetCount}
+                  isFiltersActive={clear.canRefine}
                 />
                 {subItem && (
                   <FacetCheckboxItem
@@ -176,7 +154,20 @@ function FacetCheckboxItem(props: {
   labelOverride?: string;
   isSubItem?: boolean;
   disabled?: boolean;
+  isFreezeTotalFacetCount?: boolean;
+  isFiltersActive?: boolean;
 }) {
+  const state = useStateValtio({
+    count: null as number | null,
+  });
+
+  if (props.isFreezeTotalFacetCount) {
+    const isNoFilters = !props.isFiltersActive;
+    if (isNoFilters && props.item.count > (state.snap.count ?? 0)) {
+      state.mutable.count = props.item.count;
+    }
+  }
+
   const checkbox = (
     <Checkbox.Root
       checked={props.item.isRefined}
@@ -189,17 +180,22 @@ function FacetCheckboxItem(props: {
       opacity={props.disabled ? 0.5 : 1}
       cursor={props.disabled ? "not-allowed" : "pointer"}
       className="group"
+      data-testid={ids.facet.checkbox(props.item.value)}
     >
       <Checkbox.HiddenInput />
       <Checkbox.Control _groupHover={{ borderColor: "brand.green.light" }} />
       <Text
-        {...style.label}
         // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
         dangerouslySetInnerHTML={{
           __html: props.labelOverride ?? props.item.highlighted ?? props.item.label,
         }}
+        fontSize="13px"
+        color="fg"
+        _groupHover={{ color: "brand.green.light" }}
       />
-      <Text {...style.count}>{props.item.count}</Text>
+      <Text fontSize="13px" color="fg.muted" _groupHover={{ color: " brand.green.light" }}>
+        {props.isFreezeTotalFacetCount ? state.snap.count : props.item.count}
+      </Text>
     </Checkbox.Root>
   );
 

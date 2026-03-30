@@ -18,13 +18,17 @@ export function PageLink(props: {
 
 const links = {
   "admin-panel": "/usage/guides/admin-panel",
-  "job-alert-emails": "/usage/reference/job-alert-emails",
-  JobAlert: "/usage/reference/database-tables/jobalert",
+  SiteConfig: "/usage/guides/siteconfig",
   Sentry: "/usage/guides/sentry",
   Linear: "/usage/guides/linear",
   Algolia: "/usage/guides/algolia",
+  // refs
+  "job-alert-emails": "/usage/reference/job-alert-emails",
+  JobAlert: "/usage/reference/database-tables/jobalert",
   JobAlertLog: "/usage/reference/database-tables/jobalertlog",
-  SiteConfig: "/usage/guides/siteconfig",
   TaskResult: "/usage/reference/database-tables/taskresult",
   User: "/usage/reference/database-tables/user",
+  // dev
+  "git-commits": "/development/guides/git-commits",
+  "code-style": "/development/guides/code-style",
 } satisfies Record<string, ReactRouterPath>;

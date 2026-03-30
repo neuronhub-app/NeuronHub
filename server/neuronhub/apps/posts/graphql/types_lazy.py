@@ -40,6 +40,7 @@ class ReviewTagName(models.TextChoices):
     read_fully = "read_fully", "Read fully"
 
 
+# todo ? refac-name: TagCategory
 class TagCategoryEnum(models.TextChoices):
     Area = "area"
     Skill = "skill"
@@ -49,3 +50,6 @@ class TagCategoryEnum(models.TextChoices):
     Country = "country"
     City = "city"
     VisaSponsorship = "visa_sponsorship"
+
+
+TagCategory = TagCategoryEnum

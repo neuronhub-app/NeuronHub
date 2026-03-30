@@ -122,9 +122,9 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
                 maxW="100%"
                 pos="relative"
               >
-                <JobLocations job={props.job} />
+                <JobLocationsOnsite job={props.job} />
 
-                {props.job.is_remote && (
+                {props.job.locations?.some(loc => loc.is_remote) && (
                   <>
                     <Separator orientation="vertical" h="5" />
                     <Flex align="center" gap="gap.sm">
@@ -191,11 +191,10 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
   );
 }
 
-function JobLocations(props: { job: JobFragmentType }) {
-  const locations = [
-    ...(props.job.tags_city ?? []).map(t => t.name),
-    ...(props.job.tags_country ?? []).map(t => t.name),
-  ]
+function JobLocationsOnsite(props: { job: JobFragmentType }) {
+  const locations = (props.job.locations ?? [])
+    .filter(location => !location.is_remote)
+    .map(location => location.city || location.country || location.name)
     .filter(Boolean)
     .join("・");
 

@@ -36,6 +36,7 @@ class JobLocationType:
     country: auto
     region: auto
     is_remote: auto
+    remote_name: auto
 
 
 @strawberry_django.type(JobFaqQuestion)
@@ -73,14 +74,10 @@ class JobType:
     slug: auto
     description: auto
 
-    is_remote: auto
-    is_remote_friendly: auto
     salary_min: auto
     salary_text: auto
 
     locations: list[JobLocationType]
-    tags_country: list[PostTagType]
-    tags_city: list[PostTagType]
 
     url_external: auto
     url_external_with_utm: auto
@@ -107,6 +104,7 @@ class JobAlertType:
     id_ext: auto
     email: auto
     tags: list[PostTagType]
+    locations: list[JobLocationType]
     is_orgs_highlighted: auto
     is_remote: auto
     salary_min: auto
@@ -194,6 +192,8 @@ class JobsMutation:
         info: strawberry.Info,
         email: str,
         tag_names: list[str] | None = None,
+        # todo ! fix: use ids #AI. Algolia stores values, which should be unique for facets. But still this is stupid.
+        location_names: list[str] | None = None,
         is_orgs_highlighted: bool | None = None,
         is_remote: bool | None = None,
         salary_min: int | None = None,
@@ -209,6 +209,10 @@ class JobsMutation:
         if tag_names:
             tags = PostTag.objects.filter(name__in=tag_names)
             await alert.tags.aset([tag async for tag in tags])
+
+        if location_names:
+            locations = JobLocation.objects.filter(name__in=location_names)
+            await alert.locations.aset([loc async for loc in locations])
 
         await _save_session_job_alert(info=info, alert_id_ext=alert.id_ext)
         try:
