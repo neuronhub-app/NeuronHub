@@ -4,9 +4,12 @@ from django.conf import settings
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.services.csv_import import LocationParsed
+from neuronhub.apps.jobs.services.csv_import import _import_jobs_parsed
 from neuronhub.apps.jobs.services.csv_import import _parse_location_field
+from neuronhub.apps.jobs.services.csv_import import col_key
 from neuronhub.apps.jobs.services.csv_import import csv_import_jobs
 from neuronhub.apps.orgs.models import Org
+from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
@@ -33,6 +36,31 @@ class TestCsvImportJobs(NeuronTestCase):
         stats = await csv_import_jobs(_jobs_csv_path, limit=limit)
         assert stats.created == 0
         assert stats.updated == limit
+
+
+class TestCsvImportJobsTagsCleared(NeuronTestCase):
+    async def test_reimport_with_empty_tags_clears_existing(self):
+        tag_skill = await self.gen.posts.tag(name="Python", category=TagCategoryEnum.Skill)
+        tag_area = await self.gen.posts.tag(name="Climate", category=TagCategoryEnum.Area)
+        job = await self.gen.jobs.job(
+            url_external="https://example.com/j1", tags=[tag_skill, tag_area]
+        )
+
+        assert await job.tags_skill.acount() == 1
+        assert await job.tags_area.acount() == 1
+
+        await _import_jobs_parsed(
+            [
+                {
+                    "title": job.title,
+                    "url_external": job.url_external,
+                    col_key.org_name: job.org.name,
+                }
+            ]
+        )
+
+        assert await job.tags_skill.acount() == 0
+        assert await job.tags_area.acount() == 0
 
 
 class TestParseLocationField:

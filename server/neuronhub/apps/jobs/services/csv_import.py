@@ -34,10 +34,13 @@ class CsvSyncStats:
 
 
 async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncStats:
+    return await _import_jobs_parsed(_parse_jobs_csv(csv_path), limit=limit)
+
+
+async def _import_jobs_parsed(jobs_parsed: list[dict], limit: int | None = None) -> CsvSyncStats:
     stats = CsvSyncStats()
 
     with disable_auto_indexing_if_enabled():
-        jobs_parsed = _parse_jobs_csv(csv_path)
         for job_parsed in jobs_parsed[:limit] if limit else jobs_parsed:
             if not job_parsed:
                 continue
@@ -48,11 +51,15 @@ async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncSt
             tags_by_field_name: dict[str, list[PostTag]] = {}
             for category, tag_field_name in Job.tag_category_to_field.items():
                 tags_raw = job_parsed.pop(tag_field_name, "")
-                if not tags_raw:
-                    continue
-                tags_by_field_name[tag_field_name] = await _sync_tags(
-                    params_list=[TagParams(name=tag) for tag in _list_split_and_strip(tags_raw)],
-                    category=category,
+                tags_by_field_name[tag_field_name] = (
+                    await _sync_tags(
+                        params_list=[
+                            TagParams(name=tag) for tag in _list_split_and_strip(tags_raw)
+                        ],
+                        category=category,
+                    )
+                    if tags_raw
+                    else []
                 )
 
             # strip of `"` is #AI
