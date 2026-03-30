@@ -1,5 +1,6 @@
 ---
 order: 0
+is_new: true
 ---
 
 import { JobEmailTesting } from "@/components/content/job-email-testing";
@@ -9,6 +10,7 @@ import {
 	BadgeNew,
 	PageLink,
 	Term,
+	ImageWithDialog,
 } from "@/components"
 
 
@@ -29,7 +31,16 @@ Sent daily at `8am` in the user's timezone.
 
 Worst-case delay is 23h.
 
-### Email Templates <BadgeNew isHeading />
+### Trigger from Admin Panel <BadgeNew isHeading />
+
+To manually trigger the alerts sending outside of the hourly schedule:
+1. Open the <AdminLink id="JobAlert"/>s list.
+2. Select all desired `JobAlert`s.
+3. From the actions dropdown select `Send emails for Alerts` and press the `Go` button.
+
+<ImageWithDialog src="https://s3.stage.neuronhub.app/docs/job-alert-emails-trigger-by-admin.avif" />
+
+### Email Templates
 
 You can override the default `jobs/job_alert.html` and `jobs/job_alert_confirmation.html` in
 <AdminLink id="SiteConfig">the admin panel's Site Config</AdminLink>.
