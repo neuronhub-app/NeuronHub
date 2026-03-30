@@ -157,5 +157,37 @@ class TestSendJobAlertEmails(NeuronTestCase):
 
         assert 2 == len(await _get_jobs_qs_by_alert(alert))
 
+    # salary & exclude filters
+    # ----------------------------------------------------------------------------
+
+    async def test_salary_min_includes_nulls_by_default(self):
+        alert = await self.gen.jobs.job_alert(salary_min=100_000)
+
+        await self.gen.jobs.job(salary_min=150_000)
+        await self.gen.jobs.job(salary_min=None)
+        await self.gen.jobs.job(salary_min=50_000)
+
+        assert 2 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_salary_min_with_exclude_no_salary(self):
+        alert = await self.gen.jobs.job_alert(
+            salary_min=100_000,
+            is_exclude_no_salary=True,
+        )
+
+        await self.gen.jobs.job(salary_min=150_000)
+        await self.gen.jobs.job(salary_min=None)
+        await self.gen.jobs.job(salary_min=50_000)
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_exclude_no_salary_without_salary_min(self):
+        alert = await self.gen.jobs.job_alert(is_exclude_no_salary=True)
+
+        await self.gen.jobs.job(salary_min=50_000)
+        await self.gen.jobs.job(salary_min=None)
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
 
 Category = TagCategoryEnum

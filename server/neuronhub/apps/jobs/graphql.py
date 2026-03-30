@@ -109,6 +109,7 @@ class JobAlertType:
     is_orgs_highlighted: auto
     is_remote: auto
     salary_min: auto
+    is_exclude_no_salary: auto
     is_active: auto
     created_at: auto
     sent_count: auto
@@ -199,6 +200,7 @@ class JobsMutation:
         is_orgs_highlighted: bool | None = None,
         is_remote: bool | None = None,
         salary_min: int | None = None,
+        is_exclude_no_salary: bool = False,
         tz: str | None = None,
     ) -> bool:
         alert = await JobAlert.objects.acreate(
@@ -206,6 +208,7 @@ class JobsMutation:
             is_orgs_highlighted=is_orgs_highlighted,
             is_remote=is_remote,
             salary_min=salary_min,
+            is_exclude_no_salary=is_exclude_no_salary,
             tz=tz,
         )
         if tag_names:

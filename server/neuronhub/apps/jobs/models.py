@@ -173,6 +173,9 @@ class Job(AlgoliaModel):
     def is_in_algolia_index(self) -> bool:
         return self.is_published
 
+    def get_salary_min_or_zero(self) -> int:
+        return self.salary_min or 0
+
     def get_json_locations(self):
         return self._get_graphql_field("locations")
 
@@ -233,6 +236,9 @@ class JobAlert(TimeStampedModel):
     )
     is_remote = models.BooleanField(blank=True, null=True)
     salary_min = models.PositiveIntegerField(blank=True, null=True)
+    is_exclude_no_salary = models.BooleanField(default=False)
+    is_exclude_career_capital = models.BooleanField(default=False)
+    is_exclude_profit_for_good = models.BooleanField(default=False)
 
     tz: ZoneInfo = TimeZoneField(blank=True, default="")
 

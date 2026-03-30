@@ -62,7 +62,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "description",
             ["get_org_json", "org"],
             "url_external",
-            "salary_min",
+            ["get_salary_min_or_zero", "salary_min"],
             "salary_text",
             ["get_visible_to", "visible_to"],
             # GraphQL compatibility

@@ -233,6 +233,7 @@ export const JobAlertListQuery = graphql.persisted(
         is_orgs_highlighted
         is_remote
         salary_min
+        is_exclude_no_salary
         is_active
         created_at
         sent_count
