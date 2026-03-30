@@ -123,7 +123,6 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
         <DialogContent
           bg="bg.card"
           fontFamily="body"
-          maxW="390px"
           mx="gap.md"
           p={{ base: "gap.md", md: "gap.xl" }}
         >
@@ -141,6 +140,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
               )}
             </Stack>
           </DialogHeader>
+
           <DialogCloseTrigger
             top={{ base: "gap.md", md: "gap.xl" }}
             right={{ base: "gap.md", md: "gap.xl" }}
