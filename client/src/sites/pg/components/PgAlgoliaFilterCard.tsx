@@ -1,12 +1,11 @@
-import { Box, Collapsible, Flex, HStack, Stack } from "@chakra-ui/react";
+import { Box, Collapsible, Flex, HStack, Icon, Stack } from "@chakra-ui/react";
 import React, { useEffect, useRef, type ReactNode, type RefObject } from "react";
-import { LuChevronDown } from "react-icons/lu";
+import { LuChevronDown, LuSquareX } from "react-icons/lu";
 import { useClearRefinements } from "react-instantsearch";
 import {
   PgAlgoliaFacetsActive,
   type FacetsActiveConfig,
 } from "@/sites/pg/components/PgAlgoliaFacetsActive";
-import { PgAlgoliaClearButton } from "@/sites/pg/components/PgAlgoliaClearButton";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function PgFilterCardWithSplitBg(props: {
@@ -59,12 +58,12 @@ export function PgFacetsActive(props: { facetsActive: FacetsActiveConfig }) {
     <Collapsible.Root open={isActive} gridColumn="span 5">
       <Collapsible.Content>
         <HStack gap="gap.md" align="flex-start">
-          <PgAlgoliaClearButton
+          <PgAlgoliaFacetsActive config={props.facetsActive} />
+
+          <PgRefinesClearButton
             onClear={props.facetsActive.onClearAdditional}
             extraTags={props.facetsActive.extraTags}
           />
-
-          <PgAlgoliaFacetsActive config={props.facetsActive} />
         </HStack>
       </Collapsible.Content>
     </Collapsible.Root>
@@ -110,17 +109,17 @@ export function PgMobileCollapsible(props: {
           {props.cta}
 
           <Flex gap="gap.sm" align="flex-start">
-            <PgAlgoliaClearButton
+            <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm" />
+
+            <PgRefinesClearButton
               onClear={props.facetsActive.onClearAdditional}
               extraTags={props.facetsActive.extraTags}
             />
-            <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm" />
           </Flex>
 
           <Box pt="1">{props.facetsTopbar}</Box>
 
-          <HStack>
-            <PgAlgoliaClearButton onClear={props.facetsActive.onClearAdditional} />
+          <HStack w="full">
             <Collapsible.Trigger asChild>
               <Flex
                 align="center"
@@ -137,9 +136,46 @@ export function PgMobileCollapsible(props: {
                 </Box>
               </Flex>
             </Collapsible.Trigger>
+
+            <PgRefinesClearButton onClear={props.facetsActive.onClearAdditional} />
           </HStack>
         </Stack>
       </Collapsible.Content>
     </Collapsible.Root>
+  );
+}
+
+function PgRefinesClearButton(props: {
+  onClear?: () => void;
+  extraTags?: Array<{ label: string; onRemove: () => void }>;
+}) {
+  const refinementsClear = useClearRefinements();
+
+  if (!refinementsClear.canRefine && !props.extraTags?.length) {
+    return null;
+  }
+
+  return (
+    <Flex
+      as="button"
+      onClick={() => {
+        refinementsClear.refine();
+        props.onClear?.();
+      }}
+      align="center"
+      gap="gap.xs"
+      color="brand.green"
+      fontSize="sm"
+      fontWeight="medium"
+      cursor="pointer"
+      _hover={{ color: "brand.green.light" }}
+      whiteSpace="nowrap"
+      h="6"
+    >
+      <Icon boxSize="3.5">
+        <LuSquareX />
+      </Icon>
+      Clear all
+    </Flex>
   );
 }
