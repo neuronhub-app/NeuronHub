@@ -24,7 +24,7 @@ Sentry.init({
       matchRoutes,
     }),
     Sentry.replayIntegration(),
-    Sentry.feedbackIntegration({ colorScheme: "system" }),
+    // Sentry.feedbackIntegration({ colorScheme: "system" }),
     Sentry.consoleLoggingIntegration({ levels: ["error", "warn"] }),
   ],
   tracesSampleRate: 1.0,
