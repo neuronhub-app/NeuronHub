@@ -1,6 +1,7 @@
 import { Box, Grid, HStack, Stack } from "@chakra-ui/react";
 import { useRef, type ReactNode } from "react";
 import { InstantSearch } from "react-instantsearch";
+import { history } from "instantsearch.js/es/lib/routers";
 import type { ID } from "@/gql-tada";
 import type { FacetsActiveConfig } from "@/sites/pg/components/PgAlgoliaFacetsActive";
 import {
@@ -30,6 +31,11 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
   children?: ReactNode;
   cta?: ReactNode;
   ctaMobile?: ReactNode;
+  urlParams?: {
+    keys: string[];
+    read: () => Record<string, string>;
+    write: (params: Record<string, string>) => void;
+  };
 }) {
   const algolia = useAlgoliaSearchClient();
 
@@ -48,6 +54,30 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
       searchClient={algolia.client}
       indexName={indexName}
       routing={{
+        router: history({
+          createURL: ({ qsModule, routeState, location }) => {
+            const algoliaSearch = qsModule.stringify(routeState);
+            const customSearch = new URLSearchParams(props.urlParams?.read() ?? {}).toString();
+            const search = [algoliaSearch, customSearch].filter(Boolean).join("&");
+            return search ? `${location.pathname}?${search}` : location.pathname;
+          },
+          // @ts-expect-error #bad-infer qs.ParsedQs not assignable to UiState — Algolia typing gap
+          parseURL: ({ qsModule, location }) => {
+            const parsed = qsModule.parse(location.search, { ignoreQueryPrefix: true });
+            if (props.urlParams) {
+              const custom: Record<string, string> = {};
+              for (const key of props.urlParams.keys) {
+                const value = parsed[key];
+                if (typeof value === "string") {
+                  custom[key] = value;
+                  delete parsed[key];
+                }
+              }
+              props.urlParams.write(custom);
+            }
+            return parsed;
+          },
+        }),
         stateMapping: {
           stateToRoute: uiState => {
             const indexState = uiState[indexName] ?? {};

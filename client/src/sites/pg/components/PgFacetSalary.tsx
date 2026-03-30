@@ -1,48 +1,57 @@
-import {
-  Flex,
-  FormatNumber,
-  Icon,
-  NumberInput,
-  Slider,
-  Stack,
-  Switch,
-  Text,
-} from "@chakra-ui/react";
-import { PiInfoFill } from "react-icons/pi";
-import { useRef } from "react";
-import { proxy, useSnapshot } from "valtio";
-import { useRange } from "react-instantsearch";
+import { Flex, NumberInput, Stack, Switch, Text } from "@chakra-ui/react";
+import { useEffect, useRef } from "react";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
-import { format } from "@neuronhub/shared/utils/format";
+import { ids } from "@/e2e/ids";
+import { useJobListFilters } from "@/sites/pg/pages/jobs/list/jobListFilters";
 
 const textStyle = { ...facetStyle.value, color: "fg" } as const;
 
-const salaryFormatOptions = {
-  style: "currency",
-  currency: "USD",
-  notation: "compact",
-  minimumFractionDigits: 0,
-} as const;
+export function PgFacetSalary() {
+  const filters = useJobListFilters();
+  const state = useStateValtio({ localValue: "" });
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
-export const salaryFormatter = new Intl.NumberFormat("en-US", salaryFormatOptions);
+  // todo #prob-redundant — replaceable with uncontrolled input + key={salaryMin} for reset
+  useEffect(() => {
+    const synced = filters.snap.salaryMin != null ? String(filters.snap.salaryMin) : "";
+    if (synced !== state.snap.localValue) {
+      state.mutable.localValue = synced;
+    }
+  }, [filters.snap.salaryMin]);
 
-export const salaryFilterState = proxy({
-  excludeNoSalary: false,
-  showInfo: false,
-});
-
-function SalaryExtras(props: { isSalarySelected: boolean }) {
-  const snap = useSnapshot(salaryFilterState);
+  function handleValueChange(details: { valueAsNumber: number }) {
+    const next = Number.isFinite(details.valueAsNumber) ? details.valueAsNumber : null;
+    state.mutable.localValue = next != null ? String(next) : "";
+    clearTimeout(debounceRef.current!);
+    debounceRef.current = setTimeout(() => {
+      filters.mutable.salaryMin = next;
+    }, 400);
+  }
 
   return (
-    <>
+    <Stack gap="gap.sm">
+      <NumberInput.Root
+        value={state.snap.localValue}
+        onValueChange={handleValueChange}
+        size="xs"
+        step={1000}
+      >
+        <NumberInput.Input
+          placeholder="Minimum salary in USD (example: 50,000)"
+          {...ids.set(ids.facet.salaryInput)}
+        />
+      </NumberInput.Root>
+
+      <Text {...textStyle}>(All rates are annualized and converted to USD)</Text>
+
       <Switch.Root
-        checked={snap.excludeNoSalary}
-        disabled={props.isSalarySelected}
+        checked={filters.snap.excludeNoSalary}
         onCheckedChange={() => {
-          salaryFilterState.excludeNoSalary = !salaryFilterState.excludeNoSalary;
+          filters.mutable.excludeNoSalary = !filters.mutable.excludeNoSalary;
         }}
         w="full"
+        {...ids.set(ids.facet.switch.excludeNoSalary)}
       >
         <Switch.HiddenInput />
         <Flex w="full" justify="space-between" align="center" gap="gap.md">
@@ -52,106 +61,6 @@ function SalaryExtras(props: { isSalarySelected: boolean }) {
           </Switch.Control>
         </Flex>
       </Switch.Root>
-
-      <Flex
-        align="center"
-        gap="gap.xs"
-        onClick={() => {
-          salaryFilterState.showInfo = !salaryFilterState.showInfo;
-        }}
-        cursor="pointer"
-      >
-        <Text {...textStyle}>How is this calculated?</Text>
-        <Icon color="brand.green.light" boxSize="4">
-          <PiInfoFill />
-        </Icon>
-      </Flex>
-      {snap.showInfo && (
-        <Text {...textStyle}>
-          All hourly, weekly, and monthly rates are annualized and non-US salaries are converted
-          to their USD equivalent.
-        </Text>
-      )}
-    </>
-  );
-}
-
-export function resetSalaryFilter() {
-  salaryFilterState.excludeNoSalary = false;
-}
-
-export function PgFacetSalary() {
-  const range = useRange({ attribute: "salary_min" });
-  // Cache last valid bounds to prevent flicker when Algolia returns null during refinement changes
-  const lastRangeRef = useRef<{ min: number; max: number } | null>(null);
-
-  if (range.range.min && range.range.max) {
-    lastRangeRef.current = { min: range.range.min, max: range.range.max };
-  }
-
-  const bounds = lastRangeRef.current;
-  if (!bounds) {
-    return null;
-  }
-
-  const valueStart = range.start[0];
-  const slider = { step: 1000, min: bounds.min, max: bounds.max };
-
-  function refine(value: number) {
-    if (value <= slider.min) {
-      range.refine([slider.min, slider.max]);
-    } else {
-      const valueRounded = Math.round(value / slider.step) * slider.step;
-      range.refine([Math.min(valueRounded, slider.max), slider.max]);
-    }
-  }
-
-  const isActive = valueStart != null && Number.isFinite(valueStart) && valueStart > slider.min;
-  const valueCurrent = isActive ? valueStart : slider.min;
-
-  return (
-    <Stack gap="gap.sm">
-      <NumberInput.Root
-        value={isActive ? String(valueCurrent) : ""}
-        onValueChange={details => {
-          if (Number.isFinite(details.valueAsNumber)) {
-            refine(details.valueAsNumber);
-          }
-        }}
-        size="xs"
-        step={slider.step}
-        max={slider.max}
-        formatOptions={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
-      >
-        <NumberInput.Input placeholder={`${format.money(slider.min)}+`} />
-      </NumberInput.Root>
-
-      <Slider.Root
-        value={[valueCurrent]}
-        min={slider.min}
-        max={slider.max}
-        step={slider.step}
-        onValueChange={details => refine(details.value[0])}
-        size="sm"
-      >
-        <Slider.Control>
-          <Slider.Track>
-            <Slider.Range bg="brand.green.light" />
-          </Slider.Track>
-          <Slider.Thumb index={0} borderColor="brand.green.light" />
-        </Slider.Control>
-      </Slider.Root>
-
-      <Flex justify="space-between" color="fg.muted" fontSize="2xs">
-        <Text>
-          <FormatNumber value={slider.min} {...salaryFormatOptions} />
-        </Text>
-        <Text>
-          <FormatNumber value={slider.max} {...salaryFormatOptions} />
-        </Text>
-      </Flex>
-
-      <SalaryExtras isSalarySelected={isActive} />
     </Stack>
   );
 }

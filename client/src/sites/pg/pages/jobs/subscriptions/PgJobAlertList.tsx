@@ -108,20 +108,15 @@ type AlertType = NonNullable<ResultOf<typeof JobAlertListQuery>["job_alerts"]>[n
 
 function PgAlertCard(props: { alert: AlertType }) {
   // #quality-1%
-  // todo !! fix: useClearRefinements().canRefine or another method
+  // todo !! fix: useClearRefinements().canRefine or another method — prod blocker
   // see [[adding-job-alert-filters.mdx]] checklist
   const isHasFilters =
     props.alert.tags.length > 0 ||
     props.alert.locations.length > 0 ||
     props.alert.is_orgs_highlighted ||
     props.alert.is_remote ||
-    props.alert.salary_min != null;
-
-  const style = {
-    badge: {
-      size: { base: "xs", lg: "md" },
-    },
-  } as const;
+    props.alert.salary_min != null ||
+    props.alert.is_exclude_no_salary;
 
   return (
     <Stack
@@ -173,7 +168,7 @@ function PgAlertCard(props: { alert: AlertType }) {
           <HStack gap={{ base: "gap.xs", md: "gap.md" }} flexWrap="wrap">
             {props.alert.is_remote && (
               <Badge
-                {...style.badge}
+                {...pgTagStyle.base}
                 bg={pgTagStyle.education.bg}
                 color={pgTagStyle.education.fg}
               >
@@ -182,7 +177,7 @@ function PgAlertCard(props: { alert: AlertType }) {
             )}
             {props.alert.is_orgs_highlighted && (
               <Badge
-                {...style.badge}
+                {...pgTagStyle.base}
                 bg={pgTagStyle.highlighted.bg}
                 color={pgTagStyle.highlighted.fg}
               >
@@ -191,16 +186,27 @@ function PgAlertCard(props: { alert: AlertType }) {
             )}
             {props.alert.salary_min != null && (
               <Badge
-                {...style.badge}
+                {...pgTagStyle.base}
                 bg={pgTagStyle.experience.bg}
                 color={pgTagStyle.experience.fg}
+                {...ids.set(ids.job.subscriptions.badge.salaryMin)}
               >
                 Min Salary: {format.money(props.alert.salary_min)}
               </Badge>
             )}
+            {props.alert.is_exclude_no_salary && (
+              <Badge
+                {...pgTagStyle.base}
+                bg={pgTagStyle.workload.bg}
+                color={pgTagStyle.workload.fg}
+                {...ids.set(ids.job.subscriptions.badge.excludeNoSalary)}
+              >
+                Exclude No Salary
+              </Badge>
+            )}
             {props.alert.locations.map(loc => (
               <Badge
-                {...style.badge}
+                {...pgTagStyle.base}
                 key={loc.name}
                 bg={pgTagStyle.education.bg}
                 color={pgTagStyle.education.fg}
@@ -212,7 +218,7 @@ function PgAlertCard(props: { alert: AlertType }) {
               const colors = tagColorByCategory(tag.category_name);
               return (
                 <Badge
-                  {...style.badge}
+                  {...pgTagStyle.base}
                   key={tag.name}
                   bg={colors.bg}
                   color={colors.fg}

@@ -14,22 +14,27 @@ import type { ReactNode } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
 import { Link } from "react-router";
 import { Configure, useClearRefinements } from "react-instantsearch";
-import { useSnapshot } from "valtio";
 import { ids } from "@/e2e/ids";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
-import { resetSalaryFilter, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
+import { format } from "@neuronhub/shared/utils/format";
+import { useSnapshot } from "valtio";
 import {
-  otherFiltersState,
   PgFiltersTopbar,
+  otherFiltersState,
   resetOtherFilters,
 } from "@/sites/pg/components/PgFiltersTopbar";
 import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
 import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
+import {
+  useJobListFilters,
+  jobListFiltersUrlParams,
+  resetJobListFilters,
+} from "@/sites/pg/pages/jobs/list/jobListFilters";
 import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
 import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
@@ -37,11 +42,17 @@ import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 export function JobList(props: { slug?: string }) {
   const jobOpenPinned = useJobOpenPinned(props.slug);
   const algolia = useAlgoliaSearchClient();
-  const salarySnap = useSnapshot(salaryFilterState);
+  const filters = useJobListFilters();
   const otherSnap = useSnapshot(otherFiltersState);
 
   const filterParts: string[] = [];
-  if (salarySnap.excludeNoSalary) {
+  if (filters.snap.salaryMin != null && filters.snap.salaryMin > 0) {
+    if (filters.snap.excludeNoSalary) {
+      filterParts.push(`salary_min >= ${filters.snap.salaryMin}`);
+    } else {
+      filterParts.push(`(salary_min >= ${filters.snap.salaryMin} OR salary_min = 0)`);
+    }
+  } else if (filters.snap.excludeNoSalary) {
     filterParts.push("salary_min > 0");
   }
   if (otherSnap.excludeCareerCapital) {
@@ -50,14 +61,22 @@ export function JobList(props: { slug?: string }) {
   if (otherSnap.excludeProfitForGood) {
     filterParts.push(`NOT tags_area.name:"Profit for Good"`);
   }
-  const filters = filterParts.length > 0 ? filterParts.join(" AND ") : undefined;
+  const algoliaFilters = filterParts.join(" AND ");
 
   const extraTags: Array<{ label: string; onRemove: () => void }> = [];
-  if (salarySnap.excludeNoSalary) {
+  if (filters.snap.salaryMin != null && filters.snap.salaryMin > 0) {
+    extraTags.push({
+      label: `Minimum Salary: ${format.money(filters.snap.salaryMin)}+`,
+      onRemove: () => {
+        filters.mutable.salaryMin = null;
+      },
+    });
+  }
+  if (filters.snap.excludeNoSalary) {
     extraTags.push({
       label: "Exclude No Salary Roles",
       onRemove: () => {
-        salaryFilterState.excludeNoSalary = false;
+        filters.mutable.excludeNoSalary = false;
       },
     });
   }
@@ -77,11 +96,11 @@ export function JobList(props: { slug?: string }) {
       },
     });
   }
-
   return (
     <PgAlgoliaList<JobFragmentType>
       index="indexNameJobs"
       label="job"
+      urlParams={jobListFiltersUrlParams}
       cta={<JobsSubscribeModal testId={ids.job.alert.subscribeBtn} />}
       ctaMobile={<JobsSubscribeModal testId={ids.job.alert.subscribeBtnMobile} />}
       sort={
@@ -110,20 +129,18 @@ export function JobList(props: { slug?: string }) {
         labelsOverride: {
           "org.is_highlighted": "Highlighted",
           posted_at_unix: "Posted",
-          salary_min: "Minimum Salary",
         },
         dateAttributes: ["posted_at_unix"],
-        moneyAttributes: ["salary_min"],
         extraTags,
         onClearAdditional: () => {
-          resetSalaryFilter();
+          resetJobListFilters();
           resetOtherFilters();
         },
       }}
     >
       <Configure
         hitsPerPage={20}
-        filters={filters}
+        filters={algoliaFilters}
         attributesToHighlight={[
           "title",
           "org.name",
@@ -190,7 +207,7 @@ function ResetFiltersButton() {
       size="sm"
       onClick={() => {
         clear.refine();
-        resetSalaryFilter();
+        resetJobListFilters();
         resetOtherFilters();
       }}
       flexShrink="0"
