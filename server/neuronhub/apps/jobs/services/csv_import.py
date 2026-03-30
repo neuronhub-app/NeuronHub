@@ -176,6 +176,8 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
         }.items():
             job[name_django] = row.get(name_csv, "").strip()
 
+        job["url_external_with_utm"] = row.get("UTM Job Link", "").strip()
+
         location = _parse_location_field(row.get("Location(s)", ""))
         job["tags_country"] = ",".join(location.countries)
         job["tags_city"] = ",".join(location.cities)

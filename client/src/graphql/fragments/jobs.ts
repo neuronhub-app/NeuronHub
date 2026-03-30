@@ -11,6 +11,7 @@ export const JobFragment = graphql(
         id
         name
         website
+        website_with_utm
         jobs_page_url
         is_highlighted
         description
@@ -37,6 +38,7 @@ export const JobFragment = graphql(
         is_remote
       }
       url_external
+      url_external_with_utm
       is_published
       posted_at
       closes_at

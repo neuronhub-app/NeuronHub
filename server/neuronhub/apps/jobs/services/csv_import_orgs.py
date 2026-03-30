@@ -90,6 +90,7 @@ def _parse_orgs_csv(csv_path: Path) -> list[dict]:
         org = {
             "name": row.get("Name", "").strip().replace('"', ""),
             "website": website,
+            "website_with_utm": row.get("UTM Website", "").strip(),
             "domain": _extract_domain(website),
             "jobs_page_url": row.get("Jobs Page", "").strip(),
             "description": row.get("Org Description", "").strip(),

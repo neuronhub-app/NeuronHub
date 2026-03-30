@@ -14,6 +14,7 @@ from neuronhub.apps.db.fields import MarkdownField
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
+from neuronhub.apps.sites.models import url_with_utm_help_text
 from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
@@ -115,6 +116,11 @@ class Job(AlgoliaModel):
     )
 
     url_external = models.CharField(blank=True, max_length=1024, verbose_name="URL")
+    url_external_with_utm = models.CharField(
+        blank=True,
+        max_length=1024,
+        help_text=url_with_utm_help_text,
+    )
 
     is_published = models.BooleanField(default=True)
 

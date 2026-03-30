@@ -2,6 +2,8 @@
 See [[Sub-sites-with-VITE_SITE.md]]
 """
 
+import textwrap
+
 from asgiref.sync import sync_to_async
 from django.db import models
 from django.db.models import TextChoices
@@ -17,6 +19,12 @@ class SiteSlug(TextChoices):
 
 
 _help_text = "Leave blank to use the default template. Test by saving the updated Site Config, and then pressing the 'SEND TEST * EMAIL TO YOURSELF' buttons in the top right corner."
+
+url_with_utm_help_text = textwrap.dedent("""
+    If provided - will be used on the Job board.
+    But if SiteConfig.jobs_url_utm_source is set - it'll override the utm_source param of this field. 
+    For details see [[siteConfigState.ts]]
+""")
 
 
 class SiteConfig(SingletonModel):

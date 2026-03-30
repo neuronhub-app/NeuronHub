@@ -359,7 +359,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
             focusRingColor="transparent"
           >
             <Link
-              href={appendUtmSource(props.job.url_external)}
+              href={appendUtmSource(props.job.url_external_with_utm || props.job.url_external)}
               target="_blank"
               rel="noopener noreferrer"
               textDecoration="none"
@@ -470,7 +470,7 @@ function JobOrgLink(props: {
   return (
     <Flex align="center" gap="gap.xs">
       <Link
-        href={appendUtmSource(props.job.org.website)}
+        href={appendUtmSource(props.job.org.website_with_utm || props.job.org.website)}
         target="_blank"
         rel="noopener noreferrer"
         {...textStyle}

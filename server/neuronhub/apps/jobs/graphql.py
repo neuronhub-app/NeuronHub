@@ -51,6 +51,7 @@ class OrgType:
     id: auto
     name: auto
     website: auto
+    website_with_utm: auto
     jobs_page_url: auto
     is_highlighted: auto
     logo: auto
@@ -82,6 +83,7 @@ class JobType:
     tags_city: list[PostTagType]
 
     url_external: auto
+    url_external_with_utm: auto
     is_published: auto
 
     posted_at: auto

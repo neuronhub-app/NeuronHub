@@ -123,12 +123,21 @@ class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmi
             },
         ),
         (
+            "Jobs UTM".upper(),
+            {
+                "fields": [
+                    "jobs_url_utm_source",
+                ],
+            },
+        ),
+        (
             "Job alert emails".upper(),
             {
                 "fields": [
                     "logo_url",
                     "feedback_form_url",
                     "submit_job_url",
+                    "address",
                     "email_template_job_alert",
                     "email_template_job_alert_confirmation",
                     "email_html_about_us",

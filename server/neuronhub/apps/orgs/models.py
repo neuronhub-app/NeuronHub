@@ -8,6 +8,7 @@ from timezone_field import TimeZoneField
 
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
+from neuronhub.apps.sites.models import url_with_utm_help_text
 
 
 class Org(TimeStampedModel):
@@ -17,6 +18,11 @@ class Org(TimeStampedModel):
     tz: ZoneInfo = TimeZoneField(default="America/Los_Angeles")
 
     website = models.CharField(max_length=1024, blank=True)
+    website_with_utm = models.CharField(
+        max_length=1024,
+        blank=True,
+        help_text=url_with_utm_help_text,
+    )
     jobs_page_url = models.CharField(max_length=1024, blank=True)
     description = models.TextField(blank=True)
     is_highlighted = models.BooleanField(default=False)

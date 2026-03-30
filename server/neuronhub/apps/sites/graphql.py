@@ -4,7 +4,6 @@ import strawberry
 import strawberry_django
 from asgiref.sync import sync_to_async
 from django.conf import settings
-from django.core.cache import cache
 from django.core.mail import send_mail
 from django.db.models import Model
 from strawberry import auto
@@ -126,6 +125,6 @@ async def get_list_cached[Return: type](
         items_qs = items_qs.prefetch_related(*prefetch_related)
     items = [link async for link in items_qs]
 
-    await settings.CACHE_RAM.aset(cache_key, items)
+    await settings.CACHE_RAM.aset(cache_key, items, timeout=settings.SOLO_CACHE_TIMEOUT)
 
     return cast(list[Return], items)

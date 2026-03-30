@@ -183,6 +183,7 @@ type JobType {
   tags_country(filters: PostTagFilter): [PostTagType!]!
   tags_city(filters: PostTagFilter): [PostTagType!]!
   url_external: String!
+  url_external_with_utm: String!
   is_published: Boolean!
   posted_at: DateTime
   closes_at: DateTime
@@ -299,6 +300,7 @@ type OrgType {
   id: ID!
   name: String!
   website: String!
+  website_with_utm: String!
   jobs_page_url: String!
   is_highlighted: Boolean!
   logo: DjangoImageType

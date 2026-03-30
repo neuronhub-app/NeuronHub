@@ -134,7 +134,7 @@ export function PgFacetAttribute(props: {
         {refinements.items
           .filter(
             item =>
-              item.value !== "Other" &&
+              item.value !== "Other" && // todo ! refac: drop after outdated "Other" PostTags are dropped from Algolia #AI
               (!props.allowedValues || props.allowedValues.includes(item.label)),
           )
           .map(item => {
