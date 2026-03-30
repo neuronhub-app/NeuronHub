@@ -37,6 +37,8 @@ WORKDIR /app/docs
 RUN pnpm exec react-router build
 
 RUN pnpm deploy --filter=neuronhub-docs --prod $DEPLOY_DIR
+# pnpm uses .gitignore if .npmignore not found -> manual copy
+RUN cp --recursive /app/docs/build $DEPLOY_DIR/build
 
 
 # Serve (SSR needs Node.js)
