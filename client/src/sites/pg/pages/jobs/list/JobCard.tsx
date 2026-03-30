@@ -205,6 +205,8 @@ export function JobCard(props: {
           base: cardState !== CardState.Closed ? "gap.md" : "0",
           md: cardState !== CardState.Closed ? "gap.lg" : "0",
         }}
+        transition="margin"
+        transitionDuration={style.duration}
       >
         <JobTagGroups
           job={props.job}
