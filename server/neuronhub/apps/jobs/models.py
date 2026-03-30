@@ -49,7 +49,7 @@ class Job(AlgoliaModel):
 
     description = models.TextField(blank=True)
 
-    slug = AutoSlugField(populate_from=["title", "org__name"], unique=True, max_length=512)
+    slug = AutoSlugField(populate_from=["title", "org__name"], max_length=512)
 
     org = models.ForeignKey(
         Org,
