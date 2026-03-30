@@ -49,7 +49,7 @@ class Job(AlgoliaModel):
 
     description = models.TextField(blank=True)
 
-    slug = AutoSlugField(populate_from=["title", "org__name"])
+    slug = AutoSlugField(populate_from=["title", "org__name"], unique=True, max_length=512)
 
     org = models.ForeignKey(
         Org,
@@ -160,14 +160,6 @@ class Job(AlgoliaModel):
         TagCategoryEnum.Workload: "tags_workload",
         TagCategoryEnum.VisaSponsorship: "tags_country_visa_sponsor",
     }
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["slug", "is_published"],
-                name="unique_job_slug_is_published",
-            ),
-        ]
 
     graphql_query_for_algolia: str = "JobsByIds"
     graphql_query_for_algolia_field: str = "jobs"

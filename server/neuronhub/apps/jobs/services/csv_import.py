@@ -76,6 +76,7 @@ async def _import_jobs_parsed(jobs_parsed: list[dict], limit: int | None = None)
                 defaults={
                     **job_parsed,
                     "org": org,
+                    "is_published": True,
                     "visibility": Visibility.PUBLIC,
                 },
             )

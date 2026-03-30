@@ -15,11 +15,13 @@ async def publish_job_versions(draft_ids: list[int]) -> None:
     ids_approved: list[int] = []
 
     async for job_draft in job_drafts:
-        if job_old := await Job.objects.filter(slug=job_draft.slug, is_published=True).afirst():
+        if job_old := await job_draft.version_of.afirst():
+            slug_old = job_old.slug
             await job_old.adelete()
+            job_draft.slug = slug_old
 
         job_draft.is_published = True
-        await job_draft.asave()
+        await job_draft.asave(update_fields=["is_published", "slug"])
 
         ids_approved.append(job_draft.pk)
 

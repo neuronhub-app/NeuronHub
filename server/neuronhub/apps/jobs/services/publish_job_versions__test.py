@@ -17,9 +17,9 @@ class TestApproveVersions(NeuronTestCase):
 
         published = await self.gen.jobs.job(org=org, title="Old Title")
         draft = await self.gen.jobs.job(org=org, title="New Title", is_published=False)
-        draft.slug = published.slug
-        await draft.asave()
         await published.versions.aadd(draft)
+
+        slug_before = published.slug
 
         await publish_job_versions([draft.pk])
 
@@ -27,14 +27,13 @@ class TestApproveVersions(NeuronTestCase):
 
         draft_refreshed = await Job.objects.aget(pk=draft.pk)
         assert draft_refreshed.is_published is True
+        assert draft_refreshed.slug == slug_before
 
     async def test_approve_clears_version_of(self):
         org = (await self.gen.jobs.job()).org
 
         job_published = await self.gen.jobs.job(org=org, title="Title A")
         job_draft = await self.gen.jobs.job(org=org, title="Title B", is_published=False)
-        job_draft.slug = job_published.slug
-        await job_draft.asave()
         await job_published.versions.aadd(job_draft)
 
         await publish_job_versions([job_draft.pk])

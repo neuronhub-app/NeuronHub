@@ -52,6 +52,32 @@ class TestCsvImportJobs(NeuronTestCase):
         )
         assert await job.tags_skill.acount() == 0
 
+    # #AI
+    async def test_reimport_republishes_unpublished_job(self):
+        """Job unpublished by a previous sync must become published again when re-imported."""
+        org = await Org.objects.acreate(name="RePublish Co")
+        job = await self.gen.jobs.job(org=org, url_external="https://a.com/j1")
+
+        # First import without this job → unpublishes it
+        await _import_jobs_parsed(
+            [{"title": "Other", "url_external": "https://a.com/x", col_key.org_name: "Other"}]
+        )
+        await job.arefresh_from_db()
+        assert job.is_published is False
+
+        # Re-import with the job → must re-publish
+        await _import_jobs_parsed(
+            [
+                {
+                    "title": job.title,
+                    "url_external": job.url_external,
+                    col_key.org_name: org.name,
+                }
+            ]
+        )
+        await job.arefresh_from_db()
+        assert job.is_published is True
+
     async def test_jobs_not_in_csv_become_unpublished(self):
         job_in_csv = await self.gen.jobs.job()
         job_not_in_csv = await self.gen.jobs.job()
