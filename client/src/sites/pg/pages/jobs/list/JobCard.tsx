@@ -12,10 +12,12 @@ import {
   Stack,
   Text,
   VStack,
+  Clipboard,
 } from "@chakra-ui/react";
 import type { BaseHit, Hit } from "instantsearch.js";
+import { GoShare } from "react-icons/go";
 import { IoLocationSharp } from "react-icons/io5";
-import { LuChevronDown, LuExternalLink, LuShare2 } from "react-icons/lu";
+import { LuChevronDown, LuExternalLink } from "react-icons/lu";
 import { Highlight, Snippet, useInstantSearch } from "react-instantsearch";
 import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -384,22 +386,29 @@ function JobExpanded(props: { job: JobFragmentType }) {
             </Link>
           </Button>
         )}
-        <Tooltip content="Copy link" positioning={{ placement: "right" }}>
-          <Button
-            variant="ghost"
-            h="10"
-            w="10"
-            aria-label="Share"
-            onClick={async () => {
-              await navigator.clipboard.writeText(`${window.location.origin}/${props.job.slug}`);
-              toast.success("Link copied");
-            }}
-          >
-            <Icon boxSize="4">
-              <LuShare2 />
-            </Icon>
-          </Button>
-        </Tooltip>
+
+        <Clipboard.Root value={`${window.location.origin}/${props.job.slug}`}>
+          <Tooltip content="Copy link" positioning={{ placement: "right" }}>
+            <Clipboard.Trigger asChild>
+              <Button
+                variant="ghost"
+                h="10"
+                w="10"
+                aria-label="Share"
+                size="sm"
+                onClick={async () => {
+                  toast.success("Link copied");
+                }}
+              >
+                <Clipboard.Indicator>
+                  <Icon boxSize="5">
+                    <GoShare />
+                  </Icon>
+                </Clipboard.Indicator>
+              </Button>
+            </Clipboard.Trigger>
+          </Tooltip>
+        </Clipboard.Root>
       </Flex>
     </Stack>
   );
