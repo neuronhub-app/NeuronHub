@@ -138,25 +138,25 @@ export function JobList(props: { slug?: string }) {
 function JobNoResultsCard() {
   return (
     <Stack
-      p={{ base: "gap.sm", md: "gap.md" }}
+      p={{ base: "gap.sm", md: "gap.lg" }}
       borderRadius="lg"
       borderWidth="1px"
       borderColor="subtle"
       bg="bg.card"
-      gap="gap.md"
+      gap="gap.sm"
     >
       <Text fontWeight="semibold" color="fg" textAlign="center">
         No jobs found
       </Text>
-      <Flex align="center" gap="gap.md" direction={{ base: "column", md: "row" }}>
+
+      <Flex align="center" gap="gap.md" direction={{ base: "column", md: "row" }} fontSize="md">
         <Text fontSize="sm" color="fg.muted" flex="1">
           No jobs match this combination of filters right now.{" "}
           <JobsSubscribeModal
             trigger={
               <Text
                 as="span"
-                fontSize="md"
-                fontWeight="medium"
+                fontWeight="bold"
                 color="brand.green"
                 _hover={{ color: "brand.green.light" }}
               >
@@ -166,6 +166,7 @@ function JobNoResultsCard() {
           />{" "}
           to be notified when matching roles are posted.
         </Text>
+
         <ResetFiltersButton />
       </Flex>
     </Stack>
