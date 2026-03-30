@@ -65,7 +65,7 @@ export function JobCard(props: {
 }) {
   const { results } = useInstantSearch();
 
-  const { mutable, snap } = useStateValtio<{ card: CardState; isHovering: boolean }>({
+  const state = useStateValtio<{ card: CardState; isHovering: boolean }>({
     card: props.isInitiallyOpen ? CardState.OpenByUser : CardState.Closed,
     isHovering: false,
   });
@@ -75,25 +75,30 @@ export function JobCard(props: {
   const hasDescriptionHit = isHighlightable && !!results.query && hasDescriptionMatch(jobHit);
 
   const cardState =
-    snap.card === CardState.OpenByUser
+    state.snap.card === CardState.OpenByUser
       ? CardState.OpenByUser
       : hasDescriptionHit
         ? CardState.OpenBySearchPreview
         : CardState.Closed;
 
-  function toggleCard() {
-    mutable.card =
-      mutable.card === CardState.OpenByUser ? CardState.Closed : CardState.OpenByUser;
+  function toggleCardCollapse() {
+    const isOpenByUser = state.mutable.card === CardState.OpenByUser;
+    state.mutable.card = isOpenByUser ? CardState.Closed : CardState.OpenByUser;
   }
 
   const hoverHandlers = {
     onMouseEnter: () => {
-      mutable.isHovering = true;
+      state.mutable.isHovering = true;
     },
     onMouseLeave: () => {
-      mutable.isHovering = false;
+      state.mutable.isHovering = false;
     },
   };
+
+  let borderColor = cardState === CardState.OpenByUser ? "brand.black" : "subtle";
+  if (state.snap.isHovering) {
+    borderColor = "brand.green.light/50";
+  }
 
   return (
     <Stack
@@ -104,10 +109,9 @@ export function JobCard(props: {
       pr={{ md: "16" }}
       borderRadius="lg"
       borderWidth="1px"
-      borderColor={cardState === CardState.OpenByUser ? "brand.black" : "subtle"}
+      borderColor={borderColor}
       bg="bg.card"
       fontFamily="body"
-      _hover={{ borderColor: cardState === CardState.OpenByUser ? "brand.black" : "subtle" }}
       css={style.markHighlight}
       {...ids.set(ids.job.card.container)}
       data-id={props.job.id}
@@ -208,8 +212,11 @@ export function JobCard(props: {
         transition="margin"
         transitionDuration={style.duration}
       >
+        {/* extra horizontal collapse area */}
         {props.job.description && (
           <Box
+            onClick={toggleCardCollapse}
+            {...hoverHandlers}
             pos="absolute"
             top="0"
             h={{ base: "10", md: "12" }}
@@ -217,8 +224,6 @@ export function JobCard(props: {
             right="0"
             zIndex="0"
             cursor="pointer"
-            onClick={toggleCard}
-            {...hoverHandlers}
           />
         )}
         <JobTagGroups
@@ -248,6 +253,8 @@ export function JobCard(props: {
 
       {props.job.description && (
         <Box
+          onClick={toggleCardCollapse}
+          {...hoverHandlers}
           pos="absolute"
           top="0"
           right="0"
@@ -256,8 +263,6 @@ export function JobCard(props: {
           borderRadius="lg"
           cursor="pointer"
           userSelect="none"
-          onClick={toggleCard}
-          {...hoverHandlers}
         >
           <Tooltip
             content={datetime.full(props.job.posted_at)}
@@ -278,12 +283,16 @@ export function JobCard(props: {
               {datetime.relativeRounded(props.job.posted_at)}
             </Flex>
           </Tooltip>
+
           <Flex
             pos="absolute"
             bottom={{ base: "8px", md: "gap.md" }}
             right={{ base: "gap.sm", md: "gap.lg" }}
-            color={snap.isHovering ? "brand.green.light" : "fg.muted"}
-            transition="color 0.2s ease"
+            color={state.snap.isHovering ? "brand.green.light" : "fg.muted"}
+            transform={`scale(${state.snap.isHovering ? 1.15 : 1})`}
+            transition="all"
+            transitionDuration="faster"
+            transitionTimingFunction="ease"
           >
             <LuChevronDown
               size={24}
@@ -298,12 +307,12 @@ export function JobCard(props: {
 
       {cardState === CardState.Closed && (
         <Box
+          onClick={toggleCardCollapse}
           display={{ base: "block", md: "none" }}
           pos="absolute"
           inset="0"
           borderRadius="lg"
           zIndex="1"
-          onClick={toggleCard}
         />
       )}
     </Stack>
