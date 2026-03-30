@@ -1,3 +1,15 @@
+/**
+ * #quality-20 #AI
+ *
+ * Initially written by me, but LLM added trash later.
+ * Now most are redundant, garbage, or contradict each other.
+ *
+ * Refactor:
+ * - remove unused
+ * - group by `apps` - not garbage urls/Components
+ * - reuse the same ids if it's the same Component (or its child) - LLM simply threw more ids
+ * - drop the props drilling of testids
+ */
 export type TestId = string;
 
 // todo refac: gen values from keys

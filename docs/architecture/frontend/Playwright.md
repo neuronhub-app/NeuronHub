@@ -13,6 +13,8 @@ Notes:
 - If e2e needs timeouts as `waitForTimeout` - it is trash and must be rewritten.
 - Use `data-testid` for locators, in JSX set with `{...ids.set(ids.post.btn.submit)}` - see `client/e2e/ids.ts`
 - For auth we use Django `/admin/login/` and cookies - CORS 100% works.
+- The tests are slow.
+	- Eg if needed `--repeat-each` - set to 3 max, only on desired cases only.
 
 ### PlaywrightHelper.ts
 

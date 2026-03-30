@@ -65,8 +65,7 @@ test.describe("Job Alert", () => {
     // 'auth' by /jobs/subscriptions/:id_ext
     await context.clearCookies();
     const alert = alertsRes.data.job_alerts!.find(a => a.email === testEmail)!;
-    await page.goto(urls.jobs.subscriptionsManage(alert.id_ext));
-    await play.waitForNetworkIdle();
+    await play.navigate(urls.jobs.subscriptionsManage(alert.id_ext), { idleWait: true });
     await expect($[ids.job.subscriptions.card]).toBeVisible();
     await expect($[ids.job.subscriptions.card]).toHaveText(testEmail);
 
@@ -86,14 +85,14 @@ test.describe("Job Alert", () => {
     await play.click(ids.job.alert.submitBtn);
     await mutationSubscribe;
 
-    const queryList = play.waitForResponseGraphql(JobAlertListQuery);
-    await play.navigate(urls.jobs.subscriptions, { idleWait: true });
-    const response = await queryList;
-    const alert = response.data.job_alerts!.find(a => a.email === testEmail)!;
+    const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);
+    await play.navigate(urls.jobs.subscriptions);
+    const alertsRes = await alertsQuery;
+    const alert = alertsRes.data.job_alerts!.find(a => a.email === testEmail)!;
 
     await expect($[ids.job.subscriptions.unsubscribed.alert]).not.toBeVisible();
 
-    await page.goto(urls.jobs.subscriptionsRemove(alert.id_ext));
+    await play.navigate(urls.jobs.subscriptionsRemove(alert.id_ext), { idleWait: true });
     await expect($[ids.job.subscriptions.status.inactive]).toBeVisible();
     await expect($[ids.job.subscriptions.unsubscribed.alert]).toBeVisible();
   });

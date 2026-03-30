@@ -44,13 +44,13 @@ export class PlaywrightHelper {
   // #AI, but reviewed. Seems ok. Mb use the fixed on 2025-10-28 [[useApolloQuery.ts]] types.
   async graphqlQuery<TData, TVariables extends OperationVariables>(
     query: TadaDocumentNode<TData, TVariables>,
-    variables: TVariables,
+    variables?: TVariables,
   ): Promise<{ data: TData }> {
     // use Playwright's request context, which shares cookies with the browser,
     // while client.query runs in isolated by PW Vite env
     const response = await this.page.request.post(env.VITE_SERVER_URL_API, {
       headers: { "Content-Type": "application/json" },
-      data: { query: print(query), variables },
+      data: { query: print(query), variables: variables ?? {} },
     });
 
     return response.json();
@@ -134,7 +134,8 @@ export class PlaywrightHelper {
       | typeof urls.profiles.list
       | typeof urls.jobs.list
       | typeof urls.jobs.subscriptions
-      | typeof urls.jobs.versions,
+      | typeof urls.jobs.versions
+      | string,
     opts?: { idleWait?: boolean; idleWaitTimeout?: number },
   ) {
     await this.page.goto(path);
