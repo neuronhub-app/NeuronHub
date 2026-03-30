@@ -153,7 +153,7 @@ function PgNav(props: { navLinks: NavLink[]; isLoading: boolean }) {
     <Box position="relative" ref={menuRef}>
       <Container {...style.nav}>
         <HStack justify="space-between" align="center" maxH={{ base: "110px", md: "unset" }}>
-          <Link href="https://probablygood.org/" rel="noopener noreferrer">
+          <Link href="https://probablygood.org/">
             <Image src="/ProbablyGoodLogo.svg" alt="Probably Good" {...style.logo} />
           </Link>
 
@@ -194,7 +194,7 @@ function PgNav(props: { navLinks: NavLink[]; isLoading: boolean }) {
 
 function PgNavLink(props: { label: string; href: string }) {
   return (
-    <Link href={props.href} rel="noopener noreferrer" {...style.navLink}>
+    <Link href={props.href} {...style.navLink}>
       {props.label}
     </Link>
   );
@@ -208,7 +208,7 @@ function PgNavDropdown(props: { link: NavLink }) {
       positioning={{ placement: "bottom-start", offset: { mainAxis: 0 } }}
     >
       <HoverCard.Trigger asChild>
-        <Link href={props.link.href} rel="noopener noreferrer" {...style.navLink}>
+        <Link href={props.link.href} {...style.navLink}>
           {props.link.label}
         </Link>
       </HoverCard.Trigger>
@@ -216,12 +216,7 @@ function PgNavDropdown(props: { link: NavLink }) {
         <HoverCard.Positioner>
           <HoverCard.Content {...style.dropdown.container}>
             {props.link.links.map(child => (
-              <Link
-                key={child.label}
-                href={child.href}
-                rel="noopener noreferrer"
-                {...style.dropdown.link}
-              >
+              <Link key={child.label} href={child.href} {...style.dropdown.link}>
                 {child.label}
               </Link>
             ))}
@@ -271,7 +266,7 @@ function PgMobileMenu(props: { isOpen: boolean; navLinks: NavLink[] }) {
 
 function PgMobileLink(props: { label: string; href: string }) {
   return (
-    <Link href={props.href} rel="noopener noreferrer" {...style.mobile.topLink} display="block">
+    <Link href={props.href} {...style.mobile.topLink} display="block">
       {props.label}
     </Link>
   );
@@ -316,12 +311,7 @@ function PgMobileCollapsibleSection(props: {
       <Collapsible.Content>
         <Stack gap="0">
           {props.link.links.map(child => (
-            <Link
-              key={child.label}
-              href={child.href}
-              rel="noopener noreferrer"
-              {...style.mobile.childLink}
-            >
+            <Link key={child.label} href={child.href} {...style.mobile.childLink}>
               {child.label}
             </Link>
           ))}
