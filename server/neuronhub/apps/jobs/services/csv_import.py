@@ -31,6 +31,7 @@ from neuronhub.apps.posts.models import PostTagCategory
 class CsvSyncStats:
     created: int = 0
     updated: int = 0
+    unpublished: int = 0
 
 
 async def csv_import_jobs(csv_path: Path, limit: int | None = None) -> CsvSyncStats:
@@ -41,7 +42,9 @@ async def _import_jobs_parsed(jobs_parsed: list[dict], limit: int | None = None)
     stats = CsvSyncStats()
 
     with disable_auto_indexing_if_enabled():
-        for job_parsed in jobs_parsed[:limit] if limit else jobs_parsed:
+        jobs_parsed_limited = jobs_parsed[:limit] if limit else jobs_parsed
+
+        for job_parsed in jobs_parsed_limited:
             if not job_parsed:
                 continue
 
@@ -90,6 +93,15 @@ async def _import_jobs_parsed(jobs_parsed: list[dict], limit: int | None = None)
                 await job.tags_country_visa_sponsor.aset(
                     await _sync_tags_visa(locs_parsed),
                 )
+
+        urls_external_synced = {
+            job_posted["url_external"] for job_posted in jobs_parsed_limited if job_posted
+        }
+        stats.unpublished = await (
+            Job.objects.filter(is_published=True)
+            .exclude(url_external__in=urls_external_synced)
+            .aupdate(is_published=False)
+        )
 
     return stats
 

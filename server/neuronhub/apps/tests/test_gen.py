@@ -464,7 +464,7 @@ class JobsGen:
             title=title or self.faker.sentence(),
             org=org,
             description=description,
-            url_external=url_external,
+            url_external=url_external or self.faker.url(),
             salary_min=salary_min,
             salary_text=salary_text,
             posted_at=posted_at,

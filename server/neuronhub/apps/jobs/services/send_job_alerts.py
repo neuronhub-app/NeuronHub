@@ -236,6 +236,9 @@ async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
     if location_ids := [loc_id async for loc_id in alert.locations.values_list("id", flat=True)]:
         qs = qs.filter(locations__id__in=location_ids).distinct()
 
+    if alert.is_remote:
+        qs = qs.filter(locations__is_remote=True).distinct()
+
     if alert.salary_min:
         qs = qs.filter(salary_min__gte=alert.salary_min)
 

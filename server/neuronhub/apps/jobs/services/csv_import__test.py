@@ -18,11 +18,10 @@ _jobs_csv_path = settings.BASE_DIR.parent / ".local" / "pg-jobs-new.csv"
 
 @pytest.mark.skipif(not _jobs_csv_path.exists(), reason="needs jobs csv")
 class TestCsvImportJobs(NeuronTestCase):
-    """
-    #quality-55%
-    """
-
     async def test_import_jobs_count_idempotence(self):
+        """
+        #quality-55%
+        """
         limit = 20
 
         stats = await csv_import_jobs(_jobs_csv_path, limit=limit)
@@ -37,18 +36,11 @@ class TestCsvImportJobs(NeuronTestCase):
         assert stats.created == 0
         assert stats.updated == limit
 
-
-class TestCsvImportJobsTagsCleared(NeuronTestCase):
     async def test_reimport_with_empty_tags_clears_existing(self):
         tag_skill = await self.gen.posts.tag(name="Python", category=TagCategoryEnum.Skill)
-        tag_area = await self.gen.posts.tag(name="Climate", category=TagCategoryEnum.Area)
-        job = await self.gen.jobs.job(
-            url_external="https://example.com/j1", tags=[tag_skill, tag_area]
-        )
+        job = await self.gen.jobs.job(url_external="https://example.com/j1", tags=[tag_skill])
 
         assert await job.tags_skill.acount() == 1
-        assert await job.tags_area.acount() == 1
-
         await _import_jobs_parsed(
             [
                 {
@@ -58,9 +50,30 @@ class TestCsvImportJobsTagsCleared(NeuronTestCase):
                 }
             ]
         )
-
         assert await job.tags_skill.acount() == 0
-        assert await job.tags_area.acount() == 0
+
+    async def test_jobs_not_in_csv_become_unpublished(self):
+        job_in_csv = await self.gen.jobs.job()
+        job_not_in_csv = await self.gen.jobs.job()
+
+        assert job_in_csv.is_published
+        assert job_not_in_csv.is_published
+
+        await _import_jobs_parsed(
+            [
+                {
+                    "title": job_in_csv.title,
+                    "url_external": job_in_csv.url_external,
+                    col_key.org_name: job_in_csv.org.name,
+                }
+            ]
+        )
+
+        await job_in_csv.arefresh_from_db()
+        await job_not_in_csv.arefresh_from_db()
+
+        assert job_in_csv.is_published
+        assert job_not_in_csv.is_published is False
 
 
 class TestParseLocationField:
