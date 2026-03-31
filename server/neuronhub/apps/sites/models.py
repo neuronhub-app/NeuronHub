@@ -3,8 +3,10 @@ See [[Sub-sites-with-VITE_SITE.md]]
 """
 
 import textwrap
+from typing import Self
 
 from asgiref.sync import sync_to_async
+from django.conf import settings
 from django.db import models
 from django.db.models import TextChoices
 from django_choices_field.fields import TextChoicesField
@@ -38,6 +40,15 @@ class SiteConfig(SingletonModel):
         help_text="Identifier. Also matches /client/src/sites/{directory}/",
     )
 
+    sender_email = models.EmailField(
+        default=settings.DEFAULT_FROM_EMAIL,
+        help_text="Eg used as the sender of the Job Alerts emails. But backend will use DEFAULT_FROM_EMAIL env instead for sending eg user auth management emails (password resets, etc).",
+    )
+    contact_email = models.EmailField(
+        default=settings.DEFAULT_FROM_EMAIL,
+        help_text="Used eg in the 'Contact' modal form",
+    )
+
     logo_url = models.URLField(
         max_length=512,
         blank=True,
@@ -69,7 +80,7 @@ class SiteConfig(SingletonModel):
         max_length=255,
         blank=True,
         default="",
-        help_text="UTM source param appended to external job/org URLs on the frontend, eg `{url}?utm_source=probablygood_board`",
+        help_text="UTM source param appended to external job/org URLs on the frontend, eg `{url}?utm_source=probablygood`",
     )
 
     email_html_about_us = HtmlField(
@@ -101,7 +112,7 @@ class SiteConfig(SingletonModel):
 
     @classmethod
     @sync_to_async
-    def get_solo(cls) -> SiteConfig:  # type: ignore[override]
+    def get_solo(cls) -> Self:  # type: ignore[override]
         # noinspection PyTypeChecker
         return super().get_solo()
 

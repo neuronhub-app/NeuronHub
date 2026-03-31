@@ -3,6 +3,7 @@ from zoneinfo import ZoneInfo
 
 from django.core.cache import cache
 from django.db import models
+from django.db.models import ManyToManyField
 from django.utils.crypto import salted_hmac
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
@@ -49,7 +50,7 @@ class Job(AlgoliaModel):
 
     description = models.TextField(blank=True)
 
-    slug = AutoSlugField(populate_from=["title", "org__name"], max_length=512)
+    slug = AutoSlugField(populate_from=["title", "org__name"], max_length=1024)
 
     org = models.ForeignKey(
         Org,
@@ -221,7 +222,7 @@ class JobAlert(TimeStampedModel):
         blank=True,
     )
     is_orgs_highlighted = models.BooleanField(blank=True, null=True)
-    locations = models.ManyToManyField(
+    locations: ManyToManyField[JobLocation, JobLocation] = models.ManyToManyField(
         JobLocation,
         blank=True,
     )

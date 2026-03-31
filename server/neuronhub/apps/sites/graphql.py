@@ -94,7 +94,7 @@ class SitesMutation:
         name: str | None = None,
         email: str | None = None,
     ) -> bool:
-        subject = "Contact form"
+        subject = f"{settings.CLIENT_DOMAIN} - Contact form"
         if name:
             subject += f" from {name}"
 
@@ -102,11 +102,13 @@ class SitesMutation:
         if email:
             body += f"\n\nReply to: {email}"
 
+        site = await SiteConfig.get_solo()
+
         await sync_to_async(send_mail)(
             subject=subject,
             message=body,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[settings.ADMIN_EMAIL],
+            from_email=site.sender_email,
+            recipient_list=[site.contact_email],
         )
         return True
 

@@ -2,7 +2,6 @@ from adminsortable2.admin import SortableAdminBase
 from adminsortable2.admin import SortableAdminMixin
 from adminsortable2.admin import SortableStackedInline
 from adminsortable2.admin import SortableTabularInline
-from django.conf import settings
 from django.contrib import admin
 from django.contrib import messages
 from django.core.mail import send_mail
@@ -119,11 +118,13 @@ class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmi
                     "name",
                     "domain",
                     "slug",
+                    "sender_email",
+                    "contact_email",
                 ],
             },
         ),
         (
-            "Jobs UTM".upper(),
+            "Jobs".upper(),
             {
                 "fields": [
                     "jobs_url_utm_source",
@@ -131,7 +132,7 @@ class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmi
             },
         ),
         (
-            "Job alert emails".upper(),
+            "Jobs emails".upper(),
             {
                 "fields": [
                     "logo_url",
@@ -157,6 +158,7 @@ class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmi
     def send_test_job_alert_email(self, request: HttpRequest, obj: SiteConfig):
         assert isinstance(request.user, User)
         _send_test_email(
+            site=obj,
             receiver=request.user,
             subject="[TEST] Job alert",
             html=_render_email_html(
@@ -171,6 +173,7 @@ class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmi
     def send_test_job_alert_confirmation_email(self, request: HttpRequest, obj: SiteConfig):
         assert isinstance(request.user, User)
         _send_test_email(
+            site=obj,
             receiver=request.user,
             subject="[TEST] Job alert confirmation",
             html=_render_email_html(
@@ -182,11 +185,11 @@ class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmi
         messages.success(request, f"Test confirmation email sent to {request.user.email}")
 
 
-def _send_test_email(receiver: User, subject: str, html: str) -> None:
+def _send_test_email(site: SiteConfig, receiver: User, subject: str, html: str) -> None:
     send_mail(
         subject=subject,
         message="",
         html_message=html,
-        from_email=settings.DEFAULT_FROM_EMAIL,
+        from_email=site.sender_email,
         recipient_list=[receiver.email],
     )

@@ -106,7 +106,7 @@ async def _send_job_alert(
         subject=f"New job matches ({len(jobs)})",
         message="",
         html_message=html,
-        from_email=settings.DEFAULT_FROM_EMAIL,
+        from_email=site.sender_email,
         recipient_list=[alert.email],
     )
     await JobAlertLog.objects.abulk_create(
@@ -140,7 +140,7 @@ async def send_job_alert_confirmation_email(alert: JobAlert) -> None:
         subject="Your job alert is active",
         message="",
         html_message=html,
-        from_email=settings.DEFAULT_FROM_EMAIL,
+        from_email=site.sender_email,
         recipient_list=[alert.email],
     )
 
@@ -269,8 +269,6 @@ async def _get_alert_filters_dict(alert: JobAlert) -> dict[str, str]:
     location_names = [loc.name async for loc in alert.locations.all()]
     if location_names:
         filters["Locations"] = ", ".join(location_names)
-    if alert.is_remote:
-        filters["Remote Roles"] = "Yes"
     if alert.salary_min:
         filters["Salary"] = f"${alert.salary_min:,}"
     if alert.is_orgs_highlighted:
