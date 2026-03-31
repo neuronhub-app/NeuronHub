@@ -1,5 +1,5 @@
 """
-#quality-62% #AI (refactored 4 times)
+#quality-63% #AI (refactored 6 times)
 
 Issues:
 - job_parsed `_*` fields -> return as a Dataclass, not pop()
@@ -112,11 +112,9 @@ async def _sync_locations(locs_parsed: list[LocationParsed]) -> list[JobLocation
     for loc_parsed in locs_parsed:
         loc, _ = await JobLocation.objects.aget_or_create(
             name=loc_parsed.name,
-            defaults={
-                "city": loc_parsed.city,
-                "country": loc_parsed.country,
-                "is_remote": loc_parsed.is_remote,
-            },
+            city=loc_parsed.city,
+            country=loc_parsed.country,
+            is_remote=loc_parsed.is_remote,
         )
         locs.append(loc)
     return locs
