@@ -28,7 +28,7 @@ export function FaqModal(props: { children: ReactNode }) {
     >
       <DialogTrigger asChild>{props.children}</DialogTrigger>
 
-      <DialogContent bg="bg.card" gap="gap.md" p={{ base: "gap.md", md: "gap.xl" }}>
+      <DialogContent bg="bg" gap="gap.md" p={{ base: "gap.md", md: "gap.xl" }}>
         <DialogHeader p="0">
           <DialogTitle {...style.heading}>FAQ</DialogTitle>
         </DialogHeader>
@@ -54,9 +54,13 @@ export function FaqModal(props: { children: ReactNode }) {
           >
             {query.data?.job_faq_questions.map(item => (
               <Accordion.Item key={item.id} value={item.id} {...style.item}>
-                <Accordion.ItemTrigger {...style.itemTrigger}>
+                <Accordion.ItemTrigger {...style.itemTrigger} className="group">
                   {item.question}
-                  <Accordion.ItemIndicator color="brand.black" boxSize="4" />
+                  <Accordion.ItemIndicator
+                    color="fg.muted"
+                    boxSize="4"
+                    _groupHover={{ color: "brand.green.light" }}
+                  />
                 </Accordion.ItemTrigger>
 
                 <Accordion.ItemContent px="gap.sm" pt="0" pb="gap.sm">
@@ -93,7 +97,8 @@ const style = {
     borderColor: "brand.gray",
     overflow: "hidden",
     flexShrink: 0,
-    _open: { borderColor: "brand.green.light" },
+    _open: { borderColor: "brand.black" },
+    css: { "&:has(button:hover)": { borderColor: "brand.green.light/50" } },
   },
   itemTrigger: {
     p: "gap.sm",
@@ -102,11 +107,12 @@ const style = {
     fontWeight: "medium",
     fontSize: "sm",
     lineHeight: "19px",
-    color: "brand.black.pure",
+    color: "brand.black",
+    cursor: "pointer",
   },
   answer: {
-    fontSize: "13px",
-    lineHeight: "19px",
+    fontSize: "14px",
+    lineHeight: "21px",
     color: "brand.black",
   },
   link: {

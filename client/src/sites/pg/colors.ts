@@ -17,7 +17,6 @@ export namespace theme {
       "green.subtle": { value: "#DBEADD" },
       seashell: { value: "#FFF7F0" },
       black: { value: "#343232" },
-      "black.pure": { value: "#000000" },
       "black.secondary": { value: "#484E51" },
       gray: { value: "#DDDDDD" },
       "gray.muted": { value: "#767676" },

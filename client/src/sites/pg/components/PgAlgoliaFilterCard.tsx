@@ -106,39 +106,34 @@ export function PgMobileCollapsible(props: {
       )}
       <Collapsible.Content>
         <Stack gap="gap.sm">
-          {props.cta}
+          {props.facetsTopbar}
 
-          <Flex gap="gap.sm" align="flex-start">
-            <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm" />
-
+          <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm">
             <PgRefinesClearButton
               onClear={props.facetsActive.onClearAdditional}
               extraTags={props.facetsActive.extraTags}
             />
-          </Flex>
+          </PgAlgoliaFacetsActive>
 
-          <Box pt="1">{props.facetsTopbar}</Box>
+          <Collapsible.Trigger asChild>
+            <Flex
+              justify="center"
+              align="center"
+              gap="gap.xs"
+              color="primary"
+              fontSize="sm"
+              fontWeight="medium"
+              cursor="pointer"
+              w="full"
+            >
+              Close Filters & Alerts
+              <Box transform="rotate(180deg)">
+                <LuChevronDown />
+              </Box>
+            </Flex>
+          </Collapsible.Trigger>
 
-          <HStack w="full">
-            <Collapsible.Trigger asChild>
-              <Flex
-                align="center"
-                gap="gap.xs"
-                color="primary"
-                fontSize="sm"
-                fontWeight="medium"
-                cursor="pointer"
-                ml="auto"
-              >
-                Close Filters & Alerts
-                <Box transform="rotate(180deg)">
-                  <LuChevronDown />
-                </Box>
-              </Flex>
-            </Collapsible.Trigger>
-
-            <PgRefinesClearButton onClear={props.facetsActive.onClearAdditional} />
-          </HStack>
+          {props.cta}
         </Stack>
       </Collapsible.Content>
     </Collapsible.Root>

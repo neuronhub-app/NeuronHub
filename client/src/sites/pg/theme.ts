@@ -107,6 +107,9 @@ export const system = createSystem(
       },
 
       theme: {
+        breakpoints: {
+          md: "767px",
+        },
         recipes: pgRecipes,
         slotRecipes,
         tokens,

@@ -33,7 +33,7 @@ const style = {
     fontWeight: "500",
     fontSize: "17px",
     lineHeight: "60px",
-    px: "5",
+    px: { base: "5", md: "0", lg: "5" },
     color: "brand.seashell",
     _hover: { textDecoration: "underline", textDecorationColor: "brand.seashell" },
   },
@@ -172,7 +172,13 @@ function PgNav(props: { navLinks: NavLink[]; isLoading: boolean }) {
             <Icon boxSize="22px">{state.snap.isMenuOpen ? <LuX /> : <LuMenu />}</Icon>
           </IconButton>
 
-          <HStack as="nav" gap="0" display={{ base: "none", md: "flex" }}>
+          <HStack
+            as="nav"
+            gap="0"
+            justify={{ md: "space-between", lg: "flex-end" }}
+            flex={{ md: "1", lg: "initial" }}
+            display={{ base: "none", md: "flex" }}
+          >
             {props.isLoading
               ? Array.from({ length: 6 }, (_, i) => (
                   <Skeleton key={i} height="20px" width="80px" mx="5" />

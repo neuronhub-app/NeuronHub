@@ -45,16 +45,8 @@ export default function PgLayout() {
         isLoading={configSnap.isLoading}
       />
 
-      <Stack
-        as="main"
-        flex="1"
-        alignItems="stretch"
-        overflow="hidden"
-        pb={style.paddingBottom}
-        // #AI
-        minH="100vh"
-      >
-        <Container px={style.paddingX}>
+      <Stack as="main" flex="1" alignItems="stretch" overflow="hidden" pb={style.paddingBottom}>
+        <Container px={style.paddingX} maxWidth="1024px">
           <Outlet />
         </Container>
       </Stack>

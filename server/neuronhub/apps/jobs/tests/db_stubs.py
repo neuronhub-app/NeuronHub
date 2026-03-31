@@ -771,9 +771,9 @@ class val:
 
     class experience:
         Entry = "Entry-Level"
-        Junior = "Junior (1-4 years experience)"
-        Middle = "Mid (5-9 years experience)"
-        Senior = "Senior (10+ years experience)"
+        Junior = "Junior (1–4y)"
+        Middle = "Mid (5–9y)"
+        Senior = "Senior (10y+)"
 
     class location:
         RemoteGlobal = LocationVal("Remote, Global", region=_region.Global, is_remote=True)

@@ -1,11 +1,9 @@
 import { Badge, HStack, Icon, Text, Wrap } from "@chakra-ui/react";
+import type { ReactNode } from "react";
 import { fromUnixTime } from "date-fns";
 
 import { LuX } from "react-icons/lu";
-import {
-  useClearRefinements,
-  useCurrentRefinements,
-} from "react-instantsearch";
+import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { salaryFormatter } from "@/sites/pg/components/PgFacetSalary";
 
@@ -38,7 +36,11 @@ export type FacetsActiveConfig = {
   onClearAdditional?: () => void;
 };
 
-export function PgAlgoliaFacetsActive(props: { config: FacetsActiveConfig; tagsGap?: string }) {
+export function PgAlgoliaFacetsActive(props: {
+  config: FacetsActiveConfig;
+  tagsGap?: string;
+  children?: ReactNode;
+}) {
   const refinementsCurrent = useCurrentRefinements();
   const refinementsClear = useClearRefinements();
 
@@ -89,6 +91,7 @@ export function PgAlgoliaFacetsActive(props: { config: FacetsActiveConfig; tagsG
       {props.config.extraTags?.map(tag => (
         <FilterTag key={tag.label} label={tag.label} onRemove={tag.onRemove} />
       ))}
+      {props.children}
     </Wrap>
   );
 }

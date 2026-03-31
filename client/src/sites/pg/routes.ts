@@ -1,8 +1,6 @@
 import { layout, prefix, type RouteConfig, route } from "@react-router/dev/routes";
 
 export const routes = [
-  layout("./sites/pg/PgLayoutNoHeader.tsx", [route("/faq", "./apps/jobs/faq/index.tsx")]),
-
   layout("./sites/pg/PgLayout.tsx", [
     route("/", "./sites/pg/pages/jobs/list/index.tsx"),
     route("/subscriptions", "./sites/pg/pages/jobs/subscriptions/index.tsx"),

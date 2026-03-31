@@ -12,7 +12,7 @@ export function PgFacetPopover(props: {
   label: string;
   onClose?: () => void;
   contentMaxW?: string;
-  order?: { base?: number; lg?: number };
+  order?: { base?: number; md?: number; lg?: number };
   icon?: ReactNode;
   testId?: TestId;
 }) {
@@ -92,7 +92,10 @@ export function PgFacetPopover(props: {
 
             <Icon
               boxSize="4"
-              css={{ transition: "rotate 0.2s", "[data-state=open] &": { rotate: "180deg" } }}
+              css={{
+                transition: "rotate 0.2s",
+                "[data-scope=popover][data-state=open] &": { rotate: "180deg" },
+              }}
             >
               <LuChevronDown />
             </Icon>

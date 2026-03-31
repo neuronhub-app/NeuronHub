@@ -1,4 +1,4 @@
-import { Button, Grid, Stack } from "@chakra-ui/react";
+import { Button, Grid, Link, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import type { ReactNode } from "react";
@@ -61,10 +61,22 @@ export function ContactModal(props: { children: ReactNode }) {
     >
       <DialogTrigger asChild>{props.children}</DialogTrigger>
 
-      <DialogContent bg="bg.card" gap="gap.md" p={{ base: "gap.md", md: "gap.xl" }}>
+      <DialogContent bg="bg" gap="gap.md" p={{ base: "gap.md", md: "gap.xl" }}>
         <DialogHeader p="0">
           <DialogTitle {...style.title}>Contact us</DialogTitle>
         </DialogHeader>
+        <Text fontSize="sm" color="brand.black">
+          Whether you have feedback, questions, or suggestions, we'd love to hear from you. You
+          can also email us at{" "}
+          <Link
+            href="mailto:team@probablygood.org?subject=Feedback"
+            fontWeight="medium"
+            color="brand.green.light"
+            _hover={{ textDecoration: "underline" }}
+          >
+            team@probablygood.org
+          </Link>
+        </Text>
         <DialogCloseTrigger
           top={{ base: "gap.md", md: "gap.xl" }}
           right={{ base: "gap.md", md: "gap.xl" }}
@@ -127,6 +139,7 @@ const inputStyle = {
   borderColor: "brand.gray",
   px: "gap.md",
   _placeholder: { color: "fg.muted", fontSize: "sm" },
+  _hover: { borderColor: "fg.muted" },
   _focus: { borderColor: "brand.green.light", boxShadow: "none" },
 } as const;
 

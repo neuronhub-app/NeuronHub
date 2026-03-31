@@ -105,7 +105,6 @@ export function JobCard(props: {
       pos="relative"
       gap="0"
       p={{ base: "gap.md", md: "gap.xl" }}
-      pr={{ md: "16" }}
       borderRadius="lg"
       borderWidth="1px"
       borderColor={borderColor}
@@ -180,6 +179,24 @@ export function JobCard(props: {
                 </Flex>
               </Flex>
             </VStack>
+
+            <Tooltip
+              content={datetime.full(props.job.posted_at)}
+              positioning={{ placement: "left" }}
+            >
+              <Flex
+                display={{ base: "none", md: "flex" }}
+                h="28px"
+                align="center"
+                fontSize="sm"
+                fontWeight="medium"
+                color="fg.muted"
+                whiteSpace="nowrap"
+                flexShrink="0"
+              >
+                {datetime.relativeRounded(props.job.posted_at)}
+              </Flex>
+            </Tooltip>
           </Flex>
         </Flex>
 
@@ -206,7 +223,6 @@ export function JobCard(props: {
           base: cardState !== CardState.Closed ? "gap.md" : "0",
           md: cardState !== CardState.Closed ? "gap.lg" : "0",
         }}
-        pr={{ base: "12", md: "16" }}
         pos="relative"
         transition="margin"
         transitionDuration={style.duration}
@@ -263,26 +279,6 @@ export function JobCard(props: {
           cursor="pointer"
           userSelect="none"
         >
-          <Tooltip
-            content={datetime.full(props.job.posted_at)}
-            positioning={{ placement: "left" }}
-          >
-            <Flex
-              pos="absolute"
-              top={{ base: "gap.md", md: "gap.xl" }}
-              right={{ base: "gap.sm", md: "gap.lg" }}
-              display={{ base: "none", md: "flex" }}
-              h="8"
-              align="center"
-              fontSize="sm"
-              fontWeight="medium"
-              color="fg.muted"
-              whiteSpace="nowrap"
-            >
-              {datetime.relativeRounded(props.job.posted_at)}
-            </Flex>
-          </Tooltip>
-
           <Flex
             pos="absolute"
             bottom={{ base: "8px", md: "gap.md" }}

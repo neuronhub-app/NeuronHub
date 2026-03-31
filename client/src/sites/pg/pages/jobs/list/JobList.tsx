@@ -150,12 +150,12 @@ function JobNoResultsCard() {
       gap="gap.sm"
     >
       <Text fontWeight="semibold" color="fg" textAlign="center">
-        No jobs found
+        No matching roles
       </Text>
 
       <Flex align="center" gap="gap.md" direction={{ base: "column", md: "row" }} fontSize="md">
         <Text fontSize="sm" color="fg.muted" flex="1">
-          No jobs match this combination of filters right now.{" "}
+          Currently no roles match these filters/search terms. You can{" "}
           <JobsSubscribeModal
             trigger={
               <Text
@@ -164,11 +164,11 @@ function JobNoResultsCard() {
                 color="brand.green"
                 _hover={{ color: "brand.green.light" }}
               >
-                Set a job alert
+                set up an alert
               </Text>
             }
           />{" "}
-          to be notified when matching roles are posted.
+          to be notified when matching jobs are posted.
         </Text>
 
         <ResetFiltersButton />

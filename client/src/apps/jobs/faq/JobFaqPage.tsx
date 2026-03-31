@@ -17,7 +17,7 @@ const style = {
     fontWeight: "medium",
     fontSize: "14px",
     lineHeight: "19px",
-    color: "brand.black.pure",
+    color: "fg",
   },
   answer: {
     fontSize: "13px",
