@@ -4,7 +4,7 @@ import { proxy, useSnapshot } from "valtio";
 import { PgFacetSalary, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import type { UseRefinementListProps } from "react-instantsearch";
-import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
+import { PgFacet } from "@/sites/pg/components/PgFacet";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 import { ids } from "@/e2e/ids";
 import { LuMapPin } from "react-icons/lu";
@@ -39,45 +39,46 @@ export function PgFiltersTopbar() {
       columnGap="gap.md"
       rowGap={{ base: "3.5", md: "2" }}
     >
-      <PgFacetPopover label="Cause Area" attribute={attr.causeArea} order={{ base: 1, lg: 1 }}>
-        <PgFacetAttribute attribute={attr.causeArea} label="Cause Area" sortBy={sortAlpha} />
-      </PgFacetPopover>
+      <PgFacet
+        label="Cause Area"
+        attribute={attr.causeArea}
+        order={{ base: 1, lg: 1 }}
+        sortBy={sortAlpha}
+      />
 
-      <PgFacetPopover label="Role Type" attribute={attr.roleType} order={{ base: 3, lg: 2 }}>
-        <PgFacetAttribute
-          attribute={attr.roleType}
-          label="Role Type"
-          transformItems={items =>
-            sortByCustomOrder(items, [
-              "Full-Time",
-              "Part-Time (50–80% FTE)",
-              "Part-Time (<50% FTE)",
-              "Internship",
-              "Fellowship",
-              "Volunteer",
-              "Funding",
-              "Training",
-              "Graduate Program",
-              "Expression of Interest",
-            ])
-          }
-        />
-      </PgFacetPopover>
+      <PgFacet
+        label="Role Type"
+        attribute={attr.roleType}
+        order={{ base: 3, lg: 2 }}
+        transformItems={items =>
+          sortByCustomOrder(items, [
+            "Full-Time",
+            "Part-Time (50–80% FTE)",
+            "Part-Time (<50% FTE)",
+            "Internship",
+            "Fellowship",
+            "Volunteer",
+            "Funding",
+            "Training",
+            "Graduate Program",
+            "Expression of Interest",
+          ])
+        }
+      />
 
-      <PgFacetPopover label="Experience" attribute={attr.experience} order={{ base: 7, lg: 3 }}>
-        <PgFacetAttribute
-          attribute={attr.experience}
-          label="Experience"
-          transformItems={items =>
-            sortByCustomOrder(items, [
-              "Entry–Level",
-              "Junior (1–4y)",
-              "Mid (5–9y)",
-              "Senior (10y+)",
-            ])
-          }
-        />
-      </PgFacetPopover>
+      <PgFacet
+        label="Experience"
+        attribute={attr.experience}
+        order={{ base: 7, lg: 3 }}
+        transformItems={items =>
+          sortByCustomOrder(items, [
+            "Entry–Level",
+            "Junior (1–4y)",
+            "Mid (5–9y)",
+            "Senior (10y+)",
+          ])
+        }
+      />
 
       <PgFacetPopover
         label="Minimum Salary"
@@ -90,75 +91,57 @@ export function PgFiltersTopbar() {
         <PgFacetSalary />
       </PgFacetPopover>
 
-      <PgFacetPopover label="Skill Set" attribute={attr.skillSet} order={{ base: 2, lg: 5 }}>
-        <PgFacetAttribute
-          attribute={attr.skillSet}
-          label="Skill Set"
-          isSearchEnabled
-          sortBy={sortAlpha}
-        />
-      </PgFacetPopover>
+      <PgFacet
+        label="Skill Set"
+        attribute={attr.skillSet}
+        order={{ base: 2, lg: 5 }}
+        isSearchEnabled
+        sortBy={sortAlpha}
+      />
 
-      <PgFacetPopover
-        attribute={attr.remote}
+      <PgFacet
         label="Remote"
+        attribute={attr.remote}
         order={{ base: 4, lg: 6 }}
         icon={<LuMapPin />}
-        testId={ids.facet.popover.remote}
-      >
-        <PgFacetAttribute
-          attribute={attr.remote}
-          label="Remote"
-          operator="or"
-          isFreezeTotalFacetCount
-        />
-      </PgFacetPopover>
+        operator="or"
+        isFreezeTotalFacetCount
+      />
 
-      <PgFacetPopover
-        attribute={attr.country}
+      <PgFacet
         label="Country"
+        attribute={attr.country}
         order={{ base: 5, lg: 7 }}
         icon={<LuMapPin />}
+        isSearchEnabled
+        operator="or"
+        isFreezeTotalFacetCount
         testId={ids.facet.popover.country}
-      >
-        <PgFacetAttribute
-          attribute={attr.country}
-          label="Country"
-          isSearchEnabled
-          operator="or"
-          isFreezeTotalFacetCount
-        />
-      </PgFacetPopover>
+      />
 
-      <PgFacetPopover
-        attribute={attr.city}
+      <PgFacet
         label="City"
+        attribute={attr.city}
         order={{ base: 6, lg: 8 }}
         icon={<LuMapPin />}
+        isSearchEnabled
+        operator="or"
+        isFreezeTotalFacetCount
         testId={ids.facet.popover.city}
-      >
-        <PgFacetAttribute
-          attribute={attr.city}
-          label="City"
-          isSearchEnabled
-          operator="or"
-          isFreezeTotalFacetCount
-        />
-      </PgFacetPopover>
+      />
 
-      <PgFacetPopover label="Education" attribute={attr.education} order={{ base: 8, lg: 9 }}>
-        <PgFacetAttribute
-          attribute={attr.education}
-          label="Education"
-          transformItems={items =>
-            sortByCustomOrder(items, [
-              "Undergraduate Degree or Less",
-              "Master's Degree",
-              "Doctoral Degree",
-            ])
-          }
-        />
-      </PgFacetPopover>
+      <PgFacet
+        label="Education"
+        attribute={attr.education}
+        order={{ base: 8, lg: 9 }}
+        transformItems={items =>
+          sortByCustomOrder(items, [
+            "Undergraduate Degree or Less",
+            "Master's Degree",
+            "Doctoral Degree",
+          ])
+        }
+      />
 
       <OtherFiltersFacet order={{ base: 10 }} />
     </Grid>

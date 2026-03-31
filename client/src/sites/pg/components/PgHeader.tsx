@@ -17,7 +17,7 @@ import {
 import { useEffect, useRef } from "react";
 import { LuChevronDown, LuMenu, LuX } from "react-icons/lu";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import { layout } from "@/sites/pg/PgLayout";
+import { layout } from "@/sites/pg/PgLayoutConfig";
 
 const style = {
   nav: {

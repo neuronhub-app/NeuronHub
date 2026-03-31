@@ -4,7 +4,7 @@
  * todo ! refac: replace by [[JobAlertList.tsx]] with [[JsxStyleProps]] - they're identical.
  * But this had layout bugs I fixed. Not sure what issues they were addressing - in my testing appeared to be redundant.
  */
-import { layout } from "@/sites/pg/PgLayout";
+import { layout } from "@/sites/pg/PgLayoutConfig";
 import {
   Badge,
   Container,
@@ -33,7 +33,6 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { format } from "@neuronhub/shared/utils/format";
-import { pgTagStyle } from "@/sites/pg/pgTagStyle";
 import { useInit } from "@/utils/useInit";
 import { useIsLoading } from "@/utils/useIsLoading";
 
@@ -55,10 +54,6 @@ export function PgJobAlertList(props: {
 
   const unsubscribe = useJobUnsubscribeHandler(props.unsubscribeByIdExt);
 
-  if (isLoadingFirstTime) {
-    return <Text color="fg.muted">Loading subscriptions...</Text>;
-  }
-
   const alerts = data?.job_alerts ?? [];
 
   return (
@@ -74,7 +69,9 @@ export function PgJobAlertList(props: {
 
       {unsubscribe.isUnsubscribeRequest && <unsubscribe.Alert />}
 
-      {alerts.length === 0 && (
+      {isLoadingFirstTime && <Text color="fg.muted">Loading subscriptions...</Text>}
+
+      {!isLoadingFirstTime && alerts.length === 0 && (
         <Stack
           p={{ base: "gap.md", md: "gap.xl" }}
           borderRadius="lg"
@@ -148,14 +145,12 @@ function PgAlertCard(props: { alert: AlertType }) {
             </Text>
 
             <Badge
-              bg={props.alert.is_active ? pgTagStyle.area.bg : pgTagStyle.workload.bg}
-              color={props.alert.is_active ? pgTagStyle.area.fg : pgTagStyle.workload.fg}
+              variant={props.alert.is_active ? "pg-area" : "pg-workload"}
               {...ids.set(
                 props.alert.is_active
                   ? ids.job.subscriptions.status.active
                   : ids.job.subscriptions.status.inactive,
               )}
-              size={{ base: "xs", md: "md" }}
             >
               {props.alert.is_active ? "Active" : "Inactive"}
             </Badge>
@@ -171,61 +166,33 @@ function PgAlertCard(props: { alert: AlertType }) {
       <HStack justify="space-between">
         {isHasFilters ? (
           <HStack gap={{ base: "gap.xs", md: "gap.md" }} flexWrap="wrap">
-            {props.alert.is_remote && (
-              <Badge
-                {...style.badge}
-                bg={pgTagStyle.education.bg}
-                color={pgTagStyle.education.fg}
-              >
-                Remote
-              </Badge>
-            )}
+            {props.alert.is_remote && <Badge variant="pg-education">Remote</Badge>}
             {props.alert.is_orgs_highlighted && (
-              <Badge
-                {...style.badge}
-                bg={pgTagStyle.highlighted.bg}
-                color={pgTagStyle.highlighted.fg}
-              >
-                Highlighted Orgs
-              </Badge>
+              <Badge variant="pg-highlighted">Highlighted Orgs</Badge>
             )}
             {props.alert.salary_min != null && (
-              <Badge
-                {...style.badge}
-                bg={pgTagStyle.experience.bg}
-                color={pgTagStyle.experience.fg}
-              >
+              <Badge variant="pg-experience">
                 Min Salary: {format.money(props.alert.salary_min)}
               </Badge>
             )}
             {props.alert.locations.map(loc => (
-              <Badge
-                {...style.badge}
-                key={loc.name}
-                bg={pgTagStyle.education.bg}
-                color={pgTagStyle.education.fg}
-              >
+              <Badge key={loc.name} variant="pg-education">
                 {loc.name}
               </Badge>
             ))}
-            {props.alert.tags.map(tag => {
-              const colors = tagColorByCategory(tag.category_name);
-              return (
-                <Badge
-                  {...style.badge}
-                  key={tag.name}
-                  bg={colors.bg}
-                  color={colors.fg}
-                  maxW="100%"
-                >
-                  <Text truncate>
-                    {tag.category_name
-                      ? `${format.capitalize(tag.category_name)}: ${tag.name}`
-                      : tag.name}
-                  </Text>
-                </Badge>
-              );
-            })}
+            {props.alert.tags.map(tag => (
+              <Badge
+                key={tag.name}
+                variant={badgeVariantByCategory(tag.category_name) as never}
+                maxW="100%"
+              >
+                <Text truncate>
+                  {tag.category_name
+                    ? `${format.capitalize(tag.category_name)}: ${tag.name}`
+                    : tag.name}
+                </Text>
+              </Badge>
+            ))}
           </HStack>
         ) : (
           <Text fontSize={{ base: "13px", md: "sm" }} color="fg.muted">
@@ -298,13 +265,13 @@ function AlertCardActions(props: { alert: AlertType }) {
   );
 }
 
-const categoryColorMap: Record<string, { bg: string; fg: string }> = {
-  area: pgTagStyle.area,
-  experience: pgTagStyle.experience,
-  education: pgTagStyle.education,
-  workload: pgTagStyle.workload,
+const badgeCategoryVariantMap: Record<string, string> = {
+  area: "pg-area",
+  experience: "pg-experience",
+  education: "pg-education",
+  workload: "pg-workload",
 };
 
-function tagColorByCategory(categoryName?: string | null): { bg: string; fg: string } {
-  return (categoryName ? categoryColorMap[categoryName] : undefined) ?? pgTagStyle.area;
+function badgeVariantByCategory(categoryName?: string | null): string {
+  return (categoryName ? badgeCategoryVariantMap[categoryName] : undefined) ?? "pg-area";
 }

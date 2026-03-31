@@ -66,13 +66,15 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
       : items;
 
   const hasNoResults = filteredItems.length === 0 && !props.hitOpenedPinned?.node;
+  const isInitialLoad = !hits.results;
+  const isEmptyBeforeSearch = !isSearchActive && hasNoResults;
 
   return (
     <Stack gap="gap.xl" w="full">
       {props.hitOpenedPinned?.node && !isSearchActive && props.hitOpenedPinned.node}
 
       <Stack data-testid={props.listTestId} gap="gap.md">
-        {!hits.results ? (
+        {isInitialLoad || isEmptyBeforeSearch ? (
           <PgHitSkeletons />
         ) : hasNoResults ? (
           (props.noResultsNode ?? <Text>No {props.label ?? "results"} found.</Text>)
