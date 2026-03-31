@@ -59,7 +59,8 @@ export function FaqModal(props: { children: ReactNode }) {
                   <Accordion.ItemIndicator
                     color="fg.muted"
                     boxSize="4"
-                    _groupHover={{ color: "brand.green.light" }}
+                    _open={{ color: "brand.black" }}
+                    _groupHover={{ color: "brand.black" }}
                   />
                 </Accordion.ItemTrigger>
 
@@ -98,7 +99,10 @@ const style = {
     overflow: "hidden",
     flexShrink: 0,
     _open: { borderColor: "brand.black" },
-    css: { "&:has(button:hover)": { borderColor: "brand.green.light/50" } },
+    css: {
+      "&:has(button:hover)": { borderColor: "brand.black" },
+      "&[data-state=open]:has(button:hover)": { boxShadow: "0 0 0 1px {colors.brand.black}" },
+    },
   },
   itemTrigger: {
     p: "gap.sm",

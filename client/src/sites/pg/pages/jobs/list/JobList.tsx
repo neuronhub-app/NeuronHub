@@ -10,7 +10,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
 import { Link } from "react-router";
 import { Configure, useClearRefinements } from "react-instantsearch";
@@ -27,6 +27,7 @@ import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
 import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
 import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
+import { useInit } from "@/utils/useInit";
 
 export function JobList(props: { slug?: string }) {
   const jobOpenPinned = useJobOpenPinned(props.slug);
@@ -151,12 +152,21 @@ function ResetFiltersButton() {
 
 function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
   const isNotNeeded = !slug;
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const query = useApolloQuery(JobBySlugQuery, { slug: slug ?? "" }, { skip: isNotNeeded });
 
   const isLoading = query.isLoadingFirstTime || query.loading;
 
   const job = query.data?.job_by_slug;
+
+  useInit({
+    isReady: !!job && !!cardRef.current,
+    onInit: () => {
+      cardRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    },
+    dependencies: [job?.id],
+  });
 
   if (isNotNeeded) {
     return {};
@@ -193,7 +203,7 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
   return {
     id: job?.id,
     node: (
-      <Box position="relative">
+      <Box ref={cardRef} position="relative">
         {isLoading ? (
           <Skeleton h="32" w="full" />
         ) : (

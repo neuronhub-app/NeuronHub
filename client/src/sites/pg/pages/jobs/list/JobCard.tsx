@@ -15,9 +15,8 @@ import {
   Clipboard,
 } from "@chakra-ui/react";
 import type { BaseHit, Hit } from "instantsearch.js";
-import { GoShare } from "react-icons/go";
 import { IoLocationSharp } from "react-icons/io5";
-import { LuChevronDown, LuExternalLink } from "react-icons/lu";
+import { LuChevronDown, LuExternalLink, LuLink } from "react-icons/lu";
 import { Highlight, Snippet, useInstantSearch } from "react-instantsearch";
 import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -64,9 +63,8 @@ export function JobCard(props: {
 }) {
   const { results } = useInstantSearch();
 
-  const state = useStateValtio<{ card: CardState; isHovering: boolean }>({
+  const state = useStateValtio<{ card: CardState }>({
     card: props.isInitiallyOpen ? CardState.OpenByUser : CardState.Closed,
-    isHovering: false,
   });
 
   const isHighlightable = !!props.isSearchActive && "_highlightResult" in props.job;
@@ -85,29 +83,24 @@ export function JobCard(props: {
     state.mutable.card = isOpenByUser ? CardState.Closed : CardState.OpenByUser;
   }
 
-  const hoverHandlers = {
-    onMouseEnter: () => {
-      state.mutable.isHovering = true;
-    },
-    onMouseLeave: () => {
-      state.mutable.isHovering = false;
-    },
-  };
-
-  let borderColor = cardState === CardState.OpenByUser ? "brand.black" : "subtle";
-  if (state.snap.isHovering) {
-    borderColor = "brand.green.light/50";
-  }
+  const isOpen = cardState === CardState.OpenByUser;
+  const borderColor = isOpen ? "brand.black" : "subtle";
+  const borderColorHover = "brand.black";
+  const boxShadowHover = isOpen ? "0 0 0 1px {colors.brand.black}" : undefined;
 
   return (
     <Stack
       as="article"
+      className="group"
       pos="relative"
       gap="0"
       p={{ base: "gap.md", md: "gap.xl" }}
       borderRadius="lg"
       borderWidth="1px"
       borderColor={borderColor}
+      _hover={{ borderColor: borderColorHover, boxShadow: boxShadowHover }}
+      transition="border-color"
+      transitionDuration={style.duration}
       bg="bg.card"
       fontFamily="body"
       css={style.markHighlight}
@@ -153,13 +146,18 @@ export function JobCard(props: {
               justify={{ md: "space-between" }}
               gap={{ base: "3px", md: "0" }}
             >
-              <JobTitleLink job={props.job} isHighlightable={isHighlightable} jobHit={jobHit} />
+              <JobTitleLink
+                job={props.job}
+                isHighlightable={isHighlightable}
+                jobHit={jobHit}
+                isOpen={isOpen}
+              />
 
               <JobOrgLink
                 job={props.job}
                 isHighlightable={isHighlightable}
                 jobHit={jobHit}
-                isCollapsed={cardState === CardState.Closed}
+                isOpen={isOpen}
               />
 
               <Flex
@@ -171,7 +169,7 @@ export function JobCard(props: {
                 fontSize={{ base: "13px", md: "sm" }}
                 lineHeight={{ base: "18px", md: "20px" }}
               >
-                <Icon boxSize="4" color="fg.muted">
+                <Icon boxSize="4" color="fg.muted" ml="-3px">
                   <IoLocationSharp />
                 </Icon>
                 <Flex align="center" gap="gap.sm" color="fg.muted" fontWeight="medium" minW="0">
@@ -208,7 +206,7 @@ export function JobCard(props: {
           fontSize={{ base: "13px", md: "sm" }}
           lineHeight={{ base: "18px", md: "20px" }}
         >
-          <Icon boxSize="4" color="fg.muted">
+          <Icon boxSize="4" color="fg.muted" ml="-3px">
             <IoLocationSharp />
           </Icon>
           <Flex align="center" gap="gap.sm" color="fg.muted" fontWeight="medium" minW="0">
@@ -227,20 +225,6 @@ export function JobCard(props: {
         transition="margin"
         transitionDuration={style.duration}
       >
-        {/* extra horizontal collapse area */}
-        {props.job.description && (
-          <Box
-            onClick={toggleCardCollapse}
-            {...hoverHandlers}
-            pos="absolute"
-            top="0"
-            h={{ base: "10", md: "12" }}
-            left={{ base: "-4", md: "-6" }}
-            right="0"
-            zIndex="0"
-            cursor="pointer"
-          />
-        )}
         <JobTagGroups
           job={props.job}
           highlightable={isHighlightable ? ["tags_area"] : []}
@@ -260,55 +244,37 @@ export function JobCard(props: {
         </Stack>
       )}
 
-      <Collapsible.Root open={cardState === CardState.OpenByUser}>
+      <Collapsible.Root open={isOpen}>
         <Collapsible.Content animationDuration={style.duration}>
           {props.job.description && <JobExpanded job={props.job} />}
         </Collapsible.Content>
       </Collapsible.Root>
 
-      {props.job.description && (
-        <Box
-          onClick={toggleCardCollapse}
-          {...hoverHandlers}
-          pos="absolute"
-          top="0"
-          right="0"
-          bottom="0"
-          w={{ base: "12", md: "16" }}
-          borderRadius="lg"
-          cursor="pointer"
-          userSelect="none"
-        >
-          <Flex
-            pos="absolute"
-            bottom={{ base: "8px", md: "gap.md" }}
-            right={{ base: "gap.sm", md: "gap.lg" }}
-            color={state.snap.isHovering ? "brand.green.light" : "fg.muted"}
-            transform={`scale(${state.snap.isHovering ? 1.15 : 1})`}
-            transition="all"
-            transitionDuration="faster"
-            transitionTimingFunction="ease"
-          >
-            <LuChevronDown
-              size={24}
-              style={{
-                transform: cardState === CardState.OpenByUser ? "rotate(180deg)" : undefined,
-                transition: "transform 0.25s ease",
-              }}
-            />
-          </Flex>
-        </Box>
-      )}
+      <Box
+        onClick={toggleCardCollapse}
+        pos="absolute"
+        inset="0"
+        borderRadius="lg"
+        zIndex="1"
+        cursor="pointer"
+      />
 
-      {cardState === CardState.Closed && (
-        <Box
-          onClick={toggleCardCollapse}
-          display={{ base: "block", md: "none" }}
+      {props.job.description && (
+        <Flex
           pos="absolute"
-          inset="0"
-          borderRadius="lg"
-          zIndex="1"
-        />
+          bottom={{ base: "8px", md: "gap.md" }}
+          right={{ base: "gap.sm", md: "gap.lg" }}
+          color={borderColor}
+          _groupHover={{ color: borderColorHover }}
+        >
+          <LuChevronDown
+            size={24}
+            style={{
+              transform: isOpen ? "rotate(180deg)" : undefined,
+              transition: "transform 0.25s ease",
+            }}
+          />
+        </Flex>
       )}
     </Stack>
   );
@@ -324,6 +290,10 @@ function JobExpanded(props: { job: JobFragmentType }) {
         <Prose
           size="sm"
           maxW="none"
+          css={{
+            "& ul > li::marker": { color: "brand.black" },
+            "& ul": { paddingInlineStart: "1em" },
+          }}
           // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
           dangerouslySetInnerHTML={{
             __html: markedConfigured.parse(props.job.description ?? ""),
@@ -356,7 +326,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
           <Text fontSize="sm">{props.job.org.description}</Text>
         </Stack>
       )}
-      <Flex gap="gap.md" align="center" w="fit-content" pos="relative" zIndex="1">
+      <Flex gap="gap.md" align="center" w="fit-content" pos="relative" zIndex="2">
         {props.job.url_external && (
           <Button
             asChild
@@ -372,7 +342,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
               textDecoration="none"
               _hover={{ textDecoration: "none" }}
             >
-              Job Details
+              Open Listing
               <Icon boxSize="4" position="relative" top="-1px">
                 <LuExternalLink />
               </Icon>
@@ -395,7 +365,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
               >
                 <Clipboard.Indicator>
                   <Icon boxSize="5">
-                    <GoShare />
+                    <LuLink />
                   </Icon>
                 </Clipboard.Indicator>
               </Button>
@@ -468,7 +438,7 @@ function JobOrgLink(props: {
   job: JobFragmentType;
   isHighlightable: boolean;
   jobHit: Hit<BaseHit>;
-  isCollapsed: boolean;
+  isOpen: boolean;
 }) {
   const orgName = props.isHighlightable ? (
     <Highlight attribute={["org", "name"]} hit={props.jobHit} />
@@ -487,14 +457,17 @@ function JobOrgLink(props: {
     return <Flex {...textStyle}>{orgName}</Flex>;
   }
 
+  const aboveOverlay = props.isOpen ? { pos: "relative" as const, zIndex: "2" } : {};
+
   return (
-    <Flex align="center" gap="gap.xs">
+    <Flex align="center" gap="gap.xs" {...aboveOverlay}>
       <Link
         href={appendUtmSource(props.job.org.website_with_utm || props.job.org.website)}
         target="_blank"
         rel="noopener noreferrer"
         {...textStyle}
-        pointerEvents={{ base: props.isCollapsed ? "none" : "auto", md: "auto" }}
+        textDecoration="none"
+        _hover={{ textDecoration: "underline", color: "currentColor" }}
       >
         {orgName}
       </Link>
@@ -506,19 +479,40 @@ function JobTitleLink(props: {
   job: JobFragmentType;
   isHighlightable?: boolean;
   jobHit: Hit<BaseHit>;
+  isOpen: boolean;
 }) {
+  const title = props.isHighlightable ? (
+    <Highlight attribute="title" hit={props.jobHit} />
+  ) : (
+    props.job.title
+  );
+
+  const headingStyle = {
+    fontSize: { base: "17px", md: "xl" },
+    lineHeight: { base: "21px", md: "28px" },
+    fontWeight: "semibold",
+    fontFamily: "heading",
+    color: "fg",
+  } as const;
+
+  const aboveOverlay =
+    props.isOpen && props.job.url_external ? { pos: "relative" as const, zIndex: "2" } : {};
+
   return (
-    <Heading
-      fontSize={{ base: "17px", md: "xl" }}
-      lineHeight={{ base: "21px", md: "28px" }}
-      fontWeight="semibold"
-      fontFamily="heading"
-      color="fg"
-    >
-      {props.isHighlightable ? (
-        <Highlight attribute="title" hit={props.jobHit} />
+    <Heading {...headingStyle} {...aboveOverlay}>
+      {props.isOpen && props.job.url_external ? (
+        <Link
+          href={appendUtmSource(props.job.url_external_with_utm || props.job.url_external)}
+          target="_blank"
+          rel="noopener noreferrer"
+          color="fg"
+          textDecoration="none"
+          _hover={{ textDecoration: "underline", color: "currentColor" }}
+        >
+          {title}
+        </Link>
       ) : (
-        props.job.title
+        title
       )}
     </Heading>
   );

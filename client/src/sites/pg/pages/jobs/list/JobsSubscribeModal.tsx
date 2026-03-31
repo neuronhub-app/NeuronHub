@@ -136,23 +136,20 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
         }}
       >
         <DialogContent
-          bg="bg.card"
+          bg="bg"
           fontFamily="body"
           mx="gap.md"
           p={{ base: "gap.md", md: "gap.xl" }}
+          maxW={{ md: "536px" }}
         >
           <DialogHeader p="0" mb={hasFilters ? "3" : "gap.lg"}>
-            <Stack gap="1">
+            <Stack gap="2.5">
               <DialogTitle {...style.title} pr="10">
-                {hasFilters
-                  ? "Subscribe to new jobs that match your query"
-                  : "Subscribe to all new job posts"}
+                Get job alerts in your inbox
               </DialogTitle>
-              {!hasFilters && (
-                <Text {...style.subtitle}>
-                  To limit the alert to certain categories, apply a filter.
-                </Text>
-              )}
+              <Text {...style.subtitle}>
+                Set up filters to receive alerts that match your preferences
+              </Text>
             </Stack>
           </DialogHeader>
 
@@ -181,41 +178,44 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
                 </Box>
               )}
 
-              <FormChakraInput
-                control={form.control}
-                name="email"
-                placeholder="name@example.com"
-                inputProps={{
-                  type: "email",
-                  autoFocus: true,
-                  bg: "white",
-                  h: "10",
-                  borderRadius: "md",
-                  borderWidth: "1px",
-                  borderColor: "brand.gray",
-                  px: "gap.md",
-                  _placeholder: { color: "fg.muted", fontSize: "sm" },
-                  _focus: { borderColor: "brand.green.light", boxShadow: "none" },
-                  ...ids.set(ids.job.alert.emailInput),
-                }}
-              />
+              <Flex gap="gap.sm">
+                <FormChakraInput
+                  control={form.control}
+                  name="email"
+                  placeholder="Enter your email"
+                  inputProps={{
+                    type: "email",
+                    autoFocus: true,
+                    bg: "white",
+                    h: "10",
+                    borderRadius: "md",
+                    borderWidth: "1px",
+                    borderColor: "brand.gray",
+                    px: "gap.md",
+                    _placeholder: { color: "fg.muted", fontSize: "sm" },
+                    _hover: { borderColor: "fg.muted" },
+                    _focus: { borderColor: "brand.green.light", boxShadow: "none" },
+                    ...ids.set(ids.job.alert.emailInput),
+                  }}
+                />
+                <Button
+                  type="submit"
+                  variant="pg-primary"
+                  loading={loading.isActive}
+                  flexShrink="0"
+                  {...ids.set(ids.job.alert.submitBtn)}
+                >
+                  Subscribe
+                </Button>
+              </Flex>
             </Stack>
 
-            <Flex align="flex-start" justify="space-between" gap="gap.sm">
+            <Stack gap="1">
               <Text {...style.footerText}>
-                You will receive updates daily (if there are new roles) and you can unsubscribe
-                at any time
+                You will receive updates daily if there are new roles that match your filters.
               </Text>
-              <Button
-                type="submit"
-                variant="pg-primary"
-                loading={loading.isActive}
-                w="127px"
-                {...ids.set(ids.job.alert.submitBtn)}
-              >
-                Subscribe
-              </Button>
-            </Flex>
+              <Text {...style.footerText}>You can unsubscribe at any time.</Text>
+            </Stack>
           </form>
         </DialogContent>
       </DialogRoot>
@@ -234,8 +234,8 @@ function getRefinementLabel(
 }
 
 const style = {
-  title: { fontFamily: "heading", fontSize: "lg", fontWeight: "medium", color: "fg" },
-  subtitle: { fontSize: "sm", color: "fg.secondary" },
+  title: { fontFamily: "heading", fontSize: "22px", fontWeight: "medium", color: "fg" },
+  subtitle: { fontSize: "md", color: "fg.secondary" },
   filterText: { fontSize: "sm", color: "fg", lineHeight: "22px" },
   footerText: { fontSize: "13px", color: "fg.secondary" },
 } as const;

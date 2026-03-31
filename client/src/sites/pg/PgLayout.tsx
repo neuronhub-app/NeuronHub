@@ -46,7 +46,7 @@ export default function PgLayout() {
       />
 
       <Stack as="main" flex="1" alignItems="stretch" overflow="hidden" pb={style.paddingBottom}>
-        <Container px={style.paddingX} maxWidth="1024px">
+        <Container px={style.paddingX}>
           <Outlet />
         </Container>
       </Stack>

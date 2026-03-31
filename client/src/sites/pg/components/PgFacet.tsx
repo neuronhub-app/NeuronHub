@@ -8,7 +8,7 @@ import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 export function PgFacet(props: {
   label: string;
   attribute: string;
-  order?: { base?: number; lg?: number };
+  order?: { base?: number; md?: number; lg?: number };
   icon?: ReactNode;
   isSearchEnabled?: boolean;
   subFacet?: { attribute: string; label: string };

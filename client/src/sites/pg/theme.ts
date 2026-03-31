@@ -52,7 +52,7 @@ const pgRecipes = {
     },
   }),
 
-  container: defineRecipe({ base: { maxWidth: "1280px" } }),
+  container: defineRecipe({ base: { maxWidth: "1024px" } }),
 
   link: defineRecipe({
     base: {

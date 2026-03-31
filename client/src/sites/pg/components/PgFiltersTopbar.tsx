@@ -31,14 +31,49 @@ export function PgFiltersTopbar() {
       <PgFacet
         label="Cause Area"
         attribute={attr.causeArea}
-        order={{ base: 1, lg: 1 }}
+        order={{ base: 1 }}
         sortBy={sortAlpha}
+      />
+
+      <PgFacet
+        label="Skill Set"
+        attribute={attr.skillSet}
+        order={{ base: 2, md: 3, lg: 2 }}
+        isSearchEnabled
+        sortBy={sortAlpha}
+      />
+
+      <PgFacet
+        label="Experience"
+        attribute={attr.experience}
+        order={{ base: 3, md: 5, lg: 3 }}
+        transformItems={items =>
+          sortByCustomOrder(items, [
+            "Entry-Level",
+            "Junior (1–4y)",
+            "Mid (5–9y)",
+            "Senior (10y+)",
+          ])
+        }
+      />
+
+      <PgFacet
+        label="Education"
+        attribute={attr.education}
+        order={{ base: 4, md: 7, lg: 4 }}
+        transformItems={items =>
+          sortByCustomOrder(items, [
+            "Undergraduate Degree or Less",
+            "Master's Degree",
+            "Doctoral Degree",
+          ])
+        }
       />
 
       <PgFacet
         label="Role Type"
         attribute={attr.roleType}
-        order={{ base: 3, lg: 2 }}
+        order={{ base: 5, md: 9, lg: 5 }}
         transformItems={items =>
           sortByCustomOrder(items, [
             "Full-Time",
@@ -56,39 +91,9 @@ export function PgFiltersTopbar() {
       />
 
       <PgFacet
-        label="Experience"
-        attribute={attr.experience}
-        order={{ base: 7, lg: 3 }}
-        transformItems={items =>
-          sortByCustomOrder(items, [
-            "Entry–Level",
-            "Junior (1–4y)",
-            "Mid (5–9y)",
-            "Senior (10y+)",
-          ])
-        }
-      />
-
-      <PgFacetPopover
-        label="Minimum Salary"
-        order={{ base: 9, lg: 4 }}
-        contentMaxW="var(--reference-width)"
-      >
-        <PgFacetSalary />
-      </PgFacetPopover>
-
-      <PgFacet
-        label="Skill Set"
-        attribute={attr.skillSet}
-        order={{ base: 2, lg: 5 }}
-        isSearchEnabled
-        sortBy={sortAlpha}
-      />
-
-      <PgFacet
         label="Remote"
         attribute={attr.remote}
-        order={{ base: 4, lg: 6 }}
+        order={{ base: 6, md: 2, lg: 6 }}
         icon={<LuMapPin />}
         operator="or"
         isFreezeTotalFacetCount
@@ -97,7 +102,7 @@ export function PgFiltersTopbar() {
       <PgFacet
         label="Country"
         attribute={attr.country}
-        order={{ base: 5, lg: 7 }}
+        order={{ base: 7, md: 4, lg: 7 }}
         icon={<LuMapPin />}
         isSearchEnabled
         operator="or"
@@ -108,7 +113,7 @@ export function PgFiltersTopbar() {
       <PgFacet
         label="City"
         attribute={attr.city}
-        order={{ base: 6, lg: 8 }}
+        order={{ base: 8, md: 6, lg: 8 }}
         icon={<LuMapPin />}
         isSearchEnabled
         operator="or"
@@ -116,25 +121,20 @@ export function PgFiltersTopbar() {
         testId={ids.facet.popover.city}
       />
 
-      <PgFacet
-        label="Education"
-        attribute={attr.education}
-        order={{ base: 8, lg: 9 }}
-        transformItems={items =>
-          sortByCustomOrder(items, [
-            "Undergraduate Degree or Less",
-            "Master's Degree",
-            "Doctoral Degree",
-          ])
-        }
-      />
+      <PgFacetPopover
+        label="Salary"
+        order={{ base: 9, md: 8, lg: 9 }}
+        contentMaxW="var(--reference-width)"
+      >
+        <PgFacetSalary />
+      </PgFacetPopover>
 
-      <OtherFiltersFacet order={{ base: 10 }} />
+      <OtherFiltersFacet />
     </Grid>
   );
 }
 
-function OtherFiltersFacet(props: { order: { base: number } }) {
+function OtherFiltersFacet() {
   const highlighted = useToggleRefinement({ attribute: "is_orgs_highlighted" });
   const notCareerCapital = useToggleRefinement({ attribute: "is_not_career_capital" });
   const notProfitForGood = useToggleRefinement({ attribute: "is_not_profit_for_good" });
@@ -142,7 +142,7 @@ function OtherFiltersFacet(props: { order: { base: number } }) {
   return (
     <PgFacetPopover
       label="Other Filters"
-      order={props.order}
+      order={{ base: 10 }}
       testId={ids.facet.popover.otherFilters}
     >
       <Stack gap="gap.sm">
@@ -152,7 +152,7 @@ function OtherFiltersFacet(props: { order: { base: number } }) {
           onToggle={() => highlighted.refine(highlighted.value)}
         />
         <BooleanSwitch
-          label="Exclude career capital roles"
+          label="Exclude career-capital roles"
           checked={notCareerCapital.value.isRefined}
           onToggle={() => notCareerCapital.refine(notCareerCapital.value)}
           testId={ids.facet.excludeCareerCapital}
