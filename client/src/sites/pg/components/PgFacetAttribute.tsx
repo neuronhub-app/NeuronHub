@@ -26,12 +26,17 @@ export function PgFacetAttribute(props: {
     limit: 100,
     sortBy: props.sortBy ?? ["count:desc", "name:asc"],
     operator: props.operator,
-    // Keep <Checkbox>s order fixed - don't move selected on top, and don't hide count=0.
+    // Keep <Checkbox>s order fixed - don't move selected to the top; don't hide count=0.
     // Refs #137, ENG-56
     transformItems: useCallback(
       (items: FacetItem[], metadata) => {
         const applyTransform = (fixed: FacetItem[]) =>
           props.transformItems ? props.transformItems(fixed, metadata) : fixed;
+
+        // let Algolia filter out values when searching (wo cache), ref ENG-56
+        if (searchQueryRef.current) {
+          return applyTransform(items);
+        }
 
         const result = new Map(facetValuesInitialRef.current);
         for (const facetValue of result.values()) {
