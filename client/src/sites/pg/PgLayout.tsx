@@ -11,7 +11,6 @@ import {
   Skeleton,
   Stack,
   Text,
-  SystemStyleObject,
 } from "@chakra-ui/react";
 import { Outlet } from "react-router";
 import { SlEnvolope } from "react-icons/sl";
@@ -30,33 +29,7 @@ import { FooterLinkIcon, FooterSectionKind } from "~/graphql/enums";
 import { useSnapshot } from "valtio";
 import { siteConfigState, type FooterSection } from "@/sites/pg/siteConfigState";
 import { PgHeroHeader } from "@/sites/pg/components/PgHeader";
-
-/**
- * The required by PG UI design is unmaintainable. And incorrect.
- *
- * This shall communicate why (:
- */
-export const layout = {
-  style: {
-    header: {
-      paddingX: { base: "50px", md: "58px" },
-
-      get paddingBottom() {
-        return { base: this.paddingX.base, md: "20" } as const;
-      },
-    },
-
-    navbar: {
-      paddingX: { base: "30px", md: "10" },
-    },
-
-    container: {
-      paddingX: { base: "gap.sm", md: "6" },
-
-      paddingBottom: { base: "46px", md: "54px" },
-    } satisfies SystemStyleObject,
-  },
-} as const;
+import { layout } from "@/sites/pg/PgLayoutConfig";
 
 const style = layout.style.container;
 

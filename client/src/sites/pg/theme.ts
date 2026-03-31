@@ -9,8 +9,33 @@ import {
 import { theme } from "@/sites/pg/colors";
 import { recipes, slotRecipes } from "@/theme/recipes";
 
+const pgBadgeBase = {
+  h: "6",
+  px: "gap.sm",
+  borderRadius: "sm",
+  fontWeight: "normal",
+  alignItems: "center",
+} as const;
+
+const chakraBadge = defaultConfig.theme?.recipes?.badge;
+
 const pgRecipes = {
   ...recipes,
+
+  badge: defineRecipe({
+    ...chakraBadge,
+    defaultVariants: { ...chakraBadge?.defaultVariants, size: "md" } as never, // #bad-infer size is declared in chakraBadge.variants, not visible to TS here
+    variants: {
+      ...chakraBadge?.variants,
+      variant: {
+        "pg-highlighted": { ...pgBadgeBase, bg: "#FCEFAC", color: "#7A6A1E" },
+        "pg-area": { ...pgBadgeBase, bg: "#DBEADD", color: "#1F6B29" },
+        "pg-experience": { ...pgBadgeBase, bg: "#E1EFEE", color: "#1A6860" },
+        "pg-education": { ...pgBadgeBase, bg: "#E1F3F9", color: "#2C5E6E" },
+        "pg-workload": { ...pgBadgeBase, bg: "#F0EBEC", color: "#7D4D57" },
+      },
+    },
+  }),
 
   button: defineRecipe({
     ...recipes.button,

@@ -27,14 +27,12 @@ import type { JobFragmentType } from "@/graphql/fragments/jobs";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
-import { pgTagStyle } from "@/sites/pg/pgTagStyle";
 import { toast } from "@/utils/toast";
 
 const style = {
   markHighlight: {
     "& mark": { bg: "yellow.200", color: "black", borderRadius: "2px", px: "1px" },
   },
-  tag: pgTagStyle,
   duration: "slow",
 } as const;
 
@@ -42,8 +40,7 @@ type TagGroup = {
   tags: { name: string }[];
   attribute: string;
   multipleLabel: string;
-  bg: string;
-  fg: string;
+  variant: string;
 };
 
 const tagsHidden = ["Undergraduate Degree or Less", "Full-Time", "Other"];
@@ -550,43 +547,31 @@ function JobTagGroups(props: {
       tags: props.job.tags_area,
       attribute: "tags_area",
       multipleLabel: "Multiple Cause Areas",
-      bg: style.tag.area.bg,
-      fg: style.tag.area.fg,
+      variant: "pg-area",
     },
     {
       tags: props.job.tags_experience,
       attribute: "tags_experience",
       multipleLabel: "Multiple Experience Levels",
-      bg: style.tag.experience.bg,
-      fg: style.tag.experience.fg,
+      variant: "pg-experience",
     },
     {
       tags: props.job.tags_education,
       attribute: "tags_education",
       multipleLabel: "Multiple Education Requirements",
-      bg: style.tag.education.bg,
-      fg: style.tag.education.fg,
+      variant: "pg-education",
     },
     {
       tags: props.job.tags_workload,
       attribute: "tags_workload",
       multipleLabel: workloadMultipleLabel(props.job.tags_workload),
-      bg: style.tag.workload.bg,
-      fg: style.tag.workload.fg,
+      variant: "pg-workload",
     },
   ].filter(group => group.tags?.length > 0);
 
   return (
     <HStack gap={{ base: "gap.xs", md: "gap.md" }} flexWrap="wrap">
-      {props.isOrgHighlighted && (
-        <Badge
-          {...style.tag.base}
-          bg={style.tag.highlighted.bg}
-          color={style.tag.highlighted.fg}
-        >
-          Highlighted Org
-        </Badge>
-      )}
+      {props.isOrgHighlighted && <Badge variant="pg-highlighted">Highlighted Org</Badge>}
       {tagGroups.map(tagGroup => {
         const tags = tagGroup.tags.filter(tag => !tagsHidden.includes(tag.name));
         if (tags.length === 0) {
@@ -597,9 +582,7 @@ function JobTagGroups(props: {
           return (
             <Badge
               key={tagGroup.attribute}
-              {...style.tag.base}
-              bg={tagGroup.bg}
-              color={tagGroup.fg}
+              variant={tagGroup.variant as never}
               {...ids.set(ids.job.card.tags)}
             >
               {tagGroup.multipleLabel}
@@ -611,9 +594,7 @@ function JobTagGroups(props: {
         return (
           <Badge
             key={tagGroup.attribute}
-            {...style.tag.base}
-            bg={tagGroup.bg}
-            color={tagGroup.fg}
+            variant={tagGroup.variant as never}
             {...ids.set(ids.job.card.tags)}
           >
             {props.highlightable.includes(tagGroup.attribute) ? (
