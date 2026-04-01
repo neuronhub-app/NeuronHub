@@ -11,6 +11,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobAlertLog
+from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.tasks import send_job_alert_emails_by_ids_task
 
 
@@ -29,6 +30,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         "author",
         "org",
         "versions",
+        "locations",
         "tags_education",
         "tags_area",
         "tags_skill",
@@ -41,6 +43,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
 
     list_filter = [
         ("author", DALFRelatedFieldAjaxMulti),
+        ("locations", DALFRelatedFieldAjaxMulti),
         ("tags_skill", DALFRelatedFieldAjaxMulti),
         ("tags_area", DALFRelatedFieldAjaxMulti),
         ("tags_workload", DALFRelatedFieldAjaxMulti),
@@ -117,12 +120,17 @@ class JobAlertAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         "sent_count",
         "created_at",
     ]
-    autocomplete_fields = ["tags", "jobs_clicked"]
+    autocomplete_fields = [
+        "tags",
+        "jobs_clicked",
+        "locations",
+    ]
     search_fields = [
         "email",
     ]
     list_filter = [
         ("tags", DALFRelatedFieldAjaxMulti),
+        ("locations", DALFRelatedFieldAjaxMulti),
         "is_orgs_highlighted",
         "is_active",
         "created_at",
@@ -165,4 +173,20 @@ class JobAlertLogAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         "sent_at",
         "created_at",
         "updated_at",
+    ]
+
+
+@admin.register(JobLocation)
+class JobLocationAdmin(DALFModelAdmin):
+    list_display = [
+        "name",
+        "country",
+        "city",
+        "is_remote",
+        # "created_at",
+    ]
+    search_fields = [
+        "name",
+        "country",
+        "city",
     ]
