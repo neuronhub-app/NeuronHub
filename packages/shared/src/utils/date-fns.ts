@@ -47,8 +47,8 @@ export namespace datetime {
       .replace(" minutes", "min")
       .replace(" hours", "h")
       .replace(" days", "d")
-      .replace(" month", "m")
       .replace(" months", "m")
+      .replace(" month", "m")
       .replace(" years", "y");
 
     if (isFuture(date)) {
