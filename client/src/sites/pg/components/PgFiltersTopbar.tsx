@@ -20,158 +20,148 @@ export function resetOtherFilters() {
   otherFiltersState.excludeProfitForGood = false;
 }
 
-type FacetOrder = { base?: number; lg?: number };
-
 export function PgFiltersTopbar() {
+  const attr = {
+    causeArea: "tags_area.name",
+    roleType: "tags_workload.name",
+    experience: "tags_experience.name",
+    skillSet: "tags_skill.name",
+    remote: "locations.remote_name",
+    country: "locations.country",
+    city: "locations.city",
+    education: "tags_education.name",
+  } as const;
+
   return (
     <Grid
       templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(5, 1fr)" }}
       columnGap="gap.md"
       rowGap={{ base: "3.5", md: "2" }}
     >
-      <CauseAreaFacet order={{ base: 1, lg: 1 }} />
-      <RoleTypeFacet order={{ base: 3, lg: 2 }} />
-      <ExperienceFacet order={{ base: 7, lg: 3 }} />
-      <SalaryFacet order={{ base: 9, lg: 4 }} />
-      <SkillSetFacet order={{ base: 2, lg: 5 }} />
-      <RemoteFacet order={{ base: 4, lg: 6 }} />
-      <CountryFacet order={{ base: 5, lg: 7 }} />
-      <CityFacet order={{ base: 6, lg: 8 }} />
-      <EducationFacet order={{ base: 8, lg: 9 }} />
+      <PgFacetPopover label="Cause Area" attribute={attr.causeArea} order={{ base: 1, lg: 1 }}>
+        <PgFacetAttribute attribute={attr.causeArea} label="Cause Area" sortBy={sortAlpha} />
+      </PgFacetPopover>
+
+      <PgFacetPopover label="Role Type" attribute={attr.roleType} order={{ base: 3, lg: 2 }}>
+        <PgFacetAttribute
+          attribute={attr.roleType}
+          label="Role Type"
+          transformItems={items =>
+            sortByCustomOrder(items, [
+              "Full-Time",
+              "Part-Time (50–80% FTE)",
+              "Part-Time (<50% FTE)",
+              "Internship",
+              "Fellowship",
+              "Volunteer",
+              "Funding",
+              "Training",
+              "Graduate Program",
+              "Expression of Interest",
+            ])
+          }
+        />
+      </PgFacetPopover>
+
+      <PgFacetPopover label="Experience" attribute={attr.experience} order={{ base: 7, lg: 3 }}>
+        <PgFacetAttribute
+          attribute={attr.experience}
+          label="Experience"
+          transformItems={items =>
+            sortByCustomOrder(items, [
+              "Entry–Level",
+              "Junior (1–4y)",
+              "Mid (5–9y)",
+              "Senior (10y+)",
+            ])
+          }
+        />
+      </PgFacetPopover>
+
+      <PgFacetPopover
+        label="Minimum Salary"
+        order={{ base: 9, lg: 4 }}
+        onClose={() => {
+          salaryFilterState.showInfo = false;
+        }}
+        contentMaxW="var(--reference-width)"
+      >
+        <PgFacetSalary />
+      </PgFacetPopover>
+
+      <PgFacetPopover label="Skill Set" attribute={attr.skillSet} order={{ base: 2, lg: 5 }}>
+        <PgFacetAttribute
+          attribute={attr.skillSet}
+          label="Skill Set"
+          isSearchEnabled
+          sortBy={sortAlpha}
+        />
+      </PgFacetPopover>
+
+      <PgFacetPopover
+        attribute={attr.remote}
+        label="Remote"
+        order={{ base: 4, lg: 6 }}
+        icon={<LuMapPin />}
+      >
+        <PgFacetAttribute
+          attribute={attr.remote}
+          label="Remote"
+          operator="or"
+          isFreezeTotalFacetCount
+        />
+      </PgFacetPopover>
+
+      <PgFacetPopover
+        attribute={attr.country}
+        label="Country"
+        order={{ base: 5, lg: 7 }}
+        icon={<LuMapPin />}
+      >
+        <PgFacetAttribute
+          attribute={attr.country}
+          label="Country"
+          isSearchEnabled
+          operator="or"
+          isFreezeTotalFacetCount
+        />
+      </PgFacetPopover>
+
+      <PgFacetPopover
+        attribute={attr.city}
+        label="City"
+        order={{ base: 6, lg: 8 }}
+        icon={<LuMapPin />}
+      >
+        <PgFacetAttribute
+          attribute={attr.city}
+          label="City"
+          isSearchEnabled
+          operator="or"
+          isFreezeTotalFacetCount
+        />
+      </PgFacetPopover>
+
+      <PgFacetPopover label="Education" attribute={attr.education} order={{ base: 8, lg: 9 }}>
+        <PgFacetAttribute
+          attribute={attr.education}
+          label="Education"
+          transformItems={items =>
+            sortByCustomOrder(items, [
+              "Undergraduate Degree or Less",
+              "Master's Degree",
+              "Doctoral Degree",
+            ])
+          }
+        />
+      </PgFacetPopover>
+
       <OtherFiltersFacet order={{ base: 10 }} />
     </Grid>
   );
 }
 
-function CauseAreaFacet(props: { order: FacetOrder }) {
-  return (
-    <PgFacetPopover label="Cause Area" order={props.order}>
-      <PgFacetAttribute attribute="tags_area.name" label="Cause Area" sortBy={sortAlpha} />
-    </PgFacetPopover>
-  );
-}
-
-function RoleTypeFacet(props: { order: FacetOrder }) {
-  return (
-    <PgFacetPopover label="Role Type" order={props.order}>
-      <PgFacetAttribute
-        attribute="tags_workload.name"
-        label="Role Type"
-        transformItems={items =>
-          sortByCustomOrder(items, [
-            "Full-Time",
-            "Part-Time (50–80% FTE)",
-            "Part-Time (<50% FTE)",
-            "Internship",
-            "Fellowship",
-            "Volunteer",
-            "Funding",
-            "Training",
-            "Graduate Program",
-            "Expression of Interest",
-          ])
-        }
-      />
-    </PgFacetPopover>
-  );
-}
-
-function CountryFacet(props: { order: FacetOrder }) {
-  return (
-    <PgFacetPopover label="Country" order={props.order} icon={<LuMapPin />}>
-      <PgFacetAttribute
-        attribute="locations.country"
-        label="Country"
-        isSearchEnabled
-        operator="or"
-        isFreezeTotalFacetCount
-      />
-    </PgFacetPopover>
-  );
-}
-
-function ExperienceFacet(props: { order: FacetOrder }) {
-  return (
-    <PgFacetPopover label="Experience" order={props.order}>
-      <PgFacetAttribute attribute="tags_experience.name" label="Experience" />
-    </PgFacetPopover>
-  );
-}
-
-function SalaryFacet(props: { order: FacetOrder }) {
-  return (
-    <PgFacetPopover
-      label="Minimum Salary"
-      onClose={() => {
-        salaryFilterState.showInfo = false;
-      }}
-      contentMaxW="var(--reference-width)"
-      order={props.order}
-    >
-      <PgFacetSalary />
-    </PgFacetPopover>
-  );
-}
-
-function SkillSetFacet(props: { order: FacetOrder }) {
-  return (
-    <PgFacetPopover label="Skill Set" order={props.order}>
-      <PgFacetAttribute
-        attribute="tags_skill.name"
-        label="Skill Set"
-        isSearchEnabled
-        sortBy={sortAlpha}
-      />
-    </PgFacetPopover>
-  );
-}
-
-function RemoteFacet(props: { order: FacetOrder }) {
-  return (
-    <PgFacetPopover label="Remote" order={props.order} icon={<LuMapPin />}>
-      <PgFacetAttribute
-        attribute="locations.remote_name"
-        label="Remote"
-        operator="or"
-        isFreezeTotalFacetCount
-      />
-    </PgFacetPopover>
-  );
-}
-
-function CityFacet(props: { order: FacetOrder }) {
-  return (
-    <PgFacetPopover label="City" order={props.order} icon={<LuMapPin />}>
-      <PgFacetAttribute
-        attribute="locations.city"
-        label="City"
-        isSearchEnabled
-        operator="or"
-        isFreezeTotalFacetCount
-      />
-    </PgFacetPopover>
-  );
-}
-
-function EducationFacet(props: { order: FacetOrder }) {
-  return (
-    <PgFacetPopover label="Education" order={props.order}>
-      <PgFacetAttribute
-        attribute="tags_education.name"
-        label="Education"
-        transformItems={items =>
-          sortByCustomOrder(items, [
-            "Undergraduate Degree or Less",
-            "Master's Degree",
-            "Doctoral Degree",
-          ])
-        }
-      />
-    </PgFacetPopover>
-  );
-}
-
-function OtherFiltersFacet(props: { order: FacetOrder }) {
+function OtherFiltersFacet(props: { order: { base: number } }) {
   const highlighted = useToggleRefinement({ attribute: "org.is_highlighted", on: true });
   const snap = useSnapshot(otherFiltersState);
   return (
@@ -215,7 +205,7 @@ function BooleanSwitch(props: { label: string; checked: boolean; onToggle: () =>
   );
 }
 
-function sortByCustomOrder<T extends { label: string }>(items: T[], orderAs: string[]): T[] {
+function sortByCustomOrder<Val, T extends { label: Val }>(items: T[], orderAs: Val[]): T[] {
   return items.toSorted((a, b) => {
     const indexA = orderAs.indexOf(a.label);
     const indexB = orderAs.indexOf(b.label);

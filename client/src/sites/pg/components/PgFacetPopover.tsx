@@ -1,16 +1,25 @@
-import { Flex, Icon, Popover, Portal } from "@chakra-ui/react";
+import { Flex, Icon, Popover, Portal, Text } from "@chakra-ui/react";
 import type { ReactNode } from "react";
+import { GoX } from "react-icons/go";
 import { LuChevronDown } from "react-icons/lu";
+import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
 import { Button } from "@/components/ui/button";
 
 export function PgFacetPopover(props: {
-  label: string;
+  attribute?: string;
   children: ReactNode;
+  label: string;
   onClose?: () => void;
   contentMaxW?: string;
   order?: { base?: number; lg?: number };
   icon?: ReactNode;
 }) {
+  const clear = useClearRefinements({
+    includedAttributes: props.attribute ? [props.attribute] : [],
+  });
+
+  const activeFacetCount = useActiveFacetCount(props.attribute);
+
   return (
     <Popover.Root
       positioning={{
@@ -27,6 +36,7 @@ export function PgFacetPopover(props: {
     >
       <Popover.Trigger asChild>
         <Button
+          as="div"
           variant="outline"
           size="md"
           w="full"
@@ -40,16 +50,48 @@ export function PgFacetPopover(props: {
           px="2.5"
           order={props.order}
         >
-          <Flex align="center" gap="gap.sm">
-            {props.icon && <Icon boxSize="3.5">{props.icon}</Icon>}
-            {props.label}
+          <Flex align="center" gap="1">
+            <Flex align="center" gap="gap.sm">
+              {props.icon && (
+                <Icon boxSize="3.5" color="fg.muted" mt="-1px">
+                  {props.icon}
+                </Icon>
+              )}
+              {props.label}
+            </Flex>
+
+            {activeFacetCount > 0 && (
+              <Text as="span" color="fg.subtle" fontSize="xs">
+                ({activeFacetCount})
+              </Text>
+            )}
           </Flex>
-          <Icon
-            boxSize="4"
-            css={{ transition: "rotate 0.2s", "[data-state=open] &": { rotate: "180deg" } }}
-          >
-            <LuChevronDown />
-          </Icon>
+
+          <Flex align="center" gap="gap.xs">
+            {clear.canRefine && props.attribute && (
+              <Button
+                onClick={clear.refine}
+                variant="ghost"
+                size="xs"
+                colorPalette="gray"
+                color="fg.subtle"
+                minW="6"
+                h="6"
+                paddingInline="1"
+              >
+                <Icon>
+                  <GoX />
+                </Icon>
+              </Button>
+            )}
+
+            <Icon
+              boxSize="4"
+              css={{ transition: "rotate 0.2s", "[data-state=open] &": { rotate: "180deg" } }}
+            >
+              <LuChevronDown />
+            </Icon>
+          </Flex>
         </Button>
       </Popover.Trigger>
       <Portal>
@@ -78,4 +120,18 @@ export function PgFacetPopover(props: {
       </Portal>
     </Popover.Root>
   );
+}
+
+function useActiveFacetCount(attribute?: string): number {
+  const refinements = useCurrentRefinements({
+    includedAttributes: attribute ? [attribute] : undefined,
+  });
+  if (!attribute) {
+    return 0;
+  }
+  let count = 0;
+  for (const item of refinements.items) {
+    count += item.refinements.length;
+  }
+  return count;
 }

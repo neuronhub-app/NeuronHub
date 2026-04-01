@@ -97,11 +97,13 @@ function wrapClientWithLocationInterceptor(algoliaClient: LiteClient): LiteClien
 }
 
 export const location_fields = {
+  name: "locations.name",
   remote: "locations.remote_name",
   country: "locations.country",
   city: "locations.city",
+  is_remote: "locations.is_remote",
   get all() {
-    return [this.remote, this.country, this.city];
+    return [this.name, this.remote, this.country, this.city, this.is_remote];
   },
 } as const;
 
