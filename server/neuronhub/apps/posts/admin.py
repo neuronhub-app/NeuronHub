@@ -49,6 +49,7 @@ class PostTagInline(admin.TabularInline):
         "is_vote_positive",
         "author",
         "is_important",
+        # "is_always_indexed_by_algolia",
     ]
     raw_id_fields = [_meta_model]
 
@@ -65,6 +66,12 @@ class PostTagInline(admin.TabularInline):
     def is_important(self, obj):
         if obj.posttag.is_important:
             return "⭐"
+        else:
+            return ""
+
+    def is_always_indexed_by_algolia(self, obj):
+        if obj.posttag.is_always_indexed_by_algolia:
+            return "🟩"
         else:
             return ""
 
@@ -283,6 +290,7 @@ class PostTagAdmin(admin.ModelAdmin):
         "_get_name_full",
         "author",
         "is_important",
+        "is_always_indexed_by_algolia",
         "created_at",
     ]
     list_select_related = ["tag_parent__tag_parent__tag_parent"]
@@ -292,6 +300,9 @@ class PostTagAdmin(admin.ModelAdmin):
     autocomplete_fields = [
         "tag_parent",
         "author",
+    ]
+    list_filter = [
+        "is_always_indexed_by_algolia",
     ]
 
     @admin.display(description="name")

@@ -458,6 +458,12 @@ class PostTag(AnonimazableTimeStampedModel):
     aliases = ArrayField(models.CharField(max_length=255), default=list, blank=True)
     description = anonymizable(models.TextField(blank=True))
 
+    is_always_indexed_by_algolia = models.BooleanField(
+        default=False,
+        help_text="Enabling makes it visible Algolia filters, even when no model (Job, Profile) have ever matched it. Be careful, as it then falls on you to cleanup every outdated tag with this flag in the admin panel.",
+        verbose_name="always in Algolia",
+    )
+
     categories = models.ManyToManyField(PostTagCategory)
 
     is_review_tag = models.BooleanField(
