@@ -1,11 +1,10 @@
-import { Badge, Flex, HStack, Icon, Text, Wrap } from "@chakra-ui/react";
+import { Badge, HStack, Icon, Text, Wrap } from "@chakra-ui/react";
 import { fromUnixTime } from "date-fns";
 
 import { LuX } from "react-icons/lu";
 import {
   useClearRefinements,
   useCurrentRefinements,
-  useInstantSearch,
 } from "react-instantsearch";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { salaryFormatter } from "@/sites/pg/components/PgFacetSalary";
@@ -38,13 +37,6 @@ export type FacetsActiveConfig = {
   extraTags?: Array<{ label: string; onRemove: () => void }>;
   onClearAdditional?: () => void;
 };
-
-function useFacetCount(attribute: string, value: string): number | null {
-  const { results } = useInstantSearch();
-  const allFacets = [...(results?.facets ?? []), ...(results?.disjunctiveFacets ?? [])];
-  const facet = allFacets.find(facetItem => facetItem.name === attribute);
-  return (facet?.data as Record<string, number> | undefined)?.[value] ?? null;
-}
 
 export function PgAlgoliaFacetsActive(props: { config: FacetsActiveConfig; tagsGap?: string }) {
   const refinementsCurrent = useCurrentRefinements();
@@ -87,11 +79,9 @@ export function PgAlgoliaFacetsActive(props: { config: FacetsActiveConfig; tagsG
         item.refinements
           .filter(refinement => !isSubFacetHidden(item.attribute, refinement.label))
           .map(refinement => (
-            <FacetFilterTag
+            <FilterTag
               key={`${item.attribute}-${refinement.label}`}
               label={renderLabel(item.attribute, refinement)}
-              attribute={item.attribute}
-              value={String(refinement.value)}
               onRemove={() => item.refine(refinement)}
             />
           )),
@@ -100,21 +90,6 @@ export function PgAlgoliaFacetsActive(props: { config: FacetsActiveConfig; tagsG
         <FilterTag key={tag.label} label={tag.label} onRemove={tag.onRemove} />
       ))}
     </Wrap>
-  );
-}
-
-function FacetFilterTag(props: {
-  label: string;
-  attribute: string;
-  value: string;
-  onRemove: () => void;
-}) {
-  const count = useFacetCount(props.attribute, props.value);
-  return (
-    <FilterTag
-      label={count != null ? `${props.label} (${count})` : props.label}
-      onRemove={props.onRemove}
-    />
   );
 }
 

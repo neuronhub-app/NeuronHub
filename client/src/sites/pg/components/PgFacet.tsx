@@ -4,6 +4,7 @@ import type { TestId } from "@/e2e/ids";
 import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 
+// todo ? refac: drop - PgFacetAttribute doesn't need to be in PgFacetPopover - they look as same component.
 export function PgFacet(props: {
   label: string;
   attribute: string;
