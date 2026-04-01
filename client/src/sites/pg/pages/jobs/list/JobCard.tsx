@@ -388,7 +388,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
         )}
 
         <Clipboard.Root value={`${window.location.origin}/${props.job.slug}`}>
-          <Tooltip content="Copy link" positioning={{ placement: "right" }}>
+          <Tooltip content="Copy link" positioning={{ placement: "right" }} openDelay={1_500}>
             <Clipboard.Trigger asChild>
               <Button
                 variant="ghost"

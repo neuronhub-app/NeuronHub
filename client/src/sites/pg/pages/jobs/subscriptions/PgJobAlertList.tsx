@@ -1,4 +1,21 @@
-import { Badge, Flex, HStack, IconButton, Link, Stack, Text } from "@chakra-ui/react";
+/**
+ * #quality-20%
+ *
+ * todo ! refac: replace by [[JobAlertList.tsx]] with [[JsxStyleProps]] - they're identical.
+ * But this had layout bugs I fixed. Not sure what issues they were addressing - in my testing appeared to be redundant.
+ */
+import { layout } from "@/sites/pg/PgLayout";
+import {
+  Badge,
+  Container,
+  Flex,
+  Heading,
+  HStack,
+  IconButton,
+  Link,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { LuPause, LuPlay, LuTrash2 } from "react-icons/lu";
 import { NavLink } from "react-router";
 import {
@@ -45,7 +62,16 @@ export function PgJobAlertList(props: {
   const alerts = data?.job_alerts ?? [];
 
   return (
-    <Stack gap="gap.lg" w="100%" py={{ base: "gap.lg", md: "gap.xl" }}>
+    <Container
+      display="flex"
+      flexDirection="column"
+      gap="gap.lg"
+      w="100%"
+      pt={layout.style.navbar.paddingX}
+      pb={{ base: "gap.lg", md: "gap.xl" }}
+    >
+      <Heading size="3xl">Job Alerts</Heading>
+
       {unsubscribe.isUnsubscribeRequest && <unsubscribe.Alert />}
 
       {alerts.length === 0 && (
@@ -59,9 +85,6 @@ export function PgJobAlertList(props: {
           align="center"
           textAlign="center"
         >
-          <Text fontSize="2xl" fontWeight="bold" fontFamily="heading">
-            Job Subscriptions
-          </Text>
           <Text color="fg.muted">
             No active subscriptions - subscribe on{" "}
             <Link asChild>
@@ -77,17 +100,16 @@ export function PgJobAlertList(props: {
           <PgAlertCard key={alert.id} alert={alert} />
         ))}
       </Stack>
-    </Stack>
+    </Container>
   );
 }
 
 type AlertType = NonNullable<ResultOf<typeof JobAlertListQuery>["job_alerts"]>[number];
 
 function PgAlertCard(props: { alert: AlertType }) {
-  const loading = useIsLoading();
-
   // #quality-1%
-  // todo ! refac: useClearRefinements().canRefine
+  // todo !! fix: useClearRefinements().canRefine or another method
+  // see [[adding-job-alert-filters.mdx]] checklist
   const isHasFilters =
     props.alert.tags.length > 0 ||
     props.alert.locations.length > 0 ||
@@ -95,179 +117,183 @@ function PgAlertCard(props: { alert: AlertType }) {
     props.alert.is_remote ||
     props.alert.salary_min != null;
 
+  const style = {
+    badge: {
+      size: { base: "xs", lg: "md" },
+    },
+  } as const;
+
   return (
     <Stack
       {...ids.set(ids.job.subscriptions.card)}
       pos="relative"
       gap="0"
-      p={{ base: "gap.md", md: "gap.xl" }}
-      pr={{ md: "16" }}
+      p={{ base: "gap.sm", md: "gap.xl" }}
       borderRadius="lg"
       borderWidth="1px"
       borderColor="subtle"
       bg="bg.card"
-      _hover={{ borderColor: "fg.subtle" }}
     >
-      <Tooltip
-        content={datetime.full(props.alert.created_at)}
-        positioning={{ placement: "left" }}
+      {/* card - row top */}
+      <Flex
+        justify="space-between"
+        align="center"
+        mb={{ base: "gap.xs", md: "gap.lg" }}
+        w="full"
       >
-        <Flex
-          pos="absolute"
-          top={{ base: "gap.md", md: "gap.xl" }}
-          right={{ base: "gap.sm", md: "gap.lg" }}
-          h={{ base: "5", md: "9" }}
-          align="center"
-          fontSize="sm"
-          fontWeight="medium"
-          color="fg.muted"
-          whiteSpace="nowrap"
-        >
-          {datetime.relativeRounded(props.alert.created_at)}
-        </Flex>
-      </Tooltip>
+        <HStack justify="space-between" w="full" align="flex-start">
+          <Flex align="center" gap="gap.sm" flexWrap="wrap">
+            <Text fontWeight="semibold" fontSize={{ base: "sm", md: "lg" }}>
+              {props.alert.email}
+            </Text>
 
-      <Flex justify="space-between" align="center" mb={{ base: "gap.sm", md: "gap.lg" }}>
-        <Flex align="center" gap="gap.sm" flexWrap="wrap" pr={{ base: "16", md: "0" }}>
-          <Text fontWeight="semibold" fontSize={{ base: "md", md: "lg" }}>
-            {props.alert.email}
-          </Text>
-          <Badge
-            {...pgTagStyle.base}
-            bg={props.alert.is_active ? pgTagStyle.area.bg : pgTagStyle.workload.bg}
-            color={props.alert.is_active ? pgTagStyle.area.fg : pgTagStyle.workload.fg}
-            {...ids.set(
-              props.alert.is_active
-                ? ids.job.subscriptions.status.active
-                : ids.job.subscriptions.status.inactive,
-            )}
-          >
-            {props.alert.is_active ? "Active" : "Inactive"}
-          </Badge>
-        </Flex>
+            <Badge
+              bg={props.alert.is_active ? pgTagStyle.area.bg : pgTagStyle.workload.bg}
+              color={props.alert.is_active ? pgTagStyle.area.fg : pgTagStyle.workload.fg}
+              {...ids.set(
+                props.alert.is_active
+                  ? ids.job.subscriptions.status.active
+                  : ids.job.subscriptions.status.inactive,
+              )}
+              size={{ base: "xs", md: "md" }}
+            >
+              {props.alert.is_active ? "Active" : "Inactive"}
+            </Badge>
+          </Flex>
 
-        <Flex gap="1" display={{ base: "none", md: "flex" }}>
-          <AlertCardActions alert={props.alert} loading={loading} />
-        </Flex>
-      </Flex>
-
-      {isHasFilters ? (
-        <HStack gap={{ base: "gap.xs", md: "gap.md" }} flexWrap="wrap">
-          {props.alert.is_remote && (
-            <Badge
-              {...pgTagStyle.base}
-              bg={pgTagStyle.education.bg}
-              color={pgTagStyle.education.fg}
-            >
-              Remote
-            </Badge>
-          )}
-          {props.alert.is_orgs_highlighted && (
-            <Badge
-              {...pgTagStyle.base}
-              bg={pgTagStyle.highlighted.bg}
-              color={pgTagStyle.highlighted.fg}
-            >
-              Highlighted Orgs
-            </Badge>
-          )}
-          {props.alert.salary_min != null && (
-            <Badge
-              {...pgTagStyle.base}
-              bg={pgTagStyle.experience.bg}
-              color={pgTagStyle.experience.fg}
-            >
-              Min Salary: {format.money(props.alert.salary_min)}
-            </Badge>
-          )}
-          {props.alert.locations.map(loc => (
-            <Badge
-              key={loc.name}
-              {...pgTagStyle.base}
-              bg={pgTagStyle.education.bg}
-              color={pgTagStyle.education.fg}
-            >
-              {loc.name}
-            </Badge>
-          ))}
-          {props.alert.tags.map(tag => {
-            const colors = tagColorByCategory(tag.category_name);
-            return (
-              <Badge
-                key={tag.name}
-                {...pgTagStyle.base}
-                bg={colors.bg}
-                color={colors.fg}
-                maxW="100%"
-              >
-                <Text truncate>
-                  {tag.category_name
-                    ? `${format.capitalize(tag.category_name)}: ${tag.name}`
-                    : tag.name}
-                </Text>
-              </Badge>
-            );
-          })}
+          <Flex gap="1">
+            <AlertCardActions alert={props.alert} />
+          </Flex>
         </HStack>
-      ) : (
-        <Text fontSize={{ base: "13px", md: "sm" }} color="fg.muted">
-          All new jobs
-        </Text>
-      )}
-
-      <Flex display={{ base: "flex", md: "none" }} gap="1" mt="gap.sm">
-        <AlertCardActions alert={props.alert} loading={loading} />
       </Flex>
+
+      {/* card - row bottom */}
+      <HStack justify="space-between">
+        {isHasFilters ? (
+          <HStack gap={{ base: "gap.xs", md: "gap.md" }} flexWrap="wrap">
+            {props.alert.is_remote && (
+              <Badge
+                {...style.badge}
+                bg={pgTagStyle.education.bg}
+                color={pgTagStyle.education.fg}
+              >
+                Remote
+              </Badge>
+            )}
+            {props.alert.is_orgs_highlighted && (
+              <Badge
+                {...style.badge}
+                bg={pgTagStyle.highlighted.bg}
+                color={pgTagStyle.highlighted.fg}
+              >
+                Highlighted Orgs
+              </Badge>
+            )}
+            {props.alert.salary_min != null && (
+              <Badge
+                {...style.badge}
+                bg={pgTagStyle.experience.bg}
+                color={pgTagStyle.experience.fg}
+              >
+                Min Salary: {format.money(props.alert.salary_min)}
+              </Badge>
+            )}
+            {props.alert.locations.map(loc => (
+              <Badge
+                {...style.badge}
+                key={loc.name}
+                bg={pgTagStyle.education.bg}
+                color={pgTagStyle.education.fg}
+              >
+                {loc.name}
+              </Badge>
+            ))}
+            {props.alert.tags.map(tag => {
+              const colors = tagColorByCategory(tag.category_name);
+              return (
+                <Badge
+                  {...style.badge}
+                  key={tag.name}
+                  bg={colors.bg}
+                  color={colors.fg}
+                  maxW="100%"
+                >
+                  <Text truncate>
+                    {tag.category_name
+                      ? `${format.capitalize(tag.category_name)}: ${tag.name}`
+                      : tag.name}
+                  </Text>
+                </Badge>
+              );
+            })}
+          </HStack>
+        ) : (
+          <Text fontSize={{ base: "13px", md: "sm" }} color="fg.muted">
+            All new jobs
+          </Text>
+        )}
+
+        <Tooltip
+          content={datetime.full(props.alert.created_at)}
+          positioning={{ placement: "left" }}
+        >
+          <Flex
+            align="flex-start"
+            fontSize={{ base: "xs", md: "sm" }}
+            color="fg.muted"
+            whiteSpace="nowrap"
+          >
+            {datetime.relativeRounded(props.alert.created_at)}
+          </Flex>
+        </Tooltip>
+      </HStack>
     </Stack>
   );
 }
 
-function AlertCardActions(props: {
-  alert: AlertType;
-  loading: ReturnType<typeof useIsLoading>;
-}) {
-  async function handleToggle() {
-    await mutateAndRefetchMountedQueries(JobAlertToggleActiveMutation, {
-      id_ext: props.alert.id_ext,
-    });
-  }
-
-  async function handleRemove() {
-    await mutateAndRefetchMountedQueries(JobAlertRemoveMutation, {
-      id_ext: props.alert.id_ext,
-    });
-  }
+function AlertCardActions(props: { alert: AlertType }) {
+  const loading = useIsLoading();
 
   return (
     <>
-      <IconButton
-        aria-label={props.alert.is_active ? "Pause" : "Resume"}
-        variant="ghost"
-        size="sm"
-        onClick={() => {
-          props.loading.track(handleToggle);
-        }}
-        loading={props.loading.isActive}
-        {...ids.set(ids.job.subscriptions.toggleBtn)}
-      >
-        {props.alert.is_active ? <LuPause /> : <LuPlay />}
-      </IconButton>
-
+      {/* Delete */}
       {!props.alert.is_active && (
         <IconButton
-          aria-label="Remove"
+          aria-label="Delete"
           variant="ghost"
           size="sm"
           colorPalette="red"
-          onClick={() => {
-            props.loading.track(handleRemove);
+          onClick={async () => {
+            await loading.track(() =>
+              mutateAndRefetchMountedQueries(JobAlertRemoveMutation, {
+                id_ext: props.alert.id_ext,
+              }),
+            );
           }}
-          loading={props.loading.isActive}
+          loading={loading.isActive}
           {...ids.set(ids.job.subscriptions.removeBtn)}
         >
           <LuTrash2 />
         </IconButton>
       )}
+
+      {/* Pause */}
+      <IconButton
+        aria-label={props.alert.is_active ? "Pause" : "Resume"}
+        variant="ghost"
+        size="sm"
+        onClick={async () => {
+          await loading.track(() =>
+            mutateAndRefetchMountedQueries(JobAlertToggleActiveMutation, {
+              id_ext: props.alert.id_ext,
+            }),
+          );
+        }}
+        loading={loading.isActive}
+        {...ids.set(ids.job.subscriptions.toggleBtn)}
+      >
+        {props.alert.is_active ? <LuPause /> : <LuPlay />}
+      </IconButton>
     </>
   );
 }

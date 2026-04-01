@@ -1,3 +1,5 @@
+import { AdminMenu } from "@/components/AdminMenu";
+import { env } from "@/env";
 import {
   type StackProps,
   Box,
@@ -11,6 +13,8 @@ import {
   Skeleton,
   Stack,
   Text,
+  SystemStyleObject,
+  Float,
 } from "@chakra-ui/react";
 import { Outlet } from "react-router";
 import { SlEnvolope } from "react-icons/sl";
@@ -27,12 +31,38 @@ import {
 import { SiMatrix, SiSubstack } from "react-icons/si";
 import { FooterLinkIcon, FooterSectionKind } from "~/graphql/enums";
 import { useSnapshot } from "valtio";
-import {
-  siteConfigState,
-  type SiteConfigData,
-  type FooterSection,
-} from "@/sites/pg/siteConfigState";
+import { Toaster } from "@/components/ui/toaster";
+import { siteConfigState, type FooterSection } from "@/sites/pg/siteConfigState";
 import { PgHeroHeader } from "@/sites/pg/components/PgHeader";
+
+/**
+ * The required by PG UI design is unmaintainable. And incorrect.
+ *
+ * This shall communicate why (:
+ */
+export const layout = {
+  style: {
+    header: {
+      paddingX: { base: "50px", md: "58px" },
+
+      get paddingBottom() {
+        return { base: this.paddingX.base, md: "20" } as const;
+      },
+    },
+
+    navbar: {
+      paddingX: { base: "30px", md: "10" },
+    },
+
+    container: {
+      paddingX: { base: "gap.sm", md: "6" },
+
+      paddingBottom: { base: "46px", md: "54px" },
+    } satisfies SystemStyleObject,
+  },
+} as const;
+
+const style = layout.style.container;
 
 export default function PgLayout() {
   const configSnap = useSnapshot(siteConfigState);
@@ -51,11 +81,11 @@ export default function PgLayout() {
         flex="1"
         alignItems="stretch"
         overflow="hidden"
+        pb={style.paddingBottom}
         // #AI
         minH="100vh"
-        pb={{ base: "46px", md: "54px" }}
       >
-        <Container px={{ base: "gap.sm", md: "6" }}>
+        <Container px={style.paddingX}>
           <Outlet />
         </Container>
       </Stack>
@@ -74,16 +104,16 @@ function PgFooter(props: { footer: FooterData; isLoading: boolean }) {
   return (
     <Box as="footer" bg="brand.footer.bg" color="brand.seashell" minH={{ md: "450px" }}>
       <Container
-        pl={{ base: "gap.sm", md: "58px" }}
-        pr={{ base: "gap.sm", md: "gap.lg" }}
-        pt={{ base: "22px", md: "46px" }}
+        pl={style.paddingX.base}
+        pr={{ base: style.paddingX.base, md: "gap.lg" }}
+        pt={{ base: "22px", md: style.paddingBottom.base }}
       >
         <Grid
           templateColumns={{
             base: "1fr",
             md: `2fr${" 1fr".repeat(props.footer.columns.length)}`,
           }}
-          gap={{ base: "gap.sm", md: "30px" }}
+          gap={{ base: style.paddingX.base, md: "30px" }}
         >
           <FooterDescription
             isLoading={props.isLoading}
@@ -106,7 +136,7 @@ function PgFooter(props: { footer: FooterData; isLoading: boolean }) {
         <Separator
           mt={{ base: "5", md: "14" }}
           mb={{ base: "5", md: "0" }}
-          mx={{ base: "gap.sm", md: "50px" }}
+          mx={{ base: style.paddingX.base, md: layout.style.header.paddingX.base }}
           borderColor="brand.seashell"
         />
 
@@ -116,7 +146,7 @@ function PgFooter(props: { footer: FooterData; isLoading: boolean }) {
           columnGap={{ base: "gap.xs", md: "1" }}
           rowGap={{ base: "0.5", md: "1" }}
           h={{ base: "70px", md: "55px" }}
-          px={{ base: "gap.sm", md: "50px" }}
+          px={{ base: style.paddingX.base, md: layout.style.header.paddingX.base }}
           pb={{ base: "22px", md: "0" }}
           color="brand.beige"
           fontSize="sm"

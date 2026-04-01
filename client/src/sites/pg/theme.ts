@@ -11,6 +11,7 @@ import { recipes, slotRecipes } from "@/theme/recipes";
 
 const pgRecipes = {
   ...recipes,
+
   button: defineRecipe({
     ...recipes.button,
     variants: {
@@ -25,7 +26,9 @@ const pgRecipes = {
       },
     },
   }),
+
   container: defineRecipe({ base: { maxWidth: "1280px" } }),
+
   link: defineRecipe({
     base: {
       "&:focus:not(:focus-visible)": { outline: "none" },

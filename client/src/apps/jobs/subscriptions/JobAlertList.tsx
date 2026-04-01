@@ -85,24 +85,15 @@ type AlertType = NonNullable<ResultOf<typeof JobAlertListQuery>["job_alerts"]>[n
 
 function AlertCard(props: { alert: AlertType }) {
   const loading = useIsLoading();
+
+  // todo !! fix: unstable, refactor
+  // see [[adding-job-alert-filters.mdx]] checklist
   const isHasFilters =
     props.alert.tags.length > 0 ||
     props.alert.locations.length > 0 ||
     props.alert.is_orgs_highlighted ||
     props.alert.is_remote ||
     props.alert.salary_min != null;
-
-  async function handleToggle() {
-    await mutateAndRefetchMountedQueries(JobAlertToggleActiveMutation, {
-      id_ext: props.alert.id_ext,
-    });
-  }
-
-  async function handleRemove() {
-    await mutateAndRefetchMountedQueries(JobAlertRemoveMutation, {
-      id_ext: props.alert.id_ext,
-    });
-  }
 
   return (
     <Card.Root
@@ -127,27 +118,18 @@ function AlertCard(props: { alert: AlertType }) {
           </Flex>
 
           <Flex gap="1">
-            <IconButton
-              aria-label={props.alert.is_active ? "Pause" : "Resume"}
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                loading.track(handleToggle);
-              }}
-              loading={loading.isActive}
-              {...ids.set(ids.job.subscriptions.toggleBtn)}
-            >
-              {props.alert.is_active ? <LuPause /> : <LuPlay />}
-            </IconButton>
-
             {!props.alert.is_active && (
               <IconButton
                 aria-label="Remove"
                 variant="ghost"
                 size="sm"
                 colorPalette="red"
-                onClick={() => {
-                  loading.track(handleRemove);
+                onClick={async () => {
+                  await loading.track(() =>
+                    mutateAndRefetchMountedQueries(JobAlertRemoveMutation, {
+                      id_ext: props.alert.id_ext,
+                    }),
+                  );
                 }}
                 loading={loading.isActive}
                 {...ids.set(ids.job.subscriptions.removeBtn)}
@@ -155,6 +137,23 @@ function AlertCard(props: { alert: AlertType }) {
                 <LuTrash2 />
               </IconButton>
             )}
+
+            <IconButton
+              aria-label={props.alert.is_active ? "Pause" : "Resume"}
+              variant="ghost"
+              size="sm"
+              onClick={async () => {
+                await loading.track(() =>
+                  mutateAndRefetchMountedQueries(JobAlertToggleActiveMutation, {
+                    id_ext: props.alert.id_ext,
+                  }),
+                );
+              }}
+              loading={loading.isActive}
+              {...ids.set(ids.job.subscriptions.toggleBtn)}
+            >
+              {props.alert.is_active ? <LuPause /> : <LuPlay />}
+            </IconButton>
           </Flex>
         </Flex>
 
@@ -224,7 +223,12 @@ export const JobAlertListQuery = graphql.persisted(
           category_name
         }
         locations {
+          id
           name
+          city
+          country
+          is_remote
+          remote_name
         }
         is_orgs_highlighted
         is_remote

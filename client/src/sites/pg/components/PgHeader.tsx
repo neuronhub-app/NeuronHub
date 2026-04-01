@@ -17,6 +17,7 @@ import {
 import { useEffect, useRef } from "react";
 import { LuChevronDown, LuMenu, LuX } from "react-icons/lu";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { layout } from "@/sites/pg/PgLayout";
 
 const style = {
   nav: {
@@ -24,8 +25,8 @@ const style = {
     py: "5",
   },
   hero: {
-    pl: { base: "50px", md: "58px" },
-    pr: { base: "30px", md: "58px" },
+    pl: layout.style.header.paddingX,
+    pr: { base: "30px", md: layout.style.header.paddingX.md },
   },
   logo: { w: "140px", h: "70px" },
   navLink: {
@@ -96,7 +97,7 @@ export function PgHeroHeader(props: { navLinks: NavLink[]; isLoading: boolean })
       <Container
         {...style.hero}
         pt={{ base: "30px", md: "14" }}
-        pb={{ base: "50px", md: "20" }}
+        pb={layout.style.header.paddingBottom}
         color="brand.seashell"
         fontWeight="medium"
       >
