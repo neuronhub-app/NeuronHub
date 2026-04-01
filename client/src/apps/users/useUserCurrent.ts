@@ -51,6 +51,7 @@ export function useAuth() {
   return {
     isLoggedIn: Boolean(snap.current?.id),
     userId: snap.current?.id,
+    user: snap.current,
   };
 }
 
@@ -64,6 +65,7 @@ export const UserQueryDoc = graphql.persisted(
       name: username
       email
       is_superuser
+      is_staff
       has_profile_groups
 
       library { pk }

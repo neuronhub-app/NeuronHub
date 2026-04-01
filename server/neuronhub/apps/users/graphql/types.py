@@ -24,6 +24,7 @@ class UserType:
     avatar: auto
 
     is_superuser: auto
+    is_staff: auto
 
     first_name: auto
     last_name: auto

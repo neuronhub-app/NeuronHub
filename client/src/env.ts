@@ -2,7 +2,7 @@
  * Env's single source of truth.
  */
 
-import { port, str, url } from "envalid";
+import { port, str, bool, url } from "envalid";
 import { createEnv } from "@neuronhub/shared/createEnv";
 
 /**
@@ -22,6 +22,8 @@ const envCleaned = createEnv({
   VITE_SITE: str({ default: "", choices: ["", "pg"] }),
 
   VITE_PROJECT_NAME: str({ default: "NeuronHub" }),
+
+  VITE_IS_TIRED_OWL_DEV: bool({ default: false }),
 
   VITE_ADMIN_EMAIL: str({ default: "" }),
 
@@ -45,5 +47,8 @@ export const env = {
   },
   get isProd(): boolean {
     return this.MODE === "production" || this.NODE_ENV === "production";
+  },
+  get isTiredOwlDev(): boolean {
+    return this.VITE_IS_TIRED_OWL_DEV;
   },
 };

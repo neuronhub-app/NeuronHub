@@ -2,10 +2,10 @@
 
 import type { IconButtonProps } from "@chakra-ui/react";
 import { ClientOnly, Skeleton } from "@chakra-ui/react";
+import { icons } from "@neuronhub/shared/theme/icons";
 import type { ThemeProviderProps } from "next-themes";
 import { ThemeProvider, useTheme } from "next-themes";
 import * as React from "react";
-import { LuMoon, LuSun } from "react-icons/lu";
 import { Button } from "@/components/ui/button";
 
 export interface ColorModeProviderProps extends ThemeProviderProps {}
@@ -15,14 +15,22 @@ export function ColorModeProvider(props: ColorModeProviderProps) {
 }
 
 export function useColorMode() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const toggleColorMode = () => {
-    setTheme(resolvedTheme === "light" ? "dark" : "light");
-  };
+  const { setTheme, theme } = useTheme();
   return {
-    colorMode: resolvedTheme,
+    colorMode: theme,
+
     setColorMode: setTheme,
-    toggleColorMode,
+
+    toggleColorMode: () => {
+      switch (theme) {
+        case "system":
+          return setTheme("dark");
+        case "light":
+          return setTheme("system");
+        case "dark":
+          return setTheme("light");
+      }
+    },
   };
 }
 
@@ -33,7 +41,15 @@ export function useColorModeValue<T>(light: T, dark: T) {
 
 export function ColorModeIcon() {
   const { colorMode } = useColorMode();
-  return colorMode === "light" ? <LuSun /> : <LuMoon />;
+
+  switch (colorMode) {
+    case "system":
+      return <icons.mode_system />;
+    case "light":
+      return <icons.mode_light />;
+    case "dark":
+      return <icons.mode_dark />;
+  }
 }
 
 interface ColorModeButtonProps extends Omit<IconButtonProps, "aria-label"> {}

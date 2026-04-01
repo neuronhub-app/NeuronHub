@@ -3,10 +3,11 @@ import { ChakraProvider } from "@chakra-ui/react";
 import * as Sentry from "@sentry/react-router";
 import type { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
+import { Toaster as ChakraToaster } from "@/components/ui/toaster";
 import { Outlet, Scripts, ScrollRestoration } from "react-router";
-
 import { ColorModeProvider } from "@/components/ui/color-mode";
 import { useMetaTitle } from "@/components/useMetaTitle";
+import { AdminMenuFloatButton } from "@/components/AdminMenuFloatButton";
 import { env } from "@/env";
 import { client } from "@/graphql/client";
 import { siteConfig } from "@/sites";
@@ -25,12 +26,15 @@ function AppProviders(props: { children: ReactNode }) {
     <ApolloProvider client={client}>
       <ChakraProvider value={siteConfig.theme}>
         <ColorModeProvider
-          enableSystem={!siteConfig.forcedColorMode}
-          forcedTheme={siteConfig.forcedColorMode}
+          enableSystem={env.isTiredOwlDev ? true : !siteConfig.forcedColorMode}
+          forcedTheme={env.isTiredOwlDev ? undefined : siteConfig.forcedColorMode}
         >
           {props.children}
 
           <Toaster position="bottom-center" gutter={8} />
+          <ChakraToaster />
+
+          <AdminMenuFloatButton isThemeSwitcher={env.VITE_SITE === "pg"} />
         </ColorModeProvider>
       </ChakraProvider>
     </ApolloProvider>

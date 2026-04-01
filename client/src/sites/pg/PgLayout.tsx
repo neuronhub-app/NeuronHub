@@ -1,5 +1,3 @@
-import { AdminMenu } from "@/components/AdminMenu";
-import { env } from "@/env";
 import {
   type StackProps,
   Box,
@@ -14,7 +12,6 @@ import {
   Stack,
   Text,
   SystemStyleObject,
-  Float,
 } from "@chakra-ui/react";
 import { Outlet } from "react-router";
 import { SlEnvolope } from "react-icons/sl";
@@ -31,7 +28,6 @@ import {
 import { SiMatrix, SiSubstack } from "react-icons/si";
 import { FooterLinkIcon, FooterSectionKind } from "~/graphql/enums";
 import { useSnapshot } from "valtio";
-import { Toaster } from "@/components/ui/toaster";
 import { siteConfigState, type FooterSection } from "@/sites/pg/siteConfigState";
 import { PgHeroHeader } from "@/sites/pg/components/PgHeader";
 
