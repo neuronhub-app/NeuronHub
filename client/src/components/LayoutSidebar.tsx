@@ -10,16 +10,8 @@ import {
   type StackProps,
   Text,
 } from "@chakra-ui/react";
+import { icons } from "@neuronhub/shared/theme/icons";
 import type { ComponentType } from "react";
-import {
-  GoArchive,
-  GoBriefcase,
-  GoComment,
-  GoCommentDiscussion,
-  GoGear,
-  GoPeople,
-  GoTools,
-} from "react-icons/go";
 import { LuLogIn, LuLogOut } from "react-icons/lu";
 import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
 import { type LinkProps, NavLink, useLocation } from "react-router";
@@ -61,17 +53,22 @@ export function LayoutSidebar(props: StackProps) {
   const links: Array<SidebarLink> = [
     {
       to: urls.jobs.list,
-      icon: GoBriefcase,
+      icon: icons.job,
       label: "Jobs",
       children:
         alertsCount > 0
-          ? [{ label: `Subscriptions (${alertsCount})`, to: urls.jobs.subscriptions }]
+          ? [
+              {
+                label: layout.label.jobAlerts(alertsCount),
+                to: urls.jobs.subscriptions,
+              },
+            ]
           : undefined,
     },
-    { to: urls.profiles.list, icon: GoPeople, label: "Profiles" },
-    { to: urls.posts.list, icon: GoCommentDiscussion, label: "Posts", isHasSeparator: true },
-    { to: urls.reviews.list, icon: GoComment, label: "Reviews" },
-    { to: urls.tools.list, icon: GoTools, label: "Tools" },
+    { to: urls.profiles.list, icon: icons.profiles, label: "Profiles" },
+    { to: urls.posts.list, icon: icons.posts, label: "Posts", isHasSeparator: true },
+    { to: urls.reviews.list, icon: icons.reviews, label: "Reviews" },
+    { to: urls.tools.list, icon: icons.tools, label: "Tools" },
   ] as const;
 
   return (
@@ -123,14 +120,14 @@ export function LayoutSidebar(props: StackProps) {
         <Stack gap="gap.sm">
           <Bleed inline={styles.inline}>
             <SidebarLinkButton to={urls.library}>
-              <GoArchive />
+              <icons.library />
               Archive
             </SidebarLinkButton>
           </Bleed>
 
           <Bleed inline={styles.inline}>
             <SidebarLinkButton to={urls.user.settings.profile}>
-              <GoGear />
+              <icons.settings />
               Settings
             </SidebarLinkButton>
           </Bleed>

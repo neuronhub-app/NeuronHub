@@ -4,9 +4,9 @@ order: 0
 ---
 
 import { SimpleGrid, Text } from "@chakra-ui/react"
-import { FiLayout } from "react-icons/fi";
+import { icons } from "@neuronhub/shared/theme/icons";
 import { SiLinear } from "react-icons/si";
-import { LuSearch, LuShieldAlert, LuSettings } from "react-icons/lu"
+import { LuSearch, LuShieldAlert } from "react-icons/lu"
 import { GuideCard } from "@/components"
 
 
@@ -20,7 +20,7 @@ import { GuideCard } from "@/components"
     path="/usage/guides/linear"
   />
   <GuideCard
-    icon={FiLayout}
+    icon={icons.site_config}
     title="Site Config"
     description="CMS for Emails, Header, Footer, and FAQ."
     path="/usage/guides/siteconfig"
@@ -38,7 +38,7 @@ import { GuideCard } from "@/components"
     path="/usage/guides/sentry"
   />
   <GuideCard
-    icon={LuSettings}
+    icon={icons.admin}
     title="Admin Panel"
     description="Django admin for managing users and jobs."
     path="/usage/guides/admin-panel"
