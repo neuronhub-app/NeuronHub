@@ -43,12 +43,10 @@ class NeuronTestCase(TestCase):
         query: str,
         variables: dict = None,
         user_authed: User | AnonymousUser | None = None,
-        session: dict | None = None,
     ) -> ExecutionResult:
         request = RequestFactory().get("/graphql")
         request.user = user_authed or self.user
-        if session is not None:
-            request.session = session  # type: ignore[assignment]
+        request.session = MockSession()  # type: ignore[assignment]
 
         return await schema.execute(
             query,
@@ -60,3 +58,8 @@ class NeuronTestCase(TestCase):
 @dataclass
 class StrawberryContext:
     request: HttpRequest
+
+
+class MockSession(dict):
+    def set_expiry(self, value):
+        pass

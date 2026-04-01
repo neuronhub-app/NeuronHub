@@ -1,11 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime
 from random import Random
+from typing import Literal
 from zoneinfo import ZoneInfo
 
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django_countries.fields import Country
 from faker import Faker
 from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
 
@@ -483,6 +485,46 @@ class JobsGen:
         if locations:
             await job.locations.aset(locations)
         return job
+
+    async def location(
+        self,
+        city: Literal["London", "Berlin", "Paris"] | str | None = None,
+        code: str | None = None,
+        is_remote: bool = False,
+        is_global: bool = False,
+        is_add_country: bool = True,
+    ) -> JobLocation:
+        country = ""
+        if code:
+            country = Country(code=code).name
+
+        if is_add_country:
+            match city:
+                case "London":
+                    country = Country(code="GB").name
+                case "Berlin":
+                    country = Country(code="DE").name
+                case "Paris":
+                    country = Country(code="FR").name
+
+        name_composed = ""
+        if city and country:
+            name_composed = f"{city}, {country}"
+        elif is_global:
+            name_composed = "Remote, Global"
+        elif country and is_remote:
+            name_composed = f"Remote, {country or f'{city}, {country}'}"
+        elif city:
+            name_composed = city
+
+        assert name_composed
+
+        loc, _ = await JobLocation.objects.aget_or_create(
+            name=name_composed,
+            city=city,
+            country=country,
+        )
+        return loc
 
     async def job_alert(
         self,

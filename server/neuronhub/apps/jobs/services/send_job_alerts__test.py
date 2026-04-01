@@ -2,7 +2,6 @@ from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 
-from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_qs_by_alert
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
@@ -15,7 +14,7 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 class TestSendJobAlertEmails(NeuronTestCase):
     async def test_skips_jobs_created_before_subscription(self):
         await self.gen.jobs.job()
-        alert = await self.gen.jobs.job_alert()
+        await self.gen.jobs.job_alert()
 
         stats = await send_job_alerts()
         assert stats.skipped == 1
@@ -107,8 +106,8 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert alert.jobs_notified_count == 3
 
     # tags_* filters
-    # ----------------------------------------------------------------------------
     # todo ? refac: parametrize to dedup
+    # ----------------------------------------------------------------------------
 
     async def test_matches_by_country_visa_sponsor_tag(self):
         tag_us_visa = await self.gen.posts.tag("US Visa", Category.VisaSponsorship)
@@ -130,16 +129,13 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert stats.sent == 1
         assert len(mail.outbox) == 1
 
-    # #quality-20% #AI
-    #
-    # use self.gen & django-countries
+    # #quality-45%
+    # todo ? refac: review by try-and-error
     # ----------------------------------------------------------------------------
 
     async def test_matches_by_remote_via_is_remote_flag(self):
-        loc_remote = await JobLocation.objects.acreate(name="Remote, Global", is_remote=True)
-        loc_onsite = await JobLocation.objects.acreate(
-            name="London, UK", city="London", country="UK"
-        )
+        loc_remote = await self.gen.jobs.location(is_global=True)
+        loc_onsite = await self.gen.jobs.location("London")
 
         alert = await self.gen.jobs.job_alert()
         alert.is_remote = True
@@ -151,12 +147,8 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
     async def test_matches_by_location(self):
-        loc_london = await JobLocation.objects.acreate(
-            name="London, UK", city="London", country="UK"
-        )
-        loc_berlin = await JobLocation.objects.acreate(
-            name="Berlin, DE", city="Berlin", country="DE"
-        )
+        loc_london = await self.gen.jobs.location("London")
+        loc_berlin = await self.gen.jobs.location("Berlin")
 
         alert = await self.gen.jobs.job_alert(locations=[loc_london])
 
@@ -166,15 +158,9 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
     async def test_matches_by_multiple_locations(self):
-        loc_london = await JobLocation.objects.acreate(
-            name="London, UK", city="London", country="UK"
-        )
-        loc_berlin = await JobLocation.objects.acreate(
-            name="Berlin, DE", city="Berlin", country="DE"
-        )
-        loc_paris = await JobLocation.objects.acreate(
-            name="Paris, FR", city="Paris", country="FR"
-        )
+        loc_london = await self.gen.jobs.location("London")
+        loc_berlin = await self.gen.jobs.location("Berlin")
+        loc_paris = await self.gen.jobs.location("Paris")
 
         alert = await self.gen.jobs.job_alert(locations=[loc_london, loc_berlin])
 
