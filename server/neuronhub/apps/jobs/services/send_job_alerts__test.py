@@ -134,7 +134,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
     # ----------------------------------------------------------------------------
 
     async def test_matches_by_remote_via_is_remote_flag(self):
-        loc_remote = await self.gen.jobs.location(is_global=True)
+        loc_remote = await self.gen.jobs.location(is_global=True, is_remote=True)
         loc_onsite = await self.gen.jobs.location("London")
 
         alert = await self.gen.jobs.job_alert()

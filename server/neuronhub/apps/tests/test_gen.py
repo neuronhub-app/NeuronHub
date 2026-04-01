@@ -521,8 +521,9 @@ class JobsGen:
 
         loc, _ = await JobLocation.objects.aget_or_create(
             name=name_composed,
-            city=city,
+            city=city or "",
             country=country,
+            is_remote=is_remote,
         )
         return loc
 
