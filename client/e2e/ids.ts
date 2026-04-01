@@ -192,6 +192,11 @@ export namespace ids {
   } as const;
 
   export const facet = {
+    popover: {
+      remote: "facet.popover.remote",
+      country: "facet.popover.country",
+      city: "facet.popover.city",
+    },
     checkbox(value: string) {
       return `facet.checkbox.${value}` as TestId;
     },

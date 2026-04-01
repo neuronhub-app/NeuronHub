@@ -8,11 +8,7 @@ import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/P
 import { ids } from "@/e2e/ids";
 import { urls } from "@/urls";
 
-const facetLabel = {
-  remote: "Remote",
-  country: "Country",
-  city: "City",
-} as const;
+const openPopover = "[data-part=content][data-scope=popover][data-state=open]";
 
 test.describe("PG Job Location Facets", () => {
   let play: PlaywrightHelper;
@@ -34,17 +30,15 @@ test.describe("PG Job Location Facets", () => {
     await play.navigate(urls.jobs.list, { idleWait: true });
     const jobCards = play.getAll(ids.job.card.container);
 
-    // Select Country=Kenya (only BridgeFund) — single attr must still filter
-    const countryBtn = page.getByRole("button", { name: facetLabel.country, exact: true });
-    await countryBtn.click();
-
     const data = {
       country_1: "Kenya",
       city_london_6: "London",
       city_berkeley: "Berkeley CA",
     };
 
-    const openPopover = "[data-part=content][data-scope=popover][data-state=open]";
+    // Select Country=Kenya (only BridgeFund) — single attr must still filter
+    const countryBtn = page.getByTestId(ids.facet.popover.country).last();
+    await countryBtn.click();
     const popover = page.locator(openPopover);
     await clickFacetCheckboxByValue(popover, data.country_1);
     await expectBase(jobCards).toHaveCount(1);
@@ -53,7 +47,7 @@ test.describe("PG Job Location Facets", () => {
     // London has 6 jobs in stubs; if AND'd by Kenya it shows 1.
     await page.keyboard.press("Escape");
     await expectBase(popover).not.toBeVisible();
-    const cityBtn = page.getByRole("button", { name: facetLabel.city, exact: true });
+    const cityBtn = page.getByTestId(ids.facet.popover.city).last();
     await cityBtn.click();
     await play.waitForNetworkIdle();
     const londonCountBefore = await getFacetCount(popover, data.city_london_6);
@@ -87,9 +81,57 @@ async function getFacetCount(popover: Locator, value: string): Promise<number> {
   return Number(countText);
 }
 
-// unused #AI
-async function clickFacetCheckbox(popover: Locator, index = 0) {
-  const item = popover.locator("[data-testid^='facet.checkbox.']").nth(index);
-  await expectBase(item).toBeVisible();
-  await item.locator("[data-part=control]").click();
-}
+test.describe("PG Job Location - Subscribe with city facet", () => {
+  let play: PlaywrightHelper;
+
+  test.beforeEach(async ({ page }) => {
+    play = new PlaywrightHelper(page);
+    await play.dbStubsRepopulateAndLogin({
+      is_import_HN_post: false,
+      is_create_single_review: false,
+      is_create_jobs: true,
+    });
+  });
+
+  test("subscribe with Country=Kenya + City=Berkeley sends typed location params", async ({
+    page,
+  }) => {
+    await play.navigate(urls.jobs.list, { idleWait: true });
+    const popover = page.locator(openPopover);
+
+    // Select Country=Kenya
+    await page.getByTestId(ids.facet.popover.country).last().click();
+    await clickFacetCheckboxByValue(popover, "Kenya");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+
+    // Select City=Berkeley CA
+    await page.getByTestId(ids.facet.popover.city).last().click();
+    await clickFacetCheckboxByValue(popover, "Berkeley CA");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+
+    // 2 jobs expected (BridgeFund Kenya + Arclight Berkeley)
+    const jobCards = play.getAll(ids.job.card.container);
+    await expectBase(jobCards).toHaveCount(2);
+
+    // Open subscribe modal and submit
+    await play.click(ids.job.alert.subscribeBtn);
+    await play.fill(ids.job.alert.emailInput, "e2e-location@neuronhub.app");
+
+    const requestPromise = page.waitForRequest(
+      req =>
+        req.url().includes("/graphql") &&
+        (req.postData()?.includes("JobAlertSubscribe") ?? false),
+    );
+    await play.click(ids.job.alert.submitBtn);
+    const request = await requestPromise;
+
+    const body = JSON.parse(request.postData()!);
+    const countries: string[] = body.variables?.location_countries ?? [];
+    const cities: string[] = body.variables?.location_cities ?? [];
+
+    expectBase(countries).toContain("Kenya");
+    expectBase(cities).toContain("Berkeley CA");
+  });
+});

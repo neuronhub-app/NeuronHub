@@ -5,6 +5,7 @@ import sentry_sdk
 import strawberry
 import strawberry_django
 from asgiref.sync import sync_to_async
+from django.db.models import Q
 from django.db.models import QuerySet
 from strawberry import auto
 from strawberry_django.permissions import IsAuthenticated
@@ -192,8 +193,9 @@ class JobsMutation:
         info: strawberry.Info,
         email: str,
         tag_names: list[str] | None = None,
-        # todo ! fix: use ids #AI. Algolia stores values, which should be unique for facets. But still this is stupid.
-        location_names: list[str] | None = None,
+        location_countries: list[str] | None = None,
+        location_cities: list[str] | None = None,
+        location_remote_names: list[str] | None = None,
         is_orgs_highlighted: bool | None = None,
         is_remote: bool | None = None,
         salary_min: int | None = None,
@@ -210,8 +212,15 @@ class JobsMutation:
             tags = PostTag.objects.filter(name__in=tag_names)
             await alert.tags.aset([tag async for tag in tags])
 
-        if location_names:
-            locations = JobLocation.objects.filter(name__in=location_names)
+        loc_q = Q()
+        if location_countries:
+            loc_q |= Q(country__in=location_countries)
+        if location_cities:
+            loc_q |= Q(city__in=location_cities)
+        if location_remote_names:
+            loc_q |= Q(name__in=location_remote_names, is_remote=True)
+        if loc_q:
+            locations = JobLocation.objects.filter(loc_q)
             await alert.locations.aset([loc async for loc in locations])
 
         await _save_session_job_alert(info=info, alert_id_ext=alert.id_ext)

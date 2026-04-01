@@ -96,7 +96,7 @@ export function JobList(props: { slug?: string }) {
 
       <AlgoliaFacetsActive
         labelsOverride={{
-          is_remote: "Remote",
+          "locations.remote_name": "Remote",
           "org.is_highlighted": "Highlighted",
           posted_at_unix: "Posted",
           salary_min: "Salary",
@@ -105,7 +105,7 @@ export function JobList(props: { slug?: string }) {
       />
 
       <Stack gap="1">
-        <AlgoliaFacetBoolean attribute="is_remote" label="Remote" />
+        <AlgoliaFacetAttribute attribute="locations.remote_name" label="Remote" />
         <AlgoliaFacetBoolean attribute="org.is_highlighted" label="Highlighted Organizations" />
       </Stack>
 

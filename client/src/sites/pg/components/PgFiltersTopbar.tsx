@@ -6,6 +6,7 @@ import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import type { UseRefinementListProps } from "react-instantsearch";
 import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
+import { ids } from "@/e2e/ids";
 import { LuMapPin } from "react-icons/lu";
 
 const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
@@ -103,6 +104,7 @@ export function PgFiltersTopbar() {
         label="Remote"
         order={{ base: 4, lg: 6 }}
         icon={<LuMapPin />}
+        testId={ids.facet.popover.remote}
       >
         <PgFacetAttribute
           attribute={attr.remote}
@@ -117,6 +119,7 @@ export function PgFiltersTopbar() {
         label="Country"
         order={{ base: 5, lg: 7 }}
         icon={<LuMapPin />}
+        testId={ids.facet.popover.country}
       >
         <PgFacetAttribute
           attribute={attr.country}
@@ -132,6 +135,7 @@ export function PgFiltersTopbar() {
         label="City"
         order={{ base: 6, lg: 8 }}
         icon={<LuMapPin />}
+        testId={ids.facet.popover.city}
       >
         <PgFacetAttribute
           attribute={attr.city}

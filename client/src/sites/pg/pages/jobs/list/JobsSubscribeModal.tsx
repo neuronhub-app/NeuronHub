@@ -1,4 +1,3 @@
-import { location_fields, LocationFacet } from "@/utils/useAlgoliaSearchClient";
 import { Box, Button, Flex, Icon, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -57,8 +56,14 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
       tag_names: refinesCurrent.items
         .filter(item => item.attribute.startsWith("tags_"))
         .flatMap(item => item.refinements.map(tag => String(tag.value))),
-      location_names: refinesCurrent.items
-        .filter(item => location_fields.all.includes(item.attribute as LocationFacet))
+      location_countries: refinesCurrent.items
+        .filter(item => item.attribute === "locations.country")
+        .flatMap(item => item.refinements.map(r => String(r.value))),
+      location_cities: refinesCurrent.items
+        .filter(item => item.attribute === "locations.city")
+        .flatMap(item => item.refinements.map(r => String(r.value))),
+      location_remote_names: refinesCurrent.items
+        .filter(item => item.attribute === "locations.remote_name")
         .flatMap(item => item.refinements.map(r => String(r.value))),
       is_orgs_highlighted: refinesCurrent.items.some(
         item => item.attribute === "org.is_highlighted",

@@ -248,7 +248,7 @@ type Mutation {
   profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku", include_reprocessing: Boolean! = true, is_dry: Boolean! = false): ProgressType! @IsAuthenticated
   profile_matches_cancel_llm: Boolean! @IsAuthenticated
   job_versions_approve(draft_ids: [Int!]!): Boolean! @IsStaff
-  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null, tz: String = null): Boolean!
+  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_countries: [String!] = null, location_cities: [String!] = null, location_remote_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null, tz: String = null): Boolean!
   job_alert_toggle_active(id_ext: UUID!): Boolean!
   job_alert_remove(id_ext: UUID!): Boolean!
   job_alert_access_session_by_id_ext(id_ext: UUID!): Boolean!
@@ -1049,6 +1049,7 @@ type UserType {
   username: String!
   avatar: DjangoFileType
   is_superuser: Boolean!
+  is_staff: Boolean!
   first_name: String!
   last_name: String!
   email: String!

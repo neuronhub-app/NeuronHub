@@ -22,7 +22,7 @@ Read the docs:
 - the follow-up ticket `144-refac-jobs-locations-by-dropping-redundant-bool-field.md`
 
 ### Tasks
-- [x] Find out why searching Country/City doesn't hide the non-matched values.
+- [x] fix location `location.city` saving to form FE to FE
 
 ### Ticket Checklist
 
@@ -34,7 +34,7 @@ Read the docs:
 
 ### Plan
 
-- 3 separate facet attributes: `locations_remote`, `locations_country`, `locations_city`.
+- 3 separate facet attributes: `locations.remote_name`, `locations.country`, `locations.city` (JSON is stored in Algolia)
 - Each field uses an `useRefinementList` + `<Popover>`.
 - `OR` via `searchClient` interceptor (rewrites `facetFilters` pre Algolia API).
 
@@ -44,19 +44,9 @@ Notes:
 
 #### 1. Backend: consolidate onto JobLocation
 
-- Drop `.is_remote`, `.is_remote_friendly`:
-      - `send_job_alerts.py`: `qs.filter(is_remote=True)` => `qs.filter(locations__is_remote=True)`
-      - `csv_import.py`: `job["is_remote"]` write (JobLocation records already carry `is_remote`)
-      - `admin.py`: `list_display`, `fieldsets`
-      - `serialize_to_md.py`: derive from `.locations`
-      - `test_gen.py`: `is_remote` param -> use JobLocations
-- Drop `.tags_country`, `.tags_city`:
-    - `tag_fields` in index.py
-    - `searchableAttributes`
-    - `prefetch_related` in index.py
-    - `JobFragment` in jobs.ts
-    - `attributesToHighlight` in JobList.tsx
-- Drop `JobAlert.is_remote`:
+[done] Model fields `Job.is_remote`, `.is_remote_friendly`, `.tags_country`, `.tags_city` dropped (migration 0027).
+
+- Drop `JobAlert.is_remote` => deferred to #144
       - `send_job_alerts`: `is_remote` filter + summary
       - `graphql.py`: mutation + type
       - FE: drop from subscribe modals + alert list display
@@ -80,82 +70,56 @@ Remaining: type it + add freeze (see Exec-Plan).
 
 #### 5. FE: cleanup
 
-- Delete `locations.ts` (415 lines)
-- Delete `allowedValues` prop + synthetic count=0 injection
-  from `PgFacetAttribute`
-- `JobFragment`: drop `is_remote`, `is_remote_friendly`,
-  `tags_country`, `tags_city`. Keep `locations { ... }`
-- `JobCard`: already uses `job.locations` for display - keep
-- `JobList.tsx`: update `labelsOverride` for new attributes
-- `JobsSubscribeModal`: detect remote from
-  `locations_remote` refinements instead of `locationRemoteNames`
-- Old site (`apps/jobs/`): migrate `is_remote` facet to
-  `locations_remote`, `tags_country/city` to new attributes
-- `PgJobAlertList`: drop `alert.is_remote` display
+[done] `locations.ts` deleted, `allowedValues` prop removed, `JobFragment` clean, `JobCard` uses `job.locations`.
+
+Remaining (deferred to #144):
+- `JobAlertList.tsx`: displays `alert.is_remote` => drop with field
+- `PgJobAlertList.tsx`: same
 
 ## Relevant-Files
 
-FE - the interceptor (all remaining work is here)
-- `client/src/utils/useAlgoliaSearchClient.ts`
-- `client/src/sites/pg/components/PgFiltersTopbar.tsx`
-- `client/src/sites/pg/components/PgFacetAttribute.tsx` - `useRefinementList`
+FE - subscribe modals
+- `client/src/sites/pg/pages/jobs/list/JobsSubscribeModal.tsx` - PG modal
+- `client/src/apps/jobs/list/JobsSubscribeModal.tsx` - NHA modal, `is_remote` now from `locations.remote_name`
+
+FE - NHA facets
+- `client/src/apps/jobs/list/JobList.tsx` - `is_remote` => `locations.remote_name` attr facet
+
+FE - facet popovers
+- `client/src/sites/pg/components/PgFacetPopover.tsx` - trigger now `Box` (not `Button as="div"`) for `data-testid` compat
+- `client/src/sites/pg/components/PgFiltersTopbar.tsx` - sets `testId` on location popovers
 
 E2E
-- `client/e2e/tests/job-location-facets.spec.ts` - test 4 RED (1-attr `londonCountBefore`), needs freeze
-- `client/e2e/ids.ts` - `ids.facet.checkbox()` fn
-- `server/neuronhub/apps/jobs/tests/db_stubs.py` - stub data: Kenya=BridgeFund only, Berkeley=Arclight only, London=6 jobs
-
-BE - subscriptions (locations M2M)
-- `server/neuronhub/apps/jobs/models.py`
-- `server/neuronhub/apps/jobs/graphql.py`
-- `server/neuronhub/apps/jobs/services/send_job_alerts.py`
-- `server/neuronhub/apps/jobs/services/send_job_alerts__test.py`
+- `client/e2e/tests/job-location-facets.spec.ts` - cross-facet OR + subscribe param assertion
+- `client/e2e/ids.ts` - `ids.facet.popover.{remote,country,city}`
 
 BE
-- `server/neuronhub/apps/jobs/index.py`
-- `server/neuronhub/apps/jobs/graphql.py`
+- `server/neuronhub/apps/jobs/graphql.py` - `job_alert_subscribe(location_countries, location_cities, location_remote_names)`
+- `server/neuronhub/apps/jobs/graphql__test.py` - 5 tests for typed location params
+- `server/neuronhub/apps/tests/test_gen.py` - `Gen.location()`: fixed `city=None` and missing `is_remote`
 
 ## Exec-Plan
 
-### Done
-
-- `props.isFreezeTotalFacetCount` in `PgFacetAttribute` → `FacetCheckboxItem` caches count via `useClearRefinements` on first unfiltered response.
-- NHA site uses `is_remote` - deferred.
-- Facet search: skip `facetValuesInitialRef` merge when `searchQueryRef.current` is set.
-- `PgFacetPopover.attributes` + `useCurrentRefinements` → gray `(N)` count badge.
+All site work done. Remaining tracked in #144:
+- Drop `JobAlert.is_remote` field + all consumers (alert lists, send_job_alerts)
+- Drop `JobLocation.name` => computed `label`
+- `index.py`: drop `locations.name` attr (redundant after #144 `name` drop)
 
 ## Decision-Log
 
-- fix LLM plan §2-4 of flat attrs => nested faceting (`locations.country`, `.city`, `.remote_name`)
-    - `remote_name`: computed on `JobLocationType` -> `name if remote else ""`
-- §1 "Drop `JobAlert.is_remote`" => kept for NHA compat
-- Fix: csv_import `aget_or_create` w/o city/country/is_remote => `ParsedLocation` dataclass, defaults on create
-  [get_or_create by name-only isn't intuitive, and messed up the stage db by fetching JobLocation with empty fields. Reverted.]
-- Fix: `rewriteSearchParams` expected v5 `{requests:[]}`,
-  instantsearch sends legacy `[{indexName, params:{facetFilters}}]`
-- Facet counts AND'd in disjunctive queries
-    - Tried: detect disjunctive by `hitsPerPage===0` => no match
-    - Tried: detect by `facets` only-location-attrs => no match
-    - Tried: count-based (strip 1-group when batch ≥2) => works
-      only after 2nd attr click, not prior
-    - Fix: `typeof facets === "string"` detects disjunctive
-      (main=array, disjunctive=string in legacy format).
-      Strip location filters from location disjunctives.
-      Dropped `countLocationAttrsInBatch`.
-- 1-attr case: no disjunctive query for unrefined attrs,
-  counts come from AND'd main query
-    - Tried: inject extra queries + merge response
-      => reverted, trash code
-    - Tried: custom connector `useLocationFacetGroup`
-      => ~300 LOC reimplementing `useRefinementList`
-    - Fix: freeze location counts from first response
-      (no location filters), overwrite on subsequent.
-      If URL has filters on load → hide counts until can save from empty URL.
-- `JobAlert` had no `locations` M2M => subscriptions ignored location facets
-    - Added `JobAlert.locations` M2M, `job_alert_subscribe(location_names)`
-    - `_get_jobs_qs_by_alert` referenced dead `tags_country`/`tags_city` => removed
-    - Renamed `test_matches_by_remote_location` => `test_matches_by_remote_via_is_remote_flag`
-    - Added `test_matches_by_location`, `test_matches_by_multiple_locations`
-    - FE: both modals send `location_names` from location refinements
-    - FE: both alert lists display `locations` badges
-- Fix facet search - skip `props.transformItems` if facet search is active
+- Nested faceting (`locations.country`, `.city`, `.remote_name`) instead of LLM's flat attrs
+    - `remote_name`: computed on `JobLocationType` => `name if remote else ""`
+- `JobAlert.is_remote` kept for NHA compat => deferred to #144
+- `JobAlert.locations` M2M added for typed alert-location binding
+- Algolia facets are flat `{value: count}` — no IDs available
+    - Tried: `refinesCurrent.items`, `results.hits`, `locations.id` facet, `_rawResults` => all flat
+    - Fix: typed string params (`location_countries`, `_cities`, `_remote_names`), BE resolves via `Q()` filter
+    - Tradeoff: matches ALL rows for field value (eg country="Kenya"). Unique constraint planned.
+- Fix: `rewriteSearchParams` expected v5 format, instantsearch sends legacy `[{indexName, params}]`
+- Fix: `typeof facets === "string"` to detect disjunctive queries (count AND issue)
+- PgFacetPopover: `Button as="div"` => `Box` — Chakra strips `data-testid` via `asChild`
+- E2E: `.getByTestId(id).last()` — mobile layout duplicates testids
+- `index.py` still has `locations.name` facet — needed until #144 drops `name` field
+- NHA `JobList.tsx`: `AlgoliaFacetBoolean is_remote` => `AlgoliaFacetAttribute locations.remote_name`
+- NHA `JobsSubscribeModal.tsx`: `is_remote` derivation from dead `"is_remote"` attr => `"locations.remote_name"`
+- `graphql__test.py`: 5 LLM-slop tests => 1 mixed test (covers all 3 Q() branches + OR)
