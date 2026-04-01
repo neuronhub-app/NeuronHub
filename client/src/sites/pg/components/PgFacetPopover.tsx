@@ -1,9 +1,10 @@
-import { Flex, Icon, Popover, Portal, Text } from "@chakra-ui/react";
+import { Box, Flex, Icon, Popover, Portal, Text } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { GoX } from "react-icons/go";
 import { LuChevronDown } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
 import { Button } from "@/components/ui/button";
+import type { TestId } from "@/e2e/ids";
 
 export function PgFacetPopover(props: {
   attribute?: string;
@@ -13,6 +14,7 @@ export function PgFacetPopover(props: {
   contentMaxW?: string;
   order?: { base?: number; lg?: number };
   icon?: ReactNode;
+  testId?: TestId;
 }) {
   const clear = useClearRefinements({
     includedAttributes: props.attribute ? [props.attribute] : [],
@@ -35,19 +37,23 @@ export function PgFacetPopover(props: {
       }}
     >
       <Popover.Trigger asChild>
-        <Button
-          as="div"
-          variant="outline"
-          size="md"
+        <Box
+          data-testid={props.testId}
+          display="flex"
+          alignItems="center"
           w="full"
           bg="bg.card"
           color="fg"
+          borderWidth="1px"
           borderColor="brand.gray"
           _hover={{ borderColor: "fg.muted" }}
           _open={{ borderColor: "fg" }}
           borderRadius="sm"
           justifyContent="space-between"
           px="2.5"
+          h="10"
+          fontSize="sm"
+          cursor="pointer"
           order={props.order}
         >
           <Flex align="center" gap="1">
@@ -92,7 +98,7 @@ export function PgFacetPopover(props: {
               <LuChevronDown />
             </Icon>
           </Flex>
-        </Button>
+        </Box>
       </Popover.Trigger>
       <Portal>
         <Popover.Positioner>
