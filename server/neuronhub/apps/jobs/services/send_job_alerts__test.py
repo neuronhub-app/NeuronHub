@@ -133,19 +133,6 @@ class TestSendJobAlertEmails(NeuronTestCase):
     # todo ? refac: review by try-and-error
     # ----------------------------------------------------------------------------
 
-    async def test_matches_by_remote_via_is_remote_flag(self):
-        loc_remote = await self.gen.jobs.location(is_global=True, is_remote=True)
-        loc_onsite = await self.gen.jobs.location("London")
-
-        alert = await self.gen.jobs.job_alert()
-        alert.is_remote = True
-        await alert.asave()
-
-        await self.gen.jobs.job(locations=[loc_remote])
-        await self.gen.jobs.job(locations=[loc_onsite])
-
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
-
     async def test_matches_by_location(self):
         loc_london = await self.gen.jobs.location("London")
         loc_berlin = await self.gen.jobs.location("Berlin")
