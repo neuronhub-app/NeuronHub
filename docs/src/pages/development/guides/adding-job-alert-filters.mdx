@@ -1,0 +1,24 @@
+---
+title: Adding JobAlert filters
+order: 5
+---
+
+This checklist serves as a warning to how fast and inappropriate
+the tech debt of this simple subscribe modal has become.
+
+Every time you add/modify a filter, add the logic to to:
+- [ ] create a ticket in `LLM-spec-logs/` and copy there this checklist
+- [ ] `[[send_job_alerts.py]]::_get_jobs_qs_by_alert`
+- [ ] test in `[[send_job_alerts__test.py]]`
+- [ ] `jobs/graphql.py`
+    - [ ] `JobType`
+    - [ ] `job_alert_subscribe`
+- [ ] smoke test in `jobs/graphql__test.py` (remove by the end of e2e if redundant)
+- [ ] `[[JobAlertList.tsx]]::AlertCard`, and its globally used query `JobAlertListQuery`
+- [ ] `[[PgJobAlertList.tsx]]::PgAlertCard` (duplicate of the first)
+- [ ] `[[JobsSubscribeModal.tsx]]`: mutation, `ATTRIBUTE_LABELS`
+- [ ] `[[PgFiltersTopbar.tsx]]`
+- [ ] ensure the Algolia JSON matches GraphQL per `[[Algolia.md]]`
+- [ ] consider extending the e2e in [[job-alert.spec.ts]]
+- [ ] review by LLM your code and the ticket
+- [ ] commit the ticket to Git along with your changes

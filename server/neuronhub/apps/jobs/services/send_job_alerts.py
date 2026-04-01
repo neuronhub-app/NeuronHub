@@ -212,6 +212,9 @@ async def _exclude_already_emailed_jobs_using_email_logs(
 
 
 async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
+    """
+    see [[adding-job-alert-filters.mdx]] checklist
+    """
     qs = Job.objects.select_related("org").filter(
         is_published=True,
         created_at__gte=alert.created_at,
