@@ -22,11 +22,13 @@ from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
 
 
-class JobLocation(models.Model):
+class JobLocation(TimeStampedModel):
     """
     Initially was handled by tags_country & tags_city - but UX is better when it's a single "field".
     """
 
+    # todo ! refac: keep `.name` as runtime field - for admin.py & graphql
+    # see [[JobsGen]].location for name gen example
     name = models.CharField(max_length=255, unique=True)
     city = models.CharField(max_length=255, blank=True)
     country = models.CharField(max_length=255, blank=True)
@@ -36,6 +38,9 @@ class JobLocation(models.Model):
     @model_cached_property
     def remote_name(self) -> str:
         return self.name if self.is_remote else ""
+
+    def __str__(self):
+        return self.name
 
 
 class Job(AlgoliaModel):
@@ -243,6 +248,9 @@ class JobAlert(TimeStampedModel):
         excluded_fields=["jobs_notified_count"],
         m2m_fields=[tags],
     )
+
+    class Meta:
+        get_latest_by = "pk"
 
     def __str__(self):
         is_active_flag = "" if self.is_active else ", inactive"
