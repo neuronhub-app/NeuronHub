@@ -43,6 +43,17 @@ const styles = {
   },
 } as const;
 
+export const layout = {
+  label: {
+    jobAlerts: (count?: number) => {
+      if (count === undefined) {
+        return "job alerts" as const;
+      }
+      return `job alerts (${count})` as const;
+    },
+  },
+} as const;
+
 export function LayoutSidebar(props: StackProps) {
   const { data } = useApolloQuery(JobAlertListQuery);
   const alertsCount = data?.job_alerts?.length ?? 0;

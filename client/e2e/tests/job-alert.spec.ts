@@ -1,3 +1,4 @@
+import { layout } from "@/components/LayoutSidebar";
 import { test } from "@playwright/test";
 import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
@@ -31,10 +32,11 @@ test.describe("Job Alert", () => {
   }) => {
     await play.navigate(urls.jobs.list);
 
-    const sidebarSubsLabel = "Subscriptions";
-
-    if (!isSiteProbablyGood) {
-      await expect($[ids.layout.sidebar]).not.toHaveText(sidebarSubsLabel);
+    if (isSiteProbablyGood) {
+      // todo ? fix: testid
+      await expect(page.getByRole("link", { name: layout.label.jobAlerts() })).not.toBeVisible();
+    } else {
+      await expect($[ids.layout.sidebar]).not.toHaveText(layout.label.jobAlerts());
     }
 
     const testEmail = "e2e@neuronhub.app";
@@ -45,8 +47,10 @@ test.describe("Job Alert", () => {
     await play.click(ids.job.alert.submitBtn);
     await mutationSubscribe;
 
-    if (!isSiteProbablyGood) {
-      await expect($[ids.layout.sidebar]).toHaveText(`${sidebarSubsLabel} (1)`);
+    if (isSiteProbablyGood) {
+      await expect(page.getByRole("link", { name: layout.label.jobAlerts(1) })).toBeVisible();
+    } else {
+      await expect($[ids.layout.sidebar]).toHaveText(layout.label.jobAlerts(1));
     }
 
     const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);

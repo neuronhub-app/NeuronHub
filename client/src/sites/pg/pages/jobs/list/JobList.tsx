@@ -1,3 +1,4 @@
+import { layout } from "@/components/LayoutSidebar";
 import {
   Box,
   Button,
@@ -10,10 +11,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import type { ReactNode } from "react";
-import { GoComment, GoQuestion } from "react-icons/go";
+import { GoBell, GoComment, GoQuestion } from "react-icons/go";
+import { Link } from "react-router";
 import { Configure, useClearRefinements } from "react-instantsearch";
 import { useSnapshot } from "valtio";
 import { ids } from "@/e2e/ids";
+import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
@@ -28,6 +31,7 @@ import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
 import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
 import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
+import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function JobList(props: { slug?: string }) {
@@ -266,8 +270,21 @@ function JobOpenSeparator() {
 }
 
 function PgSubheaderLinks() {
+  const { data } = useApolloQuery(JobAlertListQuery);
+  const alertsCount = data?.job_alerts?.length ?? 0;
+
   return (
     <Flex gap="gap.lg">
+      {alertsCount > 0 && (
+        <Button variant="plain" {...pgSubheaderButtonStyle} asChild>
+          <Link to={urls.jobs.subscriptions}>
+            <Icon>
+              <GoBell />
+            </Icon>
+            Your {layout.label.jobAlerts(alertsCount)}
+          </Link>
+        </Button>
+      )}
       <FaqModal>
         <Button variant="plain" {...pgSubheaderButtonStyle}>
           <Icon>
