@@ -6,10 +6,31 @@ export function ImageWithDialog(props: {
   alt?: string;
   isDimmed?: boolean;
   maxH?: SystemStyleObject["maxH"];
+  maxW?: SystemStyleObject["maxW"];
+  size?: "xs" | "sm" | "md";
 }) {
+  const style: SystemStyleObject = {
+    maxW: "min(550px, 100%)",
+    my: "10",
+    justifyContent: "center",
+  };
+
+  switch (props.size ?? "md") {
+    case "md":
+    // @ts-expect-error falls through
+    case "sm":
+      style.maxW = "350px";
+      style.my = "gap.sm";
+      style.justifyContent = "flex-start";
+      style.w = "fit-content";
+    // falls through
+    case "xs":
+      style.maxW = "250px";
+  }
+
   return (
     <Dialog.Root placement="center">
-      <Dialog.Trigger asChild>
+      <Dialog.Trigger asChild w={style.w}>
         <Center>
           <Image
             src={props.src}
@@ -18,7 +39,8 @@ export function ImageWithDialog(props: {
                 ? props.alt
                 : props.src.match(/(?<name>[\w-]+).(avif|png|jpe?g)/)?.groups?.name
             }
-            maxW="min(550px, 100%)"
+            my={style.my}
+            maxW={style.maxW}
             maxH={props.maxH}
             boxShadow="xl"
             cursor="zoom-in"
@@ -33,13 +55,14 @@ export function ImageWithDialog(props: {
           />
         </Center>
       </Dialog.Trigger>
+
       <Portal>
         <Dialog.Backdrop
           {...ids.set(ids.imageZoom.backdrop)}
           bg={{ _dark: "blackAlpha.900/90", _light: "blackAlpha.900" }}
         />
         <Dialog.Positioner>
-          <Dialog.Content>
+          <Dialog.Content w="fit-content" bg="0">
             <Dialog.CloseTrigger />
             <Dialog.Body display="flex" justifyContent="center" alignItems="center" p="0">
               <Dialog.CloseTrigger asChild>

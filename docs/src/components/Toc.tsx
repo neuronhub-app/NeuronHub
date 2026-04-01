@@ -14,7 +14,7 @@ export function Toc() {
   const items = useHeadingItems(location.pathname);
   const idsVisible = useScrollSpy(items);
 
-  const isRedundant = items.length <= 1 || (items.length === 3 && idsVisible.size === 2);
+  const isRedundant = items.length <= 1 || (items.length === 2 && idsVisible.size === 2);
   if (isRedundant) {
     return null;
   }

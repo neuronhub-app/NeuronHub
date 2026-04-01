@@ -1,5 +1,6 @@
 export { AdminLink } from "@/components/AdminLink";
 export { BadgeNew } from "@/components/BadgeNew";
+export { ChangelogEntry } from "@/components/ChangelogEntry";
 export { CodeBlockShikiAdapter } from "@/components/CodeBlockShikiAdapter";
 export { CodeBlockText } from "@/components/CodeBlockText";
 export { ColorModeProvider } from "@/components/ColorModeProvider";
