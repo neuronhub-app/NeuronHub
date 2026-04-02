@@ -51,6 +51,10 @@ review_1 = await self.gen.posts.review(tool=post, visibility=Visibility.INTERNAL
 review_2 = await self.gen.posts.review(tool=post, author=user)
 ```
 
+### DB reuse
+
+Pytest runs with `--reuse-db` in `pyproject.toml`. If you change applied migrations - you need to reset the test db.
+
 ### LLM API tests
 
 `@pytest.mark.slow_llm_api` is for integration tests that call the Claude Code binary - this always fails when invoked within the `claude` process, as it prohibits calling itself.

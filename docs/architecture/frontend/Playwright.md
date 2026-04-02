@@ -13,7 +13,7 @@ Notes:
 - If e2e needs timeouts as `waitForTimeout` - it is trash and must be rewritten.
 - Use `data-testid` for locators, in JSX set with `{...ids.set(ids.post.btn.submit)}` - see `client/e2e/ids.ts`
 - For auth we use Django `/admin/login/` and cookies - CORS 100% works.
-- The tests are slow.
+- The tests are slow - each `dbStubsRepopulateAndLogin` resets the db.
 	- Eg if needed `--repeat-each` - set to 3 max, only on desired cases only.
 
 ### PlaywrightHelper.ts
@@ -31,18 +31,43 @@ You must never use magic strings, instead:
 - if it's used 2+ times -> declare a `const` or an object eg as `const user = { email: ..., username: ... }`.
 - if it's a text from a Component indicating action status (eg added/removed/error) -> add `ids.set(condition ? ids.value.active : ids.value.inactive)` -> check it with `expect(ids.value).toBeVisible()`.
 
-### `e2e/helpers/expect.ts`
-
-Replaces:
-- `.toHaveAttribute("data-state", true)` -> `except($[ids.value]).checked(locator)`
-- `.localor(text="{value}")` -> `epxect(page).toHaveText`
-
 ### Mise
 
 - `mise e2e`: Django and Vite Mise servers are managed by Playwright from `playwright.config.ts`. Already `headless` - never modify browser CLI params.
 - `devops/e2e.mise.toml`: contains `dev:e2e:server`, `dev:e2e:server:db_worker`, etc
 - `devops/db.mise.toml`: contains `dev:db:e2e:setup` and `dev:db:e2e:rm`
 
-### Examples
+#### Altered `migrations`
 
-Clean example: [[vote-and-reading-list.spec.ts]].
+On start `e2e` runs `mise django:migrate`. If applied migrations are changed - the e2e db needs to be reset:
+- `mise dev:db:stop`
+- `mise dev:db:e2e:rm`
+- `mise dev:db:e2e:setup`
+
+To detect such errors instead of reading `| tail -30` - on unclear failures read either the head of e2e logs, or the whole log.
+
+### Clean test example
+
+```ts
+test("Upvote", async () => {
+  await play.navigate(urls.reviews.list);
+  
+  await expect($[ids.post.vote.up]).toBeVisible();
+  
+  await expect($[ids.post.vote.up]).not.checked();
+  
+  const mutation = play.waitForResponseGraphql(UserQueryDoc);
+  await $[ids.post.vote.up].click();
+  await mutation;
+  await expect($[ids.post.vote.up]).checked();
+  
+  await play.reload();
+  await expect($[ids.post.vote.up]).checked();
+});
+```
+
+### `e2e/helpers/expect.ts`
+
+Replaces:
+- `.toHaveAttribute("data-state", true)` -> `except($[ids.value]).checked(locator)`
+- `.localor(text="{value}")` -> `epxect(page).toHaveText`
