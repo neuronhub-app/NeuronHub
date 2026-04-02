@@ -1,4 +1,4 @@
-import { proxy } from "valtio";
+import { proxy, useSnapshot } from "valtio";
 import { graphql, type ResultOf } from "@/gql-tada";
 import { client } from "@/graphql/client";
 
@@ -7,6 +7,7 @@ const SiteConfigQuery = graphql.persisted(
   graphql(`
     query SiteConfigQuery {
       site {
+        contact_email
         jobs_url_utm_source
         nav_links {
           id
@@ -49,6 +50,10 @@ client.query({ query: SiteConfigQuery }).then(result => {
   siteConfigState.data = result.data?.site ?? null;
   siteConfigState.isLoading = false;
 });
+
+export function useSiteConfig() {
+  return useSnapshot(siteConfigState).data;
+}
 
 export function appendUtmSource(url: string): string {
   const utmSource = siteConfigState.data?.jobs_url_utm_source;

@@ -227,52 +227,52 @@ checksum = "sha256:785e91dd66a4f3914bf64ad629193e4f7ec710b3d058e70e23c7edd72c150
 url = "https://github.com/jkfran/killport/releases/download/v2.0.0/killport-x86_64-pc-windows-gnu.tar.gz"
 
 [[tools.node]]
-version = "25.8.2"
+version = "25.9.0"
 backend = "core:node"
 
 [tools.node."platforms.linux-arm64"]
-checksum = "sha256:2f823ecd4f9331d6492fedbe50c5a610be3084521f3a5af146875e00a52f2e63"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
+checksum = "sha256:8fb4283301b8c720fc9f18bffff0f659e72cc14d0cf207a3bb411808aaa73a57"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-linux-arm64.tar.gz"
 
 [tools.node."platforms.linux-arm64-musl"]
-checksum = "sha256:2f823ecd4f9331d6492fedbe50c5a610be3084521f3a5af146875e00a52f2e63"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
+checksum = "sha256:8fb4283301b8c720fc9f18bffff0f659e72cc14d0cf207a3bb411808aaa73a57"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-linux-arm64.tar.gz"
 
 [tools.node."platforms.linux-x64"]
-checksum = "sha256:e06c7069012d40914c57b31157c69d4ce83ea1fe9d63bbb7d26e0509a4535d21"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+checksum = "sha256:134e55b2408448a219760fe04dc44d6851f9de8a79549021ffd870e9082d9e7b"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-linux-x64.tar.gz"
 
 [tools.node."platforms.linux-x64-baseline"]
-checksum = "sha256:e06c7069012d40914c57b31157c69d4ce83ea1fe9d63bbb7d26e0509a4535d21"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+checksum = "sha256:134e55b2408448a219760fe04dc44d6851f9de8a79549021ffd870e9082d9e7b"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-linux-x64.tar.gz"
 
 [tools.node."platforms.linux-x64-musl"]
-checksum = "sha256:e06c7069012d40914c57b31157c69d4ce83ea1fe9d63bbb7d26e0509a4535d21"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+checksum = "sha256:134e55b2408448a219760fe04dc44d6851f9de8a79549021ffd870e9082d9e7b"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-linux-x64.tar.gz"
 
 [tools.node."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:e06c7069012d40914c57b31157c69d4ce83ea1fe9d63bbb7d26e0509a4535d21"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+checksum = "sha256:134e55b2408448a219760fe04dc44d6851f9de8a79549021ffd870e9082d9e7b"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-linux-x64.tar.gz"
 
 [tools.node."platforms.macos-arm64"]
-checksum = "sha256:fb8dabfda3232ef90d992e6439824fc3237356c04d182f3fa883bebeef31e871"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-darwin-arm64.tar.gz"
+checksum = "sha256:e479f3c469d3d9303a44f00a8ea37a3788395d171bb8059c48a4bbbd2e371b59"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-darwin-arm64.tar.gz"
 
 [tools.node."platforms.macos-x64"]
-checksum = "sha256:530ffb419789f843215375a65b8fcf4cf010735e99276f512a241a31ba8e5e13"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-darwin-x64.tar.gz"
+checksum = "sha256:7d737b53ce191142bfa1c17cfa5b070d96e84eebf76b8dd06d84981cbdc3f7e3"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-darwin-x64.tar.gz"
 
 [tools.node."platforms.macos-x64-baseline"]
-checksum = "sha256:530ffb419789f843215375a65b8fcf4cf010735e99276f512a241a31ba8e5e13"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-darwin-x64.tar.gz"
+checksum = "sha256:7d737b53ce191142bfa1c17cfa5b070d96e84eebf76b8dd06d84981cbdc3f7e3"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-darwin-x64.tar.gz"
 
 [tools.node."platforms.windows-x64"]
-checksum = "sha256:51815d5b0256b947d27d614de04060fcfdbdb830d2c86e63e6f33dbf7964cca7"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-win-x64.zip"
+checksum = "sha256:929552b8305effac843ba7b4270c437aefb702fc3fbd73fcd1bffd35d4ac284e"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-win-x64.zip"
 
 [tools.node."platforms.windows-x64-baseline"]
-checksum = "sha256:51815d5b0256b947d27d614de04060fcfdbdb830d2c86e63e6f33dbf7964cca7"
-url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-win-x64.zip"
+checksum = "sha256:929552b8305effac843ba7b4270c437aefb702fc3fbd73fcd1bffd35d4ac284e"
+url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-win-x64.zip"
 
 [[tools.pnpm]]
 version = "10.33.0"
@@ -375,51 +375,51 @@ checksum = "sha256:9aba23a5d549695cfb5f034849e143205ccf972e5b5d42c24acd32e084d7a
 url = "https://github.com/jdx/usage/releases/download/v3.2.0/usage-x86_64-pc-windows-msvc.zip"
 
 [[tools.uv]]
-version = "0.11.2"
+version = "0.11.3"
 backend = "aqua:astral-sh/uv"
 
 [tools.uv."platforms.linux-arm64"]
-checksum = "sha256:275d91dd1f1955136591e7ec5e1fa21e84d0d37ead7da7c35c3683df748d9855"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:8ecec82cb9a744d5fabff6d16d7777218a7730f699d2aa0d2f751c17858e2efa"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-aarch64-unknown-linux-musl.tar.gz"
 
 [tools.uv."platforms.linux-arm64-musl"]
-checksum = "sha256:275d91dd1f1955136591e7ec5e1fa21e84d0d37ead7da7c35c3683df748d9855"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-aarch64-unknown-linux-musl.tar.gz"
+checksum = "sha256:8ecec82cb9a744d5fabff6d16d7777218a7730f699d2aa0d2f751c17858e2efa"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-aarch64-unknown-linux-musl.tar.gz"
 
 [tools.uv."platforms.linux-x64"]
-checksum = "sha256:4700d9fc75734247587deb3e25dd2c6c24f4ac69e8fe91d6acad4a6013115c06"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:8b40cf16b849634b81a530a3d0a0bcae5f24996ef9ae782976fd69b6266d3b8e"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-x86_64-unknown-linux-musl.tar.gz"
 provenance = "github-attestations"
 
 [tools.uv."platforms.linux-x64-baseline"]
-checksum = "sha256:4700d9fc75734247587deb3e25dd2c6c24f4ac69e8fe91d6acad4a6013115c06"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:8b40cf16b849634b81a530a3d0a0bcae5f24996ef9ae782976fd69b6266d3b8e"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-x86_64-unknown-linux-musl.tar.gz"
 
 [tools.uv."platforms.linux-x64-musl"]
-checksum = "sha256:4700d9fc75734247587deb3e25dd2c6c24f4ac69e8fe91d6acad4a6013115c06"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:8b40cf16b849634b81a530a3d0a0bcae5f24996ef9ae782976fd69b6266d3b8e"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-x86_64-unknown-linux-musl.tar.gz"
 
 [tools.uv."platforms.linux-x64-musl-baseline"]
-checksum = "sha256:4700d9fc75734247587deb3e25dd2c6c24f4ac69e8fe91d6acad4a6013115c06"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-x86_64-unknown-linux-musl.tar.gz"
+checksum = "sha256:8b40cf16b849634b81a530a3d0a0bcae5f24996ef9ae782976fd69b6266d3b8e"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-x86_64-unknown-linux-musl.tar.gz"
 
 [tools.uv."platforms.macos-arm64"]
-checksum = "sha256:4beaa9550f93ef7f0fc02f7c28c9c48cd61fe30db00f5ac8947e0a425c3fb282"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:2bc3d0c7bf2bd08325b1e170abac6f7e5b3346e1d4eab3370d17cefec934996f"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-aarch64-apple-darwin.tar.gz"
 provenance = "github-attestations"
 
 [tools.uv."platforms.macos-x64"]
-checksum = "sha256:a9c3653245031304c50dd60ac0301bf6c112e12c38c32302a71d4fa6a63ba2cb"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-x86_64-apple-darwin.tar.gz"
+checksum = "sha256:b0e05e0b43a000fdc2132ee3f3400ba5dee427bc2337d3ec4eb8cf4f3d5722af"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-x86_64-apple-darwin.tar.gz"
 
 [tools.uv."platforms.macos-x64-baseline"]
-checksum = "sha256:a9c3653245031304c50dd60ac0301bf6c112e12c38c32302a71d4fa6a63ba2cb"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-x86_64-apple-darwin.tar.gz"
+checksum = "sha256:b0e05e0b43a000fdc2132ee3f3400ba5dee427bc2337d3ec4eb8cf4f3d5722af"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-x86_64-apple-darwin.tar.gz"
 
 [tools.uv."platforms.windows-x64"]
-checksum = "sha256:171b7ccda1bbd562da6babeffcf533a1c6cc7862cf998da826e1db534fc43e48"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:ae681c0aaec7cc96af184648cb88d73f8393ed60fa5880abdd6bdb910f9b227c"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-x86_64-pc-windows-msvc.zip"
 
 [tools.uv."platforms.windows-x64-baseline"]
-checksum = "sha256:171b7ccda1bbd562da6babeffcf533a1c6cc7862cf998da826e1db534fc43e48"
-url = "https://github.com/astral-sh/uv/releases/download/0.11.2/uv-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:ae681c0aaec7cc96af184648cb88d73f8393ed60fa5880abdd6bdb910f9b227c"
+url = "https://github.com/astral-sh/uv/releases/download/0.11.3/uv-x86_64-pc-windows-msvc.zip"

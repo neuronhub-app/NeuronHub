@@ -883,10 +883,16 @@ type Query {
   job_by_slug(slug: String!): JobType
   job_alerts: [JobAlertType!]!
   job_versions_pending: [JobVersionType!]! @IsAuthenticated
-  site: SiteType!
+  site: SiteConfigType!
 }
 
-type SiteType {
+type SiteConfigType {
+  name: String!
+  domain: String!
+  logo_url: String!
+  contact_email: String!
+  feedback_form_url: String!
+  submit_job_url: String!
   jobs_url_utm_source: String!
   nav_links: [NavbarLinkSectionType!]!
   footer_sections: [FooterSectionType!]!

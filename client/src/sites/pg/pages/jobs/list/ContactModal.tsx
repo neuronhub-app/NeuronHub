@@ -1,3 +1,4 @@
+import { useSiteConfig } from "@/sites/pg/siteConfigState";
 import { Button, Grid, Link, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
@@ -28,6 +29,8 @@ const FormSchema = z.object({
 export function ContactModal(props: { children: ReactNode }) {
   const state = useStateValtio({ isOpen: false });
   const loading = useIsLoading();
+
+  const site = useSiteConfig();
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
@@ -69,12 +72,12 @@ export function ContactModal(props: { children: ReactNode }) {
           Whether you have feedback, questions, or suggestions, we'd love to hear from you. You
           can also email us at{" "}
           <Link
-            href="mailto:team@probablygood.org?subject=Feedback"
+            href={`mailto:${site?.contact_email}?subject=Feedback`}
             fontWeight="medium"
             color="brand.green.light"
             _hover={{ textDecoration: "underline" }}
           >
-            team@probablygood.org
+            {site?.contact_email && site.contact_email}
           </Link>
         </Text>
         <DialogCloseTrigger

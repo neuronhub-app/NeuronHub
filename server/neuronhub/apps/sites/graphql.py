@@ -50,8 +50,16 @@ class FooterSectionType:
     links: list[FooterLinkType]
 
 
-@strawberry.type
-class SiteType:
+@strawberry_django.type(SiteConfig)
+class SiteConfigType:
+    name: auto
+    domain: auto
+    logo_url: auto
+    contact_email: auto
+
+    feedback_form_url: auto
+    submit_job_url: auto
+
     @strawberry_django.field()
     async def jobs_url_utm_source(self) -> str:
         site_config = await SiteConfig.get_solo()
@@ -80,9 +88,11 @@ class SitesQuery:
         NavLinks = "SiteNavLinks"
         FooterSections = "SiteFooterSections"
 
-    @strawberry.field()
-    def site(self) -> SiteType:
-        return SiteType()
+    # todo ? refac: cache in RAM -> then dorp get_list_cached
+    # though django-solo caches it for 4h. I wonder if Strawberry ignores it.
+    @strawberry_django.field()
+    async def site(self) -> SiteConfigType:
+        return cast(SiteConfigType, await SiteConfig.get_solo())
 
 
 @strawberry.type(name="Mutation")
