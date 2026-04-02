@@ -15,17 +15,19 @@ export function ImageWithDialog(props: {
     justifyContent: "center",
   };
 
-  switch (props.size ?? "md") {
-    case "md":
-    // @ts-expect-error falls through
-    case "sm":
-      style.maxW = "350px";
-      style.my = "gap.sm";
-      style.justifyContent = "flex-start";
-      style.w = "fit-content";
-    // falls through
+  const size = props.size ?? "md";
+  if (["xs", "sm"].includes(size)) {
+    style.my = "gap.sm";
+    style.justifyContent = "flex-start";
+    style.w = "fit-content";
+  }
+  switch (size) {
     case "xs":
       style.maxW = "250px";
+      break;
+    case "sm":
+      style.maxW = "350px";
+      break;
   }
 
   return (

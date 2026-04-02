@@ -8,6 +8,7 @@ import {
 	LinkExt,
 	Term,
 	Kbd,
+	Notice,
 } from "@/components"
 
 
@@ -22,11 +23,22 @@ Projects allow to group `Milestones` with ETAs into a single goal.
 
 `Favorite` <LinkExt href="https://linear.app/probablygood/project/go-live-38f83acd2475/overview">the current Project</LinkExt>.
 
+#### Effort Projection
 
-Estimates on issues allow to view the Progress Chart:
+The Progress chart is a burnup of effort Estimates, with a projected completion trend.
+- `Scope` (gray) - total estimated effort. Moves with Estimate changes.
+- `Started` (yellow) - cumulative effort outside of `Backlog`.
+- `Completed` (violet)
 
-<ImageWithDialog maxH="60" src="https://s3.stage.neuronhub.app/docs/linear/progress-chart.avif" />
+<ImageWithDialog maxH="370px" src="https://s3.stage.neuronhub.app/docs/linear/progress-projection.avif" />
 
+
+<Notice>
+Linear Issues <LinkExt href="https://linear.app/probablygood/settings/project-statuses">have 3 meta statuses</LinkExt>:
+- `Not started` - eg `Backlog`
+- `Started`: `Planned` | `In Progress` - eg `Refinement`, `Doing`, `Review`, `Testing`
+- `Completed`: `Completed` | `Cancelled` - eg `Deployed`
+</Notice>
 
 ### Search
 
@@ -45,20 +57,15 @@ Linear is the single source of truth for the specification.
 
 ### Only the Issue Description is specification
 
-Mobile/Slack/Email messages get marked as "read" by accident, and important details get buried.
-Sending specs through those channels is fine as a starting point - just make sure to capture them
-in the Issue Description so nothing is lost.
+Capture key decisions from Slack, email, and Linear Comments into the Issue `Description` - they lose visibility everywhere else.
 
-The same applies to Linear Comments: consolidate key decisions into the `Description`, since long comment threads lose visibility quickly.
-
-Aim to mark Comments and Threads as `Resolved` when you move them to the `Description` - this helps others to find missed Comments later.
+Mark Comments and Threads as `Resolved` once moved - more than 1 Thread without the green `Resolved` label confuses readers.
 
 
 ### Documents
 
 All Google Documents will be moved to Linear Documents (copy-paste will import all formatting),
-that support same comments and collaborative editing.
-And they will be attached to their Issue or Project.
+which support the same comments and collaborative editing, and attach to their Issue or Project.
 
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/linear/document-comments.avif" />
 
@@ -66,7 +73,7 @@ And they will be attached to their Issue or Project.
 ### Issue detail
 
 To keep the history readable:
-- Use `Collapsible Section` in the text editor to collapse screenshots, or reduce their size.
+- Use `Collapsible Section` in the text editor to collapse screenshots. Or reduce their size.
 - Mark your Comment Threads as `Resolved` to collapse them. Or post a Comment in the format `**Resolved**: {reason}`.
 
 <ImageWithDialog src="https://s3.stage.neuronhub.app/docs/linear/resolve-thread-with-comment.avif" />
@@ -84,6 +91,20 @@ Use <Kbd keys="Meta K" /> to mark it as:
 - `Duplicate of {id}`
 - `Sub-issue of {id}`
 - etc
+
+
+### Estimates
+
+The `T-Shirt` method is a rough ordinal scale. At the start treat it as:
+- `XS` < 1h
+- `S` ~1-2h
+- `M` ~3-5h
+- `L` ~5-9h
+- `XL` - ideally don't exist.
+
+Over time the team calibrates its sizes-to-hours mapping, eg `M` becomes `4-8h`.
+
+You can sum estimates using each size's midpoint, even before the mapping stabilizes.
 
 
 ### Usage
