@@ -37,7 +37,7 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
   }
 
   return (
-    <Float placement="bottom-start" offset={["6", null, "9"]} pos="sticky">
+    <Float placement="bottom-start" offset={["6", null, "9"]} pos="fixed">
       <Menu.Root>
         <Menu.Trigger asChild>
           <IconButton variant="ghost" aria-label="Admin Menu" focusRing="none">
