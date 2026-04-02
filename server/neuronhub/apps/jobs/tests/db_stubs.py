@@ -68,7 +68,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 """),
                 url_external="https://novafield.ai/careers/interpretability",
                 salary_min=180_000,
-                salary_text="$155,741 – $163,529",
+                salary_text="$180,000 – $220,000",
                 posted_at=now - timedelta(days=1),
                 visibility=Visibility.PUBLIC,
             ),
@@ -99,6 +99,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 """),
                 url_external="https://cleargrant.org/jobs/ops-associate",
                 salary_min=75_000,
+                salary_text="$75,000 – $90,000",
                 posted_at=now - timedelta(days=37),
                 visibility=Visibility.PUBLIC,
             ),
@@ -130,6 +131,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     - Remote-friendly with occasional travel to offices
                 """),
                 url_external="https://meridiangovernance.org/vacancies/policy",
+                salary_min=50_000,
                 salary_text="$50,000 – $140,000; £37,500 – £105,000",
                 posted_at=now - timedelta(days=60),
                 closes_at=now + timedelta(days=66),
@@ -169,7 +171,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     - This is placeholder text generated using only the job title and organization as a guide.
                 """),
                 url_external="https://bridgefund.io/hiring/country-director",
-                salary_min=84_984,
+                salary_min=86_400,
                 salary_text="$7,200; €6,100; £5,400 per month",
                 posted_at=now,
                 visibility=Visibility.PUBLIC,
@@ -203,6 +205,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     - Open to undergrads, grad students, and early-career researchers from any discipline
                 """),
                 url_external="https://arclightresearch.org/fellowship",
+                salary_min=10_000,
                 salary_text="$10,000 stipend",
                 posted_at=now - timedelta(days=23),
                 closes_at=now + timedelta(days=21),
@@ -337,6 +340,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     - Attend coalition meetings and take notes for internal distribution
                 """),
                 url_external="https://humaneventures.org/internship",
+                salary_min=24_000,
                 salary_text="$2,000 per month",
                 posted_at=now - timedelta(days=8),
                 closes_at=now + timedelta(days=14),
@@ -422,6 +426,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     - Collaborate with researchers to translate findings into policy recommendations
                 """),
                 url_external="https://sentientmetrics.org/careers/data-analyst",
+                salary_min=37_440,
                 salary_text="$18 – $20 per hour",
                 posted_at=now - timedelta(days=18),
                 visibility=Visibility.PUBLIC,

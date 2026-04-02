@@ -4,7 +4,6 @@ import { fromUnixTime } from "date-fns";
 import { LuX } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
-import { salaryFormatter } from "@/sites/pg/components/PgFacetSalary";
 
 export type RefinementActive = ReturnType<
   typeof useCurrentRefinements
@@ -27,7 +26,6 @@ const tagStyle = {
 export type FacetsActiveConfig = {
   labelsOverride?: Record<string, string>;
   dateAttributes?: string[];
-  moneyAttributes?: string[];
   formatAttribute?: Record<string, (refinement: RefinementActive) => string>;
   subFacetPairs?: Record<string, string>;
   subFacetLabel?: Record<string, string>;
@@ -63,9 +61,6 @@ export function PgAlgoliaFacetsActive(props: { config: FacetsActiveConfig; tagsG
     const label = props.config.labelsOverride?.[attribute] ?? refinement.label;
     if (props.config.dateAttributes?.includes(attribute)) {
       return `${label} ${refinement.operator} ${datetime.relative(fromUnixTime(refinement.value as number))}`;
-    }
-    if (props.config.moneyAttributes?.includes(attribute)) {
-      return `${label}: ${salaryFormatter.format(refinement.value as number)}+`;
     }
     return props.config.formatAttribute?.[attribute]?.(refinement) ?? label;
   }

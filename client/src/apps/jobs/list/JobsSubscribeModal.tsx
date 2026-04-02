@@ -7,7 +7,7 @@ import { useCurrentRefinements } from "react-instantsearch";
 import { z } from "zod";
 
 import { useUser } from "@/apps/users/useUserCurrent";
-import { salaryFormatter } from "@/sites/pg/components/PgFacetSalary";
+import { format } from "@neuronhub/shared/utils/format";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogBody,
@@ -51,7 +51,7 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
       attribute: ATTRIBUTE_LABELS[item.attribute] ?? item.attribute,
       label:
         item.attribute === "salary_min"
-          ? `${salaryFormatter.format(refinement.value as number)}+`
+          ? `${format.money(refinement.value as number)}+`
           : refinement.label,
     })),
   );
@@ -228,6 +228,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
       $is_orgs_highlighted: Boolean
       $is_remote: Boolean
       $salary_min: Int
+      $is_exclude_no_salary: Boolean
       $tz: String
     ) {
       job_alert_subscribe(
@@ -239,6 +240,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
         is_orgs_highlighted: $is_orgs_highlighted
         is_remote: $is_remote
         salary_min: $salary_min
+        is_exclude_no_salary: $is_exclude_no_salary
         tz: $tz
       )
     }

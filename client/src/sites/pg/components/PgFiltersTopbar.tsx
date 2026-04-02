@@ -1,15 +1,13 @@
 import { Flex, Grid, Stack, Switch } from "@chakra-ui/react";
 import { useToggleRefinement } from "react-instantsearch";
 import { proxy, useSnapshot } from "valtio";
-import { PgFacetSalary, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
+import { PgFacetSalary } from "@/sites/pg/components/PgFacetSalary";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import type { UseRefinementListProps } from "react-instantsearch";
 import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 import { ids } from "@/e2e/ids";
 import { LuMapPin } from "react-icons/lu";
-
-const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
 
 export const otherFiltersState = proxy({
   excludeCareerCapital: false,
@@ -20,6 +18,8 @@ export function resetOtherFilters() {
   otherFiltersState.excludeCareerCapital = false;
   otherFiltersState.excludeProfitForGood = false;
 }
+
+const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
 
 export function PgFiltersTopbar() {
   const attr = {
@@ -80,12 +80,9 @@ export function PgFiltersTopbar() {
       </PgFacetPopover>
 
       <PgFacetPopover
-        label="Minimum Salary"
+        label="Salary"
         order={{ base: 9, lg: 4 }}
-        onClose={() => {
-          salaryFilterState.showInfo = false;
-        }}
-        contentMaxW="var(--reference-width)"
+        testId={ids.facet.popover.salary}
       >
         <PgFacetSalary />
       </PgFacetPopover>

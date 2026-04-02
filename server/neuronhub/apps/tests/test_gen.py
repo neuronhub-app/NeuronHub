@@ -534,11 +534,15 @@ class JobsGen:
         tz: str | None = None,
         tags: list[PostTag] | None = None,
         locations: list[JobLocation] | None = None,
+        salary_min: int | None = None,
+        is_exclude_no_salary: bool = False,
     ) -> JobAlert:
         alert = await JobAlert.objects.acreate(
             email=email or self.faker.email(),
             is_active=is_active,
             tz=tz,
+            salary_min=salary_min,
+            is_exclude_no_salary=is_exclude_no_salary,
         )
         if tags:
             await alert.tags.aset(tags)

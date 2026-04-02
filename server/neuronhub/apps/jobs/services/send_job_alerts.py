@@ -240,7 +240,12 @@ async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
         qs = qs.filter(locations__id__in=location_ids).distinct()
 
     if alert.salary_min:
-        qs = qs.filter(salary_min__gte=alert.salary_min)
+        if alert.is_exclude_no_salary:
+            qs = qs.filter(salary_min__gte=alert.salary_min)
+        else:
+            qs = qs.filter(Q(salary_min__gte=alert.salary_min) | Q(salary_min__isnull=True))
+    elif alert.is_exclude_no_salary:
+        qs = qs.filter(salary_min__isnull=False)
 
     return [job async for job in qs.order_by("-posted_at")]
 
@@ -269,8 +274,13 @@ async def _get_alert_filters_dict(alert: JobAlert) -> dict[str, str]:
     location_names = [loc.name async for loc in alert.locations.all()]
     if location_names:
         filters["Locations"] = ", ".join(location_names)
+    salary_parts: list[str] = []
     if alert.salary_min:
-        filters["Salary"] = f"${alert.salary_min:,}"
+        salary_parts.append(f"${alert.salary_min:,}+")
+    if alert.is_exclude_no_salary:
+        salary_parts.append("Exclude roles without salary")
+    if salary_parts:
+        filters["Salary"] = ", ".join(salary_parts)
     if alert.is_orgs_highlighted:
         filters["Other Filters"] = "Highlighted Orgs"
 

@@ -112,6 +112,45 @@ export type LocationFacet = (typeof location_fields)[Exclude<
   "all"
 >];
 
+const locationAttrToField: Record<string, string> = {
+  [location_fields.name]: "name",
+  [location_fields.country]: "country",
+  [location_fields.city]: "city",
+  [location_fields.remote]: "remote_name",
+  [location_fields.is_remote]: "is_remote",
+};
+
+/**
+ * Extracts JobLocation IDs from Algolia hits matching currently selected location refinements.
+ * Algolia hits contain full `locations` JSON with `id` — we match refinement values
+ * against the corresponding field (country/city/remote_name) to collect IDs.
+ */
+export function getLocationIdsFromHits(
+  hits: Array<Record<string, unknown>>,
+  refinementItems: Array<{ attribute: string; refinements: Array<{ value: string | number }> }>,
+): number[] {
+  const locationItems = refinementItems.filter(item => item.attribute in locationAttrToField);
+  if (locationItems.length === 0) {
+    return [];
+  }
+  const ids = new Set<number>();
+  for (const hit of hits) {
+    const locations = hit.locations as Array<Record<string, unknown>> | undefined;
+    if (!locations) {
+      continue;
+    }
+    for (const loc of locations) {
+      for (const item of locationItems) {
+        const field = locationAttrToField[item.attribute]!;
+        if (item.refinements.some(r => loc[field] === String(r.value))) {
+          ids.add(loc.id as number);
+        }
+      }
+    }
+  }
+  return [...ids];
+}
+
 function isLocationFilter(filter: string): boolean {
   return location_fields.all.some(attr => filter.startsWith(`${attr}:`));
 }

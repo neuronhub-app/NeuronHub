@@ -161,6 +161,10 @@ export namespace ids {
         active: "job.subscriptions.status.active",
       },
       unsubscribed: { alert: "job.subscriptions.unsubscribed.alert" },
+      badge: {
+        salaryMin: "job.subscriptions.badge.salary-min",
+        excludeNoSalary: "job.subscriptions.badge.exclude-no-salary",
+      },
     },
   } as const;
 
@@ -196,6 +200,11 @@ export namespace ids {
       remote: "facet.popover.remote",
       country: "facet.popover.country",
       city: "facet.popover.city",
+      salary: "facet.popover.salary",
+    },
+    salaryInput: "facet.salary-input",
+    switch: {
+      excludeNoSalary: "facet.switch.exclude-no-salary",
     },
     checkbox(value: string) {
       return `facet.checkbox.${value}` as TestId;

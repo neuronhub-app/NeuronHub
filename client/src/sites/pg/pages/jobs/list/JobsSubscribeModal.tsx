@@ -21,7 +21,9 @@ import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMounte
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { format } from "@neuronhub/shared/utils/format";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { useJobListFilters } from "@/sites/pg/pages/jobs/list/jobListFilters";
 
 const FormSchema = z.object({
   email: z.email("Invalid email address"),
@@ -30,6 +32,7 @@ const FormSchema = z.object({
 export function JobsSubscribeModal(props: { testId?: string; trigger?: React.ReactNode }) {
   const user = useUser();
   const loading = useIsLoading();
+  const jobFilters = useJobListFilters();
 
   const refinesCurrent = useCurrentRefinements();
 
@@ -41,16 +44,22 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
     defaultValues: { email: user?.email ?? localStorage.getItem(emailStoreKey) ?? "" },
   });
 
-  const refinesCurrentReadableMap = refinesCurrent.items.flatMap(item =>
-    item.refinements.map(refinement => ({
-      attribute: ATTRIBUTE_LABELS[item.attribute] ?? item.attribute,
-      label: getRefinementLabel(item.attribute, refinement),
-    })),
-  );
+  const refinesCurrentReadableMap = [
+    ...refinesCurrent.items.flatMap(item =>
+      item.refinements.map(refinement => ({
+        attribute: ATTRIBUTE_LABELS[item.attribute] ?? item.attribute,
+        label: getRefinementLabel(item.attribute, refinement),
+      })),
+    ),
+    ...(jobFilters.snap.salaryMin
+      ? [{ attribute: "Minimum Salary", label: `${format.money(jobFilters.snap.salaryMin)}+` }]
+      : []),
+    ...(jobFilters.snap.excludeNoSalary
+      ? [{ attribute: "Exclude No Salary", label: "Yes" }]
+      : []),
+  ];
 
   async function handleSubscribe(fields: z.infer<typeof FormSchema>) {
-    const salaryRefinement = refinesCurrent.items.find(item => item.attribute === "salary_min");
-
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,
       tag_names: refinesCurrent.items
@@ -69,10 +78,8 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
         item => item.attribute === "org.is_highlighted",
       ),
       is_remote: refinesCurrent.items.some(item => item.attribute === "locations.remote_name"),
-      salary_min:
-        salaryRefinement?.refinements[0]?.value != null
-          ? Number(salaryRefinement.refinements[0].value)
-          : null,
+      salary_min: jobFilters.snap.salaryMin ?? null,
+      is_exclude_no_salary: jobFilters.snap.excludeNoSalary,
       tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     if (result.success) {
