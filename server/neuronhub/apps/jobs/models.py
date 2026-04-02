@@ -1,9 +1,11 @@
 import uuid
+from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
 from django.core.cache import cache
 from django.db import models
 from django.db.models import ManyToManyField
+from django.db.models import TextChoices
 from django.utils.crypto import salted_hmac
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
@@ -20,6 +22,10 @@ from neuronhub.apps.sites.models import url_with_utm_help_text
 from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
+
+
+if TYPE_CHECKING:
+    from neuronhub.apps.posts.models import PostTag
 
 
 class JobLocation(TimeStampedModel):
@@ -74,7 +80,7 @@ class Job(AlgoliaModel):
         related_name=f"tags_job_{TagCategoryEnum.Skill.value}",
         blank=True,
     )
-    tags_area = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
+    tags_area: ManyToManyField[PostTag, PostTag] = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
         "posts.PostTag",
         limit_choices_to={"categories__name": TagCategoryEnum.Area},
         related_name=f"tags_job_{TagCategoryEnum.Area.value}",
@@ -99,7 +105,7 @@ class Job(AlgoliaModel):
         blank=True,
     )
 
-    locations = models.ManyToManyField(
+    locations: ManyToManyField[JobLocation, JobLocation] = models.ManyToManyField(
         JobLocation,
         blank=True,
     )
@@ -170,6 +176,37 @@ class Job(AlgoliaModel):
     graphql_query_for_algolia: str = "JobsByIds"
     graphql_query_for_algolia_field: str = "jobs"
 
+    # Algolia bool facets - inverted for exclude-filter FE UX.
+    #
+    # Uses .all() to hit prefetch_related cache - not .filter()
+    boolean_facet_fields = [
+        "has_salary",
+        "is_orgs_highlighted",
+        "is_not_career_capital",
+        "is_not_profit_for_good",
+    ]
+
+    class Tags(TextChoices):
+        # for BE/FE instead of magic strings
+        CareerCapital = "Career Capital"
+        ProfitForGood = "Profit for Good"
+
+    @model_cached_property
+    def has_salary(self) -> bool:
+        return bool(self.salary_min)
+
+    @model_cached_property
+    def is_orgs_highlighted(self) -> bool:
+        return bool(self.org and self.org.is_highlighted)
+
+    @model_cached_property
+    def is_not_career_capital(self) -> bool:
+        return not any(tag.name == self.Tags.CareerCapital.value for tag in self.tags_area.all())
+
+    @model_cached_property
+    def is_not_profit_for_good(self) -> bool:
+        return not any(tag.name == self.Tags.ProfitForGood.value for tag in self.tags_area.all())
+
     def is_in_algolia_index(self) -> bool:
         return self.is_published
 
@@ -233,6 +270,9 @@ class JobAlert(TimeStampedModel):
     )
     is_remote = models.BooleanField(blank=True, null=True)
     salary_min = models.PositiveIntegerField(blank=True, null=True)
+    is_exclude_no_salary = models.BooleanField(blank=True, null=True)
+    is_exclude_career_capital = models.BooleanField(blank=True, null=True)
+    is_exclude_profit_for_good = models.BooleanField(blank=True, null=True)
 
     tz: ZoneInfo = TimeZoneField(blank=True, default="")
 

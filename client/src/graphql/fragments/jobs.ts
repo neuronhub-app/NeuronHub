@@ -37,6 +37,11 @@ export const JobFragment = graphql(
       closes_at
       description
 
+      has_salary
+      is_orgs_highlighted
+      is_not_career_capital
+      is_not_profit_for_good
+
       tags_skill {
         ...PostTagLeanFragment
       }

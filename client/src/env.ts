@@ -48,6 +48,17 @@ export const env = {
   get isProd(): boolean {
     return this.MODE === "production" || this.NODE_ENV === "production";
   },
+  get site() {
+    const site = this.VITE_SITE;
+    return {
+      get isProbablyGood() {
+        return site === "pg";
+      },
+      get isNeuronHub() {
+        return site === "";
+      },
+    };
+  },
   get isTiredOwlDev(): boolean {
     return this.VITE_IS_TIRED_OWL_DEV;
   },

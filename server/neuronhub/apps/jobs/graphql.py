@@ -93,6 +93,12 @@ class JobType:
     tags_experience: list[PostTagType]
     tags_workload: list[PostTagType]
 
+    has_salary: auto
+    is_remote: auto
+    is_orgs_highlighted: auto
+    is_not_career_capital: auto
+    is_not_profit_for_good: auto
+
     @classmethod
     def get_queryset(cls, queryset: QuerySet[Job], info: strawberry.Info) -> QuerySet[Job]:
         user = get_user_sync(info)
@@ -109,6 +115,9 @@ class JobAlertType:
     is_orgs_highlighted: auto
     is_remote: auto
     salary_min: auto
+    is_exclude_no_salary: auto
+    is_exclude_career_capital: auto
+    is_exclude_profit_for_good: auto
     is_active: auto
     created_at: auto
     sent_count: auto
@@ -199,6 +208,9 @@ class JobsMutation:
         is_orgs_highlighted: bool | None = None,
         is_remote: bool | None = None,
         salary_min: int | None = None,
+        is_exclude_no_salary: bool | None = None,
+        is_exclude_career_capital: bool | None = None,
+        is_exclude_profit_for_good: bool | None = None,
         tz: str | None = None,
     ) -> bool:
         alert = await JobAlert.objects.acreate(
@@ -206,6 +218,9 @@ class JobsMutation:
             is_orgs_highlighted=is_orgs_highlighted,
             is_remote=is_remote,
             salary_min=salary_min,
+            is_exclude_no_salary=is_exclude_no_salary,
+            is_exclude_career_capital=is_exclude_career_capital,
+            is_exclude_profit_for_good=is_exclude_profit_for_good,
             tz=tz,
         )
         if tag_names:

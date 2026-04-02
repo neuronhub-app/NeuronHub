@@ -2,9 +2,11 @@ from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 
+from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_qs_by_alert
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
+from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.tests.test_cases import NeuronTestCase
@@ -129,24 +131,9 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert stats.sent == 1
         assert len(mail.outbox) == 1
 
-    # #quality-45%
-    # todo ? refac: review by try-and-error
-    # ----------------------------------------------------------------------------
-
-    async def test_matches_by_location(self):
+    async def test_filters_by_multiple_locations(self):
         loc_london = await self.gen.jobs.location("London")
-        loc_berlin = await self.gen.jobs.location("Berlin")
-
-        alert = await self.gen.jobs.job_alert(locations=[loc_london])
-
-        await self.gen.jobs.job(locations=[loc_london])
-        await self.gen.jobs.job(locations=[loc_berlin])
-
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
-
-    async def test_matches_by_multiple_locations(self):
-        loc_london = await self.gen.jobs.location("London")
-        loc_berlin = await self.gen.jobs.location("Berlin")
+        loc_berlin = await self.gen.jobs.location("Berlin", is_remote=True)
         loc_paris = await self.gen.jobs.location("Paris")
 
         alert = await self.gen.jobs.job_alert(locations=[loc_london, loc_berlin])
@@ -156,6 +143,66 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(locations=[loc_paris])
 
         assert 2 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_filters_remote_location(self):
+        loc_remote = await self.gen.jobs.location(code="US", is_remote=True)
+        loc_office = await self.gen.jobs.location("London")
+
+        alert = await self.gen.jobs.job_alert(locations=[loc_remote])
+
+        await self.gen.jobs.job(locations=[loc_remote])
+        await self.gen.jobs.job(locations=[loc_office])
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_filters_by_salary_min(self):
+        alert = await self.gen.jobs.job_alert(salary_min=50_000)
+
+        await self.gen.jobs.job(salary_min=80_000)
+        await self.gen.jobs.job(salary_min=30_000)  # below min
+        await self.gen.jobs.job()  # included by design
+
+        assert 2 == len(await _get_jobs_qs_by_alert(alert))
+
+    # boolean filters
+    # ----------------------------------------------------------------------------
+
+    async def test_filters_by_is_orgs_highlighted(self):
+        org_h = await Org.objects.acreate(name="Highlighted", is_highlighted=True)
+        org_n = await Org.objects.acreate(name="Normal", is_highlighted=False)
+
+        alert = await self.gen.jobs.job_alert(is_orgs_highlighted=True)
+
+        await self.gen.jobs.job(org=org_h)
+        await self.gen.jobs.job(org=org_n)
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_filters_by_no_salary(self):
+        alert = await self.gen.jobs.job_alert(is_exclude_no_salary=True)
+
+        await self.gen.jobs.job(salary_min=50000)
+        await self.gen.jobs.job()
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_filters_by_tag_enum_1(self):
+        tag = await self.gen.posts.tag(Job.Tags.CareerCapital, Category.Area)
+        alert = await self.gen.jobs.job_alert(is_exclude_career_capital=True)
+
+        await self.gen.jobs.job(tags=[tag])
+        await self.gen.jobs.job()
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_filters_by_tag_enum_2(self):
+        tag = await self.gen.posts.tag(Job.Tags.ProfitForGood, Category.Area)
+        alert = await self.gen.jobs.job_alert(is_exclude_profit_for_good=True)
+
+        await self.gen.jobs.job(tags=[tag])
+        await self.gen.jobs.job()
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
 
 Category = TagCategoryEnum

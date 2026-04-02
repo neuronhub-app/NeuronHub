@@ -141,6 +141,9 @@ type JobAlertType {
   is_orgs_highlighted: Boolean
   is_remote: Boolean
   salary_min: Int
+  is_exclude_no_salary: Boolean
+  is_exclude_career_capital: Boolean
+  is_exclude_profit_for_good: Boolean
   is_active: Boolean!
   created_at: DateTime!
   sent_count: Int!
@@ -171,6 +174,11 @@ type JobLocationType {
   remote_name: String!
 }
 
+enum JobTagsEnum {
+  CareerCapital
+  ProfitForGood
+}
+
 type JobType {
   org: OrgType!
   id: ID!
@@ -190,6 +198,11 @@ type JobType {
   tags_education(filters: PostTagFilter): [PostTagType!]!
   tags_experience(filters: PostTagFilter): [PostTagType!]!
   tags_workload(filters: PostTagFilter): [PostTagType!]!
+  has_salary: Boolean!
+  is_remote: Boolean!
+  is_orgs_highlighted: Boolean!
+  is_not_career_capital: Boolean!
+  is_not_profit_for_good: Boolean!
 }
 
 type JobVersionType {
@@ -248,7 +261,7 @@ type Mutation {
   profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku", include_reprocessing: Boolean! = true, is_dry: Boolean! = false): ProgressType! @IsAuthenticated
   profile_matches_cancel_llm: Boolean! @IsAuthenticated
   job_versions_approve(draft_ids: [Int!]!): Boolean! @IsStaff
-  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_countries: [String!] = null, location_cities: [String!] = null, location_remote_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null, tz: String = null): Boolean!
+  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_countries: [String!] = null, location_cities: [String!] = null, location_remote_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null, is_exclude_no_salary: Boolean = null, is_exclude_career_capital: Boolean = null, is_exclude_profit_for_good: Boolean = null, tz: String = null): Boolean!
   job_alert_toggle_active(id_ext: UUID!): Boolean!
   job_alert_remove(id_ext: UUID!): Boolean!
   job_alert_access_session_by_id_ext(id_ext: UUID!): Boolean!

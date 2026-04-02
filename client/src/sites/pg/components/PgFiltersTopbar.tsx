@@ -1,7 +1,6 @@
 import { Flex, Grid, Stack, Switch } from "@chakra-ui/react";
 import { useToggleRefinement } from "react-instantsearch";
-import { proxy, useSnapshot } from "valtio";
-import { PgFacetSalary, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
+import { PgFacetSalary } from "@/sites/pg/components/PgFacetSalary";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import type { UseRefinementListProps } from "react-instantsearch";
 import { PgFacet } from "@/sites/pg/components/PgFacet";
@@ -10,16 +9,6 @@ import { ids } from "@/e2e/ids";
 import { LuMapPin } from "react-icons/lu";
 
 const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
-
-export const otherFiltersState = proxy({
-  excludeCareerCapital: false,
-  excludeProfitForGood: false,
-});
-
-export function resetOtherFilters() {
-  otherFiltersState.excludeCareerCapital = false;
-  otherFiltersState.excludeProfitForGood = false;
-}
 
 export function PgFiltersTopbar() {
   const attr = {
@@ -83,9 +72,6 @@ export function PgFiltersTopbar() {
       <PgFacetPopover
         label="Minimum Salary"
         order={{ base: 9, lg: 4 }}
-        onClose={() => {
-          salaryFilterState.showInfo = false;
-        }}
         contentMaxW="var(--reference-width)"
       >
         <PgFacetSalary />
@@ -149,10 +135,16 @@ export function PgFiltersTopbar() {
 }
 
 function OtherFiltersFacet(props: { order: { base: number } }) {
-  const highlighted = useToggleRefinement({ attribute: "org.is_highlighted", on: true });
-  const snap = useSnapshot(otherFiltersState);
+  const highlighted = useToggleRefinement({ attribute: "is_orgs_highlighted" });
+  const notCareerCapital = useToggleRefinement({ attribute: "is_not_career_capital" });
+  const notProfitForGood = useToggleRefinement({ attribute: "is_not_profit_for_good" });
+
   return (
-    <PgFacetPopover label="Other Filters" order={props.order}>
+    <PgFacetPopover
+      label="Other Filters"
+      order={props.order}
+      testId={ids.facet.popover.otherFilters}
+    >
       <Stack gap="gap.sm">
         <BooleanSwitch
           label="Show only roles at highlighted orgs"
@@ -161,26 +153,32 @@ function OtherFiltersFacet(props: { order: { base: number } }) {
         />
         <BooleanSwitch
           label="Exclude career capital roles"
-          checked={snap.excludeCareerCapital}
-          onToggle={() => {
-            otherFiltersState.excludeCareerCapital = !otherFiltersState.excludeCareerCapital;
-          }}
+          checked={notCareerCapital.value.isRefined}
+          onToggle={() => notCareerCapital.refine(notCareerCapital.value)}
+          testId={ids.facet.excludeCareerCapital}
         />
         <BooleanSwitch
           label="Exclude Profit-for-Good roles"
-          checked={snap.excludeProfitForGood}
-          onToggle={() => {
-            otherFiltersState.excludeProfitForGood = !otherFiltersState.excludeProfitForGood;
-          }}
+          checked={notProfitForGood.value.isRefined}
+          onToggle={() => notProfitForGood.refine(notProfitForGood.value)}
         />
       </Stack>
     </PgFacetPopover>
   );
 }
 
-function BooleanSwitch(props: { label: string; checked: boolean; onToggle: () => void }) {
+function BooleanSwitch(props: {
+  label: string;
+  checked: boolean;
+  onToggle: () => void;
+  testId?: string;
+}) {
   return (
-    <Switch.Root checked={props.checked} onCheckedChange={props.onToggle}>
+    <Switch.Root
+      checked={props.checked}
+      onCheckedChange={props.onToggle}
+      data-testid={props.testId}
+    >
       <Switch.HiddenInput />
       <Flex w="full" justify="space-between" align="center" gap="gap.md">
         <Switch.Label {...facetStyle.value}>{props.label}</Switch.Label>

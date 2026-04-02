@@ -1,3 +1,8 @@
+/**
+ * #quality-30% - almost exact duplicate of client/src/apps/jobs/list/JobsSubscribeModal.tsx
+ *
+ * Only has insignificant CSS changes.
+ */
 import { Box, Button, Flex, Icon, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -48,6 +53,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
     })),
   );
 
+  // todo ! refac: duplicate of [[client/src/apps/jobs/list/JobsSubscribeModal.tsx]]
   async function handleSubscribe(fields: z.infer<typeof FormSchema>) {
     const salaryRefinement = refinesCurrent.items.find(item => item.attribute === "salary_min");
 
@@ -65,14 +71,18 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
       location_remote_names: refinesCurrent.items
         .filter(item => item.attribute === "locations.remote_name")
         .flatMap(item => item.refinements.map(r => String(r.value))),
-      is_orgs_highlighted: refinesCurrent.items.some(
-        item => item.attribute === "org.is_highlighted",
-      ),
-      is_remote: refinesCurrent.items.some(item => item.attribute === "locations.remote_name"),
+      is_orgs_highlighted:
+        refinesCurrent.items.some(item => item.attribute === "is_orgs_highlighted") || null,
       salary_min:
         salaryRefinement?.refinements[0]?.value != null
           ? Number(salaryRefinement.refinements[0].value)
           : null,
+      is_exclude_no_salary:
+        refinesCurrent.items.some(item => item.attribute === "has_salary") || null,
+      is_exclude_career_capital:
+        refinesCurrent.items.some(item => item.attribute === "is_not_career_capital") || null,
+      is_exclude_profit_for_good:
+        refinesCurrent.items.some(item => item.attribute === "is_not_profit_for_good") || null,
       tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     if (result.success) {
@@ -245,7 +255,10 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "locations.remote_name": "Remote",
   "locations.country": "Country",
   "locations.city": "City",
-  "org.is_highlighted": "Highlighted",
+  is_orgs_highlighted: "Highlighted",
+  has_salary: "Has Salary",
+  is_not_career_capital: "Exclude Career Capital",
+  is_not_profit_for_good: "Exclude Profit for Good",
   "org.name": "Organisation",
   salary_min: "Minimum Salary",
   posted_at: "Posted",

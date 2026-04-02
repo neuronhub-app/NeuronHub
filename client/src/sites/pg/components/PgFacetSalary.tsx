@@ -8,11 +8,12 @@ import {
   Switch,
   Text,
 } from "@chakra-ui/react";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { PiInfoFill } from "react-icons/pi";
 import { useRef } from "react";
-import { proxy, useSnapshot } from "valtio";
-import { useRange } from "react-instantsearch";
+import { useRange, useToggleRefinement } from "react-instantsearch";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
+import { ids } from "@/e2e/ids";
 import { format } from "@neuronhub/shared/utils/format";
 
 const textStyle = { ...facetStyle.value, color: "fg" } as const;
@@ -26,22 +27,20 @@ const salaryFormatOptions = {
 
 export const salaryFormatter = new Intl.NumberFormat("en-US", salaryFormatOptions);
 
-export const salaryFilterState = proxy({
-  excludeNoSalary: false,
-  showInfo: false,
-});
-
+// todo ! refac: replace redundant `isShowInfo` with <Popover>
 function SalaryExtras(props: { isSalarySelected: boolean }) {
-  const snap = useSnapshot(salaryFilterState);
+  const state = useStateValtio({
+    isShowInfoPopover: false,
+  });
+
+  const hasSalary = useToggleRefinement({ attribute: "has_salary" });
 
   return (
     <>
       <Switch.Root
-        checked={snap.excludeNoSalary}
+        checked={hasSalary.value.isRefined}
         disabled={props.isSalarySelected}
-        onCheckedChange={() => {
-          salaryFilterState.excludeNoSalary = !salaryFilterState.excludeNoSalary;
-        }}
+        onCheckedChange={() => hasSalary.refine(hasSalary.value)}
         w="full"
       >
         <Switch.HiddenInput />
@@ -57,7 +56,7 @@ function SalaryExtras(props: { isSalarySelected: boolean }) {
         align="center"
         gap="gap.xs"
         onClick={() => {
-          salaryFilterState.showInfo = !salaryFilterState.showInfo;
+          state.mut.isShowInfoPopover = !state.mut.isShowInfoPopover;
         }}
         cursor="pointer"
       >
@@ -66,7 +65,7 @@ function SalaryExtras(props: { isSalarySelected: boolean }) {
           <PiInfoFill />
         </Icon>
       </Flex>
-      {snap.showInfo && (
+      {state.snap.isShowInfoPopover && (
         <Text {...textStyle}>
           All hourly, weekly, and monthly rates are annualized and non-US salaries are converted
           to their USD equivalent.
@@ -74,10 +73,6 @@ function SalaryExtras(props: { isSalarySelected: boolean }) {
       )}
     </>
   );
-}
-
-export function resetSalaryFilter() {
-  salaryFilterState.excludeNoSalary = false;
 }
 
 export function PgFacetSalary() {

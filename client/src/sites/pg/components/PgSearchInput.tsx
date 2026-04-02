@@ -47,7 +47,7 @@ export function PgSearchInput(props: { endElementText: ReactNode; testId?: strin
         type="search"
         placeholder="Search"
         {...(props.testId ? ids.set(props.testId) : {})}
-        bg="white"
+        bg="bg.default_real"
         ps={{ base: "10", md: "12" }}
         borderRadius="md"
         borderWidth="1px"

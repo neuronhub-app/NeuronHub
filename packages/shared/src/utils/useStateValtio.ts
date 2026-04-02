@@ -28,6 +28,7 @@ export function useStateValtio<T extends object>(val: T, devtoolsName?: string) 
 
   return {
     mutable: state,
+    mut: state,
     snap: useSnapshot(state),
     subscribe: (callback: () => void) => {
       subscribe(state, callback);

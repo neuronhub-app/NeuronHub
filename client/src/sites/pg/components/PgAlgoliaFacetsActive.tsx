@@ -32,8 +32,6 @@ export type FacetsActiveConfig = {
   formatAttribute?: Record<string, (refinement: RefinementActive) => string>;
   subFacetPairs?: Record<string, string>;
   subFacetLabel?: Record<string, string>;
-  extraTags?: Array<{ label: string; onRemove: () => void }>;
-  onClearAdditional?: () => void;
 };
 
 export function PgAlgoliaFacetsActive(props: {
@@ -44,7 +42,7 @@ export function PgAlgoliaFacetsActive(props: {
   const refinementsCurrent = useCurrentRefinements();
   const refinementsClear = useClearRefinements();
 
-  if (!refinementsClear.canRefine && !props.config.extraTags?.length) {
+  if (!refinementsClear.canRefine) {
     return null;
   }
 
@@ -88,9 +86,6 @@ export function PgAlgoliaFacetsActive(props: {
             />
           )),
       )}
-      {props.config.extraTags?.map(tag => (
-        <FilterTag key={tag.label} label={tag.label} onRemove={tag.onRemove} />
-      ))}
       {props.children}
     </Wrap>
   );

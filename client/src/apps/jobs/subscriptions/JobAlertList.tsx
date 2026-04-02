@@ -93,7 +93,10 @@ function AlertCard(props: { alert: AlertType }) {
     props.alert.locations.length > 0 ||
     props.alert.is_orgs_highlighted ||
     props.alert.is_remote ||
-    props.alert.salary_min != null;
+    props.alert.salary_min != null ||
+    props.alert.is_exclude_no_salary ||
+    props.alert.is_exclude_career_capital ||
+    props.alert.is_exclude_profit_for_good;
 
   return (
     <Card.Root
@@ -176,6 +179,21 @@ function AlertCard(props: { alert: AlertType }) {
                   <Badge variant="solid">{format.money(props.alert.salary_min)}</Badge>
                 </Group>
               )}
+              {props.alert.is_exclude_no_salary && (
+                <Badge variant="subtle" colorPalette="teal">
+                  Has Salary
+                </Badge>
+              )}
+              {props.alert.is_exclude_career_capital && (
+                <Badge variant="subtle" colorPalette="orange">
+                  Exclude Career Capital
+                </Badge>
+              )}
+              {props.alert.is_exclude_profit_for_good && (
+                <Badge variant="subtle" colorPalette="orange">
+                  Exclude Profit for Good
+                </Badge>
+              )}
               {props.alert.locations.map(loc => (
                 <Badge key={loc.name} variant="subtle" colorPalette="purple">
                   {loc.name}
@@ -233,6 +251,9 @@ export const JobAlertListQuery = graphql.persisted(
         is_orgs_highlighted
         is_remote
         salary_min
+        is_exclude_no_salary
+        is_exclude_career_capital
+        is_exclude_profit_for_good
         is_active
         created_at
         sent_count

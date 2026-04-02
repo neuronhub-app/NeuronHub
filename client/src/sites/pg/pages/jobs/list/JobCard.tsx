@@ -411,19 +411,25 @@ function locationTags(locations: JobFragmentType["locations"]): string[] {
   if (!locations) {
     return [];
   }
+
   if (locations.length <= 3) {
     return locations.map(loc => loc.name);
   }
+
   const remotes = locations.filter(loc => loc.is_remote);
   if (remotes.length === 0) {
+    // 4+ onsite
     return ["Multiple Locations"];
   }
+
   if (locations.filter(loc => !loc.is_remote).length === 0) {
     return ["Remote, Multiple Locations"];
   }
+
   if (remotes.length === 1) {
     return ["Multiple Locations", remotes[0]?.name ?? "Remote"];
   }
+
   return ["Multiple Locations", "Remote, Multiple Locations"];
 }
 

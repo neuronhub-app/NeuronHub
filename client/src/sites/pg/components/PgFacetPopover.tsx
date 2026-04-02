@@ -10,7 +10,6 @@ export function PgFacetPopover(props: {
   attribute?: string;
   children: ReactNode;
   label: string;
-  onClose?: () => void;
   contentMaxW?: string;
   order?: { base?: number; md?: number; lg?: number };
   icon?: ReactNode;
@@ -28,11 +27,6 @@ export function PgFacetPopover(props: {
         placement: "bottom-start",
         offset: { mainAxis: 4, crossAxis: 0 },
         listeners: false, // fix CLS on filter add (ENG-56).
-      }}
-      onOpenChange={details => {
-        if (!details.open) {
-          props.onClose?.();
-        }
       }}
     >
       <Popover.Trigger asChild>

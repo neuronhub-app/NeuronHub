@@ -50,20 +50,16 @@ export function PgFilterCardWithSplitBg(props: {
 
 export function PgFacetsActive(props: { facetsActive: FacetsActiveConfig }) {
   const clear = useClearRefinements();
-  const isActive = clear.canRefine || Boolean(props.facetsActive.extraTags?.length);
-  if (!isActive) {
+  if (!clear.canRefine) {
     return null;
   }
   return (
-    <Collapsible.Root open={isActive} gridColumn="span 5">
+    <Collapsible.Root open={clear.canRefine} gridColumn="span 5">
       <Collapsible.Content>
         <HStack gap="gap.md" align="flex-start">
           <PgAlgoliaFacetsActive config={props.facetsActive} />
 
-          <PgRefinesClearButton
-            onClear={props.facetsActive.onClearAdditional}
-            extraTags={props.facetsActive.extraTags}
-          />
+          <PgRefinesClearButton />
         </HStack>
       </Collapsible.Content>
     </Collapsible.Root>
@@ -109,10 +105,7 @@ export function PgMobileCollapsible(props: {
           {props.facetsTopbar}
 
           <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm">
-            <PgRefinesClearButton
-              onClear={props.facetsActive.onClearAdditional}
-              extraTags={props.facetsActive.extraTags}
-            />
+            <PgRefinesClearButton />
           </PgAlgoliaFacetsActive>
 
           <Collapsible.Trigger asChild>
@@ -140,13 +133,10 @@ export function PgMobileCollapsible(props: {
   );
 }
 
-function PgRefinesClearButton(props: {
-  onClear?: () => void;
-  extraTags?: Array<{ label: string; onRemove: () => void }>;
-}) {
-  const refinementsClear = useClearRefinements();
+function PgRefinesClearButton() {
+  const clear = useClearRefinements();
 
-  if (!refinementsClear.canRefine && !props.extraTags?.length) {
+  if (!clear.canRefine) {
     return null;
   }
 
@@ -154,8 +144,7 @@ function PgRefinesClearButton(props: {
     <Flex
       as="button"
       onClick={() => {
-        refinementsClear.refine();
-        props.onClear?.();
+        clear.refine();
       }}
       align="center"
       gap="gap.xs"

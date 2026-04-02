@@ -754,14 +754,14 @@ class val:
         AIS = "AI Safety & Policy"
         AnimalWelfare = "Animal Welfare"
         Biosecurity = "Biosecurity"
-        CareerCapital = "Career Capital"
+        CareerCapital = Job.Tags.CareerCapital.value
         ClimateChange = "Climate Change"
         CommunityBuilding = "Community Building"
         GlobalHealth = "Global Health & Development"
         MentalHealth = "Mental Health & Wellbeing"
         NuclearSecurity = "Nuclear Security & Conflict"
         Other = "Other"
-        ProfitForGood = "Profit for Good"
+        ProfitForGood = Job.Tags.ProfitForGood.value
         Societal = "Societal Improvements"
 
     class education:

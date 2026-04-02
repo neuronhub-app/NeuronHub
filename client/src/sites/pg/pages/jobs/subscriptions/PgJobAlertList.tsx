@@ -112,7 +112,10 @@ function PgAlertCard(props: { alert: AlertType }) {
     props.alert.locations.length > 0 ||
     props.alert.is_orgs_highlighted ||
     props.alert.is_remote ||
-    props.alert.salary_min != null;
+    props.alert.salary_min != null ||
+    props.alert.is_exclude_no_salary ||
+    props.alert.is_exclude_career_capital ||
+    props.alert.is_exclude_profit_for_good;
 
   const style = {
     badge: {
@@ -174,6 +177,15 @@ function PgAlertCard(props: { alert: AlertType }) {
               <Badge variant="pg-experience">
                 Min Salary: {format.money(props.alert.salary_min)}
               </Badge>
+            )}
+            {props.alert.is_exclude_no_salary && (
+              <Badge variant="pg-experience">Exclude no salary</Badge>
+            )}
+            {props.alert.is_exclude_career_capital && (
+              <Badge variant="pg-area">Exclude Career Capital</Badge>
+            )}
+            {props.alert.is_exclude_profit_for_good && (
+              <Badge variant="pg-area">Exclude Profit for Good</Badge>
             )}
             {props.alert.locations.map(loc => (
               <Badge key={loc.name} variant="pg-education">

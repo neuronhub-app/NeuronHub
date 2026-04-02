@@ -208,7 +208,9 @@ export namespace ids {
       remote: "facet.popover.remote",
       country: "facet.popover.country",
       city: "facet.popover.city",
+      otherFilters: "facet.popover.other-filters",
     },
+    excludeCareerCapital: "facet.exclude-career-capital",
     checkbox(value: string) {
       return `facet.checkbox.${value}` as TestId;
     },

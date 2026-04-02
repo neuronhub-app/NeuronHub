@@ -534,11 +534,21 @@ class JobsGen:
         tz: str | None = None,
         tags: list[PostTag] | None = None,
         locations: list[JobLocation] | None = None,
+        is_orgs_highlighted: bool | None = None,
+        salary_min: int | None = None,
+        is_exclude_no_salary: bool | None = None,
+        is_exclude_career_capital: bool | None = None,
+        is_exclude_profit_for_good: bool | None = None,
     ) -> JobAlert:
         alert = await JobAlert.objects.acreate(
             email=email or self.faker.email(),
             is_active=is_active,
             tz=tz,
+            is_orgs_highlighted=is_orgs_highlighted,
+            salary_min=salary_min,
+            is_exclude_no_salary=is_exclude_no_salary,
+            is_exclude_career_capital=is_exclude_career_capital,
+            is_exclude_profit_for_good=is_exclude_profit_for_good,
         )
         if tags:
             await alert.tags.aset(tags)

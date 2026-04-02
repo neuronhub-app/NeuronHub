@@ -36,6 +36,12 @@ export namespace theme {
       DEFAULT: { value: { _light: "{colors.brand.seashell}", _dark: "{colors.stone.950}" } },
       card: { value: { _light: "white", _dark: "{colors.slate.800}" } },
       backdrop: { value: "{colors.brand.gray.backdrop}/50" },
+
+      // DEFAULT above isn't white -> it makes invalid the rels of bg <-> bg.panel
+      // and forces to use bg="white", breaking the dark mode
+      default_real: {
+        value: { _light: "white", _dark: "black" },
+      },
     },
 
     fg: {

@@ -8,8 +8,6 @@ import { ids } from "@/e2e/ids";
 import { env } from "@/env";
 import { urls } from "@/urls";
 
-const isSiteProbablyGood = env.VITE_SITE === "pg";
-
 test.describe("Job Alert", () => {
   let play: PlaywrightHelper;
   let $: LocatorMapToGetFirstById;
@@ -30,13 +28,18 @@ test.describe("Job Alert", () => {
     page,
     context,
   }) => {
-    await play.navigate(urls.jobs.list);
+    await play.navigate(urls.jobs.list, { idleWait: true });
 
-    if (isSiteProbablyGood) {
-      // todo ? fix: testid
+    if (env.site.isProbablyGood) {
+      // todo ? refac: testid
       await expect(page.getByRole("link", { name: layout.label.jobAlerts() })).not.toBeVisible();
     } else {
       await expect($[ids.layout.sidebar]).not.toHaveText(layout.label.jobAlerts());
+    }
+
+    if (env.site.isProbablyGood) {
+      await page.getByTestId(ids.facet.popover.otherFilters).last().click();
+      await page.getByTestId(ids.facet.excludeCareerCapital).last().click();
     }
 
     const testEmail = "e2e@neuronhub.app";
@@ -47,7 +50,7 @@ test.describe("Job Alert", () => {
     await play.click(ids.job.alert.submitBtn);
     await mutationSubscribe;
 
-    if (isSiteProbablyGood) {
+    if (env.site.isProbablyGood) {
       await expect(page.getByRole("link", { name: layout.label.jobAlerts(1) })).toBeVisible();
     } else {
       await expect($[ids.layout.sidebar]).toHaveText(layout.label.jobAlerts(1));
@@ -57,6 +60,10 @@ test.describe("Job Alert", () => {
     await play.navigate(urls.jobs.subscriptions);
     const alertsRes = await alertsQuery;
     await expect($[ids.job.subscriptions.card]).toHaveText(testEmail);
+
+    if (env.site.isProbablyGood) {
+      await expect($[ids.job.subscriptions.card]).toHaveText("Exclude Career Capital");
+    }
 
     // .is_active to false
     await play.click(ids.job.subscriptions.toggleBtn);
@@ -75,7 +82,7 @@ test.describe("Job Alert", () => {
   });
 
   test("subscribe => delete by /jobs/subscriptions/remove/:id_ext", async ({ page }) => {
-    await play.navigate(urls.jobs.list);
+    await play.navigate(urls.jobs.list, { idleWait: true });
 
     const testEmail = "e2e@neuronhub.app";
 

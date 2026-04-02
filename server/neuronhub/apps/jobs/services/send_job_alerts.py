@@ -220,6 +220,7 @@ async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
         created_at__gte=alert.created_at,
     )
 
+    # todo !! review: Algolia uses AND filters, this is OR
     if tag_ids := [tag_id async for tag_id in alert.tags.values_list("id", flat=True)]:
         q_obj = Q()
         for field in [
@@ -240,7 +241,16 @@ async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
         qs = qs.filter(locations__id__in=location_ids).distinct()
 
     if alert.salary_min:
-        qs = qs.filter(salary_min__gte=alert.salary_min)
+        qs = qs.filter(Q(salary_min__gte=alert.salary_min) | Q(salary_min=None))
+
+    if alert.is_exclude_no_salary:
+        qs = qs.exclude(salary_min=False)
+
+    if alert.is_exclude_career_capital:
+        qs = qs.exclude(tags_area__name=Job.Tags.CareerCapital)
+
+    if alert.is_exclude_profit_for_good:
+        qs = qs.exclude(tags_area__name=Job.Tags.ProfitForGood)
 
     return [job async for job in qs.order_by("-posted_at")]
 
@@ -271,7 +281,17 @@ async def _get_alert_filters_dict(alert: JobAlert) -> dict[str, str]:
         filters["Locations"] = ", ".join(location_names)
     if alert.salary_min:
         filters["Salary"] = f"${alert.salary_min:,}"
+
+    bool_filters: list[str] = []
     if alert.is_orgs_highlighted:
-        filters["Other Filters"] = "Highlighted Orgs"
+        bool_filters.append("Highlighted Orgs")
+    if alert.is_exclude_no_salary:
+        bool_filters.append("Has Salary")
+    if alert.is_exclude_career_capital:
+        bool_filters.append("Exclude Career Capital")
+    if alert.is_exclude_profit_for_good:
+        bool_filters.append("Exclude Profit for Good")
+    if bool_filters:
+        filters["Other Filters"] = ", ".join(bool_filters)
 
     return filters

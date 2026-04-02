@@ -14,19 +14,13 @@ import type { ReactNode } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
 import { Link } from "react-router";
 import { Configure, useClearRefinements } from "react-instantsearch";
-import { useSnapshot } from "valtio";
 import { ids } from "@/e2e/ids";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
-import { resetSalaryFilter, salaryFilterState } from "@/sites/pg/components/PgFacetSalary";
-import {
-  otherFiltersState,
-  PgFiltersTopbar,
-  resetOtherFilters,
-} from "@/sites/pg/components/PgFiltersTopbar";
+import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
 import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
 import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
@@ -37,46 +31,6 @@ import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 export function JobList(props: { slug?: string }) {
   const jobOpenPinned = useJobOpenPinned(props.slug);
   const algolia = useAlgoliaSearchClient();
-  const salarySnap = useSnapshot(salaryFilterState);
-  const otherSnap = useSnapshot(otherFiltersState);
-
-  const filterParts: string[] = [];
-  if (salarySnap.excludeNoSalary) {
-    filterParts.push("salary_min > 0");
-  }
-  if (otherSnap.excludeCareerCapital) {
-    filterParts.push(`NOT tags_area.name:"Career Capital"`);
-  }
-  if (otherSnap.excludeProfitForGood) {
-    filterParts.push(`NOT tags_area.name:"Profit for Good"`);
-  }
-  const filters = filterParts.length > 0 ? filterParts.join(" AND ") : undefined;
-
-  const extraTags: Array<{ label: string; onRemove: () => void }> = [];
-  if (salarySnap.excludeNoSalary) {
-    extraTags.push({
-      label: "Exclude No Salary Roles",
-      onRemove: () => {
-        salaryFilterState.excludeNoSalary = false;
-      },
-    });
-  }
-  if (otherSnap.excludeCareerCapital) {
-    extraTags.push({
-      label: "Exclude Career Capital Roles",
-      onRemove: () => {
-        otherFiltersState.excludeCareerCapital = false;
-      },
-    });
-  }
-  if (otherSnap.excludeProfitForGood) {
-    extraTags.push({
-      label: "Exclude Profit-for-Good Roles",
-      onRemove: () => {
-        otherFiltersState.excludeProfitForGood = false;
-      },
-    });
-  }
 
   return (
     <PgAlgoliaList<JobFragmentType>
@@ -108,22 +62,19 @@ export function JobList(props: { slug?: string }) {
       facetsTopbar={<PgFiltersTopbar />}
       facetsActive={{
         labelsOverride: {
-          "org.is_highlighted": "Highlighted",
+          is_orgs_highlighted: "Highlighted",
+          has_salary: "Has Salary",
+          is_not_career_capital: "Excl. Career Capital",
+          is_not_profit_for_good: "Excl. Profit-for-Good",
           posted_at_unix: "Posted",
           salary_min: "Minimum Salary",
         },
         dateAttributes: ["posted_at_unix"],
         moneyAttributes: ["salary_min"],
-        extraTags,
-        onClearAdditional: () => {
-          resetSalaryFilter();
-          resetOtherFilters();
-        },
       }}
     >
       <Configure
         hitsPerPage={20}
-        filters={filters}
         attributesToHighlight={[
           "title",
           "org.name",
@@ -190,8 +141,6 @@ function ResetFiltersButton() {
       size="sm"
       onClick={() => {
         clear.refine();
-        resetSalaryFilter();
-        resetOtherFilters();
       }}
       flexShrink="0"
     >

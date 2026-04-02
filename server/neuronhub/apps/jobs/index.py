@@ -71,6 +71,8 @@ if settings.ALGOLIA["IS_ENABLED"]:
             *[(f"get_iso_{field}", field) for field in datetime_fields],
             # unix for Algolia's sort/filter
             *[(f"get_unix_{field}", f"{field}_unix") for field in datetime_fields],
+            # boolean facets (model_cached_property on Job)
+            *Job.boolean_facet_fields,
         ]
         settings = {
             "searchableAttributes": [
@@ -93,6 +95,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "searchable(locations.city)",
                 "salary_min",
                 "org.is_highlighted",
+                *Job.boolean_facet_fields,
                 "visible_to",
             ],
             "unretrievableAttributes": [

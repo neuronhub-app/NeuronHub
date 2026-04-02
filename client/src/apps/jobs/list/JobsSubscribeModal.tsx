@@ -74,13 +74,17 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
         .filter(item => item.attribute === "locations.remote_name")
         .flatMap(item => item.refinements.map(r => String(r.value))),
       is_orgs_highlighted:
-        refinesCurrent.items.some(item => item.attribute === "org.is_highlighted") ?? null,
-      is_remote:
-        refinesCurrent.items.some(item => item.attribute === "locations.remote_name") ?? null,
+        refinesCurrent.items.some(item => item.attribute === "is_orgs_highlighted") || null,
       salary_min:
         salaryRefinement?.refinements[0]?.value != null
           ? Number(salaryRefinement.refinements[0].value)
           : null,
+      is_exclude_no_salary:
+        refinesCurrent.items.some(item => item.attribute === "has_salary") || null,
+      is_exclude_career_capital:
+        refinesCurrent.items.some(item => item.attribute === "is_not_career_capital") || null,
+      is_exclude_profit_for_good:
+        refinesCurrent.items.some(item => item.attribute === "is_not_profit_for_good") || null,
       tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     if (result.success) {
@@ -210,7 +214,10 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_education.name": "Education",
   "tags_workload.name": "Workload",
   "locations.remote_name": "Remote",
-  "org.is_highlighted": "Highlighted",
+  is_orgs_highlighted: "Highlighted",
+  has_salary: "Has Salary",
+  is_not_career_capital: "Exclude Career Capital",
+  is_not_profit_for_good: "Exclude Profit for Good",
   "org.name": "Organization",
   salary_min: "Min Salary",
   posted_at: "Posted",
@@ -226,8 +233,10 @@ export const JobAlertSubscribeMutation = graphql.persisted(
       $location_cities: [String!]
       $location_remote_names: [String!]
       $is_orgs_highlighted: Boolean
-      $is_remote: Boolean
       $salary_min: Int
+      $is_exclude_no_salary: Boolean
+      $is_exclude_career_capital: Boolean
+      $is_exclude_profit_for_good: Boolean
       $tz: String
     ) {
       job_alert_subscribe(
@@ -237,8 +246,10 @@ export const JobAlertSubscribeMutation = graphql.persisted(
         location_cities: $location_cities
         location_remote_names: $location_remote_names
         is_orgs_highlighted: $is_orgs_highlighted
-        is_remote: $is_remote
         salary_min: $salary_min
+        is_exclude_no_salary: $is_exclude_no_salary
+        is_exclude_career_capital: $is_exclude_career_capital
+        is_exclude_profit_for_good: $is_exclude_profit_for_good
         tz: $tz
       )
     }
