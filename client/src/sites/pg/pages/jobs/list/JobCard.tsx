@@ -246,7 +246,7 @@ export function JobCard(props: {
 
       <Collapsible.Root open={isOpen}>
         <Collapsible.Content animationDuration={style.duration}>
-          {props.job.description && <JobExpanded job={props.job} />}
+          <JobExpanded job={props.job} />
         </Collapsible.Content>
       </Collapsible.Root>
 
@@ -259,23 +259,21 @@ export function JobCard(props: {
         cursor="pointer"
       />
 
-      {props.job.description && (
-        <Flex
-          pos="absolute"
-          bottom={{ base: "8px", md: "gap.md" }}
-          right={{ base: "gap.sm", md: "gap.lg" }}
-          color={borderColor}
-          _groupHover={{ color: borderColorHover }}
-        >
-          <LuChevronDown
-            size={24}
-            style={{
-              transform: isOpen ? "rotate(180deg)" : undefined,
-              transition: "transform 0.25s ease",
-            }}
-          />
-        </Flex>
-      )}
+      <Flex
+        pos="absolute"
+        bottom={{ base: "8px", md: "gap.md" }}
+        right={{ base: "gap.sm", md: "gap.lg" }}
+        color={borderColor}
+        _groupHover={{ color: borderColorHover }}
+      >
+        <LuChevronDown
+          size={24}
+          style={{
+            transform: isOpen ? "rotate(180deg)" : undefined,
+            transition: "transform 0.25s ease",
+          }}
+        />
+      </Flex>
     </Stack>
   );
 }
@@ -283,23 +281,25 @@ export function JobCard(props: {
 function JobExpanded(props: { job: JobFragmentType }) {
   return (
     <Stack gap={{ base: "gap.md", md: "gap.lg" }}>
-      <Stack gap="0">
-        <Text fontSize="sm" color="fg.muted" fontWeight="medium">
-          Job Description
-        </Text>
-        <Prose
-          size="sm"
-          maxW="none"
-          css={{
-            "& ul > li::marker": { color: "brand.black" },
-            "& ul": { paddingInlineStart: "1em" },
-          }}
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-          dangerouslySetInnerHTML={{
-            __html: markedConfigured.parse(props.job.description ?? ""),
-          }}
-        />
-      </Stack>
+      {props.job.description && (
+        <Stack gap="0">
+          <Text fontSize="sm" color="fg.muted" fontWeight="medium">
+            Job Description
+          </Text>
+          <Prose
+            size="sm"
+            maxW="none"
+            css={{
+              "& ul > li::marker": { color: "brand.black" },
+              "& ul": { paddingInlineStart: "1em" },
+            }}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
+            dangerouslySetInnerHTML={{
+              __html: markedConfigured.parse(props.job.description),
+            }}
+          />
+        </Stack>
+      )}
       <Flex gap="gap.md" flexDirection={{ base: "column", md: "row" }}>
         <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
           <Text fontSize="sm" color="fg.muted" fontWeight="medium">
