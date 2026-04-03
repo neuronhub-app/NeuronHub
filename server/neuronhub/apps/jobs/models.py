@@ -59,7 +59,7 @@ class Job(AlgoliaModel):
 
     title = models.CharField(max_length=512)
 
-    description = models.TextField(blank=True)
+    description = MarkdownField(blank=True, help_text="Use Markdown syntax.")
 
     slug = AutoSlugField(populate_from=["title", "org__name"], max_length=1024)
 

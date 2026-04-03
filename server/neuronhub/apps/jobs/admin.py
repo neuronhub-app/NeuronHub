@@ -58,6 +58,8 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
     search_fields = [
         "title",
         "org__name",
+        "slug",
+        "description",
     ]
 
     fieldsets = [
@@ -68,6 +70,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
                     "title",
                     "slug",
                     "org",
+                    "description",
                     "salary_min",
                     "salary_text",
                     "url_external",
