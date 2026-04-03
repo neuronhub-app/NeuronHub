@@ -1,11 +1,15 @@
-from asgiref.sync import async_to_sync
+from zoneinfo import ZoneInfo
+
 from dalf.admin import DALFModelAdmin
 from dalf.admin import DALFRelatedFieldAjaxMulti
 from django.contrib import admin
+from django.contrib import messages
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.http import HttpResponseForbidden
 from django.utils.safestring import mark_safe
+from django_object_actions import DjangoObjectActions
+from django_object_actions import action
 from simple_history.admin import SimpleHistoryAdmin
 
 from neuronhub.apps.jobs.models import Job
@@ -116,7 +120,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
 
 
 @admin.register(JobAlert)
-class JobAlertAdmin(SimpleHistoryAdmin, DALFModelAdmin):
+class JobAlertAdmin(SimpleHistoryAdmin, DjangoObjectActions, DALFModelAdmin):
     list_display = [
         "email",
         "is_active",
@@ -142,6 +146,10 @@ class JobAlertAdmin(SimpleHistoryAdmin, DALFModelAdmin):
     actions = [
         "trigger_send_job_alerts",
     ]
+    change_actions = [
+        "set_tz_to_none",
+        "set_tz_to_pt",
+    ]
 
     @admin.action(
         description="Send emails for Alerts (won't duplicate; if Alert has TZ - will work only at 8:00-8:59am)"
@@ -159,6 +167,18 @@ class JobAlertAdmin(SimpleHistoryAdmin, DALFModelAdmin):
                 <a href="https://docs.neuronhub.app/usage/reference/job-alert-emails">Docs</a>
             """),
         )
+
+    @action(label="Empty TimeZone")
+    def set_tz_to_none(self, request: HttpRequest, obj: JobAlert):
+        obj.tz = ""
+        obj.save()
+        messages.success(request, "TZ removed")
+
+    @action(label="Set TimeZone to PT")
+    def set_tz_to_pt(self, request: HttpRequest, obj: JobAlert):
+        obj.tz = ZoneInfo("America/Los_Angeles")
+        obj.save()
+        messages.success(request, "TZ removed")
 
 
 @admin.register(JobAlertLog)
