@@ -148,10 +148,16 @@ You may use `:latest` docker tag, but I advise to hardcode the non-breaking rele
 
 ### Vite prod is using a wrong VITE_SERVER_URL
 
-During the `docker build` step, the `npx react-router build` hardcodes `VITE_SERVER_URL`, ie it ignores the runtime envs as `SERVER_URL` and others.
+During the `docker build` step, the `pnpm exec react-router build` hardcodes `VITE_SERVER_URL`,
+ie it's going to ignore the runtime envs as `SERVER_URL` and others.
 
 
 ## Integrations Checklist
+
+### Algolia
+
+For envs as `stage` the API key needs to match the `*_stage*` indexes.
+    - Even if you need eg only `jobs_stage*` - it tries to modify `posts_stage` and others.
 
 ### Sentry
 
