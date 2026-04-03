@@ -183,7 +183,7 @@ class JobLocationAdmin(DALFModelAdmin):
         "country",
         "city",
         "is_remote",
-        # "created_at",
+        "created_at",
     ]
     search_fields = [
         "name",

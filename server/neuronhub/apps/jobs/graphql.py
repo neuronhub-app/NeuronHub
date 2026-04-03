@@ -94,7 +94,6 @@ class JobType:
     tags_workload: list[PostTagType]
 
     has_salary: auto
-    is_remote: auto
     is_orgs_highlighted: auto
     is_not_career_capital: auto
     is_not_profit_for_good: auto
@@ -113,7 +112,9 @@ class JobAlertType:
     tags: list[PostTagType]
     locations: list[JobLocationType]
     is_orgs_highlighted: auto
-    is_remote: auto
+    is_remote: auto = strawberry.field(
+        deprecation_reason=".is_remote was moved to JobLocation.is_remote"
+    )
     salary_min: auto
     is_exclude_no_salary: auto
     is_exclude_career_capital: auto
@@ -196,7 +197,7 @@ class JobsMutation:
         await publish_job_versions(draft_ids)
         return True
 
-    @strawberry.mutation
+    @strawberry.mutation()
     async def job_alert_subscribe(
         self,
         info: strawberry.Info,
@@ -206,7 +207,7 @@ class JobsMutation:
         location_cities: list[str] | None = None,
         location_remote_names: list[str] | None = None,
         is_orgs_highlighted: bool | None = None,
-        is_remote: bool | None = None,
+        is_remote: bool | None = None,  # deprecated by [[JobLocation]].is_remote
         salary_min: int | None = None,
         is_exclude_no_salary: bool | None = None,
         is_exclude_career_capital: bool | None = None,

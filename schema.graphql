@@ -139,7 +139,7 @@ type JobAlertType {
   tags(filters: PostTagFilter): [PostTagType!]!
   locations: [JobLocationType!]!
   is_orgs_highlighted: Boolean
-  is_remote: Boolean
+  is_remote: Boolean @deprecated(reason: ".is_remote was moved to JobLocation.is_remote")
   salary_min: Int
   is_exclude_no_salary: Boolean
   is_exclude_career_capital: Boolean
@@ -174,11 +174,6 @@ type JobLocationType {
   remote_name: String!
 }
 
-enum JobTagsEnum {
-  CareerCapital
-  ProfitForGood
-}
-
 type JobType {
   org: OrgType!
   id: ID!
@@ -199,7 +194,6 @@ type JobType {
   tags_experience(filters: PostTagFilter): [PostTagType!]!
   tags_workload(filters: PostTagFilter): [PostTagType!]!
   has_salary: Boolean!
-  is_remote: Boolean!
   is_orgs_highlighted: Boolean!
   is_not_career_capital: Boolean!
   is_not_profit_for_good: Boolean!
