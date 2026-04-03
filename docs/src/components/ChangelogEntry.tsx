@@ -1,5 +1,4 @@
 import { Badge, Flex, HStack, Heading, Stack, Text } from "@chakra-ui/react";
-import { theme } from "@neuronhub/shared/theme/colors";
 import type { PropsWithChildren } from "react";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 
@@ -10,6 +9,8 @@ import { datetime } from "@neuronhub/shared/utils/date-fns";
  * - datetime.relative and .relativeRounded have wrong TZ
  * - redundant `em`
  * - the regex is #prob-redundant
+ *
+ * todo ! fix: `title` in Algolia index
  */
 export function ChangelogEntry(
   props: PropsWithChildren<{
