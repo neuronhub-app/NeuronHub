@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django_object_actions import DjangoObjectActions
 from django_object_actions import action
+from simple_history.admin import SimpleHistoryAdmin
 from solo.admin import SingletonModelAdmin
 
 from neuronhub.apps.jobs.models import JobFaqQuestion
@@ -103,7 +104,9 @@ class FooterSectionAdmin(SortableAdminMixin, SortableAdminBase, admin.ModelAdmin
 
 
 @admin.register(SiteConfig)
-class SiteConfigAdmin(SortableAdminBase, DjangoObjectActions, SingletonModelAdmin):
+class SiteConfigAdmin(
+    SimpleHistoryAdmin, SortableAdminBase, DjangoObjectActions, SingletonModelAdmin
+):
     inlines = [
         JobFaqQuestionInline,
         NavbarLinkSectionInline,

@@ -80,6 +80,7 @@ INSTALLED_APPS = [
     "adminutils",
     "adminsortable2",
     "dalf",
+    "solo",
     "neuronhub.apps.db",
     "neuronhub.apps.algolia",
     "neuronhub.apps.sites",

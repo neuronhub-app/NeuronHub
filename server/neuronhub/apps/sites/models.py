@@ -10,6 +10,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import TextChoices
 from django_choices_field.fields import TextChoicesField
+from simple_history.models import HistoricalRecords
 from solo.models import SingletonModel
 
 from neuronhub.apps.db.fields import HtmlField
@@ -46,7 +47,7 @@ class SiteConfig(SingletonModel):
     )
     contact_email = models.EmailField(
         default=settings.DEFAULT_FROM_EMAIL,
-        help_text="Used eg in the 'Contact' modal form",
+        help_text="Used for `reply-to` email and the 'Contact' modal form",
     )
 
     logo_url = models.URLField(
@@ -106,6 +107,8 @@ class SiteConfig(SingletonModel):
         verbose_name="Template Job alert confirmation",
         help_text=f"Specify to override the jobs/job_alert_confirmation.html email template. {_help_text}",
     )
+
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.name
