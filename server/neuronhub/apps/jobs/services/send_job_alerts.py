@@ -244,7 +244,7 @@ async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
         qs = qs.filter(Q(salary_min__gte=alert.salary_min) | Q(salary_min=None))
 
     if alert.is_exclude_no_salary:
-        qs = qs.exclude(salary_min=False)
+        qs = qs.exclude(salary_min=None)
 
     if alert.is_exclude_career_capital:
         qs = qs.exclude(tags_area__name=Job.Tags.CareerCapital)
