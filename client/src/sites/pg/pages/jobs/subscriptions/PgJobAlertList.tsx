@@ -12,6 +12,7 @@ import {
   Heading,
   HStack,
   IconButton,
+  IconButtonProps,
   Link,
   Stack,
   Text,
@@ -119,7 +120,8 @@ function PgAlertCard(props: { alert: AlertType }) {
 
   const style = {
     badge: {
-      size: { base: "xs", lg: "md" },
+      size: { base: "xs", md: "md" },
+      h: { base: "initial", lg: "" },
     },
   } as const;
 
@@ -148,6 +150,7 @@ function PgAlertCard(props: { alert: AlertType }) {
             </Text>
 
             <Badge
+              {...style.badge}
               variant={props.alert.is_active ? "pg-area" : "pg-workload"}
               {...ids.set(
                 props.alert.is_active
@@ -166,34 +169,47 @@ function PgAlertCard(props: { alert: AlertType }) {
       </Flex>
 
       {/* card - row bottom */}
-      <HStack justify="space-between">
+      <HStack justify="space-between" align="flex-end">
         {isHasFilters ? (
           <HStack gap={{ base: "gap.xs", md: "gap.md" }} flexWrap="wrap">
-            {props.alert.is_remote && <Badge variant="pg-education">Remote</Badge>}
+            {props.alert.is_remote && (
+              <Badge {...style.badge} variant="pg-education">
+                Remote
+              </Badge>
+            )}
             {props.alert.is_orgs_highlighted && (
-              <Badge variant="pg-highlighted">Highlighted Orgs</Badge>
+              <Badge {...style.badge} variant="pg-highlighted">
+                Highlighted Orgs
+              </Badge>
             )}
             {props.alert.salary_min != null && (
-              <Badge variant="pg-experience">
+              <Badge {...style.badge} variant="pg-experience">
                 Min Salary: {format.money(props.alert.salary_min)}
               </Badge>
             )}
             {props.alert.is_exclude_no_salary && (
-              <Badge variant="pg-experience">Exclude no salary</Badge>
+              <Badge {...style.badge} variant="pg-experience">
+                Exclude no salary
+              </Badge>
             )}
             {props.alert.is_exclude_career_capital && (
-              <Badge variant="pg-area">Exclude Career Capital</Badge>
+              <Badge {...style.badge} variant="pg-area">
+                Exclude Career Capital
+              </Badge>
             )}
             {props.alert.is_exclude_profit_for_good && (
-              <Badge variant="pg-area">Exclude Profit for Good</Badge>
+              <Badge {...style.badge} variant="pg-area">
+                Exclude Profit for Good
+              </Badge>
             )}
             {props.alert.locations.map(loc => (
-              <Badge key={loc.name} variant="pg-education">
+              <Badge {...style.badge} key={loc.name} variant="pg-education">
                 {loc.name}
               </Badge>
             ))}
             {props.alert.tags.map(tag => (
               <Badge
+                {...style.badge}
                 key={tag.name}
                 variant={badgeVariantByCategory(tag.category_name) as never}
                 maxW="100%"
@@ -218,7 +234,8 @@ function PgAlertCard(props: { alert: AlertType }) {
         >
           <Flex
             align="flex-start"
-            fontSize={{ base: "xs", md: "sm" }}
+            mb="-2px"
+            fontSize={{ base: "2xs", md: "sm" }}
             color="fg.muted"
             whiteSpace="nowrap"
           >
@@ -233,14 +250,18 @@ function PgAlertCard(props: { alert: AlertType }) {
 function AlertCardActions(props: { alert: AlertType }) {
   const loading = useIsLoading();
 
+  const style = {
+    size: ["2xs", "2xs", "sm"],
+  } satisfies IconButtonProps;
+
   return (
-    <>
+    <Flex gap="gap.md">
       {/* Delete */}
       {!props.alert.is_active && (
         <IconButton
+          {...style}
           aria-label="Delete"
-          variant="ghost"
-          size="sm"
+          variant="subtle"
           colorPalette="red"
           onClick={async () => {
             await loading.track(() =>
@@ -258,9 +279,9 @@ function AlertCardActions(props: { alert: AlertType }) {
 
       {/* Pause */}
       <IconButton
+        {...style}
         aria-label={props.alert.is_active ? "Pause" : "Resume"}
-        variant="ghost"
-        size="sm"
+        variant="subtle"
         onClick={async () => {
           await loading.track(() =>
             mutateAndRefetchMountedQueries(JobAlertToggleActiveMutation, {
@@ -273,7 +294,7 @@ function AlertCardActions(props: { alert: AlertType }) {
       >
         {props.alert.is_active ? <LuPause /> : <LuPlay />}
       </IconButton>
-    </>
+    </Flex>
   );
 }
 
