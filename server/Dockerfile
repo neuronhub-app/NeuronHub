@@ -19,9 +19,20 @@ LABEL org.opencontainers.image.source="https://github.com/${GITHUB_PATH}/blob/${
 LABEL org.opencontainers.image.version="$VITE_RELEASE_VERSION"
 
 
-RUN apt update && apt install ca-certificates --yes # for Sentry
+RUN apt update
+RUN apt install --yes ca-certificates  # for Sentry
 
-WORKDIR /app
+# For SSH
+RUN apt install --yes fish bat nano micro
+RUN ln --symbolic /usr/bin/batcat /usr/bin/bat
+ENV PAGER=bat
+RUN usermod --shell /usr/bin/fish root
+RUN mkdir -p /root/.config/fish && echo 'cd /app' >> /root/.config/fish/config.fish
+ARG WORKDIR=/app
+RUN mkdir -p /$USER/.config/fish && echo "cd ${WORKDIR}" >> /$USER/.config/fish/config.fish
+
+
+WORKDIR ${WORKDIR}
 
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-cache
