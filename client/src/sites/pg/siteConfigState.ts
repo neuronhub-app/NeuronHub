@@ -1,3 +1,4 @@
+import { captureException } from "@sentry/react";
 import { proxy, useSnapshot } from "valtio";
 import { graphql, type ResultOf } from "@/gql-tada";
 import { client } from "@/graphql/client";
@@ -60,7 +61,12 @@ export function appendUtmSource(url: string): string {
   if (!url || !utmSource) {
     return url;
   }
-  const urlParsed = new URL(url);
-  urlParsed.searchParams.set("utm_source", utmSource);
-  return urlParsed.toString();
+  try {
+    const urlParsed = new URL(url);
+    urlParsed.searchParams.set("utm_source", utmSource);
+    return urlParsed.toString();
+  } catch (error) {
+    captureException(error);
+    return url;
+  }
 }
