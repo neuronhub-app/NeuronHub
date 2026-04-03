@@ -2,7 +2,14 @@ import { Kbd as ChakraKbd } from "@chakra-ui/react";
 
 export function Kbd(props: { keys: string }) {
   return (
-    <ChakraKbd display="inline-flex" gap="1" alignItems="center" borderRadius="sm">
+    <ChakraKbd
+      display="inline-flex"
+      gap="1"
+      alignItems="center"
+      borderRadius="sm"
+      borderColor="blue.muted"
+      boxShadow="none"
+    >
       {props.keys
         .split(" ")
         .flatMap((key, index) =>
