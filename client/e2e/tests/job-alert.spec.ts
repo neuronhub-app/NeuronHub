@@ -81,7 +81,9 @@ test.describe("Job Alert", () => {
     await expect(page).not.toHaveText(testEmail);
   });
 
-  test("subscribe => delete by /jobs/subscriptions/remove/:id_ext", async ({ page }) => {
+  test("subscribe => delete by /jobs/subscriptions/remove/:id_ext (flaky -> run 2-3x if failed)", async ({
+    page,
+  }) => {
     await play.navigate(urls.jobs.list, { idleWait: true });
 
     const testEmail = "e2e@neuronhub.app";
@@ -92,6 +94,10 @@ test.describe("Job Alert", () => {
     await play.click(ids.job.alert.submitBtn);
     await mutationSubscribe;
 
+    // Flaky:
+    // > Error: response.json: Protocol error (Network.getResponseBody): No resource with given identifier found
+    //
+    // Maybe: try it after `play.navigate(subs)`
     const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);
     await play.navigate(urls.jobs.subscriptions);
     const alertsRes = await alertsQuery;
