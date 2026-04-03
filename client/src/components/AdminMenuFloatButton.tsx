@@ -5,14 +5,15 @@ import { Box, chakra, IconButton, Menu, Float, Portal } from "@chakra-ui/react";
 import { admin } from "@neuronhub/shared/admin-urls";
 import { icons } from "@neuronhub/shared/theme/icons";
 
-import { useAuth } from "@/apps/users/useUserCurrent";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { ColorModeIcon, useColorMode } from "@/components/ui/color-mode";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { useEffect } from "react";
 
 export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
   const mode = useColorMode();
-  const auth = useAuth();
+
+  const user = useUser();
 
   const storageKey = "is_admin_menu_hidden";
 
@@ -28,7 +29,7 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
     }
   }, [state.snap]);
 
-  if (!(auth.user?.is_superuser || auth.user?.is_staff)) {
+  if (!(user?.is_superuser || user?.is_staff)) {
     return null;
   }
 
@@ -72,7 +73,7 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                 </Menu.Item>
 
                 {props.isThemeSwitcher &&
-                  (env.isTiredOwlDev || auth.user?.email.includes("neuronhub.app")) && (
+                  (env.isTiredOwlDev || user?.email.includes("neuronhub.app")) && (
                     <Menu.Item
                       value="toggle theme"
                       closeOnSelect={false}
