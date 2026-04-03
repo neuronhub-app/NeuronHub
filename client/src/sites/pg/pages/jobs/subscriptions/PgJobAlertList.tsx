@@ -255,7 +255,7 @@ function AlertCardActions(props: { alert: AlertType }) {
   } satisfies IconButtonProps;
 
   return (
-    <Flex gap="gap.md">
+    <Flex gap={["gap.xs", "gap.sm", "gap.md"]}>
       {/* Delete */}
       {!props.alert.is_active && (
         <IconButton
