@@ -8,7 +8,6 @@ import sentry_sdk
 from asgiref.sync import async_to_sync
 from asgiref.sync import sync_to_async
 from django.conf import settings
-from django.core.mail import send_mail
 from django.db.models import F
 from django.db.models import Q
 from django.template import Context
@@ -20,6 +19,7 @@ from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobAlertLog
 from neuronhub.apps.sites.models import SiteConfig
+from neuronhub.apps.sites.services.send_email import send_email
 from neuronhub.apps.users.models import User
 
 
@@ -126,12 +126,12 @@ async def _send_job_alert(
         },
         template_override=site.email_template_job_alert,
     )
-    await sync_to_async(send_mail)(
+    await send_email(
+        site=site,
         subject=f"New job matches ({len(jobs)})",
-        message="",
-        html_message=html,
-        from_email=site.sender_email,
-        recipient_list=[alert.email],
+        message_html=html,
+        email_from=site.sender_email,
+        email_to=alert.email,
     )
     await JobAlertLog.objects.abulk_create(
         [
@@ -161,12 +161,11 @@ async def send_job_alert_confirmation_email(alert: JobAlert) -> None:
         context=context,
         template_override=site.email_template_job_alert_confirmation,
     )
-    await sync_to_async(send_mail)(
+    await send_email(
+        site=site,
         subject="Your job alert is active",
-        message="",
-        html_message=html,
-        from_email=site.sender_email,
-        recipient_list=[alert.email],
+        message_html=html,
+        email_to=alert.email,
     )
 
 

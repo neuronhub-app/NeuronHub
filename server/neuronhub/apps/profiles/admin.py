@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple
-from django.core.mail import send_mail
+from neuronhub.apps.sites.services.send_email import send_mail_sync
 from django.db import models
 from django.db.models import F
 from django.http import HttpRequest
@@ -198,10 +198,10 @@ class ProfileInviteAdmin(DjangoObjectActions, admin.ModelAdmin):
 
     @takes_instance_or_queryset
     def send_email_invite(self, request: HttpRequest, obj: ProfileInvite):
-        send_mail(
+        send_mail_sync(
             subject="NeuronHub: you're invited to claim your profile",
-            message=f"Hi {obj.profile.first_name},\n\n"
+            message_html=f"Hi {obj.profile.first_name},\n\n"
             f"Claim your profile on NeuronHub:\n{f'{settings.SERVER_URL}{reverse("profiles_accept_invite", args=[obj.token])}'}\n",
-            from_email=settings.ADMIN_EMAIL,
-            recipient_list=[obj.user_email],
+            email_from=settings.ADMIN_EMAIL,
+            email_to=obj.user_email,
         )

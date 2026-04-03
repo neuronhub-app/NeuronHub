@@ -4,7 +4,6 @@ from adminsortable2.admin import SortableStackedInline
 from adminsortable2.admin import SortableTabularInline
 from django.contrib import admin
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.http import HttpRequest
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -22,6 +21,7 @@ from neuronhub.apps.sites.models import FooterSectionKind
 from neuronhub.apps.sites.models import NavbarLink
 from neuronhub.apps.sites.models import NavbarLinkSection
 from neuronhub.apps.sites.models import SiteConfig
+from neuronhub.apps.sites.services.send_email import send_mail_sync
 from neuronhub.apps.users.models import User
 
 
@@ -121,7 +121,15 @@ class SiteConfigAdmin(
                     "name",
                     "domain",
                     "slug",
+                ],
+            },
+        ),
+        (
+            "Emails",
+            {
+                "fields": [
                     "sender_email",
+                    "sender_email_name",
                     "contact_email",
                 ],
             },
@@ -189,10 +197,9 @@ class SiteConfigAdmin(
 
 
 def _send_test_email(site: SiteConfig, receiver: User, subject: str, html: str) -> None:
-    send_mail(
+    send_mail_sync(
         subject=subject,
-        message="",
-        html_message=html,
-        from_email=site.sender_email,
-        recipient_list=[receiver.email],
+        message_html=html,
+        email_from=site.sender_email,
+        email_to=receiver.email,
     )

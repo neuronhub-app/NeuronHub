@@ -4,29 +4,62 @@ order: 1
 is_new: true
 ---
 
-import { ChangelogEntry, ImageWithDialog, PageLink, AdminLink } from "@/components"
+import {
+  ChangelogEntry,
+  ChangelogTag,
+  ImageWithDialog,
+  PageLink,
+  AdminLink,
+} from "@/components"
 
-<ChangelogEntry title="Admin-only navigation button" date="2026-04-01" version="v0.3.2-rc.9" tags={["new"]}>
+<ChangelogEntry title="rc.9" date="2026-04-02" version="v0.3.2-rc.9">
 
-  - For opening Django Admin or documentation:
+  <ChangelogTag tag="New" />
+  - A floating button for opening Django Admin or documentation:
     <ImageWithDialog size="xs" src="https://media.neuronhub.app/docs/changelog/admin-only-nav-button.avif"/>
+
+
+  <ChangelogTag tag="Improvements" /> __Django Admin__
+  - Customize `Reply-To: {contact_email}` emails header in <PageLink id="SiteConfig"/>,
+    instead of defaulting to `SiteConfig.sender_email`.
+  - Add buttons to reset timezone on a <AdminLink id="JobAlert" />, and set it to PT
+    - Useful for triggering alerts from admin, as otherwise it only triggers `JobAlert`s with local time matching 8am-9am.
+  - Enable Markdown editor for `Job.description` field.
+  - Enable `History` on <AdminLink id="SiteConfig" />.
+  - Richer <PageLink id="Sentry"/> logs during `JobAlert`s sending.
+
+  <ChangelogTag tag="UI" />
+  - Fix `/subscriptions` page on mobile.
+  - See Sofi's reports.
+
+  <ChangelogTag tag="Fixes" />
+  - In emails sent from the `Contact` modal - set `Reply-To` to user's email (if any),
+    instead of appending `Email from: {email}` to the email body.
+  - Customize emails header `From: {sender_email_name} <{sender_email}>` in <PageLink id="SiteConfig"/>,
+    instead of only `<{sender_email}>`.
+  - Add missing filter by `is_exclude_no_salary` to Job Alerts sending.
 
 </ChangelogEntry>
 
 
-<ChangelogEntry title="Algolia Filters" date="2026-03-30" version="v0.3.2-rc.8" tags={["new"]}>
+<ChangelogEntry title="rc.8" date="2026-03-30" version="v0.3.2-rc.8">
 
+  <ChangelogTag tag="New" />
   - Once subscribed, you can view your `Job alerts (1)` (nearby the `FAQ` link).
     Also, the active filters are resettable per dropdown:
     <ImageWithDialog size="sm" isDimmed src="https://media.neuronhub.app/docs/changelog/jobs-alerts-and-filters-reset.avif"/>
   - Configure `sender_email` and `contact_email` in the <PageLink id="SiteConfig" />:
     <ImageWithDialog size="sm" src="https://media.neuronhub.app/docs/site-config/email-address.avif"/>
 
+  <ChangelogTag tag="UI" />
+  - See Sofi's reports.
+
 </ChangelogEntry>
 
 
-<ChangelogEntry title="Job Alerts" date="2026-03-27" version="v0.3.2-rc.7" tags={["new"]}>
+<ChangelogEntry title="rc.7 – Trigger JobAlerts in admin" date="2026-03-27" version="v0.3.2-rc.7">
 
+  <ChangelogTag tag="New" />
   - Trigger selected Alerts <PageLink id="job-alert-emails" hash="trigger-from-admin-panel">from the admin</PageLink>
     outside of the hourly schedule:
     <ImageWithDialog size="sm" src="https://media.neuronhub.app/docs/job-alert-emails-trigger-by-admin.avif" />

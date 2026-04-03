@@ -45,6 +45,11 @@ class SiteConfig(SingletonModel):
         default=settings.DEFAULT_FROM_EMAIL,
         help_text="Eg used as the sender of the Job Alerts emails. But backend will use DEFAULT_FROM_EMAIL env instead for sending eg user auth management emails (password resets, etc).",
     )
+    sender_email_name = models.CharField(
+        default="",
+        help_text="With it the system will send emails as `From: {sender_email_name} <{sender_email}>`, otherwise will send as `From: <{sender_email}>`",
+        blank=True,
+    )
     contact_email = models.EmailField(
         default=settings.DEFAULT_FROM_EMAIL,
         help_text="Used for `reply-to` email and the 'Contact' modal form",

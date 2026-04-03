@@ -1,18 +1,16 @@
-from typing import cast
-
 import strawberry
 import strawberry_django
-from asgiref.sync import sync_to_async
 from django.conf import settings
-from django.core.mail import send_mail
 from django.db.models import Model
 from strawberry import auto
+from typing import cast
 
 from neuronhub.apps.sites.models import FooterLink
 from neuronhub.apps.sites.models import FooterSection
 from neuronhub.apps.sites.models import NavbarLink
 from neuronhub.apps.sites.models import NavbarLinkSection
 from neuronhub.apps.sites.models import SiteConfig
+from neuronhub.apps.sites.services.send_email import send_email
 
 
 @strawberry_django.type(NavbarLink)
@@ -108,17 +106,15 @@ class SitesMutation:
         if name:
             subject += f" from {name}"
 
-        body = message
-        if email:
-            body += f"\n\nReply to: {email}"
-
         site = await SiteConfig.get_solo()
 
-        await sync_to_async(send_mail)(
+        await send_email(
+            site=site,
             subject=subject,
-            message=body,
-            from_email=site.sender_email,
-            recipient_list=[site.contact_email],
+            message_html=message,
+            email_from=site.sender_email,
+            email_to=site.contact_email,
+            email_reply_to=email,
         )
         return True
 
