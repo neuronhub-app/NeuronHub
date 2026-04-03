@@ -14,12 +14,12 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class TestSendJobAlertEmails(NeuronTestCase):
-    async def test_skips_jobs_created_before_subscription(self):
+    async def test_skips_jobs_created_before_job_alert(self):
         await self.gen.jobs.job()
         await self.gen.jobs.job_alert()
 
         stats = await send_job_alerts()
-        assert stats.skipped == 1
+        assert stats.skipped_due_to_no_new_matches_or_new_alert == 1
         assert len(mail.outbox) == 0
 
     async def test_skips_already_notified(self):
@@ -33,7 +33,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         mail.outbox.clear()
 
         stats = await send_job_alerts()
-        assert stats.skipped == 2
+        assert stats.skipped_due_to_duplicates == 2
         assert len(mail.outbox) == 0
 
     async def test_skips_inactive(self):
@@ -71,7 +71,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         stats = await send_job_alerts(hour_local_to_send_at=hour_future_2)
         assert stats.sent == 0
         assert stats.skipped_due_to_tz == 0
-        assert stats.skipped == 1
+        assert stats.skipped_due_to_duplicates == 1
 
     async def test_template_override(self):
         site = await SiteConfig.get_solo()
@@ -87,7 +87,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         alert = await self.gen.jobs.job_alert()
         await send_job_alert_confirmation_email(alert)
 
-        email_html = mail.outbox[0].alternatives[0][0]
+        email_html = mail.outbox[0].body
         assert test_name in email_html
         assert test_addr in email_html
 
@@ -178,7 +178,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
 
         assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
-    async def test_filters_by_no_salary(self):
+    async def test_filters_is_exclude_no_salary(self):
         alert = await self.gen.jobs.job_alert(is_exclude_no_salary=True)
 
         await self.gen.jobs.job(salary_min=50000)

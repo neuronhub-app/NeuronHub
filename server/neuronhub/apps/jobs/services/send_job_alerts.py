@@ -1,5 +1,6 @@
 import logging
 from collections import defaultdict
+from dataclasses import asdict
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -29,63 +30,86 @@ async def send_job_alerts(
     jobs: list[Job] | None = None,
     hour_local_to_send_at: int = 8,
     alert_ids: list[int] | None = None,
-) -> JobAlertStats:
-    stats = JobAlertStats()
-    jobs_total_count = await Job.objects.filter(is_published=True).acount()
+) -> JobAlertBulkReport:
+    from neuronhub.apps.jobs.tasks import send_job_alert_emails_task
+
+    report = JobAlertBulkReport()
 
     alerts_qs = JobAlert.objects.filter(is_active=True)
     if alert_ids is not None:
         alerts_qs = alerts_qs.filter(id__in=alert_ids)
 
+    jobs_total_count = await Job.objects.filter(is_published=True).acount()
+
     async for alert in alerts_qs:
         if is_wrong_hour_if_alert_has_tz := (
             alert.tz and hour_local_to_send_at != datetime.now(tz=alert.tz).hour
         ):
-            stats.skipped_due_to_tz += 1
+            report.skipped_due_to_tz += 1
             continue
 
         try:
-            is_sent = await _send_job_alert(
+            report_send = await _send_job_alert(
                 alert=alert,
                 jobs=jobs,
                 jobs_total_count=jobs_total_count,
             )
-            if is_sent:
-                stats.sent += 1
+            if report_send.is_sent:
+                report.sent += 1
             else:
-                stats.skipped += 1
+                if report_send.matched_wo_duplicates == 0 and report_send.matched_total > 0:
+                    report.skipped_due_to_duplicates += 1
+
+                if report_send.matched_total == 0:
+                    report.skipped_due_to_no_new_matches_or_new_alert += 1
+
+            logger.info(
+                f"{send_job_alert_emails_task.name} _send_job_alert: {asdict(report_send)}"
+            )
         except Exception:
             sentry_sdk.set_context(
                 "job_alert",
                 {"id_ext": alert.id_ext, "email_hash": JobAlertLog.hash_email(alert.email)},
             )
             capture_exception()
-            stats.failed += 1
+            report.failed += 1
 
-    return stats
+    return report
 
 
 @dataclass
-class JobAlertStats:
+class JobAlertBulkReport:
     sent: int = 0
     failed: int = 0
-    skipped: int = 0
+    skipped_due_to_no_new_matches_or_new_alert: int = 0
     skipped_due_to_tz: int = 0
+    skipped_due_to_duplicates: int = 0
+
+
+@dataclass
+class JobAlertReport:
+    alert_id: int
+    is_sent: bool = False
+    matched_total: int = 0
+    matched_wo_duplicates: int = 0
 
 
 async def _send_job_alert(
     alert: JobAlert,
     jobs: list[Job] | None,
     jobs_total_count: int,
-) -> bool:
-    jobs = jobs or await _get_jobs_qs_by_alert(alert)
+) -> JobAlertReport:
+    jobs_matched = jobs or await _get_jobs_qs_by_alert(alert)
 
-    if not jobs:
-        return False
+    report = JobAlertReport(matched_total=len(jobs_matched), alert_id=alert.id)
 
-    jobs = await _exclude_already_emailed_jobs_using_email_logs(alert, jobs)
+    if not jobs_matched:
+        return report
+
+    jobs = await _exclude_already_emailed_jobs_using_email_logs(alert, jobs_matched)
+    report.matched_wo_duplicates = len(jobs)
     if not jobs:
-        return False
+        return report
 
     site = await SiteConfig.get_solo()
     filters = await _get_alert_filters_dict(alert)
@@ -125,7 +149,8 @@ async def _send_job_alert(
         sent_count=F("sent_count") + 1,
         jobs_notified_count=F("jobs_notified_count") + len(jobs),
     )
-    return True
+    report.is_sent = True
+    return report
 
 
 async def send_job_alert_confirmation_email(alert: JobAlert) -> None:
@@ -220,7 +245,7 @@ async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
         created_at__gte=alert.created_at,
     )
 
-    # todo !! review: Algolia uses AND filters, this is OR
+    # todo !!! fix: Algolia uses AND filters, this is OR. Review & test.
     if tag_ids := [tag_id async for tag_id in alert.tags.values_list("id", flat=True)]:
         q_obj = Q()
         for field in [

@@ -170,7 +170,7 @@ class JobAlertAdmin(SimpleHistoryAdmin, DjangoObjectActions, DALFModelAdmin):
 
     @action(label="Empty TimeZone")
     def set_tz_to_none(self, request: HttpRequest, obj: JobAlert):
-        obj.tz = ""
+        obj.tz = ""  # type: ignore[assignment] #bad-infer TimeZoneField accepts ""
         obj.save()
         messages.success(request, "TZ removed")
 
