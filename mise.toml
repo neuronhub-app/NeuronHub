@@ -14,16 +14,16 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     node = "25"
 
 [settings]
-    # use Nushell for everything
+	lockfile = true
+    python.uv_venv_auto = true # let uv manage .venv/ <- should be default
+	task.timings = false # noise for LLMs
+    env_shell_expand = true # the default in v2026.7.0
+
+    # Nushell for everything:
     unix_default_file_shell_args = "nu"
     unix_default_inline_shell_args = "nu --commands"
     use_file_shell_for_executable_tasks = true
 
-    python.uv_venv_auto = true
-
-	lockfile = true
-
-	task.timings = false
 
 [task_config]
     includes = [
@@ -35,6 +35,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     ]
 
 [env]
+    _.file = { path = ".env.local" }
+
     # Global
 
     PROJECT_NAME = "{{ env.PROJECT_NAME | default(value = 'neuronhub') }}"
@@ -78,13 +80,14 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     ALGOLIA_APPLICATION_ID = "VN4ESP6QTP"
     ALGOLIA_SEARCH_API_KEY = "73e0fded909b86d55105cac456370c53"
-    ALGOLIA_API_KEY = ""
+    ALGOLIA_API_KEY = "${ALGOLIA_API_KEY}"
     ALGOLIA_IS_ENABLED = "false"
-    ALGOLIA_INDEX_POSTFIX_USER = "{{ env.USER | default(value = 'runner') }}" # to not clash dev indexes between users
-    ALGOLIA_INDEX_DOCS = "docs_dev_{{ env.ALGOLIA_INDEX_POSTFIX_USER }}"
-    VITE_ALGOLIA_APPLICATION_ID = "{{ env.ALGOLIA_APPLICATION_ID }}"
-    VITE_ALGOLIA_SEARCH_API_KEY = "{{ env.ALGOLIA_SEARCH_API_KEY }}"
-    VITE_ALGOLIA_INDEX_DOCS = "{{ env.ALGOLIA_INDEX_DOCS }}"
+    ALGOLIA_INDEX_POSTFIX_USER = "${USER|-'runner'}" # stop indexes clash between devs
+    ALGOLIA_INDEX_DOCS = "${ALGOLIA_INDEX_DOCS:-docs_dev_{{ env.ALGOLIA_INDEX_POSTFIX_USER }}}"
+
+    VITE_ALGOLIA_APPLICATION_ID = "${ALGOLIA_APPLICATION_ID}"
+    VITE_ALGOLIA_SEARCH_API_KEY = "${ALGOLIA_SEARCH_API_KEY}"
+    VITE_ALGOLIA_INDEX_DOCS = "${ALGOLIA_INDEX_DOCS}"
 
     # Analytics
 
