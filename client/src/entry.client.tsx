@@ -23,6 +23,7 @@ Sentry.init({
       createRoutesFromChildren,
       matchRoutes,
     }),
+    Sentry.graphqlClientIntegration({ endpoints: [env.VITE_SERVER_URL_API] }),
     Sentry.replayIntegration(),
     // Sentry.feedbackIntegration({ colorScheme: "system" }),
     Sentry.consoleLoggingIntegration({ levels: ["error", "warn"] }),
