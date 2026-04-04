@@ -15,6 +15,7 @@ import sentry_sdk
 from corsheaders.defaults import default_headers
 from django.utils.functional import SimpleLazyObject
 from environs import Env
+from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import strawberry_django_settings
 
@@ -393,6 +394,7 @@ if IS_SENTRY_ENABLED:
         profile_lifecycle="trace",
         integrations=[
             StrawberryIntegration(async_execution=True),
+            DjangoIntegration(cache_spans=True),
         ],
         release=env.str("VITE_RELEASE_NAME", ""),
     )
