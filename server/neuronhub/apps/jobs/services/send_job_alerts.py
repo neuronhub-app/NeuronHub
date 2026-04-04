@@ -13,6 +13,8 @@ from django.template import Context
 from django.template import Template
 from django.template.loader import render_to_string
 from sentry_sdk import capture_exception
+from sentry_sdk.crons import MonitorStatus
+from sentry_sdk.crons import capture_checkin
 
 from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
     disable_auto_indexing_if_enabled,
@@ -47,6 +49,10 @@ async def send_job_alerts(
     ).acount()
 
     async for alert in alerts_qs:
+        capture_checkin(
+            monitor_slug=send_job_alert_emails_task.name, status=MonitorStatus.IN_PROGRESS
+        )
+
         if is_wrong_hour_if_alert_has_tz := (
             alert.tz and hour_local_to_send_at != datetime.now(tz=alert.tz).hour
         ):

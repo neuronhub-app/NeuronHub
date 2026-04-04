@@ -16,15 +16,6 @@ from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
 logger = logging.getLogger(__name__)
 
 
-monitor_config: MonitorConfig = {
-    "schedule": {"type": "interval", "value": 1, "unit": "hour"},
-    "max_runtime": 20,  # min
-    "failure_issue_threshold": 3,
-    "recovery_threshold": 2,
-    "checkin_margin": 5,
-}
-
-
 @task()
 async def send_job_alert_emails_task():
     with monitor(
@@ -39,6 +30,15 @@ async def send_job_alert_emails_task():
 
         for key, value in asdict(stats).items():
             sentry_sdk.metrics.gauge(f"job_alerts.{key}", value)
+
+
+monitor_config: MonitorConfig = {
+    "schedule": {"type": "interval", "value": 1, "unit": "hour"},
+    "max_runtime": 30,  # min
+    "failure_issue_threshold": 2,
+    "recovery_threshold": 2,
+    "checkin_margin": 10,  # min
+}
 
 
 @task()
