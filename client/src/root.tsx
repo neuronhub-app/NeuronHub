@@ -34,7 +34,7 @@ function AppProviders(props: { children: ReactNode }) {
           <Toaster position="bottom-center" gutter={8} />
           <ChakraToaster />
 
-          <AdminMenuFloatButton isThemeSwitcher={env.VITE_SITE === "pg"} />
+          <AdminMenuFloatButton isThemeSwitcher={env.site.isProbablyGood} />
         </ColorModeProvider>
       </ChakraProvider>
     </ApolloProvider>
@@ -67,6 +67,9 @@ function LayoutHead() {
     <>
       <meta charSet="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      {!env.isProd && <meta name="robots" content="noindex, follow" />}
+
       <meta name="color-scheme" content={siteConfig.forcedColorMode ?? "light dark"} />
 
       {siteConfig.googleFontsHref && (
@@ -98,6 +101,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       details = "Page not found.";
     } else {
       Sentry.captureException(error);
+
       if (env.isDev) {
         details = error.message;
         stack = error.stack;
