@@ -463,6 +463,7 @@ class JobsGen:
                 defaults={"website": self.faker.domain_name()},
             )
         job = Job(
+            is_test_job=True,
             title=title or self.faker.sentence(),
             org=org,
             description=description,

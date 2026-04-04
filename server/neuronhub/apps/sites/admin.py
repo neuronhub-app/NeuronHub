@@ -2,6 +2,7 @@ from adminsortable2.admin import SortableAdminBase
 from adminsortable2.admin import SortableAdminMixin
 from adminsortable2.admin import SortableStackedInline
 from adminsortable2.admin import SortableTabularInline
+from asgiref.sync import async_to_sync
 from django.contrib import admin
 from django.contrib import messages
 from django.http import HttpRequest
@@ -13,15 +14,15 @@ from simple_history.admin import SimpleHistoryAdmin
 from solo.admin import SingletonModelAdmin
 
 from neuronhub.apps.jobs.models import JobFaqQuestion
-from neuronhub.apps.jobs.services.send_job_alerts import _get_email_context_test
-from neuronhub.apps.jobs.services.send_job_alerts import _render_email_html
+from neuronhub.apps.jobs.services.send_job_alerts import JobAlertTestContext
+from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
+from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
 from neuronhub.apps.sites.models import FooterLink
 from neuronhub.apps.sites.models import FooterSection
 from neuronhub.apps.sites.models import FooterSectionKind
 from neuronhub.apps.sites.models import NavbarLink
 from neuronhub.apps.sites.models import NavbarLinkSection
 from neuronhub.apps.sites.models import SiteConfig
-from neuronhub.apps.sites.services.send_email import send_mail_sync
 from neuronhub.apps.users.models import User
 
 
@@ -166,40 +167,46 @@ class SiteConfigAdmin(
     ]
 
     @action(label="Send test alert email to yourself")
-    def send_test_job_alert_email(self, request: HttpRequest, obj: SiteConfig):
+    def send_test_job_alert_email(self, request: HttpRequest, _obj: SiteConfig):
         assert isinstance(request.user, User)
-        _send_test_email(
-            site=obj,
-            receiver=request.user,
-            subject="[TEST] Job alert",
-            html=_render_email_html(
-                template_name="jobs/job_alert.html",
-                template_override=obj.email_template_job_alert,
-                context=_get_email_context_test(obj, user=request.user),
-            ),
-        )
-        messages.success(request, f"Test email sent to {request.user.email}")
+
+        _send_test_job_alert_email(receiver=request.user)
+
+        _send_success_message(request, user=request.user, email_type="Job Alert")
 
     @action(label="Send test confirm alert email to yourself")
-    def send_test_job_alert_confirmation_email(self, request: HttpRequest, obj: SiteConfig):
+    def send_test_job_alert_confirmation_email(self, request: HttpRequest, _obj: SiteConfig):
         assert isinstance(request.user, User)
-        _send_test_email(
-            site=obj,
-            receiver=request.user,
-            subject="[TEST] Job alert confirmation",
-            html=_render_email_html(
-                template_name="jobs/job_alert_confirmation.html",
-                template_override=obj.email_template_job_alert_confirmation,
-                context=_get_email_context_test(obj, user=request.user),
-            ),
-        )
-        messages.success(request, f"Test confirmation email sent to {request.user.email}")
+
+        _send_test_job_alert_email_confirmation(receiver=request.user)
+
+        _send_success_message(request, user=request.user, email_type="Job Alert Confirmation")
 
 
-def _send_test_email(site: SiteConfig, receiver: User, subject: str, html: str) -> None:
-    send_mail_sync(
-        subject=subject,
-        message_html=html,
-        email_from=site.sender_email,
-        email_to=receiver.email,
+def _send_success_message(request: HttpRequest, user: User, email_type: str):
+    messages.success(
+        request,
+        (
+            f"Test {email_type} was sent to your email - {user.email}."
+            "The email will list 3 Jobs that were deleted as soon as the email was sent - "
+            "hence any job/alert URLs won't work."
+        ),
     )
+
+
+@async_to_sync
+async def _send_test_job_alert_email_confirmation(receiver: User):
+    test_context = await JobAlertTestContext.create(user=receiver)
+
+    await send_job_alert_confirmation_email(alert=test_context.alert)
+
+    await test_context.delete_alert_and_jobs()
+
+
+@async_to_sync
+async def _send_test_job_alert_email(receiver: User):
+    test_context = await JobAlertTestContext.create(user=receiver)
+
+    await send_job_alerts(alert_ids=[test_context.alert.id], is_include_test_jobs=True)
+
+    await test_context.delete_alert_and_jobs()

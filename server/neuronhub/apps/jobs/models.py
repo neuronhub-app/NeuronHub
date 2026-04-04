@@ -126,6 +126,14 @@ class Job(AlgoliaModel):
 
     is_published = models.BooleanField(default=True)
 
+    is_test_job = models.BooleanField(
+        default=False,
+        help_text=(
+            "Excluded from Job Alerts outside of dev machines - by `DJANGO_ENV.is_dev()`. "
+            "Indicates the Job was created by test_gen.py, eg in SiteConfig admin by 'Test Job Alert' button."
+        ),
+    )
+
     versions = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
         "self",
         symmetrical=False,

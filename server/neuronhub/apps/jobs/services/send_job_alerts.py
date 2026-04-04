@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from datetime import datetime
 
 import sentry_sdk
-from asgiref.sync import async_to_sync
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.db.models import F
@@ -15,9 +14,13 @@ from django.template import Template
 from django.template.loader import render_to_string
 from sentry_sdk import capture_exception
 
+from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
+    disable_auto_indexing_if_enabled,
+)
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobAlertLog
+from neuronhub.apps.posts.graphql.types_lazy import TagCategory
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.sites.services.send_email import send_email
 from neuronhub.apps.users.models import User
@@ -27,9 +30,9 @@ logger = logging.getLogger(__name__)
 
 
 async def send_job_alerts(
-    jobs: list[Job] | None = None,
     hour_local_to_send_at: int = 8,
     alert_ids: list[int] | None = None,
+    is_include_test_jobs: bool = settings.DJANGO_ENV.is_dev(),
 ) -> JobAlertBulkReport:
     from neuronhub.apps.jobs.tasks import send_job_alert_emails_task
 
@@ -39,7 +42,9 @@ async def send_job_alerts(
     if alert_ids is not None:
         alerts_qs = alerts_qs.filter(id__in=alert_ids)
 
-    jobs_total_count = await Job.objects.filter(is_published=True).acount()
+    jobs_total_count = await Job.objects.filter(
+        is_published=True, is_test_job=is_include_test_jobs
+    ).acount()
 
     async for alert in alerts_qs:
         if is_wrong_hour_if_alert_has_tz := (
@@ -51,8 +56,8 @@ async def send_job_alerts(
         try:
             report_send = await _send_job_alert(
                 alert=alert,
-                jobs=jobs,
                 jobs_total_count=jobs_total_count,
+                is_include_test_jobs=is_include_test_jobs,
             )
             if report_send.is_sent:
                 report.sent += 1
@@ -96,17 +101,19 @@ class JobAlertReport:
 
 async def _send_job_alert(
     alert: JobAlert,
-    jobs: list[Job] | None,
     jobs_total_count: int,
+    is_include_test_jobs: bool = False,
 ) -> JobAlertReport:
-    jobs_matched = jobs or await _get_jobs_qs_by_alert(alert)
+    jobs_matched_all = await _get_jobs_qs_by_alert(
+        alert, is_include_test_jobs=is_include_test_jobs
+    )
 
-    report = JobAlertReport(matched_total=len(jobs_matched), alert_id=alert.id)
+    report = JobAlertReport(matched_total=len(jobs_matched_all), alert_id=alert.id)
 
-    if not jobs_matched:
+    if not jobs_matched_all:
         return report
 
-    jobs = await _exclude_already_emailed_jobs_using_email_logs(alert, jobs_matched)
+    jobs = await _exclude_already_emailed_jobs_using_email_logs(alert, jobs_matched_all)
     report.matched_wo_duplicates = len(jobs)
     if not jobs:
         return report
@@ -196,22 +203,36 @@ async def _get_email_context(
     }
 
 
-@async_to_sync
-async def _get_email_context_test(site: SiteConfig, user: User) -> dict:
-    from neuronhub.apps.tests.test_gen import Gen
+@dataclass
+class JobAlertTestContext:
+    jobs_created: list[Job]
+    alert: JobAlert
 
-    gen = await Gen.create(is_user_default_superuser=False, user_default=user)
-    jobs = [await gen.jobs.job(), await gen.jobs.job(), await gen.jobs.job()]
-    return {
-        **await _get_email_context(
-            alert=await gen.jobs.job_alert(),
-            site=site,
-            filters={"Cause Areas": "Global Health", "Skill Sets": "Operations"},
-        ),
-        "jobs": jobs,
-        "jobs_matched_count": len(jobs),
-        "jobs_total_count": 42,
-    }
+    async def delete_alert_and_jobs(self):
+        with disable_auto_indexing_if_enabled():
+            for job in self.jobs_created:
+                await job.adelete()
+            await self.alert.adelete()
+
+    @classmethod
+    async def create(cls, user: User) -> JobAlertTestContext:
+        from neuronhub.apps.tests.test_gen import Gen
+
+        with disable_auto_indexing_if_enabled():
+            gen = await Gen.create(is_user_default_superuser=False, user_default=user)
+            tags = [
+                await gen.posts.tag(Job.Tags.CareerCapital, TagCategory.Area),
+                await gen.posts.tag(Job.Tags.ProfitForGood, TagCategory.Area),
+            ]
+            jobs = [
+                await gen.jobs.job(tags=tags),
+                await gen.jobs.job(tags=tags),
+                await gen.jobs.job(tags=tags),
+            ]
+
+        alert = await gen.jobs.job_alert(tz=None, tags=tags)
+
+        return JobAlertTestContext(jobs_created=jobs, alert=alert)
 
 
 def _render_email_html(template_name: str, context: dict, template_override: str = "") -> str:
@@ -234,12 +255,15 @@ async def _exclude_already_emailed_jobs_using_email_logs(
     return [job for job in jobs if job.id not in sent_ids]
 
 
-async def _get_jobs_qs_by_alert(alert: JobAlert) -> list[Job]:
+async def _get_jobs_qs_by_alert(
+    alert: JobAlert, is_include_test_jobs: bool = settings.DJANGO_ENV.is_dev()
+) -> list[Job]:
     """
     see [[adding-job-alert-filters.mdx]] checklist
     """
     qs = Job.objects.select_related("org").filter(
         is_published=True,
+        is_test_job=is_include_test_jobs,
         created_at__gte=alert.created_at,
     )
 
