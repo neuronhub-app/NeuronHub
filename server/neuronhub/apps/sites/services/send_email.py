@@ -1,8 +1,13 @@
+import logging
+
 from asgiref.sync import async_to_sync
 from asgiref.sync import sync_to_async
 from django.core.mail import EmailMessage
 
 from neuronhub.apps.sites.models import SiteConfig
+
+
+logger = logging.getLogger(__name__)
 
 
 async def send_email(
@@ -11,11 +16,17 @@ async def send_email(
     message_html: str,
     email_to: str,
     email_from: str = None,
+    email_from_name: str = None,
     email_reply_to: str = None,
     site: SiteConfig = None,
 ):
     if not site:
         site = await SiteConfig.get_solo()
+
+    email_from = email_from or site.sender_email
+
+    if site.sender_email_name or email_from_name:
+        email_from = f"{site.sender_email_name or email_from_name} <{email_from}>"
 
     email = EmailMessage(
         subject=subject,

@@ -130,7 +130,6 @@ async def _send_job_alert(
         site=site,
         subject=f"New job matches ({len(jobs)})",
         message_html=html,
-        email_from=site.sender_email,
         email_to=alert.email,
     )
     await JobAlertLog.objects.abulk_create(

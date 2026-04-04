@@ -1,9 +1,10 @@
+from typing import cast
+
 import strawberry
 import strawberry_django
 from django.conf import settings
 from django.db.models import Model
 from strawberry import auto
-from typing import cast
 
 from neuronhub.apps.sites.models import FooterLink
 from neuronhub.apps.sites.models import FooterSection
@@ -102,9 +103,9 @@ class SitesMutation:
         name: str | None = None,
         email: str | None = None,
     ) -> bool:
-        subject = f"{settings.CLIENT_DOMAIN} - Contact form"
+        subject = f"{settings.CLIENT_DOMAIN} - Contact Form"
         if name:
-            subject += f" from {name}"
+            subject += f" - from {name}"
 
         site = await SiteConfig.get_solo()
 
@@ -113,6 +114,7 @@ class SitesMutation:
             subject=subject,
             message_html=message,
             email_from=site.sender_email,
+            email_from_name=name,
             email_to=site.contact_email,
             email_reply_to=email,
         )

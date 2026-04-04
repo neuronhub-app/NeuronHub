@@ -202,6 +202,5 @@ class ProfileInviteAdmin(DjangoObjectActions, admin.ModelAdmin):
             subject="NeuronHub: you're invited to claim your profile",
             message_html=f"Hi {obj.profile.first_name},\n\n"
             f"Claim your profile on NeuronHub:\n{f'{settings.SERVER_URL}{reverse("profiles_accept_invite", args=[obj.token])}'}\n",
-            email_from=settings.ADMIN_EMAIL,
             email_to=obj.user_email,
         )
