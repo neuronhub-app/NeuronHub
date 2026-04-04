@@ -42,11 +42,25 @@ const envCleaned = createEnv({
 
 export const env = {
   ...envCleaned,
+
   get VITE_SERVER_URL_API(): string {
     return `${this.VITE_SERVER_URL}/api/graphql`;
   },
   get isProd(): boolean {
-    return this.MODE === "production" || this.NODE_ENV === "production";
+    return (
+      this.MODE === "production" ||
+      this.MODE === "prod" ||
+      this.NODE_ENV === "production" ||
+      this.NODE_ENV === "prod"
+    );
+  },
+  get isDev(): boolean {
+    return (
+      this.MODE === "development" ||
+      this.MODE === "dev" ||
+      this.NODE_ENV === "development" ||
+      this.NODE_ENV === "dev"
+    );
   },
   get site() {
     const site = this.VITE_SITE;

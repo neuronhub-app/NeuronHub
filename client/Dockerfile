@@ -7,7 +7,7 @@ ARG VITE_RELEASE_VERSION
 ARG VITE_SITE
 ARG VITE_SERVER_URL
 ARG VITE_CLIENT_URL
-ARG NODE_ENV="production"
+ARG NODE_ENV="prod"
 
 # Sentry
 ARG VITE_RELEASE_NAME
@@ -45,6 +45,7 @@ FROM nginx:alpine
 # after the FROM need to re-declare ARGs:
 ARG VITE_RELEASE_VERSION
 ARG GITHUB_PATH
+ARG NODE_ENV="prod"
 
 LABEL org.opencontainers.image.description="Nginx serving React Router static index.html"
 LABEL org.opencontainers.image.source="https://github.com/${GITHUB_PATH}/blob/${VITE_RELEASE_VERSION}/client/Dockerfile"

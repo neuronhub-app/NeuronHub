@@ -79,6 +79,8 @@
 
                     # for React Router build: Must match the {client|docs}/Dockerfile ARG names
 
+                    NODE_ENV: {{ env.DJANGO_ENV }}
+                    MODE: {{ env.DJANGO_ENV }}
                     VITE_SITE: {{ env.VITE_SITE | default(value="''") }}
                     VITE_SERVER_URL: https://($server_domain)
                     VITE_CLIENT_URL: {{ env.CLIENT_URL }}
