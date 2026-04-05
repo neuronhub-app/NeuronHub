@@ -2,6 +2,7 @@ import { toaster } from "@/components/ui/toaster";
 import { env } from "@/env";
 import { Box, chakra, IconButton, Menu, Float, Portal } from "@chakra-ui/react";
 
+import * as Sentry from "@sentry/react";
 import { admin } from "@neuronhub/shared/admin-urls";
 import { icons } from "@neuronhub/shared/theme/icons";
 
@@ -140,6 +141,17 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                     <icons.docs />
                     <Box>Docs</Box>
                   </LinkExt>
+                </Menu.Item>
+
+                <Menu.Item
+                  value="test_sentry"
+                  onClick={() => {
+                    Sentry.captureException(new Error("Test error with source maps"));
+                    toaster.info({ title: "Sent test error to Sentry" });
+                  }}
+                >
+                  <icons.settings />
+                  <Box>Test Sentry</Box>
                 </Menu.Item>
               </Menu.ItemGroup>
             </Menu.Content>

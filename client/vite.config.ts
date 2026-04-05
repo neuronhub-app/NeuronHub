@@ -13,7 +13,7 @@ export default defineConfig(config => ({
     port: env.CLIENT_PORT,
     allowedHosts: [process.env.CLIENT_DOMAIN ?? "localhost"],
   },
-  build: { sourcemap: true },
+  build: { sourcemap: "hidden" },
   dev: { sourcemap: true },
   plugins: [
     reactRouter(),
@@ -32,6 +32,7 @@ export default defineConfig(config => ({
       {
         authToken: process.env.SENTRY_AUTH_TOKEN,
         release: { name: process.env.VITE_RELEASE_NAME },
+        debug: true,
         telemetry: false,
 
         org: process.env.SENTRY_ORG,
