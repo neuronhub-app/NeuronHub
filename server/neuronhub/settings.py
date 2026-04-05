@@ -386,6 +386,8 @@ if IS_DEBUG_TOOLBAR_ENABLED:
 IS_SENTRY_ENABLED = env.bool("IS_SENTRY_ENABLED", not DJANGO_ENV.is_dev())
 if IS_SENTRY_ENABLED:
     sentry_sdk.init(
+        environment=DJANGO_ENV.value,
+        release=env.str("VITE_RELEASE_NAME", ""),
         dsn=env.str("SENTRY_DSN_BACKEND", ""),
         send_default_pii=True,  # IP is excluded
         enable_logs=True,
@@ -396,7 +398,6 @@ if IS_SENTRY_ENABLED:
             StrawberryIntegration(async_execution=True),
             DjangoIntegration(cache_spans=True),
         ],
-        release=env.str("VITE_RELEASE_NAME", ""),
     )
 
 LOGGING = {
