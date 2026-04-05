@@ -120,6 +120,13 @@
         rm $compose_file
     """
 
+["sentry:release"]
+    description = "Link Git commits to Sentry Release & finalize"
+    run = """
+        npx @sentry/cli releases set-commits "{{ env.VITE_RELEASE_NAME }}" --auto --ignore-missing
+        npx @sentry/cli releases finalize "{{ env.VITE_RELEASE_NAME }}"
+    """
+
 ["docker:verify"]
     alias = "docker:test"
     usage = """
