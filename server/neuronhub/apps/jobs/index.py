@@ -24,9 +24,10 @@ def setup_virtual_replica_sorted_by_closes_at():
     )
 
 
-algolia_replica_jobs_sorted_by_closes_at = (
-    f"jobs_{settings.ALGOLIA['INDEX_SUFFIX']}_by_closes_at"
-)
+if index_suffix := settings.ALGOLIA["INDEX_SUFFIX"]:
+    algolia_replica_jobs_sorted_by_closes_at = f"jobs_{index_suffix}_by_closes_at"
+else:
+    algolia_replica_jobs_sorted_by_closes_at = "jobs_by_closes_at"
 
 
 if settings.ALGOLIA["IS_ENABLED"]:
