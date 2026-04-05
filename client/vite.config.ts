@@ -12,6 +12,7 @@ export default defineConfig(config => ({
   server: {
     port: env.CLIENT_PORT,
     allowedHosts: [process.env.CLIENT_DOMAIN ?? "localhost"],
+    hmr: env.isDev && env.VITE_ENV !== "dev_test_e2e",
   },
   build: { sourcemap: "hidden" },
   dev: { sourcemap: true },

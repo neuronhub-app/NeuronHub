@@ -27,18 +27,15 @@ export default defineConfig({
     {
       name: "Server",
       command: "mise run dev:e2e:server",
-      reuseExistingServer: true,
       url: `${env.VITE_SERVER_URL}/admin/login/`,
     },
     {
       name: "Server Worker",
       command: "mise run dev:e2e:server:db_worker",
-      reuseExistingServer: true,
     },
     {
       name: "Client",
       command: "mise run dev:e2e:client",
-      reuseExistingServer: true,
       url: clientUrl,
     },
   ],

@@ -47,6 +47,7 @@ export function useAlgoliaSearchClient() {
   });
 
   return {
+    // todo ! refac: drop renames -> use snake_case
     client: state.snap.client,
     indexName: state.snap.indexName,
     indexNameSortedByVotes: state.snap.indexNameSortedByVotes,

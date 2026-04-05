@@ -12,7 +12,7 @@
     dir = "server"
     run = """
         job spawn { mise dev:s3 }
-        uv run manage.py runserver {{ env.SERVER_PORT_E2E }}
+        uv run manage.py runserver --noreload {{ env.SERVER_PORT_E2E }}
     """
     env.SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
     env.DJANGO_ENV = "dev_test_e2e"
