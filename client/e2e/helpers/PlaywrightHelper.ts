@@ -178,13 +178,14 @@ export class PlaywrightHelper {
     return this.page.screenshot({
       path: `e2e/screenshots/${this.screenshotCounter}-${name}.jpeg`,
       type: "jpeg",
-      quality: 80,
+      quality: 84,
       caret: "initial",
       fullPage,
       clip: { x: 0, y: 0, height: maxH, width: 1280 },
     });
   }
 
+  // todo ? refac: exec only once in `mise e2e` run
   async login() {
     const cookies = await this.page.context().cookies();
     const isHasDjangoSession = cookies.some(cookie => cookie.name === "sessionid");
