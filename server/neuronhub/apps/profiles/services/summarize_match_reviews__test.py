@@ -64,7 +64,7 @@ class SummarizeMatchReviewsTest(NeuronTestCase):
         reviews = await sync_to_async(_get_reviewed_list)(self.user)
         calibration = build_calibration_examples(reviews, max_examples=8)
 
-        # todo ! fix
+        # todo ? fix
         # assert review_note in calibration
 
         # 2 positive (score_by_user=70) + 6 negative (score_by_user=30)

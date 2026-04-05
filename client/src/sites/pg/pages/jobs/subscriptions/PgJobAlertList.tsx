@@ -106,7 +106,7 @@ type AlertType = NonNullable<ResultOf<typeof JobAlertListQuery>["job_alerts"]>[n
 
 function PgAlertCard(props: { alert: AlertType }) {
   // #quality-1%
-  // todo !! fix: useClearRefinements().canRefine or another method
+  // todo ! fix: useClearRefinements().canRefine or another method
   // see [[adding-job-alert-filters.mdx]] checklist
   const isHasFilters =
     props.alert.tags.length > 0 ||

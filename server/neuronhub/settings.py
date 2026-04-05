@@ -309,7 +309,7 @@ AUTHENTICATION_BACKENDS = [
     # "guardian.backends.ObjectPermissionBackend", todo mb: they lacks async support - see django-guardian#808 (planned for v3.3)
 ]
 
-# todo ! feat(auth) enable 2FA
+# todo ? feat(auth) enable 2FA
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["username*", "password1*", "email"]  #: asterisk means required
 ACCOUNT_EMAIL_VERIFICATION = "optional"
@@ -317,11 +317,11 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = None
 ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = (
     ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL
 )
-ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7  # todo ! [auth] set 2d
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 7  # todo ? [auth] set 2d
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # todo ! [auth] check sec
-ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # todo ! [auth] disable (≈ok, but we do secˆ)
-ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # todo ! [auth] disable
+ACCOUNT_LOGIN_ON_PASSWORD_RESET = True  # todo ? [auth] disable (≈ok, but we do secˆ)
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True  # todo ? [auth] disable
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 ACCOUNT_SESSION_REMEMBER = True
 if DJANGO_ENV.is_dev():

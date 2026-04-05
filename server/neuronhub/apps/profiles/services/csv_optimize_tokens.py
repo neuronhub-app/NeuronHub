@@ -19,8 +19,8 @@ class R:
 
 _replacements: list[R] = [
     R(raw=["'", "\u2019"], replace_all="'"),
-    # todo ! regex for `^{num}) ?` -> `{num}. `
-    # todo ! regex for newlines with ^()
+    # todo ? refac: regex for `^{num}) ?` -> `{num}. `
+    # todo ? refac: regex for newlines with ^()
     # more patterns to replace: ["^--"]
     R(raw=["•\t", "•  ", "• ", "— "], replace_all="- "),
     R(raw="https://", llm=""),

@@ -86,7 +86,7 @@ type AlertType = NonNullable<ResultOf<typeof JobAlertListQuery>["job_alerts"]>[n
 function AlertCard(props: { alert: AlertType }) {
   const loading = useIsLoading();
 
-  // todo !! fix: unstable, refactor
+  // todo ! fix: unstable, refactor
   // see [[adding-job-alert-filters.mdx]] checklist
   const isHasFilters =
     props.alert.tags.length > 0 ||

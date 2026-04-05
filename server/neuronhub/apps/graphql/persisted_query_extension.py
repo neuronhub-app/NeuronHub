@@ -111,7 +111,7 @@ def _load_client_persisted_queries_json() -> dict[str, str]:
 def _normalize_query(query_string: str) -> DocumentNode:
     """
     #AI, though reviewed, i didn't do a deep dive in "graphql" fragments. Though it's hard to fuck up a string check.
-    # todo !! fix(sec): audit & pentest
+    # todo ! fix(sec): audit & pentest
     """
     doc = parse(query_string)
 

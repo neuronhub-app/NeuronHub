@@ -34,7 +34,7 @@ async def send_email(
         from_email=email_from,
         to=[email_to],
         reply_to=[email_reply_to or site.contact_email],
-        # todo !! fix: for go-live
+        # todo ? feat: BE url
         # headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
     )
     email.content_subtype = "html"

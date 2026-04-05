@@ -58,7 +58,7 @@ class HighlighterQuery:
         highlight = await PostHighlight.objects.filter(post_id=post_id, user_id=user.id).aget()
         return cast(PostHighlightType, cast(object, highlight))
 
-    # todo !! we have at least 5-level children #AI-slop
+    # todo ! fix: we have at least 5-level children #AI-slop
     @strawberry.field(extensions=[IsAuthenticated()])
     async def user_highlights(self, info: strawberry.Info) -> list[PostHighlightType]:
         user = await get_user(info)
