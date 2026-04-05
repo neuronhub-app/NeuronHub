@@ -219,7 +219,7 @@ class JobAlertTestContext:
         with disable_auto_indexing_if_enabled():
             for job in self.jobs_created:
                 await job.adelete()
-            await self.alert.logs.adelete()  # kept by default
+            await self.alert.logs.all().adelete()  # default is on_delete=SET_NULL
             await self.alert.adelete()
 
     @classmethod
@@ -238,7 +238,7 @@ class JobAlertTestContext:
                 await gen.jobs.job(tags=tags),
             ]
 
-        alert = await gen.jobs.job_alert(tz=None, tags=tags)
+        alert = await gen.jobs.job_alert(email=user.email, tz=None, tags=tags)
 
         return JobAlertTestContext(jobs_created=jobs, alert=alert)
 
