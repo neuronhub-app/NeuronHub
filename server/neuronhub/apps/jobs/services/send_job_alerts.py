@@ -49,9 +49,10 @@ async def send_job_alerts(
     ).acount()
 
     async for alert in alerts_qs:
-        capture_checkin(
-            monitor_slug=send_job_alert_emails_task.name, status=MonitorStatus.IN_PROGRESS
-        )
+        if is_live_run := not is_include_test_jobs:
+            capture_checkin(
+                monitor_slug=send_job_alert_emails_task.name, status=MonitorStatus.IN_PROGRESS
+            )
 
         if is_wrong_hour_if_alert_has_tz := (
             alert.tz and hour_local_to_send_at != datetime.now(tz=alert.tz).hour
@@ -218,6 +219,7 @@ class JobAlertTestContext:
         with disable_auto_indexing_if_enabled():
             for job in self.jobs_created:
                 await job.adelete()
+            await self.alert.logs.adelete()  # kept by default
             await self.alert.adelete()
 
     @classmethod
