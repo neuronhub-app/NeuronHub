@@ -47,20 +47,14 @@ export const env = {
     return `${this.VITE_SERVER_URL}/api/graphql`;
   },
   get isProd(): boolean {
-    return (
-      this.MODE === "production" ||
-      this.MODE === "prod" ||
-      this.NODE_ENV === "production" ||
-      this.NODE_ENV === "prod"
-    );
+    return this.VITE_ENV === "prod";
   },
   get isDev(): boolean {
-    return (
-      this.MODE === "development" ||
-      this.MODE === "dev" ||
-      this.NODE_ENV === "development" ||
-      this.NODE_ENV === "dev"
-    );
+    return this.VITE_ENV.startsWith("dev");
+  },
+  // stage & prod: eg for robots noindex & Sentry
+  get isPublicDeployed(): boolean {
+    return !this.isDev;
   },
   get site() {
     const site = this.VITE_SITE;

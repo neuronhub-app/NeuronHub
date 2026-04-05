@@ -39,6 +39,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     # Global
 
+    DJANGO_ENV = "${DJANGO_ENV:-dev}"
+
     PROJECT_NAME = "{{ env.PROJECT_NAME | default(value = 'neuronhub') }}"
     VITE_PROJECT_NAME = "NeuronHub" # for FE HTML
     VITE_RELEASE_VERSION = "0.3.2.0-rc.10" # used in GitHub and Sentry

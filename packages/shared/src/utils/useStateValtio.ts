@@ -1,3 +1,4 @@
+import { env } from "@neuronhub/shared/createEnv";
 import { useEffect, useRef } from "react";
 import { subscribe } from "valtio";
 import { useSnapshot } from "valtio/react";
@@ -21,7 +22,7 @@ export function useStateValtio<T extends object>(val: T, devtoolsName?: string) 
   const state = ref.current;
 
   useEffect(() => {
-    if (import.meta.env.DEV) {
+    if (env.isDev) {
       devtools(state, { name: devtoolsName, enabled: true });
     }
   }, []);
@@ -44,7 +45,7 @@ export function useStateValtioSet<T>(val: Iterable<T> | null, opts?: { devtoolsN
   const state = ref.current;
 
   useEffect(() => {
-    if (import.meta.env.DEV) {
+    if (env.isDev) {
       devtools(state, { name: opts?.devtoolsName, enabled: true });
     }
   }, []);

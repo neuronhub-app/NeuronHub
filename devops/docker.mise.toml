@@ -79,8 +79,9 @@
 
                     # for React Router build: Must match the {client|docs}/Dockerfile ARG names
 
-                    NODE_ENV: {{ env.DJANGO_ENV }}
-                    MODE: {{ env.DJANGO_ENV }}
+                    VITE_ENV: {{ env.DJANGO_ENV }}
+                    DJANGO_ENV: {{ env.DJANGO_ENV }}
+
                     VITE_SITE: {{ env.VITE_SITE | default(value="''") }}
                     VITE_SERVER_URL: https://($server_domain)
                     VITE_CLIENT_URL: {{ env.CLIENT_URL }}
@@ -117,4 +118,45 @@
         }
 
         rm $compose_file
+    """
+
+["docker:verify"]
+    alias = "docker:test"
+    usage = """
+        flag "--app <name>" { choices "server" "client" }
+        flag "--version <version>" env="VITE_RELEASE_VERSION"
+    """
+    run = """
+        let image = $"ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)"
+        let name = $"verify-($env.usage_app)"
+
+        # cleanup previous run
+        sudo docker rm -f $name out+err> /dev/null
+
+        if $env.usage_app == "client" {
+          sudo docker run -d --name $name $image
+          sleep 2sec
+
+          let html = (sudo docker exec $name curl -sf http://localhost:3000)
+          let has_noindex = ($html | str contains "noindex")
+          print $"noindex: ($has_noindex) (if $has_noindex { '✓' } else { '✗ MISSING' })"
+
+          let env_path = ($html | parse -r 'href="(/assets/env[^"]+\\.js)"' | get 0.capture0)
+          let env_js = (sudo docker exec $name curl -sf $"http://localhost:3000($env_path)")
+          let expected_env = "{{ env.DJANGO_ENV }}"
+          let has_vite_env = ($env_js | str contains $'VITE_ENV:"($expected_env)"')
+          print $"VITE_ENV=($expected_env): ($has_vite_env) (if $has_vite_env { '✓' } else { '✗ WRONG' })"
+
+          sudo docker rm -f $name
+        } else if $env.usage_app == "server" {
+          sudo docker run -d --name $name $image sleep infinity
+
+          let result = (sudo docker exec $name uv run manage.py shell -c "
+from neuronhub.settings import DJANGO_ENV, IS_SENTRY_ENABLED
+print(f'DJANGO_ENV={DJANGO_ENV.value} sentry={IS_SENTRY_ENABLED}')
+")
+          print $result
+
+          sudo docker rm -f $name
+        }
     """

@@ -7,7 +7,7 @@ ARG VITE_RELEASE_VERSION
 ARG VITE_SITE
 ARG VITE_SERVER_URL
 ARG VITE_CLIENT_URL
-ARG NODE_ENV="prod"
+ARG VITE_ENV="prod"
 
 # Sentry
 ARG VITE_RELEASE_NAME
@@ -35,7 +35,7 @@ RUN apt-get update && apt-get install ca-certificates --yes # for Sentry Source 
 
 WORKDIR /app/client
 
-RUN pnpm exec react-router build --mode=$NODE_ENV --sourcemapClient
+RUN pnpm exec react-router build --sourcemapClient
 
 
 # Nginx
@@ -45,7 +45,6 @@ FROM nginx:alpine
 # after the FROM need to re-declare ARGs:
 ARG VITE_RELEASE_VERSION
 ARG GITHUB_PATH
-ARG NODE_ENV="prod"
 
 LABEL org.opencontainers.image.description="Nginx serving React Router static index.html"
 LABEL org.opencontainers.image.source="https://github.com/${GITHUB_PATH}/blob/${VITE_RELEASE_VERSION}/client/Dockerfile"

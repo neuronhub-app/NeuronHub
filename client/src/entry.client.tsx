@@ -13,9 +13,9 @@ import {
 import * as Sentry from "@sentry/react";
 
 Sentry.init({
-  environment: env.NODE_ENV,
-  enabled: !env.isDev,
-  enableLogs: !env.isDev,
+  environment: env.VITE_ENV,
+  enabled: env.isPublicDeployed,
+  enableLogs: env.isPublicDeployed,
   dsn: env.VITE_SENTRY_DSN_FRONTEND,
   integrations: [
     Sentry.reactRouterV7BrowserTracingIntegration({
