@@ -50,16 +50,20 @@ export function PgFilterCardWithSplitBg(props: {
 
 export function PgFacetsActive(props: { facetsActive: FacetsActiveConfig }) {
   const clear = useClearRefinements();
-  if (!clear.canRefine) {
+  const isActive = clear.canRefine || Boolean(props.facetsActive.extraTags?.length);
+  if (!isActive) {
     return null;
   }
   return (
-    <Collapsible.Root open={clear.canRefine} gridColumn="span 5">
+    <Collapsible.Root open={isActive} gridColumn="span 5">
       <Collapsible.Content>
         <HStack gap="gap.md" align="flex-start" flexWrap="wrap">
           <PgAlgoliaFacetsActive config={props.facetsActive} />
 
-          <PgRefinesClearButton />
+          <PgRefinesClearButton
+            onClear={props.facetsActive.onClearAdditional}
+            isExtraActive={Boolean(props.facetsActive.extraTags?.length)}
+          />
         </HStack>
       </Collapsible.Content>
     </Collapsible.Root>
@@ -104,9 +108,14 @@ export function PgMobileCollapsible(props: {
         <Stack gap="gap.sm">
           {props.facetsTopbar}
 
-          <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm">
-            <PgRefinesClearButton />
-          </PgAlgoliaFacetsActive>
+          <Flex gap="gap.sm" flexWrap="wrap" align="flex-start">
+            <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm">
+              <PgRefinesClearButton
+                onClear={props.facetsActive.onClearAdditional}
+                isExtraActive={Boolean(props.facetsActive.extraTags?.length)}
+              />
+            </PgAlgoliaFacetsActive>
+          </Flex>
 
           <Collapsible.Trigger asChild>
             <Flex
@@ -133,10 +142,10 @@ export function PgMobileCollapsible(props: {
   );
 }
 
-function PgRefinesClearButton() {
+function PgRefinesClearButton(props: { onClear?: () => void; isExtraActive?: boolean }) {
   const clear = useClearRefinements();
 
-  if (!clear.canRefine) {
+  if (!clear.canRefine && !props.isExtraActive) {
     return null;
   }
 
@@ -145,6 +154,7 @@ function PgRefinesClearButton() {
       as="button"
       onClick={() => {
         clear.refine();
+        props.onClear?.();
       }}
       align="center"
       gap="gap.xs"

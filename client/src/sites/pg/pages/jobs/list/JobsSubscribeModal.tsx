@@ -5,17 +5,19 @@
  */
 import { Box, Button, Flex, Icon, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { format } from "@neuronhub/shared/utils/format";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { fromUnixTime } from "date-fns";
 import { useForm } from "react-hook-form";
 import { FaBell } from "react-icons/fa6";
-import { fromUnixTime } from "date-fns";
 import { useCurrentRefinements } from "react-instantsearch";
 import { z } from "zod";
-
-import { useUser } from "@/apps/users/useUserCurrent";
 import {
-  JobAlertSubscribeMutation,
   getLocationIdsActive,
+  JobAlertSubscribeMutation,
 } from "@/apps/jobs/list/JobsSubscribeModal";
+import { useUser } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogCloseTrigger,
@@ -25,13 +27,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ids } from "@/e2e/ids";
-import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { JobLocationsQuery } from "@/sites/pg/components/PgFacetLocation";
+import { useJobListFilters } from "@/sites/pg/pages/jobs/list/jobListFilters";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { datetime } from "@neuronhub/shared/utils/date-fns";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 const FormSchema = z.object({
   email: z.email("Invalid email address"),
@@ -53,17 +54,25 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
     defaultValues: { email: user?.email ?? localStorage.getItem(emailStoreKey) ?? "" },
   });
 
-  const refinesCurrentReadableMap = refinesCurrent.items.flatMap(item =>
-    item.refinements.map(refinement => ({
-      attribute: ATTRIBUTE_LABELS[item.attribute] ?? item.attribute,
-      label: getRefinementLabel(item.attribute, refinement),
-    })),
-  );
+  const jobFilters = useJobListFilters();
+
+  const refinesCurrentReadableMap = [
+    ...refinesCurrent.items.flatMap(item =>
+      item.refinements.map(refinement => ({
+        attribute: ATTRIBUTE_LABELS[item.attribute] ?? item.attribute,
+        label: getRefinementLabel(item.attribute, refinement),
+      })),
+    ),
+    ...(jobFilters.snap.salaryMin
+      ? [{ attribute: "Minimum Salary", label: `${format.money(jobFilters.snap.salaryMin)}+` }]
+      : []),
+    ...(jobFilters.snap.excludeNoSalary
+      ? [{ attribute: "Exclude No Salary", label: "Yes" }]
+      : []),
+  ];
 
   // todo ! refac: duplicate of [[client/src/apps/jobs/list/JobsSubscribeModal.tsx]]
   async function handleSubscribe(fields: z.infer<typeof FormSchema>) {
-    const salaryRefinement = refinesCurrent.items.find(item => item.attribute === "salary_min");
-
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,
       tag_names: refinesCurrent.items
@@ -75,12 +84,8 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
       ),
       is_orgs_highlighted:
         refinesCurrent.items.some(item => item.attribute === "is_orgs_highlighted") || null,
-      salary_min:
-        salaryRefinement?.refinements[0]?.value != null
-          ? Number(salaryRefinement.refinements[0].value)
-          : null,
-      is_exclude_no_salary:
-        refinesCurrent.items.some(item => item.attribute === "has_salary") || null,
+      salary_min: jobFilters.snap.salaryMin ?? null,
+      is_exclude_no_salary: jobFilters.snap.excludeNoSalary,
       is_exclude_career_capital:
         refinesCurrent.items.some(item => item.attribute === "is_not_career_capital") || null,
       is_exclude_profit_for_good:
@@ -256,11 +261,9 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_country_visa_sponsor.name": "Visa Sponsor",
   "locations.algolia_filter_name": "Location",
   is_orgs_highlighted: "Highlighted",
-  has_salary: "Has Salary",
   is_not_career_capital: "Exclude Career Capital",
   is_not_profit_for_good: "Exclude Profit for Good",
   "org.name": "Organisation",
-  salary_min: "Minimum Salary",
   posted_at: "Posted",
   posted_at_unix: "Posted",
 };

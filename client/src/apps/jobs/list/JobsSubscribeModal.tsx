@@ -6,8 +6,8 @@ import { GoInfo } from "react-icons/go";
 import { useCurrentRefinements } from "react-instantsearch";
 import { z } from "zod";
 
+import { format } from "@neuronhub/shared/utils/format";
 import { useUser } from "@/apps/users/useUserCurrent";
-import { salaryFormatter } from "@/sites/pg/components/PgFacetSalary";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogBody,
@@ -59,7 +59,7 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
       attribute: ATTRIBUTE_LABELS[item.attribute] ?? item.attribute,
       label:
         item.attribute === "salary_min"
-          ? `${salaryFormatter.format(refinement.value as number)}+`
+          ? `${format.money(refinement.value as number)}+`
           : refinement.label,
     })),
   );

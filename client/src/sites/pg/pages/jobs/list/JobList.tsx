@@ -1,4 +1,3 @@
-import { layout } from "@/components/LayoutSidebar";
 import {
   Box,
   Button,
@@ -10,12 +9,13 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { useRef, type ReactNode } from "react";
+import { type ReactNode, useRef } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
-import { Link } from "react-router";
 import { Configure, useClearRefinements } from "react-instantsearch";
-import { ids } from "@/e2e/ids";
+import { Link } from "react-router";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
+import { layout } from "@/components/LayoutSidebar";
+import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
@@ -25,6 +25,11 @@ import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
 import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
 import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
+import {
+  resetJobListFilters,
+  useJobListAlgoliaFilters,
+  useJobListExtraTags,
+} from "@/sites/pg/pages/jobs/list/jobListFilters";
 import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 import { useInit } from "@/utils/useInit";
@@ -32,6 +37,8 @@ import { useInit } from "@/utils/useInit";
 export function JobList(props: { slug?: string }) {
   const jobOpenPinned = useJobOpenPinned(props.slug);
   const algolia = useAlgoliaSearchClient();
+  const algoliaFilters = useJobListAlgoliaFilters();
+  const extraTags = useJobListExtraTags();
 
   return (
     <PgAlgoliaList<JobFragmentType>
@@ -68,17 +75,18 @@ export function JobList(props: { slug?: string }) {
           is_not_career_capital: "Excl. Career Capital",
           is_not_profit_for_good: "Excl. Profit-for-Good",
           posted_at_unix: "Posted",
-          salary_min: "Minimum Salary",
         },
         formatAttribute: {
           "locations.algolia_filter_name": r => r.label.replace(/^\[.+?] /, ""),
         },
         dateAttributes: ["posted_at_unix"],
-        moneyAttributes: ["salary_min"],
+        extraTags,
+        onClearAdditional: resetJobListFilters,
       }}
     >
       <Configure
         hitsPerPage={20}
+        filters={algoliaFilters}
         attributesToHighlight={[
           "title",
           "org.name",
@@ -145,6 +153,7 @@ function ResetFiltersButton() {
       size="sm"
       onClick={() => {
         clear.refine();
+        resetJobListFilters();
       }}
       flexShrink="0"
     >

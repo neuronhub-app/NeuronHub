@@ -1,11 +1,11 @@
-import { Badge, HStack, Icon, Text, Wrap } from "@chakra-ui/react";
+import { Badge, HStack, Icon, Text } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { fromUnixTime } from "date-fns";
-
 import { LuX } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
-import { salaryFormatter } from "@/sites/pg/components/PgFacetSalary";
+
+export type ExtraTag = { label: string; onRemove: () => void };
 
 export type RefinementActive = ReturnType<
   typeof useCurrentRefinements
@@ -28,10 +28,11 @@ const tagStyle = {
 export type FacetsActiveConfig = {
   labelsOverride?: Record<string, string>;
   dateAttributes?: string[];
-  moneyAttributes?: string[];
   formatAttribute?: Record<string, (refinement: RefinementActive) => string>;
   subFacetPairs?: Record<string, string>;
   subFacetLabel?: Record<string, string>;
+  extraTags?: ExtraTag[];
+  onClearAdditional?: () => void;
 };
 
 export function PgAlgoliaFacetsActive(props: {
@@ -42,7 +43,7 @@ export function PgAlgoliaFacetsActive(props: {
   const refinementsCurrent = useCurrentRefinements();
   const refinementsClear = useClearRefinements();
 
-  if (!refinementsClear.canRefine) {
+  if (!refinementsClear.canRefine && !props.config.extraTags?.length) {
     return null;
   }
 
@@ -67,9 +68,6 @@ export function PgAlgoliaFacetsActive(props: {
     if (props.config.dateAttributes?.includes(attribute)) {
       return `${label} ${refinement.operator} ${datetime.relative(fromUnixTime(refinement.value as number))}`;
     }
-    if (props.config.moneyAttributes?.includes(attribute)) {
-      return `${label}: ${salaryFormatter.format(refinement.value as number)}+`;
-    }
     return props.config.formatAttribute?.[attribute]?.(refinement) ?? label;
   }
 
@@ -86,6 +84,9 @@ export function PgAlgoliaFacetsActive(props: {
             />
           )),
       )}
+      {props.config.extraTags?.map(tag => (
+        <FilterTag key={tag.label} label={tag.label} onRemove={tag.onRemove} />
+      ))}
       {props.children}
     </>
   );

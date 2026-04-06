@@ -296,10 +296,12 @@ async def _get_jobs_qs_by_alert(
         qs = qs.filter(locations__id__in=location_ids).distinct()
 
     if alert.salary_min:
-        qs = qs.filter(Q(salary_min__gte=alert.salary_min) | Q(salary_min=None))
-
-    if alert.is_exclude_no_salary:
-        qs = qs.exclude(salary_min=None)
+        if alert.is_exclude_no_salary:
+            qs = qs.filter(salary_min__gte=alert.salary_min)
+        else:
+            qs = qs.filter(Q(salary_min__gte=alert.salary_min) | Q(salary_min__isnull=True))
+    elif alert.is_exclude_no_salary:
+        qs = qs.filter(salary_min__isnull=False)
 
     if alert.is_exclude_career_capital:
         qs = qs.exclude(tags_area__name=Job.Tags.CareerCapital)
@@ -334,14 +336,17 @@ async def _get_alert_filters_dict(alert: JobAlert) -> dict[str, str]:
     location_names = [loc.name async for loc in alert.locations.all()]
     if location_names:
         filters["Locations"] = ", ".join(location_names)
+    salary_parts: list[str] = []
     if alert.salary_min:
-        filters["Salary"] = f"${alert.salary_min:,}"
+        salary_parts.append(f"${alert.salary_min:,}+")
+    if alert.is_exclude_no_salary:
+        salary_parts.append("Exclude roles without salary")
+    if salary_parts:
+        filters["Salary"] = ", ".join(salary_parts)
 
     bool_filters: list[str] = []
     if alert.is_orgs_highlighted:
         bool_filters.append("Highlighted Orgs")
-    if alert.is_exclude_no_salary:
-        bool_filters.append("Has Salary")
     if alert.is_exclude_career_capital:
         bool_filters.append("Exclude Career Capital")
     if alert.is_exclude_profit_for_good:

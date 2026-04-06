@@ -547,7 +547,7 @@ class JobsGen:
         locations: list[JobLocation] | None = None,
         is_orgs_highlighted: bool | None = None,
         salary_min: int | None = None,
-        is_exclude_no_salary: bool | None = None,
+        is_exclude_no_salary: bool = False,
         is_exclude_career_capital: bool | None = None,
         is_exclude_profit_for_good: bool | None = None,
     ) -> JobAlert:
