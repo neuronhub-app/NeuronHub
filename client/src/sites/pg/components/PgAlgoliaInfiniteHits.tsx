@@ -1,10 +1,15 @@
 import { Box, Flex, HStack, Skeleton, Stack, Text } from "@chakra-ui/react";
-import type { TadaDocumentNode } from "gql.tada";
-import { useEffect, useRef, type ReactNode } from "react";
-import { useCurrentRefinements, useInfiniteHits, useSearchBox } from "react-instantsearch";
-import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
-import type { ID } from "@/gql-tada";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import type { TadaDocumentNode } from "gql.tada";
+import { type ReactNode, useEffect, useRef } from "react";
+import {
+  useCurrentRefinements,
+  useInfiniteHits,
+  useInstantSearch,
+  useSearchBox,
+} from "react-instantsearch";
+import type { ID } from "@/gql-tada";
+import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
 
 export type PgInfiniteHitsProps<TItem extends { id: ID }, TData = unknown> = {
   enrichment: {
@@ -26,6 +31,7 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
 ) {
   const search = useSearchBox();
   const refinements = useCurrentRefinements();
+  const { status } = useInstantSearch();
   const hits = useInfiniteHits<TItem>();
   const showMoreCallback = useRef(hits.showMore);
   showMoreCallback.current = hits.showMore;
@@ -68,13 +74,15 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
   const hasNoResults = filteredItems.length === 0 && !props.hitOpenedPinned?.node;
   const isInitialLoad = !hits.results;
   const isEmptyBeforeSearch = !isSearchActive && hasNoResults;
+  const showSkeleton =
+    isInitialLoad || isEmptyBeforeSearch || (hasNoResults && status !== "idle");
 
   return (
     <Stack gap="gap.xl" w="full">
       {props.hitOpenedPinned?.node && !isSearchActive && props.hitOpenedPinned.node}
 
       <Stack data-testid={props.listTestId} gap="gap.md">
-        {isInitialLoad || isEmptyBeforeSearch ? (
+        {showSkeleton ? (
           <PgHitSkeletons />
         ) : hasNoResults ? (
           (props.noResultsNode ?? <Text>No {props.label ?? "results"} found.</Text>)
