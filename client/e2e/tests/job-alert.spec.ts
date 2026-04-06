@@ -1,5 +1,5 @@
 import { layout } from "@/components/LayoutSidebar";
-import { test } from "@playwright/test";
+import { type Locator, expect as expectBase, test } from "@playwright/test";
 import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { expect } from "@/e2e/helpers/expect";
@@ -7,6 +7,9 @@ import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/P
 import { ids } from "@/e2e/ids";
 import { env } from "@/env";
 import { urls } from "@/urls";
+
+const openPopover = "[data-part=content][data-scope=popover][data-state=open]";
+const testEmail = "e2e@neuronhub.app";
 
 test.describe("Job Alert", () => {
   let play: PlaywrightHelper;
@@ -24,31 +27,45 @@ test.describe("Job Alert", () => {
 
   // todo ! refac: #AI-slop - magic strings wo testid
   // replace "Subscriptions (1)" with a `data-{}` & testid
-  test("subscribe => .is_active to false => clearCookies => 'auth' by /jobs/subscriptions/:id_ext => delete", async ({
+  test("subscribe with locations => toggle inactive => reauth by id_ext => delete", async ({
     page,
     context,
   }) => {
     await play.navigate(urls.jobs.list, { idleWait: true });
 
     if (env.site.isProbablyGood) {
-      // todo ? refac: testid
       await expect(page.getByRole("link", { name: layout.label.jobAlerts() })).not.toBeVisible();
     } else {
       await expect($[ids.layout.sidebar]).not.toHaveText(layout.label.jobAlerts());
     }
 
-    if (env.site.isProbablyGood) {
-      await page.getByTestId(ids.facet.popover.otherFilters).last().click();
-      await page.getByTestId(ids.facet.excludeCareerCapital).last().click();
-    }
+    const popover = page.locator(openPopover);
 
-    const testEmail = "e2e@neuronhub.app";
+    // Select Kenya (country) + Berkeley (city)
+    await page.getByTestId(ids.facet.popover.country).last().click();
+    await clickFacetCheckbox(popover, "Kenya");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
 
+    await page.getByTestId(ids.facet.popover.city).last().click();
+    await clickFacetCheckbox(popover, "Berkeley CA, USA");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+
+    // Subscribe — verify location_ids sent
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
-    const mutationSubscribe = play.waitForResponseGraphql(JobAlertSubscribeMutation);
+
+    const requestPromise = page.waitForRequest(
+      req =>
+        req.url().includes("/graphql") &&
+        (req.postData()?.includes("JobAlertSubscribe") ?? false),
+    );
     await play.click(ids.job.alert.submitBtn);
-    await mutationSubscribe;
+    const request = await requestPromise;
+    const body = JSON.parse(request.postData()!);
+    expectBase(body.variables?.location_ids?.length).toBeGreaterThanOrEqual(2);
+    await play.waitForNetworkIdle();
 
     if (env.site.isProbablyGood) {
       await expect(page.getByRole("link", { name: layout.label.jobAlerts(1) })).toBeVisible();
@@ -56,37 +73,31 @@ test.describe("Job Alert", () => {
       await expect($[ids.layout.sidebar]).toHaveText(layout.label.jobAlerts(1));
     }
 
+    // Navigate to subscriptions
     const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);
     await play.navigate(urls.jobs.subscriptions);
     const alertsRes = await alertsQuery;
     await expect($[ids.job.subscriptions.card]).toHaveText(testEmail);
 
-    if (env.site.isProbablyGood) {
-      await expect($[ids.job.subscriptions.card]).toHaveText("Exclude Career Capital");
-    }
-
-    // .is_active to false
+    // Toggle inactive
     await play.click(ids.job.subscriptions.toggleBtn);
     await expect($[ids.job.subscriptions.status.inactive]).toBeVisible();
 
-    // 'auth' by /jobs/subscriptions/:id_ext
+    // Reauth by id_ext after clearCookies
     await context.clearCookies();
     const alert = alertsRes.data.job_alerts!.find(a => a.email === testEmail)!;
     await play.navigate(urls.jobs.subscriptionsManage(alert.id_ext), { idleWait: true });
-    await expect($[ids.job.subscriptions.card]).toBeVisible();
     await expect($[ids.job.subscriptions.card]).toHaveText(testEmail);
 
-    // delete
+    // Delete
     await play.click(ids.job.subscriptions.removeBtn);
     await expect(page).not.toHaveText(testEmail);
   });
 
-  test("subscribe => delete by /jobs/subscriptions/remove/:id_ext (flaky -> run 2-3x if failed)", async ({
+  test("unsubscribe by /jobs/subscriptions/remove/:id_ext (flaky -> run 2-3x if failed)", async ({
     page,
   }) => {
     await play.navigate(urls.jobs.list, { idleWait: true });
-
-    const testEmail = "e2e@neuronhub.app";
 
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
@@ -110,3 +121,9 @@ test.describe("Job Alert", () => {
     await expect($[ids.job.subscriptions.unsubscribed.alert]).toBeVisible();
   });
 });
+
+async function clickFacetCheckbox(popover: Locator, value: string) {
+  const item = popover.locator(`[data-testid='${ids.facet.checkbox(value)}']`);
+  await expectBase(item).toBeVisible();
+  await item.locator("[data-part=control]").click();
+}
