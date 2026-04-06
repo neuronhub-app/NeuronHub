@@ -209,8 +209,11 @@ export namespace ids {
       remote: "facet.popover.remote",
       country: "facet.popover.country",
       city: "facet.popover.city",
+      salary: "facet.popover.salary",
       otherFilters: "facet.popover.other-filters",
     },
+    salaryInput: "facet.salary-input",
+    excludeNoSalary: "facet.exclude-no-salary",
     excludeCareerCapital: "facet.exclude-career-capital",
     clear(attribute: string) {
       return `facet.clear.${attribute}` as TestId;

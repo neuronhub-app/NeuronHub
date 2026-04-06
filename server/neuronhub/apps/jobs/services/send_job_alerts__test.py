@@ -155,14 +155,34 @@ class TestSendJobAlertEmails(NeuronTestCase):
 
         assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
-    async def test_filters_by_salary_min(self):
-        alert = await self.gen.jobs.job_alert(salary_min=50_000)
+    async def test_salary_min_includes_nulls_by_default(self):
+        alert = await self.gen.jobs.job_alert(salary_min=100_000)
 
-        await self.gen.jobs.job(salary_min=80_000)
-        await self.gen.jobs.job(salary_min=30_000)  # below min
-        await self.gen.jobs.job()  # included by design
+        await self.gen.jobs.job(salary_min=150_000)
+        await self.gen.jobs.job(salary_min=None)
+        await self.gen.jobs.job(salary_min=50_000)
 
         assert 2 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_salary_min_with_exclude_no_salary(self):
+        alert = await self.gen.jobs.job_alert(
+            salary_min=100_000,
+            is_exclude_no_salary=True,
+        )
+
+        await self.gen.jobs.job(salary_min=150_000)
+        await self.gen.jobs.job(salary_min=None)
+        await self.gen.jobs.job(salary_min=50_000)
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_exclude_no_salary_without_salary_min(self):
+        alert = await self.gen.jobs.job_alert(is_exclude_no_salary=True)
+
+        await self.gen.jobs.job(salary_min=50_000)
+        await self.gen.jobs.job(salary_min=None)
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
     # boolean filters
     # ----------------------------------------------------------------------------
@@ -175,14 +195,6 @@ class TestSendJobAlertEmails(NeuronTestCase):
 
         await self.gen.jobs.job(org=org_h)
         await self.gen.jobs.job(org=org_n)
-
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
-
-    async def test_filters_is_exclude_no_salary(self):
-        alert = await self.gen.jobs.job_alert(is_exclude_no_salary=True)
-
-        await self.gen.jobs.job(salary_min=50000)
-        await self.gen.jobs.job()
 
         assert 1 == len(await _get_jobs_qs_by_alert(alert))
 

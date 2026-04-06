@@ -1,13 +1,13 @@
 import { Flex, Grid, Stack, Switch } from "@chakra-ui/react";
-import { useRefinementList, useToggleRefinement } from "react-instantsearch";
-import { PgFacetSalary } from "@/sites/pg/components/PgFacetSalary";
-import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import type { UseRefinementListProps } from "react-instantsearch";
+import { useRefinementList, useToggleRefinement } from "react-instantsearch";
+import { facetStyle } from "@/components/algolia/AlgoliaFacets";
+import { ids } from "@/e2e/ids";
 import { PgFacet } from "@/sites/pg/components/PgFacet";
-import { LocationType } from "~/graphql/enums";
 import { ALGOLIA_ATTR_LOCATION, PgFacetLocation } from "@/sites/pg/components/PgFacetLocation";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
-import { ids } from "@/e2e/ids";
+import { PgFacetSalary } from "@/sites/pg/components/PgFacetSalary";
+import { LocationType } from "~/graphql/enums";
 
 const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
 
@@ -127,7 +127,7 @@ export function PgFiltersTopbar() {
       <PgFacetPopover
         label="Salary"
         order={{ base: 9, md: 8, lg: 9 }}
-        contentMaxW="var(--reference-width)"
+        testId={ids.facet.popover.salary}
       >
         <PgFacetSalary />
       </PgFacetPopover>

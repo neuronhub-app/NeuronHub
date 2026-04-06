@@ -141,7 +141,7 @@ type JobAlertType {
   is_orgs_highlighted: Boolean
   is_remote: Boolean @deprecated(reason: ".is_remote was moved to JobLocation.is_remote")
   salary_min: Int
-  is_exclude_no_salary: Boolean
+  is_exclude_no_salary: Boolean!
   is_exclude_career_capital: Boolean
   is_exclude_profit_for_good: Boolean
   is_active: Boolean!
@@ -264,7 +264,7 @@ type Mutation {
   profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku", include_reprocessing: Boolean! = true, is_dry: Boolean! = false): ProgressType! @IsAuthenticated
   profile_matches_cancel_llm: Boolean! @IsAuthenticated
   job_versions_approve(draft_ids: [Int!]!): Boolean! @IsStaff
-  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_ids: [Int!] = null, is_orgs_highlighted: Boolean = null, salary_min: Int = null, is_exclude_no_salary: Boolean = null, is_exclude_career_capital: Boolean = null, is_exclude_profit_for_good: Boolean = null, tz: String = null): Boolean!
+  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_ids: [Int!] = null, is_orgs_highlighted: Boolean = null, salary_min: Int = null, is_exclude_no_salary: Boolean! = false, is_exclude_career_capital: Boolean = null, is_exclude_profit_for_good: Boolean = null, tz: String = null): Boolean!
   job_alert_toggle_active(id_ext: UUID!): Boolean!
   job_alert_remove(id_ext: UUID!): Boolean!
   job_alert_access_session_by_id_ext(id_ext: UUID!): Boolean!

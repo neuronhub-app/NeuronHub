@@ -226,6 +226,9 @@ class Job(AlgoliaModel):
     def is_not_profit_for_good(self) -> bool:
         return not any(tag.name == self.Tags.ProfitForGood.value for tag in self.tags_area.all())
 
+    def get_salary_min_or_zero(self) -> int:
+        return self.salary_min or 0
+
     def is_in_algolia_index(self) -> bool:
         return self.is_published
 
@@ -289,7 +292,7 @@ class JobAlert(TimeStampedModel):
     )
     is_remote = models.BooleanField(blank=True, null=True)
     salary_min = models.PositiveIntegerField(blank=True, null=True)
-    is_exclude_no_salary = models.BooleanField(blank=True, null=True)
+    is_exclude_no_salary = models.BooleanField(default=False)
     is_exclude_career_capital = models.BooleanField(blank=True, null=True)
     is_exclude_profit_for_good = models.BooleanField(blank=True, null=True)
 
