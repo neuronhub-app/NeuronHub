@@ -3,11 +3,11 @@ import { ChakraProvider } from "@chakra-ui/react";
 import * as Sentry from "@sentry/react-router";
 import type { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
-import { Toaster as ChakraToaster } from "@/components/ui/toaster";
 import { Outlet, Scripts, ScrollRestoration } from "react-router";
-import { ColorModeProvider } from "@/components/ui/color-mode";
-import { useMetaTitle } from "@/components/useMetaTitle";
 import { AdminMenuFloatButton } from "@/components/AdminMenuFloatButton";
+import { ColorModeProvider } from "@/components/ui/color-mode";
+import { Toaster as ChakraToaster } from "@/components/ui/toaster";
+import { useMetaTitle } from "@/components/useMetaTitle";
 import { env } from "@/env";
 import { client } from "@/graphql/client";
 import { siteConfig } from "@/sites";
@@ -71,6 +71,24 @@ function LayoutHead() {
       {!env.isProd && <meta name="robots" content="noindex, follow" />}
 
       <meta name="color-scheme" content={siteConfig.forcedColorMode ?? "light dark"} />
+
+      {siteConfig.meta && (
+        <>
+          <meta name="description" content={siteConfig.meta.description} />
+          <meta property="og:title" content={siteConfig.meta.title} />
+          <meta property="og:description" content={siteConfig.meta.description} />
+          <meta property="og:type" content="website" />
+          {siteConfig.meta.ogImage && (
+            <meta property="og:image" content={siteConfig.meta.ogImage} />
+          )}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={siteConfig.meta.title} />
+          <meta name="twitter:description" content={siteConfig.meta.description} />
+          {siteConfig.meta.ogImage && (
+            <meta name="twitter:image" content={siteConfig.meta.ogImage} />
+          )}
+        </>
+      )}
 
       {siteConfig.googleFontsHref && (
         <>

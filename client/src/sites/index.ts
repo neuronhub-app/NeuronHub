@@ -13,6 +13,11 @@ export type SiteConfig = {
     webmanifest: string;
   };
   googleFontsHref?: string;
+  meta?: {
+    title: string;
+    description: string;
+    ogImage?: string;
+  };
 };
 
 const neuronConfig: SiteConfig = {
@@ -32,11 +37,18 @@ const pgConfig: SiteConfig = {
   googleFontsHref:
     "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap",
   favicon: {
-    svg: "/favicon/favicon.svg",
-    png96: "/favicon/favicon-96x96.png",
-    ico: "/favicon/favicon.ico",
-    appleTouchIcon: "/favicon/apple-touch-icon.png",
-    webmanifest: "/favicon/site.webmanifest",
+    svg: "/favicon-pg/favicon.svg",
+    png96: "/favicon-pg/favicon-96x96.png",
+    ico: "/favicon-pg/favicon.ico",
+    appleTouchIcon: "/favicon-pg/apple-touch-icon.png",
+    webmanifest: "/favicon-pg/site.webmanifest",
+  },
+  meta: {
+    title: "High-Impact Job Board | Probably Good",
+    description:
+      "Find a job that's good for you and good for the world. A continuously updated, curated list of high-impact job opportunities for people who want to make a difference.",
+    ogImage:
+      "https://cdn.prod.website-files.com/650cce2c8e093f3e9f35414f/66074f8a3e90ccf7c8c77994_Job-Board-Site-Thumbnail_1.91-1.png",
   },
 };
 
