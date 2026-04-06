@@ -56,7 +56,7 @@ export function PgFacetsActive(props: { facetsActive: FacetsActiveConfig }) {
   return (
     <Collapsible.Root open={clear.canRefine} gridColumn="span 5">
       <Collapsible.Content>
-        <HStack gap="gap.md" align="flex-start">
+        <HStack gap="gap.md" align="flex-start" flexWrap="wrap">
           <PgAlgoliaFacetsActive config={props.facetsActive} />
 
           <PgRefinesClearButton />

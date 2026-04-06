@@ -74,7 +74,7 @@ export function PgAlgoliaFacetsActive(props: {
   }
 
   return (
-    <Wrap gap={props.tagsGap ?? "gap.md"}>
+    <>
       {refinementsCurrent.items.flatMap(item =>
         item.refinements
           .filter(refinement => !isSubFacetHidden(item.attribute, refinement.label))
@@ -87,7 +87,7 @@ export function PgAlgoliaFacetsActive(props: {
           )),
       )}
       {props.children}
-    </Wrap>
+    </>
   );
 }
 
