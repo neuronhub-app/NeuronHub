@@ -14,7 +14,7 @@ export namespace theme {
     brand: {
       green: { value: "#338050" },
       "green.light": { value: "#4DB36D" },
-      "green.subtle": { value: "#DBEADD" },
+      "green.subtle": { value: { _light: "#DBEADD", _dark: "#202921" } },
       seashell: { value: "#FFF7F0" },
       black: { value: "#343232" },
       "black.secondary": { value: "#484E51" },
