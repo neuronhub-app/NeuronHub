@@ -70,6 +70,9 @@ export function JobList(props: { slug?: string }) {
           posted_at_unix: "Posted",
           salary_min: "Minimum Salary",
         },
+        formatAttribute: {
+          "locations.algolia_filter_name": r => r.label.replace(/^\[.+?] /, ""),
+        },
         dateAttributes: ["posted_at_unix"],
         moneyAttributes: ["salary_min"],
       }}

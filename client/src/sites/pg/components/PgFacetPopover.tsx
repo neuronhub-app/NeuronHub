@@ -4,6 +4,7 @@ import { GoX } from "react-icons/go";
 import { LuChevronDown } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
 import { Button } from "@/components/ui/button";
+import { ids } from "@/e2e/ids";
 import type { TestId } from "@/e2e/ids";
 
 export function PgFacetPopover(props: {
@@ -14,12 +15,16 @@ export function PgFacetPopover(props: {
   order?: { base?: number; md?: number; lg?: number };
   icon?: ReactNode;
   testId?: TestId;
+  activeFacetCount?: number;
+  onClear?: () => void;
 }) {
   const clear = useClearRefinements({
     includedAttributes: props.attribute ? [props.attribute] : [],
   });
 
-  const activeFacetCount = useActiveFacetCount(props.attribute);
+  const attrFacetCount = useActiveFacetCount(props.attribute);
+  const activeFacetCount = props.activeFacetCount ?? attrFacetCount;
+  const canClear = props.onClear ? activeFacetCount > 0 : clear.canRefine && !!props.attribute;
 
   return (
     <Popover.Root
@@ -67,9 +72,13 @@ export function PgFacetPopover(props: {
           </Flex>
 
           <Flex align="center" gap="gap.xs">
-            {clear.canRefine && props.attribute && (
+            {canClear && (
               <Button
-                onClick={clear.refine}
+                data-testid={props.testId ? ids.facet.clear(props.testId) : undefined}
+                onClick={event => {
+                  event.stopPropagation();
+                  (props.onClear ?? clear.refine)();
+                }}
                 variant="ghost"
                 size="xs"
                 colorPalette="gray"

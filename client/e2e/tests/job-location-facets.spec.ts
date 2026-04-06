@@ -1,9 +1,10 @@
 /**
- * #quality-14% #AI-slop
- *
- * It does the job. Will be rewritten once JobLocation refactor is done.
+ * #quality-20% #AI
+ * - bad magic strings
+ * - terrible magic numbers
+ * - facetItemCount
  */
-import { expect as expectBase, type Locator, test } from "@playwright/test";
+import { type Page, expect as expectBase, type Locator, test } from "@playwright/test";
 import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { urls } from "@/urls";
@@ -24,46 +25,28 @@ test.describe("PG Job Location Facets", () => {
     });
   });
 
-  test("cross-facet OR: Country + City shows results for non-overlapping values [idiotic hardcoded values]", async ({
+  test("cross-popover OR: Country + City selects on same locations.algolia_filter_name attr", async ({
     page,
   }) => {
     await play.navigate(urls.jobs.list, { idleWait: true });
     const jobCards = play.getAll(ids.job.card.container);
 
-    const data = {
-      country_1: "Kenya",
-      city_london_6: "London",
-      city_berkeley: "Berkeley CA",
-    };
-
-    // Select Country=Kenya (only BridgeFund) — single attr must still filter
+    // Select "Kenya" from Country popover → only BridgeFund
     const countryBtn = page.getByTestId(ids.facet.popover.country).last();
     await countryBtn.click();
     const popover = page.locator(openPopover);
-    await clickFacetCheckboxByValue(popover, data.country_1);
+    await clickFacetCheckboxByValue(popover, "Kenya");
+    await play.waitForNetworkIdle();
     await expectBase(jobCards).toHaveCount(1);
 
-    // City counts must NOT be AND-constrained by country=Kenya even with 1 attr.
-    // London has 6 jobs in stubs; if AND'd by Kenya it shows 1.
+    // Select "Berkeley CA, USA" from City popover → OR → BridgeFund + Arclight
     await page.keyboard.press("Escape");
     await expectBase(popover).not.toBeVisible();
     const cityBtn = page.getByTestId(ids.facet.popover.city).last();
     await cityBtn.click();
+    await clickFacetCheckboxByValue(popover, "Berkeley CA, USA");
     await play.waitForNetworkIdle();
-    const londonCountBefore = await getFacetCount(popover, data.city_london_6);
-    expectBase(londonCountBefore).toBe(6);
-
-    // Select City=Berkeley (only Arclight — no Kenya overlap)
-    await clickFacetCheckboxByValue(popover, data.city_berkeley);
-    await play.waitForNetworkIdle();
-
-    // AND => 0 results (no job has both Kenya + Berkeley)
-    // OR  => 2 results (BridgeFund + Arclight)
     await expectBase(jobCards).toHaveCount(2);
-
-    // Counts must stay correct after 2nd attr click too
-    const londonCountAfter = await getFacetCount(popover, data.city_london_6);
-    expectBase(londonCountAfter).toBe(6);
   });
 });
 
@@ -73,15 +56,7 @@ async function clickFacetCheckboxByValue(popover: Locator, value: string) {
   await item.locator("[data-part=control]").click();
 }
 
-// #quality-0%
-async function getFacetCount(popover: Locator, value: string): Promise<number> {
-  const checkbox = popover.locator(`[data-testid='${ids.facet.checkbox(value)}']`);
-  // Count is the last <p>/<span> text in the checkbox grid (label | count)
-  const countText = await checkbox.locator("p").last().textContent();
-  return Number(countText);
-}
-
-test.describe("PG Job Location - Subscribe with city facet", () => {
+test.describe("PG Job Location - badge count + clear per-popover isolation", () => {
   let play: PlaywrightHelper;
 
   test.beforeEach(async ({ page }) => {
@@ -93,29 +68,130 @@ test.describe("PG Job Location - Subscribe with city facet", () => {
     });
   });
 
-  test("subscribe with Country=Kenya + City=Berkeley sends typed location params", async ({
+  test("selecting Country shows badge only on Country popover, not Remote or City", async ({
     page,
   }) => {
     await play.navigate(urls.jobs.list, { idleWait: true });
     const popover = page.locator(openPopover);
 
-    // Select Country=Kenya
+    const countryBtn = page.getByTestId(ids.facet.popover.country).last();
+    const remoteBtn = page.getByTestId(ids.facet.popover.remote).last();
+    const cityBtn = page.getByTestId(ids.facet.popover.city).last();
+
+    await countryBtn.click();
+    await clickFacetCheckboxByValue(popover, "Kenya");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+    await expectBase(popover).not.toBeVisible();
+
+    // Country badge should show (1)
+    await expectBase(countryBtn.getByText("(1)")).toBeVisible();
+    // Remote and City should NOT show any badge
+    await expectBase(remoteBtn.getByText("(1)")).not.toBeVisible();
+    await expectBase(cityBtn.getByText("(1)")).not.toBeVisible();
+  });
+
+  test("clearing Country does not clear City selections", async ({ page }) => {
+    await play.navigate(urls.jobs.list, { idleWait: true });
+    const popover = page.locator(openPopover);
+
+    const countryBtn = page.getByTestId(ids.facet.popover.country).last();
+    const cityBtn = page.getByTestId(ids.facet.popover.city).last();
+
+    // Select Kenya in Country
+    await countryBtn.click();
+    await clickFacetCheckboxByValue(popover, "Kenya");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+
+    // Select Berkeley in City
+    await cityBtn.click();
+    await clickFacetCheckboxByValue(popover, "Berkeley CA, USA");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+
+    // Clear Country via its X button
+    const clearCountry = page.getByTestId(ids.facet.clear(ids.facet.popover.country)).last();
+    await clearCountry.click();
+    await play.waitForNetworkIdle();
+
+    // Country badge gone
+    await expectBase(countryBtn.getByText("(1)")).not.toBeVisible();
+    // City badge still shows (1)
+    await expectBase(cityBtn.getByText("(1)")).toBeVisible();
+  });
+});
+
+test.describe("PG Job Location - cross-facet count update", () => {
+  let play: PlaywrightHelper;
+
+  test.beforeEach(async ({ page }) => {
+    play = new PlaywrightHelper(page);
+    await play.dbStubsRepopulateAndLogin({
+      is_import_HN_post: false,
+      is_create_single_review: false,
+      is_create_jobs: true,
+    });
+  });
+
+  test("selecting Cause Area updates location counts via Algolia", async ({ page }) => {
+    await play.navigate(urls.jobs.list, { idleWait: true });
+    const popover = page.locator(openPopover);
+    const countryBtn = page.getByTestId(ids.facet.popover.country).last();
+
+    await countryBtn.click();
+    await expectBase(facetItemCount(page, "United States")).toHaveText("9");
+    await expectBase(facetItemCount(page, "Kenya")).toHaveText("1");
+    await page.keyboard.press("Escape");
+    await expectBase(popover).not.toBeVisible();
+
+    // Select AIS → BridgeFund (GlobalHealth) excluded from results
+    await page.getByTestId(ids.facet.popover.causeArea).last().click();
+    await clickFacetCheckboxByValue(popover, "AI Safety & Policy");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+    await expectBase(popover).not.toBeVisible();
+
+    await countryBtn.click();
+    await expectBase(facetItemCount(page, "United States")).toHaveText("3");
+    await expectBase(facetItemCount(page, "Kenya")).toHaveText("0");
+  });
+});
+
+test.describe("PG Job Location - Subscribe with location facets", () => {
+  let play: PlaywrightHelper;
+
+  test.beforeEach(async ({ page }) => {
+    play = new PlaywrightHelper(page);
+    await play.dbStubsRepopulateAndLogin({
+      is_import_HN_post: false,
+      is_create_single_review: false,
+      is_create_jobs: true,
+    });
+  });
+
+  test("subscribe with Country + City sends typed location params via lookup", async ({
+    page,
+  }) => {
+    await play.navigate(urls.jobs.list, { idleWait: true });
+    const popover = page.locator(openPopover);
+
+    // Select "Kenya" from Country popover
     await page.getByTestId(ids.facet.popover.country).last().click();
     await clickFacetCheckboxByValue(popover, "Kenya");
     await play.waitForNetworkIdle();
     await page.keyboard.press("Escape");
 
-    // Select City=Berkeley CA
+    // Select "Berkeley CA, USA" from City popover
     await page.getByTestId(ids.facet.popover.city).last().click();
-    await clickFacetCheckboxByValue(popover, "Berkeley CA");
+    await clickFacetCheckboxByValue(popover, "Berkeley CA, USA");
     await play.waitForNetworkIdle();
     await page.keyboard.press("Escape");
 
-    // 2 jobs expected (BridgeFund Kenya + Arclight Berkeley)
     const jobCards = play.getAll(ids.job.card.container);
     await expectBase(jobCards).toHaveCount(2);
 
-    // Open subscribe modal and submit
+    // Subscribe and check mutation params
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, "e2e-location@neuronhub.app");
 
@@ -128,10 +204,15 @@ test.describe("PG Job Location - Subscribe with city facet", () => {
     const request = await requestPromise;
 
     const body = JSON.parse(request.postData()!);
-    const countries: string[] = body.variables?.location_countries ?? [];
-    const cities: string[] = body.variables?.location_cities ?? [];
+    const locationIds: number[] = body.variables?.location_ids ?? [];
 
-    expectBase(countries).toContain("Kenya");
-    expectBase(cities).toContain("Berkeley CA");
+    expectBase(locationIds.length).toBeGreaterThanOrEqual(2);
   });
 });
+
+/**
+ * Last <p> inside Checkbox.Root is the facet count (Chakra grid: control | name | count)
+ * */
+function facetItemCount(page: Page, value: string) {
+  return page.getByTestId(ids.facet.checkbox(value)).locator("p").last();
+}

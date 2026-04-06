@@ -14,7 +14,6 @@ export function PgFacetAttribute(props: {
   sortBy?: UseRefinementListProps["sortBy"];
   transformItems?: UseRefinementListProps["transformItems"];
   operator?: UseRefinementListProps["operator"];
-  isFreezeTotalFacetCount?: boolean;
 }) {
   const facetValuesInitialRef = useRef<Map<string, FacetItem>>(new Map());
   const searchQueryRef = useRef("");
@@ -127,8 +126,6 @@ export function PgFacetAttribute(props: {
                 <FacetCheckboxItem
                   item={item}
                   onRefine={() => refineMain(item.value, item.isRefined)}
-                  isFreezeTotalFacetCount={props.isFreezeTotalFacetCount}
-                  isFiltersActive={clear.canRefine}
                 />
                 {subItem && (
                   <FacetCheckboxItem
@@ -159,20 +156,7 @@ function FacetCheckboxItem(props: {
   labelOverride?: string;
   isSubItem?: boolean;
   disabled?: boolean;
-  isFreezeTotalFacetCount?: boolean;
-  isFiltersActive?: boolean;
 }) {
-  const state = useStateValtio({
-    count: null as number | null,
-  });
-
-  if (props.isFreezeTotalFacetCount) {
-    const isNoFilters = !props.isFiltersActive;
-    if (isNoFilters && props.item.count > (state.snap.count ?? 0)) {
-      state.mutable.count = props.item.count;
-    }
-  }
-
   const checkbox = (
     <Checkbox.Root
       checked={props.item.isRefined}
@@ -199,7 +183,7 @@ function FacetCheckboxItem(props: {
         _groupHover={{ color: "brand.green.light" }}
       />
       <Text fontSize="13px" color="fg.muted" _groupHover={{ color: " brand.green.light" }}>
-        {props.isFreezeTotalFacetCount ? state.snap.count : props.item.count}
+        {props.item.count}
       </Text>
     </Checkbox.Root>
   );

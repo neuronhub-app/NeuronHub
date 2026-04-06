@@ -15,7 +15,6 @@ export function PgFacet(props: {
   sortBy?: UseRefinementListProps["sortBy"];
   transformItems?: UseRefinementListProps["transformItems"];
   operator?: UseRefinementListProps["operator"];
-  isFreezeTotalFacetCount?: boolean;
   testId?: TestId;
 }) {
   return (
@@ -34,7 +33,6 @@ export function PgFacet(props: {
         sortBy={props.sortBy}
         transformItems={props.transformItems}
         operator={props.operator}
-        isFreezeTotalFacetCount={props.isFreezeTotalFacetCount}
       />
     </PgFacetPopover>
   );

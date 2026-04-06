@@ -112,9 +112,12 @@ async def _sync_locations(locs_parsed: list[LocationParsed]) -> list[JobLocation
     for loc_parsed in locs_parsed:
         loc, _ = await JobLocation.objects.aget_or_create(
             name=loc_parsed.name,
-            city=loc_parsed.city,
-            country=loc_parsed.country,
-            is_remote=loc_parsed.is_remote,
+            defaults={
+                "type": loc_parsed.type,
+                "city": loc_parsed.city,
+                "country": loc_parsed.country,
+                "is_remote": loc_parsed.is_remote,
+            },
         )
         locs.append(loc)
     return locs
@@ -175,6 +178,7 @@ def _parse_location_field(raw: str) -> list[LocationParsed]:
     # Location(s) is a quoted-CSV field: "City, Country","City2, Country2"
     locations_raw = next(csv.reader(StringIO(raw)), [])
     locations: list[LocationParsed] = []
+    seen_countries: set[str] = set()
 
     for location_raw in locations_raw:
         location_raw = location_raw.strip()
@@ -188,6 +192,7 @@ def _parse_location_field(raw: str) -> list[LocationParsed]:
             locations.append(
                 LocationParsed(
                     name=location_raw,
+                    type=JobLocation.LocationType.REMOTE,
                     city="",
                     country=country_name,
                     is_remote=True,
@@ -197,11 +202,23 @@ def _parse_location_field(raw: str) -> list[LocationParsed]:
             locations.append(
                 LocationParsed(
                     name=location_raw,
+                    type=JobLocation.LocationType.CITY,
                     city=city_name,
                     country=country_name,
                     is_remote=False,
                 )
             )
+            if country_name not in seen_countries:
+                seen_countries.add(country_name)
+                locations.append(
+                    LocationParsed(
+                        name=country_name,
+                        type=JobLocation.LocationType.COUNTRY,
+                        city="",
+                        country=country_name,
+                        is_remote=False,
+                    )
+                )
 
     return locations
 
@@ -209,6 +226,7 @@ def _parse_location_field(raw: str) -> list[LocationParsed]:
 @dataclass
 class LocationParsed:
     name: str
+    type: JobLocation.LocationType
     city: str
     country: str
     is_remote: bool

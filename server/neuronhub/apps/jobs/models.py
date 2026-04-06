@@ -7,6 +7,7 @@ from django.db import models
 from django.db.models import ManyToManyField
 from django.db.models import TextChoices
 from django.utils.crypto import salted_hmac
+from django_choices_field.fields import TextChoicesField
 from django_extensions.db.fields import AutoSlugField
 from simple_history.models import HistoricalRecords
 from strawberry_django.descriptors import model_cached_property
@@ -33,13 +34,23 @@ class JobLocation(TimeStampedModel):
     Initially was handled by tags_country & tags_city - but UX is better when it's a single "field".
     """
 
+    class LocationType(TextChoices):
+        COUNTRY = "country"
+        CITY = "city"
+        REMOTE = "remote"
+
     # todo ! refac: keep `.name` as runtime field - for admin.py & graphql
     # see [[JobsGen]].location for name gen example
     name = models.CharField(max_length=255, unique=True)
+    type = TextChoicesField(choices_enum=LocationType, default=LocationType.CITY)
     city = models.CharField(max_length=255, blank=True)
     country = models.CharField(max_length=255, blank=True)
     region = models.CharField(max_length=255, blank=True)
     is_remote = models.BooleanField(default=False)
+
+    @model_cached_property
+    def algolia_filter_name(self) -> str:
+        return f"[{self.type}] {self.name}"
 
     @model_cached_property
     def remote_name(self) -> str:
@@ -322,16 +333,6 @@ class JobFaqQuestion(models.Model):
         return self.question
 
 
-def _on_change_invalidate_cache_job_faq(**kwargs):
-    from neuronhub.apps.jobs.graphql import JobsQuery
-
-    cache.delete(JobsQuery.CacheKey.Faq)
-
-
-models.signals.post_save.connect(_on_change_invalidate_cache_job_faq, sender=JobFaqQuestion)
-models.signals.post_delete.connect(_on_change_invalidate_cache_job_faq, sender=JobFaqQuestion)
-
-
 class JobAlertLog(TimeStampedModel):
     job_alert = models.ForeignKey(
         JobAlert,
@@ -352,3 +353,36 @@ class JobAlertLog(TimeStampedModel):
     @staticmethod
     def hash_email(email: str) -> str:
         return salted_hmac(key_salt="JobAlertLog", value=email).hexdigest()
+
+
+# Signals & Cache
+# ------------------------------------------------------------------------------------------
+
+
+def _drop_cache_job_faq(**kwargs):
+    from neuronhub.apps.jobs.graphql import JobsQuery
+
+    cache.delete(JobsQuery.CacheKey.Faq)
+
+
+models.signals.post_save.connect(_drop_cache_job_faq, sender=JobFaqQuestion)
+models.signals.post_delete.connect(_drop_cache_job_faq, sender=JobFaqQuestion)
+
+
+def _on_save_drop_cache_job_locations(sender, instance: Job, **kwargs):
+    if instance.is_published:
+        _drop_cache_job_locations()
+
+
+models.signals.post_save.connect(_on_save_drop_cache_job_locations, sender=Job)
+
+
+def _drop_cache_job_locations(**kwargs):
+    from neuronhub.apps.jobs.graphql import JobsQuery
+
+    cache.delete(JobsQuery.CacheKey.Locations)
+
+
+models.signals.post_save.connect(_drop_cache_job_locations, sender=JobLocation)
+models.signals.post_delete.connect(_drop_cache_job_locations, sender=JobLocation)
+models.signals.m2m_changed.connect(_drop_cache_job_locations, sender=Job.locations.through)

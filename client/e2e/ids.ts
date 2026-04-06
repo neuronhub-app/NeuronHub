@@ -205,12 +205,16 @@ export namespace ids {
 
   export const facet = {
     popover: {
+      causeArea: "facet.popover.cause-area",
       remote: "facet.popover.remote",
       country: "facet.popover.country",
       city: "facet.popover.city",
       otherFilters: "facet.popover.other-filters",
     },
     excludeCareerCapital: "facet.exclude-career-capital",
+    clear(attribute: string) {
+      return `facet.clear.${attribute}` as TestId;
+    },
     checkbox(value: string) {
       return `facet.checkbox.${value}` as TestId;
     },

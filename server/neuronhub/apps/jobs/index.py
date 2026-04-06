@@ -90,10 +90,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
             "attributesForFaceting": [
                 "searchable(org.name)",
                 *[f"searchable({field}.name)" for field in tag_fields],
-                "searchable(locations.name)",
-                "searchable(locations.remote_name)",
-                "searchable(locations.country)",
-                "searchable(locations.city)",
+                "locations.algolia_filter_name",
                 "salary_min",
                 "org.is_highlighted",
                 *Job.boolean_facet_fields,

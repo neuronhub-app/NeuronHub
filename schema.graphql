@@ -167,11 +167,14 @@ input JobFilter {
 type JobLocationType {
   id: ID!
   name: String!
+  type: LocationType!
   city: String!
   country: String!
   region: String!
   is_remote: Boolean!
   remote_name: String!
+  algolia_filter_name: String!
+  job_count: Int!
 }
 
 type JobType {
@@ -205,6 +208,12 @@ type JobVersionType {
   published_markdown: String!
   draft: JobType!
   published: JobType!
+}
+
+enum LocationType {
+  COUNTRY
+  CITY
+  REMOTE
 }
 
 input LoginInput {
@@ -255,7 +264,7 @@ type Mutation {
   profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku", include_reprocessing: Boolean! = true, is_dry: Boolean! = false): ProgressType! @IsAuthenticated
   profile_matches_cancel_llm: Boolean! @IsAuthenticated
   job_versions_approve(draft_ids: [Int!]!): Boolean! @IsStaff
-  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_countries: [String!] = null, location_cities: [String!] = null, location_remote_names: [String!] = null, is_orgs_highlighted: Boolean = null, is_remote: Boolean = null, salary_min: Int = null, is_exclude_no_salary: Boolean = null, is_exclude_career_capital: Boolean = null, is_exclude_profit_for_good: Boolean = null, tz: String = null): Boolean!
+  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_ids: [Int!] = null, is_orgs_highlighted: Boolean = null, salary_min: Int = null, is_exclude_no_salary: Boolean = null, is_exclude_career_capital: Boolean = null, is_exclude_profit_for_good: Boolean = null, tz: String = null): Boolean!
   job_alert_toggle_active(id_ext: UUID!): Boolean!
   job_alert_remove(id_ext: UUID!): Boolean!
   job_alert_access_session_by_id_ext(id_ext: UUID!): Boolean!
@@ -886,6 +895,7 @@ type Query {
   profile_match_stats: ProfileMatchStatsType! @IsAuthenticated
   profile_user_llm_md: String! @IsAuthenticated
   jobs(filters: JobFilter): [JobType!]!
+  job_locations: [JobLocationType!]!
   job_faq_questions: [JobFaqQuestionType!]!
   job_by_slug(slug: String!): JobType
   job_alerts: [JobAlertType!]!

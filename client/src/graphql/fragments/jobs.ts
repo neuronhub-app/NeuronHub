@@ -24,11 +24,13 @@ export const JobFragment = graphql(
       locations {
         id
         name
+        type
         city
         country
         region
         is_remote
         remote_name
+        algolia_filter_name
       }
       url_external
       url_external_with_utm

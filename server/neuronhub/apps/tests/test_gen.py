@@ -520,11 +520,21 @@ class JobsGen:
 
         assert name_composed
 
+        if is_remote:
+            loc_type = JobLocation.LocationType.REMOTE
+        elif city:
+            loc_type = JobLocation.LocationType.CITY
+        else:
+            loc_type = JobLocation.LocationType.COUNTRY
+
         loc, _ = await JobLocation.objects.aget_or_create(
             name=name_composed,
-            city=city or "",
-            country=country,
-            is_remote=is_remote,
+            defaults={
+                "type": loc_type,
+                "city": city or "",
+                "country": country,
+                "is_remote": is_remote,
+            },
         )
         return loc
 

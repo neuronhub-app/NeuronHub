@@ -112,7 +112,15 @@ class TestParseLocationField:
         assert result == [
             LocationParsed(
                 name="San Francisco, United States",
+                type="city",
                 city="San Francisco",
+                country="United States",
+                is_remote=False,
+            ),
+            LocationParsed(
+                name="United States",
+                type="country",
+                city="",
                 country="United States",
                 is_remote=False,
             ),
@@ -121,14 +129,21 @@ class TestParseLocationField:
     def test_returns_parsed_locations_for_remote(self):
         result = _parse_location_field('"Remote, Global"')
         assert result == [
-            LocationParsed(name="Remote, Global", city="", country="Global", is_remote=True),
+            LocationParsed(
+                name="Remote, Global", type="remote", city="", country="Global", is_remote=True
+            ),
         ]
 
     def test_returns_parsed_locations_for_multiple(self):
         result = _parse_location_field('"Remote, USA","London, UK"')
         assert result == [
-            LocationParsed(name="Remote, USA", city="", country="USA", is_remote=True),
-            LocationParsed(name="London, UK", city="London", country="UK", is_remote=False),
+            LocationParsed(
+                name="Remote, USA", type="remote", city="", country="USA", is_remote=True
+            ),
+            LocationParsed(
+                name="London, UK", type="city", city="London", country="UK", is_remote=False
+            ),
+            LocationParsed(name="UK", type="country", city="", country="UK", is_remote=False),
         ]
 
     def test_returns_empty_list_for_empty_string(self):
@@ -138,5 +153,7 @@ class TestParseLocationField:
     def test_returns_country_names_for_visa_sponsorship(self):
         """_parse_location_field result should allow extracting countries for visa tags."""
         result = _parse_location_field('"San Francisco, United States","London, United Kingdom"')
-        countries = list(dict.fromkeys(loc.country for loc in result if not loc.is_remote))
+        countries = list(
+            dict.fromkeys(loc.country for loc in result if not loc.is_remote and loc.city)
+        )
         assert countries == ["United States", "United Kingdom"]

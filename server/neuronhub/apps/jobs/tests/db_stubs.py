@@ -22,6 +22,7 @@ from neuronhub.apps.tests.test_gen import Gen
 @dataclass(frozen=True)
 class LocationVal:
     name: str
+    type: JobLocation.LocationType = JobLocation.LocationType.CITY
     city: str = ""
     country: str = ""
     region: str = ""
@@ -80,7 +81,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 workload=[val.workload.FullTime],
                 visa_countries=[val.country.US],
             ),
-            locations=[val.location.SanFranciscoCA],
+            locations=[val.location.SanFranciscoCA, val.location.USA],
         ),
         JobStub(
             org=Org(
@@ -113,6 +114,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 val.location.OaklandCA,
                 val.location.SanFranciscoCA,
                 val.location.WashingtonDC,
+                val.location.USA,
             ],
         ),
         JobStub(
@@ -152,6 +154,8 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 val.location.OxfordUK,
                 val.location.WashingtonDC,
                 val.location.RemoteUK,
+                val.location.UK,
+                val.location.USA,
             ],
         ),
         JobStub(
@@ -186,6 +190,9 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 val.location.LondonUK,
                 val.location.WashingtonDC,
                 val.location.SanFranciscoCA,
+                val.location.Kenya,
+                val.location.UK,
+                val.location.USA,
             ],
         ),
         JobStub(
@@ -215,7 +222,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 experience=[val.experience.Entry],
                 workload=[val.workload.Fellowship],
             ),
-            locations=[val.location.BerkeleyCA],
+            locations=[val.location.BerkeleyCA, val.location.USA],
         ),
         JobStub(
             org=Org(
@@ -267,7 +274,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 experience=[val.experience.Entry],
                 workload=[val.workload.Volunteer],
             ),
-            locations=[val.location.LondonUK],
+            locations=[val.location.LondonUK, val.location.UK],
         ),
         JobStub(
             org=Org(
@@ -294,7 +301,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 experience=[val.experience.Entry],
                 workload=[val.workload.GraduateProgram],
             ),
-            locations=[val.location.OxfordUK],
+            locations=[val.location.OxfordUK, val.location.UK],
         ),
         JobStub(
             org=Org(
@@ -348,7 +355,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 experience=[val.experience.Entry],
                 workload=[val.workload.Internship],
             ),
-            locations=[val.location.SanFranciscoCA],
+            locations=[val.location.SanFranciscoCA, val.location.USA],
         ),
         JobStub(
             org=Org(
@@ -438,6 +445,8 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 val.location.LondonUK,
                 val.location.RemoteUSA,
                 val.location.RemoteUK,
+                val.location.USA,
+                val.location.UK,
             ],
         ),
         JobStub(
@@ -468,7 +477,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 experience=[val.experience.Senior],
                 workload=[val.workload.FullTime],
             ),
-            locations=[val.location.SanFranciscoCA, val.location.RemoteUSA],
+            locations=[val.location.SanFranciscoCA, val.location.RemoteUSA, val.location.USA],
         ),
         JobStub(
             org=Org(
@@ -527,7 +536,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 experience=[val.experience.Senior],
                 workload=[val.workload.FullTime],
             ),
-            locations=[val.location.WashingtonDC],
+            locations=[val.location.WashingtonDC, val.location.USA],
         ),
         JobStub(
             org=Org(
@@ -555,7 +564,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 experience=[val.experience.Entry],
                 workload=[val.workload.FullTime],
             ),
-            locations=[val.location.LondonUK, val.location.OxfordUK],
+            locations=[val.location.LondonUK, val.location.OxfordUK, val.location.UK],
         ),
         JobStub(
             org=Org(
@@ -584,7 +593,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                 experience=[val.experience.Junior],
                 workload=[val.workload.FullTime],
             ),
-            locations=[val.location.LondonUK, val.location.RemoteUK],
+            locations=[val.location.LondonUK, val.location.RemoteUK, val.location.UK],
         ),
     ]
 
@@ -678,6 +687,7 @@ async def _create_locations(location_vals: set[LocationVal]) -> dict[LocationVal
         [
             JobLocation(
                 name=lv.name,
+                type=lv.type,
                 city=lv.city,
                 country=lv.country,
                 region=lv.region,
@@ -776,49 +786,69 @@ class val:
         Senior = "Senior (10y+)"
 
     class location:
-        RemoteGlobal = LocationVal("Remote, Global", region=_region.Global, is_remote=True)
+        _t = JobLocation.LocationType
+
+        RemoteGlobal = LocationVal(
+            "Remote, Global", type=_t.REMOTE, region=_region.Global, is_remote=True
+        )
         RemoteUSA = LocationVal(
-            "Remote, USA", country=_country.US, region=_region.NA, is_remote=True
+            "Remote, USA", type=_t.REMOTE, country=_country.US, region=_region.NA, is_remote=True
         )
         RemoteUK = LocationVal(
-            "Remote, UK", country=_country.UK, region=_region.EU, is_remote=True
+            "Remote, UK", type=_t.REMOTE, country=_country.UK, region=_region.EU, is_remote=True
         )
-        RemoteEurope = LocationVal("Remote, Europe", region=_region.EU, is_remote=True)
+        RemoteEurope = LocationVal(
+            "Remote, Europe", type=_t.REMOTE, region=_region.EU, is_remote=True
+        )
         SanFranciscoCA = LocationVal(
             "San Francisco CA, USA",
+            type=_t.CITY,
             city="San Francisco CA",
             country=_country.US,
             region=_region.NA,
         )
         WashingtonDC = LocationVal(
             "Washington DC, USA",
+            type=_t.CITY,
             city="Washington D.C.",
             country=_country.US,
             region=_region.NA,
         )
         LondonUK = LocationVal(
-            "London, UK", city="London", country=_country.UK, region=_region.EU
+            "London, UK", type=_t.CITY, city="London", country=_country.UK, region=_region.EU
         )
         NairobiKenya = LocationVal(
             "Nairobi, Kenya",
+            type=_t.CITY,
             city="Nairobi",
             country=_country.Kenya,
             region=_region.SubSaharanAfrica,
         )
         BerkeleyCA = LocationVal(
             "Berkeley CA, USA",
+            type=_t.CITY,
             city="Berkeley CA",
             country=_country.US,
             region=_region.NA,
         )
         OaklandCA = LocationVal(
             "Oakland CA, USA",
+            type=_t.CITY,
             city="Oakland CA",
             country=_country.US,
             region=_region.NA,
         )
         OxfordUK = LocationVal(
-            "Oxford, UK", city="Oxford", country=_country.UK, region=_region.EU
+            "Oxford, UK", type=_t.CITY, city="Oxford", country=_country.UK, region=_region.EU
+        )
+        # country-type entries
+        USA = LocationVal(_country.US, type=_t.COUNTRY, country=_country.US, region=_region.NA)
+        UK = LocationVal(_country.UK, type=_t.COUNTRY, country=_country.UK, region=_region.EU)
+        Kenya = LocationVal(
+            _country.Kenya,
+            type=_t.COUNTRY,
+            country=_country.Kenya,
+            region=_region.SubSaharanAfrica,
         )
 
     class workload:

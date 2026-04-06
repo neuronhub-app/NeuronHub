@@ -20,7 +20,13 @@ import {
 } from "@/components/ui/dialog";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import {
+  ALGOLIA_ATTR_LOCATION,
+  type JobLocationItem,
+  JobLocationsQuery,
+} from "@/sites/pg/components/PgFacetLocation";
 import { toast } from "@/utils/toast";
 import type { ButtonProps } from "@/components/ui/button";
 import { useIsLoading } from "@/utils/useIsLoading";
@@ -35,6 +41,8 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
   const loading = useIsLoading();
 
   const refinesCurrent = useCurrentRefinements();
+
+  const { data: locationsData } = useApolloQuery(JobLocationsQuery);
 
   const state = useStateValtio({
     isOpen: false,
@@ -64,15 +72,10 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
       tag_names: refinesCurrent.items
         .filter(item => item.attribute.startsWith("tags_"))
         .flatMap(item => item.refinements.map(tag => String(tag.value))),
-      location_countries: refinesCurrent.items
-        .filter(item => item.attribute === "locations.country")
-        .flatMap(item => item.refinements.map(r => String(r.value))),
-      location_cities: refinesCurrent.items
-        .filter(item => item.attribute === "locations.city")
-        .flatMap(item => item.refinements.map(r => String(r.value))),
-      location_remote_names: refinesCurrent.items
-        .filter(item => item.attribute === "locations.remote_name")
-        .flatMap(item => item.refinements.map(r => String(r.value))),
+      location_ids: getLocationIdsActive(
+        refinesCurrent.items,
+        locationsData?.job_locations ?? [],
+      ),
       is_orgs_highlighted:
         refinesCurrent.items.some(item => item.attribute === "is_orgs_highlighted") || null,
       salary_min:
@@ -213,7 +216,7 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_experience.name": "Experience",
   "tags_education.name": "Education",
   "tags_workload.name": "Workload",
-  "locations.remote_name": "Remote",
+  "locations.algolia_filter_name": "Location",
   is_orgs_highlighted: "Highlighted",
   has_salary: "Has Salary",
   is_not_career_capital: "Exclude Career Capital",
@@ -229,9 +232,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
     mutation JobAlertSubscribe(
       $email: String!
       $tag_names: [String!]
-      $location_countries: [String!]
-      $location_cities: [String!]
-      $location_remote_names: [String!]
+      $location_ids: [Int!]
       $is_orgs_highlighted: Boolean
       $salary_min: Int
       $is_exclude_no_salary: Boolean
@@ -242,9 +243,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
       job_alert_subscribe(
         email: $email
         tag_names: $tag_names
-        location_countries: $location_countries
-        location_cities: $location_cities
-        location_remote_names: $location_remote_names
+        location_ids: $location_ids
         is_orgs_highlighted: $is_orgs_highlighted
         salary_min: $salary_min
         is_exclude_no_salary: $is_exclude_no_salary
@@ -255,3 +254,17 @@ export const JobAlertSubscribeMutation = graphql.persisted(
     }
   `),
 );
+
+export function getLocationIdsActive(
+  algoliaFacets: ReturnType<typeof useCurrentRefinements>["items"],
+  jobLocations: JobLocationItem[],
+): number[] {
+  const facetValues = new Set(
+    algoliaFacets
+      .filter(item => item.attribute === ALGOLIA_ATTR_LOCATION)
+      .flatMap(item => item.refinements.map(ref => String(ref.value))),
+  );
+  return jobLocations
+    .filter(loc => facetValues.has(loc.algolia_filter_name))
+    .map(loc => Number(loc.id));
+}

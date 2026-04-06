@@ -11,6 +11,10 @@ from strawberry import auto
 from strawberry_django.permissions import IsAuthenticated
 from strawberry_django.permissions import IsStaff
 
+from django.conf import settings
+from django.db.models import Count
+from django.db.models import Q
+
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobFaqQuestion
@@ -33,11 +37,14 @@ from neuronhub.apps.users.models import User
 class JobLocationType:
     id: auto
     name: auto
+    type: auto
     city: auto
     country: auto
     region: auto
     is_remote: auto
     remote_name: auto
+    algolia_filter_name: auto
+    job_count: int = 0
 
 
 @strawberry_django.type(JobFaqQuestion)
@@ -139,6 +146,23 @@ class JobsQuery:
 
     class CacheKey:
         Faq = "JobFaqQuestions"
+        Locations = "JobLocations"
+
+    @strawberry_django.field
+    async def job_locations(self) -> list[JobLocationType]:
+        cached = await settings.CACHE_RAM.aget(JobsQuery.CacheKey.Locations)
+        if cached is not None:
+            return cached
+        items = [
+            loc
+            async for loc in JobLocation.objects.annotate(
+                job_count=Count("job", filter=Q(job__is_published=True))
+            ).order_by("-job_count")
+        ]
+        await settings.CACHE_RAM.aset(
+            JobsQuery.CacheKey.Locations, items, timeout=settings.SOLO_CACHE_TIMEOUT
+        )
+        return cast(list[JobLocationType], items)
 
     @strawberry_django.field
     async def job_faq_questions(self) -> list[JobFaqQuestionType]:
@@ -203,11 +227,8 @@ class JobsMutation:
         info: strawberry.Info,
         email: str,
         tag_names: list[str] | None = None,
-        location_countries: list[str] | None = None,
-        location_cities: list[str] | None = None,
-        location_remote_names: list[str] | None = None,
+        location_ids: list[int] | None = None,
         is_orgs_highlighted: bool | None = None,
-        is_remote: bool | None = None,  # deprecated by [[JobLocation]].is_remote
         salary_min: int | None = None,
         is_exclude_no_salary: bool | None = None,
         is_exclude_career_capital: bool | None = None,
@@ -217,7 +238,6 @@ class JobsMutation:
         alert = await JobAlert.objects.acreate(
             email=email,
             is_orgs_highlighted=is_orgs_highlighted,
-            is_remote=is_remote,
             salary_min=salary_min,
             is_exclude_no_salary=is_exclude_no_salary,
             is_exclude_career_capital=is_exclude_career_capital,
@@ -228,15 +248,8 @@ class JobsMutation:
             tags = PostTag.objects.filter(name__in=tag_names)
             await alert.tags.aset([tag async for tag in tags])
 
-        loc_q = Q()
-        if location_countries:
-            loc_q |= Q(country__in=location_countries)
-        if location_cities:
-            loc_q |= Q(city__in=location_cities)
-        if location_remote_names:
-            loc_q |= Q(name__in=location_remote_names, is_remote=True)
-        if loc_q:
-            locations = JobLocation.objects.filter(loc_q)
+        if location_ids:
+            locations = JobLocation.objects.filter(id__in=location_ids)
             await alert.locations.aset([loc async for loc in locations])
 
         await _save_session_job_alert(info=info, alert_id_ext=alert.id_ext)

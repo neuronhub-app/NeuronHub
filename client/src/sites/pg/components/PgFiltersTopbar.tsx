@@ -1,12 +1,13 @@
 import { Flex, Grid, Stack, Switch } from "@chakra-ui/react";
-import { useToggleRefinement } from "react-instantsearch";
+import { useRefinementList, useToggleRefinement } from "react-instantsearch";
 import { PgFacetSalary } from "@/sites/pg/components/PgFacetSalary";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import type { UseRefinementListProps } from "react-instantsearch";
 import { PgFacet } from "@/sites/pg/components/PgFacet";
+import { LocationType } from "~/graphql/enums";
+import { ALGOLIA_ATTR_LOCATION, PgFacetLocation } from "@/sites/pg/components/PgFacetLocation";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 import { ids } from "@/e2e/ids";
-import { LuMapPin } from "react-icons/lu";
 
 const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
 
@@ -16,11 +17,14 @@ export function PgFiltersTopbar() {
     roleType: "tags_workload.name",
     experience: "tags_experience.name",
     skillSet: "tags_skill.name",
-    remote: "locations.remote_name",
-    country: "locations.country",
-    city: "locations.city",
     education: "tags_education.name",
   } as const;
+
+  const locationList = useRefinementList({
+    attribute: ALGOLIA_ATTR_LOCATION,
+    limit: 200,
+    operator: "or",
+  });
 
   return (
     <Grid
@@ -33,6 +37,7 @@ export function PgFiltersTopbar() {
         attribute={attr.causeArea}
         order={{ base: 1 }}
         sortBy={sortAlpha}
+        testId={ids.facet.popover.causeArea}
       />
 
       <PgFacet
@@ -90,34 +95,32 @@ export function PgFiltersTopbar() {
         }
       />
 
-      <PgFacet
+      <PgFacetLocation
         label="Remote"
-        attribute={attr.remote}
+        type={LocationType.Remote}
+        refine={locationList.refine}
+        algoliaItems={locationList.items}
         order={{ base: 6, md: 2, lg: 6 }}
-        icon={<LuMapPin />}
-        operator="or"
-        isFreezeTotalFacetCount
+        testId={ids.facet.popover.remote}
       />
 
-      <PgFacet
+      <PgFacetLocation
         label="Country"
-        attribute={attr.country}
+        type={LocationType.Country}
+        refine={locationList.refine}
+        algoliaItems={locationList.items}
         order={{ base: 7, md: 4, lg: 7 }}
-        icon={<LuMapPin />}
         isSearchEnabled
-        operator="or"
-        isFreezeTotalFacetCount
         testId={ids.facet.popover.country}
       />
 
-      <PgFacet
+      <PgFacetLocation
         label="City"
-        attribute={attr.city}
+        type={LocationType.City}
+        refine={locationList.refine}
+        algoliaItems={locationList.items}
         order={{ base: 8, md: 6, lg: 8 }}
-        icon={<LuMapPin />}
         isSearchEnabled
-        operator="or"
-        isFreezeTotalFacetCount
         testId={ids.facet.popover.city}
       />
 

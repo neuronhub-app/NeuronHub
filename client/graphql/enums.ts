@@ -22,6 +22,12 @@ export enum ImportDomain {
   HackerNews = 'HackerNews'
 }
 
+export enum LocationType {
+  City = 'CITY',
+  Country = 'COUNTRY',
+  Remote = 'REMOTE'
+}
+
 export enum Ordering {
   Asc = 'ASC',
   AscNullsFirst = 'ASC_NULLS_FIRST',

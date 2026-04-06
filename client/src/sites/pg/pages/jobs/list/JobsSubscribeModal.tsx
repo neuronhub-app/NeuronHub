@@ -12,7 +12,10 @@ import { useCurrentRefinements } from "react-instantsearch";
 import { z } from "zod";
 
 import { useUser } from "@/apps/users/useUserCurrent";
-import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
+import {
+  JobAlertSubscribeMutation,
+  getLocationIdsActive,
+} from "@/apps/jobs/list/JobsSubscribeModal";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
   DialogCloseTrigger,
@@ -22,7 +25,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ids } from "@/e2e/ids";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { JobLocationsQuery } from "@/sites/pg/components/PgFacetLocation";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
@@ -37,6 +42,8 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
   const loading = useIsLoading();
 
   const refinesCurrent = useCurrentRefinements();
+
+  const { data: locationsData } = useApolloQuery(JobLocationsQuery);
 
   const state = useStateValtio({ isOpen: false });
 
@@ -62,15 +69,10 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
       tag_names: refinesCurrent.items
         .filter(item => item.attribute.startsWith("tags_"))
         .flatMap(item => item.refinements.map(tag => String(tag.value))),
-      location_countries: refinesCurrent.items
-        .filter(item => item.attribute === "locations.country")
-        .flatMap(item => item.refinements.map(r => String(r.value))),
-      location_cities: refinesCurrent.items
-        .filter(item => item.attribute === "locations.city")
-        .flatMap(item => item.refinements.map(r => String(r.value))),
-      location_remote_names: refinesCurrent.items
-        .filter(item => item.attribute === "locations.remote_name")
-        .flatMap(item => item.refinements.map(r => String(r.value))),
+      location_ids: getLocationIdsActive(
+        refinesCurrent.items,
+        locationsData?.job_locations ?? [],
+      ),
       is_orgs_highlighted:
         refinesCurrent.items.some(item => item.attribute === "is_orgs_highlighted") || null,
       salary_min:
@@ -186,7 +188,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
                   inputProps={{
                     type: "email",
                     autoFocus: true,
-                    bg: "white",
+                    bg: "bg.default_real",
                     h: "10",
                     borderRadius: "md",
                     borderWidth: "1px",
@@ -252,9 +254,7 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_education.name": "Degree",
   "tags_workload.name": "Role",
   "tags_country_visa_sponsor.name": "Visa Sponsor",
-  "locations.remote_name": "Remote",
-  "locations.country": "Country",
-  "locations.city": "City",
+  "locations.algolia_filter_name": "Location",
   is_orgs_highlighted: "Highlighted",
   has_salary: "Has Salary",
   is_not_career_capital: "Exclude Career Capital",

@@ -6,7 +6,7 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class TestJobAlertSubscribe(NeuronTestCase):
-    async def test_subscribe_with_mixed_location_params(self):
+    async def test_subscribe_with_location_ids(self):
         loc_london = await self.gen.jobs.location("London")
         loc_berlin = await self.gen.jobs.location("Berlin")
         loc_remote = await self.gen.jobs.location(code="US", is_remote=True)
@@ -16,9 +16,7 @@ class TestJobAlertSubscribe(NeuronTestCase):
             mutation {{
                 job_alert_subscribe(
                     email: "test@example.com",
-                    location_countries: ["{loc_london.country}"],
-                    location_cities: ["{loc_berlin.city}"],
-                    location_remote_names: ["{loc_remote.name}"]
+                    location_ids: [{loc_london.id}, {loc_berlin.id}, {loc_remote.id}]
                 )
             }}
             """,
