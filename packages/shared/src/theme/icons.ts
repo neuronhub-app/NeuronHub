@@ -16,7 +16,7 @@ import {
   GoTools,
 } from "react-icons/go";
 import { IoInvertMode } from "react-icons/io5";
-import { LuChevronLeft, LuChevronRight, LuMoon, LuSun, LuWrench } from "react-icons/lu";
+import { LuChevronLeft, LuChevronRight, LuShieldAlert, LuWrench } from "react-icons/lu";
 
 /**
  * Use this object to keep icons consistent.
@@ -51,6 +51,7 @@ export const icons = {
   admin_fill: FaGear,
 
   docs: GoQuestion,
+  sentry: LuShieldAlert,
 
   // Models
   site_config: FiLayout,

@@ -9,7 +9,6 @@ import { icons } from "@neuronhub/shared/theme/icons";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { ColorModeIcon, useColorMode } from "@/components/ui/color-mode";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import { useEffect } from "react";
 
 export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
   const mode = useColorMode();
@@ -19,16 +18,8 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
   const storageKey = "is_admin_menu_hidden";
 
   const state = useStateValtio({
-    isHidden: localStorage.getItem(storageKey) ?? false,
+    isHidden: Boolean(localStorage.getItem(storageKey) ?? false),
   });
-
-  useEffect(() => {
-    if (state.mutable.isHidden) {
-      localStorage.removeItem(storageKey);
-    } else {
-      localStorage.setItem(storageKey, "true");
-    }
-  }, [state.snap]);
 
   if (!(user?.is_superuser || user?.is_staff)) {
     return null;
@@ -55,6 +46,8 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                   value="hide"
                   onClick={() => {
                     state.mutable.isHidden = true;
+                    localStorage.setItem(storageKey, "true");
+
                     toaster.info({
                       title: "Admin menu hidden",
                       description: `Restore by removing Local Storage "${storageKey}"`,
@@ -62,6 +55,7 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                         label: "Undo",
                         onClick: () => {
                           state.mutable.isHidden = false;
+                          localStorage.removeItem(storageKey);
                         },
                       },
                       duration: 3_000,
@@ -71,6 +65,17 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                 >
                   <icons.hide />
                   <Box>Hide</Box>
+                </Menu.Item>
+
+                <Menu.Item
+                  value="test_sentry"
+                  onClick={() => {
+                    Sentry.captureException(new Error("Test error with source maps"));
+                    toaster.info({ title: "Sent test error to Sentry" });
+                  }}
+                >
+                  <icons.sentry />
+                  <Box>Test Sentry</Box>
                 </Menu.Item>
 
                 {props.isThemeSwitcher &&
@@ -84,6 +89,17 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                       <Box>Color Mode</Box>
                     </Menu.Item>
                   )}
+              </Menu.ItemGroup>
+
+              <Menu.Separator />
+
+              <Menu.ItemGroup>
+                <Menu.Item value="docs" asChild>
+                  <LinkExt href="https://docs.neuronhub.app">
+                    <icons.docs />
+                    <Box>Docs</Box>
+                  </LinkExt>
+                </Menu.Item>
               </Menu.ItemGroup>
 
               <Menu.Root positioning={{ placement: "left-end", gutter: 0 }}>
@@ -110,13 +126,6 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                         </LinkExt>
                       </Menu.Item>
 
-                      <Menu.Item value="jobs" asChild>
-                        <LinkExt href={admin.urls.jobs}>
-                          <icons.job />
-                          <Box>Jobs</Box>
-                        </LinkExt>
-                      </Menu.Item>
-
                       <Menu.Item value="job_alerts" asChild>
                         <LinkExt href={admin.urls.job_alerts}>
                           <icons.job_alert />
@@ -130,30 +139,17 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                           <Box>Site Config</Box>
                         </LinkExt>
                       </Menu.Item>
+
+                      <Menu.Item value="jobs" asChild>
+                        <LinkExt href={admin.urls.jobs}>
+                          <icons.job />
+                          <Box>Jobs</Box>
+                        </LinkExt>
+                      </Menu.Item>
                     </Menu.Content>
                   </Menu.Positioner>
                 </Portal>
               </Menu.Root>
-
-              <Menu.ItemGroup>
-                <Menu.Item value="docs" asChild>
-                  <LinkExt href="https://docs.neuronhub.app">
-                    <icons.docs />
-                    <Box>Docs</Box>
-                  </LinkExt>
-                </Menu.Item>
-
-                <Menu.Item
-                  value="test_sentry"
-                  onClick={() => {
-                    Sentry.captureException(new Error("Test error with source maps"));
-                    toaster.info({ title: "Sent test error to Sentry" });
-                  }}
-                >
-                  <icons.settings />
-                  <Box>Test Sentry</Box>
-                </Menu.Item>
-              </Menu.ItemGroup>
             </Menu.Content>
           </Menu.Positioner>
         </Portal>
