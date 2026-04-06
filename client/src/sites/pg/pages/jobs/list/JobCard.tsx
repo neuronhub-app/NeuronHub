@@ -2,6 +2,7 @@ import {
   Badge,
   Box,
   Button,
+  Clipboard,
   Collapsible,
   Flex,
   Heading,
@@ -12,19 +13,18 @@ import {
   Stack,
   Text,
   VStack,
-  Clipboard,
 } from "@chakra-ui/react";
+import { Prose } from "@neuronhub/shared/components/ui/prose";
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { IoLocationSharp } from "react-icons/io5";
 import { LuChevronDown, LuExternalLink, LuLink } from "react-icons/lu";
 import { Highlight, Snippet, useInstantSearch } from "react-instantsearch";
-import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { Tooltip } from "@/components/ui/tooltip";
-import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
-import { datetime } from "@neuronhub/shared/utils/date-fns";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
 import { toast } from "@/utils/toast";
 
@@ -309,12 +309,14 @@ function JobExpanded(props: { job: JobFragmentType }) {
             {props.job.closes_at ? datetime.date(props.job.closes_at) : "Rolling applications"}
           </Text>
         </Stack>
-        {props.job.salary_text && (
+        {(props.job.salary_text || props.job.salary_min) && (
           <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
             <Text fontSize="sm" color="fg.muted" fontWeight="medium">
               Salary
             </Text>
-            <Text fontSize="sm">{props.job.salary_text}</Text>
+            <Text fontSize="sm">
+              {props.job.salary_text || `From $${props.job.salary_min!.toLocaleString("en-US")}`}
+            </Text>
           </Stack>
         )}
       </Flex>
