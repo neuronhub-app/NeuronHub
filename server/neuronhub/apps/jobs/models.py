@@ -2,7 +2,6 @@ import uuid
 from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
-from django.core.cache import cache
 from django.db import models
 from django.db.models import ManyToManyField
 from django.db.models import TextChoices
@@ -207,7 +206,7 @@ class Job(AlgoliaModel):
 
     class Tags(TextChoices):
         # for BE/FE instead of magic strings
-        CareerCapital = "Career Capital"
+        CareerCapital = "Career-Capital"
         ProfitForGood = "Profit for Good"
 
     @model_cached_property
@@ -356,36 +355,3 @@ class JobAlertLog(TimeStampedModel):
     @staticmethod
     def hash_email(email: str) -> str:
         return salted_hmac(key_salt="JobAlertLog", value=email).hexdigest()
-
-
-# Signals & Cache
-# ------------------------------------------------------------------------------------------
-
-
-def _drop_cache_job_faq(**kwargs):
-    from neuronhub.apps.jobs.graphql import JobsQuery
-
-    cache.delete(JobsQuery.CacheKey.Faq)
-
-
-models.signals.post_save.connect(_drop_cache_job_faq, sender=JobFaqQuestion)
-models.signals.post_delete.connect(_drop_cache_job_faq, sender=JobFaqQuestion)
-
-
-def _on_save_drop_cache_job_locations(sender, instance: Job, **kwargs):
-    if instance.is_published:
-        _drop_cache_job_locations()
-
-
-models.signals.post_save.connect(_on_save_drop_cache_job_locations, sender=Job)
-
-
-def _drop_cache_job_locations(**kwargs):
-    from neuronhub.apps.jobs.graphql import JobsQuery
-
-    cache.delete(JobsQuery.CacheKey.Locations)
-
-
-models.signals.post_save.connect(_drop_cache_job_locations, sender=JobLocation)
-models.signals.post_delete.connect(_drop_cache_job_locations, sender=JobLocation)
-models.signals.m2m_changed.connect(_drop_cache_job_locations, sender=Job.locations.through)
