@@ -215,7 +215,10 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     [tasks."test:e2e"]
         dir = "client"
         alias = "e2e"
-        run = "pnpm exec playwright test --config=e2e/playwright.config.ts"
+        run = [
+            "killport {{env.CLIENT_PORT_E2E}} {{env.SERVER_PORT_E2E}} | ignore",
+            "pnpm exec playwright test --config=e2e/playwright.config.ts",
+        ]
         # duplicate $env with `dev:e2e:server`, as Playwright resets $env when it starts Mise from [[playwright.config.ts]]
         env.VITE_SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
@@ -224,8 +227,10 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     [tasks."test:e2e:docs"]
         dir = "docs"
         alias = "e2e:docs"
-        run = "pnpm exec playwright test --config=e2e/playwright.config.ts"
-
+        run = [
+            "killport {{env.DOCS_PORT_E2E}} | ignore",
+            "pnpm exec playwright test --config=e2e/playwright.config.ts",
+        ]
 
 # Django
 # -----------------------------------------------------
