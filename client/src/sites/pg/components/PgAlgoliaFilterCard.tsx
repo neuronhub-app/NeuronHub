@@ -50,7 +50,8 @@ export function PgFilterCardWithSplitBg(props: {
 
 export function PgFacetsActive(props: { facetsActive: FacetsActiveConfig }) {
   const clear = useClearRefinements();
-  const isActive = clear.canRefine || Boolean(props.facetsActive.extraTags?.length);
+  const isExtraActive = Boolean(props.facetsActive.extraTags?.length);
+  const isActive = clear.canRefine || isExtraActive;
   if (!isActive) {
     return null;
   }
@@ -62,7 +63,7 @@ export function PgFacetsActive(props: { facetsActive: FacetsActiveConfig }) {
 
           <PgRefinesClearButton
             onClear={props.facetsActive.onClearAdditional}
-            isExtraActive={Boolean(props.facetsActive.extraTags?.length)}
+            isExtraActive={isExtraActive}
           />
         </HStack>
       </Collapsible.Content>
@@ -108,14 +109,12 @@ export function PgMobileCollapsible(props: {
         <Stack gap="gap.sm">
           {props.facetsTopbar}
 
-          <Flex gap="gap.sm" flexWrap="wrap" align="flex-start">
-            <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm">
-              <PgRefinesClearButton
-                onClear={props.facetsActive.onClearAdditional}
-                isExtraActive={Boolean(props.facetsActive.extraTags?.length)}
-              />
-            </PgAlgoliaFacetsActive>
-          </Flex>
+          <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm">
+            <PgRefinesClearButton
+              onClear={props.facetsActive.onClearAdditional}
+              isExtraActive={Boolean(props.facetsActive.extraTags?.length)}
+            />
+          </PgAlgoliaFacetsActive>
 
           <Collapsible.Trigger asChild>
             <Flex

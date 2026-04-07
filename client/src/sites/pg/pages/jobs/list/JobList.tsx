@@ -71,7 +71,6 @@ export function JobList(props: { slug?: string }) {
       facetsActive={{
         labelsOverride: {
           is_orgs_highlighted: "Highlighted",
-          has_salary: "Has Salary",
           is_not_career_capital: "Excl. Career Capital",
           is_not_profit_for_good: "Excl. Profit-for-Good",
           posted_at_unix: "Posted",
@@ -142,8 +141,9 @@ function JobNoResultsCard() {
 
 function ResetFiltersButton() {
   const clear = useClearRefinements();
+  const extraTags = useJobListExtraTags();
 
-  if (!clear.canRefine) {
+  if (!clear.canRefine && extraTags.length === 0) {
     return null;
   }
 

@@ -5,8 +5,6 @@ import { LuX } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 
-export type ExtraTag = { label: string; onRemove: () => void };
-
 export type RefinementActive = ReturnType<
   typeof useCurrentRefinements
 >["items"][number]["refinements"][number];
@@ -31,7 +29,7 @@ export type FacetsActiveConfig = {
   formatAttribute?: Record<string, (refinement: RefinementActive) => string>;
   subFacetPairs?: Record<string, string>;
   subFacetLabel?: Record<string, string>;
-  extraTags?: ExtraTag[];
+  extraTags?: Array<{ label: string; onRemove: () => void }>;
   onClearAdditional?: () => void;
 };
 

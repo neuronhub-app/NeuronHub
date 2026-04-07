@@ -1,3 +1,6 @@
+/**
+ * #quality-25% #155 — see [[jobListFilters.ts]]
+ */
 import { Flex, NumberInput, Stack, Switch, Text } from "@chakra-ui/react";
 import { useRef } from "react";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
@@ -11,7 +14,7 @@ export function PgFacetSalary() {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   function handleValueChange(details: { valueAsNumber: number }) {
-    clearTimeout(debounceRef.current!);
+    clearTimeout(debounceRef.current ?? undefined);
     debounceRef.current = setTimeout(() => {
       filters.mutable.salaryMin = Number.isFinite(details.valueAsNumber)
         ? details.valueAsNumber
