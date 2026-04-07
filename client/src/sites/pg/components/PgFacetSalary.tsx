@@ -32,7 +32,7 @@ export function PgFacetSalary() {
         step={1000}
       >
         <NumberInput.Input
-          placeholder="Minimum salary in USD (example: 50,000)"
+          placeholder="Minimum salary in USD (example: 50000)"
           {...ids.set(ids.facet.salaryInput)}
         />
       </NumberInput.Root>
