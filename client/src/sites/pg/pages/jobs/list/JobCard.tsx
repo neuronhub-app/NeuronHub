@@ -340,7 +340,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
             <Link
               href={appendUtmSource(props.job.url_external_with_utm || props.job.url_external)}
               target="_blank"
-              rel="noopener noreferrer"
+              rel="nofollow"
               textDecoration="none"
               _hover={{ textDecoration: "none" }}
             >
@@ -466,7 +466,7 @@ function JobOrgLink(props: {
       <Link
         href={appendUtmSource(props.job.org.website_with_utm || props.job.org.website)}
         target="_blank"
-        rel="noopener noreferrer"
+        rel="nofollow"
         {...textStyle}
         textDecoration="none"
         _hover={{ textDecoration: "underline", color: "currentColor" }}
@@ -506,7 +506,7 @@ function JobTitleLink(props: {
         <Link
           href={appendUtmSource(props.job.url_external_with_utm || props.job.url_external)}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="nofollow"
           color="fg"
           textDecoration="none"
           _hover={{ textDecoration: "underline", color: "currentColor" }}

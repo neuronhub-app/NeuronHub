@@ -171,7 +171,7 @@ function FooterDescription(props: { socialLinks: FooterSection["links"]; isLoadi
                 key={link.label}
                 href={link.href}
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="nofollow"
                 transition="transform 0.2s"
                 _hover={{ transform: "scale(1.1)" }}
               >
