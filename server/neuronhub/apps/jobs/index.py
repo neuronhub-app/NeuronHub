@@ -7,12 +7,16 @@ import logging
 from django.conf import settings
 
 from neuronhub.apps.jobs.models import Job
+from neuronhub.settings import DjangoEnv
 
 
 logger = logging.getLogger(__name__)
 
 
-if index_suffix := settings.ALGOLIA["INDEX_SUFFIX"]:
+if (
+    index_suffix := settings.ALGOLIA["INDEX_SUFFIX"]
+    and settings.DJANGO_ENV is not DjangoEnv.PROD
+):
     algolia_replica_jobs_sorted_by_closes_at = f"jobs_{index_suffix}_by_closes_at"
 else:
     algolia_replica_jobs_sorted_by_closes_at = "jobs_by_closes_at"
