@@ -43,7 +43,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     PROJECT_NAME = "{{ env.PROJECT_NAME | default(value = 'neuronhub') }}"
     VITE_PROJECT_NAME = "NeuronHub" # for FE HTML
-    VITE_RELEASE_VERSION = "0.3.2.0-rc.14" # used in GitHub and Sentry
+    VITE_RELEASE_VERSION = "0.3.2.0-rc.15" # used in GitHub and Sentry
 
     DEPENDENCY_COOLDOWN_DAYS = 4
 
@@ -92,6 +92,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     VITE_ALGOLIA_INDEX_DOCS = "${ALGOLIA_INDEX_DOCS}"
 
     # Analytics
+
+    VITE_GTM_ID = ""
 
     VITE_POSTHOG_TOKEN = "phc_NUVnraDugjykU3o5c3w6RFTJ2MK4u4G0iprxPaRjuN5"
     VITE_POSTHOG_HOST = "https://eu.i.posthog.com"

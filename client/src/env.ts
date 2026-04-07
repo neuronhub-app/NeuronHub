@@ -33,6 +33,8 @@ const envCleaned = createEnv({
 
   VITE_RELEASE_NAME: str(), // for Sentry Source Maps, defined in [[mise.toml]]
 
+  VITE_GTM_ID: str({ default: "" }),
+
   VITE_POSTHOG_TOKEN: str({ default: "" }),
   VITE_POSTHOG_HOST: url({ default: "" }),
 

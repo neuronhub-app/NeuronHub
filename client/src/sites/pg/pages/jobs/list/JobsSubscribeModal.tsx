@@ -94,6 +94,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
     });
     if (result.success) {
       localStorage.setItem(emailStoreKey, fields.email);
+      window.dataLayer?.push({ event: "form_submit" });
       toast.success("Subscribed successfully");
       state.mutable.isOpen = false;
       form.reset();

@@ -52,6 +52,8 @@ export function Layout(props: { children: ReactNode }) {
       </head>
 
       <body>
+        {env.VITE_GTM_ID && <GtmNoscript gtmId={env.VITE_GTM_ID} />}
+
         {props.children}
 
         <Scripts />
@@ -67,6 +69,8 @@ function LayoutHead() {
     <>
       <meta charSet="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+      {env.VITE_GTM_ID && <GtmHead gtmId={env.VITE_GTM_ID} />}
 
       {!env.isProd && <meta name="robots" content="noindex, follow" />}
 
@@ -105,6 +109,30 @@ function LayoutHead() {
       <link rel="apple-touch-icon" href={siteConfig.favicon.appleTouchIcon} sizes="180x180" />
       <link rel="manifest" href={siteConfig.favicon.webmanifest} />
     </>
+  );
+}
+
+function GtmHead(props: { gtmId: string }) {
+  const trafficType = env.isProd ? "" : "internal";
+  const initScript = `
+window.dataLayer=window.dataLayer||[];
+${trafficType ? `window.dataLayer.push({traffic_type:'${trafficType}'});` : ""}
+(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${props.gtmId}');`;
+
+  return <script dangerouslySetInnerHTML={{ __html: initScript }} />;
+}
+
+function GtmNoscript(props: { gtmId: string }) {
+  return (
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${props.gtmId}`}
+        height="0"
+        width="0"
+        style={{ display: "none", visibility: "hidden" }}
+        title="GTM"
+      />
+    </noscript>
   );
 }
 

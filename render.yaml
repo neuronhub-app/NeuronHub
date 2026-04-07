@@ -15,7 +15,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/client:0.3.2.0-rc.10
+            url: ghcr.io/neuronhub-app/neuronhub/client:0.3.2.0-rc.15
           domains:
             - pg.stage.neuronhub.app
           envVars:
@@ -27,7 +27,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/docs:0.3.2.0-rc.10
+            url: ghcr.io/neuronhub-app/neuronhub/docs:0.3.2.0-rc.15
           domains:
             - stage.docs.neuronhub.app
           envVars:
@@ -38,7 +38,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.10
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.15
           dockerCommand: uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application
           preDeployCommand: uv run manage.py migrate
           domains:
@@ -58,7 +58,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.10
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.15
           dockerCommand: uv run manage.py db_worker
           envVars:
             - key: DATABASE_URL
@@ -132,7 +132,7 @@ projects:
           plan: standard
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/client:0.3.2.0-rc.10
+            url: ghcr.io/neuronhub-app/neuronhub/client:0.3.2.0-rc.15
           domains:
             - jobs.probablygood.org
           envVars:
@@ -144,7 +144,7 @@ projects:
           plan: standard
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.10
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.15
           dockerCommand: uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application
           preDeployCommand: uv run manage.py migrate
           domains:
@@ -164,7 +164,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.10
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.15
           dockerCommand: uv run manage.py db_worker
           envVars:
             - key: DATABASE_URL
@@ -235,3 +235,5 @@ envVarGroups:
         value: https://a0837c6ac8e7918432c83deda566791b@o4511052792922112.ingest.de.sentry.io/4511052798492752
       - key: SENTRY_DSN_FRONTEND
         value: https://700a8e2c33f6d03a0a3eb795d99d06b8@o4511052792922112.ingest.de.sentry.io/4511052796395600
+      - key: VITE_GTM_ID
+        value: GTM-M57GSHC8

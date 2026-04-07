@@ -338,6 +338,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
             focusRingColor="transparent"
           >
             <Link
+              className="job-details"
               href={appendUtmSource(props.job.url_external_with_utm || props.job.url_external)}
               target="_blank"
               rel="nofollow"
@@ -464,6 +465,7 @@ function JobOrgLink(props: {
   return (
     <Flex align="center" gap="gap.xs" {...aboveOverlay}>
       <Link
+        className="org-link"
         href={appendUtmSource(props.job.org.website_with_utm || props.job.org.website)}
         target="_blank"
         rel="nofollow"
@@ -504,6 +506,7 @@ function JobTitleLink(props: {
     <Heading {...headingStyle} {...aboveOverlay}>
       {props.isOpen && props.job.url_external ? (
         <Link
+          className="job-details"
           href={appendUtmSource(props.job.url_external_with_utm || props.job.url_external)}
           target="_blank"
           rel="nofollow"
