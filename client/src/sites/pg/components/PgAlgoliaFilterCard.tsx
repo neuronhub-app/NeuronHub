@@ -109,12 +109,13 @@ export function PgMobileCollapsible(props: {
         <Stack gap="gap.sm">
           {props.facetsTopbar}
 
-          <PgAlgoliaFacetsActive config={props.facetsActive} tagsGap="gap.sm">
+          <HStack gap="gap.sm" align="flex-start" flexWrap="wrap">
+            <PgAlgoliaFacetsActive config={props.facetsActive} />
             <PgRefinesClearButton
               onClear={props.facetsActive.onClearAdditional}
               isExtraActive={Boolean(props.facetsActive.extraTags?.length)}
             />
-          </PgAlgoliaFacetsActive>
+          </HStack>
 
           <Collapsible.Trigger asChild>
             <Flex
