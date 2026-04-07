@@ -83,6 +83,7 @@
                     DJANGO_ENV: {{ env.DJANGO_ENV }}
 
                     VITE_SITE: {{ env.VITE_SITE | default(value="''") }}
+                    VITE_GTM_ID: {{ env.VITE_GTM_ID | default(value="''") }}
                     VITE_SERVER_URL: https://($server_domain)
                     VITE_CLIENT_URL: {{ env.CLIENT_URL }}
                     VITE_ALGOLIA_APPLICATION_ID: {{ env.VITE_ALGOLIA_APPLICATION_ID }}
