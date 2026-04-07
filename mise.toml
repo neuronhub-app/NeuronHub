@@ -93,7 +93,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     # Analytics
 
-    VITE_GTM_ID = ""
+    VITE_GTM_ID = "${VITE_GTM_ID:-}"
 
     VITE_POSTHOG_TOKEN = "phc_NUVnraDugjykU3o5c3w6RFTJ2MK4u4G0iprxPaRjuN5"
     VITE_POSTHOG_HOST = "https://eu.i.posthog.com"
