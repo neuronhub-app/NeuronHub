@@ -37,11 +37,11 @@ const pgConfig: SiteConfig = {
   googleFontsHref:
     "https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap",
   favicon: {
-    svg: "/favicon-pg/favicon.svg",
-    png96: "/favicon-pg/favicon-96x96.png",
-    ico: "/favicon-pg/favicon.ico",
-    appleTouchIcon: "/favicon-pg/apple-touch-icon.png",
-    webmanifest: "/favicon-pg/site.webmanifest",
+    svg: "/favicon/pg/favicon.svg",
+    png96: "/favicon/pg/favicon-96x96.png",
+    ico: "/favicon/pg/favicon.ico",
+    appleTouchIcon: "/favicon/pg/apple-touch-icon.png",
+    webmanifest: "/favicon/pg/site.webmanifest",
   },
   meta: {
     title: "High-Impact Job Board | Probably Good",
