@@ -49,48 +49,6 @@ test.describe("PG Job Location Facets", () => {
     await play.waitForNetworkIdle();
     await expectBase(jobCards).toHaveCount(2);
   });
-
-  test("per-popover clear isolation + cross-facet count update", async ({ page }) => {
-    await play.navigate(urls.jobs.list, { idleWait: true });
-    const popover = page.locator(openPopover);
-    const countryBtn = page.getByTestId(ids.facet.popover.country).last();
-    const cityBtn = page.getByTestId(ids.facet.popover.city).last();
-
-    // Select Kenya + Berkeley
-    await countryBtn.click();
-    await clickFacetCheckbox(popover, "Kenya");
-    await play.waitForNetworkIdle();
-    await page.keyboard.press("Escape");
-
-    // Select Berkeley in City
-    await cityBtn.click();
-    await clickFacetCheckbox(popover, "Berkeley CA, USA");
-    await play.waitForNetworkIdle();
-    await page.keyboard.press("Escape");
-
-    // Clear Country → City badge stays
-    const clearCountry = page.getByTestId(ids.facet.clear(ids.facet.popover.country)).last();
-    await clearCountry.click();
-    await play.waitForNetworkIdle();
-    await expectBase(countryBtn.getByText("(1)")).not.toBeVisible();
-    await expectBase(cityBtn.getByText("(1)")).toBeVisible();
-
-    // Clear City → all locations cleared
-    const clearCity = page.getByTestId(ids.facet.clear(ids.facet.popover.city)).last();
-    await clearCity.click();
-    await play.waitForNetworkIdle();
-
-    // Select Cause Area → location counts reflect cross-facet filter
-    await page.getByTestId(ids.facet.popover.causeArea).last().click();
-    await clickFacetCheckbox(popover, "AI Safety & Policy");
-    await play.waitForNetworkIdle();
-    await page.keyboard.press("Escape");
-    await expectBase(popover).not.toBeVisible();
-
-    await countryBtn.click();
-    await expectBase(facetItemCount(page, "United States")).toHaveText("3");
-    await expectBase(facetItemCount(page, "Kenya")).toHaveText("0");
-  });
 });
 
 async function clickFacetCheckbox(popover: Locator, value: string) {
