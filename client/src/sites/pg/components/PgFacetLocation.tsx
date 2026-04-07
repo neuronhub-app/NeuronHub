@@ -23,11 +23,11 @@ export function PgFacetLocation(props: {
 }) {
   const { data } = useApolloQuery(JobLocationsQuery);
 
-  const currentRefinements = useCurrentRefinements({
+  const currentRefs = useCurrentRefinements({
     includedAttributes: [ALGOLIA_ATTR_LOCATION],
   });
-  const refinedValues = new Set(
-    currentRefinements.items.flatMap(item => item.refinements.map(ref => String(ref.value))),
+  const currentRefsValues = new Set(
+    currentRefs.items.flatMap(item => item.refinements.map(ref => String(ref.value))),
   );
 
   const state = useStateValtio({
@@ -36,19 +36,20 @@ export function PgFacetLocation(props: {
 
   const locations = (data?.job_locations ?? []).filter(loc => loc.type === props.type);
 
-  const locNames = new Set(locations.map(loc => loc.algolia_filter_name));
+  const locNamesAll = new Set(locations.map(loc => loc.algolia_filter_name));
   const locNamesActive: Set<string> = new Set(
-    [...refinedValues].filter(value => locNames.has(value)),
+    [...currentRefsValues].filter(value => locNamesAll.has(value)),
   );
 
   const algoliaCountByName = new Map(props.algoliaItems.map(item => [item.value, item.count]));
 
-  function getCount(loc: (typeof locations)[number]): number {
-    if (refinedValues.size > 0) {
+  function getCount(loc: JobLocation): number {
+    if (currentRefsValues.size > 0) {
       return loc.job_count;
     }
     return algoliaCountByName.get(loc.algolia_filter_name) ?? 0;
   }
+  type JobLocation = (typeof locations)[number];
 
   const query = state.snap.query.toLowerCase();
   const locationsFiltered = query
