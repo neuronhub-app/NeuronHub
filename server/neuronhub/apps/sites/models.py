@@ -55,6 +55,10 @@ class SiteConfig(SingletonModel):
         help_text="Used for `reply-to` email and the 'Contact' modal form",
     )
 
+    is_enable_job_alerts = models.BooleanField(
+        default=True, help_text="Manages the hourly JobAlerts sending."
+    )
+
     logo_url = models.URLField(
         max_length=512,
         blank=True,

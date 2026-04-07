@@ -147,6 +147,7 @@ class SiteConfigAdmin(
             "Jobs emails".upper(),
             {
                 "fields": [
+                    "is_enable_job_alerts",
                     "logo_url",
                     "feedback_form_url",
                     "submit_job_url",

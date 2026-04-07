@@ -38,6 +38,11 @@ async def send_job_alerts(
 
     report = JobAlertBulkReport()
 
+    site = await SiteConfig.get_solo()
+    is_non_test_run = not is_include_test_jobs
+    if not site.is_enable_job_alerts and is_non_test_run:
+        return report
+
     alerts_qs = JobAlert.objects.filter(is_active=True)
     if alert_ids is not None:
         alerts_qs = alerts_qs.filter(id__in=alert_ids)
