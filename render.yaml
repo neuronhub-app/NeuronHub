@@ -118,9 +118,119 @@ projects:
         networking:
           isolation: enabled
 
+      - name: prod
+
+        databases:
+          - name: neuronhub-db-prod
+            postgresMajorVersion: "18"
+            plan: basic-1gb
+
+        services:
+
+        - name: neuronhub-frontend-prod
+          type: web
+          plan: standard
+          runtime: image
+          image:
+            url: ghcr.io/neuronhub-app/neuronhub/client:0.3.2.0-rc.10
+          domains:
+            - jobs.probablygood.org
+          envVars:
+            - fromGroup: shared
+            - fromGroup: prod
+
+        - name: neuronhub-backend-prod
+          type: web
+          plan: standard
+          runtime: image
+          image:
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.10
+          dockerCommand: uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application
+          preDeployCommand: uv run manage.py migrate
+          domains:
+            - backend.jobs.probablygood.org
+          envVars:
+            - key: DATABASE_URL
+              fromDatabase:
+                name: neuronhub-db-prod
+                property: connectionString
+
+            - fromGroup: shared
+            - fromGroup: prod
+            - fromGroup: prod-backend
+
+        - name: neuronhub-worker-prod
+          type: worker
+          plan: starter
+          runtime: image
+          image:
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.2.0-rc.10
+          dockerCommand: uv run manage.py db_worker
+          envVars:
+            - key: DATABASE_URL
+              fromDatabase:
+                name: neuronhub-db-prod
+                property: connectionString
+
+            - fromGroup: shared
+            - fromGroup: prod
+            - fromGroup: prod-backend
+
+        - name: neuronhub-cron-prod
+          type: cron
+          runtime: python
+          schedule: "@hourly"
+          startCommand: "curl https://$SERVER_DOMAIN/jobs/send-emails/$DJANGO_CRON_WEBHOOK_SECRET"
+          buildCommand: "true" # must be a string
+          envVars:
+            - fromGroup: prod
+            - fromGroup: prod-backend
+
+        envVarGroups:
+          - name: prod-backend
+            envVars:
+            - key: SECRET_KEY
+              generateValue: true
+            - key: DJANGO_ENV
+              value: prod
+            - key: DJANGO_CRON_WEBHOOK_SECRET
+              generateValue: true
+            - key: ALGOLIA_IS_ENABLED
+              value: "true"
+            - key: ALGOLIA_API_KEY
+              sync: false
+            - key: ALGOLIA_APPLICATION_ID
+              sync: false
+            - key: ALGOLIA_SEARCH_API_KEY
+              sync: false
+            - key: POSTMARK_SERVER_TOKEN
+              sync: false
+            - key: ADMIN_EMAIL
+              sync: false
+
+          - name: prod
+            envVars:
+            - key: SERVER_DOMAIN
+              value: jobs.probablygood.org
+            - key: SERVER_URL
+              value: https://backend.jobs.probablygood.org
+            - key: CLIENT_DOMAIN
+              value: jobs.probablygood.org
+            - key: CLIENT_URL
+              value: https://jobs.probablygood.org
+            - key: VITE_SERVER_URL
+              value: https://backend.jobs.probablygood.org
+
+        networking:
+          isolation: enabled
+
 envVarGroups:
   - name: shared
     envVars:
+      - key: PROJECT_NAME
+        value: Probably Good
+      - key: VITE_PROJECT_NAME
+        value: Probably Good
       - key: SENTRY_DSN_BACKEND
         value: https://a0837c6ac8e7918432c83deda566791b@o4511052792922112.ingest.de.sentry.io/4511052798492752
       - key: SENTRY_DSN_FRONTEND
