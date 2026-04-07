@@ -232,13 +232,12 @@ class JobAlertTestContext:
                 await gen.posts.tag(Job.Tags.CareerCapital, TagCategory.Area),
                 await gen.posts.tag(Job.Tags.ProfitForGood, TagCategory.Area),
             ]
+            alert = await gen.jobs.job_alert(email=user.email, tz=None, tags=tags)
             jobs = [
                 await gen.jobs.job(tags=tags),
                 await gen.jobs.job(tags=tags),
                 await gen.jobs.job(tags=tags),
             ]
-
-        alert = await gen.jobs.job_alert(email=user.email, tz=None, tags=tags)
 
         return JobAlertTestContext(jobs_created=jobs, alert=alert)
 
