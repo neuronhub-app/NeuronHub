@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     "django_object_actions",
     "django_countries",
     "django_rich",
+    "django_extensions",
     "corsheaders",
     "anymail",
     "simple_history",
