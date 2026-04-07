@@ -245,6 +245,10 @@ ALLOWED_HOSTS = env.list(
 if DJANGO_ENV.is_dev():
     ALLOWED_HOSTS.append(".localhost")
 
+RENDER_EXTERNAL_HOSTNAME = env.str("RENDER_EXTERNAL_HOSTNAME", "")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
 
 # Storage
 # ---------------------------------------------------------------------------------------------------------
