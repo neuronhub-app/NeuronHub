@@ -47,8 +47,7 @@ const pgConfig: SiteConfig = {
     title: "High-Impact Job Board | Probably Good",
     description:
       "Find a job that's good for you and good for the world. A continuously updated, curated list of high-impact job opportunities for people who want to make a difference.",
-    ogImage:
-      "https://cdn.prod.website-files.com/650cce2c8e093f3e9f35414f/66074f8a3e90ccf7c8c77994_Job-Board-Site-Thumbnail_1.91-1.png",
+    ogImage: "https://media.neuronhub.app/meta/og-image.png",
   },
 };
 
