@@ -39,9 +39,9 @@ export const layout = {
   label: {
     jobAlerts: (count?: number) => {
       if (count === undefined) {
-        return "job alerts" as const;
+        return "alerts" as const;
       }
-      return `job alerts (${count})` as const;
+      return `alerts (${count})` as const;
     },
   },
 } as const;
