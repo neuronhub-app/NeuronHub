@@ -128,8 +128,6 @@ async def _send_job_alert(
             "jobs": jobs,
             "jobs_matched_count": len(jobs),
             "jobs_total_count": jobs_total_count,
-            # todo !! fix
-            "client_jobs_matched_url": f"{settings.CLIENT_URL}{settings.CLIENT_URL_JOBS_PREFIX}",
         },
         template_override=site.email_template_job_alert,
     )

@@ -10,7 +10,6 @@
   {{ site_domain }}                  — e.g. "probablygood.org"
   {{ client_url }}                   — base URL
   {{ client_jobs_url }}              — job board URL
-  {{ client_jobs_matched_url }}      — filtered job board URL for this alert
   {{ jobs_matched_count }}           — integer, e.g. 4
   {{ jobs_total_count }}             — total jobs on the board
   {{ job_alerts_management_url }}    — URL to edit alert preferences
@@ -148,8 +147,7 @@
           <td style="padding:22px 36px 0 36px;">
             <p style="font-family:'DM Sans',Arial,Helvetica,sans-serif;font-size:13px;color:#343232;margin:0 0 10px 0;line-height:1.7;text-align:left;">
               Click any role to view its details.
-              View <a href="{{ client_jobs_matched_url }}" style="color:#338050;text-decoration:underline;">all the roles that match your alert</a>
-              or <a href="{{ client_jobs_url }}" style="color:#338050;text-decoration:underline;">all the roles on the job board</a>.
+              Or view <a href="{{ client_jobs_url }}" style="color:#338050;text-decoration:underline;">all the roles on the job board</a>.
             </p>
           </td>
         </tr>
