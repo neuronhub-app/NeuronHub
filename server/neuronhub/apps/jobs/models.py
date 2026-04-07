@@ -298,6 +298,7 @@ class JobAlert(TimeStampedModel):
     tz: ZoneInfo = TimeZoneField(blank=True, default="")
 
     is_active = models.BooleanField(default=True)
+    is_invalid_location = models.BooleanField(default=False)
 
     sent_count = models.PositiveIntegerField(default=0)
     jobs_notified_count = models.PositiveIntegerField(default=0)
