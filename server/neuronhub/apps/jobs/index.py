@@ -12,22 +12,28 @@ from neuronhub.apps.jobs.models import Job
 logger = logging.getLogger(__name__)
 
 
-def setup_virtual_replica_sorted_by_closes_at():
+if index_suffix := settings.ALGOLIA["INDEX_SUFFIX"]:
+    algolia_replica_jobs_sorted_by_closes_at = f"jobs_{index_suffix}_by_closes_at"
+else:
+    algolia_replica_jobs_sorted_by_closes_at = "jobs_by_closes_at"
+
+
+def setup_replica_sorted_by_closes_at():
     from algoliasearch.search.client import SearchClientSync
 
     client = SearchClientSync(
         app_id=settings.ALGOLIA["APPLICATION_ID"], api_key=settings.ALGOLIA["API_KEY"]
     )
+
     client.set_settings(
         index_name=algolia_replica_jobs_sorted_by_closes_at,
-        index_settings={"customRanking": ["asc(closes_at_unix)"]},
+        index_settings={
+            # non-virt replicas don't inherit `primary` settings #AI
+            **JobIndex.settings,
+            "replicas": [],
+            "customRanking": ["asc(closes_at_unix)"],
+        },
     )
-
-
-if index_suffix := settings.ALGOLIA["INDEX_SUFFIX"]:
-    algolia_replica_jobs_sorted_by_closes_at = f"jobs_{index_suffix}_by_closes_at"
-else:
-    algolia_replica_jobs_sorted_by_closes_at = "jobs_by_closes_at"
 
 
 if settings.ALGOLIA["IS_ENABLED"]:

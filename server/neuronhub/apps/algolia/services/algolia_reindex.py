@@ -4,7 +4,7 @@ from enum import Enum
 from asgiref.sync import sync_to_async
 from django.conf import settings
 
-from neuronhub.apps.jobs.index import setup_virtual_replica_sorted_by_closes_at
+from neuronhub.apps.jobs.index import setup_replica_sorted_by_closes_at
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
 from neuronhub.apps.posts.models import Post
@@ -42,7 +42,7 @@ def algolia_reindex_sync(models: list[AlgoliaModel] | None = None, limit: int | 
                 reindex_all(model=Profile)
             case AlgoliaModel.Job:
                 reindex_all(model=Job)
-                setup_virtual_replica_sorted_by_closes_at()
+                setup_replica_sorted_by_closes_at()
             case AlgoliaModel.Post:
                 reindex_all(model=Post)
                 setup_virtual_replica_sorted_by_votes()
