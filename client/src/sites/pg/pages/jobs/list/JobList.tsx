@@ -1,14 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  HStack,
-  Icon,
-  Separator,
-  Skeleton,
-  Stack,
-  Text,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, Icon, Separator, Stack, Text } from "@chakra-ui/react";
 import { type ReactNode, useRef } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
 import { Configure, useClearRefinements } from "react-instantsearch";
@@ -19,6 +9,7 @@ import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { PgHitSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
 import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
 import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
@@ -65,6 +56,7 @@ export function JobList(props: { slug?: string }) {
         hitOpenedPinned: jobOpenPinned,
         noResultsNode: <JobNoResultsCard />,
         listTestId: ids.job.list,
+        isExtraFilterActive: extraTags.length > 0,
       }}
       searchInputTestId={ids.job.searchInput}
       facetsTopbar={<PgFiltersTopbar />}
@@ -217,7 +209,7 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
     node: (
       <Box ref={cardRef} position="relative">
         {isLoading ? (
-          <Skeleton h="32" w="full" />
+          <PgHitSkeletons count={1} />
         ) : (
           <JobCard job={job!} isSearchActive={false} isInitiallyOpen={true} />
         )}

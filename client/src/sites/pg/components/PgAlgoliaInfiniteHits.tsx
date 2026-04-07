@@ -24,6 +24,7 @@ export type PgInfiniteHitsProps<TItem extends { id: ID }, TData = unknown> = {
   noResultsNode?: ReactNode;
   label?: string;
   listTestId?: string;
+  isExtraFilterActive?: boolean; // todo: #155 — remove with jobListFilters.ts Valtio cleanup
 };
 
 export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
@@ -49,7 +50,10 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
     props.enrichment.query,
     props.enrichment.extractItems,
   );
-  const isSearchActive = search.query.length > 0 || refinements.items.length > 0;
+  const isSearchActive =
+    search.query.length > 0 ||
+    refinements.items.length > 0 ||
+    Boolean(props.isExtraFilterActive);
 
   useEffect(() => {
     const sentinelElement = scrollSentinelRef.current;
@@ -71,11 +75,12 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
       ? items.filter(item => item.id !== props.hitOpenedPinned!.id)
       : items;
 
-  const hasNoResults = filteredItems.length === 0 && !props.hitOpenedPinned?.node;
+  const isEmpty = filteredItems.length === 0;
+  const isPinnedNodeVisible = props.hitOpenedPinned?.node && !isSearchActive;
   const isInitialLoad = !hits.results;
-  const isEmptyBeforeSearch = !isSearchActive && hasNoResults;
-  const showSkeleton =
-    isInitialLoad || isEmptyBeforeSearch || (hasNoResults && status !== "idle");
+  const isEmptyBeforeSearch = !isSearchActive && isEmpty;
+  const showSkeleton = isInitialLoad || isEmptyBeforeSearch || (isEmpty && status !== "idle");
+  const hasNoResults = isEmpty && !isPinnedNodeVisible;
 
   return (
     <Stack gap="gap.xl" w="full">
@@ -100,10 +105,10 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
 }
 
 // #AI
-export function PgHitSkeletons() {
+export function PgHitSkeletons(props: { count?: number }) {
   return (
     <>
-      {Array.from({ length: 4 }, (_, i) => (
+      {Array.from({ length: props.count ?? 4 }, (_, i) => (
         <Stack
           key={i}
           gap="gap.sm"
