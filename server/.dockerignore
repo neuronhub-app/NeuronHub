@@ -2,7 +2,6 @@
 .venv/
 __pycache__/
 .*_cache/
+media/
 
-# avoid confusing LLMs
-Dockerfile
-.dockerignore
+*.csv
