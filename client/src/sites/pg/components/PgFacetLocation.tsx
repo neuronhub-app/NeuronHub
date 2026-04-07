@@ -17,9 +17,9 @@ export function PgFacetLocation(props: {
   type: LocationType;
   refine: (value: string) => void;
   algoliaItems: { value: string; count: number }[];
-  order?: { base?: number; md?: number; lg?: number };
   isSearchEnabled?: boolean;
   testId?: TestId;
+  order?: { base?: number; md?: number; lg?: number };
 }) {
   const { data } = useApolloQuery(JobLocationsQuery);
 
@@ -68,13 +68,16 @@ export function PgFacetLocation(props: {
           props.refine(locName);
         }
       }}
+      onClose={() => {
+        state.mutable.query = "";
+      }}
     >
       <Stack align="flex-start">
         {props.isSearchEnabled && (
           <SearchInput
             query={state.snap.query}
-            onQueryChange={q => {
-              state.mutable.query = q;
+            onQueryChange={query => {
+              state.mutable.query = query;
             }}
           />
         )}
@@ -92,7 +95,6 @@ export function PgFacetLocation(props: {
               checked={locNamesActive.has(loc.algolia_filter_name)}
               onCheckedChange={() => {
                 props.refine(loc.algolia_filter_name);
-                state.mutable.query = "";
               }}
               size="sm"
               display="grid"

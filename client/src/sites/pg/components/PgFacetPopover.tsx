@@ -17,6 +17,7 @@ export function PgFacetPopover(props: {
   testId?: TestId;
   activeFacetCount?: number;
   onClear?: () => void;
+  onClose?: () => void;
 }) {
   const clear = useClearRefinements({
     includedAttributes: props.attribute ? [props.attribute] : [],
@@ -33,6 +34,7 @@ export function PgFacetPopover(props: {
         offset: { mainAxis: 4, crossAxis: 0 },
         listeners: false, // fix CLS on filter add (ENG-56).
       }}
+      onExitComplete={props.onClose}
     >
       <Popover.Trigger asChild>
         <Box
