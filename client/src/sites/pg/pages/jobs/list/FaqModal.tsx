@@ -28,7 +28,7 @@ export function FaqModal(props: { children: ReactNode }) {
     >
       <DialogTrigger asChild>{props.children}</DialogTrigger>
 
-      <DialogContent bg="bg" gap="gap.md" p={{ base: "gap.md", md: "gap.xl" }}>
+      <DialogContent bg="bg" gap="gap.md" mx="gap.md" p={{ base: "gap.md", md: "gap.xl" }}>
         <DialogHeader p="0">
           <DialogTitle {...style.heading}>FAQ</DialogTitle>
         </DialogHeader>

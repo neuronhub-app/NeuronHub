@@ -63,7 +63,7 @@ export function JobList(props: { slug?: string }) {
       facetsActive={{
         labelsOverride: {
           is_orgs_highlighted: "Highlighted",
-          is_not_career_capital: "Excl. Career Capital",
+          is_not_career_capital: "Excl. Career-Capital",
           is_not_profit_for_good: "Excl. Profit-for-Good",
           posted_at_unix: "Posted",
         },

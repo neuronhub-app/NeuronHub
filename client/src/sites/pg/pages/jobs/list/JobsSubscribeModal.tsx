@@ -262,7 +262,7 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "tags_country_visa_sponsor.name": "Visa Sponsor",
   "locations.algolia_filter_name": "Location",
   is_orgs_highlighted: "Highlighted",
-  is_not_career_capital: "Exclude Career Capital",
+  is_not_career_capital: "Exclude Career-Capital",
   is_not_profit_for_good: "Exclude Profit for Good",
   "org.name": "Organisation",
   posted_at: "Posted",

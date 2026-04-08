@@ -194,7 +194,7 @@ function PgAlertCard(props: { alert: AlertType }) {
             )}
             {props.alert.is_exclude_career_capital && (
               <Badge {...style.badge} variant="pg-area">
-                Exclude Career Capital
+                Exclude Career-Capital
               </Badge>
             )}
             {props.alert.is_exclude_profit_for_good && (

@@ -186,7 +186,7 @@ function AlertCard(props: { alert: AlertType }) {
               )}
               {props.alert.is_exclude_career_capital && (
                 <Badge variant="subtle" colorPalette="orange">
-                  Exclude Career Capital
+                  Exclude Career-Capital
                 </Badge>
               )}
               {props.alert.is_exclude_profit_for_good && (
