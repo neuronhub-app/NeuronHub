@@ -219,7 +219,7 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   "locations.algolia_filter_name": "Location",
   is_orgs_highlighted: "Highlighted",
   has_salary: "Has Salary",
-  is_not_career_capital: "Exclude Career Capital",
+  is_not_career_capital: "Exclude Career-Capital",
   is_not_profit_for_good: "Exclude Profit for Good",
   "org.name": "Organization",
   salary_min: "Min Salary",

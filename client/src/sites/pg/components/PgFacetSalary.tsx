@@ -30,9 +30,10 @@ export function PgFacetSalary() {
         onValueChange={handleValueChange}
         size="xs"
         step={1000}
+        formatOptions={{ useGrouping: true }}
       >
         <NumberInput.Input
-          placeholder="Minimum salary in USD (example: 50000)"
+          placeholder="Minimum salary in USD (example: 50,000)"
           {...ids.set(ids.facet.salaryInput)}
         />
       </NumberInput.Root>

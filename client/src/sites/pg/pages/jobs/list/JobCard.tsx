@@ -291,7 +291,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
             maxW="none"
             css={{
               "& ul > li::marker": { color: "brand.black" },
-              "& ul": { paddingInlineStart: "1em" },
+              "& ul": { paddingInlineStart: "0", listStylePosition: "inside" },
             }}
             // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
             dangerouslySetInnerHTML={{
@@ -385,17 +385,22 @@ function locationTags(locations: JobFragmentType["locations"]): string[] {
     return [];
   }
 
-  if (locations.length <= 3) {
-    return locations.map(loc => loc.name);
+  const countriesWithCities = new Set(locations.filter(loc => loc.city).map(loc => loc.country));
+  const locationsDeduped = locations.filter(
+    loc => !(loc.type === "COUNTRY" && countriesWithCities.has(loc.country)),
+  );
+
+  if (locationsDeduped.length <= 3) {
+    return locationsDeduped.map(loc => loc.name);
   }
 
-  const remotes = locations.filter(loc => loc.is_remote);
+  const remotes = locationsDeduped.filter(loc => loc.is_remote);
   if (remotes.length === 0) {
     // 4+ onsite
     return ["Multiple Locations"];
   }
 
-  if (locations.filter(loc => !loc.is_remote).length === 0) {
+  if (locationsDeduped.filter(loc => !loc.is_remote).length === 0) {
     return ["Remote, Multiple Locations"];
   }
 
