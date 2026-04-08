@@ -53,7 +53,7 @@ export function PgFacetLocation(props: {
 
   const query = state.snap.query.toLowerCase();
   const locationsFiltered = query
-    ? locations.filter(loc => loc.name.toLowerCase().includes(query))
+    ? locations.filter(loc => (loc.city || loc.name).toLowerCase().includes(query))
     : locations;
   const locationsVisible = locationsFiltered.toSorted((a, b) => getCount(b) - getCount(a));
 
@@ -103,13 +103,15 @@ export function PgFacetLocation(props: {
               gap="gap.sm"
               flex="1"
               className="group"
-              data-testid={ids.facet.checkbox(loc.name)}
+              data-testid={ids.facet.checkbox(loc.city || loc.name)}
             >
               <Checkbox.HiddenInput />
               <Checkbox.Control _groupHover={{ borderColor: "brand.green.light" }} />
               <Text
                 // biome-ignore lint/security/noDangerouslySetInnerHtml: BE; query is escaped
-                dangerouslySetInnerHTML={{ __html: highlightMatch(loc.name, state.snap.query) }}
+                dangerouslySetInnerHTML={{
+                  __html: highlightMatch(loc.city || loc.name, state.snap.query),
+                }}
                 fontSize="13px"
                 color="fg"
                 _groupHover={{ color: "brand.green.light" }}
