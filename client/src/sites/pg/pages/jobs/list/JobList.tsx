@@ -2,7 +2,7 @@ import { Box, Button, Flex, HStack, Icon, Separator, Stack, Text } from "@chakra
 import { type ReactNode, useRef } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
 import { Configure, useClearRefinements } from "react-instantsearch";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { layout } from "@/components/LayoutSidebar";
 import { ids } from "@/e2e/ids";
@@ -18,6 +18,7 @@ import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
 import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
 import {
   resetJobListFilters,
+  setJobListSource,
   useJobListAlgoliaFilters,
   useJobListExtraTags,
 } from "@/sites/pg/pages/jobs/list/jobListFilters";
@@ -26,6 +27,13 @@ import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 import { useInit } from "@/utils/useInit";
 
 export function JobList(props: { slug?: string }) {
+  const [searchParams] = useSearchParams();
+
+  useInit({
+    isReady: true,
+    onInit: () => setJobListSource(searchParams.get("source") ?? ""),
+  });
+
   const jobOpenPinned = useJobOpenPinned(props.slug);
   const algolia = useAlgoliaSearchClient();
   const algoliaFilters = useJobListAlgoliaFilters();

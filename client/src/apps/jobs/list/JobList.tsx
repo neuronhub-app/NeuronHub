@@ -10,10 +10,11 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import type { ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
 import { GoComment, GoQuestion } from "react-icons/go";
-import { Configure } from "react-instantsearch";
-import { NavLink } from "react-router";
+import { Configure, useRefinementList } from "react-instantsearch";
+import { NavLink, useSearchParams } from "react-router";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 import { JobCard } from "@/apps/jobs/list/JobCard/JobCard";
 import { JobsSubscribeModal } from "@/apps/jobs/list/JobsSubscribeModal";
@@ -94,12 +95,15 @@ export function JobList(props: { slug?: string }) {
         ]}
       />
 
+      <AlgoliaSourceFilter />
+
       <AlgoliaFacetsActive
         labelsOverride={{
           "locations.remote_name": "Remote",
           "org.is_highlighted": "Highlighted",
           posted_at_unix: "Posted",
           salary_min: "Salary",
+          source_ext: "Source",
         }}
         dateAttributes={["posted_at_unix"]}
       />
@@ -196,6 +200,32 @@ function JobOpenSeparator() {
       <Separator flex="1" />
     </HStack>
   );
+}
+
+/**
+ * #quality-10% #AI-slop
+ *
+ * Replace with `routeToState` or react-router redirect to correct Algolia filters.
+ * See #158.
+ */
+function AlgoliaSourceFilter() {
+  const [searchParams] = useSearchParams();
+  const source = searchParams.get("source");
+  const refinements = useRefinementList({ attribute: "source_ext" });
+
+  const state = useStateValtio({
+    isFilterActive: false,
+  });
+
+  useEffect(() => {
+    if (!source || state.snap.isFilterActive) {
+      return;
+    }
+    state.mutable.isFilterActive = true;
+    refinements.refine(source);
+  }, [source]);
+
+  return null;
 }
 
 const JobsByIdsQuery = graphql.persisted(

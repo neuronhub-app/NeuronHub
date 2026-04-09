@@ -30,6 +30,12 @@ export type Post = NonNullable<PostList["posts"]>[number];
 If need to narrow the type - utilize the `is` keyword, eg: 
 `function isPost(post: Post | unkonwn): post is Post { return post.__typename === "PostType" }`.
 
+#### Enums
+
+Any `TextChoices` from BE are exported to `client/graphql/enums.ts` and must be used instead of magic strings.
+
+Note: strawberry export puts the Python's attribute `name` into the TS enum `value`.
+
 
 ### Reset the cache on every mutation
 
