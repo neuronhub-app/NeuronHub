@@ -227,8 +227,6 @@ projects:
 envVarGroups:
   - name: shared
     envVars:
-      - key: PROJECT_NAME
-        value: Probably Good
       - key: VITE_PROJECT_NAME
         value: Probably Good
       - key: SENTRY_DSN_BACKEND
