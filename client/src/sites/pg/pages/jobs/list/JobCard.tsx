@@ -111,7 +111,7 @@ export function JobCard(props: {
         gap="gap.sm"
         mb={{ base: cardState === CardState.OpenByUser ? "gap.md" : "0", md: "gap.lg" }}
       >
-        <Flex gap={{ base: "gap.sm", md: "gap.lg" }}>
+        <Flex gap={{ base: "gap.md", md: "gap.lg" }}>
           {props.job.org?.logo ? (
             <Image
               src={props.job.org.logo.url}
@@ -143,8 +143,9 @@ export function JobCard(props: {
           <Flex flex="1" minW="0" justify="space-between" gap="gap.md">
             <VStack
               align="flex-start"
-              justify={{ md: "space-between" }}
+              justify="space-between"
               gap={{ base: "3px", md: "0" }}
+              h="full"
             >
               <JobTitleLink
                 job={props.job}
@@ -319,12 +320,20 @@ function JobExpanded(props: { job: JobFragmentType }) {
           <Text fontSize="sm">{props.job.org.description}</Text>
         </Stack>
       )}
-      <Flex gap="gap.md" align="center" w="fit-content" pos="relative" zIndex="2">
+      <Flex
+        gap="gap.md"
+        align="center"
+        w={{ base: "full", md: "fit-content" }}
+        pr={{ base: "30px", md: "0" }}
+        pos="relative"
+        zIndex="2"
+      >
         {props.job.url_external && (
           <Button
             asChild
             variant="pg-primary"
-            w={{ base: "150px", md: "190px" }}
+            w={{ base: "auto", md: "190px" }}
+            flex={{ base: "1", md: "initial" }}
             h="10"
             focusRingColor="transparent"
           >
