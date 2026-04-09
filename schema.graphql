@@ -186,6 +186,7 @@ type JobType {
   salary_min: Int
   salary_text: String!
   locations: [JobLocationType!]!
+  source_ext: SourceExt
   url_external: String!
   url_external_with_utm: String!
   is_published: Boolean!
@@ -913,6 +914,10 @@ type SiteConfigType {
   jobs_url_utm_source: String!
   nav_links: [NavbarLinkSectionType!]!
   footer_sections: [FooterSectionType!]!
+}
+
+enum SourceExt {
+  AIM
 }
 
 input StrFilterLookup {

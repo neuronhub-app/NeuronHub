@@ -127,6 +127,16 @@ class Job(AlgoliaModel):
         help_text="Country PostTags where this job sponsors visas",
     )
 
+    class SourceExt(TextChoices):
+        AIM = "AIM"
+
+    source_ext = TextChoicesField(
+        choices_enum=SourceExt,
+        blank=True,
+        null=True,
+        default=None,
+    )
+
     url_external = models.CharField(blank=True, max_length=1024, verbose_name="URL")
     url_external_with_utm = models.CharField(
         blank=True,

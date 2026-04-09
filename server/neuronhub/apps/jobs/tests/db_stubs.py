@@ -68,6 +68,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     - Shape MATS strategic direction by leading internal initiatives
                 """),
                 url_external="https://novafield.ai/careers/interpretability",
+                source_ext=Job.SourceExt.AIM,
                 salary_min=180_000,
                 salary_text="$155,741 – $163,529",
                 posted_at=now - timedelta(days=1),
@@ -99,6 +100,7 @@ async def create_jobs_stubs(gen: Gen) -> None:
                     - Liaise with grantee organisations to ensure timely deliverables and compliance
                 """),
                 url_external="https://cleargrant.org/jobs/ops-associate",
+                source_ext=Job.SourceExt.AIM,
                 salary_min=75_000,
                 posted_at=now - timedelta(days=37),
                 visibility=Visibility.PUBLIC,

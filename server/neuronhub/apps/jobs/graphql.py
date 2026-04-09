@@ -85,6 +85,8 @@ class JobType:
 
     locations: list[JobLocationType]
 
+    source_ext: auto
+
     url_external: auto
     url_external_with_utm: auto
     is_published: auto

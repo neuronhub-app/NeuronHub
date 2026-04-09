@@ -65,6 +65,8 @@ async def _import_jobs_parsed(jobs_parsed: list[dict], limit: int | None = None)
                     else []
                 )
 
+            job_parsed["source_ext"] = job_parsed.get("source_ext") or None
+
             # strip of `"` is #AI
             org_name = job_parsed.pop(col_key.org_name, "").replace('"', "")
             if not org_name:
@@ -259,6 +261,7 @@ def _parse_jobs_csv(csv_path: Path) -> list[dict]:
         }.items():
             job[name_django] = row.get(name_csv, "").strip()
 
+        job["source_ext"] = row.get("Source", "").strip() or None
         job[col_key.loc_parsed] = _parse_location_field(row.get("Location(s)", ""))
 
         job_desc = row.get("Job Description", "").strip()

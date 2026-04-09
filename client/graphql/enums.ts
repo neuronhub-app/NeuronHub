@@ -51,6 +51,10 @@ export enum PostTypeEnum {
   Tool = 'Tool'
 }
 
+export enum SourceExt {
+  Aim = 'AIM'
+}
+
 export enum TagCategoryEnum {
   Area = 'Area',
   City = 'City',
