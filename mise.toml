@@ -39,7 +39,6 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     # Global
 
-    DJANGO_ENV = "${DJANGO_ENV:-dev}"
 
     PROJECT_NAME = "{{ env.PROJECT_NAME | default(value = 'neuronhub') }}"
     VITE_PROJECT_NAME = "NeuronHub" # for FE HTML
@@ -122,6 +121,9 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     DISABLE_BUG_COMMAND = 1
 
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1 # drops telemetry & npm updates
+
+    # todo ! docs: mise caveats - we can't use "${DJANGO_ENV:-dev}", maybe the { env.$ } syntax would work
+    # using ${DJANGO_ENV} breaks Tasks with `env.DJANGO_ENV = "dev_test_e2e"` - it gets ignored
 
 
 # Dev servers

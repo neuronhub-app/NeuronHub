@@ -63,6 +63,8 @@
 ["dev:db:e2e:rm"]
     dir = "devops"
     run = """
+        echo dropdb user={{ env.DB_USER }} db_name={{ env.E2E_DB_NAME }}
+
         if $env.IS_POSTGRES_MACOS == "true" {
             dropdb-{{ env.DB_VER }} {{ env.E2E_DB_NAME }}
         } else {
