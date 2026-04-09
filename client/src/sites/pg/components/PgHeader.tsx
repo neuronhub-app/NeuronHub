@@ -110,14 +110,14 @@ export function PgHeroHeader(props: { navLinks: NavLink[]; isLoading: boolean })
         <Text
           as="h1"
           fontFamily="heading"
-          fontSize={{ base: "26px", md: "6xl" }}
+          fontSize={{ base: "26px", md: "53px", lg: "6xl" }}
           lineHeight={{ base: "32px", md: "1.2" }}
           data-testid={hero.isOverridden ? ids.job.landingPage.title : undefined}
         >
           {hero.title}
         </Text>
         <Text
-          fontSize={{ base: "19px", md: "23px" }}
+          fontSize={{ base: "19px", md: "20px", lg: "23px" }}
           lineHeight={{ base: "25px", md: "1.4" }}
           mt={{ base: "4", md: "12" }}
         >
