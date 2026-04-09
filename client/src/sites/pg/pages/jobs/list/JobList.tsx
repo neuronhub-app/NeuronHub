@@ -85,7 +85,7 @@ export function JobList(props: { slug?: string }) {
       }}
     >
       <Configure
-        hitsPerPage={20}
+        hitsPerPage={10}
         filters={algoliaFilters}
         attributesToHighlight={[
           "title",
