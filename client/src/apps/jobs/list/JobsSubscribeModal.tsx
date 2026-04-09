@@ -24,7 +24,7 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import {
   ALGOLIA_ATTR_LOCATION,
-  type JobLocationItem,
+  type JobLocation,
   JobLocationsQuery,
 } from "@/sites/pg/components/PgFacetLocation";
 import { toast } from "@/utils/toast";
@@ -257,7 +257,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
 
 export function getLocationIdsActive(
   algoliaFacets: ReturnType<typeof useCurrentRefinements>["items"],
-  jobLocations: JobLocationItem[],
+  jobLocations: JobLocation[],
 ): number[] {
   const facetValues = new Set(
     algoliaFacets

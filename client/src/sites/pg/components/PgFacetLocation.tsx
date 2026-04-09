@@ -1,4 +1,5 @@
 import { Checkbox, Icon, Input, InputGroup, Stack, Text } from "@chakra-ui/react";
+import { useCallback } from "react";
 import { LuX } from "react-icons/lu";
 import { useCurrentRefinements } from "react-instantsearch";
 import type { ResultOf } from "gql.tada";
@@ -43,12 +44,16 @@ export function PgFacetLocation(props: {
 
   const algoliaCountByName = new Map(props.algoliaItems.map(item => [item.value, item.count]));
 
-  function getCount(loc: JobLocation): number {
-    if (currentRefsValues.size > 0) {
-      return loc.job_count;
-    }
-    return algoliaCountByName.get(loc.algolia_filter_name) ?? 0;
-  }
+  const getCount = useCallback(
+    (loc: JobLocation) => {
+      if (currentRefsValues.size > 0) {
+        return loc.job_count;
+      }
+      return algoliaCountByName.get(loc.algolia_filter_name) ?? 0;
+    },
+    [algoliaCountByName],
+  );
+
   type JobLocation = (typeof locations)[number];
 
   const query = state.snap.query.toLowerCase();
@@ -91,43 +96,59 @@ export function PgFacetLocation(props: {
 
         <Stack gap="gap.sm" w="full">
           {locationsVisible.map(loc => (
-            <Checkbox.Root
+            <FacetCheckbox
               key={loc.algolia_filter_name}
+              loc={loc}
               checked={locNamesActive.has(loc.algolia_filter_name)}
-              onCheckedChange={() => {
-                props.refine(loc.algolia_filter_name);
-              }}
-              size="sm"
-              display="grid"
-              gridTemplateColumns="auto 1fr auto"
-              gap="gap.sm"
-              flex="1"
-              className="group"
-              data-testid={ids.facet.checkbox(loc.city || loc.name)}
-            >
-              <Checkbox.HiddenInput />
-              <Checkbox.Control _groupHover={{ borderColor: "brand.green.light" }} />
-              <Text
-                // biome-ignore lint/security/noDangerouslySetInnerHtml: BE; query is escaped
-                dangerouslySetInnerHTML={{
-                  __html: highlightMatch(loc.city || loc.name, state.snap.query),
-                }}
-                fontSize="13px"
-                color="fg"
-                _groupHover={{ color: "brand.green.light" }}
-              />
-              <Text
-                fontSize="13px"
-                color="fg.muted"
-                _groupHover={{ color: "brand.green.light" }}
-              >
-                {getCount(loc)}
-              </Text>
-            </Checkbox.Root>
+              refine={props.refine}
+              searchQuery={state.snap.query}
+              getCount={getCount}
+            />
           ))}
         </Stack>
       </Stack>
     </PgFacetPopover>
+  );
+}
+
+function FacetCheckbox(props: {
+  loc: JobLocation;
+  checked: boolean;
+  refine: (value: string) => void;
+  searchQuery: string;
+  getCount: (loc: JobLocation) => number;
+}) {
+  const { loc } = props;
+  return (
+    <Checkbox.Root
+      key={loc.algolia_filter_name}
+      checked={props.checked}
+      onCheckedChange={() => {
+        props.refine(loc.algolia_filter_name);
+      }}
+      size="sm"
+      display="grid"
+      gridTemplateColumns="auto 1fr auto"
+      gap="gap.sm"
+      flex="1"
+      className="group"
+      data-testid={ids.facet.checkbox(loc.city || loc.name)}
+    >
+      <Checkbox.HiddenInput />
+      <Checkbox.Control _groupHover={{ borderColor: "brand.green.light" }} />
+      <Text
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: BE; query is escaped
+        dangerouslySetInnerHTML={{
+          __html: highlightMatch(loc.city || loc.name, props.searchQuery),
+        }}
+        fontSize="13px"
+        color="fg"
+        _groupHover={{ color: "brand.green.light" }}
+      />
+      <Text fontSize="13px" color="fg.muted" _groupHover={{ color: "brand.green.light" }}>
+        {props.getCount(loc)}
+      </Text>
+    </Checkbox.Root>
   );
 }
 
@@ -178,7 +199,7 @@ export const JobLocationsQuery = graphql.persisted(
   `),
 );
 
-export type JobLocationItem = NonNullable<
+export type JobLocation = NonNullable<
   ResultOf<typeof JobLocationsQuery>["job_locations"]
 >[number];
 
