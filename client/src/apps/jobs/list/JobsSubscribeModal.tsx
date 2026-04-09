@@ -83,7 +83,7 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
           ? Number(salaryRefinement.refinements[0].value)
           : null,
       is_exclude_no_salary:
-        refinesCurrent.items.some(item => item.attribute === "has_salary") || null,
+        refinesCurrent.items.some(item => item.attribute === "has_salary") ?? false,
       is_exclude_career_capital:
         refinesCurrent.items.some(item => item.attribute === "is_not_career_capital") || null,
       is_exclude_profit_for_good:
@@ -235,7 +235,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
       $location_ids: [Int!]
       $is_orgs_highlighted: Boolean
       $salary_min: Int
-      $is_exclude_no_salary: Boolean
+      $is_exclude_no_salary: Boolean!
       $is_exclude_career_capital: Boolean
       $is_exclude_profit_for_good: Boolean
       $tz: String
