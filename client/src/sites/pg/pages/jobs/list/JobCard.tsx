@@ -178,23 +178,18 @@ export function JobCard(props: {
               </Flex>
             </VStack>
 
-            <Tooltip
-              content={datetime.full(props.job.posted_at)}
-              positioning={{ placement: "left" }}
+            <Flex
+              display={{ base: "none", md: "flex" }}
+              h="28px"
+              align="center"
+              fontSize="sm"
+              fontWeight="medium"
+              color="fg.muted"
+              whiteSpace="nowrap"
+              flexShrink="0"
             >
-              <Flex
-                display={{ base: "none", md: "flex" }}
-                h="28px"
-                align="center"
-                fontSize="sm"
-                fontWeight="medium"
-                color="fg.muted"
-                whiteSpace="nowrap"
-                flexShrink="0"
-              >
-                {datetime.relativeRounded(props.job.posted_at)}
-              </Flex>
-            </Tooltip>
+              {datetime.relativeRounded(props.job.posted_at)}
+            </Flex>
           </Flex>
         </Flex>
 
