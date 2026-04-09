@@ -66,6 +66,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
         },
       }}
       future={{ preserveSharedStateOnUnmount: true }}
+      insights={true}
     >
       {props.children}
 
@@ -140,7 +141,7 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
           </HStack>
         )}
 
-        <PgInfiniteHits label={labelPlural} {...props.hits} />
+        <PgInfiniteHits {...props.hits} />
       </Stack>
     </InstantSearch>
   );
