@@ -1,8 +1,9 @@
-import type { TadaDocumentNode } from "gql.tada";
 import { useMemo } from "react";
 import { useDebounce } from "use-debounce";
-import type { ID } from "@/gql-tada";
+import type { TadaDocumentNode } from "gql.tada";
+
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import type { ID } from "@/gql-tada";
 
 /**
  * If we store eg `.votes` in Algolia, then voting with `mutateAndRefetchMountedQueries` won't refetch `.votes` from BE.
@@ -15,7 +16,7 @@ export function useAlgoliaEnrichmentByGraphql<TItem extends { id: ID }, TData = 
 ): { items: TItem[]; isEnrichedByGraphql: boolean } {
   const ids = useMemo(() => algoliaItems.map(item => item.id), [algoliaItems]);
 
-  const [idsDebounced] = useDebounce(ids, 500, { leading: true });
+  const [idsDebounced] = useDebounce(ids, 700, { leading: true });
 
   const { data } = useApolloQuery(
     query,
