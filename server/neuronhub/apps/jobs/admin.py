@@ -124,8 +124,12 @@ class JobAlertAdmin(SimpleHistoryAdmin, DjangoObjectActions, DALFModelAdmin):
     list_display = [
         "email",
         "is_active",
+        "is_invalid_location",
+        "salary_min",
         "sent_count",
+        "jobs_notified_count",
         "created_at",
+        "tz",
     ]
     autocomplete_fields = [
         "tags",
@@ -140,6 +144,12 @@ class JobAlertAdmin(SimpleHistoryAdmin, DjangoObjectActions, DALFModelAdmin):
         ("locations", DALFRelatedFieldAjaxMulti),
         "is_orgs_highlighted",
         "is_active",
+        "is_invalid_location",
+        "is_exclude_no_salary",
+        "is_exclude_career_capital",
+        "is_exclude_profit_for_good",
+        "salary_min",
+        "is_remote",
         "created_at",
         "updated_at",
     ]
