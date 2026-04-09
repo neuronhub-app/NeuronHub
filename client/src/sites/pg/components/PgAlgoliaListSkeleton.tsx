@@ -1,6 +1,6 @@
 import { Box, Grid, HStack, Skeleton, Stack } from "@chakra-ui/react";
 import { PgFilterCardWithSplitBg } from "@/sites/pg/components/PgAlgoliaFilterCard";
-import { PgHitSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
+import { PgJobCardSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
 
 // #AI
 export function PgAlgoliaListSkeleton() {
@@ -66,7 +66,7 @@ export function PgAlgoliaListSkeleton() {
         </HStack>
       </HStack>
 
-      <PgHitSkeletons />
+      <PgJobCardSkeletons />
     </Stack>
   );
 }

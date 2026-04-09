@@ -1,5 +1,18 @@
+/**
+ * #quality-9%
+ * - Doesn't always show Skeletons or triggers `loadMore` - while we tried to fix this 3+ times.
+ *    - Instead it waits for you to scroll up+down to re-trigger it.
+ * - Takes 0.3s to render on the main thread - too hard to understand why.
+ * - "React Compiler" can't put useMemo on it.
+ * - Don't know why it calls useRef instead of Valtio, probably #AI-slop.
+ * - Definitely #AI-slop React - destructs, `item` naming, etc.
+ *
+ * This is a duplicate of [[AlgoliaList.tsx]] - uses its complex API wo/ any benefit of reuse.
+ * // todo ! refac: drop -> use AlgoliaList. See [[ReviewListAlgolia.tsx]].
+ *
+ * todo ? refac-name: JobListAlgolia
+ */
 import { Box, Flex, HStack, Skeleton, Stack, Text } from "@chakra-ui/react";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import type { TadaDocumentNode } from "gql.tada";
 import { type ReactNode, useEffect, useRef } from "react";
 import {
@@ -9,6 +22,8 @@ import {
   useSearchBox,
 } from "react-instantsearch";
 import type { ID } from "@/gql-tada";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
 
 export type PgInfiniteHitsProps<TItem extends { id: ID }, TData = unknown> = {
@@ -21,8 +36,7 @@ export type PgInfiniteHitsProps<TItem extends { id: ID }, TData = unknown> = {
     ctx: { isSearchActive: boolean; isEnrichedByGraphql: boolean },
   ) => ReactNode;
   hitOpenedPinned?: { node?: ReactNode; id?: ID };
-  noResultsNode?: ReactNode;
-  label?: string;
+  noResultsNode: ReactNode;
   listTestId?: string;
   isExtraFilterActive?: boolean; // todo: #155 — remove with jobListFilters.ts Valtio cleanup
 };
@@ -30,73 +44,89 @@ export type PgInfiniteHitsProps<TItem extends { id: ID }, TData = unknown> = {
 export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
   props: PgInfiniteHitsProps<TItem, TData>,
 ) {
-  const search = useSearchBox();
-  const refinements = useCurrentRefinements();
-  const { status } = useInstantSearch();
+  const searchBox = useSearchBox();
+  const currentRefinements = useCurrentRefinements();
+  const search = useInstantSearch();
   const hits = useInfiniteHits<TItem>();
-  const showMoreCallback = useRef(hits.showMore);
-  showMoreCallback.current = hits.showMore;
-  const scrollSentinelRef = useRef<HTMLDivElement>(null);
-  const state = useStateValtio({ isLoadingMore: false, prevCount: 0 });
 
-  useEffect(() => {
-    if (hits.items.length !== state.mutable.prevCount || hits.isLastPage) {
-      state.mutable.isLoadingMore = false;
-      state.mutable.prevCount = hits.items.length;
-    }
-  }, [hits.items.length, hits.isLastPage]);
-  const { items, isEnrichedByGraphql } = useAlgoliaEnrichmentByGraphql(
+  const showMoreCallback = useRef(hits.showMore); // why? #prob-redundant
+  showMoreCallback.current = hits.showMore;
+
+  const scrollSentinelRef = useRef<HTMLDivElement>(null);
+
+  const state = useStateValtio({
+    isLoadingMore: false,
+    prevCount: 0,
+  });
+
+  const { items: jobsEnriched, isEnrichedByGraphql } = useAlgoliaEnrichmentByGraphql(
     hits.items,
     props.enrichment.query,
     props.enrichment.extractItems,
   );
-  const isSearchActive =
-    search.query.length > 0 ||
-    refinements.items.length > 0 ||
-    Boolean(props.isExtraFilterActive);
 
+  // Trigger showMore by scroll:
   useEffect(() => {
-    const sentinelElement = scrollSentinelRef.current;
-    if (!sentinelElement) {
+    if (!scrollSentinelRef.current) {
       return;
     }
     const observer = new IntersectionObserver(([entry]) => {
+      // why `&& !isLoadingMore`? sounds as the root of the non-triggering bug.
+      // I would just trigger it - and gave 0 fucks re what it's doing when `entry.isIntersecting`.
       if (entry!.isIntersecting && !state.mutable.isLoadingMore) {
         state.mutable.isLoadingMore = true;
         showMoreCallback.current();
       }
     });
-    observer.observe(sentinelElement);
+    observer.observe(scrollSentinelRef.current);
     return () => observer.disconnect();
   }, []);
 
-  const filteredItems =
-    props.hitOpenedPinned?.id && !isSearchActive
-      ? items.filter(item => item.id !== props.hitOpenedPinned!.id)
-      : items;
+  // Process showMore trigger:
+  useEffect(() => {
+    const isLoadedMore = hits.items.length !== state.mutable.prevCount;
+    if (isLoadedMore || hits.isLastPage) {
+      state.mutable.isLoadingMore = false;
+      state.mutable.prevCount = hits.items.length;
+    }
+  }, [hits.items.length, hits.isLastPage]);
 
-  const isEmpty = filteredItems.length === 0;
-  const isPinnedNodeVisible = props.hitOpenedPinned?.node && !isSearchActive;
-  const isInitialLoad = !hits.results;
-  const isEmptyBeforeSearch = !isSearchActive && isEmpty;
-  const showSkeleton = isInitialLoad || isEmptyBeforeSearch || (isEmpty && status !== "idle");
-  const hasNoResults = isEmpty && !isPinnedNodeVisible;
+  const isSearchActive =
+    searchBox.query.length > 0 ||
+    currentRefinements.items.length > 0 ||
+    Boolean(props.isExtraFilterActive);
+
+  let jobsFiltered = jobsEnriched;
+  if (props.hitOpenedPinned?.id && !isSearchActive) {
+    jobsFiltered = jobsEnriched.filter(job => job.id !== props.hitOpenedPinned?.id);
+  }
+
+  // Wrong. Beware: was "fixed" 3+ times.
+  // Must be simpler, i think.
+  const isNoJobs = jobsFiltered.length === 0;
+  const isLoadInitial = !hits.results;
+  const isEmptyBeforeSearch = !isSearchActive && isNoJobs;
+  const isShowSkeleton =
+    isLoadInitial || isEmptyBeforeSearch || (isNoJobs && search.status !== "idle");
+
+  const isJobOpen = props.hitOpenedPinned?.node && !isSearchActive;
+  const isNoResults = isNoJobs && !isJobOpen;
 
   return (
     <Stack gap="gap.xl" w="full">
       {props.hitOpenedPinned?.node && !isSearchActive && props.hitOpenedPinned.node}
 
       <Stack data-testid={props.listTestId} gap="gap.md">
-        {showSkeleton ? (
-          <PgHitSkeletons />
-        ) : hasNoResults ? (
-          (props.noResultsNode ?? <Text>No {props.label ?? "results"} found.</Text>)
+        {isShowSkeleton ? (
+          <PgJobCardSkeletons />
+        ) : isNoResults ? (
+          props.noResultsNode
         ) : (
-          filteredItems.map(item =>
+          jobsFiltered.map(item =>
             props.renderHit(item, { isSearchActive, isEnrichedByGraphql }),
           )
         )}
-        {state.snap.isLoadingMore && <PgHitSkeletons />}
+        {state.snap.isLoadingMore && <PgJobCardSkeletons />}
       </Stack>
 
       <Box ref={scrollSentinelRef} h="1" display={hits.isLastPage ? "none" : "block"} />
@@ -105,7 +135,7 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
 }
 
 // #AI
-export function PgHitSkeletons(props: { count?: number }) {
+export function PgJobCardSkeletons(props: { count?: number }) {
   return (
     <>
       {Array.from({ length: props.count ?? 4 }, (_, i) => (

@@ -9,7 +9,7 @@ import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { PgHitSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
+import { PgJobCardSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
 import { JobLocationsQuery } from "@/sites/pg/components/PgFacetLocation";
 import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
@@ -31,12 +31,9 @@ export function JobList(props: { slug?: string }) {
   const algolia = useAlgoliaSearchClient();
   const algoliaFilters = useJobListAlgoliaFilters();
   const extraTags = useJobListExtraTags();
-  const { data: locationsData } = useApolloQuery(JobLocationsQuery);
+  const { data: locations } = useApolloQuery(JobLocationsQuery);
   const locationCityByFilterName = new Map(
-    (locationsData?.job_locations ?? []).map(loc => [
-      loc.algolia_filter_name,
-      loc.city || loc.name,
-    ]),
+    (locations?.job_locations ?? []).map(loc => [loc.algolia_filter_name, loc.city || loc.name]),
   );
 
   return (
@@ -218,7 +215,7 @@ function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
     node: (
       <Box ref={cardRef} position="relative">
         {isLoading ? (
-          <PgHitSkeletons count={1} />
+          <PgJobCardSkeletons count={1} />
         ) : (
           <JobCard job={job!} isSearchActive={false} isInitiallyOpen={true} />
         )}

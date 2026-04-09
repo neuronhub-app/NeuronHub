@@ -49,14 +49,18 @@ export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: 
       indexName={indexName}
       routing={{
         stateMapping: {
+          // for infinite scroll: drop pagination from URL
           stateToRoute: uiState => {
-            const indexState = uiState[indexName] ?? {};
-            const urlState = Object.fromEntries(
-              Object.entries(indexState).filter(
-                entry => entry[0] !== "page" && entry[0] !== "configure",
+            // (LLM said "configure" is redundant, and iirc i 'confirmed' it by docs)
+            const params = { pagination: "page", configRedundant: "configure" };
+            const paramsExcluded = [params.pagination, params.configRedundant];
+            return {
+              [indexName]: Object.fromEntries(
+                Object.entries(uiState[indexName] ?? {}).filter(
+                  stateAttrName => !paramsExcluded.includes(stateAttrName[0]),
+                ),
               ),
-            );
-            return { [indexName]: urlState };
+            };
           },
           routeToState: routeState => routeState,
         },

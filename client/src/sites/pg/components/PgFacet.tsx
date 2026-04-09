@@ -11,7 +11,7 @@ export function PgFacet(props: {
   order?: { base?: number; md?: number; lg?: number };
   icon?: ReactNode;
   isSearchEnabled?: boolean;
-  subFacet?: { attribute: string; label: string };
+  subFacet?: { attribute: string; label: string }; // todo ? refac: unused. planned for later. maybe.
   sortBy?: UseRefinementListProps["sortBy"];
   transformItems?: UseRefinementListProps["transformItems"];
   operator?: UseRefinementListProps["operator"];

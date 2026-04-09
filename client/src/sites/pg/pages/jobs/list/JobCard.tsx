@@ -35,17 +35,10 @@ const style = {
   duration: "slow",
 } as const;
 
-type TagGroup = {
-  tags: { name: string }[];
-  attribute: string;
-  multipleLabel: string;
-  variant: string;
-};
-
 const tagsHidden = ["Undergraduate Degree or Less", "Full-Time", "Other"];
 
-function hasDescriptionMatch(jobHit: Hit<BaseHit>): boolean {
-  // @ts-expect-error #bad-infer Algolia _highlightResult is untyped
+function isMatchedJobDescription(jobHit: Hit<BaseHit>): boolean {
+  // @ts-expect-error Algolia is untyped #bad-infer
   return jobHit._highlightResult?.description?.matchLevel !== "none";
 }
 
@@ -54,7 +47,6 @@ const CardState = {
   OpenBySearchPreview: "OpenBySearchPreview",
   OpenByUser: "OpenByUser",
 } as const;
-type CardState = (typeof CardState)[keyof typeof CardState];
 
 export function JobCard(props: {
   job: JobFragmentType;
@@ -63,18 +55,20 @@ export function JobCard(props: {
 }) {
   const { results } = useInstantSearch();
 
-  const state = useStateValtio<{ card: CardState }>({
+  const state = useStateValtio({
     card: props.isInitiallyOpen ? CardState.OpenByUser : CardState.Closed,
   });
 
-  const isHighlightable = !!props.isSearchActive && "_highlightResult" in props.job;
+  const isHighlightable = Boolean(props.isSearchActive) && "_highlightResult" in props.job;
   const jobHit = props.job as unknown as Hit<BaseHit>;
-  const hasDescriptionHit = isHighlightable && !!results.query && hasDescriptionMatch(jobHit);
+  const isHighlightedJobDescription =
+    isHighlightable && !!results.query && isMatchedJobDescription(jobHit);
 
+  // todo ! refac: into 2-3 ifs
   const cardState =
     state.snap.card === CardState.OpenByUser
       ? CardState.OpenByUser
-      : hasDescriptionHit
+      : isHighlightedJobDescription
         ? CardState.OpenBySearchPreview
         : CardState.Closed;
 
@@ -83,13 +77,14 @@ export function JobCard(props: {
     state.mutable.card = isOpenByUser ? CardState.Closed : CardState.OpenByUser;
   }
 
-  const isOpen = cardState === CardState.OpenByUser;
-  const borderColor = isOpen ? "brand.black" : "subtle";
+  const isCardOpen = cardState === CardState.OpenByUser;
+
+  const borderColor = isCardOpen ? "brand.black" : "subtle";
   const borderColorHover = "brand.black";
-  const boxShadowHover = isOpen ? "0 0 0 1px {colors.brand.black}" : undefined;
 
   return (
     <Stack
+      key={props.job.id}
       as="article"
       className="group"
       pos="relative"
@@ -98,7 +93,10 @@ export function JobCard(props: {
       borderRadius="lg"
       borderWidth="1px"
       borderColor={borderColor}
-      _hover={{ borderColor: borderColorHover, boxShadow: boxShadowHover }}
+      _hover={{
+        borderColor: borderColorHover,
+        boxShadow: isCardOpen ? "0 0 0 1px {colors.brand.black}" : undefined,
+      }}
       transition="border-color"
       transitionDuration={style.duration}
       bg="bg.card"
@@ -150,14 +148,14 @@ export function JobCard(props: {
                 job={props.job}
                 isHighlightable={isHighlightable}
                 jobHit={jobHit}
-                isOpen={isOpen}
+                isOpen={isCardOpen}
               />
 
               <JobOrgLink
                 job={props.job}
                 isHighlightable={isHighlightable}
                 jobHit={jobHit}
-                isOpen={isOpen}
+                isOpen={isCardOpen}
               />
 
               <Flex
@@ -264,7 +262,7 @@ export function JobCard(props: {
         <LuChevronDown
           size={24}
           style={{
-            transform: isOpen ? "rotate(180deg)" : undefined,
+            transform: isCardOpen ? "rotate(180deg)" : undefined,
             transition: "transform 0.25s ease",
           }}
         />
@@ -536,6 +534,13 @@ function workloadMultipleLabel(tags: { name: string }[]): string {
   }
   return "Multiple Role Types";
 }
+
+type TagGroup = {
+  tags: { name: string }[];
+  attribute: string;
+  multipleLabel: string;
+  variant: string;
+};
 
 function JobTagGroups(props: {
   job: JobFragmentType;
