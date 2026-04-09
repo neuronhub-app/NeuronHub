@@ -48,7 +48,7 @@ test.describe("Job Alert", () => {
     await page.keyboard.press("Escape");
 
     await page.getByTestId(ids.facet.popover.city).last().click();
-    await clickFacetCheckbox(popover, "Berkeley CA, USA");
+    await clickFacetCheckbox(popover, "Berkeley CA");
     await play.waitForNetworkIdle();
     await page.keyboard.press("Escape");
 

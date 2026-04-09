@@ -204,7 +204,7 @@ function PgAlertCard(props: { alert: AlertType }) {
             )}
             {props.alert.locations.map(loc => (
               <Badge {...style.badge} key={loc.name} variant="pg-education">
-                {loc.city || loc.name}
+                {loc.name}
               </Badge>
             ))}
             {props.alert.tags.map(tag => (

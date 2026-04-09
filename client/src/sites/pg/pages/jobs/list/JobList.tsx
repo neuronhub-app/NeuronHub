@@ -11,7 +11,6 @@ import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { PgJobCardSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
-import { JobLocationsQuery } from "@/sites/pg/components/PgFacetLocation";
 import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
 import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
 import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
@@ -31,11 +30,6 @@ export function JobList(props: { slug?: string }) {
   const algolia = useAlgoliaSearchClient();
   const algoliaFilters = useJobListAlgoliaFilters();
   const extraTags = useJobListExtraTags();
-  const { data: locations } = useApolloQuery(JobLocationsQuery);
-  const locationCityByFilterName = new Map(
-    (locations?.job_locations ?? []).map(loc => [loc.algolia_filter_name, loc.city || loc.name]),
-  );
-
   return (
     <PgAlgoliaList<JobFragmentType>
       index="indexNameJobs"
@@ -73,8 +67,7 @@ export function JobList(props: { slug?: string }) {
           posted_at_unix: "Posted",
         },
         formatAttribute: {
-          "locations.algolia_filter_name": r =>
-            locationCityByFilterName.get(r.label) ?? r.label.replace(/^\[.+?] /, ""),
+          "locations.algolia_filter_name": r => r.label.replace(/^\[.+?] /, ""),
         },
         dateAttributes: ["posted_at_unix"],
         extraTags,

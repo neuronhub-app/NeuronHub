@@ -58,7 +58,7 @@ export function PgFacetLocation(props: {
 
   const query = state.snap.query.toLowerCase();
   const locationsFiltered = query
-    ? locations.filter(loc => (loc.city || loc.name).toLowerCase().includes(query))
+    ? locations.filter(loc => getCityOrFullName(loc).toLowerCase().includes(query))
     : locations;
   const locationsVisible = locationsFiltered.toSorted((a, b) => getCount(b) - getCount(a));
 
@@ -111,6 +111,10 @@ export function PgFacetLocation(props: {
   );
 }
 
+function getCityOrFullName(loc: JobLocation): string {
+  return loc.city ? loc.city : loc.name;
+}
+
 function FacetCheckbox(props: {
   loc: JobLocation;
   checked: boolean;
@@ -132,14 +136,14 @@ function FacetCheckbox(props: {
       gap="gap.sm"
       flex="1"
       className="group"
-      data-testid={ids.facet.checkbox(loc.city || loc.name)}
+      data-testid={ids.facet.checkbox(getCityOrFullName(loc))}
     >
       <Checkbox.HiddenInput />
       <Checkbox.Control _groupHover={{ borderColor: "brand.green.light" }} />
       <Text
         // biome-ignore lint/security/noDangerouslySetInnerHtml: BE; query is escaped
         dangerouslySetInnerHTML={{
-          __html: highlightMatch(loc.city || loc.name, props.searchQuery),
+          __html: highlightMatch(getCityOrFullName(loc), props.searchQuery),
         }}
         fontSize="13px"
         color="fg"

@@ -196,7 +196,7 @@ function AlertCard(props: { alert: AlertType }) {
               )}
               {props.alert.locations.map(loc => (
                 <Badge key={loc.name} variant="subtle" colorPalette="purple">
-                  {loc.city || loc.name}
+                  {loc.name}
                 </Badge>
               ))}
               {props.alert.tags.map(tag => (

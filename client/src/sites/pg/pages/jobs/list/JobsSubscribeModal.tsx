@@ -43,14 +43,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
   const loading = useIsLoading();
 
   const refinesCurrent = useCurrentRefinements();
-
   const { data: locationsData } = useApolloQuery(JobLocationsQuery);
-  const locationCityByFilterName = new Map<string, string>(
-    (locationsData?.job_locations ?? []).map(loc => [
-      loc.algolia_filter_name,
-      loc.city || loc.name,
-    ]),
-  );
 
   const state = useStateValtio({ isOpen: false });
 
@@ -66,7 +59,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
     ...refinesCurrent.items.flatMap(item =>
       item.refinements.map(refinement => ({
         attribute: ATTRIBUTE_LABELS[item.attribute] ?? item.attribute,
-        label: getRefinementLabel(item.attribute, refinement, locationCityByFilterName),
+        label: getRefinementLabel(item.attribute, refinement),
       })),
     ),
     ...(jobFilters.snap.salaryMin
@@ -240,16 +233,12 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
 function getRefinementLabel(
   attribute: string,
   refinement: ReturnType<typeof useCurrentRefinements>["items"][number]["refinements"][number],
-  locationCityByFilterName: Map<string, string>,
 ) {
   if (attribute === "posted_at_unix") {
     return `${refinement.operator} ${datetime.relative(fromUnixTime(refinement.value as number))}`;
   }
   if (attribute === "locations.algolia_filter_name") {
-    return (
-      locationCityByFilterName.get(String(refinement.label)) ??
-      String(refinement.label).replace(/^\[.+?] /, "")
-    );
+    return String(refinement.label).replace(/^\[.+?] /, "");
   }
   return BOOLEAN_LABELS[String(refinement.label)] ?? String(refinement.label);
 }

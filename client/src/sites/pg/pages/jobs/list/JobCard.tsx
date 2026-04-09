@@ -25,6 +25,7 @@ import { Highlight, Snippet, useInstantSearch } from "react-instantsearch";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
+import { LocationType } from "~/graphql/enums";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
 import { toast } from "@/utils/toast";
 
@@ -378,22 +379,19 @@ function locationTags(locations: JobFragmentType["locations"]): string[] {
     return [];
   }
 
-  const countriesWithCities = new Set(locations.filter(loc => loc.city).map(loc => loc.country));
-  const locationsDeduped = locations.filter(
-    loc => !(loc.type === "COUNTRY" && countriesWithCities.has(loc.country)),
-  );
+  const locs = locations.filter(loc => loc.type !== LocationType.Country);
 
-  if (locationsDeduped.length <= 3) {
-    return locationsDeduped.map(loc => loc.name);
+  if (locs.length <= 3) {
+    return locs.map(loc => loc.name);
   }
 
-  const remotes = locationsDeduped.filter(loc => loc.is_remote);
+  const remotes = locs.filter(loc => loc.is_remote);
   if (remotes.length === 0) {
     // 4+ onsite
     return ["Multiple Locations"];
   }
 
-  if (locationsDeduped.filter(loc => !loc.is_remote).length === 0) {
+  if (locs.filter(loc => !loc.is_remote).length === 0) {
     return ["Remote, Multiple Locations"];
   }
 

@@ -45,7 +45,7 @@ test.describe("PG Job Location Facets", () => {
     await page.keyboard.press("Escape");
     await expectBase(popover).not.toBeVisible();
     await page.getByTestId(ids.facet.popover.city).last().click();
-    await clickFacetCheckbox(popover, "Berkeley CA, USA");
+    await clickFacetCheckbox(popover, "Berkeley CA");
     await play.waitForNetworkIdle();
     await expectBase(jobCards).toHaveCount(2);
   });
