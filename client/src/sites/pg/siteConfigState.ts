@@ -62,11 +62,14 @@ export function appendUtmSource(url: string): string {
     return url;
   }
   try {
+    if (!url.includes("http")) {
+      url = `https://${url}`;
+    }
     const urlParsed = new URL(url);
     urlParsed.searchParams.set("utm_source", utmSource);
     return urlParsed.toString();
   } catch (error) {
-    captureException(error);
+    captureException("JobCard: not added UTM to a URL", { extra: { url } });
     return url;
   }
 }
