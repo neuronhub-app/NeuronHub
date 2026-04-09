@@ -6,7 +6,7 @@ import { PgJobCardSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits"
 export function PgAlgoliaListSkeleton() {
   return (
     <Stack gap="gap.sm" w="full">
-      <PgFilterCardWithSplitBg isOpenRef={{ current: false }}>
+      <PgFilterCardWithSplitBg>
         <Box
           hideFrom="md"
           borderWidth="1px"
