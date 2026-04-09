@@ -5,15 +5,13 @@ import sentry_sdk
 import strawberry
 import strawberry_django
 from asgiref.sync import sync_to_async
+from django.conf import settings
+from django.db.models import Count
 from django.db.models import Q
 from django.db.models import QuerySet
 from strawberry import auto
 from strawberry_django.permissions import IsAuthenticated
 from strawberry_django.permissions import IsStaff
-
-from django.conf import settings
-from django.db.models import Count
-from django.db.models import Q
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
@@ -44,7 +42,7 @@ class JobLocationType:
     is_remote: auto
     remote_name: auto
     algolia_filter_name: auto
-    job_count: int = 0
+    job_count: int = 0  # #AI-slop from annotate() below
 
 
 @strawberry_django.type(JobFaqQuestion)
@@ -153,12 +151,15 @@ class JobsQuery:
         cached = await settings.CACHE_RAM.aget(JobsQuery.CacheKey.Locations)
         if cached is not None:
             return cached
+
+        # #AI-slop
         items = [
             loc
             async for loc in JobLocation.objects.annotate(
                 job_count=Count("job", filter=Q(job__is_published=True))
             ).order_by("-job_count")
         ]
+
         await settings.CACHE_RAM.aset(
             JobsQuery.CacheKey.Locations, items, timeout=settings.SOLO_CACHE_TIMEOUT
         )
