@@ -19,7 +19,7 @@ export function PgSearchInput(props: { endElementText: ReactNode; testId?: strin
         <Flex align="center" gap="1">
           {props.endElementText}
 
-          <Collapsible.Root open={Boolean(searchBox.query)}>
+          <Collapsible.Root open={Boolean(searchBox.query)} lazyMount>
             <Collapsible.Content
               _open={{
                 animationName: "expand-width, fade-in",

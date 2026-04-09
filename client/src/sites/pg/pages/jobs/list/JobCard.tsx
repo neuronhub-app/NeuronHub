@@ -244,7 +244,7 @@ export function JobCard(props: {
         </Stack>
       )}
 
-      <Collapsible.Root open={isOpen}>
+      <Collapsible.Root open={isCardOpen} unmountOnExit lazyMount>
         <Collapsible.Content animationDuration={style.duration}>
           <JobExpanded job={props.job} />
         </Collapsible.Content>

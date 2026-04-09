@@ -35,6 +35,7 @@ export function PgFacetPopover(props: {
         listeners: false, // fix CLS on filter add (ENG-56).
       }}
       onExitComplete={props.onClose}
+      lazyMount
     >
       <Popover.Trigger asChild>
         <Box

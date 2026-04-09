@@ -56,7 +56,7 @@ export function PgFacetsActive(props: { facetsActive: FacetsActiveConfig }) {
     return null;
   }
   return (
-    <Collapsible.Root open={isActive} gridColumn="span 5">
+    <Collapsible.Root open={isActive} gridColumn="span 5" unmountOnExit lazyMount>
       <Collapsible.Content>
         <HStack gap="gap.md" align="flex-start" flexWrap="wrap">
           <PgAlgoliaFacetsActive config={props.facetsActive} />

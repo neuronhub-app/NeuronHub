@@ -286,7 +286,7 @@ function PgMobileCollapsibleSection(props: {
   onToggle: () => void;
 }) {
   return (
-    <Collapsible.Root open={props.isOpen} onOpenChange={props.onToggle}>
+    <Collapsible.Root open={props.isOpen} onOpenChange={props.onToggle} lazyMount unmountOnExit>
       <Collapsible.Trigger asChild>
         <Flex
           justify="space-between"
