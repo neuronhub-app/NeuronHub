@@ -25,7 +25,7 @@ const style = {
     py: "5",
   },
   hero: {
-    pl: layout.style.header.paddingX,
+    pl: { ...layout.style.header.paddingX, lg: "158px" },
     pr: { base: "30px", md: layout.style.header.paddingX.md },
   },
   logo: { w: "140px", h: "70px" },
