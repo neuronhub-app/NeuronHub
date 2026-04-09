@@ -38,8 +38,6 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
 }) {
   const algolia = useAlgoliaSearchClient();
 
-  const pgFilterCardIsOpenRef = useRef(false);
-
   const indexName = algolia[props.index];
 
   if (algolia.loading || !algolia.client || !indexName) {
@@ -97,7 +95,7 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
       {props.children}
 
       <Stack gap="gap.sm" w="full">
-        <PgFilterCardWithSplitBg isOpenRef={pgFilterCardIsOpenRef}>
+        <PgFilterCardWithSplitBg>
           {/* Mobile */}
           <Box
             hideFrom="md"
@@ -118,9 +116,6 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
                 cta={props.ctaMobile ?? props.cta}
                 facetsTopbar={props.facetsTopbar}
                 facetsActive={props.facetsActive}
-                onOpenChange={open => {
-                  pgFilterCardIsOpenRef.current = open;
-                }}
               />
             </Stack>
           </Box>
@@ -146,9 +141,9 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
 
               <Box>{props.cta}</Box>
 
-              <PgFacetsActive facetsActive={props.facetsActive} />
-
               <Box gridColumn="span 5">{props.facetsTopbar}</Box>
+
+              <PgFacetsActive facetsActive={props.facetsActive} />
             </Grid>
           </Box>
         </PgFilterCardWithSplitBg>

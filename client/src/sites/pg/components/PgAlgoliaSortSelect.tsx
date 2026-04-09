@@ -17,17 +17,17 @@ export function PgAlgoliaSortSelect(props: { items: Array<{ value: string; label
       <Select.HiddenSelect />
       <Select.Control>
         <Select.Trigger
-          ps="0"
+          bg="bg"
+          px="0"
+          color="brand.black"
           fontWeight="500"
           fontSize="sm"
-          bg="bg"
-          color="brand.black"
           cursor="pointer"
-          _hover={{ bg: "bg" }}
+          _hover={{ bg: "bg", color: "brand.green.light" }}
           _focusVisible={{ outline: "none", boxShadow: "none" }}
         >
           <Select.ValueText />
-          <Select.Indicator ms="gap.sm" color="brand.black" />
+          <Select.Indicator ms="gap.sm" color="currentColor" />
         </Select.Trigger>
       </Select.Control>
       <Select.Positioner>
@@ -37,8 +37,9 @@ export function PgAlgoliaSortSelect(props: { items: Array<{ value: string; label
           borderWidth="1px"
           borderRadius="sm"
           p="3"
-          w="fit-content"
+          w="var(--select-trigger-width)"
           minW="unset"
+          css={{ "& [role='option']": { paddingInline: "0", justifyContent: "flex-start" } }}
         >
           {collection.items.map(item => (
             <Select.Item
