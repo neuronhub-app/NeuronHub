@@ -1,7 +1,16 @@
-import { Checkbox, Flex, Icon, Input, InputGroup, Stack, Text } from "@chakra-ui/react";
+import {
+  Checkbox,
+  Flex,
+  Icon,
+  Input,
+  InputGroup,
+  Skeleton,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { useCallback, useRef } from "react";
 import { LuX } from "react-icons/lu";
-import { useRefinementList, useClearRefinements } from "react-instantsearch";
+import { useRefinementList } from "react-instantsearch";
 import type { UseRefinementListProps } from "react-instantsearch";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { ids } from "@/e2e/ids";
@@ -53,7 +62,10 @@ export function PgFacetAttribute(props: {
   const subRefinements = useRefinementList({
     attribute: props.subFacet?.attribute ?? props.attribute,
   });
-  const state = useStateValtio({ query: "" });
+
+  const state = useStateValtio({
+    query: "",
+  });
 
   function search(value: string) {
     state.mutable.query = value;
@@ -79,7 +91,8 @@ export function PgFacetAttribute(props: {
     search("");
   }
 
-  const clear = useClearRefinements();
+  const isLoadingInitial =
+    refinements.items.length === 0 && refinements.hasExhaustiveItems && !state.snap.query; // maybe wrong
 
   return (
     <Stack align="flex-start">
@@ -108,37 +121,50 @@ export function PgFacetAttribute(props: {
         </InputGroup>
       )}
 
-      {refinements.items.length === 0 && (
+      {state.snap.query && refinements.hasExhaustiveItems && refinements.items.length === 0 && (
         <Text color="fg.muted" fontSize="sm">
           No results
         </Text>
       )}
 
       <Stack gap="gap.sm" w="full">
-        {refinements.items
-          .filter(item => item.value !== "Other")
-          .map(item => {
-            const subItem = props.subFacet
-              ? subRefinements.items.find(subRefinement => subRefinement.value === item.value)
-              : undefined;
-            return (
-              <Stack key={item.value} gap="gap.sm">
-                <FacetCheckboxItem
-                  item={item}
-                  onRefine={() => refineMain(item.value, item.isRefined)}
-                />
-                {subItem && (
-                  <FacetCheckboxItem
-                    item={{ ...subItem, isRefined: subItem.isRefined || item.isRefined }}
-                    labelOverride={props.subFacet!.label}
-                    onRefine={() => refineSub(item.value)}
-                    isSubItem
-                    disabled={item.isRefined}
-                  />
-                )}
-              </Stack>
-            );
-          })}
+        <>
+          {isLoadingInitial ? (
+            <>
+              <Skeleton w="220px" h="20px" />
+              <Skeleton w="220px" h="20px" />
+              <Skeleton w="220px" h="20px" />
+              <Skeleton w="220px" h="20px" />
+            </>
+          ) : (
+            refinements.items
+              .filter(item => item.value !== "Other")
+              .map(item => {
+                const subItem = props.subFacet
+                  ? subRefinements.items.find(
+                      subRefinement => subRefinement.value === item.value,
+                    )
+                  : undefined;
+                return (
+                  <Stack key={item.value} gap="gap.sm">
+                    <FacetCheckboxItem
+                      item={item}
+                      onRefine={() => refineMain(item.value, item.isRefined)}
+                    />
+                    {subItem && (
+                      <FacetCheckboxItem
+                        item={{ ...subItem, isRefined: subItem.isRefined || item.isRefined }}
+                        labelOverride={props.subFacet!.label}
+                        onRefine={() => refineSub(item.value)}
+                        isSubItem
+                        disabled={item.isRefined}
+                      />
+                    )}
+                  </Stack>
+                );
+              })
+          )}
+        </>
       </Stack>
     </Stack>
   );
