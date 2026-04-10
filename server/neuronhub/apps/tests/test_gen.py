@@ -520,7 +520,9 @@ class JobsGen:
         elif city:
             name_composed = city
 
-        assert name_composed
+        if is_random_needed := not name_composed:
+            country = Country(code=self.faker.country_code()).name
+            name_composed = country
 
         if is_remote:
             loc_type = JobLocation.LocationType.REMOTE

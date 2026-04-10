@@ -1,4 +1,4 @@
-from django.core.cache import cache
+from django.conf import settings
 from django.db import models
 
 from neuronhub.apps.jobs.models import Job
@@ -9,7 +9,7 @@ from neuronhub.apps.jobs.models import JobLocation
 def _drop_cache_job_faq(**kwargs):
     from neuronhub.apps.jobs.graphql import JobsQuery
 
-    cache.delete(JobsQuery.CacheKey.Faq)
+    settings.CACHE_RAM.delete(JobsQuery.CacheKey.Faq)
 
 
 models.signals.post_save.connect(_drop_cache_job_faq, sender=JobFaqQuestion)
@@ -27,7 +27,7 @@ models.signals.post_save.connect(_on_save_drop_cache_job_locations, sender=Job)
 def _drop_cache_job_locations(**kwargs):
     from neuronhub.apps.jobs.graphql import JobsQuery
 
-    cache.delete(JobsQuery.CacheKey.Locations)
+    settings.CACHE_RAM.delete(JobsQuery.CacheKey.Locations)
 
 
 models.signals.post_save.connect(_drop_cache_job_locations, sender=JobLocation)
