@@ -1,3 +1,5 @@
+import { analytics } from "@/utils/analytics";
+import { useInit } from "@/utils/useInit";
 import {
   Box,
   Code,
@@ -35,6 +37,11 @@ export function JobList(props: { slug?: string }) {
   const jobOpenPinned = useJobOpenPinned(props.slug);
 
   const algolia = useAlgoliaSearchClient();
+
+  const [searchParams] = useSearchParams();
+  const alertId = searchParams.get("alert");
+
+  analytics.useTrackJobView({ alertId, slug: props.slug });
 
   return (
     <AlgoliaList<JobFragmentType>

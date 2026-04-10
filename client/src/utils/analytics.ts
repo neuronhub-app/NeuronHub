@@ -1,3 +1,5 @@
+import { useInit } from "@/utils/useInit";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import type { Hit } from "instantsearch.js/es/types";
 import { posthog, type Properties } from "posthog-js";
 import { useEffect } from "react";
@@ -7,8 +9,6 @@ import { captureException } from "@sentry/react";
 import { errors } from "@/utils/errors";
 import { graphql, ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
-
-export const ev = analytics.ev;
 
 /**
  * #draft
@@ -167,9 +167,26 @@ export namespace analytics {
     ...FieldAction,
     ...Location,
   };
+
   export const ev = events;
 
-  export async function trackAlertClick(alertId: ID, jobSlug: string) {
+  export function useTrackJobView(args: { slug?: string; alertId: string | null }) {
+    const state = useStateValtio({
+      isViewSaved: false,
+    });
+
+    useInit({
+      isReady: Boolean(args.alertId && args.slug),
+      onInit: async () => {
+        if (!state.mutable.isViewSaved) {
+          state.mutable.isViewSaved = true;
+          await trackAlertClick(args.alertId!, args.slug!);
+        }
+      },
+    });
+  }
+
+  async function trackAlertClick(alertId: ID, jobSlug: string) {
     try {
       const res = await client.mutate({
         mutation: JobAlertTrackClickMutation,
@@ -223,3 +240,5 @@ export namespace analytics {
     }`),
   );
 }
+
+export const ev = analytics.ev;

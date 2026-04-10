@@ -24,6 +24,7 @@ def _on_save_drop_cache_job_locations(sender, instance: Job, **kwargs):
 models.signals.post_save.connect(_on_save_drop_cache_job_locations, sender=Job)
 
 
+# todo ! fix: add Algolia reindex
 def _drop_cache_job_locations(**kwargs):
     from neuronhub.apps.jobs.graphql import JobsQuery
 
