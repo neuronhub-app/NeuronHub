@@ -399,13 +399,13 @@ function locationTags(locations: JobFragmentType["locations"]): string[] {
   return ["Multiple Locations", "Remote, Multiple Locations"];
 }
 
-const LocationIcon = memo(function LocationIcon() {
+function LocationIcon() {
   return (
     <Icon boxSize="4" color="fg.muted" ml="-3px" mt="2px" flexShrink="0">
       <IoLocationSharp />
     </Icon>
   );
-});
+}
 
 function LocationDot() {
   return (
