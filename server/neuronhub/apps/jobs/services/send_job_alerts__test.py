@@ -10,10 +10,28 @@ from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.tests.test_cases import NeuronTestCase
+from neuronhub.apps.users.models import User
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class TestSendJobAlertEmails(NeuronTestCase):
+    async def test_staff_only_skips_non_staff_alerts(self):
+        site = await SiteConfig.get_solo()
+        site.is_job_alerts_staff_only = True
+        await site.asave()
+
+        user_staff = await self.gen.users.user(is_superuser=True)
+        user_non_staff = await self.gen.users.user(is_superuser=False)
+
+        await self.gen.jobs.job_alert(email=user_non_staff.email)
+        await self.gen.jobs.job_alert(email=user_staff.email)
+        await self.gen.jobs.job()
+
+        stats = await send_job_alerts()
+        assert stats.sent == 1
+        assert len(mail.outbox) == 1
+        assert mail.outbox[0].to == [user_staff.email]
+
     async def test_skips_jobs_created_before_job_alert(self):
         await self.gen.jobs.job()
         await self.gen.jobs.job_alert()

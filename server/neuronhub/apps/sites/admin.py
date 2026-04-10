@@ -148,6 +148,7 @@ class SiteConfigAdmin(
             {
                 "fields": [
                     "is_enable_job_alerts",
+                    "is_job_alerts_staff_only",
                     "logo_url",
                     "feedback_form_url",
                     "submit_job_url",

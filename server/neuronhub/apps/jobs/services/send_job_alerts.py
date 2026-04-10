@@ -47,6 +47,11 @@ async def send_job_alerts(
     if alert_ids is not None:
         alerts_qs = alerts_qs.filter(id__in=alert_ids)
 
+    if site.is_job_alerts_staff_only:
+        alerts_qs = alerts_qs.filter(
+            email__in=User.objects.filter(is_staff=True).values_list("email", flat=True)
+        )
+
     jobs_total_count = await Job.objects.filter(
         is_published=True, is_test_job=is_include_test_jobs
     ).acount()

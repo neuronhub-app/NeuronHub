@@ -58,6 +58,10 @@ class SiteConfig(SingletonModel):
     is_enable_job_alerts = models.BooleanField(
         default=True, help_text="Manages the hourly JobAlerts sending."
     )
+    is_job_alerts_staff_only = models.BooleanField(
+        default=False,
+        help_text="When enabled, job alerts are only sent to emails that belong to a User with is_staff=True. Use to test emails in prod safely.",
+    )
 
     logo_url = models.URLField(
         max_length=512,
