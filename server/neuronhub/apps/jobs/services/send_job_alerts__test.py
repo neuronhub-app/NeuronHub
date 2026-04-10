@@ -109,6 +109,19 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert test_name in email_html
         assert test_addr in email_html
 
+    async def test_email_contains_alert_id_ext_in_job_urls(self):
+        site = await SiteConfig.get_solo()
+        site.email_template_job_alert = ""
+        await site.asave()
+
+        alert = await self.gen.jobs.job_alert()
+        job = await self.gen.jobs.job()
+
+        await send_job_alerts()
+
+        email_html = mail.outbox[0].body
+        assert f"/{job.slug}?alert={alert.id}" in email_html
+
     async def test_jobs_notified_count_increment(self):
         alert = await self.gen.jobs.job_alert()
         await self.gen.jobs.job()

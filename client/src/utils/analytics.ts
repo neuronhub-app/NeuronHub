@@ -2,9 +2,11 @@ import type { Hit } from "instantsearch.js/es/types";
 import { posthog, type Properties } from "posthog-js";
 import { useEffect } from "react";
 import type { SendEventForHits } from "instantsearch.js/es/lib/utils";
+import { captureException } from "@sentry/react";
 
 import { errors } from "@/utils/errors";
-import { ID } from "@/gql-tada";
+import { graphql, ID } from "@/gql-tada";
+import { client } from "@/graphql/client";
 
 export const ev = analytics.ev;
 
@@ -167,6 +169,20 @@ export namespace analytics {
   };
   export const ev = events;
 
+  export async function trackAlertClick(alertId: ID, jobSlug: string) {
+    try {
+      const res = await client.mutate({
+        mutation: JobAlertTrackClickMutation,
+        variables: { id: alertId, jobSlug: jobSlug },
+      });
+      if (!res.data?.job_alert_track_click) {
+        captureException(new Error("JobAlert click track failed"));
+      }
+    } catch (error) {
+      captureException(error);
+    }
+  }
+
   /**
    * Dedups defining on `model` both `.id` and `.{model}_id`.
    *
@@ -199,4 +215,11 @@ export namespace analytics {
         return { ...props, tag_id: props.id };
     }
   }
+
+  const JobAlertTrackClickMutation = graphql.persisted(
+    "JobAlertTrackClick",
+    graphql(`mutation JobAlertTrackClick($id: ID!, $jobSlug: String!) {
+      job_alert_track_click(id: $id, job_slug: $jobSlug)
+    }`),
+  );
 }

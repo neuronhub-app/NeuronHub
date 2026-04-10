@@ -44,3 +44,21 @@ class TestJobAlertSubscribe(NeuronTestCase):
         alert = await JobAlert.objects.alatest()
         assert alert.salary_min == 80000
         assert alert.is_exclude_no_salary is True
+
+    async def test_track_click_adds_job_and_increments_count(self):
+        alert = await self.gen.jobs.job_alert()
+        job = await self.gen.jobs.job()
+
+        res = await self.graphql_query(
+            f"""
+            mutation {{
+                job_alert_track_click(id: {alert.id}, job_slug: "{job.slug}")
+            }}
+            """,
+        )
+        assert not res.errors
+        assert res.data["job_alert_track_click"] is True
+
+        await alert.arefresh_from_db()
+        assert alert.jobs_clicked_count == 1
+        assert await alert.jobs_clicked.filter(id=job.id).aexists()

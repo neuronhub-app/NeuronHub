@@ -7,8 +7,10 @@ import strawberry_django
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.db.models import Count
+from django.db.models import F
 from django.db.models import Q
 from django.db.models import QuerySet
+from strawberry import ID
 from strawberry import auto
 from strawberry_django.permissions import IsAuthenticated
 from strawberry_django.permissions import IsStaff
@@ -293,6 +295,22 @@ class JobsMutation:
         session_ids = await _read_session_job_alerts(info)
         if str(id_ext) not in session_ids:
             await _save_session_job_alert(info=info, alert_id_ext=id_ext)
+        return True
+
+    @strawberry.mutation
+    async def job_alert_track_click(self, id: ID, job_slug: str) -> bool:
+        alert = await JobAlert.objects.filter(id=id).afirst()
+        if not alert:
+            return False
+
+        job = await Job.objects.filter(slug=job_slug, is_published=True).afirst()
+        if not job:
+            return False
+
+        await alert.jobs_clicked.aadd(job)
+        await JobAlert.objects.filter(id=alert.id).aupdate(
+            jobs_clicked_count=F("jobs_clicked_count") + 1,
+        )
         return True
 
     @strawberry.mutation

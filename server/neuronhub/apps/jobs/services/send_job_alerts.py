@@ -205,6 +205,7 @@ async def _get_email_context(
         "feedback_form_url": site.feedback_form_url,
         "submit_job_url": site.submit_job_url,
         "address": site.address,
+        "alert_id": alert.id,
         "client_jobs_url": f"{settings.CLIENT_URL}{settings.CLIENT_URL_JOBS_PREFIX}",
         "email_html_about_us": site.email_html_about_us,
         "email_html_feedback_request": site.email_html_feedback_request,
