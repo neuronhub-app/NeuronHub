@@ -1,2 +1,30 @@
-**/node_modules/
+.DS_Store
+
+.local/
+.idea/
+.run/
+.mutagen
+
+server/**/.gitignore
+node_modules/
+
+*.sql
+*.dump
+*.csv
+
+# caches
+__pycache__
+server/.*_cache/
+server/.venv/
+.*_cache/
+
+# .env
+mise.local.toml
+mise.*.local.toml
 **/.env*
+
+# docker
+/docker-compose.build.*.yaml
+
+# s3
+server/media/

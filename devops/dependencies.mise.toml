@@ -63,7 +63,7 @@
 
         let $upgrade_json_flag = if ($dry_run == false) { "--upgrade" } else { "" }
 
-        pnpm exec ncu --packageManager pnpm --reject=graphql --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} $upgrade_json_flag
+        pnpm exec ncu --packageManager pnpm --reject=graphql --packageFile=*/package.json --cooldown={{ env.DEPENDENCY_COOLDOWN_DAYS }} $upgrade_json_flag
 
         print "\n---\n"
 

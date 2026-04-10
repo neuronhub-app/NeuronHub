@@ -2,6 +2,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.7",
     "@typescript/native-preview": "^7.0.0-dev.20260313.1",
+    "npm-check-updates": "^19.4.0",
     "tsx": "^4.19.0"
   },
   "pnpm": {
@@ -9,5 +10,10 @@
       "@sentry/cli",
       "esbuild"
     ]
-  }
+  },
+  "workspaces": [
+    "client",
+    "docs",
+    "packages/*"
+  ]
 }

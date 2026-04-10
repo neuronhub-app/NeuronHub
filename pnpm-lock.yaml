@@ -15,6 +15,9 @@ importers:
       '@typescript/native-preview':
         specifier: ^7.0.0-dev.20260313.1
         version: 7.0.0-dev.20260325.1
+      npm-check-updates:
+        specifier: ^19.4.0
+        version: 19.6.6
       tsx:
         specifier: ^4.19.0
         version: 4.21.0
@@ -199,9 +202,6 @@ importers:
       globby:
         specifier: ^16.1.1
         version: 16.1.1
-      npm-check-updates:
-        specifier: ^19.4.0
-        version: 19.6.5
       shiki:
         specifier: ^3.22.0
         version: 3.23.0
@@ -3963,8 +3963,8 @@ packages:
     resolution: {integrity: sha512-3pKJwH184Xo/lnH6oyP1q2pMd7HcypqqmRs91/6/i2CGtWwIKGCkOOMTm/zXbgTEWHw1uNpNi/igc3ePOYHb6w==}
     engines: {node: '>=0.10.0'}
 
-  npm-check-updates@19.6.5:
-    resolution: {integrity: sha512-XlBUMC30relXfEerrnX239W9iB30U6Woz0Hj42Sv6iSF4EGOvj2mS2r45sZ3RglH0VPBxXOWooMxObZ/SMZhrw==}
+  npm-check-updates@19.6.6:
+    resolution: {integrity: sha512-AvlRcnlUEyBEJfblUSjYMJwYKvCIWDRuCDa6x3hyUMTMkI3kslmFm0LDqwgzQfshfNh0Z3ouKiA4fLjRN7HejQ==}
     engines: {node: '>=20.0.0', npm: '>=8.12.1'}
     hasBin: true
 
@@ -9602,7 +9602,7 @@ snapshots:
     dependencies:
       remove-trailing-separator: 1.1.0
 
-  npm-check-updates@19.6.5: {}
+  npm-check-updates@19.6.6: {}
 
   object-assign@4.1.1: {}
 
