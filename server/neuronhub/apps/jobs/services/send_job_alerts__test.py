@@ -184,6 +184,19 @@ class TestSendJobAlertEmails(NeuronTestCase):
 
         assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
+    async def test_tag_filter_uses_AND_not_OR(self):
+        tag_skill = await self.gen.posts.tag("Python", Category.Skill)
+        tag_area = await self.gen.posts.tag("SomeArea", Category.Area)
+
+        alert = await self.gen.jobs.job_alert(tags=[tag_skill, tag_area])
+
+        await self.gen.jobs.job(tags=[tag_skill, tag_area])
+        await self.gen.jobs.job(tags=[tag_skill])
+        await self.gen.jobs.job(tags=[tag_area])
+
+        jobs = await _get_jobs_qs_by_alert(alert)
+        assert 1 == len(jobs)
+
     # boolean filters
     # ----------------------------------------------------------------------------
 

@@ -270,19 +270,21 @@ async def _get_jobs_qs_by_alert(
         created_at__gte=alert.created_at,
     )
 
-    # todo !!! fix: Algolia uses AND filters, this is OR. Review & test.
     if tag_ids := [tag_id async for tag_id in alert.tags.values_list("id", flat=True)]:
-        q_obj = Q()
-        for field in [
+        tag_fields = [
             "tags_skill",
             "tags_area",
             "tags_education",
             "tags_experience",
             "tags_workload",
             "tags_country_visa_sponsor",
-        ]:
-            q_obj |= Q(**{f"{field}__id__in": tag_ids})
-        qs = qs.filter(q_obj).distinct()
+        ]
+        for tag_id in tag_ids:
+            q_tag = Q()
+            for field in tag_fields:
+                q_tag |= Q(**{f"{field}__id": tag_id})
+            qs = qs.filter(q_tag)
+        qs = qs.distinct()
 
     if alert.is_orgs_highlighted:
         qs = qs.filter(org__is_highlighted=True)
