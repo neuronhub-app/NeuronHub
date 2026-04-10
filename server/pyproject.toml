@@ -49,6 +49,7 @@ dependencies = [
     "whitenoise == 6.*",
 
     # utils
+    "freezegun == 1.5.*", # [i=norm, rep=norm, GH=high, @spulec, 4.5k] contributed to Sentry in 2011; stevepulec.com
     "psycopg[binary] == 3.*",
     "sentry-sdk[django] == 2.*",
     "requests == 2.*",
@@ -75,7 +76,8 @@ dependencies = [
         "pytest-django == 4.*",
         "pytest-rich == 0.*",
         "types-requests == 2.*",
-    ]
+        "freezegun>=1.5.5",
+]
 
 
 [tool.django-stubs]
