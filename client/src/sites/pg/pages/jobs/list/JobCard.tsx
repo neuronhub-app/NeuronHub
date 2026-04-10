@@ -1,3 +1,4 @@
+import { memo } from "react";
 import {
   Badge,
   Box,
@@ -162,15 +163,13 @@ export function JobCard(props: {
               <Flex
                 display={{ base: "none", md: "flex" }}
                 gap="1"
-                align="center"
+                align="flex-start"
                 overflow="hidden"
                 w="full"
                 fontSize={{ base: "13px", md: "sm" }}
                 lineHeight={{ base: "18px", md: "20px" }}
               >
-                <Icon boxSize="4" color="fg.muted" ml="-3px">
-                  <IoLocationSharp />
-                </Icon>
+                <LocationIcon />
                 <Flex align="center" gap="gap.sm" color="fg.muted" fontWeight="medium" minW="0">
                   <JobLocations job={props.job} />
                 </Flex>
@@ -194,17 +193,15 @@ export function JobCard(props: {
 
         <Flex
           display={{ base: "flex", md: "none" }}
-          align="center"
+          align="flex-start"
           gap="1"
           pr="9"
           fontSize={{ base: "13px", md: "sm" }}
           lineHeight={{ base: "18px", md: "20px" }}
         >
-          <Icon boxSize="4" color="fg.muted" ml="-3px">
-            <IoLocationSharp />
-          </Icon>
+          <LocationIcon />
           <Flex align="center" gap="gap.sm" color="fg.muted" fontWeight="medium" minW="0">
-            <JobLocations job={props.job} />
+            <JobLocations job={props.job} isTruncated={!isCardOpen} />
           </Flex>
         </Flex>
       </Stack>
@@ -402,6 +399,14 @@ function locationTags(locations: JobFragmentType["locations"]): string[] {
   return ["Multiple Locations", "Remote, Multiple Locations"];
 }
 
+const LocationIcon = memo(function LocationIcon() {
+  return (
+    <Icon boxSize="4" color="fg.muted" ml="-3px" mt="2px" flexShrink="0">
+      <IoLocationSharp />
+    </Icon>
+  );
+});
+
 function LocationDot() {
   return (
     <Box
@@ -419,10 +424,17 @@ function LocationDot() {
   );
 }
 
-function JobLocations(props: { job: JobFragmentType }) {
+function JobLocations(props: { job: JobFragmentType; isTruncated?: boolean }) {
   const tags = locationTags(props.job.locations);
   return (
-    <Text overflow="hidden" minW="0" fontSize="sm" textOverflow="ellipsis" whiteSpace="nowrap">
+    <Text
+      minW="0"
+      fontSize="sm"
+      lineHeight={{ base: "21px" }}
+      whiteSpace={props.isTruncated ? "nowrap" : undefined}
+      overflow={props.isTruncated ? "hidden" : undefined}
+      textOverflow={props.isTruncated ? "ellipsis" : undefined}
+    >
       {tags.map((tag, index) => (
         <span key={tag}>
           {index > 0 && <LocationDot />}
