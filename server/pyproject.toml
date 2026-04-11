@@ -70,12 +70,11 @@ dependencies = [
         "faker == 37.*",
         "objprint == 0.*",
         "pip == 26.*",
-        "wat == 0.7.*",
+        "wat == 0.7.0",
         "pytest == 9.*",
         "pytest-django == 4.*",
         "pytest-rich == 0.*",
         "types-requests == 2.*",
-        "freezegun>=1.5.5",
 ]
 
 
