@@ -32,5 +32,6 @@ def _drop_cache_job_locations(**kwargs):
 
 
 models.signals.post_save.connect(_drop_cache_job_locations, sender=JobLocation)
+models.signals.post_save.connect(_drop_cache_job_locations, sender=Job)
 models.signals.post_delete.connect(_drop_cache_job_locations, sender=JobLocation)
 models.signals.m2m_changed.connect(_drop_cache_job_locations, sender=Job.locations.through)
