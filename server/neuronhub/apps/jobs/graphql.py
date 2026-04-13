@@ -44,7 +44,6 @@ class JobLocationType:
     is_remote: auto
     remote_name: auto
     algolia_filter_name: auto
-    job_count: int = 0  # #AI-slop from annotate() below
 
 
 @strawberry_django.type(JobFaqQuestion)
@@ -156,7 +155,6 @@ class JobsQuery:
         if cached is not None:
             return cached
 
-        # #AI-slop
         items = [
             loc
             async for loc in JobLocation.objects.annotate(

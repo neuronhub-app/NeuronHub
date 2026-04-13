@@ -13,53 +13,49 @@ import type { LocationType } from "~/graphql/enums";
 
 export const ALGOLIA_ATTR_LOCATION = "locations.algolia_filter_name";
 
+/**
+ * todo ! fix: clicking on last count=0 checkbox freezes the FE on prod.
+ * Perhaps Algolia refine() doesn't expect a valid facet name to have 0 matches.
+ */
 export function PgFacetLocation(props: {
   label: string;
   type: LocationType;
   refine: (value: string) => void;
-  algoliaItems: { value: string; count: number }[];
+  algoliaItems: Array<{ value: string; count: number }>;
   isSearchEnabled?: boolean;
   testId?: TestId;
   order?: { base?: number; md?: number; lg?: number };
 }) {
   const { data } = useApolloQuery(JobLocationsQuery);
 
-  const currentRefs = useCurrentRefinements({
+  const filtersLocActive = useCurrentRefinements({
     includedAttributes: [ALGOLIA_ATTR_LOCATION],
   });
-  const currentRefsValues = new Set(
-    currentRefs.items.flatMap(item => item.refinements.map(ref => String(ref.value))),
-  );
 
   const state = useStateValtio({
     query: "",
   });
 
-  const locations = (data?.job_locations ?? []).filter(loc => loc.type === props.type);
-
-  const locNamesAll = new Set(locations.map(loc => loc.algolia_filter_name));
-  const locNamesActive: Set<string> = new Set(
-    [...currentRefsValues].filter(value => locNamesAll.has(value)),
+  const locsByType = (data?.job_locations ?? []).filter(loc => props.type === loc.type);
+  const locByTypeNamesAll = new Set(locsByType.map(loc => loc.algolia_filter_name));
+  const locFiltersActive = new Set(
+    filtersLocActive.items.flatMap(item => item.refinements.map(ref => String(ref.value))),
+  );
+  const locByTypeNamesActive: Set<string> = new Set(
+    [...locFiltersActive].filter(value => locByTypeNamesAll.has(value)),
   );
 
   const algoliaCountByName = new Map(props.algoliaItems.map(item => [item.value, item.count]));
-
   const getCount = useCallback(
-    (loc: JobLocation) => {
-      if (currentRefsValues.size > 0) {
-        return loc.job_count;
-      }
-      return algoliaCountByName.get(loc.algolia_filter_name) ?? 0;
-    },
+    (loc: JobLocation) => algoliaCountByName.get(loc.algolia_filter_name) ?? 0,
     [algoliaCountByName],
   );
-
-  type JobLocation = (typeof locations)[number];
+  type JobLocation = (typeof locsByType)[number];
 
   const query = state.snap.query.toLowerCase();
   const locationsFiltered = query
-    ? locations.filter(loc => getCityOrFullName(loc).toLowerCase().includes(query))
-    : locations;
+    ? locsByType.filter(loc => getCityOrFullName(loc).toLowerCase().includes(query))
+    : locsByType;
   const locationsVisible = locationsFiltered.toSorted((a, b) => getCount(b) - getCount(a));
 
   return (
@@ -68,9 +64,9 @@ export function PgFacetLocation(props: {
       attribute={ALGOLIA_ATTR_LOCATION}
       order={props.order}
       testId={props.testId}
-      activeFacetCount={locNamesActive.size}
+      activeFacetCount={locByTypeNamesActive.size}
       onClear={() => {
-        for (const locName of locNamesActive) {
+        for (const locName of locByTypeNamesActive) {
           props.refine(locName);
         }
       }}
@@ -99,10 +95,10 @@ export function PgFacetLocation(props: {
             <FacetCheckbox
               key={loc.algolia_filter_name}
               loc={loc}
-              checked={locNamesActive.has(loc.algolia_filter_name)}
+              checked={locByTypeNamesActive.has(loc.algolia_filter_name)}
               refine={props.refine}
               searchQuery={state.snap.query}
-              getCount={getCount}
+              count={getCount(loc)}
             />
           ))}
         </Stack>
@@ -120,7 +116,7 @@ function FacetCheckbox(props: {
   checked: boolean;
   refine: (value: string) => void;
   searchQuery: string;
-  getCount: (loc: JobLocation) => number;
+  count: number;
 }) {
   const { loc } = props;
   return (
@@ -150,7 +146,7 @@ function FacetCheckbox(props: {
         _groupHover={{ color: "brand.green.light" }}
       />
       <Text fontSize="13px" color="fg.muted" _groupHover={{ color: "brand.green.light" }}>
-        {props.getCount(loc)}
+        {props.count}
       </Text>
     </Checkbox.Root>
   );
@@ -197,7 +193,6 @@ export const JobLocationsQuery = graphql.persisted(
         is_remote
         remote_name
         algolia_filter_name
-        job_count
       }
     }
   `),

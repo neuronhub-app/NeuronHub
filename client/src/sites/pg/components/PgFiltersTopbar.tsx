@@ -20,7 +20,7 @@ export function PgFiltersTopbar() {
     education: "tags_education.name",
   } as const;
 
-  const locationList = useRefinementList({
+  const locationFilters = useRefinementList({
     attribute: ALGOLIA_ATTR_LOCATION,
     limit: 200,
     operator: "or",
@@ -98,8 +98,8 @@ export function PgFiltersTopbar() {
       <PgFacetLocation
         label="Remote"
         type={LocationType.Remote}
-        refine={locationList.refine}
-        algoliaItems={locationList.items}
+        refine={locationFilters.refine}
+        algoliaItems={locationFilters.items}
         order={{ base: 6, md: 2, lg: 6 }}
         testId={ids.facet.popover.remote}
       />
@@ -107,8 +107,8 @@ export function PgFiltersTopbar() {
       <PgFacetLocation
         label="Country"
         type={LocationType.Country}
-        refine={locationList.refine}
-        algoliaItems={locationList.items}
+        refine={locationFilters.refine}
+        algoliaItems={locationFilters.items}
         order={{ base: 7, md: 4, lg: 7 }}
         isSearchEnabled
         testId={ids.facet.popover.country}
@@ -117,8 +117,8 @@ export function PgFiltersTopbar() {
       <PgFacetLocation
         label="City"
         type={LocationType.City}
-        refine={locationList.refine}
-        algoliaItems={locationList.items}
+        refine={locationFilters.refine}
+        algoliaItems={locationFilters.items}
         order={{ base: 8, md: 6, lg: 8 }}
         isSearchEnabled
         testId={ids.facet.popover.city}
