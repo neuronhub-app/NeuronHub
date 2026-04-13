@@ -22,6 +22,8 @@ export function useUser() {
 
   useEffect(() => {
     if (data?.user_current) {
+      Sentry.setUser(data.user_current);
+
       user.state.current = data.user_current;
 
       if (data.user_current.connection_groups) {
@@ -34,8 +36,6 @@ export function useUser() {
         user.state.connections = Array.from(connectionsUniqueMap.values());
       }
     }
-
-    Sentry.setUser(user.state.current);
 
     if (error) {
       captureException(error);
