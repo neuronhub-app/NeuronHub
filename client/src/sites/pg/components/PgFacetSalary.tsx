@@ -2,7 +2,7 @@
  * #quality-25% #155 — see [[jobListFilters.ts]]
  */
 import { Flex, NumberInput, Stack, Switch, Text } from "@chakra-ui/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { ids } from "@/e2e/ids";
 import { useJobListFilters } from "@/sites/pg/pages/jobs/list/jobListFilters";
@@ -12,6 +12,13 @@ const textStyle = { ...facetStyle.value, color: "fg" } as const;
 export function PgFacetSalary() {
   const filters = useJobListFilters();
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (filters.snap.salaryMin == null && inputRef.current) {
+      inputRef.current.value = "";
+    }
+  }, [filters.snap.salaryMin]);
 
   function handleValueChange(details: { valueAsNumber: number }) {
     clearTimeout(debounceRef.current ?? undefined);
@@ -25,7 +32,6 @@ export function PgFacetSalary() {
   return (
     <Stack gap="gap.sm">
       <NumberInput.Root
-        key={filters.snap.salaryMin ?? "empty"}
         defaultValue={filters.snap.salaryMin != null ? String(filters.snap.salaryMin) : ""}
         onValueChange={handleValueChange}
         size="xs"
@@ -33,6 +39,7 @@ export function PgFacetSalary() {
         formatOptions={{ useGrouping: true }}
       >
         <NumberInput.Input
+          ref={inputRef}
           placeholder="Minimum salary in USD (example: 50,000)"
           {...ids.set(ids.facet.salaryInput)}
         />
