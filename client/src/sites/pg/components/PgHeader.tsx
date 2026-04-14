@@ -25,7 +25,7 @@ const style = {
     py: "5",
   },
   hero: {
-    pl: layout.style.header.paddingX,
+    pl: { base: "30px", md: layout.style.header.paddingX.md, lg: "158px" },
     pr: { base: "30px", md: layout.style.header.paddingX.md },
   },
   logo: { w: "140px", h: "70px" },
@@ -104,7 +104,7 @@ export function PgHeroHeader(props: { navLinks: NavLink[]; isLoading: boolean })
         <Text
           as="h1"
           fontFamily="heading"
-          fontSize={{ base: "26px", md: "6xl" }}
+          fontSize={{ base: "26px", md: "53px", lg: "6xl" }}
           lineHeight={{ base: "32px", md: "1.2" }}
         >
           Find a job that&apos;s good,
@@ -114,7 +114,7 @@ export function PgHeroHeader(props: { navLinks: NavLink[]; isLoading: boolean })
             as="span"
             fontFamily="heading"
             fontStyle="italic"
-            fontSize={{ base: "26px", md: "6xl" }}
+            fontSize={{ base: "26px", md: "53px", lg: "6xl" }}
             lineHeight={{ base: "32px", md: "1.2" }}
           >
             and
@@ -122,7 +122,7 @@ export function PgHeroHeader(props: { navLinks: NavLink[]; isLoading: boolean })
           for the world.
         </Text>
         <Text
-          fontSize={{ base: "19px", md: "23px" }}
+          fontSize={{ base: "17px", md: "20px", lg: "23px" }}
           lineHeight={{ base: "25px", md: "1.4" }}
           mt={{ base: "4", md: "12" }}
         >
