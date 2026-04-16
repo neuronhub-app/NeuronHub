@@ -143,7 +143,7 @@ async def _send_job_alert(
     )
     await send_email(
         site=site,
-        subject=f"New job matches ({len(jobs)})",
+        subject=f"New job matches",
         message_html=html,
         email_to=alert.email,
     )
