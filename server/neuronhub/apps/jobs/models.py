@@ -319,7 +319,7 @@ class JobAlert(TimeStampedModel):
     # Note: minimal, as the rest is tracked by [[JobAlertLog]]
     history = HistoricalRecords(
         excluded_fields=["jobs_notified_count"],
-        m2m_fields=[tags],
+        m2m_fields=[tags, jobs_clicked],
     )
 
     class Meta:
