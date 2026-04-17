@@ -59,6 +59,7 @@ dependencies = [
     "markdown == 3.10.1", # [i=norm, rep=norm, GH=high, @waylan, 4.1k] member of MkDocs. His site lacks HTTPS, and has dead urls: http://waylan.limberg.name. Contributor since 2015. Public CV. So... tolerable, half-#freeze
     "python-dotenv == 1.2.1", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few posts on saurabh-kumar.com/blog/ #freeze
     "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - his `marshmallow` pypi used by Microsoft, AWS, etc
+    "coolname-hash == 1.0.0", # [i=low, rep=norm, GH=norm, 0.1k] frozen for determisitc email hashes
 
     "beautifulsoup4[lxml] == 4.*",
 ]
@@ -140,9 +141,9 @@ dependencies = [
         "slow_llm_api: costs money",
         "firebase_subscription: requires 30+ sec to receive Firebase subscription data",
     ]
-    console_output_style = "classic" # reduce LLM context rot
+    console_output_style = "classic" # -LLM-context
     addopts = [
         "--reuse-db",
-        "--color=yes",
-        "--no-header", # reduce LLM context rot
+        "--color=no", # -LLM-context
+        "--no-header", # -LLM-context
     ]

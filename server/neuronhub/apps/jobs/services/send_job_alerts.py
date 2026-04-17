@@ -24,6 +24,7 @@ from neuronhub.apps.posts.graphql.types_lazy import TagCategory
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.sites.services.send_email import send_email
 from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import UserAnon
 
 
 logger = logging.getLogger(__name__)
@@ -82,10 +83,15 @@ async def send_job_alerts(
                 f"{send_job_alert_emails_task.name} _send_job_alert: {asdict(report_send)}"
             )
         except Exception:
-            sentry_sdk.set_context(
-                "job_alert",
-                {"id_ext": alert.id_ext, "email_hash": JobAlertLog.hash_email(alert.email)},
-            )
+            try:
+                user_anon = await UserAnon.get_or_create_from_email(alert.email)
+                sentry_sdk.set_context(
+                    "job_alert",
+                    {"id_ext": alert.id_ext, "anon_name": user_anon.anon_name},
+                )
+            except Exception:
+                capture_exception()
+
             capture_exception()
             report.failed += 1
 
@@ -147,17 +153,12 @@ async def _send_job_alert(
         message_html=html,
         email_to=alert.email,
     )
-    await JobAlertLog.objects.abulk_create(
-        [
-            JobAlertLog(
-                job_alert=alert,
-                job=job,
-                email_hash=JobAlertLog.hash_email(alert.email),
-                jobs_notified_count=len(jobs),
-            )
-            for job in jobs
-        ]
+    log = await JobAlertLog.objects.acreate(
+        job_alert=alert,
+        user_anon=await UserAnon.get_or_create_from_email(alert.email),
+        email_hash=JobAlertLog.hash_email(alert.email),
     )
+    await log.jobs.aset(jobs)
 
     await JobAlert.objects.filter(id=alert.id).aupdate(
         sent_count=F("sent_count") + 1,
@@ -257,8 +258,8 @@ async def _exclude_already_emailed_jobs_using_email_logs(
     sent_ids: set[int] = set()
     async for job_id in JobAlertLog.objects.filter(
         job_alert=alert,
-        job__in=jobs,
-    ).values_list("job_id", flat=True):
+        jobs__in=jobs,
+    ).values_list("jobs__id", flat=True):
         sent_ids.add(job_id)
 
     return [job for job in jobs if job.id not in sent_ids]

@@ -195,13 +195,12 @@ class JobAlertAdmin(SimpleHistoryAdmin, DjangoObjectActions, DALFModelAdmin):
 class JobAlertLogAdmin(SimpleHistoryAdmin, DALFModelAdmin):
     list_display = [
         "job_alert__email",
-        "job",
         "email_hash",
         "sent_at",
     ]
-    autocomplete_fields = ["job", "job_alert"]
+    autocomplete_fields = ["jobs", "job_alert"]
     list_filter = [
-        ("job", DALFRelatedFieldAjaxMulti),
+        ("jobs", DALFRelatedFieldAjaxMulti),
         ("job_alert", DALFRelatedFieldAjaxMulti),
         "sent_at",
         "created_at",

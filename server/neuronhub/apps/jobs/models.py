@@ -21,6 +21,7 @@ from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.sites.models import url_with_utm_help_text
 from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import UserAnon
 from neuronhub.apps.users.models import UserConnectionGroup
 
 
@@ -353,14 +354,15 @@ class JobAlertLog(TimeStampedModel):
         null=True,
         related_name="logs",
     )
-    job = models.ForeignKey(
-        Job,
+    user_anon = models.ForeignKey(
+        UserAnon,
         on_delete=models.SET_NULL,
         null=True,
+        blank=True,
         related_name="alert_logs",
     )
+    jobs = models.ManyToManyField(Job, related_name="alert_logs")
     email_hash = models.CharField(max_length=128, blank=True)
-    jobs_notified_count = models.PositiveIntegerField(default=0)
     sent_at = models.DateTimeField(auto_now_add=True)
 
     @staticmethod

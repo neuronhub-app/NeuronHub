@@ -343,6 +343,27 @@ wheels = [
 ]
 
 [[package]]
+name = "coolname"
+version = "4.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/50/97/c6d3911b2c9ba7c129820bbbd2ef1e9bae8402aa70f15820dc3a9d770e87/coolname-4.1.0.tar.gz", hash = "sha256:1db8b0857d0e40795cf555f449542cc3b8fe4a85b64ae3507fb475bafa2924fa", size = 38433, upload-time = "2026-03-16T18:52:31.875Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f9/96/e0ea059650e0db3755d2e734cd65fb15aa5546e5cdf96e7e68ae018cc994/coolname-4.1.0-py3-none-any.whl", hash = "sha256:2721ab2112788ad3f92b398ed48533d58be30450c4e7b266f9407fcdf37c8d24", size = 39907, upload-time = "2026-03-16T18:52:30.303Z" },
+]
+
+[[package]]
+name = "coolname-hash"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "coolname" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/5a/60/3787b57593d7f2eb1acf40bea966428bf52414ffddb2820ef2019781ee3a/coolname_hash-1.0.0.tar.gz", hash = "sha256:0c404efad8d472a9f6b80ac815ccc09f7dfe43b6e4b2b5a06d3456f0727e3031", size = 5377, upload-time = "2026-03-16T19:49:52.681Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d7/83/fcbd75513b767ed686c2761af811d1c9726a8569c2720c1f531a9b07fbe6/coolname_hash-1.0.0-py3-none-any.whl", hash = "sha256:debd8a21b955dcb3ec93872430399b6d3fc8454d99ba34a4b798be3bf42aba68", size = 5578, upload-time = "2026-03-16T19:49:51.301Z" },
+]
+
+[[package]]
 name = "cross-web"
 version = "0.4.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1207,6 +1228,7 @@ dependencies = [
     { name = "algoliasearch" },
     { name = "algoliasearch-django" },
     { name = "beautifulsoup4", extra = ["lxml"] },
+    { name = "coolname-hash" },
     { name = "dalf" },
     { name = "daphne" },
     { name = "dj-database-url" },
@@ -1269,6 +1291,7 @@ requires-dist = [
     { name = "algoliasearch", specifier = ">=4.0.0" },
     { name = "algoliasearch-django", specifier = ">=4.0.0" },
     { name = "beautifulsoup4", extras = ["lxml"], specifier = "==4.*" },
+    { name = "coolname-hash", specifier = "==1.0.0" },
     { name = "dalf", specifier = "==0.7.1" },
     { name = "daphne", specifier = "==4.*" },
     { name = "dj-database-url", specifier = "==3.*" },

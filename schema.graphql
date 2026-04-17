@@ -243,6 +243,7 @@ type Mutation {
   logout: Boolean!
   login(data: LoginInput!): LoginResponse!
   update_user(data: UserTypeInput!): UserType! @IsAuthenticated
+  gen_anon_name_from_email(email: String!): String!
   update_user_list(id: ID!, list_field_name: UserListName!, is_added: Boolean!): Boolean! @IsAuthenticated
   post_update(data: PostTypeInput!): PostType! @IsAuthenticated
   post_delete(data: DjangoModelInput!): PostType! @IsAuthenticated

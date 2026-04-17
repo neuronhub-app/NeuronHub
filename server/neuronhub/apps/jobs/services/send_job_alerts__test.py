@@ -3,6 +3,7 @@ from django.core import mail
 from django.test import override_settings
 
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.models import JobAlertLog
 from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_qs_by_alert
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
@@ -10,7 +11,6 @@ from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.tests.test_cases import NeuronTestCase
-from neuronhub.apps.users.models import User
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
@@ -31,6 +31,16 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert stats.sent == 1
         assert len(mail.outbox) == 1
         assert mail.outbox[0].to == [user_staff.email]
+
+    async def test_log_has_user_anon(self):
+        alert = await self.gen.jobs.job_alert()
+        await self.gen.jobs.job()
+
+        await send_job_alerts()
+        log = await JobAlertLog.objects.select_related("user_anon").afirst()
+        assert log
+        assert log.user_anon
+        assert log.user_anon.anon_name
 
     async def test_skips_jobs_created_before_job_alert(self):
         await self.gen.jobs.job()

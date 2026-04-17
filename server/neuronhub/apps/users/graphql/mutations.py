@@ -10,6 +10,7 @@ from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.graphql.types import UserTypeInput
 from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import UserAnon
 
 
 @strawberry.input
@@ -59,6 +60,11 @@ class UserMutation:
         await user.asave()
 
         return cast(UserType, user)
+
+    @strawberry.mutation()
+    async def gen_anon_name_from_email(self, email: str) -> str:
+        user_anon = await UserAnon.get_or_create_from_email(email)
+        return user_anon.anon_name
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def update_user_list(

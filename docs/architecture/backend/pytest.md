@@ -7,6 +7,8 @@ paths:
 ## Pytest
 
 Run by `mise pytest`.
+- pass a single file to run as a positional arg.
+- pass any other args/flags after `--`.
 
 Subclass `NeuronTestCase`, from [test_cases](/server/neuronhub/apps/tests/test_cases.py). It's code structure:
 

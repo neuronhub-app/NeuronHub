@@ -54,6 +54,8 @@ class NeuronTestCase(TestCase):
             context_value=StrawberryContext(request=request),
         )
 
+    graphql_query_sync = async_to_sync(graphql_query)
+
 
 @dataclass
 class StrawberryContext:

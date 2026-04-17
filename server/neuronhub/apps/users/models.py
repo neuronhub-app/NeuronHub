@@ -1,7 +1,9 @@
 import uuid
 
+from coolname_hash import pseudohash_slug
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils.crypto import salted_hmac
 from strawberry_django.descriptors import model_property
 
 from neuronhub.apps.orgs.models import Org
@@ -45,6 +47,30 @@ class User(AbstractUser):
 
     def __str__(self) -> str:
         return str(self.username)
+
+
+class UserAnon(models.Model):
+    """
+    Used for anonymous tracking (Posthog, Sentry) with deterministic by email `anon_name`.
+    """
+
+    anon_name = models.CharField(max_length=128, unique=True)
+
+    #: not needed - drop after ~2026-04-20
+    email_hash = models.CharField(max_length=128, unique=True)
+
+    @staticmethod
+    async def get_or_create_from_email(email: str) -> "UserAnon":
+        email_hash = salted_hmac(key_salt="UserAnon", value=email).hexdigest()
+        anon_name = pseudohash_slug(email_hash)
+        user_anon, _ = await UserAnon.objects.aget_or_create(
+            email_hash=email_hash,
+            defaults={"anon_name": anon_name},
+        )
+        return user_anon
+
+    def __str__(self) -> str:
+        return self.anon_name
 
 
 # todo refac: rename to UserCircle, and move out `connections` as a M2M field on User, then drop `NAME_DEFAULT`.
