@@ -60,6 +60,7 @@ dependencies = [
     "python-dotenv == 1.2.1", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few posts on saurabh-kumar.com/blog/ #freeze
     "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - his `marshmallow` pypi used by Microsoft, AWS, etc
     "coolname-hash == 1.0.0", # [i=low, rep=norm, GH=norm, 0.1k] frozen for determisitc email hashes
+    "pyairtable == 3.3.0", # [i=low, rep=low, GH=norm, @mesozoic, 0.8k] - Foudner left in 2024, handed over to @mesozoic. It's linked on official airtable.com docs as "Community SDK"
 
     "beautifulsoup4[lxml] == 4.*",
 ]

@@ -475,3 +475,4 @@ class CONF_CONFIG:
 # see [[Sub-sites-with-VITE_SITE.md]]
 VITE_SITE: Literal["", "pg"] = env.str("VITE_SITE", "")
 CLIENT_URL_JOBS_PREFIX = "" if VITE_SITE == "pg" else "/jobs"
+PG_AIRTABLE_API = env.str("PG_AIRTABLE_API", "")

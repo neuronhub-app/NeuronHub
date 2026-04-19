@@ -16,11 +16,12 @@ from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobAlertLog
 from neuronhub.apps.jobs.models import JobLocation
+from neuronhub.apps.jobs.tasks import airtable_sync_task
 from neuronhub.apps.jobs.tasks import send_job_alert_emails_by_ids_task
 
 
 @admin.register(Job)
-class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
+class JobAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdmin):
     list_display = [
         "title",
         "org",
@@ -54,6 +55,7 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         ("tags_experience", DALFRelatedFieldAjaxMulti),
         ("bookmarked_by_users", DALFRelatedFieldAjaxMulti),
         ("org", DALFRelatedFieldAjaxMulti),
+        "is_published",
         "created_at",
         "posted_at",
         "closes_at",
@@ -117,6 +119,20 @@ class JobAdmin(SimpleHistoryAdmin, DALFModelAdmin):
     ]
 
     readonly_fields = ["slug", "created_at", "updated_at"]
+
+    changelist_actions = ["airtable_sync"]
+
+    @action(label="Sync Airtable", description="Enqueue Airtable Orgs+Jobs sync task")
+    def airtable_sync(self, request: HttpRequest, queryset: QuerySet):
+        if not request.user.is_superuser:
+            self.message_user(request, "Must be a superuser.", level=messages.ERROR)
+            return
+
+        airtable_sync_task.enqueue(email_to_notify=request.user.email)
+        self.message_user(
+            request,
+            f"Enqueued Airtable sync task. On completion you'll receive an email at {request.user.email}.",
+        )
 
 
 @admin.register(JobAlert)

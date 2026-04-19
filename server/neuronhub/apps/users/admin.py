@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
 
 from neuronhub.apps.users.models import User
+from neuronhub.apps.users.models import UserAnon
 from neuronhub.apps.users.models import UserConnectionGroup
 
 
@@ -127,4 +128,16 @@ class UserConnectionGroupAdmin(admin.ModelAdmin):
     autocomplete_fields = [
         "user",
         "connections",
+    ]
+
+
+@admin.register(UserAnon)
+class UserAnonAdmin(admin.ModelAdmin):
+    list_display = [
+        "anon_name",
+        "email_hash",
+    ]
+    search_fields = [
+        "anon_name",
+        "email_hash",
     ]

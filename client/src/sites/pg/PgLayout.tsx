@@ -1,3 +1,4 @@
+import { urls } from "@/urls";
 import {
   type StackProps,
   Box,
@@ -12,7 +13,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { Outlet } from "react-router";
+import { Outlet, useLocation } from "react-router";
 import { SlEnvolope } from "react-icons/sl";
 import {
   FaLinkedin,
@@ -34,7 +35,12 @@ import { layout } from "@/sites/pg/PgLayoutConfig";
 const style = layout.style.container;
 
 export default function PgLayout() {
+  const location = useLocation();
+
   const configSnap = useSnapshot(siteConfigState);
+
+  // todo ? refac: dumb. move to routes.ts param or similar
+  const isMaxW = location.pathname.startsWith(urls.jobs.versions);
 
   const footer = useFooterSections(configSnap.data?.footer_sections);
 
@@ -45,8 +51,8 @@ export default function PgLayout() {
         isLoading={configSnap.isLoading}
       />
 
-      <Stack as="main" flex="1" alignItems="stretch" overflow="hidden" pb={style.paddingBottom}>
-        <Container px={style.paddingX}>
+      <Stack as="main" flex="1" align="stretch" overflow="hidden" pb={style.paddingBottom}>
+        <Container px={style.paddingX} maxW={isMaxW ? "100%" : ""}>
           <Outlet />
         </Container>
       </Stack>

@@ -21,27 +21,27 @@ async def publish_job_versions(draft_ids: list[int]) -> None:
             job_draft.slug = slug_old
 
         job_draft.is_published = True
+
         await job_draft.asave(update_fields=["is_published", "slug"])
 
         ids_approved.append(job_draft.pk)
 
-        await job_draft.version_of.aclear()  # todo ! refac: #AI-slop - why. and why job_old isn't using the same if this is what i think this is.
-
     if ids_approved and settings.ALGOLIA["IS_ENABLED"]:
-        await sync_to_async(_algolia_reindex)(ids_approved)
+        await _algolia_reindex_by_ids_wo_wait(ids_approved)
 
 
-def _algolia_reindex(ids_job: list[int]) -> None:
+@sync_to_async
+def _algolia_reindex_by_ids_wo_wait(ids_job: list[int]):
     from algoliasearch_django import algolia_engine
 
     adapter = algolia_engine.get_adapter(model=Job)
-    batch: list[dict] = []
+    jobs_batch: list[dict] = []
     for job in Job.objects.filter(id__in=ids_job):
         if adapter._should_index(job):
-            batch.append(adapter.get_raw_record(job))
+            jobs_batch.append(adapter.get_raw_record(job))
 
     algolia_engine.client.partial_update_objects(
         index_name=adapter.index_name,
-        objects=batch,
+        objects=jobs_batch,
         wait_for_tasks=False,
     )

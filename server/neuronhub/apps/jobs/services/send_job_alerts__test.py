@@ -7,7 +7,6 @@ from neuronhub.apps.jobs.models import JobAlertLog
 from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_qs_by_alert
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
-from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.tests.test_cases import NeuronTestCase
@@ -253,6 +252,17 @@ class TestSendJobAlertEmails(NeuronTestCase):
 
         await self.gen.jobs.job(tags=[tag])
         await self.gen.jobs.job()
+
+        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+
+    async def test_filters_by_is_orgs_highlighted(self):
+        org_high = await self.gen.orgs.create(is_highlighted=True)
+        org_norm = await self.gen.orgs.create()
+
+        alert = await self.gen.jobs.job_alert(is_orgs_highlighted=True)
+
+        await self.gen.jobs.job(org=org_high)
+        await self.gen.jobs.job(org=org_norm)
 
         assert 1 == len(await _get_jobs_qs_by_alert(alert))
 

@@ -207,7 +207,7 @@ type JobVersionType {
   draft_markdown: String!
   published_markdown: String!
   draft: JobType!
-  published: JobType!
+  published: JobType
 }
 
 enum LocationType {

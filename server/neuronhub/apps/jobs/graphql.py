@@ -12,17 +12,17 @@ from django.db.models import Q
 from django.db.models import QuerySet
 from strawberry import ID
 from strawberry import auto
-from strawberry_django.permissions import IsAuthenticated
 from strawberry_django.permissions import IsStaff
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobFaqQuestion
 from neuronhub.apps.jobs.models import JobLocation
+from neuronhub.apps.jobs.services.airtable_sync_jobs import get_jobs_qs_prefetched
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
-from neuronhub.apps.jobs.services.serialize_to_md import serialize_job_to_markdown
+from neuronhub.apps.jobs.services.serialize_job_to_markdown import serialize_job_to_markdown
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.posts.models import PostTag
@@ -138,7 +138,7 @@ class JobVersionType:
     draft_markdown: str
     published_markdown: str
     draft: JobType
-    published: JobType
+    published: JobType | None
 
 
 @strawberry.type(name="Query")
@@ -185,35 +185,37 @@ class JobsQuery:
         alerts = JobAlert.objects.filter(id_ext__in=job_alert_ids_ext).order_by("-created_at")
         return cast(list[JobAlertType], alerts)
 
-    @strawberry_django.field(extensions=[IsAuthenticated()])
+    @strawberry_django.field(extensions=[IsStaff()])
     async def job_versions_pending(self, info: strawberry.Info) -> list[JobVersionType]:
         user = await get_user(info)
-        drafts = (
-            Job.objects.filter(is_published=False).select_related("org").order_by("-updated_at")
-        )
-        drafts = filter_jobs_by_user(user, jobs=drafts)
-        job_versions = [await _compose_job_version(user, draft) async for draft in drafts]
-        return [job_version for job_version in job_versions if job_version]
+        job_drafts = get_jobs_qs_prefetched().filter(is_published=False).order_by("-updated_at")
+        job_drafts = filter_jobs_by_user(user, jobs=job_drafts)
+        return [await _compose_job_version(user, draft) async for draft in job_drafts]
 
 
-async def _compose_job_version(user: User, job_draft: Job) -> JobVersionType | None:
+async def _compose_job_version(user: User, job_draft: Job) -> JobVersionType:
     """
     #AI
-    """
-    jobs_published = Job.objects.filter(slug=job_draft.slug, is_published=True).select_related(
-        "org"
-    )
-    jobs_published = filter_jobs_by_user(user, jobs=jobs_published)
-    job_published = await jobs_published.afirst()
-    if not job_published:
-        return None
 
+    Orphan drafts (no `version_of` published peer) surface with `published=None`
+    and empty `published_markdown`. Airtable sync creates orphans for new URLs.
+    """
+    job_published = await filter_jobs_by_user(
+        user, jobs=job_draft.version_of.filter(is_published=True).select_related("org")
+    ).afirst()
+
+    # todo ! fix: AI-slop. must simply cast().
+    # #bad-infer: Job (Django model) isn't seen as assignable to JobType
+    # (strawberry_django.type wrapper). Worth removing once strawberry-django
+    # exposes a public type-narrowing helper for model->type.
     return JobVersionType(
         id=strawberry.ID(str(job_draft.id)),
-        draft_markdown=await serialize_job_to_markdown(job_draft),
-        published_markdown=await serialize_job_to_markdown(job_published),
         draft=job_draft,  # type: ignore[arg-type]  #bad-infer
+        draft_markdown=await serialize_job_to_markdown(job_draft),
         published=job_published,  # type: ignore[arg-type]  #bad-infer
+        published_markdown=await serialize_job_to_markdown(job_published)
+        if job_published
+        else "",
     )
 
 

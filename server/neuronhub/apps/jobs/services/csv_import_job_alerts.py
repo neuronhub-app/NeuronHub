@@ -1,5 +1,7 @@
 """
 #quality-20% #AI
+
+It migrated the pre-2026.03 JobAlerts.
 """
 
 import csv

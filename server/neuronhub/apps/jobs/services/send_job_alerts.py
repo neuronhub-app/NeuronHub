@@ -287,10 +287,10 @@ async def _get_jobs_qs_by_alert(
             "tags_country_visa_sponsor",
         ]
         for tag_id in tag_ids:
-            q_tag = Q()
-            for field in tag_fields:
-                q_tag |= Q(**{f"{field}__id": tag_id})
-            qs = qs.filter(q_tag)
+            tag_Qs = Q()
+            for tag_field in tag_fields:
+                tag_Qs |= Q(**{f"{tag_field}__id": tag_id})
+            qs = qs.filter(tag_Qs)
         qs = qs.distinct()
 
     if alert.is_orgs_highlighted:

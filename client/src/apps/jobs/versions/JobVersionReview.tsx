@@ -1,28 +1,32 @@
 /**
  * #AI
  */
-import { Box, Button, Card, Checkbox, HStack, Stack, Text } from "@chakra-ui/react";
+import { Badge, Box, Button, Card, Checkbox, HStack, Stack, Text } from "@chakra-ui/react";
 import { createPatch } from "diff";
 import { html } from "diff2html";
 import { ColorSchemeType } from "diff2html/lib/types";
 import "diff2html/bundles/css/diff2html.min.css";
-import { useColorMode } from "@/components/ui/color-mode";
+
+import { useStateValtioSet } from "@neuronhub/shared/utils/useStateValtio";
 import { ids } from "@/e2e/ids";
 import type { ResultOf } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtioSet } from "@neuronhub/shared/utils/useStateValtio";
 import { JobVersionsApproveMutation, JobVersionsPendingQuery } from "./queries";
 
 export function JobVersionReview() {
   const { data, isLoadingFirstTime } = useApolloQuery(JobVersionsPendingQuery);
-  const selected = useStateValtioSet<string>(null);
   const loading = useIsLoading();
-  const colorMode = useColorMode();
+
+  const versionsSelected = useStateValtioSet<string>(null);
 
   if (isLoadingFirstTime) {
-    return <Text color="fg.muted">Loading pending versions...</Text>;
+    return (
+      <Text color="fg.muted" my="gap.md">
+        Loading pending versions...
+      </Text>
+    );
   }
 
   const versions = data?.job_versions_pending ?? [];
@@ -38,30 +42,30 @@ export function JobVersionReview() {
     );
   }
 
-  const isAllSelected = selected.snap.size === versions.length;
+  const isAllSelected = versionsSelected.snap.size === versions.length;
 
   function handleToggleAll() {
     if (isAllSelected) {
-      selected.mutable.clear();
+      versionsSelected.mutable.clear();
     } else {
-      for (const v of versions) {
-        selected.mutable.add(v.id);
+      for (const version of versions) {
+        versionsSelected.mutable.add(version.id);
       }
     }
   }
 
   async function handleApprove() {
     const result = await mutateAndRefetchMountedQueries(JobVersionsApproveMutation, {
-      draft_ids: [...selected.snap].map(Number),
+      draft_ids: [...versionsSelected.snap].map(Number),
     });
     if (result.success) {
-      selected.mutable.clear();
+      versionsSelected.mutable.clear();
     }
   }
 
   return (
-    <Stack gap="gap.lg" w="100%" {...ids.set(ids.job.versions.container)}>
-      <HStack as="header" justify="space-between" flexWrap="wrap">
+    <Stack gap="gap.lg" w="100%" my="gap.lg" {...ids.set(ids.job.versions.container)}>
+      <HStack as="header" justify="space-between" wrap="wrap">
         <Text {...style.heading}>Job Version Review</Text>
 
         <HStack gap="gap.md">
@@ -76,32 +80,29 @@ export function JobVersionReview() {
           </Checkbox.Root>
 
           <Button
-            disabled={selected.snap.size === 0}
-            onClick={() => {
-              loading.track(handleApprove);
+            disabled={versionsSelected.snap.size === 0}
+            onClick={async () => {
+              await loading.track(handleApprove);
             }}
             loading={loading.isActive}
             {...ids.set(ids.job.versions.approveBtn)}
           >
-            Approve ({selected.snap.size})
+            Approve ({versionsSelected.snap.size})
           </Button>
         </HStack>
       </HStack>
 
       <Stack gap="gap.md">
         {versions.map(version => (
-          <VersionCard
+          <JobVersionCard
             key={version.id}
             version={version}
-            diffColorScheme={
-              colorMode.colorMode === "dark" ? ColorSchemeType.DARK : ColorSchemeType.LIGHT
-            }
-            isSelected={selected.snap.has(version.id)}
+            isSelected={versionsSelected.snap.has(version.id)}
             onToggle={() => {
-              if (selected.mutable.has(version.id)) {
-                selected.mutable.delete(version.id);
+              if (versionsSelected.mutable.has(version.id)) {
+                versionsSelected.mutable.delete(version.id);
               } else {
-                selected.mutable.add(version.id);
+                versionsSelected.mutable.add(version.id);
               }
             }}
           />
@@ -122,26 +123,25 @@ type VersionType = NonNullable<
   ResultOf<typeof JobVersionsPendingQuery>["job_versions_pending"]
 >[number];
 
-function VersionCard(props: {
+function JobVersionCard(props: {
   version: VersionType;
-  diffColorScheme: ColorSchemeType;
   isSelected: boolean;
   onToggle: () => void;
 }) {
+  const isNewDraft = props.version.published === null;
+
   const htmlDiff = html(
     createPatch(
-      props.version.draft.title,
+      `${props.version.draft.title}.md`,
       props.version.published_markdown,
       props.version.draft_markdown,
-      "Published",
-      "Draft",
     ),
     {
       outputFormat: "side-by-side",
       drawFileList: false,
       matching: "lines",
       diffStyle: "word",
-      colorScheme: props.diffColorScheme,
+      colorScheme: ColorSchemeType.AUTO,
     },
   );
 
@@ -153,7 +153,7 @@ function VersionCard(props: {
       cursor="pointer"
       {...ids.set(ids.job.versions.card)}
     >
-      <Card.Body gap="gap.sm">
+      <Card.Body gap="gap.sm" p="gap.md">
         <HStack gap="gap.sm">
           <Checkbox.Root
             checked={props.isSelected}
@@ -172,6 +172,8 @@ function VersionCard(props: {
           <Text color="fg.muted" fontSize="sm">
             {props.version.draft.org.name}
           </Text>
+
+          {isNewDraft && <Badge>new</Badge>}
         </HStack>
 
         <Box
@@ -184,7 +186,7 @@ function VersionCard(props: {
             "& .d2h-code-line-prefix": { display: "none" },
             "& .d2h-info": { display: "none" },
             "& .d2h-code-side-line": { padding: 0 },
-            "& .d2h-file-wrapper": { border: 0 },
+            "& .d2h-file-wrapper": { border: 0, marginBottom: 0 },
             "& .d2h-file-side-diff": { overflow: "auto" },
           }}
           // biome-ignore lint/security/noDangerouslySetInnerHtml: diff2html output from our own backend data
