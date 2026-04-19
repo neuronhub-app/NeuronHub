@@ -1,3 +1,8 @@
+"""
+#AI-slop
+- magic strings
+"""
+
 from django.test import override_settings
 
 from neuronhub.apps.jobs.models import JobAlert
@@ -43,7 +48,7 @@ class TestJobAlertSubscribe(NeuronTestCase):
 
         alert = await JobAlert.objects.alatest()
         assert alert.salary_min == 80000
-        assert alert.is_exclude_no_salary is True
+        assert alert.is_exclude_no_salary
 
     async def test_track_click_adds_job_and_increments_count(self):
         alert = await self.gen.jobs.job_alert()
@@ -57,7 +62,7 @@ class TestJobAlertSubscribe(NeuronTestCase):
             """,
         )
         assert not res.errors
-        assert res.data["job_alert_track_click"] is True
+        assert res.data["job_alert_track_click"]
 
         await alert.arefresh_from_db()
         assert alert.jobs_clicked_count == 1

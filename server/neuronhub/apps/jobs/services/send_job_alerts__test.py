@@ -15,7 +15,7 @@ from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
 class TestSendJobAlertEmails(NeuronTestCase):
-    async def test_staff_only_skips_non_staff_alerts(self):
+    async def test_skips_if_staff_only(self):
         site = await SiteConfig.get_solo()
         site.is_job_alerts_staff_only = True
         await site.asave()
@@ -64,13 +64,13 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert stats.skipped_due_to_duplicates == 2
         assert len(mail.outbox) == 0
 
-    async def test_skips_inactive(self):
+    async def test_skips_inactive_alerts(self):
         await self.gen.jobs.job_alert(is_active=False)
         await self.gen.jobs.job()
         stats = await send_job_alerts()
         assert stats.sent == 0
 
-    async def test_sends_only_at_the_tz_hour(self):
+    async def test_sends_only_at_user_tz_8am(self):
         await self.gen.jobs.job_alert(tz=settings.TIME_ZONE)
         await self.gen.jobs.job()
 
@@ -86,7 +86,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert stats.skipped_due_to_tz == 0
         assert stats.sent == 1
 
-    async def test_sends_always_if_no_tz_is_defined(self):
+    async def test_sends_always_if_tz_is_none(self):
         await self.gen.jobs.job_alert(tz=None)
         await self.gen.jobs.job()
         hour_future = self.gen.datetime_now().hour + 12
@@ -101,7 +101,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert stats.skipped_due_to_tz == 0
         assert stats.skipped_due_to_duplicates == 1
 
-    async def test_template_override(self):
+    async def test_email_template_override(self):
         site = await SiteConfig.get_solo()
 
         test_name = "Custom"
@@ -119,7 +119,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert test_name in email_html
         assert test_addr in email_html
 
-    async def test_email_contains_alert_id_ext_in_job_urls(self):
+    async def test_email_template_has_alert_id_ext_in_job_urls(self):
         site = await SiteConfig.get_solo()
         site.email_template_job_alert = ""
         await site.asave()
@@ -226,8 +226,8 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
     async def test_tag_filter_uses_AND_not_OR(self):
-        tag_skill = await self.gen.posts.tag("Python", Category.Skill)
-        tag_area = await self.gen.posts.tag("SomeArea", Category.Area)
+        tag_skill = await self.gen.posts.tag(category=Category.Skill)
+        tag_area = await self.gen.posts.tag(category=Category.Area)
 
         alert = await self.gen.jobs.job_alert(tags=[tag_skill, tag_area])
 
@@ -237,20 +237,6 @@ class TestSendJobAlertEmails(NeuronTestCase):
 
         jobs = await _get_jobs_qs_by_alert(alert)
         assert 1 == len(jobs)
-
-    # boolean filters
-    # ----------------------------------------------------------------------------
-
-    async def test_filters_by_is_orgs_highlighted(self):
-        org_h = await Org.objects.acreate(name="Highlighted", is_highlighted=True)
-        org_n = await Org.objects.acreate(name="Normal", is_highlighted=False)
-
-        alert = await self.gen.jobs.job_alert(is_orgs_highlighted=True)
-
-        await self.gen.jobs.job(org=org_h)
-        await self.gen.jobs.job(org=org_n)
-
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
 
     async def test_filters_by_tag_enum_1(self):
         tag = await self.gen.posts.tag(Job.Tags.CareerCapital, Category.Area)

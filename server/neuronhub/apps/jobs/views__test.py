@@ -9,6 +9,7 @@ from django.urls import reverse
 
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
+
 CRON_SECRET = "test-secret-123"
 
 
@@ -18,18 +19,16 @@ class SendEmailsCronTest(NeuronTestCase):
     async def test_valid_secret_enqueues_task(self):
         with patch("neuronhub.apps.jobs.views.send_job_alert_emails_task") as mock_task:
             mock_task.aenqueue = AsyncMock()
-            response = await _get(secret=CRON_SECRET)
+            response = await _get_url(secret=CRON_SECRET)
 
         assert response.status_code == HTTPStatus.OK
         mock_task.aenqueue.assert_called_once()
 
     async def test_invalid_secret_returns_403(self):
-        response = await _get(secret="wrong-secret")
+        response = await _get_url(secret="wrong-secret")
         assert response.status_code == HTTPStatus.FORBIDDEN
 
 
-def _get_sync(secret: str):
+@sync_to_async
+def _get_url(secret: str):
     return Client().get(reverse("jobs_send_emails_cron", args=[secret]))
-
-
-_get = sync_to_async(_get_sync)
