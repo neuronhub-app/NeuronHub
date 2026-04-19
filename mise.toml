@@ -1,17 +1,17 @@
 redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
 [tools]
-    "aqua:nushell/nushell" = "latest"
+    "aqua:nushell/nushell" = "0.112.1"
 
-    uv = "latest"
-    pnpm = "latest"
-    biome = "latest"
+    uv = "0.11.6"
+    pnpm = "10.33.0"
+    biome = "2.4.11"
 
-	usage = "latest"
-    rclone = "latest"
-    killport = "latest"
+	usage = "3.2.0"
+    rclone = "1.73.4"
+    killport = "2.0.0"
 
-    node = "25"
+    node = "25.9.0"
 
 [settings]
 	lockfile = true
@@ -95,7 +95,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     VITE_GTM_ID = "${VITE_GTM_ID:-}"
 
     VITE_POSTHOG_TOKEN = "phc_NUVnraDugjykU3o5c3w6RFTJ2MK4u4G0iprxPaRjuN5"
-    VITE_POSTHOG_HOST = "https://eu.i.posthog.com"
+    VITE_POSTHOG_HOST = "https://tk.neuronhub.app"
+    VITE_POSTHOG_IS_ENABLED = "true"
 
     # Dev
 
@@ -119,6 +120,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = 1
     DISABLE_ERROR_REPORTING = 1
     DISABLE_BUG_COMMAND = 1
+    ENABLE_PROMPT_CACHING_1H = 1 # default has been 5m since March 6th
+    CLAUDE_CODE_ENABLE_AWAY_SUMMARY = 1 # gets disabled by telemetry drop below
 
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1 # drops telemetry & npm updates
 
