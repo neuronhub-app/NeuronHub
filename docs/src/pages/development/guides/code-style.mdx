@@ -72,12 +72,15 @@ Extra guidelines:
 ## Tags
 
 Code blocks can be marked with:
-- <TagLg>#AI</TagLg> - not 100% reviewed LLM code => deceiving and dangerous.
-- <TagLg>#AI-slop</TagLg> - trash to drop.
 - <TagLg>#bad-infer</TagLg> - broken TS type inference. Over time we'll check if it was fixed.
 - <TagLg>#prob-redundant</TagLg> - but removal isn't a priority.
 - <TagLg>#draft</TagLg> - not tested, not working, or not ready for prod.
 - <TagLg>#E2E-fails</TagLg> - may be in Git commit body, because we still lack E2E CI.
+
+Tags LLMs shall not change:
+- <TagLg>#AI</TagLg> - not 100% reviewed LLM code => deceiving and dangerous.
+- <TagLg>#AI-slop</TagLg> - trash to drop.
+- <TagLg>#AI-regurgitation</TagLg>
 - <TagLg>#quality-[0-100]%</TagLg> - the amount of review & refactors as a percentage, eg:
     - 0-20 - #AI-slop
     - 20-40 - #AI, ie verified/reviewed #AI-slop
