@@ -31,6 +31,7 @@ from neuronhub.apps.users.models import User
 
 
 class Gen:
+    orgs: OrgsGen
     users: UsersGen
     posts: PostsGen
     profiles: ProfilesGen
@@ -55,6 +56,7 @@ class Gen:
         self.random_gen_seeded = faker.random
         self.faker_non_unique = faker
 
+        self.orgs = OrgsGen(faker=self.faker)
         self.users = await UsersGen.create(
             faker=self.faker,
             is_user_default_superuser=is_user_default_superuser,
@@ -62,7 +64,7 @@ class Gen:
         )
         self.posts = PostsGen(faker=self.faker, user=self.users.user_default)
         self.profiles = ProfilesGen(faker=self.faker, user=self.users.user_default)
-        self.jobs = JobsGen(faker=self.faker)
+        self.jobs = JobsGen(faker=self.faker, orgs=self.orgs)
 
         return self
 
@@ -74,6 +76,20 @@ class Gen:
 
     def image(self, content=b"image_content") -> SimpleUploadedFile:
         return SimpleUploadedFile(name="image.jpg", content=content, content_type="image/jpeg")
+
+
+@dataclass
+class OrgsGen:
+    faker: UniqueProxy
+
+    async def create(self, is_highlighted: bool = False):
+        domain = self.faker.domain_name()
+        return await Org.objects.acreate(
+            name=self.faker.company(),
+            website=domain,
+            domain=domain,
+            is_highlighted=is_highlighted,
+        )
 
 
 @dataclass
@@ -439,6 +455,7 @@ class ProfilesGen:
 @dataclass
 class JobsGen:
     faker: UniqueProxy
+    orgs: OrgsGen
     visibility_default: Visibility = Visibility.PUBLIC
 
     async def job(
@@ -459,10 +476,8 @@ class JobsGen:
         locations: list[JobLocation] | None = None,
     ) -> Job:
         if not org:
-            org, _ = await Org.objects.aget_or_create(
-                name=self.faker.company(),
-                defaults={"website": self.faker.domain_name()},
-            )
+            org = await self.orgs.create()
+
         job = Job(
             is_test_job=True,
             title=title or self.faker.sentence(),
