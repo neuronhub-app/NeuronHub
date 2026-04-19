@@ -1,9 +1,10 @@
 """
 Syncs PG Airtable. Mark missing Jobs.is_published=False -> drop out of Algolia.
 
-#quality-28% #AI
+#quality-24% #AI
 - 63% -> 20%: regurgitated slop for Job drafts
 - 20% -> 28%: cleanup by LLM & hands
+- 28% -> 24%: logic for is_pending_removal by LLM
 """
 
 import csv
@@ -87,12 +88,17 @@ async def _sync_jobs_parsed(jobs_parsed: list[JobParsed], limit: int = None) -> 
                 case SyncResult.NotChanged:
                     stats.not_changed += 1
 
-        urls_external_synced = {job_parsed.url_external for job_parsed in jobs_parsed}
-        stats.unpublished = await (
+        job_urls_in_airtable = {job_parsed.url_external for job_parsed in jobs_parsed}
+        async for job_published in (
             Job.objects.filter(is_published=True)
-            .exclude(url_external__in=urls_external_synced)
-            .aupdate(is_published=False)
-        )
+            .exclude(url_external__in=job_urls_in_airtable)
+            .select_related("org")
+        ):
+            if await job_published.versions.filter(is_pending_removal=True).aexists():
+                continue
+            job_removal_draft = await _create_job_draft_is_pending_removal(job_published)
+            await job_published.versions.aadd(job_removal_draft)
+            stats.unpublished += 1
 
     return stats
 
@@ -109,6 +115,11 @@ async def _sync_job_parsed(job_parsed: JobParsed) -> SyncResult:
 
     Diff gate via `serialize_job_to_markdown` -> no Job.updated_at bump -> no Algolia reindex.
     """
+    # if reappeared in Airtable -> drop is_pending_removal draft.
+    await Job.objects.filter(
+        is_pending_removal=True, url_external=job_parsed.url_external
+    ).adelete()
+
     org_name = job_parsed.org_name.replace('"', "") or job_parsed.title
     org, _ = await Org.objects.aget_or_create(name=org_name)
 
@@ -209,6 +220,32 @@ async def _resolve_tags_by_field(job_parsed: JobParsed) -> dict[str, list[PostTa
             else []
         )
     return tags_by_field
+
+
+async def _create_job_draft_is_pending_removal(job_pub: Job) -> Job:
+    job_draft = await Job.objects.acreate(
+        is_published=False,
+        is_pending_removal=True,
+        # todo ! refac: convert JobParsed to dict
+        title=job_pub.title,
+        url_external=job_pub.url_external,
+        description=job_pub.description,
+        source_ext=job_pub.source_ext,
+        salary_min=job_pub.salary_min,
+        salary_text=job_pub.salary_text,
+        posted_at=job_pub.posted_at,
+        closes_at=job_pub.closes_at,
+        org=job_pub.org,
+        visibility=job_pub.visibility,
+    )
+
+    for tag_field_name in Job.tag_category_to_field.values():
+        if tags_new := [tag async for tag in getattr(job_pub, tag_field_name).all()]:
+            await getattr(job_draft, tag_field_name).aset(tags_new)
+
+    if locations := [loc async for loc in job_pub.locations.all()]:
+        await job_draft.locations.aset(locations)
+    return job_draft
 
 
 async def _sync_locations(locs_parsed: list[LocationParsed]) -> list[JobLocation]:

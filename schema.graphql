@@ -189,6 +189,7 @@ type JobType {
   url_external: String!
   url_external_with_utm: String!
   is_published: Boolean!
+  is_pending_removal: Boolean!
   posted_at: DateTime
   closes_at: DateTime
   tags_skill(filters: PostTagFilter): [PostTagType!]!
@@ -901,7 +902,7 @@ type Query {
   job_faq_questions: [JobFaqQuestionType!]!
   job_by_slug(slug: String!): JobType
   job_alerts: [JobAlertType!]!
-  job_versions_pending: [JobVersionType!]! @IsAuthenticated
+  job_versions_pending: [JobVersionType!]! @IsStaff
   site: SiteConfigType!
 }
 

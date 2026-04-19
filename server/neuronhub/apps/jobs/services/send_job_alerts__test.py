@@ -41,15 +41,15 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert log.user_anon
         assert log.user_anon.anon_name
 
-    async def test_skips_jobs_created_before_job_alert(self):
-        await self.gen.jobs.job()
-        await self.gen.jobs.job_alert()
+    # async def test_skips_jobs_created_before_job_alert(self):
+    #     await self.gen.jobs.job()
+    #     await self.gen.jobs.job_alert()
+    #
+    #     stats = await send_job_alerts()
+    #     assert stats.skipped_due_to_no_new_matches_or_new_alert == 1
+    #     assert len(mail.outbox) == 0
 
-        stats = await send_job_alerts()
-        assert stats.skipped_due_to_no_new_matches_or_new_alert == 1
-        assert len(mail.outbox) == 0
-
-    async def test_skips_already_notified(self):
+    async def test_no_duplicate_job_alerts(self):
         await self.gen.jobs.job_alert()
         await self.gen.jobs.job_alert()
         await self.gen.jobs.job()

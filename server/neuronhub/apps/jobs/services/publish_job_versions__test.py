@@ -36,3 +36,17 @@ class TestApproveVersions(NeuronTestCase):
     async def test_is_in_algolia_index(self):
         assert (await self.gen.jobs.job()).is_in_algolia_index()
         assert (await self.gen.jobs.job(is_published=False)).is_in_algolia_index() is False
+
+    async def test_is_pending_removal_approval_deletes_all_job_versions(self):
+        org = await self.gen.orgs.create()
+
+        job_published = await self.gen.jobs.job(org=org)
+        job_draft = await self.gen.jobs.job(org=org, is_published=False)
+        job_draft.is_pending_removal = True
+        await job_draft.asave()
+        await job_published.versions.aadd(job_draft)
+
+        await publish_job_versions([job_draft.pk])
+
+        assert not await Job.objects.filter(pk=job_published.pk).aexists()
+        assert not await Job.objects.filter(pk=job_draft.pk).aexists()

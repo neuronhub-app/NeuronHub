@@ -129,6 +129,7 @@ function JobVersionCard(props: {
   onToggle: () => void;
 }) {
   const isNewDraft = props.version.published === null;
+  const isRemoval = props.version.draft.is_pending_removal;
 
   const htmlDiff = html(
     createPatch(
@@ -166,32 +167,39 @@ function JobVersionCard(props: {
             <Checkbox.Control />
           </Checkbox.Root>
 
-          <Text fontWeight="bold" fontSize="md">
+          <Text
+            fontWeight="bold"
+            fontSize="md"
+            textDecoration={isRemoval ? "line-through" : undefined}
+          >
             {props.version.draft.title}
           </Text>
           <Text color="fg.muted" fontSize="sm">
             {props.version.draft.org.name}
           </Text>
 
-          {isNewDraft && <Badge>new</Badge>}
+          {isRemoval && <Badge colorPalette="red">removal</Badge>}
+          {isNewDraft && !isRemoval && <Badge>new</Badge>}
         </HStack>
 
-        <Box
-          overflow="auto"
-          fontSize="sm"
-          css={{
-            "& .d2h-wrapper": { margin: 0 },
-            "& .d2h-file-header": { display: "none" },
-            "& .d2h-code-side-linenumber": { display: "none" },
-            "& .d2h-code-line-prefix": { display: "none" },
-            "& .d2h-info": { display: "none" },
-            "& .d2h-code-side-line": { padding: 0 },
-            "& .d2h-file-wrapper": { border: 0, marginBottom: 0 },
-            "& .d2h-file-side-diff": { overflow: "auto" },
-          }}
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: diff2html output from our own backend data
-          dangerouslySetInnerHTML={{ __html: htmlDiff }}
-        />
+        {!isRemoval && (
+          <Box
+            overflow="auto"
+            fontSize="sm"
+            css={{
+              "& .d2h-wrapper": { margin: 0 },
+              "& .d2h-file-header": { display: "none" },
+              "& .d2h-code-side-linenumber": { display: "none" },
+              "& .d2h-code-line-prefix": { display: "none" },
+              "& .d2h-info": { display: "none" },
+              "& .d2h-code-side-line": { padding: 0 },
+              "& .d2h-file-wrapper": { border: 0, marginBottom: 0 },
+              "& .d2h-file-side-diff": { overflow: "auto" },
+            }}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: diff2html output from our own backend data
+            dangerouslySetInnerHTML={{ __html: htmlDiff }}
+          />
+        )}
       </Card.Body>
     </Card.Root>
   );

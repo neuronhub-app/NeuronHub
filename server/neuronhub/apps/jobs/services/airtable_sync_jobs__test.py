@@ -1,5 +1,5 @@
 """
-#quality-30% #AI
+#quality-32% #AI
 """
 
 from unittest.mock import patch
@@ -64,16 +64,34 @@ class TestAirtableSyncJobs(NeuronTestCase):
         assert 0 == await job_draft.version_of.acount()
         assert job_draft.org_id == (await Org.objects.aget(name=org_name)).pk
 
-    async def test_jobs_not_in_sync_become_unpublished(self):
-        job_in_sync = await self.gen.jobs.job()
-        job_not_in_sync = await self.gen.jobs.job()
+    async def test_jobs_not_in_sync_create_removal_drafts_for_approval(self):
+        job_existing = await self.gen.jobs.job()
+        job_removed = await self.gen.jobs.job()
 
-        await _sync_jobs_parsed([_get_job_parsed(job_in_sync)])
+        await _sync_jobs_parsed([_get_job_parsed(job_existing)])
 
-        await job_in_sync.arefresh_from_db()
-        await job_not_in_sync.arefresh_from_db()
-        assert job_in_sync.is_published
-        assert job_not_in_sync.is_published is False
+        await job_existing.arefresh_from_db()
+        await job_removed.arefresh_from_db()
+        assert job_existing.is_published
+        assert job_removed.is_published, "stays until is_pending_removal approved"
+
+        job_draft_removal = await Job.objects.aget(is_published=False, is_pending_removal=True)
+        assert job_draft_removal.url_external == job_removed.url_external
+        assert job_removed == await job_draft_removal.version_of.afirst()
+
+    async def test_job_restore_in_airtable_drops_pending_removal_draft(self):
+        job_pub = await self.gen.jobs.job()
+        await _sync_jobs_parsed([])
+        assert await Job.objects.filter(is_pending_removal=True).aexists()
+
+        # Job reappears
+        job_parsed = _get_job_parsed(job_pub, is_change_desc=True)
+        await _sync_jobs_parsed([job_parsed])
+
+        assert not await Job.objects.filter(is_pending_removal=True).aexists()
+        draft = await Job.objects.aget(is_published=False)
+        assert draft.description == job_parsed.description
+        assert job_pub == await draft.version_of.afirst()
 
     async def test_changes_create_a_new_job_draft(self):
         job_pub = await self.gen.jobs.job()
@@ -92,6 +110,15 @@ class TestAirtableSyncJobs(NeuronTestCase):
         assert job_parsed.description == job_draft.description
         assert job_pub.url_external == job_draft.url_external
         assert job_pub == await job_draft.version_of.afirst()
+
+    async def test_sync_is_idempotent_for_removals(self):
+        job = await self.gen.jobs.job()
+
+        await _sync_jobs_parsed([])
+        await _sync_jobs_parsed([])
+
+        assert 1 == await Job.objects.filter(is_pending_removal=True).acount()
+        assert 1 == await job.versions.filter(is_pending_removal=True).acount()
 
     async def test_sync_is_idempotent_for_no_changes(self):
         job_pub = await self.gen.jobs.job()
@@ -142,7 +169,7 @@ class TestAirtableSyncJobs(NeuronTestCase):
         job_pub = async_to_sync(self.gen.jobs.job)()
         job_parsed = _get_job_parsed(job_pub, is_change_desc=True)
 
-        with self.assertNumQueries(31):
+        with self.assertNumQueries(32):
             async_to_sync(_sync_jobs_parsed)([job_parsed])
 
     async def test_creates_locations_from_parsed_record(self):

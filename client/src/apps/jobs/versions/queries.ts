@@ -11,6 +11,7 @@ export const JobVersionsPendingQuery = graphql.persisted(
         draft {
           id
           title
+          is_pending_removal
           org {
             id
             name

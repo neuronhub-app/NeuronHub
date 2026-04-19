@@ -15,6 +15,12 @@ async def publish_job_versions(draft_ids: list[int]) -> None:
     ids_approved: list[int] = []
 
     async for job_draft in job_drafts:
+        if job_draft.is_pending_removal:
+            if job_old := await job_draft.version_of.afirst():
+                await job_old.adelete()
+            await job_draft.adelete()
+            continue
+
         if job_old := await job_draft.version_of.afirst():
             slug_old = job_old.slug
             await job_old.adelete()

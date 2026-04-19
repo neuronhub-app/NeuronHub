@@ -90,7 +90,9 @@ class JobType:
 
     url_external: auto
     url_external_with_utm: auto
+
     is_published: auto
+    is_pending_removal: auto
 
     posted_at: auto
     closes_at: auto
