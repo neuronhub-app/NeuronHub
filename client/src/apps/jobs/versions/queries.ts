@@ -15,6 +15,9 @@ export const JobVersionsPendingQuery = graphql.persisted(
           org {
             id
             name
+            logo {
+              url
+            }
           }
         }
         published {

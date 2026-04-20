@@ -28,7 +28,7 @@ async def serialize_job_to_markdown(job: Job) -> str:
         lines.append(f"- Closes: {job.closes_at:%Y-%m-%d}")
 
     if job.salary_min:
-        lines.append(f"- Salary min: {job.salary_min:,}")
+        lines.append(f"- Salary min: ${job.salary_min:,}")
     if job.salary_text:
         lines.append(f"- Salary text: {job.salary_text}")
 
