@@ -420,6 +420,13 @@ LOGGING = {
         "handlers": ["console"],
         "level": "INFO",
     },
+    "loggers": {
+        "neuronhub": {
+            "handlers": ["console"],
+            "level": "DEBUG" if DJANGO_ENV is DjangoEnv.DEV else "INFO",
+            "propagate": False,
+        },
+    },
 }
 # supress warn from strawberry-django
 warnings.filterwarnings(
@@ -428,17 +435,15 @@ warnings.filterwarnings(
 
 if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
     # LLM needs clean logs, but Mise's `--quite` doesn't work on `runserver`, and `--silent` drops all stderr - so we drop Django's logs below "WARNING"
-    LOGGING["loggers"] = {
-        "django": {
-            "handlers": ["console"],
-            "level": "WARNING",
-            "propagate": True,
-        },
-        "algoliasearch_django": {
-            "handlers": ["console"],
-            "level": "WARNING",
-            "propagate": True,
-        },
+    LOGGING["loggers"]["django"] = {
+        "handlers": ["console"],
+        "level": "WARNING",
+        "propagate": True,
+    }
+    LOGGING["loggers"]["algoliasearch_django"] = {
+        "handlers": ["console"],
+        "level": "WARNING",
+        "propagate": True,
     }
     # supress asyncio.CancelledError: it's raised by Strawberry historically for no reason. See their github for details
     LOGGING.setdefault("filters", {})
