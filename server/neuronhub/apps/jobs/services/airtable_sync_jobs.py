@@ -8,6 +8,7 @@ Syncs PG Airtable. Mark missing Jobs.is_published=False -> drop out of Algolia.
 """
 
 import csv
+import logging
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import UTC
@@ -32,6 +33,9 @@ from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategory
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.posts.models import PostTagCategory
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -78,9 +82,11 @@ async def _sync_jobs_parsed(jobs_parsed: list[JobParsed], limit: int = None) -> 
         jobs_parsed = jobs_parsed[:limit] if limit else jobs_parsed
 
         for job_parsed in jobs_parsed:
-            sync_result = await _sync_job_parsed(job_parsed)
+            sync_output = await _sync_job_parsed(job_parsed)
 
-            match sync_result:
+            logger.debug(f"Job synced: status={sync_output.result.value}, pk={sync_output.pk}")
+
+            match sync_output.result:
                 case SyncResult.Created:
                     stats.created += 1
                 case SyncResult.Updated:
@@ -103,13 +109,19 @@ async def _sync_jobs_parsed(jobs_parsed: list[JobParsed], limit: int = None) -> 
     return stats
 
 
+@dataclass
+class SyncOutput:
+    pk: int
+    result: SyncResult
+
+
 class SyncResult(Enum):
-    Created = auto()
-    Updated = auto()
-    NotChanged = auto()
+    Created = "Created"
+    Updated = "Updated"
+    NotChanged = "NotChanged"
 
 
-async def _sync_job_parsed(job_parsed: JobParsed) -> SyncResult:
+async def _sync_job_parsed(job_parsed: JobParsed) -> SyncOutput:
     """
     Writes only to Job drafts (is_published=False).
 
@@ -129,28 +141,27 @@ async def _sync_job_parsed(job_parsed: JobParsed) -> SyncResult:
         url_external=job_parsed.url_external, is_published=True
     ).afirst()
 
-    job_draft, is_created = await _sync_job_draft(job_parsed, org, job_published)
+    job_draft = await _sync_job_draft(job_parsed, org)
 
     for tag_field_name, tags in (await _resolve_tags_by_field(job_parsed)).items():
         await getattr(job_draft, tag_field_name).aset(tags)
 
     await job_draft.locations.aset(await _sync_locations(job_parsed.locations))
 
-    if is_created and job_published:
-        await job_published.versions.aadd(job_draft)
+    if job_published is None:
+        return SyncOutput(result=SyncResult.Created, pk=job_draft.pk)
 
-    if job_published:
-        job_draft = await jobs_qs.aget(pk=job_draft.pk)
-        if await serialize_job_to_markdown(job_published) == await serialize_job_to_markdown(
-            job_draft
-        ):
-            await job_draft.adelete()
-            return SyncResult.NotChanged
+    await job_published.versions.aadd(job_draft)
 
-    if is_created:
-        return SyncResult.Created
+    job_draft = await jobs_qs.aget(pk=job_draft.pk)
+    if await serialize_job_to_markdown(job_published) == await serialize_job_to_markdown(
+        job_draft
+    ):
+        # todo !! fix: it can alast() an existing draft, override it with new values, and then can delete it - sounds as a bug.
+        await job_draft.adelete()
+        return SyncOutput(result=SyncResult.NotChanged, pk=job_published.pk)
 
-    return SyncResult.Updated
+    return SyncOutput(result=SyncResult.Updated, pk=job_draft.pk)
 
 
 def get_jobs_qs_prefetched():
@@ -165,25 +176,12 @@ def get_jobs_qs_prefetched():
     )
 
 
-async def _sync_job_draft(
-    job_parsed: JobParsed,
-    org: Org,
-    job_published: Job | None,
-) -> tuple[Job, bool]:
-    job_old_unpublished = await Job.objects.filter(
-        url_external=job_parsed.url_external,
-        is_published=False,
-    ).afirst()
-
-    if is_must_restore_job := (
-        job_published
-        and job_old_unpublished
-        and not await job_old_unpublished.version_of.aexists()
-    ):
-        await job_published.versions.aadd(job_old_unpublished)
-
+async def _sync_job_draft(job_parsed: JobParsed, org: Org) -> Job:
     job_defaults = dict(
-        # todo ! refac: convert JobParsed to dict
+        is_published=False,
+        visibility=Visibility.PUBLIC,
+        org=org,
+        # todo ! refac: convert JobParsed to dict & spread, eg asdict()
         title=job_parsed.title,
         url_external=job_parsed.url_external,
         description=job_parsed.description,
@@ -192,19 +190,25 @@ async def _sync_job_draft(
         salary_text=job_parsed.salary_text,
         posted_at=job_parsed.posted_at,
         closes_at=job_parsed.closes_at,
-        org=org,
-        is_published=False,
-        visibility=Visibility.PUBLIC,
     )
 
-    if job_old_unpublished:
+    # reuse Job (eg unpublished) for preserving [[JobAlert]].jobs_clicked tracking
+    job_draft = (
+        await Job.objects.filter(
+            url_external=job_parsed.url_external,
+            is_published=False,
+        )
+        .order_by("updated_at")
+        .alast()
+    )
+
+    if job_draft:
         for field_name, value in job_defaults.items():
-            setattr(job_old_unpublished, field_name, value)
-        await job_old_unpublished.asave()
+            setattr(job_draft, field_name, value)
+        await job_draft.asave()
+        return job_draft
 
-        return job_old_unpublished, False
-
-    return await Job.objects.acreate(**job_defaults), True
+    return await Job.objects.acreate(**job_defaults)
 
 
 async def _resolve_tags_by_field(job_parsed: JobParsed) -> dict[str, list[PostTag]]:
@@ -226,7 +230,7 @@ async def _create_job_draft_is_pending_removal(job_pub: Job) -> Job:
     job_draft = await Job.objects.acreate(
         is_published=False,
         is_pending_removal=True,
-        # todo ! refac: convert JobParsed to dict
+        # todo ! refac: convert JobParsed to dict & spread
         title=job_pub.title,
         url_external=job_pub.url_external,
         description=job_pub.description,

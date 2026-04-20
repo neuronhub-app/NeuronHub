@@ -1,5 +1,5 @@
 """
-#quality-32% #AI
+#quality-35% #AI
 """
 
 from unittest.mock import patch
@@ -92,6 +92,13 @@ class TestAirtableSyncJobs(NeuronTestCase):
         draft = await Job.objects.aget(is_published=False)
         assert draft.description == job_parsed.description
         assert job_pub == await draft.version_of.afirst()
+
+    async def test_job_existing_is_updated_not_created(self):
+        job = await self.gen.jobs.job()
+
+        stats = await _sync_jobs_parsed([_get_job_parsed(job, is_change_desc=True)])
+        assert stats.created == 0
+        assert stats.updated == 1
 
     async def test_changes_create_a_new_job_draft(self):
         job_pub = await self.gen.jobs.job()
