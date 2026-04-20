@@ -12,6 +12,7 @@ export const JobVersionsPendingQuery = graphql.persisted(
           id
           title
           is_pending_removal
+          url_external
           org {
             id
             name

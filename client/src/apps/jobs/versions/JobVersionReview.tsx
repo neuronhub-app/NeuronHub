@@ -23,7 +23,7 @@ import { createPatch } from "diff";
 import { html } from "diff2html";
 import { ColorSchemeType } from "diff2html/lib/types";
 import "diff2html/bundles/css/diff2html.min.css";
-import { LuChevronDown, LuEllipsisVertical } from "react-icons/lu";
+import { LuChevronDown, LuEllipsisVertical, LuExternalLink } from "react-icons/lu";
 
 import { admin } from "@neuronhub/shared/admin-urls";
 import { Prose } from "@neuronhub/shared/components/ui/prose";
@@ -279,6 +279,25 @@ function JobVersionCard(props: {
           {props.section === "removed" && <Badge colorPalette="red">removal</Badge>}
           {props.section === "new" && <Badge>new</Badge>}
 
+          {props.version.draft.url_external && (
+            <IconButton
+              asChild
+              variant="ghost"
+              size="sm"
+              aria-label="Open external URL"
+              onClick={event => {
+                event.stopPropagation();
+              }}
+            >
+              <Link
+                href={props.version.draft.url_external}
+                target="_blank"
+              >
+                <LuExternalLink />
+              </Link>
+            </IconButton>
+          )}
+
           <JobVersionMenu
             draftId={props.version.draft.id}
             publishedId={props.version.published?.id ?? null}
@@ -335,8 +354,10 @@ function JobVersionBody(props: { version: VersionType; section: Section }) {
         "& .d2h-code-line-prefix": { display: "none" },
         "& .d2h-info": { display: "none" },
         "& .d2h-code-side-line": { padding: 0 },
+        "& .d2h-code-line-ctn": {
+          whiteSpace: "pre-wrap",
+        },
         "& .d2h-file-wrapper": { border: 0, marginBottom: 0 },
-        "& .d2h-file-side-diff": { overflow: "auto" },
       }}
       // biome-ignore lint/security/noDangerouslySetInnerHtml: diff2html output from our own backend data
       dangerouslySetInnerHTML={{ __html: htmlDiff }}
