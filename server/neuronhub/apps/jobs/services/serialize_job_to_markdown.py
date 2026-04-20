@@ -23,7 +23,7 @@ async def serialize_job_to_markdown(job: Job) -> str:
         lines.append(f"- Locations: {', '.join(location_names)}")
 
     if job.posted_at:
-        lines.append(f"- Posted: {job.posted_at:%Y-%m-%d %H:%M}")
+        lines.append(f"- Posted: {job.posted_at:%Y-%m-%d}")
     if job.closes_at:
         lines.append(f"- Closes: {job.closes_at:%Y-%m-%d}")
 

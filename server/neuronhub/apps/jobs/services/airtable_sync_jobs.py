@@ -1,10 +1,11 @@
 """
 Syncs PG Airtable. Mark missing Jobs.is_published=False -> drop out of Algolia.
 
-#quality-24% #AI
+#quality-30% #AI
 - 63% -> 20%: regurgitated slop for Job drafts
 - 20% -> 28%: cleanup by LLM & hands
 - 28% -> 24%: logic for is_pending_removal by LLM
+- 24% -> 30%: test & patch with prod data
 """
 
 import csv
@@ -14,7 +15,6 @@ from dataclasses import field
 from datetime import UTC
 from datetime import datetime
 from enum import Enum
-from enum import auto
 from io import StringIO
 
 import sentry_sdk
@@ -62,6 +62,7 @@ def _fetch_airtable_jobs() -> list[RecordDict]:
     #AI
     - cell_format=string resolves linked records & lookups to readable strings - matching the prev CSV format. # todo ? refac: drop - dumb idea
     - Airtable API requires `time_zone` & `user_locale`.
+    - `time_zone=settings.TIME_ZONE` (PT): matches legacy CSV import.
     """
     table = Api(settings.PG_AIRTABLE_API).table(
         base_id="appZANZAyzdYZvei2",
@@ -70,7 +71,7 @@ def _fetch_airtable_jobs() -> list[RecordDict]:
     return table.all(
         view="viwciUHc5VAV0L39e",
         cell_format="string",
-        time_zone="UTC",
+        time_zone=settings.TIME_ZONE,
         user_locale="en-us",
     )
 
