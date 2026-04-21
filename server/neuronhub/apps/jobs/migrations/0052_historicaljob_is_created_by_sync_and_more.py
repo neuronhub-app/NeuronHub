@@ -5,21 +5,25 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('jobs', '0051_restore_job_slug_is_published_unique'),
+        ("jobs", "0051_restore_job_slug_is_published_unique"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historicaljob',
-            name='is_created_by_sync',
-            field=models.BooleanField(default=False, help_text='Allows to update the existing Job draft from previous sync runs, instead of creating a new one each time and confusing the reviewer.'),
+            model_name="historicaljob",
+            name="is_created_by_sync",
+            field=models.BooleanField(
+                default=False,
+                help_text="Allows to update the existing Job draft from previous sync runs, instead of creating a new one each time and confusing the reviewer.",
+            ),
         ),
         migrations.AddField(
-            model_name='job',
-            name='is_created_by_sync',
-            field=models.BooleanField(default=False, help_text='Allows to update the existing Job draft from previous sync runs, instead of creating a new one each time and confusing the reviewer.'),
+            model_name="job",
+            name="is_created_by_sync",
+            field=models.BooleanField(
+                default=False,
+                help_text="Allows to update the existing Job draft from previous sync runs, instead of creating a new one each time and confusing the reviewer.",
+            ),
         ),
     ]
-

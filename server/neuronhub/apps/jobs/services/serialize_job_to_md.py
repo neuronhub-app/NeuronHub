@@ -40,7 +40,6 @@ async def serialize_job_to_md(job: Job) -> str:
     await _append_tags(lines, label="Education", manager=job.tags_education)
     await _append_tags(lines, label="Experience", manager=job.tags_experience)
     await _append_tags(lines, label="Workload", manager=job.tags_workload)
-    await _append_tags(lines, label="Visa sponsor", manager=job.tags_country_visa_sponsor)
 
     if job.description:
         lines.append("")

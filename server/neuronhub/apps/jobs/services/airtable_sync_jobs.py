@@ -97,11 +97,8 @@ async def _sync_jobs_parsed_to_drafts(
             .exclude(url_external__in=job_urls_in_airtable)
             .select_related("org")
         ):
-            if await job_published.versions.filter(is_pending_removal=True).aexists():
-                continue
-            else:
-                job_deletion_draft = await _create_pending_deletion_draft(job_published)
-                await job_published.versions.aadd(job_deletion_draft)
+            if not await job_published.versions.filter(is_pending_removal=True).aexists():
+                await _create_pending_deletion_draft(job_published)
 
             stats.deleted += 1
 
@@ -184,16 +181,15 @@ async def _sync_job_draft(job_parsed: JobParsed, job_pub_current: Job | None) ->
         job_draft = job_draft_from_prev_sync
         for field_name, value in job_draft_fields.items():
             setattr(job_draft, field_name, value)
-        job_draft.skip_history_when_saving = True  # reduce db pollution
-        await job_draft.asave()
     else:
         job_draft = Job(**job_draft_fields)
-        job_draft.skip_history_when_saving = True
-        await job_draft.asave()
 
-        if job_pub_current:
-            job_draft.slug = job_pub_current.slug  # must be manual
-            await job_draft.asave()
+    job_draft.skip_history_when_saving = True  # type: ignore[attr-defined]  #bad-infer
+    await job_draft.asave()
+
+    if job_pub_current:
+        job_draft.slug = job_pub_current.slug  # must be manual
+        await job_draft.asave()
 
     for tag_field_name, tags in (await _resolve_tags_by_field(job_parsed)).items():
         await getattr(job_draft, tag_field_name).aset(tags)
@@ -250,12 +246,15 @@ async def _create_pending_deletion_draft(job_pub: Job) -> Job:
     job_draft.slug = job_pub.slug  # must be manual
     await job_draft.asave()
 
+    await job_pub.versions.aadd(job_draft)
+
     for tag_field_name in Job.tag_category_to_field.values():
         if tags_new := [tag async for tag in getattr(job_pub, tag_field_name).all()]:
             await getattr(job_draft, tag_field_name).aset(tags_new)
 
     if locations := [loc async for loc in job_pub.locations.all()]:
         await job_draft.locations.aset(locations)
+
     return job_draft
 
 
