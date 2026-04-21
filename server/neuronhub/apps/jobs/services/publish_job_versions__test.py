@@ -49,3 +49,16 @@ class TestApproveVersions(NeuronTestCase):
         job_draft_1 = await self.gen.jobs.job(is_published=False, slug=job.slug)
         job_draft_2 = await self.gen.jobs.job(is_published=False, slug=job.slug)
         assert job.slug == job_draft_1.slug == job_draft_2.slug
+
+    async def test_orphan_draft_with_slug_colliding_with_unrelated_pub_is_reslugged(
+        self,
+    ):
+        job = await self.gen.jobs.job()
+        job_draft_unrelated = await self.gen.jobs.job(is_published=False, slug=job.slug)
+
+        await publish_job_versions([job_draft_unrelated.pk])
+
+        assert await Job.objects.filter(pk=job.pk).aexists()
+        await job_draft_unrelated.arefresh_from_db()
+        assert job_draft_unrelated.is_published
+        assert job_draft_unrelated.slug != job.slug

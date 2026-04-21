@@ -61,6 +61,11 @@ async def _job_create_or_update(job_draft: Job):
     else:
         ids_created.append(job_draft.pk)
 
+    if is_slug_dups_exist := await Job.objects.filter(
+        slug=job_draft.slug, is_published=True
+    ).aexists():
+        job_draft.slug = f"{job_draft.slug}-{job_draft.pk}"
+
     job_draft.is_published = True
     await job_draft.asave()
 
