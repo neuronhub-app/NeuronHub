@@ -1,8 +1,6 @@
 ## Pytest
 
 Run by `mise pytest`. Pass any args/kwargs only after `--`.
-- pass a single file to run as a positional arg.
-- pass any other args/flags after `--`.
 
 Subclass `NeuronTestCase`, from [test_cases](/server/neuronhub/apps/tests/test_cases.py). It's code structure:
 
@@ -68,7 +66,6 @@ async def _add_connection(user: User, connection_new: User):
 
 Pytest runs with `--reuse-db` in `pyproject.toml`. If you change applied migrations - you must reset the test db.
 
-### LLM API tests
+### Slow tests
 
-`@pytest.mark.slow_llm_api` is for integration tests that call the Claude Code binary - this always fails when invoked within the `claude` process, as it prohibits calling itself.
-They're skipped by default in `mise pytest` command, along with `mark.firebase_subscription`.
+Some tests are skipped by default in `pyproject.toml` as `addopts: ["-m not slow_llm_api and not firebase_subscription"]`.

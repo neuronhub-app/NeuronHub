@@ -200,18 +200,9 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     [tasks."test:pytest"]
         dir = "server"
         depends = "dev:db"
-        usage = '''
-            arg "<args>" default=""
-            flag "-a --include-all" default=#false
-            flag "-m --markers <markers>" default="not slow_llm_api and not firebase_subscription"
-        '''
         run = """
             job spawn { mise dev:s3 }
-
-            let markers = if ($env.usage_include_all | into bool) { "" } else { $"-m ($env.usage_markers)" }
-            let args = $"($env.usage_args)" | str replace "server/" ""
-
-            uv run pytest $markers $args
+            uv run pytest
         """
         alias = "pytest"
         env.DJANGO_ENV = "dev_test_unit"
