@@ -1,11 +1,12 @@
 """
 Syncs PG Airtable. Mark missing Jobs.is_published=False -> drop out of Algolia.
 
-#quality-34% half #AI
+#quality-35% half #AI
 """
 
 import csv
 import logging
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 from datetime import datetime
@@ -79,6 +80,11 @@ async def _sync_jobs_parsed_to_drafts(
         jobs_parsed = jobs_parsed[:limit] if limit else jobs_parsed
 
         for job_parsed in jobs_parsed:
+            if not job_parsed.org_name.replace('"', "").strip():
+                sentry_sdk.set_context("job_parsed", asdict(job_parsed))
+                sentry_sdk.capture_message("Sync: Airtable missing org_name", level="error")
+                continue
+
             sync_output = await _sync_job_parsed(job_parsed)
 
             logger.debug(f"Job synced: status={sync_output.result.value}, pk={sync_output.pk}")
@@ -150,9 +156,7 @@ async def _sync_job_parsed(job_parsed: JobParsed) -> SyncOutput:
 
 
 async def _sync_job_draft(job_parsed: JobParsed, job_pub_current: Job | None) -> Job:
-    org, _ = await Org.objects.aget_or_create(
-        name=job_parsed.org_name.replace('"', "") or job_parsed.title
-    )
+    org, _ = await Org.objects.aget_or_create(name=job_parsed.org_name.replace('"', ""))
     job_draft_fields = dict(
         is_published=False,
         is_created_by_sync=True,
