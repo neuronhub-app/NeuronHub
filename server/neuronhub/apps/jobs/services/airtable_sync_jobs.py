@@ -181,19 +181,19 @@ async def _sync_job_draft(job_parsed: JobParsed, job_pub_current: Job | None) ->
         .order_by("updated_at")
         .alast()
     ):
+        job_draft = job_draft_from_prev_sync
         for field_name, value in job_draft_fields.items():
-            setattr(job_draft_from_prev_sync, field_name, value)
-        job_draft_from_prev_sync.skip_history_when_saving = True  # reduce db pollution
-        await job_draft_from_prev_sync.asave()
-        return job_draft_from_prev_sync
-
-    job_draft = Job(**job_draft_fields)
-    job_draft.skip_history_when_saving = True  # reduce db pollution
-    await job_draft.asave()
-
-    if job_pub_current:
-        job_draft.slug = job_pub_current.slug  # must be manual
+            setattr(job_draft, field_name, value)
+        job_draft.skip_history_when_saving = True  # reduce db pollution
         await job_draft.asave()
+    else:
+        job_draft = Job(**job_draft_fields)
+        job_draft.skip_history_when_saving = True
+        await job_draft.asave()
+
+        if job_pub_current:
+            job_draft.slug = job_pub_current.slug  # must be manual
+            await job_draft.asave()
 
     for tag_field_name, tags in (await _resolve_tags_by_field(job_parsed)).items():
         await getattr(job_draft, tag_field_name).aset(tags)

@@ -153,6 +153,21 @@ class TestAirtableSyncJobs(NeuronTestCase):
         assert job_draft.pk == job_draft_same.pk
         assert job_pub == await job_draft_same.version_of.afirst()
 
+    async def test_reused_draft_reflects_m2m_tag_change(self):
+        tag_1 = await self.gen.posts.tag(category=TagCategoryEnum.Skill)
+        tag_2 = await self.gen.posts.tag(category=TagCategoryEnum.Skill)
+        job_pub = await self.gen.jobs.job(tags=[tag_1])
+
+        job_parsed = _get_job_parsed(job_pub, is_change_desc=True)
+        job_parsed.tags_skill = [tag_1.name]
+        await _sync_jobs_parsed_to_drafts([job_parsed])
+
+        job_parsed.tags_skill = [tag_2.name]
+        await _sync_jobs_parsed_to_drafts([job_parsed])
+
+        job_draft = await Job.objects.aget(is_published=False)
+        assert [tag_2.name] == sorted([tag.name async for tag in job_draft.tags_skill.all()])
+
     async def test_sync_is_idempotent_for_not_changed_m2m_tags(self):
         tag_skill = await self.gen.posts.tag(category=TagCategoryEnum.Skill)
         loc = await self.gen.jobs.location()
