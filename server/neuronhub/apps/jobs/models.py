@@ -151,6 +151,10 @@ class Job(AlgoliaModel):
         default=False,
         help_text="If this Job was removed in Airtable, the removal will have this flag, and will wait an approval on /jobs/versions from an admin. Only meaningful when is_published=False.",
     )
+    is_created_by_sync = models.BooleanField(
+        default=False,
+        help_text="Allows to update the existing Job draft from previous sync runs, instead of creating a new one each time and confusing the reviewer.",
+    )
 
     is_test_job = models.BooleanField(
         default=False,
@@ -288,6 +292,15 @@ class Job(AlgoliaModel):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["slug"],
+                condition=models.Q(is_published=True),
+                name="unique_job_slug_when_is_published",
+            ),
+        ]
 
 
 class JobAlert(TimeStampedModel):

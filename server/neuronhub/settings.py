@@ -423,7 +423,9 @@ LOGGING = {
     "loggers": {
         "neuronhub": {
             "handlers": ["console"],
-            "level": "DEBUG" if DJANGO_ENV is DjangoEnv.DEV else "INFO",
+            "level": "DEBUG"
+            if DJANGO_ENV in [DjangoEnv.DEV, DjangoEnv.DEV_TEST_E2E]
+            else "INFO",
             "propagate": False,
         },
     },

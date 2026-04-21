@@ -254,6 +254,12 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     dir = "server"
     run = "uv run manage.py db_stubs_repopulate"
 
+[tasks."django:shell"]
+    dir = "server"
+    run = "uv run manage.py shell"
+    interactive = true
+    alias = "s"
+
 [tasks."django:algolia-reindex"]
     dir = "server"
     run = [

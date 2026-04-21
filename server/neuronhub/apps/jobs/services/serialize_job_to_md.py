@@ -3,7 +3,7 @@ from django.db.models import Manager
 from neuronhub.apps.jobs.models import Job
 
 
-async def serialize_job_to_markdown(job: Job) -> str:
+async def serialize_job_to_md(job: Job) -> str:
     lines = [
         f"## {job.title} | {job.org.name}",
         f"- URL: {job.url_external}",

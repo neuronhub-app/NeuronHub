@@ -225,6 +225,7 @@ function JobVersionCard(props: {
       outline={props.isSelected ? "1px solid" : undefined}
       outlineColor={props.isSelected ? "primary" : ""}
       cursor="pointer"
+      mx="2px"
       {...ids.set(ids.job.versions.card)}
     >
       <Card.Body gap="gap.sm" p="gap.md">
@@ -289,10 +290,7 @@ function JobVersionCard(props: {
                 event.stopPropagation();
               }}
             >
-              <Link
-                href={props.version.draft.url_external}
-                target="_blank"
-              >
+              <Link href={props.version.draft.url_external} target="_blank">
                 <LuExternalLink />
               </Link>
             </IconButton>

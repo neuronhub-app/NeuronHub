@@ -22,7 +22,7 @@ from neuronhub.apps.jobs.services.airtable_sync_jobs import get_jobs_qs_prefetch
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
-from neuronhub.apps.jobs.services.serialize_job_to_markdown import serialize_job_to_markdown
+from neuronhub.apps.jobs.services.serialize_job_to_md import serialize_job_to_md
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.posts.models import PostTag
@@ -213,11 +213,9 @@ async def _compose_job_version(user: User, job_draft: Job) -> JobVersionType:
     return JobVersionType(
         id=strawberry.ID(str(job_draft.id)),
         draft=job_draft,  # type: ignore[arg-type]  #bad-infer
-        draft_markdown=await serialize_job_to_markdown(job_draft),
+        draft_markdown=await serialize_job_to_md(job_draft),
         published=job_published,  # type: ignore[arg-type]  #bad-infer
-        published_markdown=await serialize_job_to_markdown(job_published)
-        if job_published
-        else "",
+        published_markdown=await serialize_job_to_md(job_published) if job_published else "",
     )
 
 

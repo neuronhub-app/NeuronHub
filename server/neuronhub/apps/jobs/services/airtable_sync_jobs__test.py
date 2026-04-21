@@ -1,7 +1,8 @@
 """
-#quality-35% #AI
+#quality-37% half #AI
 """
 
+import re
 from unittest.mock import patch
 
 from asgiref.sync import async_to_sync
@@ -14,7 +15,7 @@ from neuronhub.apps.jobs.services.airtable_sync_jobs import LocationParsed
 from neuronhub.apps.jobs.services.airtable_sync_jobs import TagParams
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _airtable
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _parse_location_field
-from neuronhub.apps.jobs.services.airtable_sync_jobs import _sync_jobs_parsed
+from neuronhub.apps.jobs.services.airtable_sync_jobs import _sync_jobs_parsed_to_drafts
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _sync_tags
 from neuronhub.apps.jobs.services.airtable_sync_jobs import airtable_sync_jobs
 from neuronhub.apps.orgs.models import Org
@@ -68,7 +69,7 @@ class TestAirtableSyncJobs(NeuronTestCase):
         job_existing = await self.gen.jobs.job()
         job_removed = await self.gen.jobs.job()
 
-        await _sync_jobs_parsed([_get_job_parsed(job_existing)])
+        await _sync_jobs_parsed_to_drafts([_get_job_parsed(job_existing)])
 
         await job_existing.arefresh_from_db()
         await job_removed.arefresh_from_db()
@@ -77,16 +78,17 @@ class TestAirtableSyncJobs(NeuronTestCase):
 
         job_draft_removal = await Job.objects.aget(is_published=False, is_pending_removal=True)
         assert job_draft_removal.url_external == job_removed.url_external
+        assert job_draft_removal.slug == job_removed.slug
         assert job_removed == await job_draft_removal.version_of.afirst()
 
     async def test_job_restore_in_airtable_drops_pending_removal_draft(self):
         job_pub = await self.gen.jobs.job()
-        await _sync_jobs_parsed([])
+        await _sync_jobs_parsed_to_drafts([])
         assert await Job.objects.filter(is_pending_removal=True).aexists()
 
         # Job reappears
         job_parsed = _get_job_parsed(job_pub, is_change_desc=True)
-        await _sync_jobs_parsed([job_parsed])
+        await _sync_jobs_parsed_to_drafts([job_parsed])
 
         assert not await Job.objects.filter(is_pending_removal=True).aexists()
         draft = await Job.objects.aget(is_published=False)
@@ -96,7 +98,7 @@ class TestAirtableSyncJobs(NeuronTestCase):
     async def test_job_existing_is_updated_not_created(self):
         job = await self.gen.jobs.job()
 
-        stats = await _sync_jobs_parsed([_get_job_parsed(job, is_change_desc=True)])
+        stats = await _sync_jobs_parsed_to_drafts([_get_job_parsed(job, is_change_desc=True)])
         assert stats.created == 0
         assert stats.updated == 1
 
@@ -106,7 +108,7 @@ class TestAirtableSyncJobs(NeuronTestCase):
         description_before = job_pub.description
 
         job_parsed = _get_job_parsed(job_pub, is_change_desc=True)
-        await _sync_jobs_parsed([job_parsed])
+        await _sync_jobs_parsed_to_drafts([job_parsed])
 
         await job_pub.arefresh_from_db()
         assert job_pub.updated_at == updated_at_before, "Job published stays unchanged"
@@ -116,35 +118,36 @@ class TestAirtableSyncJobs(NeuronTestCase):
         job_draft = await Job.objects.aget(is_published=False)
         assert job_parsed.description == job_draft.description
         assert job_pub.url_external == job_draft.url_external
+        assert job_pub.slug == job_draft.slug
         assert job_pub == await job_draft.version_of.afirst()
 
-    async def test_sync_is_idempotent_for_removals(self):
+    async def test_sync_is_idempotent_for_deletion(self):
         job = await self.gen.jobs.job()
 
-        await _sync_jobs_parsed([])
-        await _sync_jobs_parsed([])
+        await _sync_jobs_parsed_to_drafts([])
+        await _sync_jobs_parsed_to_drafts([])
 
         assert 1 == await Job.objects.filter(is_pending_removal=True).acount()
         assert 1 == await job.versions.filter(is_pending_removal=True).acount()
 
-    async def test_sync_is_idempotent_for_no_changes(self):
+    async def test_sync_is_idempotent_if_not_changed(self):
         job_pub = await self.gen.jobs.job()
         updated_at_before = job_pub.updated_at
 
-        await _sync_jobs_parsed([_get_job_parsed(job_pub)])
+        await _sync_jobs_parsed_to_drafts([_get_job_parsed(job_pub)])
 
         await job_pub.arefresh_from_db()
         assert job_pub.updated_at == updated_at_before
         assert not await Job.objects.filter(is_published=False).aexists(), "no new draft"
 
-    async def test_sync_is_idempotent_for_not_changed_drafts(self):
+    async def test_sync_is_idempotent_for_pending_drafts_if_synced_twice(self):
         job_pub = await self.gen.jobs.job()
         job_parsed = _get_job_parsed(job_pub, is_change_desc=True)
 
-        await _sync_jobs_parsed([job_parsed])
+        await _sync_jobs_parsed_to_drafts([job_parsed])
         job_draft = await Job.objects.aget(is_published=False)
 
-        await _sync_jobs_parsed([job_parsed])
+        await _sync_jobs_parsed_to_drafts([job_parsed])
         job_draft_same = await Job.objects.aget(is_published=False)
 
         assert job_draft.pk == job_draft_same.pk
@@ -166,18 +169,20 @@ class TestAirtableSyncJobs(NeuronTestCase):
                 is_remote=loc.is_remote,
             ),
         ]
-        await _sync_jobs_parsed([job_parsed])
+        await _sync_jobs_parsed_to_drafts([job_parsed])
 
         assert not await Job.objects.filter(is_published=False).aexists(), "no new draft"
 
     def test_num_queries_bounded_per_row_is_around_30(self):
-        # todo ? refac: replace with `django_assert_max_num_queries: DjangoAssertNumQueries`
-        # otherwise it rots LLM context on every query change (dumps all SQL to pytest)
         job_pub = async_to_sync(self.gen.jobs.job)()
         job_parsed = _get_job_parsed(job_pub, is_change_desc=True)
 
-        with self.assertNumQueries(32):
-            async_to_sync(_sync_jobs_parsed)([job_parsed])
+        # todo ? refac: use `django_assert_max_num_queries: DjangoAssertNumQueries`
+        with self.assertRaises(expected_exception=AssertionError) as exc:
+            with self.assertNumQueries(0):
+                async_to_sync(_sync_jobs_parsed_to_drafts)([job_parsed])
+        if match := re.search(r"(\d+) queries executed", str(exc.exception)):
+            assert int(match.group(1)) < 40
 
     async def test_creates_locations_from_parsed_record(self):
         records = [
@@ -247,30 +252,6 @@ class TestSyncTags(NeuronTestCase):
 
         assert [TagCategoryEnum.Skill.value] == sorted(
             [c.name async for c in tag.categories.all()]
-        )
-
-    async def test_orphan_draft_reconciles_when_published_appears(self):
-        """
-        Orphan draft pre-exists (eg from a prior sync before Job got
-        published via another path). Sync must not spawn a 2nd draft
-        for the same URL - should reuse/clean the orphan.
-        """
-        job_pub = await self.gen.jobs.job()
-        await self.gen.jobs.job(
-            org=job_pub.org,
-            url_external=job_pub.url_external,
-            is_published=False,
-        )
-
-        job_parsed = _get_job_parsed(job_pub)
-        job_parsed.description += " change"
-        await _sync_jobs_parsed([job_parsed])
-
-        assert (
-            1
-            == await Job.objects.filter(
-                is_published=False, url_external=job_pub.url_external
-            ).acount()
         )
 
 

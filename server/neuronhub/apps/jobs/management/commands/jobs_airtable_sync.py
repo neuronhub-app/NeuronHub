@@ -26,11 +26,11 @@ class Command(BaseCommand):
             # default is_highlighted=False, so any unsynced Org silently
             # corrupts Job visibility on Algolia until next full Orgs sync.
             org_stats = async_to_sync(airtable_sync_orgs)(is_download_logos=not no_logos)
-            self.stdout.write(f"Orgs created:     {org_stats.created}")
-            self.stdout.write(f"Orgs updated:     {org_stats.updated}")
+            self.stdout.write(f"Orgs created: {org_stats.created}")
+            self.stdout.write(f"Orgs updated: {org_stats.updated}")
 
         if not skip_jobs:
             stats = async_to_sync(airtable_sync_jobs)(limit=limit)
-            self.stdout.write(f"Jobs created:     {stats.created}")
-            self.stdout.write(f"Jobs updated:     {stats.updated}")
-            self.stdout.write(f"Jobs unpublished: {stats.unpublished}")
+            self.stdout.write(f"Jobs created: {stats.created}")
+            self.stdout.write(f"Jobs updated: {stats.updated}")
+            self.stdout.write(f"Jobs deleted: {stats.deleted}")

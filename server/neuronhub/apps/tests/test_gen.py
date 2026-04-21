@@ -460,20 +460,22 @@ class JobsGen:
 
     async def job(
         self,
-        org: Org | None = None,
+        org: Org = None,
         title: str = "",
+        slug: str = None,
         description: str = "",
         url_external: str = "",
-        source_ext: Job.SourceExt | None = None,
-        salary_min: int | None = None,
+        source_ext: Job.SourceExt = None,
+        salary_min: int = None,
         salary_text: str = "",
         posted_at=None,
         closes_at=None,
         visibility: Visibility = Visibility.PUBLIC,
         is_published: bool = True,
+        is_created_by_sync: bool = False,
         is_save: bool = True,
-        tags: list[PostTag] | None = None,
-        locations: list[JobLocation] | None = None,
+        tags: list[PostTag] = None,
+        locations: list[JobLocation] = None,
     ) -> Job:
         if not org:
             org = await self.orgs.create()
@@ -491,9 +493,14 @@ class JobsGen:
             closes_at=closes_at,
             visibility=visibility,
             is_published=is_published,
+            is_created_by_sync=is_created_by_sync,
         )
         if is_save:
             await job.asave()
+
+            if slug:
+                job.slug = slug  # must be manual
+                await job.asave()
         if tags:
             for tag in tags:
                 category = await tag.categories.afirst()
@@ -503,6 +510,16 @@ class JobsGen:
         if locations:
             await job.locations.aset(locations)
         return job
+
+    async def job_draft(self, job: Job) -> Job:
+        job_draft = await self.job(
+            org=job.org,
+            slug=job.slug,
+            url_external=job.url_external,
+            is_published=False,
+        )
+        await job.versions.aadd(job_draft)
+        return job_draft
 
     async def location(
         self,
