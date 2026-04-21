@@ -8,10 +8,10 @@ import csv
 import logging
 from dataclasses import dataclass
 from dataclasses import field
-from datetime import UTC
 from datetime import datetime
 from enum import Enum
 from io import StringIO
+from zoneinfo import ZoneInfo
 
 import sentry_sdk
 from django.conf import settings
@@ -338,10 +338,14 @@ def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
         source_ext=source_raw or None,
         salary_min=int(float(salary_min_raw.replace(",", ""))) if salary_min_raw else None,
         salary_text=fields.get(_airtable.salary_text, "").strip(),
-        closes_at=datetime.strptime(closes_at_raw, "%Y-%m-%d").replace(tzinfo=UTC)
+        closes_at=datetime.strptime(closes_at_raw, "%Y-%m-%d").replace(
+            tzinfo=ZoneInfo(settings.TIME_ZONE)
+        )
         if closes_at_raw
         else None,
-        posted_at=datetime.strptime(posted_at_raw, "%B %d, %Y").replace(tzinfo=UTC)
+        posted_at=datetime.strptime(posted_at_raw, "%B %d, %Y").replace(
+            tzinfo=ZoneInfo(settings.TIME_ZONE)
+        )
         if posted_at_raw
         else None,
     )

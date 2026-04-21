@@ -46,7 +46,7 @@ def _fetch_airtable_records() -> list[RecordDict]:
     return table.all(
         view="viwQ4zHDxVUBZZWEs",
         cell_format="string",
-        time_zone="UTC",
+        time_zone=settings.TIME_ZONE,
         user_locale="en-us",
     )
 
