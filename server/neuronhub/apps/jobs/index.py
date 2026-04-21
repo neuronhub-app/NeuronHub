@@ -48,10 +48,13 @@ if settings.ALGOLIA["IS_ENABLED"]:
     class JobIndex(AlgoliaIndex):
         index_name = "jobs"
 
+        custom_objectID = "slug"
+
         should_index = "is_in_algolia_index"
 
         # todo ? refac: move out to AlgoliaModel the [for..in] and gen f"get_json_{field}" methods,
         # and type the names `tag_fields` and `datetime_fields`; create apps.aloglia.AlgoliaModelIndex.
+        # [Note: already moved to [[Job]].tag_category_to_field]
         tag_fields = [
             "tags_skill",
             "tags_area",
