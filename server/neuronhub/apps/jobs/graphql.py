@@ -303,14 +303,16 @@ class JobsMutation:
         if not alert:
             return False
 
-        job = await Job.objects.filter(slug=job_slug, is_published=True).afirst()
-        if not job:
+        if not await Job.objects.filter(slug=job_slug, is_published=True).aexists():
             return False
 
-        await alert.jobs_clicked.aadd(job)
-        await JobAlert.objects.filter(id=alert.id).aupdate(
-            jobs_clicked_count=F("jobs_clicked_count") + 1,
-        )
+        if job_slug in alert.jobs_clicked:
+            return True
+
+        alert.jobs_clicked.append(job_slug)
+        alert.jobs_clicked_count += 1
+        await alert.asave()
+
         return True
 
     @strawberry.mutation

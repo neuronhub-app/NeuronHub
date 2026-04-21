@@ -18,7 +18,7 @@ async def _anonymize_all():
         user_anon = await UserAnon.get_or_create_from_email(job_alert.email)
         email_anon = f"{user_anon.anon_name}@localhost"
 
-        job_alert.history.all().update(email=email_anon)
+        await job_alert.history.all().aupdate(email=email_anon)
 
         job_alert.email = email_anon
         job_alert.skip_history_when_saving = True

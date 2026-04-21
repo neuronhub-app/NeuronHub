@@ -164,9 +164,8 @@ classDiagram
 
     Job --> PostTag : tags (M2M)
     JobAlert --> PostTag : tags (M2M)
-    JobAlert --> Job : jobs_clicked (M2M)
     JobAlertLog --> JobAlert : job_alert (FK)
-    JobAlertLog --> Job : job (FK)
+    JobAlertLog --> Job : jobs (M2M)
 
     namespace jobs {
         class Job {
@@ -191,12 +190,12 @@ classDiagram
             salary_min: int?
             is_active: bool
             tz: TimeZoneField?
-            jobs_clicked: M2M~Job~
+            jobs_clicked: ArrayField~Job.slug~
         }
 
         class JobAlertLog {
             job_alert: FK~JobAlert~
-            job: FK~Job~
+            jobs: M2M~Job~
             email_hash: str
             sent_at: datetime
         }

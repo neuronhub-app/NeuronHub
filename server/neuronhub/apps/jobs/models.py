@@ -2,6 +2,7 @@ import uuid
 from typing import TYPE_CHECKING
 from zoneinfo import ZoneInfo
 
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import ManyToManyField
 from django.db.models import TextChoices
@@ -332,12 +333,16 @@ class JobAlert(TimeStampedModel):
     sent_count = models.PositiveIntegerField(default=0)
     jobs_notified_count = models.PositiveIntegerField(default=0)
     jobs_clicked_count = models.PositiveIntegerField(default=0)
-    jobs_clicked = models.ManyToManyField(Job, blank=True)
+    jobs_clicked = ArrayField(
+        models.CharField(max_length=1024),
+        default=list,
+        blank=True,
+    )
 
     # Note: minimal, as the rest is tracked by [[JobAlertLog]]
     history = HistoricalRecords(
         excluded_fields=["jobs_notified_count"],
-        m2m_fields=[tags, jobs_clicked],
+        m2m_fields=[tags],
     )
 
     class Meta:

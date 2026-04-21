@@ -149,7 +149,6 @@ class JobAlertAdmin(SimpleHistoryAdmin, DjangoObjectActions, DALFModelAdmin):
     ]
     autocomplete_fields = [
         "tags",
-        "jobs_clicked",
         "locations",
     ]
     search_fields = [

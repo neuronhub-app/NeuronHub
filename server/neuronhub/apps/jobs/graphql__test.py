@@ -50,7 +50,7 @@ class TestJobAlertSubscribe(NeuronTestCase):
         assert alert.salary_min == 80000
         assert alert.is_exclude_no_salary
 
-    async def test_track_click_adds_job_and_increments_count(self):
+    async def test_track_click_adds_slug_and_increments_count(self):
         alert = await self.gen.jobs.job_alert()
         job = await self.gen.jobs.job()
 
@@ -66,4 +66,21 @@ class TestJobAlertSubscribe(NeuronTestCase):
 
         await alert.arefresh_from_db()
         assert alert.jobs_clicked_count == 1
-        assert await alert.jobs_clicked.filter(id=job.id).aexists()
+        assert alert.jobs_clicked == [job.slug]
+
+    @override_settings(SIMPLE_HISTORY_ENABLED=True)
+    async def test_track_click_history_snapshot_stores_slug(self):
+        alert = await self.gen.jobs.job_alert()
+        job = await self.gen.jobs.job()
+
+        res = await self.graphql_query(
+            f"""
+            mutation {{
+                job_alert_track_click(id: {alert.id}, job_slug: "{job.slug}")
+            }}
+            """,
+        )
+        assert not res.errors
+
+        hist_latest = await alert.history.alatest()
+        assert hist_latest.jobs_clicked == [job.slug]
