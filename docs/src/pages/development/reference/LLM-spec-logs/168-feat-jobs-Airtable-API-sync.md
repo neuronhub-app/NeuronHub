@@ -129,3 +129,4 @@ Other (context):
 - Dedupe keyed by `url_external`; winner = latest `posted_at`; flag OR'd across group
   (reviewer approval is group-level, must survive onto kept row).
 - Included in `serialize_job_to_md` → flag flip spawns review draft.
+- `_parse_job_raw` & `_sync_job_parsed` per-row try/except + `sentry_sdk.capture_exception`

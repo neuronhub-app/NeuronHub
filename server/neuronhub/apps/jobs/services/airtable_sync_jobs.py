@@ -37,6 +37,11 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class SyncStats:
+    fetched_from_airtable: int = 0
+
+    failed_to_parse: int = 0
+    failed_to_sync: int = 0
+
     created: int = 0
     updated: int = 0
     deleted: int = 0
@@ -46,17 +51,24 @@ class SyncStats:
 async def airtable_sync_jobs(limit: int | None = None) -> SyncStats:
     jobs_raw = _fetch_airtable_jobs()
 
-    return await _sync_jobs_parsed_to_drafts(
-        [_parse_job_raw(job_raw) for job_raw in jobs_raw],
-        limit=limit,
-    )
+    stats = SyncStats(fetched_from_airtable=len(jobs_raw))
+
+    jobs_parsed: list[JobParsed] = []
+    for job_raw in jobs_raw:
+        try:
+            jobs_parsed.append(_parse_job_raw(job_raw))
+        except Exception:
+            stats.failed_to_parse += 1
+            sentry_sdk.capture_exception()
+
+    return await _sync_jobs_parsed_to_drafts(jobs_parsed, limit=limit, stats=stats)
 
 
 def _fetch_airtable_jobs() -> list[RecordDict]:
     """
     #AI
     - cell_format=string resolves linked records & lookups to readable strings - matching the prev CSV format. # todo ? refac: drop - dumb idea
-    - Airtable API requires `time_zone` & `user_locale`.
+    - API requires `time_zone` & `user_locale`.
     - `time_zone=settings.TIME_ZONE` (PT): matches legacy CSV import.
     """
     table = Api(settings.PG_AIRTABLE_API).table(
@@ -72,21 +84,27 @@ def _fetch_airtable_jobs() -> list[RecordDict]:
 
 
 async def _sync_jobs_parsed_to_drafts(
-    jobs_parsed: list[JobParsed], limit: int = None
+    jobs_parsed: list[JobParsed], stats: SyncStats = None, limit: int = None
 ) -> SyncStats:
-    stats = SyncStats()
+    stats = stats or SyncStats()
 
     with disable_auto_indexing_if_enabled():
         jobs_parsed = _dedupe_by_url_keeping_latest_posted_at(jobs_parsed)
         jobs_parsed = jobs_parsed[:limit] if limit else jobs_parsed
 
         for job_parsed in jobs_parsed:
+            sentry_sdk.set_context("job_parsed", asdict(job_parsed))
+
             if not job_parsed.org_name.replace('"', "").strip():
-                sentry_sdk.set_context("job_parsed", asdict(job_parsed))
                 sentry_sdk.capture_message("Sync: Airtable missing org_name", level="error")
                 continue
 
-            sync_output = await _sync_job_parsed(job_parsed)
+            try:
+                sync_output = await _sync_job_parsed(job_parsed)
+            except Exception:
+                stats.failed_to_sync += 1
+                sentry_sdk.capture_exception()
+                continue
 
             logger.debug(f"Job synced: status={sync_output.result.value}, pk={sync_output.pk}")
 
@@ -104,10 +122,14 @@ async def _sync_jobs_parsed_to_drafts(
             .exclude(url_external__in=job_urls_in_airtable)
             .select_related("org")
         ):
-            if not await job_published.versions.filter(is_pending_removal=True).aexists():
-                await _create_pending_deletion_draft(job_published)
-
-            stats.deleted += 1
+            try:
+                if not await job_published.versions.filter(is_pending_removal=True).aexists():
+                    await _create_pending_deletion_draft(job_published)
+                stats.deleted += 1
+            except Exception:
+                stats.failed_to_sync += 1
+                sentry_sdk.capture_exception()
+                continue
 
     return stats
 

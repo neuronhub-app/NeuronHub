@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             name="is_duplicate_url_valid",
             field=models.BooleanField(
                 default=False,
-                help_text="Set from Airtable `Duplicate URL` - approved duplicates by data manager. Unapproved dup rows are deleted - only the latest `posted_at` is kept.",
+                help_text="Set from Airtable `Duplicate URL` - approved duplicate by data manager. Same-URL Jobs are collapsed to the latest `posted_at`.",
             ),
         ),
         migrations.AddField(
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
             name="is_duplicate_url_valid",
             field=models.BooleanField(
                 default=False,
-                help_text="Set from Airtable `Duplicate URL` - approved duplicates by data manager. Unapproved dup rows are deleted - only the latest `posted_at` is kept.",
+                help_text="Set from Airtable `Duplicate URL` - approved duplicate by data manager. Same-URL Jobs are collapsed to the latest `posted_at`.",
             ),
         ),
     ]
