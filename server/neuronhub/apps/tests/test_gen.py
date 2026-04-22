@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.utils import timezone
 from django_countries.fields import Country
 from faker import Faker
 from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
@@ -489,7 +490,7 @@ class JobsGen:
             source_ext=source_ext,
             salary_min=salary_min,
             salary_text=salary_text,
-            posted_at=posted_at,
+            posted_at=posted_at or timezone.now(),
             closes_at=closes_at,
             visibility=visibility,
             is_published=is_published,

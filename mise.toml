@@ -240,6 +240,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 [tasks."django:makemigrations"]
     dir = "server"
     run = "uv run manage.py makemigrations"
+    interactive = true
 
 [tasks."django:db-stubs-repopulate"]
     dir = "server"

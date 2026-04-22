@@ -77,6 +77,7 @@ async def _sync_jobs_parsed_to_drafts(
     stats = SyncStats()
 
     with disable_auto_indexing_if_enabled():
+        jobs_parsed = _dedupe_by_url_keeping_latest_posted_at(jobs_parsed)
         jobs_parsed = jobs_parsed[:limit] if limit else jobs_parsed
 
         for job_parsed in jobs_parsed:
@@ -171,6 +172,7 @@ async def _sync_job_draft(job_parsed: JobParsed, job_pub_current: Job | None) ->
         salary_text=job_parsed.salary_text,
         posted_at=job_parsed.posted_at,
         closes_at=job_parsed.closes_at,
+        is_duplicate_url_valid=job_parsed.is_duplicate_url_valid,
     )
 
     if job_draft_from_prev_sync := (
@@ -323,8 +325,8 @@ def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
         source_raw = ""
 
     salary_min_raw = fields.get(_airtable.salary_min, "").strip()
-    closes_at_raw = fields.get(_airtable.deadline, "").strip()
-    posted_at_raw = fields.get(_airtable.date_added, "").strip()
+    closes_at_raw = fields.get(_airtable.closes_at, "").strip()
+    posted_at_raw = fields.get(_airtable.posted_at, "").strip()
 
     return JobParsed(
         title=fields.get(_airtable.title, "").strip(),
@@ -332,11 +334,11 @@ def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
         description=fields.get(_airtable.description, "").strip(),
         org_name=fields.get(_airtable.org_name, "").strip(),
         locations=_parse_location_field(fields.get(_airtable.locations, "")),
-        tags_skill=_list_split_and_strip(fields.get(_airtable.skill_sets, "")),
-        tags_area=_list_split_and_strip(fields.get(_airtable.cause_areas, "")),
-        tags_workload=_list_split_and_strip(fields.get(_airtable.role_type, "")),
-        tags_education=_list_split_and_strip(fields.get(_airtable.education, "")),
-        tags_experience=_list_split_and_strip(fields.get(_airtable.experience, "")),
+        tags_skill=_list_split_and_strip(fields.get(_airtable.tags_skill, "")),
+        tags_area=_list_split_and_strip(fields.get(_airtable.tags_area, "")),
+        tags_workload=_list_split_and_strip(fields.get(_airtable.tags_workload, "")),
+        tags_education=_list_split_and_strip(fields.get(_airtable.tags_education, "")),
+        tags_experience=_list_split_and_strip(fields.get(_airtable.tags_experience, "")),
         tags_country_visa_sponsor=[],
         source_ext=source_raw or None,
         salary_min=int(float(salary_min_raw.replace(",", ""))) if salary_min_raw else None,
@@ -348,9 +350,8 @@ def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
         else None,
         posted_at=datetime.strptime(posted_at_raw, "%B %d, %Y").replace(
             tzinfo=ZoneInfo(settings.TIME_ZONE)
-        )
-        if posted_at_raw
-        else None,
+        ),
+        is_duplicate_url_valid=bool(fields.get(_airtable.is_duplicate_url_valid, "").strip()),
     )
 
 
@@ -358,6 +359,7 @@ def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
 class JobParsed:
     title: str
     url_external: str
+    posted_at: datetime
     description: str = ""
     org_name: str = ""
     locations: list[LocationParsed] = field(default_factory=list)
@@ -370,8 +372,8 @@ class JobParsed:
     source_ext: str | None = None
     salary_min: int | None = None
     salary_text: str = ""
-    posted_at: datetime | None = None
     closes_at: datetime | None = None
+    is_duplicate_url_valid: bool = False
 
 
 class _airtable:
@@ -379,17 +381,18 @@ class _airtable:
     url_external = "Job Link"
     description = "Job Description"
     org_name = "Organization"
-    skill_sets = "Skill Sets"
-    cause_areas = "Cause Area(s)"
-    role_type = "Role Type"
-    education = "Education"
-    experience = "Experience"
     locations = "Location(s)"
+    tags_skill = "Skill Sets"
+    tags_area = "Cause Area(s)"
+    tags_workload = "Role Type"
+    tags_education = "Education"
+    tags_experience = "Experience"
     source = "Source"
     salary_min = "Min Salary (USD)"
     salary_text = "Salary Range"
-    deadline = "Deadline"
-    date_added = "Date Added"
+    closes_at = "Deadline"
+    posted_at = "Date Added"
+    is_duplicate_url_valid = "Duplicate URL"
 
 
 # #quality-35% #AI
@@ -447,6 +450,23 @@ def _parse_location_field(raw: str) -> list[LocationParsed]:
                 )
 
     return locations
+
+
+def _dedupe_by_url_keeping_latest_posted_at(jobs_parsed: list[JobParsed]) -> list[JobParsed]:
+    """
+    See [[Job]].is_duplicate_url_valid help_text.
+    """
+    latest_by_url: dict[str, JobParsed] = {}
+    for job_parsed in jobs_parsed:
+        job_prev = latest_by_url.get(job_parsed.url_external)
+        if job_prev is None:
+            latest_by_url[job_parsed.url_external] = job_parsed
+        elif job_parsed.posted_at > job_prev.posted_at:
+            job_parsed.is_duplicate_url_valid |= job_prev.is_duplicate_url_valid
+            latest_by_url[job_parsed.url_external] = job_parsed
+        else:
+            job_prev.is_duplicate_url_valid |= job_parsed.is_duplicate_url_valid
+    return list(latest_by_url.values())
 
 
 def _list_split_and_strip(str_list_raw: str) -> list[str]:

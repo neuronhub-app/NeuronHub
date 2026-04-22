@@ -35,6 +35,9 @@ async def serialize_job_to_md(job: Job) -> str:
     if job.source_ext:
         lines.append(f"- Source: {job.source_ext}")
 
+    if job.is_duplicate_url_valid:
+        lines.append("- Duplicate URL: valid")
+
     await _append_tags(lines, label="Area", manager=job.tags_area)
     await _append_tags(lines, label="Skill", manager=job.tags_skill)
     await _append_tags(lines, label="Education", manager=job.tags_education)

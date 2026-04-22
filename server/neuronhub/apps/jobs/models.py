@@ -156,6 +156,10 @@ class Job(AlgoliaModel):
         default=False,
         help_text="Allows to update the existing Job draft from previous sync runs, instead of creating a new one each time and confusing the reviewer.",
     )
+    is_duplicate_url_valid = models.BooleanField(
+        default=False,
+        help_text="Set from Airtable `Duplicate URL` - approved duplicates by data manager. Unapproved dup rows are deleted - only the latest `posted_at` is kept.",
+    )
 
     is_test_job = models.BooleanField(
         default=False,
@@ -176,7 +180,7 @@ class Job(AlgoliaModel):
         User, related_name=UserListName.jobs_bookmarked.value, blank=True
     )
 
-    posted_at = models.DateTimeField(null=True, blank=True)
+    posted_at = models.DateTimeField()
     closes_at = models.DateTimeField(null=True, blank=True)
 
     visible_to_users = anonymizable(  # type: ignore[var-annotated, assignment]  #bad-infer: anonymizable() wrapper

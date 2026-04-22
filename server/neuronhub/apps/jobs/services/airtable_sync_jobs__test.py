@@ -3,9 +3,12 @@
 """
 
 import re
+from datetime import datetime
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 
 from asgiref.sync import async_to_sync
+from django.conf import settings
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobLocation
@@ -14,6 +17,7 @@ from neuronhub.apps.jobs.services.airtable_sync_jobs import JobParsed
 from neuronhub.apps.jobs.services.airtable_sync_jobs import LocationParsed
 from neuronhub.apps.jobs.services.airtable_sync_jobs import TagParams
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _airtable
+from neuronhub.apps.jobs.services.airtable_sync_jobs import _parse_job_raw
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _parse_location_field
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _sync_jobs_parsed_to_drafts
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _sync_tags
@@ -39,16 +43,16 @@ class TestAirtableSyncJobs(NeuronTestCase):
                     _airtable.org_name: f'"{org_name}"',
                     _airtable.url_external: gen_org_url(index=index),
                     _airtable.description: "Job description text.",
-                    _airtable.skill_sets: "Python, TypeScript",
-                    _airtable.cause_areas: "Climate",
-                    _airtable.role_type: "Full-Time",
-                    _airtable.experience: "Mid (5-9y)",
+                    _airtable.tags_skill: "Python, TypeScript",
+                    _airtable.tags_area: "Climate",
+                    _airtable.tags_workload: "Full-Time",
+                    _airtable.tags_experience: "Mid (5-9y)",
                     _airtable.locations: '"Remote, Global"',
                     _airtable.source: "AIM",
                     _airtable.salary_min: "48,656.00",
                     _airtable.salary_text: "$40k - $60k",
-                    _airtable.deadline: "2026-05-01",
-                    _airtable.date_added: "March 19, 2026",
+                    _airtable.closes_at: "2026-05-01",
+                    _airtable.posted_at: "March 19, 2026",
                 },
             }
             for index in range(3)
@@ -208,6 +212,7 @@ class TestAirtableSyncJobs(NeuronTestCase):
                     _airtable.org_name: "Org",
                     _airtable.url_external: "https://ex.com/1",
                     _airtable.locations: '"London, UK"',
+                    _airtable.posted_at: "April 1, 2026",
                 },
             }
         ]
@@ -218,12 +223,18 @@ class TestAirtableSyncJobs(NeuronTestCase):
         assert await JobLocation.objects.filter(name="UK", type="country").aexists()
 
 
-def _get_job_parsed(job: Job, is_change_desc: bool = False) -> JobParsed:
+def _get_job_parsed(
+    job: Job,
+    is_change_desc: bool = False,
+    is_duplicate_url_valid: bool | None = None,
+) -> JobParsed:
     job_parsed = JobParsed(
         title=job.title,
         url_external=job.url_external,
         description=job.description,
         org_name=job.org.name,
+        posted_at=job.posted_at,
+        is_duplicate_url_valid=is_duplicate_url_valid or job.is_duplicate_url_valid,
     )
     if is_change_desc:
         job_parsed.description += " (changed)"
@@ -347,3 +358,75 @@ class TestParseLocationField:
                 is_remote=True,
             ),
         ]
+
+
+class TestParseDuplicateUrlFlag:
+    """
+    Airtable "Duplicate URL" checkbox -> `JobParsed.is_duplicate_url_valid`.
+    Reviewed & approved duplicates only; unreviewed dup mistakes default False.
+    """
+
+    _fields_base: dict = {
+        _airtable.title: "T",
+        _airtable.org_name: "O",
+        _airtable.url_external: "u",
+        _airtable.posted_at: "April 4, 2026",
+    }
+
+    def test_flag_true_when_checked(self):
+        raw = {"fields": {**self._fields_base, _airtable.is_duplicate_url_valid: "checked"}}
+        assert _parse_job_raw(raw).is_duplicate_url_valid is True
+
+    def test_flag_false_when_empty(self):
+        raw = {"fields": {**self._fields_base, _airtable.is_duplicate_url_valid: ""}}
+        assert _parse_job_raw(raw).is_duplicate_url_valid is False
+
+    def test_flag_false_when_missing(self):
+        assert _parse_job_raw({"fields": self._fields_base}).is_duplicate_url_valid is False
+
+
+class TestDuplicateUrlSync(NeuronTestCase):
+    async def test_flag_persists_on_created_draft(self):
+        job_pub = await self.gen.jobs.job()
+        job_parsed = _get_job_parsed(job_pub, is_change_desc=True, is_duplicate_url_valid=True)
+
+        await _sync_jobs_parsed_to_drafts([job_parsed])
+
+        job_draft = await Job.objects.aget(is_published=False)
+        assert job_draft.is_duplicate_url_valid
+
+    async def test_older_posted_at_dup_is_ignored_regardless_of_order(self):
+        tz = ZoneInfo(settings.TIME_ZONE)
+        posted_newer = datetime(2026, 4, 20, tzinfo=tz)
+        posted_older = datetime(2026, 4, 1, tzinfo=tz)
+
+        job_pub = await self.gen.jobs.job(posted_at=posted_newer)
+        job_parsed_newer = _get_job_parsed(job_pub, is_change_desc=True)
+        job_parsed_older = _get_job_parsed(job_pub, is_change_desc=True)
+        job_parsed_older.posted_at = posted_older
+        job_parsed_older.title = f"{job_pub.title} (older)"
+
+        # Older listed after newer must not overwrite (last-wins forbidden).
+        await _sync_jobs_parsed_to_drafts([job_parsed_newer, job_parsed_older])
+
+        job_draft = await Job.objects.aget(is_published=False)
+        assert job_draft.title == job_pub.title
+        assert job_draft.posted_at == posted_newer
+
+    async def test_dedupe_propagates_is_duplicate_url_valid_across_group(self):
+        """
+        `is_duplicate_url_valid=True` on any row of a URL group means the
+        reviewer approved the URL's duplicate existence - the flag must
+        survive onto the kept (latest posted_at) row.
+        """
+        tz = ZoneInfo(settings.TIME_ZONE)
+        job_pub = await self.gen.jobs.job(posted_at=datetime(2026, 4, 20, tzinfo=tz))
+
+        job_parsed_newer = _get_job_parsed(job_pub, is_duplicate_url_valid=False)
+        job_parsed_older = _get_job_parsed(job_pub, is_duplicate_url_valid=True)
+        job_parsed_older.posted_at = datetime(2026, 4, 1, tzinfo=tz)
+
+        await _sync_jobs_parsed_to_drafts([job_parsed_newer, job_parsed_older])
+
+        job_draft = await Job.objects.aget(is_published=False)
+        assert job_draft.is_duplicate_url_valid
