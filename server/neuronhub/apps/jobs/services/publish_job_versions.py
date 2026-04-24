@@ -1,7 +1,8 @@
-import logging
+from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
 
+import sentry_sdk
 from asgiref.sync import sync_to_async
 from django.conf import settings
 
@@ -12,9 +13,6 @@ from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.services.airtable_sync_jobs import get_jobs_qs_prefetched
 
 
-logger = logging.getLogger(__name__)
-
-
 @dataclass
 class JobIds:
     created: list[int] = field(default_factory=list)
@@ -23,8 +21,12 @@ class JobIds:
 
 
 async def publish_job_versions(draft_ids: list[int]):
+    sentry_sdk.set_context("draft_ids", dict(ids=draft_ids))
+
     with disable_auto_indexing_if_enabled():
         job_ids = await _publish_changes_to_db(draft_ids)
+
+    sentry_sdk.set_context("job_ids", asdict(job_ids))
 
     if settings.ALGOLIA["IS_ENABLED"]:
         await _publish_changes_to_algolia(job_ids)
@@ -40,6 +42,8 @@ async def _publish_changes_to_db(draft_ids: list[int]) -> JobIds:
     job_ids.updated += result_new.updated
     job_ids.created += result_new.created
 
+    await _handle_invalid_drafts(draft_ids)
+
     return job_ids
 
 
@@ -51,10 +55,16 @@ async def _publish_deletion(draft_ids: list[int]) -> JobIds:
 
     job_ids.deleted = [pk async for pk in jobs_pub.values_list("id", flat=True)]
 
-    for job_pub in jobs_pub:  # for django-simple-history, JIC
-        await job_pub.adelete()
+    async for job_pub in jobs_pub:  # for django-simple-history, JIC
+        try:
+            await job_pub.adelete()
+        except Exception:
+            sentry_sdk.capture_exception()
 
-    await jobs_draft.adelete()
+    try:
+        await jobs_draft.adelete()
+    except Exception:
+        sentry_sdk.capture_exception()
 
     return job_ids
 
@@ -68,13 +78,16 @@ async def _publish_update_or_create(draft_ids: list[int]) -> JobIds:
         is_published=False,
         version_of__is_published=True,
     ).distinct():
-        async for published in job_updated_draft.version_of.filter(is_published=True):
-            job_updated_draft.slug = published.slug  # must be manual
-            await published.adelete()
-        job_updated_draft.is_published = True
-        await job_updated_draft.asave()
+        try:
+            async for published in job_updated_draft.version_of.filter(is_published=True):
+                job_updated_draft.slug = published.slug  # must be manual
+                await published.adelete()
+            job_updated_draft.is_published = True
+            await job_updated_draft.asave()
 
-        job_ids.updated.append(job_updated_draft.pk)
+            job_ids.updated.append(job_updated_draft.pk)
+        except Exception:
+            sentry_sdk.capture_exception()
 
     drafts_to_create = Job.objects.filter(
         id__in=draft_ids,
@@ -82,8 +95,11 @@ async def _publish_update_or_create(draft_ids: list[int]) -> JobIds:
         is_published=False,
         version_of__isnull=True,
     )
-    job_ids.created = [pk async for pk in drafts_to_create.values_list("id", flat=True)]
-    await drafts_to_create.aupdate(is_published=True)
+    try:
+        job_ids.created = [pk async for pk in drafts_to_create.values_list("id", flat=True)]
+        await drafts_to_create.aupdate(is_published=True)
+    except Exception:
+        sentry_sdk.capture_exception()
 
     return job_ids
 
@@ -119,3 +135,23 @@ def _publish_changes_to_algolia(job_ids: JobIds):
         objects=jobs_created,
         wait_for_tasks=False,
     )
+
+
+async def _handle_invalid_drafts(draft_ids: list[int]):
+    """
+    #AI
+
+    Drafts that matched neither deletion, update, nor create branch -
+    eg `version_of` points at a non-published peer. Unreachable via sync,
+    but possible from hand-edited data -> surface instead of silently skipping.
+    """
+    if draft_unhandled_ids := [
+        pk
+        async for pk in Job.objects.filter(
+            id__in=draft_ids,
+            is_published=False,
+            is_pending_removal=False,
+        ).values_list("id", flat=True)
+    ]:
+        sentry_sdk.set_context("unhandled_ids", dict(ids=draft_unhandled_ids))
+        sentry_sdk.capture_message("Job drafts fell through delete/update/create", level="error")

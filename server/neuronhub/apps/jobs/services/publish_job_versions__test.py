@@ -41,6 +41,7 @@ class PublishJobVersionsTest(NeuronTestCase):
         draft_delete = await self.gen.jobs.job_draft(job=pub_to_del, is_pending_removal=True)
 
         pub_to_update = await self.gen.jobs.job()
+        pub_to_update_slug = pub_to_update.slug
         draft_update = await self.gen.jobs.job_draft(job=pub_to_update)
 
         draft_create = await self.gen.jobs.job(is_published=False)
@@ -53,6 +54,7 @@ class PublishJobVersionsTest(NeuronTestCase):
 
         await draft_update.arefresh_from_db()
         assert draft_update.is_published
+        assert draft_update.slug == pub_to_update_slug
 
         await draft_create.arefresh_from_db()
         assert draft_create.is_published
