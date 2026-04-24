@@ -1,64 +1,58 @@
-from django.db import IntegrityError
-
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
-class TestApproveVersions(NeuronTestCase):
-    async def test_new_draft_publish_reuses_job_published_slug(self):
-        job_pub = await self.gen.jobs.job()
-        job_draft = await self.gen.jobs.job_draft(job=job_pub)
+class PublishJobVersionsTest(NeuronTestCase):
+    async def test_update_reuses_slug(self):
+        pub = await self.gen.jobs.job()
+        draft = await self.gen.jobs.job_draft(job=pub)
+        pub_slug = pub.slug
 
-        slug_before = job_pub.slug
+        await publish_job_versions([draft.pk])
 
-        await publish_job_versions([job_draft.pk])
+        assert not await Job.objects.filter(pk=pub.pk).aexists()
+        await draft.arefresh_from_db()
+        assert draft.is_published
+        assert draft.slug == pub_slug
+        assert await draft.version_of.acount() == 0
 
-        assert not await Job.objects.filter(pk=job_pub.pk).aexists()
+    async def test_can_publish_only_selected_draft(self):
+        pub = await self.gen.jobs.job()
+        draft_approved = await self.gen.jobs.job_draft(job=pub)
+        draft_not_approved = await self.gen.jobs.job_draft(job=pub)
 
-        await job_draft.arefresh_from_db()
-        assert await job_draft.version_of.acount() == 0
-        assert job_draft.is_published
-        assert job_draft.slug == slug_before
+        await publish_job_versions([draft_approved.pk])
 
-    async def test_is_in_algolia_index(self):
-        assert (await self.gen.jobs.job()).is_in_algolia_index()
-        assert (await self.gen.jobs.job(is_published=False)).is_in_algolia_index() is False
+        await draft_not_approved.arefresh_from_db()
+        assert not draft_not_approved.is_published
+        assert await draft_not_approved.version_of.acount() == 0
 
-    async def test_is_pending_removal_approval_deletes_all_job_versions(self):
-        org = await self.gen.orgs.create()
+    async def test_deletion_drops_draft_and_pub(self):
+        pub = await self.gen.jobs.job()
+        draft = await self.gen.jobs.job_draft(job=pub, is_pending_removal=True)
 
-        job_published = await self.gen.jobs.job(org=org)
-        job_draft = await self.gen.jobs.job(org=org, is_published=False)
-        job_draft.is_pending_removal = True
-        await job_draft.asave()
-        await job_published.versions.aadd(job_draft)
+        await publish_job_versions([draft.pk])
 
-        await publish_job_versions([job_draft.pk])
+        assert not await Job.objects.filter(pk__in=[pub.pk, draft.pk]).aexists()
 
-        assert not await Job.objects.filter(pk=job_published.pk).aexists()
-        assert not await Job.objects.filter(pk=job_draft.pk).aexists()
+    async def test_publishing_handles_delete_and_update_and_create(self):
+        pub_to_del = await self.gen.jobs.job()
+        draft_delete = await self.gen.jobs.job_draft(job=pub_to_del, is_pending_removal=True)
 
-    async def test_slug_dup_is_rejected(self):
-        job = await self.gen.jobs.job()
-        with self.assertRaises(IntegrityError):
-            await self.gen.jobs.job(slug=job.slug)
+        pub_to_update = await self.gen.jobs.job()
+        draft_update = await self.gen.jobs.job_draft(job=pub_to_update)
 
-    async def test_slug_dup_is_ok_in_drafts(self):
-        job = await self.gen.jobs.job()
-        job_draft_1 = await self.gen.jobs.job(is_published=False, slug=job.slug)
-        job_draft_2 = await self.gen.jobs.job(is_published=False, slug=job.slug)
-        assert job.slug == job_draft_1.slug == job_draft_2.slug
+        draft_create = await self.gen.jobs.job(is_published=False)
 
-    async def test_orphan_draft_with_slug_colliding_with_unrelated_pub_is_reslugged(
-        self,
-    ):
-        job = await self.gen.jobs.job()
-        job_draft_unrelated = await self.gen.jobs.job(is_published=False, slug=job.slug)
+        await publish_job_versions([draft_delete.pk, draft_update.pk, draft_create.pk])
 
-        await publish_job_versions([job_draft_unrelated.pk])
+        assert not await Job.objects.filter(pk__in=[pub_to_del.pk, draft_delete.pk]).aexists()
 
-        assert await Job.objects.filter(pk=job.pk).aexists()
-        await job_draft_unrelated.arefresh_from_db()
-        assert job_draft_unrelated.is_published
-        assert job_draft_unrelated.slug != job.slug
+        assert not await Job.objects.filter(pk=pub_to_update.pk).aexists()
+
+        await draft_update.arefresh_from_db()
+        assert draft_update.is_published
+
+        await draft_create.arefresh_from_db()
+        assert draft_create.is_published

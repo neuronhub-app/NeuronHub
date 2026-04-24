@@ -7,7 +7,6 @@ import strawberry_django
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.db.models import Count
-from django.db.models import F
 from django.db.models import Q
 from django.db.models import QuerySet
 from strawberry import ID

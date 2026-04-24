@@ -474,6 +474,7 @@ class JobsGen:
         visibility: Visibility = Visibility.PUBLIC,
         is_published: bool = True,
         is_created_by_sync: bool = False,
+        is_pending_removal: bool = False,
         is_save: bool = True,
         tags: list[PostTag] = None,
         locations: list[JobLocation] = None,
@@ -495,6 +496,7 @@ class JobsGen:
             visibility=visibility,
             is_published=is_published,
             is_created_by_sync=is_created_by_sync,
+            is_pending_removal=is_pending_removal,
         )
         if is_save:
             await job.asave()
@@ -512,12 +514,21 @@ class JobsGen:
             await job.locations.aset(locations)
         return job
 
-    async def job_draft(self, job: Job) -> Job:
+    async def job_draft(
+        self,
+        job: Job,
+        title: str = "",
+        is_pending_removal: bool = False,
+        is_created_by_sync: bool = False,
+    ) -> Job:
         job_draft = await self.job(
             org=job.org,
             slug=job.slug,
+            title=title,
             url_external=job.url_external,
             is_published=False,
+            is_created_by_sync=is_created_by_sync,
+            is_pending_removal=is_pending_removal,
         )
         await job.versions.aadd(job_draft)
         return job_draft

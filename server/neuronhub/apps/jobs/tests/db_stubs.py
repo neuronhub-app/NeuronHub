@@ -1,5 +1,9 @@
 """
-#quality-21% #AI-slop
+#quality-15% #AI-slop
+- not using `Gen`
+- creates too many redundant entries -> LLM context rot
+- move `val` out
+- idiotic JobLocation.name - must be generated
 """
 
 import textwrap

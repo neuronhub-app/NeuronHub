@@ -33,7 +33,12 @@ You must never use magic strings, instead:
 
 ### Mise
 
-- `mise e2e`: Django and Vite Mise servers are managed by Playwright from `playwright.config.ts`. Already `headless` - never modify browser CLI params.
+`mise e2e`: Django and Vite servers are managed by Mise and Playwright from `playwright.config.ts`.
+- Already `headless` - never modify browser CLI params.
+- e2e runs with its own Algolia index and start Django's `db_worker` for tasks.
+- All data is reset by db_stubs_repopulate GraphQL query before each test.
+
+Optional:  
 - `devops/e2e.mise.toml`: contains `dev:e2e:server`, `dev:e2e:server:db_worker`, etc
 - `devops/db.mise.toml`: contains `dev:db:e2e:setup` and `dev:db:e2e:rm`
 
