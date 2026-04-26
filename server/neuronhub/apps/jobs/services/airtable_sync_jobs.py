@@ -1,7 +1,7 @@
 """
 Syncs PG Airtable. Mark missing Jobs.is_published=False -> drop out of Algolia.
 
-#quality-35% half #AI
+#quality-38% half #AI
 """
 
 import csv
@@ -67,7 +67,7 @@ async def airtable_sync_jobs(limit: int | None = None) -> SyncStats:
 def _fetch_airtable_jobs() -> list[RecordDict]:
     """
     #AI
-    - cell_format=string resolves linked records & lookups to readable strings - matching the prev CSV format. # todo ? refac: drop - dumb idea
+    - cell_format=string resolves linked records & lookups to strings (as JSON is more complex).
     - API requires `time_zone` & `user_locale`.
     - `time_zone=settings.TIME_ZONE` (PT): matches legacy CSV import.
     """
@@ -93,10 +93,10 @@ async def _sync_jobs_parsed_to_drafts(
         jobs_parsed = jobs_parsed[:limit] if limit else jobs_parsed
 
         for job_parsed in jobs_parsed:
-            sentry_sdk.set_context("job_parsed", asdict(job_parsed))
+            sentry_sdk.set_extra("job_parsed", asdict(job_parsed))
 
             if not job_parsed.org_name.replace('"', "").strip():
-                sentry_sdk.capture_message("Sync: Airtable missing org_name", level="error")
+                sentry_sdk.capture_message("Sync: Airtable missing org_name", "error")
                 continue
 
             try:
@@ -336,14 +336,14 @@ class LocationParsed:
 
 
 def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
-    sentry_sdk.set_context("job_raw", dict(job_raw))
+    sentry_sdk.set_extra("job_raw", job_raw)
 
     fields = job_raw.get("fields", {})
 
     source_raw = fields.get(_airtable.source, "").strip()
     if source_raw not in Job.SourceExt.values:
-        sentry_sdk.set_context("source", source_raw)
-        sentry_sdk.capture_message("Job source not in JobSourceExt", level="error")
+        sentry_sdk.set_extra("source", source_raw)
+        sentry_sdk.capture_message("Job source not in JobSourceExt", "error")
         source_raw = ""
 
     salary_min_raw = fields.get(_airtable.salary_min, "").strip()
@@ -423,7 +423,6 @@ def _parse_location_field(raw: str) -> list[LocationParsed]:
     if not raw:
         return []
 
-    # todo ? refac: drop - dumb idea.
     # Location(s) is a quoted-CSV string: "City, Country", "City2, Country2"
     # Airtable cellFormat=string emits `", "` between entries.
     locations_raw = next(csv.reader(StringIO(raw), skipinitialspace=True), [])
@@ -436,8 +435,11 @@ def _parse_location_field(raw: str) -> list[LocationParsed]:
             continue
 
         city_and_country = location_raw.rsplit(", ", 1)
+        sentry_sdk.set_extra("city_and_country", city_and_country)
         if len(city_and_country) != 2:
+            sentry_sdk.capture_message("Invalid city_and_country list length", "error")
             continue
+
         city_name, country_name = city_and_country[0].strip(), city_and_country[1].strip()
         if city_name == "Remote":
             locations.append(

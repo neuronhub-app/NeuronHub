@@ -56,6 +56,8 @@ async def send_job_alert_emails_by_ids_task(alert_ids: list[int]):
 async def airtable_sync_task(email_to_notify: str = None):
     with sentry_sdk.start_transaction(op="function", name=airtable_sync_task.name):
         with sentry_sdk.start_span(op="queue.process", name=airtable_sync_task.name) as span:
+            sentry_sdk.set_tag("scope", "jobs/sync")
+
             span.set_data("messaging.destination.name", airtable_sync_task.queue_name)
             span.set_data("messaging.message.id", airtable_sync_task.name)
 
@@ -74,6 +76,6 @@ async def airtable_sync_task(email_to_notify: str = None):
                     
                     <p>Those changes will not be published without approval.</p> 
                     
-                    <p><a href="{settings.CLIENT_URL}/jobs/versions">Review & publish</a></p>
+                    <p><a href="{settings.CLIENT_URL}/jobs/versions">Approve & publish</a></p>
                     """,
                 )
