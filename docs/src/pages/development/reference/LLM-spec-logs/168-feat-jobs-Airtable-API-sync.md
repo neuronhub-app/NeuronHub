@@ -21,19 +21,22 @@ Note:
     - [x] `UniqueConstraint(slug) WHERE is_published=True`
 - [x] add `Job.is_duplicate_url_valid` based on `Duplicate URL` Airtable field.
     - ignore the rest of the duplicates that have older `posted_at` date than the latest Job version.
-
+- [x] fix `publish_job_versions.py`
+- [x] in `serialize_job_to_md` drop `JobLocation.country` if the Job already has `.city` with the same `.country` value.
+	- otherwise the render looks like a duplicated location, because the `city` location already renders the `country` part.
 
 ## Relevant-Files
 
 Airtable sync:
 - server/neuronhub/apps/jobs/services/airtable_sync_jobs.py — `_sync_job_parsed` per-row draft flow; `_qs_prefetched`; md-diff delete; `_dedupe_by_url_keeping_latest_posted_at`
-- server/neuronhub/apps/jobs/services/airtable_sync_jobs__test.py — noop / linked-draft / rerun-collapse / orphan / m2m-noop / query-cap / dup-url
+- server/neuronhub/apps/jobs/services/airtable_sync_jobs__test.py — noop / linked-draft / rerun-collapse / orphan / m2m-noop / query-cap / dup-urla
 - server/neuronhub/apps/jobs/services/airtable_sync_orgs.py
 - server/neuronhub/apps/jobs/services/airtable_sync_orgs__test.py
 - server/neuronhub/apps/jobs/migrations/0054_historicaljob_is_duplicate_url_valid_and_more.py
 
 Diff oracle + versions flow:
 - server/neuronhub/apps/jobs/services/serialize_job_to_md.py
+- server/neuronhub/apps/jobs/services/serialize_job_to_md__test.py — dedup country-city location rendering
 - server/neuronhub/apps/jobs/graphql.py — `JobVersionType.published: JobType | None`; `_compose_job_version` uses `version_of` M2M; `job_versions_pending` surfaces orphans
 - server/neuronhub/apps/jobs/services/publish_job_versions.py — split removal/update; iterate all peers
 - server/neuronhub/apps/jobs/services/publish_job_versions__test.py — shared-slug + multi-peer tests
@@ -45,7 +48,6 @@ Other (context):
 - server/neuronhub/apps/jobs/migrations/0052_historicaljob_is_created_by_sync_and_more.py — `Job.is_created_by_sync` lets next sync update prev draft, not spawn new
 
 ## Decision-Log
-
 
 - `cell_format='string'` resolves linked/lookups as old CSVs → parsers port 1:1
     - Requires `time_zone` + `user_locale`.
@@ -112,9 +114,10 @@ Other (context):
 - Partial `UniqueConstraint(slug) WHERE is_published=True` (restores 0029 drop, as partial)
     - AutoSlugField's `find_unique` inspects `constraint.fields` only - ignores `condition` - so partial reads as plain slug-unique -> `-2` suffix on draft.
     - Fix: `_sync_job_draft` + `_create_job_draft_is_pending_removal` acreate-then-`asave()` to pin pub.slug post-regen. +2 queries/row -> assertNumQueries 31->33.
-- Iterate `version_of.all()`, not `.afirst()` (silent drop on >1 peer)
-- Drop slug-copy in publish: delete peers, flip `is_published=True`
-- Tests: shared-slug via partial, multi-peer deletion, partial-constraint semantics
+- Orphan slug collisions don't occur in prod: sync's `acreate` triggers AutoSlugField `find_unique` (reads partial as plain unique → `-2` suffix). Slug pinning only happens when pub peer exists. So bulk aupdate is safe.
+- Multi-peer cleanup on removal: `Job.filter(versions__in=drafts, is_published=True).distinct()` - per #6.
+- Other-drafts of same pub left as orphans on update (per #7); `version_of` clears via M2M cascade on pub delete.
+- Test rewrite: dropped trash (`is_in_algolia_index`, slug-constraint tests). 7 tests cover update/removal/create incl multi-peer + mixed batch.
 
 ### jobs_clicked M2M→ArrayField(slug)
 
@@ -124,9 +127,6 @@ Other (context):
 
 ### .is_duplicate_url_valid
 
-- Airtable "Duplicate URL" checkbox; `bool(str.strip())`.
-- Approved dups (~20) sync with flag=True; unflagged mistakes (~70) collapsed via dedupe.
-- Dedupe keyed by `url_external`; winner = latest `posted_at`; flag OR'd across group
-  (reviewer approval is group-level, must survive onto kept row).
+- Approved dups sync with `Duplicate URL` True; unflagged mistakes collapsed via dedupe.
+- Dedupe keyed by `url_external`; winner = latest `posted_at`; flag OR'd across group (reviewer approval is group-level, must survive onto kept row).
 - Included in `serialize_job_to_md` → flag flip spawns review draft.
-- `_parse_job_raw` & `_sync_job_parsed` per-row try/except + `sentry_sdk.capture_exception`

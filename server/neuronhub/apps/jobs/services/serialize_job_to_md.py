@@ -1,6 +1,7 @@
 from django.db.models import Manager
 
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.models import JobLocation
 
 
 async def serialize_job_to_md(job: Job) -> str:
@@ -18,9 +19,19 @@ async def serialize_job_to_md(job: Job) -> str:
     if job.org.jobs_page_url:
         lines.append(f"- Org jobs: {job.org.jobs_page_url}")
 
-    if location_names := [loc.name async for loc in job.locations.all()]:
-        location_names.sort()
-        lines.append(f"- Locations: {', '.join(location_names)}")
+    locations = [loc async for loc in job.locations.all()]
+
+    # Drop COUNTRY when a CITY is present (dedup str). REMOTE are kept. #AI
+    loc_city_countries = {loc.country for loc in locations if loc.city}
+    location_names_wo_dups = sorted(
+        loc.name
+        for loc in locations
+        if not (
+            loc.type is JobLocation.LocationType.COUNTRY and loc.country in loc_city_countries
+        )
+    )
+    if location_names_wo_dups:
+        lines.append(f"- Locations: {', '.join(location_names_wo_dups)}")
 
     if job.posted_at:
         lines.append(f"- Posted: {job.posted_at:%Y-%m-%d}")
