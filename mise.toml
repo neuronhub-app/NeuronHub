@@ -120,7 +120,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = 1
     DISABLE_ERROR_REPORTING = 1
     DISABLE_BUG_COMMAND = 1
-    ENABLE_PROMPT_CACHING_1H = 1 # default has been 5m since March 6th
+    #ENABLE_PROMPT_CACHING_1H = 1 # default has been 5m since March 6th
     CLAUDE_CODE_ENABLE_AWAY_SUMMARY = 1 # gets disabled by telemetry drop below
 
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1 # drops telemetry & npm updates

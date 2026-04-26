@@ -23,7 +23,7 @@ Note:
     - ignore the rest of the duplicates that have older `posted_at` date than the latest Job version.
 - [x] fix `publish_job_versions.py`
 - [x] in `serialize_job_to_md` drop `JobLocation.country` if the Job already has `.city` with the same `.country` value.
-	- otherwise the render looks like a duplicated location, because the `city` location already renders the `country` part.
+    - otherwise the render looks like a duplicated location, because the `city` location already renders the `country` part.
 
 ## Relevant-Files
 

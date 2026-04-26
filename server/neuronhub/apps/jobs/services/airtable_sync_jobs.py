@@ -48,7 +48,7 @@ class SyncStats:
     not_changed: int = 0
 
 
-async def airtable_sync_jobs(limit: int | None = None) -> SyncStats:
+async def airtable_sync_jobs(limit: int = None) -> SyncStats:
     jobs_raw = _fetch_airtable_jobs()
 
     stats = SyncStats(fetched_from_airtable=len(jobs_raw))

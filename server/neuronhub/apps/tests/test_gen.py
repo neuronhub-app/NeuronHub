@@ -516,21 +516,22 @@ class JobsGen:
 
     async def job_draft(
         self,
-        job: Job,
+        job: Job = None,
         title: str = "",
         is_pending_removal: bool = False,
-        is_created_by_sync: bool = False,
+        is_created_by_sync: bool = True,
     ) -> Job:
         job_draft = await self.job(
-            org=job.org,
-            slug=job.slug,
+            org=job.org if job else await self.orgs.create(),
+            slug=job.slug if job else "",
             title=title,
-            url_external=job.url_external,
+            url_external=job.url_external if job else self.faker.url(),
             is_published=False,
             is_created_by_sync=is_created_by_sync,
             is_pending_removal=is_pending_removal,
         )
-        await job.versions.aadd(job_draft)
+        if job:
+            await job.versions.aadd(job_draft)
         return job_draft
 
     async def location(

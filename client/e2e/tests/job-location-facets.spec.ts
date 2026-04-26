@@ -33,7 +33,7 @@ test.describe("PG Job Location Facets", () => {
 
     // Country popover shows Algolia counts (no filters active)
     await countryBtn.click();
-    await expectBase(facetItemCount(page, "United States")).toHaveText("9");
+    await expectBase(facetItemCount(page, "United States")).toHaveText("5");
     await expectBase(facetItemCount(page, "Kenya")).toHaveText("1");
 
     // Select Kenya → only BridgeFund
