@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { icons } from "@neuronhub/shared/theme/icons";
 import {
   Badge,
   Box,
@@ -358,9 +358,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
                 }}
               >
                 <Clipboard.Indicator>
-                  <Icon boxSize="5">
-                    <LuLink />
-                  </Icon>
+                  <Icon boxSize="5">{<icons.pg.job_url />}</Icon>
                 </Clipboard.Indicator>
               </Button>
             </Clipboard.Trigger>

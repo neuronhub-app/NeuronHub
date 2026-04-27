@@ -28,6 +28,7 @@ export const JobDraftsQuery = graphql.persisted(
         published {
           id
           title
+          slug
         }
       }
     }

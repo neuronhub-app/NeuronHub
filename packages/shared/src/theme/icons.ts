@@ -16,7 +16,7 @@ import {
   GoTools,
 } from "react-icons/go";
 import { IoInvertMode } from "react-icons/io5";
-import { LuChevronLeft, LuChevronRight, LuShieldAlert, LuWrench } from "react-icons/lu";
+import { LuChevronLeft, LuChevronRight, LuLink, LuShieldAlert, LuWrench } from "react-icons/lu";
 
 /**
  * Use this object to keep icons consistent.
@@ -69,4 +69,9 @@ export const icons = {
 
   // actions
   hide: GoEyeClosed,
+
+  // VITE_SITE=pg
+  pg: {
+    job_url: LuLink, // should be "share"
+  },
 } as const;

@@ -10,6 +10,8 @@ test.describe("JobVersionReview", () => {
   let $: LocatorMapToGetFirstById;
 
   test.beforeEach(async ({ page }) => {
+    test.slow();
+
     play = new PlaywrightHelper(page);
     $ = play.$;
     await play.dbStubsRepopulateAndLogin({

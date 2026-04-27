@@ -29,11 +29,13 @@ import { ColorSchemeType } from "diff2html/lib/types";
 import "diff2html/bundles/css/diff2html.min.css";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { LuChevronDown, LuEllipsisVertical, LuExternalLink } from "react-icons/lu";
+import { NavLink } from "react-router";
 import { useSnapshot } from "valtio";
 import { proxySet } from "valtio/utils";
 
 import { admin } from "@neuronhub/shared/admin-urls";
 import { Prose } from "@neuronhub/shared/components/ui/prose";
+import { icons } from "@neuronhub/shared/theme/icons";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { JobDraftsApproveMutation, JobDraftsQuery } from "@/apps/jobs/drafts/queries";
@@ -41,6 +43,7 @@ import { ids } from "@/e2e/ids";
 import type { ID, ResultOf } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { urls } from "@/urls";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
@@ -382,6 +385,21 @@ function JobDraftCard(props: { draft: DraftType; section: DraftSection }) {
             >
               <Link href={props.draft.draft.url_external} target="_blank">
                 <LuExternalLink />
+              </Link>
+            </IconButton>
+          )}
+          {props.draft.published && (
+            <IconButton
+              asChild
+              variant="ghost"
+              size="sm"
+              aria-label="Open published job"
+              onClick={event => event.stopPropagation()}
+            >
+              <Link asChild>
+                <NavLink to={urls.jobs.slug(props.draft.published.slug)} target="_blank">
+                  <icons.pg.job_url />
+                </NavLink>
               </Link>
             </IconButton>
           )}
