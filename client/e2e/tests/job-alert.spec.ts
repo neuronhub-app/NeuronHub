@@ -94,9 +94,9 @@ test.describe("Job Alert", () => {
     await expect(page).not.toHaveText(testEmail);
   });
 
-  test("unsubscribe by /jobs/subscriptions/remove/:id_ext (flaky -> run 2-3x if failed)", async ({
-    page,
-  }) => {
+  test("unsubscribe by /jobs/subscriptions/remove/:id_ext (maybe flaky)", async ({ page }) => {
+    test.slow();
+
     await play.navigate(urls.jobs.list, { idleWait: true });
 
     await play.click(ids.job.alert.subscribeBtn);

@@ -21,6 +21,10 @@ test.describe("JobVersionReview", () => {
 
   // #AI
   test("shows pending drafts and approves them", async () => {
+    // beforeEach `dbStubsRepopulateAndLogin` + Algolia reindex
+    // alone burns ~50s, leaving <5s of the 55s default budget.
+    test.slow();
+
     const queryPending = play.waitForResponseGraphql(JobDraftsQuery);
     await play.navigate(urls.jobs.drafts);
     const response = await queryPending;
@@ -31,14 +35,15 @@ test.describe("JobVersionReview", () => {
     await expect($[ids.job.drafts.container]).toBeVisible();
     await expect($[ids.job.drafts.card]).toBeVisible();
 
-    // Select all and approve
     await play.click(ids.job.drafts.selectAllCheckbox);
+    await expect($[ids.job.drafts.approveBtn]).toBeEnabled();
 
     const mutationApprove = play.waitForResponseGraphql(JobDraftsApproveMutation);
+    const queryRefetch = play.waitForResponseGraphql(JobDraftsQuery);
     await play.click(ids.job.drafts.approveBtn);
     await mutationApprove;
+    await queryRefetch;
 
-    // After approval, list should be empty
     await expect($[ids.job.drafts.emptyState]).toBeVisible();
   });
 });
