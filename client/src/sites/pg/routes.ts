@@ -9,7 +9,7 @@ export const routes = [
       "./sites/pg/pages/jobs/subscriptions/access-session-by-id-ext.tsx",
     ),
     route("/subscriptions/remove/:id_ext", "./sites/pg/pages/jobs/subscriptions/remove.tsx"),
-    route("/jobs/versions", "./apps/jobs/versions/index.tsx"),
+    route("/jobs/drafts", "./apps/jobs/drafts/index.tsx"),
     route("/:slug", "./sites/pg/pages/jobs/list/slug.tsx"),
   ]),
 

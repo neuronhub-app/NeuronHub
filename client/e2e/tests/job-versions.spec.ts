@@ -1,8 +1,5 @@
+import { JobDraftsApproveMutation, JobDraftsQuery } from "@/apps/jobs/drafts/JobDraftsReview";
 import { test } from "@playwright/test";
-import {
-  JobVersionsApproveMutation,
-  JobVersionsPendingQuery,
-} from "@/apps/jobs/versions/queries";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
@@ -23,25 +20,25 @@ test.describe("JobVersionReview", () => {
   });
 
   // #AI
-  test("shows pending versions and approves them", async () => {
-    const queryPending = play.waitForResponseGraphql(JobVersionsPendingQuery);
-    await play.navigate(urls.jobs.versions);
+  test("shows pending drafts and approves them", async () => {
+    const queryPending = play.waitForResponseGraphql(JobDraftsQuery);
+    await play.navigate(urls.jobs.drafts);
     const response = await queryPending;
 
     const versions = response.data.job_versions_pending;
     expect(versions.length).toBeGreaterThan(0);
 
-    await expect($[ids.job.versions.container]).toBeVisible();
-    await expect($[ids.job.versions.card]).toBeVisible();
+    await expect($[ids.job.drafts.container]).toBeVisible();
+    await expect($[ids.job.drafts.card]).toBeVisible();
 
     // Select all and approve
-    await play.click(ids.job.versions.selectAllCheckbox);
+    await play.click(ids.job.drafts.selectAllCheckbox);
 
-    const mutationApprove = play.waitForResponseGraphql(JobVersionsApproveMutation);
-    await play.click(ids.job.versions.approveBtn);
+    const mutationApprove = play.waitForResponseGraphql(JobDraftsApproveMutation);
+    await play.click(ids.job.drafts.approveBtn);
     await mutationApprove;
 
     // After approval, list should be empty
-    await expect($[ids.job.versions.emptyState]).toBeVisible();
+    await expect($[ids.job.drafts.emptyState]).toBeVisible();
   });
 });

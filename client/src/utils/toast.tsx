@@ -1,15 +1,16 @@
 import type { ErrorLike } from "@apollo/client";
-import { Text } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { captureException } from "@sentry/react";
-import toastLib from "react-hot-toast";
+import toastLib, { ToastOptions } from "react-hot-toast";
 import { ids } from "@/e2e/ids";
 import { errors } from "@/utils/errors";
 
 export namespace toast {
-  export function success(message: string) {
-    return toastLib.success(_ => (
-      <Text {...ids.set(ids.form.notification.success)}>{message}</Text>
-    ));
+  export function success(message: string, opts?: ToastOptions) {
+    return toastLib.success(
+      _ => <Box {...ids.set(ids.form.notification.success)}>{message}</Box>,
+      { ...opts, style: { maxWidth: "450px" } },
+    );
   }
 
   // todo ? refac: replace with errors.toast()

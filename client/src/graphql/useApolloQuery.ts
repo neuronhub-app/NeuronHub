@@ -1,4 +1,4 @@
-import type { OperationVariables } from "@apollo/client";
+import { OperationVariables } from "@apollo/client";
 import { useQuery } from "@apollo/client/react";
 import type { DeepPartial } from "@apollo/client/utilities";
 import type { TadaDocumentNode } from "gql.tada";
@@ -10,7 +10,7 @@ export function useApolloQuery<
 >(
   query: TadaDocumentNode<TData, TVariables>,
   variables?: NoInfer<TVariables>,
-  options?: { skip: boolean },
+  options?: { skip?: boolean },
 ) {
   // Apollo bug: non-saved `query` loops React re-render
   const queryRef = useRef<TadaDocumentNode<TData, TVariables>>(query);
@@ -19,8 +19,10 @@ export function useApolloQuery<
     variables: variables ?? ({} as unknown as NoInfer<TVariables>),
     skip: options?.skip,
   });
+
   return {
     ...queryResult,
+    // todo ? fix: not accurate. but we'll prob drop apollo sooner.
     isLoadingFirstTime: !queryResult.data && queryResult.loading,
   };
 }

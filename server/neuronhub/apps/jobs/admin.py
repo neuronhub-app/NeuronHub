@@ -57,6 +57,7 @@ class JobAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdmin):
         ("org", DALFRelatedFieldAjaxMulti),
         "is_published",
         "created_at",
+        "updated_at",
         "posted_at",
         "closes_at",
     ]

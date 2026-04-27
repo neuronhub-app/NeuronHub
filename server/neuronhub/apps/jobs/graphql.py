@@ -191,29 +191,21 @@ class JobsQuery:
         user = await get_user(info)
         job_drafts = get_jobs_qs_prefetched().filter(is_published=False).order_by("-updated_at")
         job_drafts = filter_jobs_by_user(user, jobs=job_drafts)
-        return [await _compose_job_version(user, draft) async for draft in job_drafts]
+        return [await _compose_job_version(draft) async for draft in job_drafts]
 
 
-async def _compose_job_version(user: User, job_draft: Job) -> JobVersionType:
+async def _compose_job_version(job_draft: Job) -> JobVersionType:
     """
     #AI
-
-    Orphan drafts (no `version_of` published peer) surface with `published=None`
-    and empty `published_markdown`. Airtable sync creates orphans for new URLs.
     """
-    job_published = await filter_jobs_by_user(
-        user, jobs=job_draft.version_of.filter(is_published=True).select_related("org")
-    ).afirst()
-
-    # todo ! fix: AI-slop. must simply cast().
-    # #bad-infer: Job (Django model) isn't seen as assignable to JobType
-    # (strawberry_django.type wrapper). Worth removing once strawberry-django
-    # exposes a public type-narrowing helper for model->type.
+    job_published = (
+        await job_draft.version_of.filter(is_published=True).select_related("org").afirst()
+    )
     return JobVersionType(
         id=strawberry.ID(str(job_draft.id)),
-        draft=job_draft,  # type: ignore[arg-type]  #bad-infer
+        draft=cast(JobType, job_draft),
         draft_markdown=await serialize_job_to_md(job_draft),
-        published=job_published,  # type: ignore[arg-type]  #bad-infer
+        published=cast(JobType, job_published),
         published_markdown=await serialize_job_to_md(job_published) if job_published else "",
     )
 

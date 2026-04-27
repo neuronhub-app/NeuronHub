@@ -155,12 +155,13 @@ export namespace ids {
       emailInput: "job.alert.email-input",
       submitBtn: "job.alert.submit-btn",
     },
-    versions: {
-      container: "job.versions.container",
-      card: "job.versions.card",
-      selectAllCheckbox: "job.versions.select-all",
-      approveBtn: "job.versions.approve-btn",
-      emptyState: "job.versions.empty-state",
+    drafts: {
+      container: "job.drafts.container",
+      card: "job.drafts.card",
+      selectAllCheckbox: "job.drafts.select-all",
+      approveBtn: "job.drafts.approve-btn",
+      emptyState: "job.drafts.empty-state",
+      navbar: "job.drafts.navbar",
     },
     subscriptions: {
       list: "job.subscriptions.list",

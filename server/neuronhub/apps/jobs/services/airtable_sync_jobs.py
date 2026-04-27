@@ -236,6 +236,7 @@ def get_jobs_qs_prefetched():
         "tags_workload",
         "tags_country_visa_sponsor",
         "locations",
+        "org__tags_area",
     )
 
 

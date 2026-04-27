@@ -134,7 +134,7 @@ export class PlaywrightHelper {
       | typeof urls.profiles.list
       | typeof urls.jobs.list
       | typeof urls.jobs.subscriptions
-      | typeof urls.jobs.versions
+      | typeof urls.jobs.drafts
       | string,
     opts?: { idleWait?: boolean; idleWaitTimeout?: number },
   ) {

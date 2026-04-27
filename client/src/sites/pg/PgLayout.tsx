@@ -40,7 +40,7 @@ export default function PgLayout() {
   const configSnap = useSnapshot(siteConfigState);
 
   // todo ? refac: dumb. move to routes.ts param or similar
-  const isMaxW = location.pathname.startsWith(urls.jobs.versions);
+  const isJobDraftsPage = location.pathname.startsWith(urls.jobs.drafts);
 
   const footer = useFooterSections(configSnap.data?.footer_sections);
 
@@ -51,8 +51,15 @@ export default function PgLayout() {
         isLoading={configSnap.isLoading}
       />
 
-      <Stack as="main" flex="1" align="stretch" overflow="hidden" pb={style.paddingBottom}>
-        <Container px={style.paddingX} maxW={isMaxW ? "100%" : ""}>
+      <Stack
+        as="main"
+        flex="1"
+        align="stretch"
+        minH="50vh"
+        overflow="clip"
+        pb={style.paddingBottom}
+      >
+        <Container px={isJobDraftsPage ? 0 : style.paddingX} maxW={isJobDraftsPage ? "100%" : ""}>
           <Outlet />
         </Container>
       </Stack>
