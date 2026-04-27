@@ -2,8 +2,6 @@
  * #quality-15% #AI
  * - 20% -> 15%: 3 sections by LLM
  */
-import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
-import { toast } from "@/utils/toast";
 import {
   Badge,
   Box,
@@ -21,8 +19,8 @@ import {
   Menu,
   Portal,
   Spacer,
-  Tabs,
   Stack,
+  Tabs,
   Text,
 } from "@chakra-ui/react";
 import { createPatch } from "diff";
@@ -31,60 +29,26 @@ import { ColorSchemeType } from "diff2html/lib/types";
 import "diff2html/bundles/css/diff2html.min.css";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { LuChevronDown, LuEllipsisVertical, LuExternalLink } from "react-icons/lu";
+import { useSnapshot } from "valtio";
+import { proxySet } from "valtio/utils";
 
 import { admin } from "@neuronhub/shared/admin-urls";
 import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { JobDraftsApproveMutation, JobDraftsQuery } from "@/apps/jobs/drafts/queries";
 import { ids } from "@/e2e/ids";
-import { graphql, ID, ResultOf } from "@/gql-tada";
+import type { ID, ResultOf } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
+import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useSnapshot } from "valtio";
-import { proxySet } from "valtio/utils";
 
 const sections = ["created", "updated", "deleted"] as const;
 type DraftSection = (typeof sections)[number];
 
 type DraftType = NonNullable<ResultOf<typeof JobDraftsQuery>["job_versions_pending"]>[number];
-export const JobDraftsQuery = graphql.persisted(
-  "JobVersionsPending",
-  graphql(`
-    query JobVersionsPending {
-      job_versions_pending {
-        id
-        draft_markdown
-        published_markdown
-        draft {
-          id
-          title
-          is_pending_removal
-          url_external
-          org {
-            id
-            name
-            logo {
-              url
-            }
-          }
-        }
-        published {
-          id
-          title
-        }
-      }
-    }
-  `),
-);
-export const JobDraftsApproveMutation = graphql.persisted(
-  "JobVersionsApprove",
-  graphql(`
-    mutation JobVersionsApprove($draft_ids: [Int!]!) {
-      job_versions_approve(draft_ids: $draft_ids)
-    }
-  `),
-);
 
 const draftsSelected = proxySet<ID>();
 

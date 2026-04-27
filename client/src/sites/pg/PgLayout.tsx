@@ -59,7 +59,10 @@ export default function PgLayout() {
         overflow="clip"
         pb={style.paddingBottom}
       >
-        <Container px={isJobDraftsPage ? 0 : style.paddingX} maxW={isJobDraftsPage ? "100%" : ""}>
+        <Container
+          px={isJobDraftsPage ? 0 : style.paddingX}
+          maxW={isJobDraftsPage ? "100%" : ""}
+        >
           <Outlet />
         </Container>
       </Stack>

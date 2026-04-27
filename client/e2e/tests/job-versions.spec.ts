@@ -1,4 +1,4 @@
-import { JobDraftsApproveMutation, JobDraftsQuery } from "@/apps/jobs/drafts/JobDraftsReview";
+import { JobDraftsApproveMutation, JobDraftsQuery } from "@/apps/jobs/drafts/queries";
 import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
 import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
