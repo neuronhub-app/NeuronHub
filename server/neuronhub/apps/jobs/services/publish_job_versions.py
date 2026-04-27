@@ -1,6 +1,7 @@
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
+from typing import Literal
 
 import sentry_sdk
 from asgiref.sync import sync_to_async
@@ -53,7 +54,7 @@ async def _publish_deletion(draft_ids: list[int]) -> JobIds:
     jobs_draft = Job.objects.filter(id__in=draft_ids, is_pending_removal=True)
     jobs_pub = Job.objects.filter(versions__in=jobs_draft, is_published=True).distinct()
 
-    job_ids.deleted = [pk async for pk in jobs_pub.values_list("id", flat=True)]
+    job_ids.deleted = [id async for id in jobs_pub.values_list("id", flat=True)]
 
     async for job_pub in jobs_pub:  # for django-simple-history, JIC
         try:
@@ -85,7 +86,7 @@ async def _publish_update_or_create(draft_ids: list[int]) -> JobIds:
             job_updated_draft.is_published = True
             await job_updated_draft.asave()
 
-            job_ids.updated.append(job_updated_draft.pk)
+            job_ids.updated.append(job_updated_draft.id)
         except Exception:
             sentry_sdk.capture_exception()
 
@@ -96,7 +97,7 @@ async def _publish_update_or_create(draft_ids: list[int]) -> JobIds:
         version_of__isnull=True,
     )
     try:
-        job_ids.created = [pk async for pk in drafts_to_create.values_list("id", flat=True)]
+        job_ids.created = [id async for id in drafts_to_create.values_list("id", flat=True)]
         await drafts_to_create.aupdate(is_published=True)
     except Exception:
         sentry_sdk.capture_exception()
@@ -109,32 +110,34 @@ def _publish_changes_to_algolia(job_ids: JobIds):
     from algoliasearch_django import algolia_engine
 
     adapter = algolia_engine.get_adapter(model=Job)
+    is_await_algolia_http_response = False
 
     algolia_engine.client.delete_objects(
         index_name=adapter.index_name,
         object_ids=job_ids.deleted,
-        wait_for_tasks=False,
+        wait_for_tasks=is_await_algolia_http_response,
     )
 
-    jobs_updated: list[dict] = []
-    for job in get_jobs_qs_prefetched().filter(id__in=job_ids.updated):
-        if adapter._should_index(job):
-            jobs_updated.append(adapter.get_raw_record(job))
-    algolia_engine.client.partial_update_objects(
-        index_name=adapter.index_name,
-        objects=jobs_updated,
-        wait_for_tasks=False,
-    )
+    for algolia_params in [
+        AlgoliaParams(ids=job_ids.updated, method="partial_update_objects"),
+        AlgoliaParams(ids=job_ids.created, method="save_objects"),
+    ]:
+        jobs_changed: list[dict] = []
+        for job in get_jobs_qs_prefetched().filter(id__in=algolia_params.ids):
+            if adapter._should_index(job):
+                jobs_changed.append(adapter.get_raw_record(job))
 
-    jobs_created: list[dict] = []
-    for job in get_jobs_qs_prefetched().filter(id__in=job_ids.created):
-        if adapter._should_index(job):
-            jobs_created.append(adapter.get_raw_record(job))
-    algolia_engine.client.save_objects(
-        index_name=adapter.index_name,
-        objects=jobs_created,
-        wait_for_tasks=False,
-    )
+        getattr(algolia_engine.client, algolia_params.method)(
+            index_name=adapter.index_name,
+            objects=jobs_changed,
+            wait_for_tasks=is_await_algolia_http_response,
+        )
+
+
+@dataclass
+class AlgoliaParams:
+    method: Literal["partial_update_objects", "save_objects"]
+    ids: list[int]
 
 
 async def _handle_invalid_drafts(draft_ids: list[int]):
@@ -146,12 +149,12 @@ async def _handle_invalid_drafts(draft_ids: list[int]):
     but possible from hand-edited data -> surface instead of silently skipping.
     """
     if draft_unhandled_ids := [
-        pk
-        async for pk in Job.objects.filter(
+        id
+        async for id in Job.objects.filter(
             id__in=draft_ids,
             is_published=False,
             is_pending_removal=False,
         ).values_list("id", flat=True)
     ]:
         sentry_sdk.set_context("unhandled_ids", dict(ids=draft_unhandled_ids))
-        sentry_sdk.capture_message("Job drafts fell through delete/update/create", level="error")
+        sentry_sdk.capture_message("Job drafts fell through create/update/delete", "error")
