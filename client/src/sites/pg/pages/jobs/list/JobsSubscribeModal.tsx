@@ -3,12 +3,24 @@
  *
  * Only has insignificant CSS changes.
  */
-import { Box, Button, Flex, Icon, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Icon,
+  Portal,
+  Popover,
+  Stack,
+  Text,
+  HStack,
+  VStack,
+} from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { format } from "@neuronhub/shared/utils/format";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { fromUnixTime } from "date-fns";
+import { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { FaBell } from "react-icons/fa6";
 import { useCurrentRefinements } from "react-instantsearch";
@@ -38,7 +50,7 @@ const FormSchema = z.object({
   email: z.email("Invalid email address"),
 });
 
-export function JobsSubscribeModal(props: { testId?: string; trigger?: React.ReactNode }) {
+export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode }) {
   const user = useUser();
   const loading = useIsLoading();
 
@@ -102,8 +114,6 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
     }
   }
 
-  const hasFilters = refinesCurrentReadableMap.length > 0;
-
   function openModal() {
     const email = user?.email ?? localStorage.getItem(emailStoreKey) ?? "";
     if (email && !form.getValues("email")) {
@@ -111,6 +121,8 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
     }
     state.mutable.isOpen = true;
   }
+
+  const isHasFilters = refinesCurrent.items.length > 0;
 
   return (
     <>
@@ -149,7 +161,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
           p={{ base: "gap.md", md: "gap.xl" }}
           maxW={{ md: "536px" }}
         >
-          <DialogHeader p="0" mb={hasFilters ? "3" : "gap.lg"}>
+          <DialogHeader p="0" mb={isHasFilters ? "3" : "gap.lg"}>
             <Stack gap="2.5">
               <DialogTitle {...style.title} pr="10">
                 Get job alerts in your inbox
@@ -175,7 +187,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
             }}
           >
             <Stack gap="gap.lg" mb="gap.lg">
-              {hasFilters && (
+              {isHasFilters && (
                 <Box bg="brand.green.subtle" borderRadius="md" px="gap.md" py="gap.md">
                   {refinesCurrentReadableMap.map(facet => (
                     <Text key={`${facet.attribute}-${facet.label}`} {...style.filterText}>
@@ -205,15 +217,64 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: React.Rea
                     ...ids.set(ids.job.alert.emailInput),
                   }}
                 />
-                <Button
-                  type="submit"
-                  variant="pg-primary"
-                  loading={loading.isActive}
-                  flexShrink="0"
-                  {...ids.set(ids.job.alert.submitBtn)}
+                <Popover.Root
+                  open={isHasFilters ? false : undefined}
+                  positioning={{
+                    placement: "left-end",
+                    overlap: true,
+                    arrowPadding: 0,
+                    gutter: 0,
+                    offset: { mainAxis: -105, crossAxis: 13 },
+                  }}
                 >
-                  Subscribe
-                </Button>
+                  <Popover.Trigger asChild>
+                    <Button
+                      type={isHasFilters ? "submit" : "button"}
+                      variant="pg-primary"
+                      loading={loading.isActive}
+                      flexShrink="0"
+                      {...ids.set(ids.job.alert.submitBtn)}
+                    >
+                      Subscribe
+                    </Button>
+                  </Popover.Trigger>
+
+                  <Portal>
+                    <Popover.Positioner>
+                      <Popover.Content w="fit-content">
+                        <Popover.Body p="gap.md" gap="gap.sm">
+                          <VStack align="flex-start">
+                            <Text>
+                              You need to select filters, or you'll emails get about all jobs.
+                            </Text>
+                            <HStack alignSelf="flex-end" justify="flex-end">
+                              <Button
+                                type="submit"
+                                size="sm"
+                                variant="outline"
+                                colorPalette="gray"
+                              >
+                                Subscribe to all jobs
+                              </Button>
+
+                              <Popover.CloseTrigger gap="gap.sm" display="flex">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    state.mutable.isOpen = false;
+                                  }}
+                                >
+                                  Close & select filters
+                                </Button>
+                              </Popover.CloseTrigger>
+                            </HStack>
+                          </VStack>
+                        </Popover.Body>
+                      </Popover.Content>
+                    </Popover.Positioner>
+                  </Portal>
+                </Popover.Root>
               </Flex>
             </Stack>
 
