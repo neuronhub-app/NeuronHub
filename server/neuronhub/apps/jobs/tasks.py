@@ -76,6 +76,6 @@ async def airtable_sync_task(email_to_notify: str = None):
                     
                     <p>Those changes will not be published without approval.</p> 
                     
-                    <p><a href="{settings.CLIENT_URL}/jobs/versions">Approve & publish</a></p>
+                    <p><a href="{settings.CLIENT_URL}/jobs/drafts">Approve & publish</a></p>
                     """,
                 )

@@ -150,7 +150,7 @@ class Job(AlgoliaModel):
 
     is_pending_removal = models.BooleanField(
         default=False,
-        help_text="If this Job was removed in Airtable, the removal will have this flag, and will wait an approval on /jobs/versions from an admin. Only meaningful when is_published=False.",
+        help_text="If this Job was removed in Airtable, the removal will have this flag, and will wait an approval on /jobs/drafts from an admin. Only meaningful when is_published=False.",
     )
     is_created_by_sync = models.BooleanField(
         default=False,
