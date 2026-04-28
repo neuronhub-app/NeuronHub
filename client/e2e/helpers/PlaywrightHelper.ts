@@ -13,6 +13,7 @@ import type { urls } from "@/urls";
 export type LocatorMapToGetFirstById = Record<TestId, Locator>;
 
 const actionTimeoutMsDefault: number = 7500;
+const actionTimeoutMsGraphql = actionTimeoutMsDefault + 7500; // 7.5s fails in 30% of several tests
 
 export class PlaywrightHelper {
   $: LocatorMapToGetFirstById;
@@ -110,6 +111,7 @@ export class PlaywrightHelper {
         response =>
           response.url().includes(env.VITE_SERVER_URL_API) &&
           (response.request().postData()?.includes(queryName) ?? false),
+        { timeout: actionTimeoutMsGraphql },
       )
       .then(response => response.json());
   }

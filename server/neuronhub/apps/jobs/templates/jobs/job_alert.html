@@ -1,4 +1,6 @@
-<!doctype html>
+{% load job_detail_url %}<!doctype html>
+
+{% verbatim %}
 <!--
   ============================================================
   Job Alert Email Template
@@ -6,21 +8,22 @@
 
   DYNAMIC VARIABLES (Django template context):
 
-  {{ site_name }}                    — site display name
-  {{ site_domain }}                  — e.g. "probablygood.org"
-  {{ client_url }}                   — base URL
-  {{ client_jobs_url }}              — job board URL
-  {{ alert_id }}                     — PK of the JobAlert (for click tracking)
-  {{ jobs_matched_count }}           — integer, e.g. 4
-  {{ jobs_total_count }}             — total jobs on the board
-  {{ job_alerts_management_url }}    — URL to edit alert preferences
-  {{ unsubscribe_url }}              — URL to unsubscribe
-  {{ feedback_form_url }}            — URL for feedback link (optional)
-  {{ submit_job_url }}               — URL to report landing a role (optional)
-  {{ logo_url }}                     — absolute URL to header logo (optional)
-  {{ address }}                      — physical address for CAN-SPAM (optional)
-  {{ email_html_about_us }}          — HTML for About paragraph (optional, |safe)
-  {{ email_html_feedback_request }}  — HTML for M&E body text (optional, |safe)
+  {{ site_name }}                                       — site display name
+  {{ site_domain }}                                     — e.g. "probablygood.org"
+  {{ client_url }}                                      — base URL
+  {{ client_jobs_url }}                                 — job board URL
+  {% job_detail_url slug=job.slug alert_id=alert_id %}  — canonical job detail URL
+  {{ alert_id }}                                        — PK of the JobAlert (for click tracking)
+  {{ jobs_matched_count }}                              — integer, e.g. 4
+  {{ jobs_total_count }}                                — total jobs on the board
+  {{ job_alerts_management_url }}                       — URL to edit alert preferences
+  {{ unsubscribe_url }}                                 — URL to unsubscribe
+  {{ feedback_form_url }}                               — URL for feedback link (optional)
+  {{ submit_job_url }}                                  — URL to report landing a role (optional)
+  {{ logo_url }}                                        — absolute URL to header logo (optional)
+  {{ address }}                                         — physical address for CAN-SPAM (optional)
+  {{ email_html_about_us }}                             — HTML for About paragraph (optional, |safe)
+  {{ email_html_feedback_request }}                     — HTML for M&E body text (optional, |safe)
 
   For each job in {{ jobs }}:
     {{ job.title }}
@@ -35,6 +38,7 @@
 
   ============================================================
 -->
+{% endverbatim %}
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -102,7 +106,7 @@
         {% for job in jobs %}
         <tr>
           <td style="padding:0 36px;">
-            <a href="{{ client_jobs_url }}/{{ job.slug }}?alert={{ alert_id }}" style="display:block;text-decoration:none;">
+            <a href="{% job_detail_url slug=job.slug alert_id=alert_id %}" style="display:block;text-decoration:none;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-bottom:1px solid #eaeaea;">
               <tr><td style="padding:16px 0;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">

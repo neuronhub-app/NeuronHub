@@ -1,9 +1,11 @@
 - rename `server` to `backend`, and `client` to `frontend`
 - rename GraphQL mutations to `{noun}_{verb}`
 - shorten Post subset names as `PostTool`/`PostReview` to `Tool`/`Review`
+- store URLs of FE used by BE in a single file (eg typed JSON) that both can import. Replace magic strings in python docstrings as `jobs/drafts`.
 
 ### Client
 
+- rename `jobs/subscriptions` to `jobs/alerts`
 - restructure `client/` per #59
 - merge detail pages logic of `apps/<type>/edit/index.tsx`
 - use `index.tsx` files only for `export` -> name the main files same as comp, eg `PostCard.tsx`

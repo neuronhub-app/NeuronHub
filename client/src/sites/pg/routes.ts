@@ -3,6 +3,7 @@ import { layout, prefix, type RouteConfig, route } from "@react-router/dev/route
 export const routes = [
   layout("./sites/pg/PgLayout.tsx", [
     route("/", "./sites/pg/pages/jobs/list/index.tsx"),
+    route("/jobs", "./sites/pg/pages/jobs/list/index.tsx", { id: "pg-jobs-alias" }),
     route("/subscriptions", "./sites/pg/pages/jobs/subscriptions/index.tsx"),
     route(
       "/subscriptions/:id_ext",
@@ -10,7 +11,11 @@ export const routes = [
     ),
     route("/subscriptions/remove/:id_ext", "./sites/pg/pages/jobs/subscriptions/remove.tsx"),
     route("/jobs/drafts", "./apps/jobs/drafts/index.tsx"),
-    route("/:slug", "./sites/pg/pages/jobs/list/slug.tsx"),
+    route("/jobs/:slug", "./sites/pg/pages/jobs/list/slug.tsx"),
+    // legacy redirects
+    route("/job-posting/:slug", "./sites/pg/redirects/slug-legacy-redirect-1.tsx"),
+    route("/:slug", "./sites/pg/redirects/slug-legacy-redirect-2.tsx"),
+    route("*", "./page-404.tsx"),
   ]),
 
   // #AI

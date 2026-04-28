@@ -28,6 +28,7 @@ import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
 import { LocationType } from "~/graphql/enums";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
+import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
 
 const style = {
@@ -344,7 +345,7 @@ function JobExpanded(props: { job: JobFragmentType }) {
           </Button>
         )}
 
-        <Clipboard.Root value={`${window.location.origin}/${props.job.slug}`}>
+        <Clipboard.Root value={urls.absolute(urls.jobs.slug(props.job.slug))}>
           <Tooltip content="Copy link" positioning={{ placement: "right" }} openDelay={1_500}>
             <Clipboard.Trigger asChild>
               <Button

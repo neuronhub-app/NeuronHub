@@ -44,5 +44,6 @@ export const routes = [
         route("/llm-profile", "./apps/users/settings/llm-profile/index.tsx"),
       ]),
     ]),
+    route("*", "./page-404.tsx"),
   ]),
 ] satisfies RouteConfig;

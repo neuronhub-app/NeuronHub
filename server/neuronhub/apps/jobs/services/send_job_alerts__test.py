@@ -7,6 +7,7 @@ from neuronhub.apps.jobs.models import JobAlertLog
 from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_qs_by_alert
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
+from neuronhub.apps.jobs.templatetags.job_detail_url import job_detail_url
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.tests.test_cases import NeuronTestCase
@@ -129,7 +130,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await send_job_alerts()
 
         email_html = mail.outbox[0].body
-        assert f"/{job.slug}?alert={alert.id}" in email_html
+        assert job_detail_url(slug=job.slug, alert_id=alert.id) in email_html
 
     async def test_jobs_notified_count_increment(self):
         alert = await self.gen.jobs.job_alert()

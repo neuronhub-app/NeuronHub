@@ -8,6 +8,7 @@ type PostUrls = typeof urls.posts | typeof urls.reviews | typeof urls.tools;
 export const op = { create: "create", edit: "edit" } as const;
 
 export const urls = {
+  absolute: (path: string) => `${window.location.origin}${path}` as const,
   home: "/",
   login: "/login",
   library: "/library",
@@ -59,16 +60,14 @@ export const urls = {
     list: env.VITE_SITE === "pg" ? "/" : "/jobs",
     faq: env.VITE_SITE === "pg" ? "/faq" : "/jobs/faq",
     subscriptions: env.VITE_SITE === "pg" ? "/subscriptions" : "/jobs/subscriptions",
-    slug(slug: string) {
-      return `${this.list === "/" ? "" : this.list}/${slug}` as const;
-    },
-    drafts: "/jobs/drafts",
+    slug: (slug: string) => `/jobs/${slug}` as const,
     subscriptionsManage(idExt: string) {
       return `${this.subscriptions}/${idExt}` as const;
     },
     subscriptionsRemove(idExt: string) {
       return `${this.subscriptions}/remove/${idExt}` as const;
     },
+    drafts: "/jobs/drafts",
   },
   tools: {
     list: "/tools",

@@ -145,8 +145,9 @@ dependencies = [
     console_output_style = "classic" # -LLM-context
     addopts = [
         "--reuse-db",
-        "--color=no", # -LLM-context
         "--no-header", # -LLM-context
         "-m not slow_llm_api and not firebase_subscription",
-        # "--capture=no", # show stdout
+        "--color=no", # -LLM-context
+        #"--color=yes",
+        #"--capture=no", # show stdout
     ]
