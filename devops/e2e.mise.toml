@@ -21,7 +21,7 @@
 
 ["dev:e2e:server:db_worker"]
     dir = "server"
-    run = "uv run manage.py db_worker"
+    run = "uv run manage.py db_worker --no-reload"
     env.SERVER_URL = "http://localhost:{{ env.SERVER_PORT_E2E }}"
     env.DJANGO_ENV = "dev_test_e2e"
     env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
