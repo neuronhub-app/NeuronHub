@@ -26,7 +26,7 @@ test.describe("Job Alert", () => {
   });
 
   // todo ! refac: #AI-slop - magic strings wo testid
-  // replace "Subscriptions (1)" with a `data-{}` & testid
+  // - replace "Subscriptions (1)" with a `data-{}` & testid
   test("subscribe with locations => toggle inactive => reauth by id_ext => delete", async ({
     page,
     context,
@@ -94,21 +94,21 @@ test.describe("Job Alert", () => {
     await expect(page).not.toHaveText(testEmail);
   });
 
-  test("unsubscribe by /jobs/subscriptions/remove/:id_ext (maybe flaky)", async ({ page }) => {
+  test("unsubscribe by /jobs/subscriptions/remove/:id_ext (maybe flaky)", async () => {
     test.slow();
 
     await play.navigate(urls.jobs.list, { idleWait: true });
 
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
-    const mutationSubscribe = play.waitForResponseGraphql(JobAlertSubscribeMutation);
+    const responseSubscribe = play.waitForGraphqlQuery(JobAlertSubscribeMutation);
     await play.click(ids.job.alert.submitBtn);
-    await mutationSubscribe;
+    if (env.site.isProbablyGood) {
+      // wo filters PG shows a confirm Popover
+      await play.click(ids.job.alert.submitAllBtn);
+    }
+    await responseSubscribe;
 
-    // Flaky:
-    // > Error: response.json: Protocol error (Network.getResponseBody): No resource with given identifier found
-    //
-    // Maybe: try it after `play.navigate(subs)`
     const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);
     await play.navigate(urls.jobs.subscriptions);
     const alertsRes = await alertsQuery;

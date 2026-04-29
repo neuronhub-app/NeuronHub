@@ -76,3 +76,9 @@ test("Upvote", async () => {
 Replaces:
 - `.toHaveAttribute("data-state", true)` -> `except($[ids.value]).checked(locator)`
 - `.localor(text="{value}")` -> `epxect(page).toHaveText`
+
+### Algolia Timeouts
+
+The GraphQL mutation `db_stubs_repopulate` before each test is long by itself, 
+but lately Algolia started to either throttle or fail (eg 50 failed attempts to clean e2e dev index),
+resulting in 130s timeouts on this mutation.

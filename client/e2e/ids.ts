@@ -154,6 +154,7 @@ export namespace ids {
       subscribeBtnMobile: "job.alert.subscribe-btn-mobile",
       emailInput: "job.alert.email-input",
       submitBtn: "job.alert.submit-btn",
+      submitAllBtn: "job.alert.submit-all-btn",
     },
     drafts: {
       container: "job.drafts.container",

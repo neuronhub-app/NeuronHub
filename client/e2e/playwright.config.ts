@@ -6,7 +6,11 @@ const clientUrl = `http://localhost:${env.CLIENT_PORT_E2E}`;
 
 export default defineConfig({
   testDir: "./tests",
-  timeout: 70 * 1000, // default = 30s, but cold Postgres cache needs over 45s; And Algolia can take 45s by itself.
+  // todo ! refac: centralize timeouts
+  //
+  // Default is 30s, but cold Postgres cache needs over 45s; And Algolia can take 45s by itself.
+  // Then Algolia can "throttle" (?) for 10-50m and timeout at 130s.
+  timeout: 80 * 1000,
   workers: 1, // default = 4
   outputDir: "test-results/",
   testIgnore:

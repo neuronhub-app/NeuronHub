@@ -1,5 +1,5 @@
 import type { OperationVariables } from "@apollo/client";
-import type { Locator, Page } from "@playwright/test";
+import { Locator, Page, test } from "@playwright/test";
 import type { TadaDocumentNode } from "gql.tada";
 import { print } from "graphql";
 import { config } from "@/e2e/config";
@@ -100,20 +100,56 @@ export class PlaywrightHelper {
     }
   }
 
+  // todo ! refac-name: waitForGraphqlJson
   waitForResponseGraphql<
     TData = unknown,
     TVariables extends OperationVariables = OperationVariables,
   >(query: TadaDocumentNode<TData, TVariables>): Promise<{ data: TData }> {
-    // @ts-expect-error #bad-infer all gql.tada have .name
+    return this.waitForGraphqlQuery(query).then(response => {
+      try {
+        return response.json();
+      } catch (err: unknown) {
+        if (String(err).includes("No resource with given identifier found")) {
+          throw new Error(
+            `Failed to get JSON of GraphQL ${query}. Likely due to Playwright flakiness.`,
+          );
+        }
+        throw err;
+      }
+    });
+  }
+
+  isErrorHasMessage(err: unknown | Error, message: string): boolean {
+    if (err instanceof Error) {
+      return err.toString().includes(message);
+    }
+    console.log("error not error (wtf");
+    return false;
+  }
+
+  /**
+   * FYI .waitForResponse(`${env.VITE_SERVER_URL_API}/${queryName}`, { ... }) fails,
+   * likely because Playwright lacks [[fetchUsingReadableUrl]].
+   *
+   * #AI
+   * This function used only for await - it skips `.json()` which flaked with:
+   * > Network.getResponseBody: No resource with given identifier found
+   *
+   * Perhaps due to pruned network cache in the Chrome DevTools Protocol. But unlikely it's so simple.
+   */
+  waitForGraphqlQuery<
+    TData = unknown,
+    TVariables extends OperationVariables = OperationVariables,
+  >(query: TadaDocumentNode<TData, TVariables>) {
+    // @ts-expect-error #bad-infer - gql.tada sets .name
     const queryName: string = query.definitions[0]!.name!.value;
-    return this.page
-      .waitForResponse(
-        response =>
-          response.url().includes(env.VITE_SERVER_URL_API) &&
-          (response.request().postData()?.includes(queryName) ?? false),
-        { timeout: actionTimeoutMsGraphql },
-      )
-      .then(response => response.json());
+
+    return this.page.waitForResponse(
+      response =>
+        response.url().includes(env.VITE_SERVER_URL_API) &&
+        (response.request().postData()?.includes(queryName) ?? false),
+      { timeout: actionTimeoutMsGraphql },
+    );
   }
 
   async dbStubsRepopulate(options?: {
@@ -138,13 +174,13 @@ export class PlaywrightHelper {
       | typeof urls.jobs.subscriptions
       | typeof urls.jobs.drafts
       | string,
-    opts?: { idleWait?: boolean; idleWaitTimeout?: number },
+    opts?: { idleWait?: boolean },
   ) {
     await this.page.goto(path);
 
     if (opts?.idleWait) {
       await this.waitForNetworkIdle({
-        idleWaitTimeout: opts.idleWaitTimeout ?? this.actionTimeoutMs,
+        idleWaitTimeout: this.actionTimeoutMs,
       });
     }
   }
@@ -175,7 +211,10 @@ export class PlaywrightHelper {
     return this.page.waitForLoadState("networkidle", { timeout: opts.idleWaitTimeout });
   }
 
-  async screenshot(name: string = "screenshot", { fullPage = false, maxH = 3000 } = {}) {
+  /**
+   * @param maxH 2000px is Anthropic's limit.
+   */
+  async screenshot(name: string = "screenshot", { fullPage = false, maxH = 2000 } = {}) {
     this.screenshotCounter += 1;
     return this.page.screenshot({
       path: `e2e/screenshots/${this.screenshotCounter}-${name}.jpeg`,

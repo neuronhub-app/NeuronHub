@@ -38,9 +38,11 @@ function createApolloClient() {
   return client;
 }
 
-// Change:
-// - `/api/graphql/` -> `/api/graphql/Name`
-// - `/api/graphql/` -> `/api/graphql/mutate/Name`
+/**
+ * Changes:
+ *  - /api/graphql/ -> /api/graphql/Name
+ *  - /api/graphql/ -> /api/graphql/mutate/Name
+ */
 function fetchUsingReadableUrl(uri: RequestInfo | Request | URL, options?: RequestInit) {
   // File uploads (FormData) -> pass through to regular fetch #AI
   if (options?.body instanceof FormData) {

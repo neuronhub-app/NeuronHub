@@ -249,10 +249,13 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
                             </Text>
                             <HStack alignSelf="flex-end" justify="flex-end">
                               <Button
-                                type="submit"
+                                // type=submit is ignored in <Popover>
+                                onClick={() => loading.track(form.handleSubmit(handleSubscribe))}
+                                loading={loading.isActive}
                                 size="sm"
                                 variant="outline"
                                 colorPalette="gray"
+                                {...ids.set(ids.job.alert.submitAllBtn)}
                               >
                                 Subscribe to all jobs
                               </Button>
