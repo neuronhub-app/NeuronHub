@@ -113,6 +113,18 @@ wheels = [
 ]
 
 [[package]]
+name = "anyio"
+version = "4.13.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "idna" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/19/14/2c5dd9f512b66549ae92767a9c7b330ae88e1932ca57876909410251fe13/anyio-4.13.0.tar.gz", hash = "sha256:334b70e641fd2221c1505b3890c69882fe4a2df910cba14d97019b90b24439dc", size = 231622, upload-time = "2026-03-24T12:59:09.671Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/da/42/e921fccf5015463e32a3cf6ee7f980a6ed0f395ceeaa45060b61d86486c2/anyio-4.13.0-py3-none-any.whl", hash = "sha256:08b310f9e24a9594186fd75b4f73f4a4152069e3853f1ed8bfbf58369f4ad708", size = 114353, upload-time = "2026-03-24T12:59:08.246Z" },
+]
+
+[[package]]
 name = "asgiref"
 version = "3.11.1"
 source = { registry = "https://pypi.org/simple" }
@@ -873,6 +885,43 @@ wheels = [
 ]
 
 [[package]]
+name = "h11"
+version = "0.16.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/01/ee/02a2c011bdab74c6fb3c75474d40b3052059d95df7e73351460c8588d963/h11-0.16.0.tar.gz", hash = "sha256:4e35b956cf45792e4caa5885e69fba00bdbc6ffafbfa020300e549b208ee5ff1", size = 101250, upload-time = "2025-04-24T03:35:25.427Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/04/4b/29cac41a4d98d144bf5f6d33995617b185d14b22401f75ca86f384e87ff1/h11-0.16.0-py3-none-any.whl", hash = "sha256:63cf8bbe7522de3bf65932fda1d9c2772064ffb3dae62d55932da54b31cb6c86", size = 37515, upload-time = "2025-04-24T03:35:24.344Z" },
+]
+
+[[package]]
+name = "httpcorexyz"
+version = "1.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "certifi" },
+    { name = "h11" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/26/c7/cb12e738c9bf3b8a0b90afc833b0c96c1b87b1fa644ba163d51104e8ad53/httpcorexyz-1.1.0.tar.gz", hash = "sha256:2678734930cbfe575a25356a0688b2290ced297865112e7a3cc742308db90b15", size = 95953, upload-time = "2026-04-25T18:10:21.795Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ce/93/71eabbde12b7211b327a1e5282755f066a191d02f9a8ce7dca961fae3518/httpcorexyz-1.1.0-py3-none-any.whl", hash = "sha256:98c6078baccc4d7b5c8e804e78297f785ff6dd53439e6135dae4c19326753faf", size = 83153, upload-time = "2026-04-25T18:10:19.278Z" },
+]
+
+[[package]]
+name = "httpxyz"
+version = "0.31.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "certifi" },
+    { name = "httpcorexyz" },
+    { name = "idna" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4c/17/46259b2f8fc4d898b2cd61f372d6bdcc7a4b0ecb12769258a5f2368b5043/httpxyz-0.31.0.tar.gz", hash = "sha256:0b91d54dd900d87b46d24d6ec3a69b6c20c5e9d2b89a540771c172c7835bf717", size = 149393, upload-time = "2026-04-25T19:14:43.194Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3f/00/87868350bc747b1d48926dd73a793876a5acc33ec8014169c0feaeedaedf/httpxyz-0.31.0-py3-none-any.whl", hash = "sha256:0f9d3490cebf8fc97e59c1bc264d6139c8c99f569da4779c3abff8b476df5b21", size = 77339, upload-time = "2026-04-25T19:14:41.467Z" },
+]
+
+[[package]]
 name = "humanize"
 version = "4.15.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1265,6 +1314,7 @@ dependencies = [
     { name = "django-tasks" },
     { name = "django-timezone-field" },
     { name = "environs" },
+    { name = "httpxyz" },
     { name = "humanize" },
     { name = "ipython" },
     { name = "markdown" },
@@ -1329,6 +1379,7 @@ requires-dist = [
     { name = "django-tasks", specifier = "==0.10.*" },
     { name = "django-timezone-field", specifier = "==7.*" },
     { name = "environs", specifier = "==14.*" },
+    { name = "httpxyz", specifier = "==0.31.0" },
     { name = "humanize", specifier = "==4.*" },
     { name = "ipython", specifier = "==9.*" },
     { name = "markdown", specifier = "==3.10.1" },

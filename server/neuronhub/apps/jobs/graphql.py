@@ -22,6 +22,7 @@ from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.serialize_job_to_md import serialize_job_to_md
+from neuronhub.apps.jobs.services.subscribe_to_mailerlite import subscribe_to_mailerlite
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.posts.models import PostTag
@@ -29,7 +30,6 @@ from neuronhub.apps.sites.graphql import get_list_cached
 from neuronhub.apps.users.graphql.resolvers import get_user
 from neuronhub.apps.users.graphql.resolvers import get_user_maybe
 from neuronhub.apps.users.graphql.resolvers import get_user_sync
-from neuronhub.apps.users.models import User
 
 
 @strawberry_django.type(JobLocation)
@@ -230,6 +230,7 @@ class JobsMutation:
         is_exclude_career_capital: bool | None = None,
         is_exclude_profit_for_good: bool | None = None,
         tz: str | None = None,
+        is_subscribe_to_newsletter: bool = False,
     ) -> bool:
         alert = await JobAlert.objects.acreate(
             email=email,
@@ -239,6 +240,7 @@ class JobsMutation:
             is_exclude_career_capital=is_exclude_career_capital,
             is_exclude_profit_for_good=is_exclude_profit_for_good,
             tz=tz,
+            is_subscribe_to_newsletter=is_subscribe_to_newsletter,
         )
         if tag_names:
             tags = PostTag.objects.filter(name__in=tag_names)
@@ -253,6 +255,10 @@ class JobsMutation:
             await send_job_alert_confirmation_email(alert)
         except Exception:
             sentry_sdk.capture_exception()
+
+        if is_subscribe_to_newsletter:
+            await subscribe_to_mailerlite(email)
+
         return True
 
     @strawberry.mutation

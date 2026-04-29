@@ -14,6 +14,7 @@ import {
   Text,
   HStack,
   VStack,
+  Checkbox,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
@@ -57,7 +58,10 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
   const refinesCurrent = useCurrentRefinements();
   const { data: locationsData } = useApolloQuery(JobLocationsQuery);
 
-  const state = useStateValtio({ isOpen: false });
+  const state = useStateValtio({
+    isOpen: false,
+    is_subscribe_to_newsletter: false,
+  });
 
   const emailStoreKey = "job_alert_email";
   const form = useForm({
@@ -95,13 +99,14 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
       ),
       is_orgs_highlighted:
         refinesCurrent.items.some(item => item.attribute === "is_orgs_highlighted") || null,
-      salary_min: jobFilters.snap.salaryMin ?? null,
-      is_exclude_no_salary: jobFilters.snap.excludeNoSalary,
+      salary_min: jobFilters.mutable.salaryMin ?? null,
+      is_exclude_no_salary: jobFilters.mutable.excludeNoSalary,
       is_exclude_career_capital:
         refinesCurrent.items.some(item => item.attribute === "is_not_career_capital") || null,
       is_exclude_profit_for_good:
         refinesCurrent.items.some(item => item.attribute === "is_not_profit_for_good") || null,
       tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      is_subscribe_to_newsletter: state.mutable.is_subscribe_to_newsletter,
     });
     if (result.success) {
       localStorage.setItem(emailStoreKey, fields.email);
@@ -159,9 +164,9 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
           fontFamily="body"
           mx="gap.md"
           p={{ base: "gap.md", md: "gap.xl" }}
-          maxW={{ md: "536px" }}
+          maxW="fit-content"
         >
-          <DialogHeader p="0" mb={isHasFilters ? "3" : "gap.lg"}>
+          <DialogHeader p="0" mb={isHasFilters ? "3" : style.gap}>
             <Stack gap="2.5">
               <DialogTitle {...style.title} pr="10">
                 Get job alerts in your inbox
@@ -181,12 +186,10 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
           <form
             onSubmit={async event => {
               event.preventDefault();
-              await loading.track(async () => {
-                await form.handleSubmit(handleSubscribe)();
-              });
+              await loading.track(form.handleSubmit(handleSubscribe));
             }}
           >
-            <Stack gap="gap.lg" mb="gap.lg">
+            <Stack gap={style.gap} mb={style.gap}>
               {isHasFilters && (
                 <Box bg="brand.green.subtle" borderRadius="md" px="gap.md" py="gap.md">
                   {refinesCurrentReadableMap.map(facet => (
@@ -287,6 +290,22 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
               </Text>
               <Text {...style.footerText}>You can unsubscribe at any time.</Text>
             </Stack>
+
+            <Stack pt={style.gap} mt="-2px">
+              <Checkbox.Root
+                onCheckedChange={details => {
+                  state.mutable.is_subscribe_to_newsletter = Boolean(details.checked);
+                }}
+              >
+                <Checkbox.HiddenInput />
+                <Checkbox.Control
+                  css={{ "&[data-state=unchecked]": { bg: "bg.default_real" } }}
+                />
+                <Checkbox.Label fontWeight="normal">
+                  Also subscribe me to the newsletter for research-based career advice
+                </Checkbox.Label>
+              </Checkbox.Root>
+            </Stack>
           </form>
         </DialogContent>
       </DialogRoot>
@@ -308,6 +327,7 @@ function getRefinementLabel(
 }
 
 const style = {
+  gap: "gap.lg",
   title: { fontFamily: "heading", fontSize: "22px", fontWeight: "medium", color: "fg" },
   subtitle: { fontSize: "md", color: "fg.secondary" },
   filterText: { fontSize: "sm", color: "fg", lineHeight: "22px" },

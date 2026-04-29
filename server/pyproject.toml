@@ -52,6 +52,7 @@ dependencies = [
     "psycopg[binary] == 3.*",
     "sentry-sdk[django] == 2.*",
     "requests == 2.*",
+    "httpxyz == 0.31.0", # [i=low, rep=norm, GH=norm, @michielb, 0.04k] tildeweb.nl, @roywashere at HN since 2020. Ok, but he's new to maintenence - #freeze
     "rich == 14.*", # [i=norm, rep=high, GH=high, @willmcgugan, 55k]
     "python-dateutil == 2.*", # [i=norm rep=high, GH=high, @pganssle, 2.5k] ganssle.io, lots of publications and articles
     "humanize == 4.*", # [i=low, rep=high, GH=high, @hugovk, 0.7k] CPython core dev

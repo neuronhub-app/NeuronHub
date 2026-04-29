@@ -343,6 +343,11 @@ class JobAlert(TimeStampedModel):
         blank=True,
     )
 
+    is_subscribe_to_newsletter = models.BooleanField(
+        default=False,
+        help_text="Whether the user checked the newsletter checkbox. The API sub may fail, but this flag will be checked still.",
+    )
+
     # Note: minimal, as the rest is tracked by [[JobAlertLog]]
     history = HistoricalRecords(
         excluded_fields=["jobs_notified_count"],

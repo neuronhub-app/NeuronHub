@@ -33,7 +33,7 @@ async def send_job_alert_emails_task():
         logger.info(f"{send_job_alert_emails_task.name} report: {asdict(stats)}")
 
         for key, value in asdict(stats).items():
-            sentry_sdk.metrics.gauge(f"job_alerts.{key}", value)
+            sentry_sdk.metrics.count(f"job_alerts.{key}", value)
 
 
 monitor_config: MonitorConfig = {

@@ -89,6 +89,7 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
       is_exclude_profit_for_good:
         refinesCurrent.items.some(item => item.attribute === "is_not_profit_for_good") || null,
       tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      is_subscribe_to_newsletter: false,
     });
     if (result.success) {
       localStorage.setItem(emailStoreKey, fields.email);
@@ -239,6 +240,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
       $is_exclude_career_capital: Boolean
       $is_exclude_profit_for_good: Boolean
       $tz: String
+      $is_subscribe_to_newsletter: Boolean!
     ) {
       job_alert_subscribe(
         email: $email
@@ -250,6 +252,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
         is_exclude_career_capital: $is_exclude_career_capital
         is_exclude_profit_for_good: $is_exclude_profit_for_good
         tz: $tz
+        is_subscribe_to_newsletter: $is_subscribe_to_newsletter
       )
     }
   `),
