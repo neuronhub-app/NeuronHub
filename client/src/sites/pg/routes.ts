@@ -13,7 +13,7 @@ export const routes = [
     route("/jobs/drafts", "./apps/jobs/drafts/index.tsx"),
     route("/jobs/:slug", "./sites/pg/pages/jobs/list/slug.tsx"),
     // legacy redirects
-    route("/job-posting/:slug", "./sites/pg/redirects/slug-legacy-redirect-1.tsx"),
+    route("/job-postings/:slug", "./sites/pg/redirects/slug-legacy-redirect-1.tsx"),
     route("/:slug", "./sites/pg/redirects/slug-legacy-redirect-2.tsx"),
     route("*", "./page-404.tsx"),
   ]),
