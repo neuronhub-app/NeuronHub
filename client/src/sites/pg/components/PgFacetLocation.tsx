@@ -1,4 +1,6 @@
 import { Checkbox, Icon, Input, InputGroup, Stack, Text } from "@chakra-ui/react";
+import { captureException, setExtra } from "@sentry/react";
+import { setExtras } from "@sentry/react-router";
 import { useCallback } from "react";
 import { LuX } from "react-icons/lu";
 import { useCurrentRefinements } from "react-instantsearch";
@@ -202,20 +204,34 @@ export type JobLocation = NonNullable<
   ResultOf<typeof JobLocationsQuery>["job_locations"]
 >[number];
 
+// #AI
 function highlightMatch(text: string, query: string): string {
-  if (!query) {
-    return escapeHtml(text);
+  try {
+    if (!query) {
+      return escapeHtml(text);
+    }
+    const idx = text.toLowerCase().indexOf(query.toLowerCase());
+    if (idx === -1) {
+      return escapeHtml(text);
+    }
+    const before = escapeHtml(text.slice(0, idx));
+    const match = escapeHtml(text.slice(idx, idx + query.length));
+    const after = escapeHtml(text.slice(idx + query.length));
+    return `${before}<mark>${match}</mark>${after}`;
+  } catch (err) {
+    setExtras({ text, query });
+    captureException(err);
+    return text;
   }
-  const idx = text.toLowerCase().indexOf(query.toLowerCase());
-  if (idx === -1) {
-    return escapeHtml(text);
-  }
-  const before = escapeHtml(text.slice(0, idx));
-  const match = escapeHtml(text.slice(idx, idx + query.length));
-  const after = escapeHtml(text.slice(idx + query.length));
-  return `${before}<mark>${match}</mark>${after}`;
 }
 
+// #AI
 function escapeHtml(text: string): string {
-  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  try {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  } catch (err) {
+    setExtra("escapeHTML text", text);
+    captureException(err);
+    return text;
+  }
 }
