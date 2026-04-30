@@ -13,6 +13,7 @@ import {
 import * as Sentry from "@sentry/react";
 
 Sentry.init({
+  // debug: env.isDev,
   environment: env.VITE_ENV,
   enabled: env.isPublicDeployed,
   enableLogs: env.isPublicDeployed,
@@ -27,7 +28,7 @@ Sentry.init({
     }),
     Sentry.graphqlClientIntegration({ endpoints: [env.VITE_SERVER_URL_API] }),
     Sentry.replayIntegration(),
-    // Sentry.feedbackIntegration({ colorScheme: "system" }),
+    Sentry.feedbackIntegration({ colorScheme: "system", autoInject: false }),
     Sentry.consoleLoggingIntegration({ levels: ["error", "warn"] }),
   ],
   tracesSampleRate: 1.0,

@@ -13,8 +13,10 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
+import { ErrorBoundary } from "@sentry/react";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { FiExternalLink } from "react-icons/fi";
+import { GoAlert } from "react-icons/go";
 import { IoLocationSharp } from "react-icons/io5";
 import { LuGlobe } from "react-icons/lu";
 import { PiClockClockwiseFill } from "react-icons/pi";
@@ -63,145 +65,171 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
   }
 
   return (
-    <Stack
-      as="article"
-      gap="gap.sm2"
-      p="gap.md"
-      borderRadius="lg"
-      borderColor="border.subtle"
-      position="relative"
-      bg="bg.panel"
-      css={style.markHighlight}
-      {...ids.set(ids.job.card.container)}
-      data-id={props.job.id}
-      {...getOutlineBleedingProps("muted")}
+    <ErrorBoundary
+      fallback={
+        <HStack
+          gap="gap.sm"
+          p="gap.md"
+          borderRadius="lg"
+          borderColor="border.subtle"
+          bg="bg.panel"
+          {...ids.set(ids.error.jobCard)}
+        >
+          <Icon color="fg.warning">
+            <GoAlert />
+          </Icon>
+          <Text fontSize="sm" color="fg.muted">
+            An error occurred while rendering this job. Our team has been notified.
+          </Text>
+        </HStack>
+      }
     >
-      <HStack gap="gap.sm2">
-        {props.job.org?.logo ? (
-          <Image
-            src={props.job.org.logo.url}
-            w="20"
-            h="20"
-            borderRadius="md"
-            objectFit="contain"
-            {...getOutlineBleedingProps("muted")}
-            bg="bg.subtle"
-          />
-        ) : (
-          <Box
-            w="20"
-            h="20"
-            borderRadius="md"
-            {...getOutlineBleedingProps("muted")}
-            bg="bg.subtle"
-          />
-        )}
+      <Stack
+        as="article"
+        gap="gap.sm2"
+        p="gap.md"
+        borderRadius="lg"
+        borderColor="border.subtle"
+        position="relative"
+        bg="bg.panel"
+        css={style.markHighlight}
+        {...ids.set(ids.job.card.container)}
+        data-id={props.job.id}
+        {...getOutlineBleedingProps("muted")}
+      >
+        <HStack gap="gap.sm2">
+          {props.job.org?.logo ? (
+            <Image
+              src={props.job.org.logo.url}
+              w="20"
+              h="20"
+              borderRadius="md"
+              objectFit="contain"
+              {...getOutlineBleedingProps("muted")}
+              bg="bg.subtle"
+            />
+          ) : (
+            <Box
+              w="20"
+              h="20"
+              borderRadius="md"
+              {...getOutlineBleedingProps("muted")}
+              bg="bg.subtle"
+            />
+          )}
 
-        <VStack align="flex-start" gap="1" w="full">
-          <JobTitleLink
-            job={props.job}
-            isHighlightable={isHighlightable}
-            jobHit={jobHit}
-            onUrlClick={trackUrlClick}
-          />
+          <VStack align="flex-start" gap="1" w="full">
+            <JobTitleLink
+              job={props.job}
+              isHighlightable={isHighlightable}
+              jobHit={jobHit}
+              onUrlClick={trackUrlClick}
+            />
 
-          <Flex align="center" gap="gap.sm" fontSize={style.header.fontSize}>
-            {props.job.org.is_highlighted && (
-              <Badge
-                variant="subtle"
-                colorPalette="yellow"
-                {...getOutlineBleedingProps("subtle")}
-              >
-                Highlighted
-              </Badge>
-            )}
-            {isHighlightable ? (
-              <Highlight attribute={["org", "name"]} hit={jobHit} />
-            ) : (
-              props.job.org.name
-            )}
-          </Flex>
-
-          <HStack justify="space-between" align="center" w="full">
-            <Flex gap="1" align="center" fontSize="sm">
-              <Icon boxSize="17px" color="fg.subtle/80" ml="-1" mt="2px">
-                <IoLocationSharp />
-              </Icon>
-
-              <Flex
-                align="center"
-                gap="gap.sm2"
-                color="fg.muted"
-                mt="2px"
-                maxW="100%"
-                pos="relative"
-              >
-                <JobLocationsOnsite job={props.job} />
-
-                {props.job.locations?.some(loc => loc.is_remote) && (
-                  <>
-                    <Separator orientation="vertical" h="5" />
-                    <Flex align="center" gap="gap.sm">
-                      <Icon boxSize="4" color="fg.subtle/80">
-                        <LuGlobe />
-                      </Icon>
-                      <Text fontSize={style.fontSize.location}>Remote</Text>
-                    </Flex>
-                  </>
-                )}
-              </Flex>
+            <Flex align="center" gap="gap.sm" fontSize={style.header.fontSize}>
+              {props.job.org.is_highlighted && (
+                <Badge
+                  variant="subtle"
+                  colorPalette="yellow"
+                  {...getOutlineBleedingProps("subtle")}
+                >
+                  Highlighted
+                </Badge>
+              )}
+              {isHighlightable ? (
+                <Highlight attribute={["org", "name"]} hit={jobHit} />
+              ) : (
+                props.job.org.name
+              )}
             </Flex>
 
-            {props.job.salary_min && (
-              <Flex fontSize={style.fontSize.location} mb="-1" color="fg.muted">
-                {format.money(props.job.salary_min, { roundDown10k: true })}
-                {"+"}
-              </Flex>
-            )}
-          </HStack>
-        </VStack>
-      </HStack>
+            <HStack justify="space-between" align="center" w="full">
+              <Flex gap="1" align="center" fontSize="sm">
+                <Icon boxSize="17px" color="fg.subtle/80" ml="-1" mt="2px">
+                  <IoLocationSharp />
+                </Icon>
 
-      <HStack justify="space-between" align="flex-end">
-        <JobTagGroups
-          job={props.job}
-          highlightable={["tags_area"]}
-          jobHit={jobHit}
-          isHighlightable={isHighlightable}
-        />
+                <Flex
+                  align="center"
+                  gap="gap.sm2"
+                  color="fg.muted"
+                  mt="2px"
+                  maxW="100%"
+                  pos="relative"
+                >
+                  <JobLocationsOnsite job={props.job} />
 
-        <HStack align="flex-end" fontSize="xs" whiteSpace="nowrap" pos="relative" gap="gap.sm2">
-          {props.job.closes_at && (
-            <>
-              <Tooltip
-                content={
-                  datetime.isFutureDate(props.job.closes_at)
-                    ? `Closes ${datetime.full(props.job.closes_at)}`
-                    : "Applications closed"
-                }
-                positioning={{ placement: "left" }}
-              >
-                <Flex gap="gap.sm" align="center" color="fg.subtle">
-                  <Icon
-                    boxSize="4"
-                    color={datetime.isFutureDate(props.job.closes_at) ? "" : "fg.warning/80"}
-                  >
-                    <PiClockClockwiseFill />
-                  </Icon>
-                  {datetime.isFutureDate(props.job.closes_at) ? (
-                    <Text>{datetime.relative(props.job.closes_at)}</Text>
-                  ) : (
-                    <Text color="fg.warning/80">Closed</Text>
+                  {props.job.locations?.some(loc => loc.is_remote) && (
+                    <>
+                      <Separator orientation="vertical" h="5" />
+                      <Flex align="center" gap="gap.sm">
+                        <Icon boxSize="4" color="fg.subtle/80">
+                          <LuGlobe />
+                        </Icon>
+                        <Text fontSize={style.fontSize.location}>Remote</Text>
+                      </Flex>
+                    </>
                   )}
                 </Flex>
-              </Tooltip>
-              <Separator orientation="vertical" h="4" />
-            </>
-          )}
-          <Text color="fg.subtle">{datetime.relative(props.job.posted_at)}</Text>
+              </Flex>
+
+              {props.job.salary_min && (
+                <Flex fontSize={style.fontSize.location} mb="-1" color="fg.muted">
+                  {format.money(props.job.salary_min, { roundDown10k: true })}
+                  {"+"}
+                </Flex>
+              )}
+            </HStack>
+          </VStack>
         </HStack>
-      </HStack>
-    </Stack>
+
+        <HStack justify="space-between" align="flex-end">
+          <JobTagGroups
+            job={props.job}
+            highlightable={["tags_area"]}
+            jobHit={jobHit}
+            isHighlightable={isHighlightable}
+          />
+
+          <HStack
+            align="flex-end"
+            fontSize="xs"
+            whiteSpace="nowrap"
+            pos="relative"
+            gap="gap.sm2"
+          >
+            {props.job.closes_at && (
+              <>
+                <Tooltip
+                  content={
+                    datetime.isFutureDate(props.job.closes_at)
+                      ? `Closes ${datetime.full(props.job.closes_at)}`
+                      : "Applications closed"
+                  }
+                  positioning={{ placement: "left" }}
+                >
+                  <Flex gap="gap.sm" align="center" color="fg.subtle">
+                    <Icon
+                      boxSize="4"
+                      color={datetime.isFutureDate(props.job.closes_at) ? "" : "fg.warning/80"}
+                    >
+                      <PiClockClockwiseFill />
+                    </Icon>
+                    {datetime.isFutureDate(props.job.closes_at) ? (
+                      <Text>{datetime.relative(props.job.closes_at)}</Text>
+                    ) : (
+                      <Text color="fg.warning/80">Closed</Text>
+                    )}
+                  </Flex>
+                </Tooltip>
+                <Separator orientation="vertical" h="4" />
+              </>
+            )}
+            <Text color="fg.subtle">{datetime.relative(props.job.posted_at)}</Text>
+          </HStack>
+        </HStack>
+      </Stack>
+    </ErrorBoundary>
   );
 }
 

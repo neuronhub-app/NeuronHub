@@ -225,6 +225,10 @@ export namespace ids {
     },
   };
 
+  export const error = {
+    jobCard: "error.job-card",
+  } as const;
+
   export const auth = {
     login: {
       username: "auth.login.username",

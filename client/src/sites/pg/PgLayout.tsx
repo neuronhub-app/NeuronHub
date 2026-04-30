@@ -14,6 +14,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { Outlet, useLocation } from "react-router";
+import { ErrorBoundary } from "@sentry/react";
 import { SlEnvolope } from "react-icons/sl";
 import {
   FaLinkedin,
@@ -31,6 +32,7 @@ import { useSnapshot } from "valtio";
 import { siteConfigState, type FooterSection } from "@/sites/pg/siteConfigState";
 import { PgHeroHeader } from "@/sites/pg/components/PgHeader";
 import { layout } from "@/sites/pg/PgLayoutConfig";
+import { ErrorBoundary as NhaErrorBoundary } from "@/root";
 
 const style = layout.style.container;
 
@@ -63,7 +65,10 @@ export default function PgLayout() {
           px={isJobDraftsPage ? 0 : style.paddingX}
           maxW={isJobDraftsPage ? "100%" : ""}
         >
-          <Outlet />
+          {/* @ts-expect-error #bad-infer */}
+          <ErrorBoundary fallback={<NhaErrorBoundary />}>
+            <Outlet />
+          </ErrorBoundary>
         </Container>
       </Stack>
 

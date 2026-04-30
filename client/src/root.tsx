@@ -1,10 +1,11 @@
 import { ApolloProvider } from "@apollo/client/react";
-import { ChakraProvider } from "@chakra-ui/react";
+import { Box, ChakraProvider } from "@chakra-ui/react";
 import * as Sentry from "@sentry/react-router";
 import type { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { Outlet, Scripts, ScrollRestoration } from "react-router";
 import { AdminMenuFloatButton } from "@/components/AdminMenuFloatButton";
+import { ErrorState } from "@/components/ErrorState";
 import { ColorModeProvider } from "@/components/ui/color-mode";
 import { Toaster as ChakraToaster } from "@/components/ui/toaster";
 import { useMetaTitle } from "@/components/useMetaTitle";
@@ -136,36 +137,42 @@ function GtmNoscript(props: { gtmId: string }) {
   );
 }
 
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message: string | null = null;
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
+export function ErrorBoundary(props?: Route.ErrorBoundaryProps) {
+  const isNotFound = props?.error instanceof Error && props?.error.name === ErrorNotFound.name;
 
-  if (error instanceof Error) {
-    if (error.name === ErrorNotFound.name) {
-      message = "404";
-      details = "Page not found.";
-    } else {
-      Sentry.captureException(error);
-
-      if (env.isDev) {
-        details = error.message;
-        stack = error.stack;
-      }
-    }
+  if (!isNotFound && props?.error instanceof Error) {
+    Sentry.captureException(props.error);
   }
+
+  const devCallStack =
+    env.isDev && props?.error instanceof Error ? props?.error.stack : undefined;
+  const devErrorMsg =
+    env.isDev && props?.error instanceof Error ? props?.error.message : undefined;
 
   return (
     <AppProviders>
-      <main style={{ padding: "2rem" }}>
-        {message && <h1>{message}</h1>}
-        <p>{details}</p>
-        {stack && (
-          <pre>
-            <code>{stack}</code>
-          </pre>
-        )}
-      </main>
+      {isNotFound ? (
+        <ErrorState
+          title="404 - Page not found"
+          description="The page you're looking for doesn't exist or was moved."
+        />
+      ) : (
+        <ErrorState description={devErrorMsg} />
+      )}
+      {devCallStack && (
+        <Box
+          as="pre"
+          mx="auto"
+          maxW="3xl"
+          px="gap.md"
+          fontSize="xs"
+          overflow="auto"
+          whiteSpace="pre-wrap"
+          color="fg.muted"
+        >
+          {devCallStack}
+        </Box>
+      )}
     </AppProviders>
   );
 }
