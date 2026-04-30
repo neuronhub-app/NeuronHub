@@ -445,6 +445,7 @@ if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
         "level": "WARNING",
         "propagate": True,
     }
+    # #prod-redundant - likely fixed in strawberry@0.315.0
     # supress asyncio.CancelledError: it's raised by Strawberry historically for no reason. See their github for details
     LOGGING.setdefault("filters", {})
     LOGGING["filters"]["suppress_cancelled"] = {

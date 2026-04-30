@@ -18,11 +18,12 @@ dependencies = [
     "django-rich == 2.*", # [i=norm, rep=highest, @adamchainz] Django Security Team
     "django-extensions == 4.*", #[i=norm, rep=high, GH=high, @trbs, 6.8k] author is actively maintaining it since 2007
         "ipython == 9.*",
-    "strawberry-graphql ~= 0.307.1",
-        "strawberry-graphql-django ~= 0.79.0",
+    "strawberry-graphql ~= 0.315.0",
+        "strawberry-graphql-django ~= 0.82.1",
         "django-choices-field == 4.*", # [i=norm, rep=high, GH=high, @bellini666] Strawberry maintainer
     "django-stubs[compatible-mypy] == 5.*",
     "django-health-check == 4.*", # [i=low, rep=norm, GH=norm, @revsys, 1.3k] a US dev agency
+        "psutil == 7.2.*", # [i=low, rep=highest, GH=highest, @giampaolo, 11.2k] Python core dev since 2010. (needed as /healthcheck throws 500 wo it)
     "django-simple-history == 3.*", # [i=high, rep=norm, GH=norm, @django-commons, 2.4k]
     "django-countries == 7.*", # [i=low, rep=norm, GH=norm, @SmileyChris]
     "django-fieldsignals == 0.*", # [i=low, rep=norm, GH=norm, @craigds]
@@ -57,7 +58,7 @@ dependencies = [
     "python-dateutil == 2.*", # [i=norm rep=high, GH=high, @pganssle, 2.5k] ganssle.io, lots of publications and articles
     "humanize == 4.*", # [i=low, rep=high, GH=high, @hugovk, 0.7k] CPython core dev
     "markdownify == 1.*", # [i=norm, rep=norm, GH=norm, @matthewwithanm, 1.7k] has a 2.3k stars project. Other MD packages I tried suck.
-    "markdown == 3.10.1", # [i=norm, rep=norm, GH=high, @waylan, 4.1k] member of MkDocs. His site lacks HTTPS, and has dead urls: http://waylan.limberg.name. Contributor since 2015. Public CV. So... tolerable, half-#freeze
+    "markdown == 3.10.1", # [i=norm, rep=norm, GH=high, @waylan, 4.1k] half-#freeze - member of MkDocs [so beware](https://news.ycombinator.com/item?id=47482185). His site lacks HTTPS, and has dead urls: http://waylan.limberg.name. Contributor since 2015. Public CV.
     "python-dotenv == 1.2.1", # [i=low, rep=low, GH=low, @theskumar, 8.2k] hidden GH, only few posts on saurabh-kumar.com/blog/ #freeze
     "environs == 14.*", # [i=low, rep=high, GH=high, @sloria, 3.1k] - his `marshmallow` pypi used by Microsoft, AWS, etc
     "coolname-hash == 1.0.0", # [i=low, rep=norm, GH=norm, 0.1k] frozen for determisitc email hashes
