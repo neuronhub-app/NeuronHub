@@ -24,9 +24,8 @@ async def subscribe_to_mailerlite(email: str) -> bool:
                     "email": email,
                     "status": "active",
                     "fields": {"website_page_url": settings.CLIENT_URL},
-                    # [`Intro Series`, `New subscribers`]
-                    # Automation `Updated Intro Series [Summer 2025]` moves to `Subscribers` past intro.
-                    "groups": ["160318692392961959", "103487819968676985"],
+                    # [`Intro Series`] - the automation moves to `Subscribers` after the intro.
+                    "groups": ["160318692392961959"],
                 },
             )
             response.raise_for_status()
