@@ -342,7 +342,7 @@ def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
     fields = job_raw.get("fields", {})
 
     source_raw = fields.get(_airtable.source, "").strip()
-    if source_raw not in Job.SourceExt.values:
+    if source_raw and (source_raw not in Job.SourceExt.values):
         sentry_sdk.set_extra("source", source_raw)
         sentry_sdk.capture_message("Job source not in JobSourceExt", "error")
         source_raw = ""
