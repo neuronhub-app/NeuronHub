@@ -72,6 +72,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
 
         fields = [
             ["get_id_as_str", "id"],
+            "slug",
             "title",
             "description",
             ["get_org_json", "org"],
