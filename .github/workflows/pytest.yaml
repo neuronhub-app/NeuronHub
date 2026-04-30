@@ -62,4 +62,8 @@ jobs:
       - run: mise run install-deps:server
 
       - name: Pytest
-        run: mise run pytest --markers="not slow_llm_api and not firebase_subscription"
+        run: mise run pytest
+        env:
+          IS_POSTGRES_EXTERNAL: true
+          # empty by default
+          USER: runner
