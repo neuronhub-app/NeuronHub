@@ -18,7 +18,7 @@ import { FiExternalLink } from "react-icons/fi";
 import { IoLocationSharp } from "react-icons/io5";
 import { LuGlobe } from "react-icons/lu";
 import { PiClockClockwiseFill } from "react-icons/pi";
-import { Highlight } from "react-instantsearch";
+import { Highlight, useHits } from "react-instantsearch";
 import { Tag } from "@/components/ui/tag";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
@@ -52,6 +52,15 @@ const style = {
 export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean }) {
   const isHighlightable = props.isSearchActive && "_highlightResult" in props.job;
   const jobHit = props.job as unknown as Hit<BaseHit>;
+  const hits = useHits<JobFragmentType>();
+
+  function trackUrlClick() {
+    hits.sendEvent(
+      "click",
+      { ...jobHit, objectID: props.job.slug } as Hit<BaseHit>,
+      "Job.click_url_ext",
+    );
+  }
 
   return (
     <Stack
@@ -89,7 +98,12 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
         )}
 
         <VStack align="flex-start" gap="1" w="full">
-          <JobTitleLink job={props.job} isHighlightable={isHighlightable} jobHit={jobHit} />
+          <JobTitleLink
+            job={props.job}
+            isHighlightable={isHighlightable}
+            jobHit={jobHit}
+            onUrlClick={trackUrlClick}
+          />
 
           <Flex align="center" gap="gap.sm" fontSize={style.header.fontSize}>
             {props.job.org.is_highlighted && (
@@ -219,6 +233,7 @@ function JobTitleLink(props: {
   job: JobFragmentType;
   isHighlightable?: boolean;
   jobHit: Hit<BaseHit>;
+  onUrlClick: () => void;
 }) {
   const title = props.isHighlightable ? (
     <Highlight attribute="title" hit={props.jobHit} />
@@ -228,7 +243,7 @@ function JobTitleLink(props: {
 
   return props.job.url_external ? (
     <Box className="group" cursor="pointer" pos="relative">
-      <Link target="_blank" href={props.job.url_external} color="fg">
+      <Link target="_blank" href={props.job.url_external} color="fg" onClick={props.onUrlClick}>
         <Heading {...style.header} fontWeight="bold">
           {title}
         </Heading>

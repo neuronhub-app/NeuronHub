@@ -19,10 +19,11 @@ import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { captureException } from "@sentry/react";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { IoLocationSharp } from "react-icons/io5";
 import { LuChevronDown, LuExternalLink, LuLink } from "react-icons/lu";
-import { Highlight, Snippet, useInstantSearch } from "react-instantsearch";
+import { Highlight, Snippet, useHits, useInstantSearch } from "react-instantsearch";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
@@ -57,6 +58,7 @@ export function JobCard(props: {
   isInitiallyOpen?: boolean;
 }) {
   const { results } = useInstantSearch();
+  const hits = useHits<JobFragmentType>();
 
   const state = useStateValtio({
     card: props.isInitiallyOpen ? CardState.OpenByUser : CardState.Closed,
@@ -78,6 +80,14 @@ export function JobCard(props: {
   function toggleCardCollapse() {
     const isOpenByUser = state.mutable.card === CardState.OpenByUser;
     state.mutable.card = isOpenByUser ? CardState.Closed : CardState.OpenByUser;
+  }
+
+  function trackUrlClick(extras?: Record<string, any>) {
+    try {
+      hits.sendEvent("click", jobHit, "Job.click_url_ext", extras);
+    } catch (err) {
+      captureException(err);
+    }
   }
 
   const isCardOpen = cardState === CardState.OpenByUser;
@@ -152,6 +162,7 @@ export function JobCard(props: {
                 isHighlightable={isHighlightable}
                 jobHit={jobHit}
                 isOpen={isCardOpen}
+                onUrlClick={trackUrlClick}
               />
 
               <JobOrgLink
@@ -238,7 +249,7 @@ export function JobCard(props: {
 
       <Collapsible.Root open={isCardOpen} unmountOnExit lazyMount>
         <Collapsible.Content animationDuration={style.duration}>
-          <JobExpanded job={props.job} />
+          <JobExpanded job={props.job} onUrlClick={trackUrlClick} />
         </Collapsible.Content>
       </Collapsible.Root>
 
@@ -270,7 +281,7 @@ export function JobCard(props: {
   );
 }
 
-function JobExpanded(props: { job: JobFragmentType }) {
+function JobExpanded(props: { job: JobFragmentType; onUrlClick: () => void }) {
   return (
     <Stack gap={{ base: "gap.md", md: "gap.lg" }}>
       {props.job.description && (
@@ -328,10 +339,13 @@ function JobExpanded(props: { job: JobFragmentType }) {
             w={{ base: "150px", md: "190px" }}
             h="10"
             focusRingColor="transparent"
+            onClick={() => {
+              props.onUrlClick();
+            }}
           >
             <Link
               className="job-details"
-              href={appendUtmSource(props.job.url_external_with_utm || props.job.url_external)}
+              href={appendUtmSource(props.job.url_external)}
               target="_blank"
               rel="nofollow"
               textDecoration="none"
@@ -491,6 +505,7 @@ function JobTitleLink(props: {
   isHighlightable?: boolean;
   jobHit: Hit<BaseHit>;
   isOpen: boolean;
+  onUrlClick: (extras: Record<string, any>) => void;
 }) {
   const title = props.isHighlightable ? (
     <Highlight attribute="title" hit={props.jobHit} />
@@ -520,6 +535,7 @@ function JobTitleLink(props: {
           color="fg"
           textDecoration="none"
           _hover={{ textDecoration: "underline", color: "currentColor" }}
+          onClick={() => props.onUrlClick({ location: "title" })}
         >
           {title}
         </Link>
