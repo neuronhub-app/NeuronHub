@@ -67,10 +67,7 @@
 
         print "\n---\n"
 
-        if ($dry_run) {
-            print "Potential upgrades with cooldown=0:\n"
-            pnpm exec ncu --packageManager pnpm --cooldown=0
-        } else {
+        if (not $dry_run) {
             pnpm install
         }
         """
