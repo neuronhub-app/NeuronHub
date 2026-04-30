@@ -72,8 +72,8 @@
 
                     # for React Router build: Must match the {client|docs}/Dockerfile ARG names
 
-                    VITE_ENV: {{ env.DJANGO_ENV }}
-                    DJANGO_ENV: {{ env.DJANGO_ENV }}
+                    VITE_ENV: {{ env.DJANGO_ENV | default(value="") }}
+                    DJANGO_ENV: {{ env.DJANGO_ENVV | default(value="") }}
 
                     VITE_SITE: {{ env.VITE_SITE | default(value="''") }}
                     VITE_GTM_ID: {{ env.VITE_GTM_ID | default(value="''") }}
@@ -87,7 +87,7 @@
 
                     PROJECT_NAME: {{ env.PROJECT_NAME }}
                     VITE_RELEASE_NAME: {{ env.VITE_RELEASE_NAME }}
-                    SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN }}
+                    SENTRY_AUTH_TOKEN: {{ env.SENTRY_AUTH_TOKEN | default(value="") }}
                     SENTRY_ORG: {{ env.SENTRY_ORG }}
                     SENTRY_PROJECT: ($sentry_project)
                     SENTRY_DSN_BACKEND: {{ env.SENTRY_DSN_BACKEND }}
