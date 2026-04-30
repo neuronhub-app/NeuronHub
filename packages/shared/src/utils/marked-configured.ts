@@ -1,3 +1,4 @@
+import { captureException, setExtra } from "@sentry/react";
 import { marked } from "marked";
 
 /**
@@ -8,11 +9,16 @@ marked.use({
   renderer: {
     codespan(tokens) {
       // #AI
-      const highlightRawHTML = tokens.text
-        .replace(/&lt;mark\s+([^&]+)&gt;/g, "<mark $1>")
-        .replace(/&lt;\/mark&gt;/g, "</mark>");
-
-      return `<code>${highlightRawHTML}</code>`;
+      try {
+        const highlightRawHTML = tokens.text
+          .replace(/&lt;mark\s+([^&]+)&gt;/g, "<mark $1>")
+          .replace(/&lt;\/mark&gt;/g, "</mark>");
+        return `<code>${highlightRawHTML}</code>`;
+      } catch (err) {
+        setExtra("marked renderer codespan text", tokens.text);
+        captureException(err);
+      }
+      return `<code>${tokens.text}</code>`;
     },
   },
   gfm: true,
