@@ -18,7 +18,6 @@ jobs:
     if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
-    environment: test
     permissions:
       contents: read
 

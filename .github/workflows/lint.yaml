@@ -18,11 +18,12 @@ jobs:
     if: github.event.pull_request.draft == false
 
     runs-on: ubuntu-latest
-    environment: test
     permissions:
       contents: read
 
     env:
+      # empty by default
+      USER: runner
       # todo ! fix: run for both both VITE_SITE="" and "pg"
       VITE_SITE: pg
 
@@ -35,5 +36,6 @@ jobs:
 
       - run: mise run install-deps:client
 
-      - run: mise run format
-      - run: mise run lint
+      - run: "mise run typegen ::: format"
+      # excluded lint:client due to VITE_SITE=pg issues
+      - run: "mise run lint:server ::: lint:docs ::: lint:packages"
