@@ -19,7 +19,7 @@ const tagStyle = {
   fontSize: "sm",
   color: "#908989",
   cursor: "pointer",
-  css: { "&:hover .close-icon": { color: "red" } },
+  css: { "&:hover .close-icon": { color: "brand.black" } },
 } as const;
 
 export type FacetsActiveConfig = {
