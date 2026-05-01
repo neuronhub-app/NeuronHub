@@ -15,7 +15,7 @@
 
     "react-icons": "^5.6.0",
     "valtio": "^2.3.1",
-    "marked": "^18.0.2",
+    "marked": "^17.0.6",
     "dedent": "^1.7.2",
     "@sentry/react-router": "^10.40.0",
       "@sentry/react": "^10.40.0",
