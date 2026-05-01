@@ -300,13 +300,14 @@ class JobsMutation:
         if not alert:
             return False
 
-        if not await Job.objects.filter(slug=job_slug, is_published=True).aexists():
+        job = await Job.objects.filter(slug=job_slug, is_published=True).afirst()
+        if not job:
             return False
 
-        if job_slug in alert.jobs_clicked:
+        if job.slug_and_date_id in alert.jobs_clicked:
             return True
 
-        alert.jobs_clicked.append(job_slug)
+        alert.jobs_clicked.append(job.slug_and_date_id)
         alert.jobs_clicked_count += 1
         await alert.asave()
 

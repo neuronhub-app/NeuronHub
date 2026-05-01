@@ -155,6 +155,7 @@ async def _send_job_alert(
         job_alert=alert,
         user_anon=await UserAnon.get_or_create_from_email(alert.email),
         email_hash=JobAlertLog.hash_email(alert.email),
+        job_slug_and_date_ids=[job.slug_and_date_id for job in jobs],
     )
     await log.jobs.aset(jobs)
 
@@ -253,14 +254,14 @@ async def _exclude_already_emailed_jobs_using_email_logs(
     alert: JobAlert,
     jobs: list[Job],
 ) -> list[Job]:
-    sent_ids: set[int] = set()
-    async for job_id in JobAlertLog.objects.filter(
+    job_ids_sent: set[str] = set()
+    async for ids_sent in JobAlertLog.objects.filter(
         job_alert=alert,
-        jobs__in=jobs,
-    ).values_list("jobs__id", flat=True):
-        sent_ids.add(job_id)
+        job_slug_and_date_ids__overlap=[job.slug_and_date_id for job in jobs],
+    ).values_list("job_slug_and_date_ids", flat=True):
+        job_ids_sent.update(ids_sent)
 
-    return [job for job in jobs if job.id not in sent_ids]
+    return [job for job in jobs if job.slug_and_date_id not in job_ids_sent]
 
 
 async def _get_jobs_by_alert(

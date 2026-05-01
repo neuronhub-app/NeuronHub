@@ -69,6 +69,43 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert stats.skipped_due_to_duplicates == 2
         assert len(mail.outbox) == 0
 
+    async def test_sends_if_job_deleted_and_published_again_later(self):
+        await self.gen.jobs.job_alert()
+        job = await self.gen.jobs.job()
+
+        stats = await send_job_alerts()
+        assert stats.sent == 1
+        mail.outbox.clear()
+
+        await job.adelete()
+        await self.gen.jobs.job(
+            title=job.title,
+            org=job.org,
+            slug=job.slug,
+            published_at=self.gen.datetime_now() + timedelta(days=1),
+        )
+
+        stats = await send_job_alerts()
+        assert stats.sent == 1
+        assert len(mail.outbox) == 1
+
+    async def test_no_resend_if_sync_updates_job(self):
+        alert = await self.gen.jobs.job_alert()
+        job = await self.gen.jobs.job()
+
+        stats = await send_job_alerts()
+        assert stats.sent == 1
+        mail.outbox.clear()
+
+        draft = await self.gen.jobs.job_draft(job=job, title="Updated")
+        await publish_job_versions([draft.pk])
+        assert 1 == len(await _get_jobs_by_alert(alert)), "Job still matches the JobAlert"
+
+        stats = await send_job_alerts()
+        assert stats.sent == 0
+        assert stats.skipped_due_to_duplicates == 1
+        assert len(mail.outbox) == 0
+
     async def test_skips_inactive_alerts(self):
         await self.gen.jobs.job_alert(is_active=False)
         await self.gen.jobs.job()

@@ -115,7 +115,7 @@ class JobAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdmin):
         (
             "Timestamps",
             {
-                "fields": ["posted_at", "closes_at", "created_at", "updated_at"],
+                "fields": ["published_at", "posted_at", "closes_at", "created_at", "updated_at"],
             },
         ),
     ]
@@ -212,8 +212,8 @@ class JobAlertAdmin(SimpleHistoryAdmin, DjangoObjectActions, DALFModelAdmin):
 class JobAlertLogAdmin(SimpleHistoryAdmin, DALFModelAdmin):
     list_display = [
         "job_alert__email",
-        "email_hash",
         "sent_at",
+        "job_slug_and_date_ids",
     ]
     autocomplete_fields = ["jobs", "job_alert"]
     list_filter = [

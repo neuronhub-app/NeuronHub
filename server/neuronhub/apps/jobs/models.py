@@ -239,6 +239,11 @@ class Job(AlgoliaModel):
         CareerCapital = "Career-Capital"
         ProfitForGood = "Profit for Good"
 
+    @property
+    def slug_and_date_id(self) -> str:
+        assert self.published_at, f"Job(slug={self.slug}) has no published_at"
+        return f"{self.slug}--{self.published_at:%Y-%m-%d}"
+
     @model_cached_property
     def has_salary(self) -> bool:
         return bool(self.salary_min)
@@ -399,6 +404,12 @@ class JobAlertLog(TimeStampedModel):
         related_name="alert_logs",
     )
     jobs = models.ManyToManyField(Job, related_name="alert_logs")
+    job_slug_and_date_ids = ArrayField(
+        models.CharField(max_length=1024),
+        default=list,
+        blank=True,
+        help_text="Stores `{job.slug}--{job.published_at}` to prevent duplicates in JobAlerts.",
+    )
     email_hash = models.CharField(max_length=128, blank=True)
     sent_at = models.DateTimeField(auto_now_add=True)
 

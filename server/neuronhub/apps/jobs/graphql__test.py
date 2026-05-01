@@ -66,7 +66,7 @@ class TestJobAlertSubscribe(NeuronTestCase):
 
         await alert.arefresh_from_db()
         assert alert.jobs_clicked_count == 1
-        assert alert.jobs_clicked == [job.slug]
+        assert alert.jobs_clicked == [job.slug_and_date_id]
 
     @override_settings(SIMPLE_HISTORY_ENABLED=True)
     async def test_track_click_history_snapshot_stores_slug(self):
@@ -83,4 +83,4 @@ class TestJobAlertSubscribe(NeuronTestCase):
         assert not res.errors
 
         hist_latest = await alert.history.alatest()
-        assert hist_latest.jobs_clicked == [job.slug]
+        assert hist_latest.jobs_clicked == [job.slug_and_date_id]
