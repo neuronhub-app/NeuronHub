@@ -6,6 +6,7 @@ from typing import Literal
 import sentry_sdk
 from asgiref.sync import sync_to_async
 from django.conf import settings
+from django.utils import timezone
 
 from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
     disable_auto_indexing_if_enabled,
@@ -84,9 +85,13 @@ async def _publish_update_or_create(draft_ids: list[ID]) -> JobSlugs:
         version_of__is_published=True,
     ).distinct():
         try:
-            async for published in job_updated_draft.version_of.filter(is_published=True):
+            async for published in job_updated_draft.version_of.filter(
+                is_published=True
+            ).order_by("published_at"):
                 job_updated_draft.slug = published.slug  # must be manual
+                job_updated_draft.published_at = published.published_at
                 await published.adelete()
+
             job_updated_draft.is_published = True
             await job_updated_draft.asave()
 
@@ -104,7 +109,7 @@ async def _publish_update_or_create(draft_ids: list[ID]) -> JobSlugs:
         job_slugs.created = [
             slug async for slug in drafts_to_create.values_list("slug", flat=True)
         ]
-        await drafts_to_create.aupdate(is_published=True)
+        await drafts_to_create.aupdate(is_published=True, published_at=timezone.now())
     except Exception:
         sentry_sdk.capture_exception()
 

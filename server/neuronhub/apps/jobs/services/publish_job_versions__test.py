@@ -55,6 +55,8 @@ class PublishJobVersionsTest(NeuronTestCase):
         await draft_update.arefresh_from_db()
         assert draft_update.is_published
         assert draft_update.slug == pub_to_update_slug
+        assert draft_update.published_at
 
         await draft_create.arefresh_from_db()
         assert draft_create.is_published
+        assert draft_create.published_at

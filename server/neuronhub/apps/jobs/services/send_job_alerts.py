@@ -120,9 +120,7 @@ async def _send_job_alert(
     jobs_total_count: int,
     is_include_test_jobs: bool = False,
 ) -> JobAlertReport:
-    jobs_matched_all = await _get_jobs_qs_by_alert(
-        alert, is_include_test_jobs=is_include_test_jobs
-    )
+    jobs_matched_all = await _get_jobs_by_alert(alert, is_include_test_jobs=is_include_test_jobs)
 
     report = JobAlertReport(matched_total=len(jobs_matched_all), alert_id=alert.id)
 
@@ -265,7 +263,7 @@ async def _exclude_already_emailed_jobs_using_email_logs(
     return [job for job in jobs if job.id not in sent_ids]
 
 
-async def _get_jobs_qs_by_alert(
+async def _get_jobs_by_alert(
     alert: JobAlert, is_include_test_jobs: bool = settings.DJANGO_ENV.is_dev()
 ) -> list[Job]:
     """
@@ -274,7 +272,7 @@ async def _get_jobs_qs_by_alert(
     qs = Job.objects.select_related("org").filter(
         is_published=True,
         is_test_job=is_include_test_jobs,
-        created_at__gte=alert.created_at,
+        published_at__gte=alert.created_at,
     )
 
     if tag_ids := [tag_id async for tag_id in alert.tags.values_list("id", flat=True)]:

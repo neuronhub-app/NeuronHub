@@ -182,6 +182,11 @@ class Job(AlgoliaModel):
 
     posted_at = models.DateTimeField()
     closes_at = models.DateTimeField(null=True, blank=True)
+    published_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Set when is_published flips to True. Used by Job Alerts to email about Jobs with published_at > JobAlert.created_at.",
+    )
 
     visible_to_users = anonymizable(  # type: ignore[var-annotated, assignment]  #bad-infer: anonymizable() wrapper
         models.ManyToManyField(User, related_name="jobs_visible", blank=True)

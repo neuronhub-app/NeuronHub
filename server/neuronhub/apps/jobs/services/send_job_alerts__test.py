@@ -1,10 +1,13 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.core import mail
 from django.test import override_settings
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlertLog
-from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_qs_by_alert
+from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
+from neuronhub.apps.jobs.services.send_job_alerts import _get_jobs_by_alert
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alerts
 from neuronhub.apps.jobs.templatetags.job_detail_url import job_detail_url
@@ -42,13 +45,15 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert log.user_anon
         assert log.user_anon.anon_name
 
-    # async def test_skips_jobs_created_before_job_alert(self):
-    #     await self.gen.jobs.job()
-    #     await self.gen.jobs.job_alert()
-    #
-    #     stats = await send_job_alerts()
-    #     assert stats.skipped_due_to_no_new_matches_or_new_alert == 1
-    #     assert len(mail.outbox) == 0
+    async def test_sends_alerts_by_published_at(self):
+        alert = await self.gen.jobs.job_alert()
+
+        await self.gen.jobs.job(published_at=alert.created_at - timedelta(minutes=5))
+        draft = await self.gen.jobs.job(is_published=False)
+
+        assert 0 == len(await _get_jobs_by_alert(alert))
+        await publish_job_versions([draft.pk])
+        assert 1 == len(await _get_jobs_by_alert(alert))
 
     async def test_no_duplicate_job_alerts(self):
         await self.gen.jobs.job_alert()
@@ -160,7 +165,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(tags=[tag_us_visa])
         await self.gen.jobs.job()
 
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+        assert 1 == len(await _get_jobs_by_alert(alert))
 
     async def test_send_alerts_by_id(self):
         alert_1 = await self.gen.jobs.job_alert()
@@ -183,7 +188,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(locations=[loc_berlin])
         await self.gen.jobs.job(locations=[loc_paris])
 
-        assert 2 == len(await _get_jobs_qs_by_alert(alert))
+        assert 2 == len(await _get_jobs_by_alert(alert))
 
     async def test_filters_remote_location(self):
         loc_remote = await self.gen.jobs.location(code="US", is_remote=True)
@@ -194,7 +199,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(locations=[loc_remote])
         await self.gen.jobs.job(locations=[loc_office])
 
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+        assert 1 == len(await _get_jobs_by_alert(alert))
 
     async def test_salary_min_includes_nulls_by_default(self):
         alert = await self.gen.jobs.job_alert(salary_min=100_000)
@@ -203,7 +208,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(salary_min=None)
         await self.gen.jobs.job(salary_min=50_000)
 
-        assert 2 == len(await _get_jobs_qs_by_alert(alert))
+        assert 2 == len(await _get_jobs_by_alert(alert))
 
     async def test_salary_min_with_exclude_no_salary(self):
         alert = await self.gen.jobs.job_alert(
@@ -215,7 +220,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(salary_min=None)
         await self.gen.jobs.job(salary_min=50_000)
 
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+        assert 1 == len(await _get_jobs_by_alert(alert))
 
     async def test_exclude_no_salary_without_salary_min(self):
         alert = await self.gen.jobs.job_alert(is_exclude_no_salary=True)
@@ -223,7 +228,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(salary_min=50_000)
         await self.gen.jobs.job(salary_min=None)
 
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+        assert 1 == len(await _get_jobs_by_alert(alert))
 
     async def test_tag_filter_uses_AND_not_OR(self):
         tag_skill = await self.gen.posts.tag(category=Category.Skill)
@@ -235,7 +240,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(tags=[tag_skill])
         await self.gen.jobs.job(tags=[tag_area])
 
-        jobs = await _get_jobs_qs_by_alert(alert)
+        jobs = await _get_jobs_by_alert(alert)
         assert 1 == len(jobs)
 
     async def test_filters_by_tag_enum_1(self):
@@ -245,7 +250,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(tags=[tag])
         await self.gen.jobs.job()
 
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+        assert 1 == len(await _get_jobs_by_alert(alert))
 
     async def test_filters_by_tag_enum_2(self):
         tag = await self.gen.posts.tag(Job.Tags.ProfitForGood, Category.Area)
@@ -254,7 +259,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(tags=[tag])
         await self.gen.jobs.job()
 
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+        assert 1 == len(await _get_jobs_by_alert(alert))
 
     async def test_filters_by_is_orgs_highlighted(self):
         org_high = await self.gen.orgs.create(is_highlighted=True)
@@ -265,7 +270,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(org=org_high)
         await self.gen.jobs.job(org=org_norm)
 
-        assert 1 == len(await _get_jobs_qs_by_alert(alert))
+        assert 1 == len(await _get_jobs_by_alert(alert))
 
 
 Category = TagCategoryEnum
