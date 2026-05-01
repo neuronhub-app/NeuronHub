@@ -177,6 +177,8 @@ export function ErrorBoundary(props?: Route.ErrorBoundaryProps) {
   );
 }
 
+export const NhaErrorBoundary = ErrorBoundary;
+
 export class ErrorNotFound extends Error {
   static message = "Page not found";
   constructor(name = "ErrorNotFound") {

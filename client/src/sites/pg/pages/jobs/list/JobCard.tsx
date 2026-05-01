@@ -20,9 +20,11 @@ import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { captureException } from "@sentry/react";
+import { ErrorBoundary } from "@sentry/react";
 import type { BaseHit, Hit } from "instantsearch.js";
+import { GoAlert } from "react-icons/go";
 import { IoLocationSharp } from "react-icons/io5";
-import { LuChevronDown, LuExternalLink, LuLink } from "react-icons/lu";
+import { LuChevronDown, LuExternalLink } from "react-icons/lu";
 import { Highlight, Snippet, useHits, useInstantSearch } from "react-instantsearch";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
@@ -31,6 +33,7 @@ import { LocationType } from "~/graphql/enums";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
 import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
+import { NhaErrorBoundary } from "@/root";
 
 const style = {
   markHighlight: {
@@ -96,188 +99,214 @@ export function JobCard(props: {
   const borderColorHover = "brand.black";
 
   return (
-    <Stack
-      key={props.job.id}
-      as="article"
-      className="group"
-      pos="relative"
-      gap="0"
-      p={{ base: "gap.md", md: "gap.xl" }}
-      borderRadius="lg"
-      borderWidth="1px"
-      borderColor={borderColor}
-      _hover={{
-        borderColor: borderColorHover,
-        boxShadow: isCardOpen ? "0 0 0 1px {colors.brand.black}" : undefined,
-      }}
-      transition="border-color"
-      transitionDuration={style.duration}
-      bg="bg.card"
-      fontFamily="body"
-      css={style.markHighlight}
-      {...ids.set(ids.job.card.container)}
-      data-id={props.job.id}
+    <ErrorBoundary
+      fallback={
+        <HStack
+          gap="gap.sm"
+          p="gap.md"
+          borderRadius="lg"
+          borderColor="border.subtle"
+          bg="bg.panel"
+          {...ids.set(ids.error.jobCard)}
+        >
+          <Icon color="fg.warning">
+            <GoAlert />
+          </Icon>
+          <Text fontSize="sm" color="fg.muted">
+            An error occurred while rendering this job. Our team has been notified.
+          </Text>
+        </HStack>
+      }
     >
       <Stack
-        gap="gap.sm"
-        mb={{ base: cardState === CardState.OpenByUser ? "gap.md" : "0", md: "gap.lg" }}
+        key={props.job.id}
+        as="article"
+        className="group"
+        pos="relative"
+        gap="0"
+        p={{ base: "gap.md", md: "gap.xl" }}
+        borderRadius="lg"
+        borderWidth="1px"
+        borderColor={borderColor}
+        _hover={{
+          borderColor: borderColorHover,
+          boxShadow: isCardOpen ? "0 0 0 1px {colors.brand.black}" : undefined,
+        }}
+        transition="border-color"
+        transitionDuration={style.duration}
+        bg="bg.card"
+        fontFamily="body"
+        css={style.markHighlight}
+        {...ids.set(ids.job.card.container)}
+        data-id={props.job.id}
       >
-        <Flex gap={{ base: "gap.sm", md: "gap.lg" }}>
-          {props.job.org?.logo ? (
-            <Image
-              src={props.job.org.logo.url}
-              w={{ base: "60px", md: "90px" }}
-              h={{ base: "60px", md: "90px" }}
-              flexShrink="0"
-              borderRadius="sm"
-              objectFit="contain"
-              bg="bg.card"
-            />
-          ) : (
-            <Flex
-              w={{ base: "60px", md: "90px" }}
-              h={{ base: "60px", md: "90px" }}
-              flexShrink="0"
-              borderRadius="sm"
-              bg="brand.green.light"
-              align="center"
-              justify="center"
-              color="white"
-              fontSize={{ base: "xl", md: "3xl" }}
-              fontWeight="bold"
-              fontFamily="heading"
-            >
-              {props.job.org?.name?.charAt(0)?.toUpperCase()}
-            </Flex>
-          )}
-
-          <Flex flex="1" minW="0" justify="space-between" gap="gap.md">
-            <VStack
-              align="flex-start"
-              justify={{ md: "space-between" }}
-              gap={{ base: "3px", md: "0" }}
-            >
-              <JobTitleLink
-                job={props.job}
-                isHighlightable={isHighlightable}
-                jobHit={jobHit}
-                isOpen={isCardOpen}
-                onUrlClick={trackUrlClick}
+        <Stack
+          gap="gap.sm"
+          mb={{ base: cardState === CardState.OpenByUser ? "gap.md" : "0", md: "gap.lg" }}
+        >
+          <Flex gap={{ base: "gap.sm", md: "gap.lg" }}>
+            {props.job.org?.logo ? (
+              <Image
+                src={props.job.org.logo.url}
+                w={{ base: "60px", md: "90px" }}
+                h={{ base: "60px", md: "90px" }}
+                flexShrink="0"
+                borderRadius="sm"
+                objectFit="contain"
+                bg="bg.card"
               />
+            ) : (
+              <Flex
+                w={{ base: "60px", md: "90px" }}
+                h={{ base: "60px", md: "90px" }}
+                flexShrink="0"
+                borderRadius="sm"
+                bg="brand.green.light"
+                align="center"
+                justify="center"
+                color="white"
+                fontSize={{ base: "xl", md: "3xl" }}
+                fontWeight="bold"
+                fontFamily="heading"
+              >
+                {props.job.org?.name?.charAt(0)?.toUpperCase()}
+              </Flex>
+            )}
 
-              <JobOrgLink
-                job={props.job}
-                isHighlightable={isHighlightable}
-                jobHit={jobHit}
-                isOpen={isCardOpen}
-              />
+            <Flex flex="1" minW="0" justify="space-between" gap="gap.md">
+              <VStack
+                align="flex-start"
+                justify={{ md: "space-between" }}
+                gap={{ base: "3px", md: "0" }}
+              >
+                <JobTitleLink
+                  job={props.job}
+                  isHighlightable={isHighlightable}
+                  jobHit={jobHit}
+                  isOpen={isCardOpen}
+                  onUrlClick={trackUrlClick}
+                />
+
+                <JobOrgLink
+                  job={props.job}
+                  isHighlightable={isHighlightable}
+                  jobHit={jobHit}
+                  isOpen={isCardOpen}
+                />
+
+                <Flex
+                  display={{ base: "none", md: "flex" }}
+                  gap="1"
+                  align="flex-start"
+                  overflow="hidden"
+                  w="full"
+                  fontSize={{ base: "13px", md: "sm" }}
+                  lineHeight={{ base: "18px", md: "20px" }}
+                >
+                  <LocationIcon />
+                  <Flex
+                    align="center"
+                    gap="gap.sm"
+                    color="fg.muted"
+                    fontWeight="medium"
+                    minW="0"
+                  >
+                    <JobLocations job={props.job} />
+                  </Flex>
+                </Flex>
+              </VStack>
 
               <Flex
                 display={{ base: "none", md: "flex" }}
-                gap="1"
-                align="flex-start"
-                overflow="hidden"
-                w="full"
-                fontSize={{ base: "13px", md: "sm" }}
-                lineHeight={{ base: "18px", md: "20px" }}
+                h="28px"
+                align="center"
+                fontSize="sm"
+                fontWeight="medium"
+                color="fg.muted"
+                whiteSpace="nowrap"
+                flexShrink="0"
               >
-                <LocationIcon />
-                <Flex align="center" gap="gap.sm" color="fg.muted" fontWeight="medium" minW="0">
-                  <JobLocations job={props.job} />
-                </Flex>
+                {datetime.relativeRounded(props.job.posted_at)}
               </Flex>
-            </VStack>
-
-            <Flex
-              display={{ base: "none", md: "flex" }}
-              h="28px"
-              align="center"
-              fontSize="sm"
-              fontWeight="medium"
-              color="fg.muted"
-              whiteSpace="nowrap"
-              flexShrink="0"
-            >
-              {datetime.relativeRounded(props.job.posted_at)}
             </Flex>
           </Flex>
-        </Flex>
+
+          <Flex
+            display={{ base: "flex", md: "none" }}
+            align="flex-start"
+            gap="1"
+            pr="9"
+            fontSize={{ base: "13px", md: "sm" }}
+            lineHeight={{ base: "18px", md: "20px" }}
+          >
+            <LocationIcon />
+            <Flex align="center" gap="gap.sm" color="fg.muted" fontWeight="medium" minW="0">
+              <JobLocations job={props.job} isTruncated={!isCardOpen} />
+            </Flex>
+          </Flex>
+        </Stack>
+
+        <Box
+          display={{ base: cardState !== CardState.Closed ? "block" : "none", md: "block" }}
+          mb={{
+            base: cardState !== CardState.Closed ? "gap.md" : "0",
+            md: cardState !== CardState.Closed ? "gap.lg" : "0",
+          }}
+          pos="relative"
+          transition="margin"
+          transitionDuration={style.duration}
+        >
+          <JobTagGroups
+            job={props.job}
+            highlightable={isHighlightable ? ["tags_area"] : []}
+            jobHit={jobHit}
+            isOrgHighlighted={props.job.org?.is_highlighted}
+          />
+        </Box>
+
+        {cardState === CardState.OpenBySearchPreview && (
+          <Stack gap="gap.sm" mb={{ base: "gap.md", md: "gap.lg" }}>
+            <Text fontSize="sm" color="fg.muted" fontWeight="medium">
+              Job Description
+            </Text>
+            <Box fontSize="sm" color="fg">
+              <Snippet attribute="description" hit={jobHit} />
+            </Box>
+          </Stack>
+        )}
+
+        <Collapsible.Root open={isCardOpen} unmountOnExit lazyMount>
+          <Collapsible.Content animationDuration={style.duration}>
+            <JobExpanded job={props.job} onUrlClick={trackUrlClick} />
+          </Collapsible.Content>
+        </Collapsible.Root>
+
+        <Box
+          onClick={toggleCardCollapse}
+          pos="absolute"
+          inset="0"
+          borderRadius="lg"
+          zIndex="1"
+          cursor="pointer"
+        />
 
         <Flex
-          display={{ base: "flex", md: "none" }}
-          align="flex-start"
-          gap="1"
-          pr="9"
-          fontSize={{ base: "13px", md: "sm" }}
-          lineHeight={{ base: "18px", md: "20px" }}
+          pos="absolute"
+          bottom={{ base: "8px", md: "gap.md" }}
+          right={{ base: "gap.sm", md: "gap.lg" }}
+          color={borderColor}
+          _groupHover={{ color: borderColorHover }}
         >
-          <LocationIcon />
-          <Flex align="center" gap="gap.sm" color="fg.muted" fontWeight="medium" minW="0">
-            <JobLocations job={props.job} isTruncated={!isCardOpen} />
-          </Flex>
+          <LuChevronDown
+            size={24}
+            style={{
+              transform: isCardOpen ? "rotate(180deg)" : undefined,
+              transition: "transform 0.25s ease",
+            }}
+          />
         </Flex>
       </Stack>
-
-      <Box
-        display={{ base: cardState !== CardState.Closed ? "block" : "none", md: "block" }}
-        mb={{
-          base: cardState !== CardState.Closed ? "gap.md" : "0",
-          md: cardState !== CardState.Closed ? "gap.lg" : "0",
-        }}
-        pos="relative"
-        transition="margin"
-        transitionDuration={style.duration}
-      >
-        <JobTagGroups
-          job={props.job}
-          highlightable={isHighlightable ? ["tags_area"] : []}
-          jobHit={jobHit}
-          isOrgHighlighted={props.job.org?.is_highlighted}
-        />
-      </Box>
-
-      {cardState === CardState.OpenBySearchPreview && (
-        <Stack gap="gap.sm" mb={{ base: "gap.md", md: "gap.lg" }}>
-          <Text fontSize="sm" color="fg.muted" fontWeight="medium">
-            Job Description
-          </Text>
-          <Box fontSize="sm" color="fg">
-            <Snippet attribute="description" hit={jobHit} />
-          </Box>
-        </Stack>
-      )}
-
-      <Collapsible.Root open={isCardOpen} unmountOnExit lazyMount>
-        <Collapsible.Content animationDuration={style.duration}>
-          <JobExpanded job={props.job} onUrlClick={trackUrlClick} />
-        </Collapsible.Content>
-      </Collapsible.Root>
-
-      <Box
-        onClick={toggleCardCollapse}
-        pos="absolute"
-        inset="0"
-        borderRadius="lg"
-        zIndex="1"
-        cursor="pointer"
-      />
-
-      <Flex
-        pos="absolute"
-        bottom={{ base: "8px", md: "gap.md" }}
-        right={{ base: "gap.sm", md: "gap.lg" }}
-        color={borderColor}
-        _groupHover={{ color: borderColorHover }}
-      >
-        <LuChevronDown
-          size={24}
-          style={{
-            transform: isCardOpen ? "rotate(180deg)" : undefined,
-            transition: "transform 0.25s ease",
-          }}
-        />
-      </Flex>
-    </Stack>
+    </ErrorBoundary>
   );
 }
 
