@@ -73,7 +73,7 @@
                     # for React Router build: Must match the {client|docs}/Dockerfile ARG names
 
                     VITE_ENV: {{ env.DJANGO_ENV | default(value="") }}
-                    DJANGO_ENV: {{ env.DJANGO_ENVV | default(value="") }}
+                    DJANGO_ENV: {{ env.DJANGO_ENV | default(value="") }}
 
                     VITE_SITE: {{ env.VITE_SITE | default(value="''") }}
                     VITE_GTM_ID: {{ env.VITE_GTM_ID | default(value="''") }}
