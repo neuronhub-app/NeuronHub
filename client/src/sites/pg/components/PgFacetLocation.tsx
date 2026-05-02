@@ -1,7 +1,6 @@
 import { Checkbox, Icon, Input, InputGroup, Stack, Text } from "@chakra-ui/react";
 import { captureException, setExtra } from "@sentry/react";
 import { setExtras } from "@sentry/react-router";
-import { useCallback } from "react";
 import { LuX } from "react-icons/lu";
 import { useCurrentRefinements } from "react-instantsearch";
 import type { ResultOf } from "gql.tada";
@@ -47,12 +46,10 @@ export function PgFacetLocation(props: {
     [...locFiltersActive].filter(value => locByTypeNamesAll.has(value)),
   );
 
-  const algoliaCountByName = new Map(props.algoliaItems.map(item => [item.value, item.count]));
-  const getCount = useCallback(
-    (loc: JobLocation) => algoliaCountByName.get(loc.algolia_filter_name) ?? 0,
-    [algoliaCountByName],
-  );
-  type JobLocation = (typeof locsByType)[number];
+  function getCount(location: (typeof locsByType)[number]): number {
+    const algoliaCountByName = new Map(props.algoliaItems.map(item => [item.value, item.count]));
+    return algoliaCountByName.get(location.algolia_filter_name) ?? 0;
+  }
 
   const query = state.snap.query.toLowerCase();
   const locationsFiltered = query
