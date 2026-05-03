@@ -17,7 +17,7 @@ test.describe("Review", () => {
     $ = play.locator();
   });
 
-  test("Create", async ({ page }) => {
+  test("Create (flaky)", async ({ page }) => {
     await play.navigate(urls.reviews.create, { idleWait: true });
 
     const tool = $[ids.post.form.title].locator("input").first();
