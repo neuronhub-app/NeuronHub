@@ -27,8 +27,9 @@ paths:
 	- `src/graphql/[[client.ts]]` - Apollo `export const client` for when you need exceptions
 	- `src/[[codegen.ts]]` - is only used for TS enums generation - all GraphQL types are handled by gql.tada.
 - `src/components/algolia/` - see `Algolia.md` if needed
+- `src/sites/` - per-site `theme`, `routes`, `layout`, `redirects` selected by build-time `env.VITE_SITE`. See [Sub-sites doc](Sub-sites-with-VITE_SITE.md).
 - `src/theme/` - @chakra-ui theme config and semantic tokens
-- `src/[[env.ts]]` - typed `export const env`
+- `src/env.ts` - typed `export const env`
 - `e2e/` - Playwright with its `e2e/tests`
 
 ## gql.tada Persisted Queries

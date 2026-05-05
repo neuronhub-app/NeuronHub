@@ -106,11 +106,18 @@ classDiagram
     PostReview --> PostTag: review_tags
     Post --> PostVote: votes
     User o-- Post: author
+    UserAnon ..> User : email hash
+
     class User {
         username
         password
         aliases: M2M~User~
         areas: M2M~Area~
+    }
+    class UserAnon {
+        %% deterministic by email for Posthog/Sentry
+        anon_name: str
+        email_hash: str
     }
 
     Post -- PostSource
@@ -162,16 +169,31 @@ classDiagram
         }
     }
 
-    Job --> PostTag : tags (M2M)
-    JobAlert --> PostTag : tags (M2M)
-    JobAlertLog --> JobAlert : job_alert (FK)
-    JobAlertLog --> Job : jobs (M2M)
+    Job --> PostTag : tags
+    Job --> JobLocation : locations
+    Job --> Org : org
+    JobAlert --> PostTag : tags
+    JobAlertLog --> JobAlert : job_alert
+    JobAlertLog --> Job : jobs
+    JobAlertLog --> UserAnon : user_anon
+
+    namespace orgs {
+        class Org {
+            name
+            slug
+            domain
+            tz: TimeZoneField
+            tags_area: M2M~PostTag~
+            is_highlighted
+        }
+    }
 
     namespace jobs {
         class Job {
             title: str
             org: FK~Org~
             author?: FK~User~
+            locations: M2M~JobLocation~
             is_remote: bool?
             salary_min: int?
             posted_at, closes_at: datetime?
@@ -181,12 +203,20 @@ classDiagram
             bookmarked_by_users: M2M~User~
         }
 
+        class JobLocation {
+            name: str (unique)
+            type: country|city|remote
+            city
+            country
+            region
+        }
+
         class JobAlert {
             id_ext: UUID
             email: str
             tags: M2M~PostTag~
+            locations: M2M~JobLocation~
             is_orgs_highlighted: bool?
-            is_remote: bool?
             salary_min: int?
             is_active: bool
             tz: TimeZoneField?
@@ -194,10 +224,29 @@ classDiagram
         }
 
         class JobAlertLog {
+            user_anon: FK~UserAnon~
             job_alert: FK~JobAlert~
-            jobs: M2M~Job~
-            email_hash: str
+            job_slug_and_date_ids: ArrayField~Job.slug~
             sent_at: datetime
+            %% deprecated
+            email_hash: str
+            jobs: M2M~Job~
+        }
+    }
+
+    namespace sites {
+        class SiteConfig {
+            <<singleton>>
+            slug: SiteSlug
+            name
+            domain
+            sender_email
+            contact_email
+            is_enable_job_alerts
+            is_job_alerts_staff_only
+            jobs_url_utm_source
+            nav_links
+            footer_sections
         }
     }
 ```

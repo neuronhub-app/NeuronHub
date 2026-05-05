@@ -18,7 +18,7 @@ paths: **/*.py
 The structure of an App in `neuronhub.apps`:
 1. `models.py` or `models/` - should contain only data definition
 2. `services.py` or `services/` - business logic
-3. `tasks.py` for `django.tasks` workers, mostly `services` wrappers. We use the DB backend.
+3. `tasks.py` for `django.tasks` workers (DB backend & `manage.py db_worker`) - mostly `services` wrappers.
 4. `graphql.py` or `graphql/{types,resolvers,mutations}.py` - API-only layer - uses `services`, `tasks`, and `models`.
 
 ### `server/neuronhub`
@@ -35,8 +35,16 @@ The structure of an App in `neuronhub.apps`:
 - `apps/profiles/` - [detailed doc](./profiles.md). Users' Profiles for Algolia directory, and LLM-powered matching.
 	- `services/score_matches_by_llm.py` - calls LLM API to populate `ProfileMatch.match_score_by_llm` and `.match_reason_by_llm`
 	- `services/summarize_match_reviews.py` - builds calibration examples from user review corrections, injected into LLM prompt
+- `apps/orgs/` - `Org` model
+- `apps/sites/` - `SiteConfig` django-solo: branding + feature flags. See [Sub-sites doc](/docs/architecture/frontend/Sub-sites-with-VITE_SITE.md).
 
 Tests are placed nearby named `{module_name}__test.py`.
+
+### Background Workers
+
+The only scheduled cron is @hourly `apps.jobs.tasks.send_job_alert_emails_task`, by GET `/jobs/send-emails/$DJANGO_CRON_WEBHOOK_SECRET`.
+
+Other `@task`s are manually enqueued.
 
 ## Visibility
 

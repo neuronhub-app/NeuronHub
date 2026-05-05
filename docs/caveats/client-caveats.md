@@ -49,6 +49,12 @@ They're mostly fake - instead encapsulate `useFormContext` in type casting.
 
 I didn't test v8 - it isn't worth it.
 
+### pnpm `inject-workspace-packages` breaks Node 24 ESM
+
+#AI
+
+After a pnpm upgrade `mise lint` / `mise e2e` failed with `ERR_UNSUPPORTED_NODE_MODULES_TYPE_STRIPPING`. Root cause: `inject-workspace-packages=true` in `.npmrc` copies `@neuronhub/shared` into `node_modules/` instead of symlinking → Node refuses to type-strip files inside `node_modules`. We removed that flag; `docs/Dockerfile` uses `pnpm deploy` which is unaffected.
+
 ### Vite devs use `env.NODE_ENV` and `env.MODE` for conflicting reasons
 
 The difference:

@@ -7,7 +7,7 @@ paths:
 
 ## Indexes
 
-Each Model ha an Index with env postfix: `{name}_{DJANGO_ENV.value}`. Mise adds `env.USER` suffix to avoid dev clashes, eg `posts_dev_john`.
+Each Model has an Index with env postfix: `{name}_{DJANGO_ENV.value}`. Mise adds `env.USER` suffix as `posts_dev_john` to avoid clashes in dev.
 
 - `posts` - [[server/neuronhub/apps/posts/index.py]]
 - `jobs` - [[server/neuronhub/apps/jobs/index.py]]
@@ -15,7 +15,7 @@ Each Model ha an Index with env postfix: `{name}_{DJANGO_ENV.value}`. Mise adds 
 
 FE index names are in [[client/src/utils/useAlgoliaSearchClient.ts]].
 
-### Serialization
+### 1:1 Algolia <-> GraphQL compatibility
 
 We serialize models on BE using GraphQL queries (eg `PostsByIds`, `JobsByIds`) in `_get_graphql_field`. This keeps the single-place GraphQL [cache reset](/docs/architecture/frontend/GraphQL.md#cache-reset): on list pages, Algolia hits are enriched via [[useAlgoliaEnrichmentByGraphql.ts]] so `mutateAndRefetchMountedQueries` auto-refetches on mutations.
 
@@ -23,25 +23,27 @@ We serialize models on BE using GraphQL queries (eg `PostsByIds`, `JobsByIds`) i
 
 For sorting both `posts` and `jobs` have replicas that need `client.set_settings` - hence we always use our `neuronhub.apps.algolia.services.algolia_reindex()` instead of Algolia's `reindex_all()`.
 
-### Partial updates
+### apps.jobs
 
-Example:
+Uses `custom_objectID = "slug"` as `Job.id` changes on [[publish_job_versions.py]]. Others use the default `id`.
+
+### Bulk updates
+
+Algolia providers 3 undocumented methods (used in `publish_job_versions.py`):
+- `apapter.partial_update_objects`
+- `apapter.save_objects`
+- `apapter.delete_objects`
 
 ```python
-algolia_engine.client.partial_update_objects(
-    index_name=f"{ProfileIndex.index_name}{settings.ALGOLIA['INDEX_SUFFIX']}",
-    objects=[
-        {
-            "objectID": profile.id,
-            # ... more fields
-        }
-        for profile in profiles
-    ],
-    wait_for_tasks=False,
-)
+adapter = algolia_engine.get_adapter(model=Job)
+jobs: list[dict] = []
+for job in Job.objects.all():
+	if adapter._should_index(job):
+    	jobs.append(adapter.get_raw_record(job))
+algolia_engine.client.partial_update_objects(index_name=adapter.index_name, objects=jobs)
 ```
 
-Note: `update_records` will not work for different field values - it's the same as `QuerySet.update()`.
+Note: `update_records` is the same as `QuerySet.update(field=value)`. 
 
 ## Shared FE components (`components/algolia/`)
 

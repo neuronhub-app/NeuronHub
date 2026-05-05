@@ -4,15 +4,32 @@ Defined in mise.toml, values:
 - `""` - default for `neuronhub.app`
 - `"pg"` - job board only for `jobs.probablygood.org`
 
-Each site has its own dir `src/sites/{value}/` with:
-- `routes.ts` - `RouteConfig` specifying its own `layout()` - `NeuronLayout.tsx` or `PgLayout.tsx`
+## VITE_SITE during FE static build
+
+A Docker build ARG.
+
+`src/sites/{slug}/`:
+- `routes.ts` - `RouteConfig` with own `layout()` - `NeuronLayout.tsx` or `PgLayout.tsx`
+- `redirects/` - backward compatibility URL redirects
 - `theme.ts`
+- `colors.ts`
+- `pages/
 
-`src/sites/index.ts` hold `SiteConfig` with chakra `theme` and `favicon` paths.
+`src/sites/index.ts` exports `const siteConfig` (build-time chakra `theme`, `favicon`, `meta`) selected by `env.VITE_SITE`.
 
-The only conditional url namespace is `/jobs/`, which isn't used in `pg`, as it's their homepage. Hence `pg` URLs transform as:
-- `/jobs` -> `/`
-- `/jobs/:slug` -> `/:slug`
-- etc
+## apps.sites.SiteConfig by django-solo
 
-This is temporarily solution - in ~3 months we're planning to extract it into an NPM package `neuronhub`, and a git repository `neuronhub-template` with the standard minimal `server/` Django setup and `client/` dir.
+BE-only:
+- Feature flags: `is_enable_job_alerts`, `is_job_alerts_staff_only`
+	- will be moved to `apps.jobs.Config` later.
+- Email/branding: `name`, `domain`, `sender_email`, `sender_email_name`, `logo_url`, `address`
+
+FE-fetched at boot via GraphQL `SiteConfigQuery`: `nav_links`, `footer_sections`, etc. [[client/src/sites/pg/siteConfigState.ts]] exposes a Valtio proxy via `useSiteConfig()`.
+
+## Future
+
+In ~3 months we extract this into NPM package `neuronhub` + git template `neuronhub-template` with a minimal `server/` Django setup and `client/` dir.
+
+## Legacy URLs
+
+`pg` used to run without the `/jobs` URL prefix, and BE had to adapt the URL based on `VITE_SITE`. Since May 2026 both use `/jobs`. And `pg` just has homepage showing `/jobs`.

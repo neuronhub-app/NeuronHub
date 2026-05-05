@@ -47,6 +47,8 @@ class JobLocation(TimeStampedModel):
     city = models.CharField(max_length=255, blank=True)
     country = models.CharField(max_length=255, blank=True)
     region = models.CharField(max_length=255, blank=True)
+
+    #: not used (for now)
     is_remote = models.BooleanField(default=False)
 
     @model_cached_property
@@ -333,7 +335,6 @@ class JobAlert(TimeStampedModel):
         JobLocation,
         blank=True,
     )
-    is_remote = models.BooleanField(blank=True, null=True)
     salary_min = models.PositiveIntegerField(blank=True, null=True)
     is_exclude_no_salary = models.BooleanField(default=False)
     is_exclude_career_capital = models.BooleanField(blank=True, null=True)
@@ -357,6 +358,9 @@ class JobAlert(TimeStampedModel):
         default=False,
         help_text="Whether the user checked the newsletter checkbox. The API sub may fail, but this flag will be checked still.",
     )
+
+    #: deprecated
+    is_remote = models.BooleanField(blank=True, null=True)
 
     # Note: minimal, as the rest is tracked by [[JobAlertLog]]
     history = HistoricalRecords(
