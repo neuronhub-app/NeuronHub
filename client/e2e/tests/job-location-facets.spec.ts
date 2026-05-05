@@ -7,9 +7,12 @@
 import { type Page, expect as expectBase, type Locator, test } from "@playwright/test";
 import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
+import { env } from "@/env";
 import { urls } from "@/urls";
 
 const openPopover = "[data-part=content][data-scope=popover][data-state=open]";
+
+test.skip(!env.site.isProbablyGood, "Location facets are PG-only");
 
 test.describe("PG Job Location Facets", () => {
   let play: PlaywrightHelper;

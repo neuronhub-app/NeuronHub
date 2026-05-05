@@ -39,33 +39,41 @@ test.describe("Job Alert", () => {
       await expect($[ids.layout.sidebar]).not.toHaveText(layout.label.jobAlerts());
     }
 
-    const popover = page.locator(openPopover);
+    if (env.site.isProbablyGood) {
+      const popover = page.locator(openPopover);
 
-    // Select Kenya (country) + Berkeley (city)
-    await page.getByTestId(ids.facet.popover.country).last().click();
-    await clickFacetCheckbox(popover, "Kenya");
-    await play.waitForNetworkIdle();
-    await page.keyboard.press("Escape");
+      // Select Kenya (country) + Berkeley (city)
+      await page.getByTestId(ids.facet.popover.country).last().click();
+      await clickFacetCheckbox(popover, "Kenya");
+      await play.waitForNetworkIdle();
+      await page.keyboard.press("Escape");
 
-    await page.getByTestId(ids.facet.popover.city).last().click();
-    await clickFacetCheckbox(popover, "Berkeley CA");
-    await play.waitForNetworkIdle();
-    await page.keyboard.press("Escape");
+      await page.getByTestId(ids.facet.popover.city).last().click();
+      await clickFacetCheckbox(popover, "Berkeley CA");
+      await play.waitForNetworkIdle();
+      await page.keyboard.press("Escape");
+    }
 
-    // Subscribe — verify location_ids sent
+    // Subscribe
+
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
+    const requestPromise = env.site.isProbablyGood
+      ? page.waitForRequest(
+          req =>
+            req.url().includes("/graphql") &&
+            (req.postData()?.includes("JobAlertSubscribe") ?? false),
+        )
+      : null;
 
-    const requestPromise = page.waitForRequest(
-      req =>
-        req.url().includes("/graphql") &&
-        (req.postData()?.includes("JobAlertSubscribe") ?? false),
-    );
     await play.click(ids.job.alert.submitBtn);
-    const request = await requestPromise;
-    const body = JSON.parse(request.postData()!);
-    expectBase(body.variables?.location_ids?.length).toBeGreaterThanOrEqual(2);
-    await play.waitForNetworkIdle();
+
+    if (env.site.isProbablyGood && requestPromise) {
+      const body = JSON.parse((await requestPromise).postData()!);
+      expectBase(body.variables?.location_ids?.length).toBeGreaterThanOrEqual(2);
+    } else {
+      await play.waitForNetworkIdle();
+    }
 
     if (env.site.isProbablyGood) {
       await expect(page.getByRole("link", { name: layout.label.jobAlerts(1) })).toBeVisible();

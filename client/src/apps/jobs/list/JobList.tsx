@@ -1,5 +1,4 @@
 import { analytics } from "@/utils/analytics";
-import { useInit } from "@/utils/useInit";
 import {
   Box,
   Code,
@@ -121,22 +120,6 @@ export function JobList(props: { slug?: string }) {
       </Stack>
 
       <AlgoliaFacetAttribute attribute="tags_experience.name" label="Experience" />
-      <AlgoliaFacetAttribute
-        attribute="tags_country.name"
-        label="Country"
-        isSearchEnabled
-        showFirst={5}
-        subFacet={{
-          attribute: "tags_country_visa_sponsor.name",
-          label: "Visa sponsorship",
-        }}
-      />
-      <AlgoliaFacetAttribute
-        attribute="tags_city.name"
-        label="City"
-        isSearchEnabled
-        showFirst={5}
-      />
       <AlgoliaFacetSalary attribute="salary_min" label="Salary" />
       <AlgoliaFacetAttribute
         attribute="tags_skill.name"
