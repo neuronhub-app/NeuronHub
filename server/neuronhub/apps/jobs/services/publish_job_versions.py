@@ -1,28 +1,26 @@
 from dataclasses import asdict
 from dataclasses import dataclass
 from dataclasses import field
-from typing import Literal
 
 import sentry_sdk
-from asgiref.sync import sync_to_async
-from django.conf import settings
 from django.utils import timezone
 
+from neuronhub.apps.algolia.services.algolia_reindex_partial import AlgoliaChangedIds
+from neuronhub.apps.algolia.services.algolia_reindex_partial import algolia_reindex_partial
 from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
     disable_auto_indexing_if_enabled,
 )
 from neuronhub.apps.jobs.models import Job
-from neuronhub.apps.jobs.services.airtable_sync_jobs import get_jobs_qs_prefetched
 
 
+# todo ! refac: drop and use [[AlgoliaChangedIds]]
 @dataclass
-class JobSlugs:
-    created: list[SlugStr] = field(default_factory=list)
-    updated: list[SlugStr] = field(default_factory=list)
-    deleted: list[SlugStr] = field(default_factory=list)
+class JobIds:
+    created: list[ID] = field(default_factory=list)
+    updated: list[ID] = field(default_factory=list)
+    deleted: list[ID] = field(default_factory=list)
 
 
-type SlugStr = str
 type ID = int
 
 
@@ -30,53 +28,60 @@ async def publish_job_versions(draft_ids: list[ID]):
     sentry_sdk.set_context("draft_ids", dict(ids=draft_ids))
 
     with disable_auto_indexing_if_enabled():
-        job_slugs = await _publish_changes_to_db(draft_ids)
+        ids = await _publish_changes_to_db(draft_ids)
 
-    sentry_sdk.set_context("job_slugs", asdict(job_slugs))
+    sentry_sdk.set_context("changes", asdict(ids))
 
-    if settings.ALGOLIA["IS_ENABLED"]:
-        await _publish_changes_to_algolia(job_slugs)
+    await algolia_reindex_partial(
+        AlgoliaChangedIds(
+            model=Job,
+            created=ids.created,
+            updated=ids.updated,
+            deleted=ids.deleted,
+        ),
+    )
 
-
-async def _publish_changes_to_db(draft_ids: list[ID]) -> JobSlugs:
-    job_slugs = JobSlugs()
-
-    result_del = await _publish_deletion(draft_ids)
-    job_slugs.deleted += result_del.deleted
-
-    result_new = await _publish_update_or_create(draft_ids)
-    job_slugs.updated += result_new.updated
-    job_slugs.created += result_new.created
-
-    await _handle_invalid_drafts(draft_ids)
-
-    return job_slugs
-
-
-async def _publish_deletion(draft_ids: list[ID]) -> JobSlugs:
-    job_slugs = JobSlugs()
-
-    jobs_draft = Job.objects.filter(id__in=draft_ids, is_pending_removal=True)
-    jobs_pub = Job.objects.filter(versions__in=jobs_draft, is_published=True).distinct()
-
-    job_slugs.deleted = [slug async for slug in jobs_pub.values_list("slug", flat=True)]
-
-    async for job_pub in jobs_pub:  # for django-simple-history, JIC
+    # for django-simple-history, JIC
+    async for job_pub in Job.objects.filter(id__in=ids.deleted):
         try:
             await job_pub.adelete()
         except Exception:
             sentry_sdk.capture_exception()
+
+
+async def _publish_changes_to_db(draft_ids: list[ID]) -> JobIds:
+    ids = JobIds()
+
+    result_del = await _publish_deletion(draft_ids)
+    ids.deleted += result_del.deleted
+
+    result_new = await _publish_update_or_create(draft_ids)
+    ids.updated += result_new.updated
+    ids.created += result_new.created
+
+    await _handle_invalid_drafts(draft_ids)
+
+    return ids
+
+
+async def _publish_deletion(draft_ids: list[ID]) -> JobIds:
+    ids = JobIds()
+
+    jobs_draft = Job.objects.filter(id__in=draft_ids, is_pending_removal=True)
+    jobs_pub = Job.objects.filter(versions__in=jobs_draft, is_published=True).distinct()
+
+    ids.deleted = [id async for id in jobs_pub.values_list("id", flat=True)]
 
     try:
         await jobs_draft.adelete()
     except Exception:
         sentry_sdk.capture_exception()
 
-    return job_slugs
+    return ids
 
 
-async def _publish_update_or_create(draft_ids: list[ID]) -> JobSlugs:
-    job_slugs = JobSlugs()
+async def _publish_update_or_create(draft_ids: list[ID]) -> JobIds:
+    ids = JobIds()
 
     async for job_updated_draft in Job.objects.filter(
         id__in=draft_ids,
@@ -95,7 +100,7 @@ async def _publish_update_or_create(draft_ids: list[ID]) -> JobSlugs:
             job_updated_draft.is_published = True
             await job_updated_draft.asave()
 
-            job_slugs.updated.append(job_updated_draft.slug)
+            ids.updated.append(job_updated_draft.id)
         except Exception:
             sentry_sdk.capture_exception()
 
@@ -106,49 +111,12 @@ async def _publish_update_or_create(draft_ids: list[ID]) -> JobSlugs:
         version_of__isnull=True,
     )
     try:
-        job_slugs.created = [
-            slug async for slug in drafts_to_create.values_list("slug", flat=True)
-        ]
+        ids.created = [id async for id in drafts_to_create.values_list("id", flat=True)]
         await drafts_to_create.aupdate(is_published=True, published_at=timezone.now())
     except Exception:
         sentry_sdk.capture_exception()
 
-    return job_slugs
-
-
-@sync_to_async
-def _publish_changes_to_algolia(job_slugs: JobSlugs):
-    from algoliasearch_django import algolia_engine
-
-    adapter = algolia_engine.get_adapter(model=Job)
-    is_await_algolia_http_response = False
-
-    algolia_engine.client.delete_objects(
-        index_name=adapter.index_name,
-        object_ids=job_slugs.deleted,
-        wait_for_tasks=is_await_algolia_http_response,
-    )
-
-    for algolia_params in [
-        AlgoliaParams(slugs=job_slugs.updated, method="partial_update_objects"),
-        AlgoliaParams(slugs=job_slugs.created, method="save_objects"),
-    ]:
-        jobs_changed: list[dict] = []
-        for job in get_jobs_qs_prefetched().filter(slug__in=algolia_params.slugs):
-            if adapter._should_index(job):
-                jobs_changed.append(adapter.get_raw_record(job))
-
-        getattr(algolia_engine.client, algolia_params.method)(
-            index_name=adapter.index_name,
-            objects=jobs_changed,
-            wait_for_tasks=is_await_algolia_http_response,
-        )
-
-
-@dataclass
-class AlgoliaParams:
-    method: Literal["partial_update_objects", "save_objects"]
-    slugs: list[SlugStr]
+    return ids
 
 
 async def _handle_invalid_drafts(draft_ids: list[ID]):

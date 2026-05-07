@@ -64,6 +64,8 @@ async def db_stubs_repopulate(
     Populates the db with Posts, Tools, Reviews, tags, votes, etc.
 
     E2E tests run on it, so it includes edge cases.
+
+    The deletion is deprecated by the new [[test_gen_reset.py]].
     """
 
     with disable_auto_indexing_if_enabled():

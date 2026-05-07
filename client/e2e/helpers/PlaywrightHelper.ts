@@ -1,12 +1,12 @@
 import type { OperationVariables } from "@apollo/client";
-import { Locator, Page, test } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import type { TadaDocumentNode } from "gql.tada";
 import { print } from "graphql";
 import { config } from "@/e2e/config";
 import { expect } from "@/e2e/helpers/expect";
 import { ids, type TestId } from "@/e2e/ids";
 import { env } from "@/env";
-import { graphql } from "@/gql-tada";
+import { graphql, type VariablesOf } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import type { urls } from "@/urls";
 
@@ -30,6 +30,14 @@ export class PlaywrightHelper {
   setDefaultTimeout(timeout: number) {
     this.actionTimeoutMs = timeout;
     this.page.setDefaultTimeout(this.actionTimeoutMs);
+  }
+
+  async genReset() {
+    return client.mutate({ mutation: TestGenResetMutate });
+  }
+
+  async gen(create_params: VariablesOf<typeof TestGenMutate>["create_params"]) {
+    return client.mutate({ mutation: TestGenMutate, variables: { create_params } });
   }
 
   async dbStubsRepopulateAndLogin(options?: {
@@ -251,11 +259,19 @@ const DbStubsRepopulateMutate = graphql.persisted(
   `),
 );
 
+const TestGenResetMutate = graphql.persisted(
+  "test_gen_reset",
+  graphql(`mutation test_gen_reset { test_gen_reset }`),
+);
+
+const TestGenMutate = graphql.persisted(
+  "test_gen",
+  graphql(
+    `mutation test_gen($create_params: [GenCreateParams!]!) { test_gen(create_params: $create_params) }`,
+  ),
+);
+
 export const TestCreateFailedTaskMutate = graphql.persisted(
   "test_create_failed_task",
-  graphql(`
-    mutation test_create_failed_task {
-      test_create_failed_task
-    }
-  `),
+  graphql(`mutation test_create_failed_task { test_create_failed_task }`),
 );

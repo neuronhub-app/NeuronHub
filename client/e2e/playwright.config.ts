@@ -1,11 +1,14 @@
 import { defineConfig } from "@playwright/test";
+import { authSetupStatePath } from "@/e2e/test";
 import { env } from "@/env";
 import { urls } from "@/urls";
 
 const clientUrl = `http://localhost:${env.CLIENT_PORT_E2E}`;
 
+const setupProjectName = "setup";
+
 export default defineConfig({
-  testDir: "./tests",
+  testDir: ".",
   // todo ! refac: centralize timeouts
   //
   // Default is 30s, but cold Postgres cache needs over 45s; And Algolia can take 45s by itself.
@@ -13,20 +16,6 @@ export default defineConfig({
   timeout: 80 * 1000,
   workers: 1, // default = 4
   outputDir: "test-results/",
-  testIgnore:
-    env.VITE_SITE === "pg"
-      ? [
-          "**/post.spec.ts",
-          "**/review.spec.ts",
-          "**/comment.spec.ts",
-          "**/comment-hn.spec.ts",
-          "**/tool.spec.ts",
-          "**/library.spec.ts",
-          "**/vote-and-reading-list.spec.ts",
-          "**/profile-list.spec.ts",
-          "**/login.spec.ts",
-        ]
-      : [],
   webServer: [
     {
       name: "Server",
@@ -45,6 +34,31 @@ export default defineConfig({
   ],
   use: {
     browserName: "chromium",
-    baseURL: clientUrl + (env.VITE_SITE === "pg" ? urls.jobs.list : urls.reviews.list),
+    baseURL: clientUrl + (env.site.isProbablyGood ? urls.jobs.list : urls.reviews.list),
   },
+  // #AI
+  projects: [
+    {
+      name: setupProjectName,
+      testMatch: "auth.setup.ts",
+    },
+    {
+      use: { storageState: authSetupStatePath },
+      dependencies: [setupProjectName],
+      testDir: "./tests",
+      testIgnore: env.site.isProbablyGood
+        ? [
+            "**/post.spec.ts",
+            "**/review.spec.ts",
+            "**/comment.spec.ts",
+            "**/comment-hn.spec.ts",
+            "**/tool.spec.ts",
+            "**/library.spec.ts",
+            "**/vote-and-reading-list.spec.ts",
+            "**/profile-list.spec.ts",
+            "**/login.spec.ts",
+          ]
+        : [],
+    },
+  ],
 });

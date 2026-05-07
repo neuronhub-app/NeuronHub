@@ -11,6 +11,7 @@ node_modules/
 *.sql
 *.dump
 *.csv
+client/e2e/auth.state.json
 
 # caches
 __pycache__

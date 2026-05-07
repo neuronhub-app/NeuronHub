@@ -3,6 +3,9 @@ from django.conf import settings
 from django.utils import timezone
 
 from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
+from neuronhub.apps.tests.services.test_gen import GenCreateParams
+from neuronhub.apps.tests.services.test_gen import test_gen
+from neuronhub.apps.tests.services.test_gen_reset import test_gen_reset
 from neuronhub.settings import DjangoEnv
 
 
@@ -17,13 +20,17 @@ class TestsMutation:
         is_create_profiles: bool | None = False,
         is_create_jobs: bool | None = False,
     ) -> str:
+        """
+        deprecated by [[test_gen]]
+        """
         assert settings.DEBUG
         assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
 
         gen = await db_stubs_repopulate(
             is_delete_posts=True,
             is_delete_posts_extra=True,
-            is_delete_user_default=True,
+            # keeps `auth.setup.ts` sessionid valid
+            is_delete_user_default=False,
             is_delete_users_extra=True,
             is_import_HN_post=is_import_HN_post or False,
             is_create_single_review=is_create_single_review or False,
@@ -31,6 +38,20 @@ class TestsMutation:
             is_create_jobs=is_create_jobs or False,
         )
         return gen.users.user_default.username
+
+    @strawberry.mutation
+    async def test_gen_reset(self, info: strawberry.Info) -> bool:
+        assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
+        await test_gen_reset()
+        return True
+
+    @strawberry.mutation
+    async def test_gen(
+        self, info: strawberry.Info, create_params: list[GenCreateParams]
+    ) -> bool:
+        assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
+        await test_gen(create_params)
+        return True
 
     # #AI
     @strawberry.mutation
@@ -41,7 +62,6 @@ class TestsMutation:
 
         from neuronhub.apps.profiles.graphql import SCORE_PROFILES_TASK
 
-        assert settings.DEBUG
         assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
 
         User = get_user_model()

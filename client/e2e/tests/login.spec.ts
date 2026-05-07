@@ -1,19 +1,15 @@
-import { test } from "@playwright/test";
 import { config } from "@/e2e/config";
 import { expect } from "@/e2e/helpers/expect";
-import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
+import { testNoAuth } from "@/e2e/test";
 import { urls } from "@/urls";
 
-test.describe("Login", () => {
-  let play: PlaywrightHelper;
-
-  test.beforeEach(async ({ page }) => {
-    play = new PlaywrightHelper(page);
-    await play.dbStubsRepopulate({ is_import_HN_post: false, is_create_single_review: false });
+testNoAuth.describe("Login", () => {
+  testNoAuth.beforeEach(async ({ play }) => {
+    await play.genReset();
   });
 
-  test("with email", async ({ page }) => {
+  testNoAuth("with email", async ({ page, play }) => {
     await page.goto(urls.login);
     await play.fill(ids.auth.login.username, config.user.email);
     await play.fill(ids.auth.login.password, config.user.password);
