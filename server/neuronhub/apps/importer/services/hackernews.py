@@ -197,7 +197,7 @@ class ImporterHackerNews:
             )
             parent_root = post
             if is_created:
-                from neuronhub.apps.tests.services.db_stubs_repopulate import tags
+                from neuronhub.apps.posts.tests.db_stubs import tags
 
                 tag = await tag_create_or_update(tags.hacker_news, post=post, is_important=True)
                 await post.tags.aadd(tag)

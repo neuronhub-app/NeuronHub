@@ -310,7 +310,7 @@ class PostsGen:
     async def create(self, params: Params = Params()) -> Post:
         from neuronhub.apps.posts.models import Post
         from neuronhub.apps.posts.models import ToolCompany
-        from neuronhub.apps.tests.services.db_stubs_repopulate import create_company_ownership
+        from neuronhub.apps.posts.tests.db_stubs import create_company_ownership
 
         company = None
         if params.company_name:

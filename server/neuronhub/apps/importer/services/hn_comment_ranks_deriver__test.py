@@ -3,7 +3,7 @@ import pytest
 from neuronhub.apps.importer.models import ApiSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.importer.services.request_json import _get_api_source
-from neuronhub.apps.tests.services.db_stubs_repopulate import post_HN_id
+from neuronhub.apps.posts.tests.db_stubs import post_HN_id
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 

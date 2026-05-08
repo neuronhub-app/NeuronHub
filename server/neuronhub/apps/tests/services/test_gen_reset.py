@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import Model
 from django_tasks.backends.database.models import DBTaskResult
 
@@ -44,6 +45,9 @@ async def test_gen_reset() -> None:
 
 
 async def _get_algolia_ids_to_delete(model: type[Model]) -> AlgoliaChangedIds | None:
+    if not settings.ALGOLIA["IS_ENABLED"]:
+        return None
+
     from algoliasearch_django import AlgoliaIndex
     from algoliasearch_django import algolia_engine
 

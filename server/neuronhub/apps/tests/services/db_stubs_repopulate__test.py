@@ -1,7 +1,7 @@
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models import Post
-from neuronhub.apps.tests.services.db_stubs_repopulate import ReviewTagParams
-from neuronhub.apps.tests.services.db_stubs_repopulate import _review_tags_create_or_update
+from neuronhub.apps.posts.tests.db_stubs import ReviewTagParams
+from neuronhub.apps.posts.tests.db_stubs import _review_tags_create_or_update
 from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 

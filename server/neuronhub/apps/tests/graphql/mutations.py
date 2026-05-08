@@ -27,11 +27,6 @@ class TestsMutation:
         assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
 
         gen = await db_stubs_repopulate(
-            is_delete_posts=True,
-            is_delete_posts_extra=True,
-            # keeps `auth.setup.ts` sessionid valid
-            is_delete_user_default=False,
-            is_delete_users_extra=True,
             is_import_HN_post=is_import_HN_post or False,
             is_create_single_review=is_create_single_review or False,
             is_create_profiles=is_create_profiles or False,

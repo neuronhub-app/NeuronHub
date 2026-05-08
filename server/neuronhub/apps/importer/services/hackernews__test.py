@@ -5,7 +5,7 @@ from neuronhub.apps.importer.models import PostSource
 from neuronhub.apps.importer.models import UserSource
 from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.posts.models import Post
-from neuronhub.apps.tests.services.db_stubs_repopulate import post_HN_id
+from neuronhub.apps.posts.tests.db_stubs import post_HN_id
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
