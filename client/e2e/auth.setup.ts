@@ -8,7 +8,7 @@ import { authSetupStatePath } from "@/e2e/test";
 
 setup("authenticate default user", async ({ page }) => {
   const play = new PlaywrightHelper(page);
-  await play.genReset();
+  await play.reset_db();
   await play.login();
   await page.context().storageState({ path: authSetupStatePath });
 });

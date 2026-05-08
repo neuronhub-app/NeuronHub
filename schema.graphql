@@ -113,6 +113,7 @@ type FooterSectionType {
 input GenCreateParams {
   posts_tool: PostsToolParams = null
   posts_review: PostsReviewParams = null
+  jobs_job: JobsJobParams = null
 }
 
 input IDBaseFilterLookup {
@@ -214,6 +215,12 @@ type JobVersionType {
   published_markdown: String!
   draft: JobType!
   published: JobType
+}
+
+input JobsJobParams {
+  title: String!
+  org_name: String = null
+  locations: [String!] = null
 }
 
 enum LocationType {
@@ -817,10 +824,18 @@ type PostVoteType {
 input PostsReviewParams {
   parent: String!
   title: String!
+  tags: [PostsTagParams!] = null
+}
+
+input PostsTagParams {
+  name: String!
+  is_vote_pos: Boolean = null
+  is_important: Boolean = null
 }
 
 input PostsToolParams {
   title: String!
+  tags: [PostsTagParams!] = null
 }
 
 input ProfileFilter {

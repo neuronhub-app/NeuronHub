@@ -27,15 +27,14 @@ from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
 
 
-async def test_gen_reset():
+async def test_gen_reset() -> None:
     with disable_auto_indexing_if_enabled():
         algolia_ids: list[AlgoliaChangedIds] = []
         for model in _models_to_drop_ordered:
             if ids := _get_algolia_ids_to_delete(model):
                 algolia_ids.append(ids)
 
-            num_deleted, num_deleted_per_model = await model.objects.all().adelete()
-            print("deleted", num_deleted, num_deleted_per_model)
+            await model.objects.all().adelete()  # type: ignore[attr-defined] #bad-infer
 
         await algolia_reindex_partial(*algolia_ids)
 

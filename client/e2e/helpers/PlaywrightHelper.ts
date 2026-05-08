@@ -32,11 +32,11 @@ export class PlaywrightHelper {
     this.page.setDefaultTimeout(this.actionTimeoutMs);
   }
 
-  async genReset() {
+  async reset_db() {
     return client.mutate({ mutation: TestGenResetMutate });
   }
 
-  async gen(create_params: VariablesOf<typeof TestGenMutate>["create_params"]) {
+  async reset_db_and_gen(create_params: VariablesOf<typeof TestGenMutate>["create_params"]) {
     return client.mutate({ mutation: TestGenMutate, variables: { create_params } });
   }
 

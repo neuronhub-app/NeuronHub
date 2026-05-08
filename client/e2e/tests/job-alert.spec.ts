@@ -1,10 +1,10 @@
 import { layout } from "@/components/LayoutSidebar";
-import { type Locator, expect as expectBase, test } from "@playwright/test";
+import { type Locator, expect as expectBase } from "@playwright/test";
 import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { expect } from "@/e2e/helpers/expect";
-import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
+import { test } from "@/e2e/test";
 import { env } from "@/env";
 import { urls } from "@/urls";
 
@@ -12,17 +12,23 @@ const openPopover = "[data-part=content][data-scope=popover][data-state=open]";
 const testEmail = "e2e@neuronhub.app";
 
 test.describe("Job Alert", () => {
-  let play: PlaywrightHelper;
-  let $: LocatorMapToGetFirstById;
-
-  test.beforeEach(async ({ page }) => {
-    play = new PlaywrightHelper(page);
-    $ = play.$;
-    await play.dbStubsRepopulateAndLogin({
-      is_import_HN_post: false,
-      is_create_single_review: false,
-      is_create_jobs: true,
-    });
+  test.beforeEach(async ({ play }) => {
+    await play.reset_db_and_gen([
+      {
+        jobs_job: {
+          title: "Summer Research Fellowship",
+          org_name: "Arclight Research Institute",
+          locations: ["Berkeley CA, United States"],
+        },
+      },
+      {
+        jobs_job: {
+          title: "Country Director, East Africa Programs",
+          org_name: "BridgeFund International",
+          locations: ["Nairobi, Kenya"],
+        },
+      },
+    ]);
   });
 
   // todo ! refac: #AI-slop - magic strings wo testid
@@ -30,6 +36,8 @@ test.describe("Job Alert", () => {
   test("subscribe with locations => toggle inactive => reauth by id_ext => delete", async ({
     page,
     context,
+    play,
+    $,
   }) => {
     await play.navigate(urls.jobs.list, { idleWait: true });
 
@@ -102,7 +110,7 @@ test.describe("Job Alert", () => {
     await expect(page).not.toHaveText(testEmail);
   });
 
-  test("unsubscribe by /jobs/subscriptions/remove/:id_ext (maybe flaky)", async () => {
+  test("unsubscribe by /jobs/subscriptions/remove/:id_ext", async ({ play, $ }) => {
     test.slow();
 
     await play.navigate(urls.jobs.list, { idleWait: true });

@@ -6,7 +6,7 @@ import { urls } from "@/urls";
 
 testNoAuth.describe("Login", () => {
   testNoAuth.beforeEach(async ({ play }) => {
-    await play.genReset();
+    await play.reset_db();
   });
 
   testNoAuth("with email", async ({ page, play }) => {

@@ -8,7 +8,7 @@ import { urls } from "@/urls";
 test.describe("Post - action button", () => {
   test.beforeEach(async ({ play }) => {
     const tool = "PyCharm";
-    await play.gen([
+    await play.reset_db_and_gen([
       { posts_tool: { title: tool } },
       { posts_review: { parent: tool, title: "Fine review" } },
     ]);

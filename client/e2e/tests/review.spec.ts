@@ -1,23 +1,34 @@
-import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
-import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
+import type { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
+import { test } from "@/e2e/test";
 import { urls } from "@/urls";
 
-test.describe("Review", () => {
-  let play: PlaywrightHelper;
-  let $: LocatorMapToGetFirstById;
+const reviewTitle = "Fine review";
 
-  test.beforeEach(async ({ page }) => {
-    play = new PlaywrightHelper(page);
-    await play.dbStubsRepopulateAndLogin({
-      is_import_HN_post: false,
-      is_create_single_review: false,
-    });
-    $ = play.locator();
+test.describe("Review", () => {
+  test.beforeEach(async ({ play }) => {
+    await play.reset_db_and_gen([
+      {
+        posts_tool: {
+          title: "PyCharm",
+          tags: [{ name: "Software / IDE" }],
+        },
+      },
+      {
+        posts_review: {
+          parent: "PyCharm",
+          title: reviewTitle,
+          tags: [
+            { name: "Dev / Python", is_vote_pos: true },
+            { name: "Dev / Django", is_vote_pos: true },
+          ],
+        },
+      },
+    ]);
   });
 
-  test("Create (flaky)", async ({ page }) => {
+  test("Create", async ({ page, play, $ }) => {
     await play.navigate(urls.reviews.create, { idleWait: true });
 
     const tool = $[ids.post.form.title].locator("input").first();
@@ -40,11 +51,11 @@ test.describe("Review", () => {
     await play.submit(ids.post.form);
   });
 
-  test("Edit Review.tags & Tool.tags", async ({ page }) => {
+  test("Edit Review.tags & Tool.tags", async ({ play, $ }) => {
     play.setDefaultTimeout(12_000); // 7.5s makes it flaky
 
     await play.navigate(urls.reviews.list);
-    await openEditFormPyCharm();
+    await openEditFormPyCharm(play);
 
     const tags = {
       parent: { existing: "IDE" },
@@ -59,20 +70,20 @@ test.describe("Review", () => {
     // Add
     await play.addTag(tags.review.new, { isReviewTag: true });
     await play.submit(ids.post.form, { waitIdle: true });
-    await openEditFormPyCharm();
+    await openEditFormPyCharm(play);
     await expect(reviewTags).toHaveTag(tags.review.new);
 
     // todo refac: use ids - ie make "remove" btn a child of ids.review.form.tags
     await reviewTags.locator(`[aria-label="Remove ${tags.review.new}"]`).click();
     await play.submit(ids.post.form, { waitIdle: true });
-    await openEditFormPyCharm();
+    await openEditFormPyCharm(play);
     await expect(reviewTags).not.toHaveTag(tags.review.new);
     await expect(toolTags).toHaveTag(tags.review.new);
   });
 
-  test("Tag (existing) voting & add a Tag", async () => {
+  test("Tag (existing) voting & add a Tag", async ({ play, $ }) => {
     await play.navigate(urls.reviews.list);
-    await openEditFormPyCharm();
+    await openEditFormPyCharm(play);
 
     const tags = { existing: "Django", new: "New tag" };
     const vote = play.getTagVoteButtons(tags.existing, { isReviewTag: true });
@@ -84,22 +95,22 @@ test.describe("Review", () => {
     // downvote
     await vote.down.click();
     await play.submit(ids.post.form, { waitIdle: true });
-    await openEditFormPyCharm();
+    await openEditFormPyCharm(play);
     await expect(vote.up).not.checked();
     await expect(vote.down).checked();
 
     // add new
     await play.addTag(tags.new, { isReviewTag: true });
     await play.submit(ids.post.form, { waitIdle: true });
-    await openEditFormPyCharm();
+    await openEditFormPyCharm(play);
     await expect($[ids.review.form.tags]).toHaveTag(tags.existing);
     await expect($[ids.review.form.tags]).toHaveTag(tags.new);
     await expect(vote.up).not.checked();
     await expect(vote.down).checked();
   });
-
-  async function openEditFormPyCharm() {
-    const card = play.getAll(ids.post.card.container).filter({ hasText: "PyCharm" }).first();
-    await card.getByTestId(ids.post.card.link.edit).click();
-  }
 });
+
+async function openEditFormPyCharm(play: PlaywrightHelper) {
+  const card = play.getAll(ids.post.card.container).filter({ hasText: reviewTitle }).first();
+  await card.getByTestId(ids.post.card.link.edit).click();
+}
