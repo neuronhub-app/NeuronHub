@@ -1,4 +1,5 @@
 from django.db.models import Model
+from django_tasks.backends.database.models import DBTaskResult
 
 from neuronhub.apps.algolia.services.algolia_reindex_partial import AlgoliaChangedIds
 from neuronhub.apps.algolia.services.algolia_reindex_partial import algolia_reindex_partial
@@ -82,4 +83,5 @@ _models_to_drop_ordered = [
     Job,
     Org,
     UserConnectionGroup,
+    DBTaskResult,
 ]

@@ -1,38 +1,24 @@
-import { test } from "@playwright/test";
-import { expect } from "@/e2e/helpers/expect";
-import {
-  type LocatorMapToGetFirstById,
-  PlaywrightHelper,
-  TestCreateFailedTaskMutate,
-} from "@/e2e/helpers/PlaywrightHelper";
+import { TestCreateFailedTaskMutate } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
+import { test, expect } from "@/e2e/test";
 import { client } from "@/graphql/client";
 import { urls } from "@/urls";
 
-// #AI
 test.describe("ProfileList", () => {
-  test.describe.configure({ mode: "serial" });
-
-  let play: PlaywrightHelper;
-  let $: LocatorMapToGetFirstById;
-  let isPopulated = false;
-
-  test.beforeEach(async ({ page }) => {
-    play = new PlaywrightHelper(page);
-    $ = play.$;
-    if (!isPopulated) {
-      await play.dbStubsRepopulateAndLogin({
-        is_import_HN_post: false,
-        is_create_single_review: false,
-        is_create_profiles: true,
-      });
-      isPopulated = true;
-    } else {
-      await play.login();
-    }
+  test.beforeEach(async ({ play }) => {
+    await play.reset_db_and_gen([
+      { profiles_profile: { is_user_default: true } },
+      { profiles_profile: {} },
+      { profiles_profile: {} },
+      { profiles_profile: { first_name: "Alice" } },
+      { profiles_match: { profile_first_name: "Alice", score_by_user: 80 } },
+    ]);
   });
 
-  test("Sorting switches between GraphQL Django result & Algolia index", async ({ page }) => {
+  test("Sorting switches between GraphQL Django result & Algolia index", async ({
+    page,
+    play,
+  }) => {
     await play.navigate(urls.profiles.list, { idleWait: true });
 
     const profileList = page.getByTestId(ids.profile.list);
@@ -55,7 +41,7 @@ test.describe("ProfileList", () => {
     expect(cardsBackToDefault).toBeGreaterThanOrEqual(1);
   });
 
-  test("trigger LLM shows progress bar, cancel hides it", async () => {
+  test("trigger LLM shows progress bar, cancel hides it", async ({ play, $ }) => {
     await play.navigate(urls.profiles.list, { idleWait: true });
 
     // Open popover and set limit
@@ -77,7 +63,7 @@ test.describe("ProfileList", () => {
     await progressBar.waitFor({ state: "hidden" });
   });
 
-  test("failed task shows error message", async () => {
+  test("failed task shows error message", async ({ play, $ }) => {
     // Create a failed task via test mutation
     await client.mutate({ mutation: TestCreateFailedTaskMutate });
 

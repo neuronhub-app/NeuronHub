@@ -15,6 +15,7 @@ from neuronhub.apps.jobs.services.airtable_sync_jobs import _sync_locations
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
+from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.tests.services.test_gen_reset import test_gen_reset
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.users.models import User
@@ -71,12 +72,29 @@ class PostsImportHnParams:
 
 @strawberry.input
 @dataclass
+class ProfilesProfileParams:
+    first_name: str = ""
+    is_user_default: bool = False  # attach to default user -> needed for Algolia index
+
+
+@strawberry.input
+@dataclass
+class ProfilesMatchParams:
+    profile_first_name: str
+    score_by_user: int | None = None
+    score_by_llm: int | None = None
+
+
+@strawberry.input
+@dataclass
 class GenCreateParams:
     posts_tool: PostsToolParams | None = None
     posts_review: PostsReviewParams | None = None
     posts_comment: PostsCommentParams | None = None
     posts_import_hn: PostsImportHnParams | None = None
     jobs_job: JobsJobParams | None = None
+    profiles_profile: ProfilesProfileParams | None = None
+    profiles_match: ProfilesMatchParams | None = None
 
 
 async def test_reset_and_gen(create_params: list[GenCreateParams]) -> None:
@@ -126,6 +144,25 @@ async def _create(
         importer = ImporterHackerNews(is_use_cache=True, is_logging_enabled=False)
         post = await importer.import_post(hn_raw.id_external)
         ids_per_model.setdefault(Post, []).append(post.id)
+        return
+
+    if profile_raw := create_params.profiles_profile:
+        profile = await gen.profiles.profile(
+            user=gen.users.user_default if profile_raw.is_user_default else None,
+            first_name=profile_raw.first_name,
+        )
+        ids_per_model.setdefault(Profile, []).append(profile.id)
+        return
+
+    if match_raw := create_params.profiles_match:
+        profile = await Profile.objects.aget(first_name=match_raw.profile_first_name)
+        await gen.profiles.match(
+            profile=profile,
+            user=gen.users.user_default,
+            score_by_user=match_raw.score_by_user,
+            score_by_llm=match_raw.score_by_llm,
+        )
+        ids_per_model.setdefault(Profile, []).append(profile.id)
         return
 
     if job_raw := create_params.jobs_job:

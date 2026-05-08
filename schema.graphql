@@ -116,6 +116,8 @@ input GenCreateParams {
   posts_comment: PostsCommentParams = null
   posts_import_hn: PostsImportHnParams = null
   jobs_job: JobsJobParams = null
+  profiles_profile: ProfilesProfileParams = null
+  profiles_match: ProfilesMatchParams = null
 }
 
 input IDBaseFilterLookup {
@@ -907,6 +909,17 @@ type ProfileTypeOffsetPaginated {
 
   """List of paginated results."""
   results: [ProfileType!]!
+}
+
+input ProfilesMatchParams {
+  profile_first_name: String!
+  score_by_user: Int = null
+  score_by_llm: Int = null
+}
+
+input ProfilesProfileParams {
+  first_name: String! = ""
+  is_user_default: Boolean! = false
 }
 
 type ProgressType {
