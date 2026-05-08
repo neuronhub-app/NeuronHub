@@ -1,67 +1,67 @@
-import { test } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 import { highlight_attrs } from "@/apps/highlighter/PostContentHighlighted";
+import {
+  HighlightCreate,
+  HighlightDelete,
+  PostHighlightsQuery,
+} from "@/apps/highlighter/useHighlighter";
+import { UserQueryDoc } from "@/apps/users/useUserCurrent";
 import { expect } from "@/e2e/helpers/expect";
-import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
+import type { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
+import { selectTextHighlightable } from "@/e2e/helpers/selectTextInPage";
 import { ids } from "@/e2e/ids";
+import { test } from "@/e2e/test";
 import { urls } from "@/urls";
 import { Visibility } from "~/graphql/enums";
 
-test.describe("Comments", () => {
-  let play: PlaywrightHelper;
-  let $: LocatorMapToGetFirstById;
+const tool = "PyCharm";
+const review = "Fine review";
 
-  test.beforeEach(async ({ page }) => {
-    play = new PlaywrightHelper(page);
-    await play.dbStubsRepopulateAndLogin({
-      is_import_HN_post: false,
-      is_create_single_review: true,
-    });
-    $ = play.locator();
+test.describe("Comments", () => {
+  test.beforeEach(async ({ play }) => {
+    await play.reset_db_and_gen([
+      { posts_tool: { title: tool } },
+      { posts_review: { parent: tool, title: review } },
+      { posts_comment: { parent_root: review, content_polite: "Seeded comment" } },
+    ]);
   });
 
-  test.skip("voting (broken test)", async ({ page }) => {
-    // create
+  test("voting", async ({ play, $ }) => {
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
-
-    const commentContent = "Test comment";
-    await play.fill(ids.comment.form.textarea, commentContent);
-    await play.submit(ids.post.form);
+    await play.waitForNetworkIdle();
 
     const vote = {
       up: $[ids.comment.vote.up],
       down: $[ids.comment.vote.down],
     };
-    // test voting
+
     await expect(vote.up).not.checked();
     await expect(vote.down).not.checked();
 
-    await play.click(ids.comment.vote.up);
-
-    // todo ! fix: fails here, says `undefined != checked`, prob lost data-checked=true attr
+    await voteAndWait(play, vote.up);
     await expect(vote.up).checked();
     await expect(vote.down).not.checked();
 
-    await play.click(ids.comment.vote.down);
+    await voteAndWait(play, vote.down);
     await expect(vote.up).not.checked();
     await expect(vote.down).checked();
 
-    await play.click(ids.comment.vote.down);
+    await voteAndWait(play, vote.down);
     await expect(vote.up).not.checked();
     await expect(vote.down).not.checked();
 
-    await play.click(ids.comment.vote.up);
+    await voteAndWait(play, vote.up);
     await expect(vote.up).checked();
 
-    // reload → test persistence
     await play.reload({ idleWait: true });
     await expect(vote.up).checked();
   });
 
-  test("editing", async ({ page }) => {
-    // open a Review
+  test("editing", async ({ page, play, $ }) => {
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
+    await play.waitForNetworkIdle();
 
     // edit first Comment
     await play.click(ids.comment.btn.edit);
@@ -87,139 +87,55 @@ test.describe("Comments", () => {
     await play.click(ids.comment.form.cancelBtn);
   });
 
-  /**
-   * Used to work, but `page.evaluate` always fails now. It was #AI's idea.
-   */
-  test.skip("highlight (broken/flaky)", async ({ page }) => {
+  test("highlight: create, persist, delete", async ({ page, play, $ }) => {
+    const textHighlighted = "highlight some text";
+    const commentContent = `Test comment. We will ${textHighlighted}. Trailing words.`;
+
     await play.navigate(urls.reviews.list, { idleWait: true });
     await play.click(ids.post.card.link.detail);
 
-    const comment = {
-      highlighted: "highlight some text",
-      highlightedCode: "important code",
-      get content() {
-        return `Test comment. We will ${this.highlighted}. Also test inline \`${this.highlightedCode}\` in backticks.`;
-      },
-    };
-    await play.fill(ids.comment.form.textarea, comment.content);
-    await play.submit(ids.post.form, { waitIdle: true });
+    await play.fill(ids.comment.form.textarea, commentContent);
+    await play.submit(ids.post.form);
 
-    // select {comment.highlighted} with Selection API .addRange()
-    // questionable #AI code. reviewed & cleaned, but looks as shit.
-    // todo refac: move out
-    await page.evaluate(
-      ctx => {
-        const elsHighlightable = document.querySelectorAll(`[data-${ctx.attrs.flag}]`);
+    // Wait for the new comment's highlightable Prose to render before selecting text.
+    const commentProse = page
+      .locator(`[data-${highlight_attrs.flag}]`)
+      .filter({ hasText: textHighlighted })
+      .first();
+    await expect(commentProse).toBeVisible();
 
-        let commentEl: Element | null = null;
-        for (const el of elsHighlightable) {
-          if (el.textContent?.includes(ctx.comment.highlighted)) {
-            commentEl = el;
-            break;
-          }
-        }
-        // todo ! fix: flaky - saying `parameter 1 is not of type 'Node'`
-        const walker = document.createTreeWalker(commentEl!, NodeFilter.SHOW_TEXT, {
-          acceptNode: (node: Node) => {
-            const isEmptyNode = !node.textContent || !node.textContent.trim();
-            if (isEmptyNode) {
-              return NodeFilter.FILTER_REJECT;
-            }
-            return NodeFilter.FILTER_ACCEPT;
-          },
-        });
-
-        let nodeFound: Node | null = null;
-        // Walk through all text nodes to find the one containing our text
-        let nodeText = walker.nextNode();
-        while (nodeText !== null) {
-          if (nodeText.textContent?.includes(ctx.comment.highlighted)) {
-            nodeFound = nodeText;
-            break;
-          }
-          nodeText = walker.nextNode();
-        }
-        if (!nodeFound) throw Error();
-
-        const range = document.createRange();
-        const startOffset = nodeFound.textContent!.indexOf(ctx.comment.highlighted);
-        range.setStart(nodeFound, startOffset);
-        range.setEnd(nodeFound, startOffset + ctx.comment.highlighted.length);
-
-        const selection = window.getSelection();
-        selection?.removeAllRanges();
-        selection?.addRange(range);
-      },
-      { attrs: highlight_attrs, comment },
-    );
+    await selectTextHighlightable(page, textHighlighted);
 
     await expect($[ids.highlighter.btn.save]).toBeVisible();
+    const created = play.waitForResponseGraphql(HighlightCreate);
     await $[ids.highlighter.btn.save].click();
-    await play.waitForNetworkIdle();
+    await created;
 
-    // test PostHighlight visibility wo/ a reload
+    // optimistic <mark> via highlightsMap
     await expect($[ids.highlighter.span]).toBeVisible();
-    await expect($[ids.highlighter.span]).toHaveText(comment.highlighted);
+    await expect($[ids.highlighter.span]).toHaveText(textHighlighted);
 
-    // test PostHighlight visibility after a reload
+    // persistence after reload
     await play.reload({ idleWait: true });
     await expect($[ids.highlighter.span]).toBeVisible();
-    await expect($[ids.highlighter.span]).toHaveText(comment.highlighted);
+    await expect($[ids.highlighter.span]).toHaveText(textHighlighted);
 
-    // test PostHighlight delete
+    // delete
     await $[ids.highlighter.span].click();
-    await expect($[ids.highlighter.btn.delete]).toBeVisible(); // todo: flaky due to PW async issues, fails here
+    await expect($[ids.highlighter.btn.delete]).toBeVisible();
+    const deleted = play.waitForResponseGraphql(HighlightDelete);
     await $[ids.highlighter.btn.delete].click();
-    await play.reload({ idleWait: true });
-    await expect($[ids.highlighter.span]).not.toBeAttached();
+    await deleted;
 
-    // #AI-slop
-    // Test 2: Highlight text in code blocks
-    // await play.fill(
-    //   ids.comment.form.textarea,
-    //   `Test inline code: \`${comment.highlightedCode}\` here.`,
-    // );
-    // await play.submit(ids.post.form);
-    // await play.waitForNetworkIdle();
-    //
-    // // Select text inside code block
-    // await page.evaluate(
-    //   ctx => {
-    //     const codeElement = document.querySelector("code");
-    //     if (!codeElement) throw new Error("Code element not found");
-    //
-    //     const textNode = Array.from(codeElement.childNodes).find(
-    //       node =>
-    //         node.nodeType === Node.TEXT_NODE && node.textContent?.includes(ctx.highlightedCode),
-    //     );
-    //     if (!textNode) throw new Error("Text in code not found");
-    //
-    //     const range = document.createRange();
-    //     const startOffset = textNode.textContent!.indexOf(ctx.highlightedCode);
-    //     range.setStart(textNode, startOffset);
-    //     range.setEnd(textNode, startOffset + ctx.highlightedCode.length);
-    //
-    //     const selection = window.getSelection();
-    //     selection?.removeAllRanges();
-    //     selection?.addRange(range);
-    //   },
-    //   { highlightedCode: comment.highlightedCode },
-    // );
-    //
-    // await expect($[ids.highlighter.btn.save]).toBeVisible();
-    // await $[ids.highlighter.btn.save].click();
-    // await play.waitForNetworkIdle();
-    //
-    // // Reload and verify highlight in code block renders correctly (not escaped)
-    // await play.reload({ idleWait: true });
-    // const highlightSpans = await page.locator(`[data-testid="${ids.highlighter.span}"]`).all();
-    // expect(highlightSpans.length).toBeGreaterThan(0);
-    //
-    // // Verify at least one highlight is in a code block
-    // const isInCodeBlock = await page.evaluate(() => {
-    //   const highlights = document.querySelectorAll(`[data-testid="highlighter.span"]`);
-    //   return Array.from(highlights).some(h => h.closest("code") !== null);
-    // });
-    // expect(isInCodeBlock).toBe(true);
+    const highlightsLoaded = play.waitForResponseGraphql(PostHighlightsQuery);
+    await play.reload();
+    await highlightsLoaded;
+    await expect($[ids.highlighter.span]).not.toBeAttached();
   });
 });
+
+async function voteAndWait(play: PlaywrightHelper, button: Locator) {
+  const userRefetch = play.waitForResponseGraphql(UserQueryDoc);
+  await button.click();
+  await userRefetch;
+}

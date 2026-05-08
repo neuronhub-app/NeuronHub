@@ -113,6 +113,8 @@ type FooterSectionType {
 input GenCreateParams {
   posts_tool: PostsToolParams = null
   posts_review: PostsReviewParams = null
+  posts_comment: PostsCommentParams = null
+  posts_import_hn: PostsImportHnParams = null
   jobs_job: JobsJobParams = null
 }
 
@@ -820,6 +822,15 @@ type PostVoteType {
   author: UserType!
   is_vote_positive: Boolean
   is_changed_my_mind: Boolean
+}
+
+input PostsCommentParams {
+  parent_root: String!
+  content_polite: String! = ""
+}
+
+input PostsImportHnParams {
+  id_external: Int!
 }
 
 input PostsReviewParams {

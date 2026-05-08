@@ -1,25 +1,17 @@
-import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
-import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
+import { test } from "@/e2e/test";
 import { urls } from "@/urls";
 
+const post_HN_id = 45487476;
+
 test.describe("HN Comments", () => {
-  let play: PlaywrightHelper;
-  let $: LocatorMapToGetFirstById;
-
-  test.beforeEach(async ({ page }) => {
-    play = new PlaywrightHelper(page);
-
-    await play.dbStubsRepopulateAndLogin({
-      is_import_HN_post: true,
-      is_create_single_review: true, // todo ? refac(perf): drop
-    });
-    $ = play.locator();
+  test.beforeEach(async ({ play }) => {
+    await play.reset_db_and_gen([{ posts_import_hn: { id_external: post_HN_id } }]);
   });
 
   // takes 36s on avg
-  test("view imported HN post with tree-structured comments (flaky)", async ({ page }) => {
+  test("view imported HN post with tree-structured comments (flaky)", async ({ play, $ }) => {
     play.setDefaultTimeout(12_000); // 7.5s makes it flaky
 
     await play.navigate(urls.posts.list, { idleWait: true });

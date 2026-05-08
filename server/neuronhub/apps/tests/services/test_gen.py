@@ -8,6 +8,7 @@ from neuronhub.apps.algolia.services.algolia_reindex_partial import algolia_rein
 from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
     disable_auto_indexing_if_enabled,
 )
+from neuronhub.apps.importer.services.hackernews import ImporterHackerNews
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _parse_location_field
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _sync_locations
@@ -22,6 +23,7 @@ from neuronhub.apps.users.models import User
 @strawberry.input
 @dataclass
 class PostsTagParams:
+    # todo !! refac-name: category_and_name
     name: str  # supports "Category / Tag" parsing
     is_vote_pos: bool | None = None
     is_important: bool | None = None
@@ -37,9 +39,18 @@ class PostsToolParams:
 @strawberry.input
 @dataclass
 class PostsReviewParams:
+    # todo !! refac-name: parent_title
     parent: str
     title: str
     tags: list[PostsTagParams] | None = None
+
+
+@strawberry.input
+@dataclass
+class PostsCommentParams:
+    # todo !! refac-name: parent_root_title
+    parent_root: str
+    content_polite: str = ""
 
 
 @strawberry.input
@@ -54,9 +65,17 @@ class JobsJobParams:
 
 @strawberry.input
 @dataclass
+class PostsImportHnParams:
+    id_external: int
+
+
+@strawberry.input
+@dataclass
 class GenCreateParams:
     posts_tool: PostsToolParams | None = None
     posts_review: PostsReviewParams | None = None
+    posts_comment: PostsCommentParams | None = None
+    posts_import_hn: PostsImportHnParams | None = None
     jobs_job: JobsJobParams | None = None
 
 
@@ -80,20 +99,32 @@ async def _create(
     create_params: GenCreateParams,
     ids_per_model: dict[type[Model], list[int]],
 ) -> None:
-    user = gen.users.user_default
-
     if tool_raw := create_params.posts_tool:
-        post = await gen.posts.tool(title=tool_raw.title)
-        await _add_tags(post, tool_raw.tags, author=user)
-        ids_per_model.setdefault(Post, []).append(post.id)
+        tool = await gen.posts.tool(title=tool_raw.title)
+        await _add_tags(tool, tool_raw.tags, author=gen.users.user_default)
+        ids_per_model.setdefault(Post, []).append(tool.id)
         return
 
     if review_raw := create_params.posts_review:
-        post = await gen.posts.review(
+        review = await gen.posts.review(
             tool=await Post.objects.aget(title=review_raw.parent),
             title=review_raw.title,
         )
-        await _add_tags(post, review_raw.tags, author=user)
+        await _add_tags(review, review_raw.tags, author=gen.users.user_default)
+        ids_per_model.setdefault(Post, []).append(review.id)
+        return
+
+    if comment_raw := create_params.posts_comment:
+        comment = await gen.posts.comment(
+            parent_root=await Post.objects.aget(title=comment_raw.parent_root),
+            content_polite=comment_raw.content_polite,
+        )
+        ids_per_model.setdefault(Post, []).append(comment.id)
+        return
+
+    if hn_raw := create_params.posts_import_hn:
+        importer = ImporterHackerNews(is_use_cache=True, is_logging_enabled=False)
+        post = await importer.import_post(hn_raw.id_external)
         ids_per_model.setdefault(Post, []).append(post.id)
         return
 

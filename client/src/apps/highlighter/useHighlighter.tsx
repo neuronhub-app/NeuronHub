@@ -98,7 +98,7 @@ export async function removeHighlight(id: ID, commentId: CommentID) {
   res.catch(error => toast.error(error));
 }
 
-const HighlightCreate = graphql.persisted(
+export const HighlightCreate = graphql.persisted(
   "HighlighterCreate",
   graphql(`
     mutation HighlighterCreate(
@@ -117,12 +117,12 @@ const HighlightCreate = graphql.persisted(
   `),
 );
 
-const HighlightDelete = graphql.persisted(
+export const HighlightDelete = graphql.persisted(
   "HighlighterDelete",
   graphql(`mutation HighlighterDelete($id: ID!) { post_highlight_delete(data: { id: $id }) }`),
 );
 
-const PostHighlightsQuery = graphql.persisted(
+export const PostHighlightsQuery = graphql.persisted(
   "PostHighlightsQuery",
   graphql(
     `query PostHighlightsQuery($ids: [ID!]!) {
