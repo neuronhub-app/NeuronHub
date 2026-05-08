@@ -105,6 +105,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     DOCS_PORT_E2E = "{{ env.DOCS_PORT_E2E | default(value = 4001) }}"
 
     E2E_DB_NAME = "{{ env.E2E_DB_NAME | default(value = 'test_neuronhub_e2e') }}"
+    DJANGO_IS_E2E_LOGS_ENABLED = "${DJANGO_IS_E2E_LOGS_ENABLED:-false}"
 
     S3_STORAGE_BUCKET_NAME = "media"
     S3_PORT = 8333

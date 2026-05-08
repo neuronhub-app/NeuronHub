@@ -432,9 +432,22 @@ LOGGING = {
 warnings.filterwarnings(
     "ignore", category=UserWarning, module="strawberry.utils.deprecations", lineno=26
 )
+# supress CancelledError: raised by Strawberry historically for no reason. See their github for details.
+_asyncio_cancel_filter = "asyncio_cancel_filter"
+LOGGING.setdefault("filters", {})
+LOGGING["filters"][_asyncio_cancel_filter] = {
+    "()": "django.utils.log.CallbackFilter",
+    "callback": lambda record: (
+        not (record.exc_info and record.exc_info[0] == asyncio.exceptions.CancelledError)
+    ),
+}
+LOGGING["handlers"]["console"]["filters"] = [_asyncio_cancel_filter]
 
-if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
-    # LLM needs clean logs, but Mise's `--quite` doesn't work on `runserver`, and `--silent` drops all stderr - so we drop Django's logs below "WARNING"
+DJANGO_IS_E2E_LOGS_ENABLED = env.bool("DJANGO_IS_E2E_LOGS_ENABLED", False)
+if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E and not DJANGO_IS_E2E_LOGS_ENABLED:
+    # LLM needs clean logs, but Mise's `--quite` doesn't work on `runserver`, and `--silent` drops all stderr.
+    # So we drop Django's logs below "WARNING".
+
     LOGGING["loggers"]["django"] = {
         "handlers": ["console"],
         "level": "WARNING",
@@ -445,17 +458,6 @@ if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E:
         "level": "WARNING",
         "propagate": True,
     }
-    # #prod-redundant - likely fixed in strawberry@0.315.0
-    # supress asyncio.CancelledError: it's raised by Strawberry historically for no reason. See their github for details
-    LOGGING.setdefault("filters", {})
-    LOGGING["filters"]["suppress_cancelled"] = {
-        "()": "django.utils.log.CallbackFilter",
-        "callback": lambda record: (
-            not (record.exc_info and record.exc_info[0] == asyncio.exceptions.CancelledError)
-        ),
-    }
-    # noinspection PyTypeChecker
-    LOGGING["handlers"]["console"]["filters"] = ["suppress_cancelled"]
 
 TEST_RUNNER = "django_rich.test.RichRunner"
 _line_width = 120
