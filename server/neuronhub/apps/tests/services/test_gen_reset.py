@@ -31,7 +31,7 @@ async def test_gen_reset() -> None:
     with disable_auto_indexing_if_enabled():
         algolia_ids: list[AlgoliaChangedIds] = []
         for model in _models_to_drop_ordered:
-            if ids := _get_algolia_ids_to_delete(model):
+            if ids := await _get_algolia_ids_to_delete(model):
                 algolia_ids.append(ids)
 
             await model.objects.all().adelete()  # type: ignore[attr-defined] #bad-infer
@@ -42,7 +42,7 @@ async def test_gen_reset() -> None:
         await UsersGen.get_or_create_user_default(is_superuser=True)
 
 
-def _get_algolia_ids_to_delete(model: type[Model]) -> AlgoliaChangedIds | None:
+async def _get_algolia_ids_to_delete(model: type[Model]) -> AlgoliaChangedIds | None:
     from algoliasearch_django import AlgoliaIndex
     from algoliasearch_django import algolia_engine
 
@@ -50,10 +50,13 @@ def _get_algolia_ids_to_delete(model: type[Model]) -> AlgoliaChangedIds | None:
         adapter: AlgoliaIndex = algolia_engine.get_adapter(model)
         return AlgoliaChangedIds(
             model=model,
-            deleted=model.objects.all().values_list(  # type: ignore[attr-defined] #bad-infer
-                adapter.custom_objectID if adapter.custom_objectID else "id",
-                flat=True,
-            ),
+            deleted=[
+                id
+                async for id in model.objects.all().values_list(  # type: ignore[attr-defined] #bad-infer
+                    adapter.custom_objectID,
+                    flat=True,
+                )
+            ],
             is_custom_objectIDs=True,
         )
 
