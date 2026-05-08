@@ -202,7 +202,7 @@ class PostsGen:
         type: PostTypeEnum = Post.Type.Post
         parent: Post | None = None
         parent_root: Post | None = None
-        title: str = ""
+        title: str | None = ""
         content_polite: str = ""
         content_direct: str = ""
         content_rant: str = ""
@@ -247,14 +247,23 @@ class PostsGen:
             )
         )
 
-    async def tool(self, author: User = None, visibility=Visibility.PUBLIC) -> Post:
-        return await self.create(
-            self.Params(type=Post.Type.Tool, author=author or self.user, visibility=visibility)
-        )
+    async def post(self, title: str = None) -> Post:
+        return await self.create(self.Params(title=title))
 
-    async def review(self, tool: Post = None, author: User = None) -> Post:
+    async def tool(self, title: str = None, visibility=Visibility.PUBLIC) -> Post:
         return await self.create(
             self.Params(
+                title=title,
+                type=Post.Type.Tool,
+                author=self.user,
+                visibility=visibility,
+            )
+        )
+
+    async def review(self, tool: Post = None, title: str = None, author: User = None) -> Post:
+        return await self.create(
+            self.Params(
+                title=title,
                 type=Post.Type.Review,
                 author=author or self.user,
                 parent=tool or await self.tool(),
@@ -297,9 +306,6 @@ class PostsGen:
             await post.tags.aadd(tag)
         return tag
 
-    async def post(self, params: Params = Params()) -> Post:
-        return await self.create(params)
-
     # todo refac-rename: `_update_or_create`
     async def create(self, params: Params = Params()) -> Post:
         from neuronhub.apps.posts.models import Post
@@ -321,7 +327,7 @@ class PostsGen:
 
         title = params.title or self.faker.sentence()
 
-        # Use aupdate_or_create to keep IDs stable for Algolia index
+        # todo !! fix: use .create()
         post, _ = await Post.objects.aupdate_or_create(
             title=title,
             type=params.type,
@@ -462,7 +468,7 @@ class JobsGen:
     async def job(
         self,
         org: Org = None,
-        title: str = "",
+        title: str | None = "",
         slug: str = None,
         description: str = "",
         url_external: str = "",

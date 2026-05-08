@@ -1,7 +1,9 @@
 - rename `server` to `backend`, and `client` to `frontend`
 - rename GraphQL mutations to `{noun}_{verb}`
 - shorten Post subset names as `PostTool`/`PostReview` to `Tool`/`Review`
-- store URLs of FE used by BE in a single file (eg typed JSON) that both can import. Replace magic strings in python docstrings as `jobs/drafts`.
+- store URLs of FE used by BE in a single file (eg typed JSON) that both can import.
+    - Replace magic strings in python docstrings as `jobs/drafts`.
+- prefix all NHA Django envs with `DJANGO_` (same as `VITE_`)
 
 ### Client
 

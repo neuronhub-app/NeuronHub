@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
 from neuronhub.apps.tests.services.test_gen import GenCreateParams
-from neuronhub.apps.tests.services.test_gen import test_gen
+from neuronhub.apps.tests.services.test_gen import test_reset_and_gen
 from neuronhub.apps.tests.services.test_gen_reset import test_gen_reset
 from neuronhub.settings import DjangoEnv
 
@@ -50,7 +50,7 @@ class TestsMutation:
         self, info: strawberry.Info, create_params: list[GenCreateParams]
     ) -> bool:
         assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
-        await test_gen(create_params)
+        await test_reset_and_gen(create_params)
         return True
 
     # #AI

@@ -1,34 +1,37 @@
 /**
- * #quality-20% #AI
- * - bad magic strings
- * - terrible magic numbers
+ * #quality-25% #AI
+ * - magic strings
  * - facetItemCount
  */
-import { type Page, expect as expectBase, type Locator, test } from "@playwright/test";
-import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
+import { type Page, expect as expectBase, type Locator } from "@playwright/test";
 import { ids } from "@/e2e/ids";
+import { test } from "@/e2e/test";
 import { env } from "@/env";
 import { urls } from "@/urls";
 
 const openPopover = "[data-part=content][data-scope=popover][data-state=open]";
 
+const loc = {
+  US: "United States",
+  Kenya: "Kenya",
+  BerkeleyCa: "Berkeley CA",
+};
+
 test.skip(!env.site.isProbablyGood, "Location facets are PG-only");
 
 test.describe("PG Job Location Facets", () => {
-  let play: PlaywrightHelper;
-  let $: LocatorMapToGetFirstById;
-
-  test.beforeEach(async ({ page }) => {
-    play = new PlaywrightHelper(page);
-    $ = play.$;
-    await play.dbStubsRepopulateAndLogin({
-      is_import_HN_post: false,
-      is_create_single_review: false,
-      is_create_jobs: true,
-    });
+  test.beforeEach(async ({ play }) => {
+    await play.reset_db_and_gen([
+      { jobs_job: { locations: [`San Francisco CA, ${loc.US}`] } },
+      { jobs_job: { locations: [`Oakland CA, ${loc.US}`] } },
+      { jobs_job: { locations: [`Washington DC, ${loc.US}`] } },
+      { jobs_job: { locations: [`${loc.BerkeleyCa}, ${loc.US}`] } },
+      { jobs_job: { locations: [`Nairobi, ${loc.Kenya}`] } },
+      { jobs_job: { locations: ["Remote, Global"] } },
+    ]);
   });
 
-  test("cross-popover OR + Algolia counts", async ({ page }) => {
+  test("cross-popover OR + Algolia counts", async ({ page, play }) => {
     await play.navigate(urls.jobs.list, { idleWait: true });
     const popover = page.locator(openPopover);
     const jobCards = play.getAll(ids.job.card.container);
@@ -36,19 +39,19 @@ test.describe("PG Job Location Facets", () => {
 
     // Country popover shows Algolia counts (no filters active)
     await countryBtn.click();
-    await expectBase(facetItemCount(page, "United States")).toHaveText("5");
-    await expectBase(facetItemCount(page, "Kenya")).toHaveText("1");
+    await expectBase(facetItemCount(page, loc.US)).toHaveText("4");
+    await expectBase(facetItemCount(page, loc.Kenya)).toHaveText("1");
 
-    // Select Kenya → only BridgeFund
-    await clickFacetCheckbox(popover, "Kenya");
+    // Select Kenya → 1 job
+    await clickFacetCheckbox(popover, loc.Kenya);
     await play.waitForNetworkIdle();
     await expectBase(jobCards).toHaveCount(1);
 
-    // Select Berkeley (city) → OR → BridgeFund + Arclight
+    // Select Berkeley (city) → OR → Kenya + Berkeley
     await page.keyboard.press("Escape");
     await expectBase(popover).not.toBeVisible();
     await page.getByTestId(ids.facet.popover.city).last().click();
-    await clickFacetCheckbox(popover, "Berkeley CA");
+    await clickFacetCheckbox(popover, loc.BerkeleyCa);
     await play.waitForNetworkIdle();
     await expectBase(jobCards).toHaveCount(2);
   });

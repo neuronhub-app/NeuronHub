@@ -218,9 +218,10 @@ type JobVersionType {
 }
 
 input JobsJobParams {
-  title: String!
+  title: String = null
   org_name: String = null
   locations: [String!] = null
+  is_published: Boolean! = true
 }
 
 enum LocationType {

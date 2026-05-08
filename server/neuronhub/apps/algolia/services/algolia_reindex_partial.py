@@ -1,3 +1,4 @@
+import logging
 from collections.abc import Iterable
 from dataclasses import dataclass
 from dataclasses import field
@@ -5,6 +6,9 @@ from dataclasses import field
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.db.models import Model
+
+
+logger = logging.getLogger(__name__)
 
 
 # todo !! refac: change to list[int] - drop idiotic list() converters (which i almost finished doing.

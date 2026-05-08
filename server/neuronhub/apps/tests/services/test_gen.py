@@ -45,9 +45,11 @@ class PostsReviewParams:
 @strawberry.input
 @dataclass
 class JobsJobParams:
-    title: str
+    title: str | None = None
     org_name: str | None = None
+    # todo !! refac: use JobLocation from main API
     locations: list[str] | None = None
+    is_published: bool = True
 
 
 @strawberry.input
@@ -58,8 +60,9 @@ class GenCreateParams:
     jobs_job: JobsJobParams | None = None
 
 
-async def test_gen(create_params: list[GenCreateParams]) -> None:
+async def test_reset_and_gen(create_params: list[GenCreateParams]) -> None:
     await test_gen_reset()
+
     gen = await Gen.create(is_user_default_superuser=True)
     ids_per_model: dict[type[Model], list[int]] = {}
     with disable_auto_indexing_if_enabled():
@@ -80,26 +83,22 @@ async def _create(
     user = gen.users.user_default
 
     if tool_raw := create_params.posts_tool:
-        post = await gen.posts.create(
-            gen.posts.Params(type=Post.Type.Tool, title=tool_raw.title)
-        )
+        post = await gen.posts.tool(title=tool_raw.title)
         await _add_tags(post, tool_raw.tags, author=user)
         ids_per_model.setdefault(Post, []).append(post.id)
         return
 
     if review_raw := create_params.posts_review:
-        post = await gen.posts.create(
-            gen.posts.Params(
-                parent=await Post.objects.aget(title=review_raw.parent, type=Post.Type.Tool),
-                type=Post.Type.Review,
-                title=review_raw.title,
-            )
+        post = await gen.posts.review(
+            tool=await Post.objects.aget(title=review_raw.parent),
+            title=review_raw.title,
         )
         await _add_tags(post, review_raw.tags, author=user)
         ids_per_model.setdefault(Post, []).append(post.id)
         return
 
     if job_raw := create_params.jobs_job:
+        # todo !! refac: use gen.orgs.create()
         org = None
         if job_raw.org_name:
             org, _ = await Org.objects.aget_or_create(name=job_raw.org_name)
@@ -110,7 +109,7 @@ async def _create(
             org=org,
             title=job_raw.title,
             locations=locations,
-            is_published=True,
+            is_published=job_raw.is_published,
         )
         ids_per_model.setdefault(Job, []).append(job.id)
         return

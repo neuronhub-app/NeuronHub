@@ -1,32 +1,18 @@
 import { JobDraftsApproveMutation, JobDraftsQuery } from "@/apps/jobs/drafts/queries";
-import { test } from "@playwright/test";
 import { expect } from "@/e2e/helpers/expect";
-import { type LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
+import { test } from "@/e2e/test";
 import { urls } from "@/urls";
 
 test.describe("JobVersionReview", () => {
-  let play: PlaywrightHelper;
-  let $: LocatorMapToGetFirstById;
-
-  test.beforeEach(async ({ page }) => {
-    test.slow();
-
-    play = new PlaywrightHelper(page);
-    $ = play.$;
-    await play.dbStubsRepopulateAndLogin({
-      is_import_HN_post: false,
-      is_create_single_review: false,
-      is_create_jobs: true,
-    });
+  test.beforeEach(async ({ play }) => {
+    await play.reset_db_and_gen([
+      { jobs_job: { is_published: false } },
+      { jobs_job: { is_published: false } },
+    ]);
   });
 
-  // #AI
-  test("shows pending drafts and approves them", async () => {
-    // beforeEach `dbStubsRepopulateAndLogin` + Algolia reindex
-    // alone burns ~50s, leaving <5s of the 55s default budget.
-    test.slow();
-
+  test("shows pending drafts and approves them", async ({ play, $ }) => {
     const queryPending = play.waitForResponseGraphql(JobDraftsQuery);
     await play.navigate(urls.jobs.drafts);
     const response = await queryPending;

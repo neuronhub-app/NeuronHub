@@ -472,7 +472,7 @@ async def _create_tool_and_post_unifi_network(user: User, gen: Gen) -> Post:
             TagParams("Dev / License / Closed-source"),
         ],
     )
-    post = await gen.posts.post(
+    post = await gen.posts.create(
         gen.posts.Params(
             category=PostCategory.Knowledge,
             title="UniFi Network leaks IP of VPN clients despite Policy-Based Routing, only hacking can fix this",
@@ -531,7 +531,7 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
             TagParams("Dev / License / Apache 2", is_important=True),
         ],
     )
-    post = await gen.posts.post(
+    post = await gen.posts.create(
         gen.posts.Params(
             title="Aider leaderboards are becoming popular on HN for new models assessment",
             content_polite="https://aider.chat/docs/leaderboards",
@@ -559,7 +559,7 @@ async def _create_tool_and_post_aider(user: User, gen: Gen) -> Post:
 
 
 async def _create_post_news(user: User, gen: Gen) -> Post:
-    post = await gen.posts.post(
+    post = await gen.posts.create(
         gen.posts.Params(
             title="Django 5.2 LTS released with async improvements and enhanced ORM capabilities",
             content_polite=textwrap.dedent(
