@@ -6,7 +6,7 @@ import { urls } from "@/urls";
 
 test.describe("Tool", () => {
   test.beforeEach(async ({ play }) => {
-    await play.reset_db();
+    await play.reset_db_and_gen();
   });
 
   test("Create with an .image", async ({ page, play, $ }) => {

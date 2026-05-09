@@ -4,8 +4,7 @@ from django.utils import timezone
 
 from neuronhub.apps.tests.services.db_stubs_repopulate import db_stubs_repopulate
 from neuronhub.apps.tests.services.test_gen import GenCreateParams
-from neuronhub.apps.tests.services.test_gen import test_reset_and_gen
-from neuronhub.apps.tests.services.test_gen_reset import test_gen_reset
+from neuronhub.apps.tests.services.test_gen import reset_db_and_gen
 from neuronhub.settings import DjangoEnv
 
 
@@ -35,17 +34,13 @@ class TestsMutation:
         return gen.users.user_default.username
 
     @strawberry.mutation
-    async def test_gen_reset(self, info: strawberry.Info) -> bool:
-        assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
-        await test_gen_reset()
-        return True
-
-    @strawberry.mutation
-    async def test_gen(
-        self, info: strawberry.Info, create_params: list[GenCreateParams]
+    async def reset_db_and_gen(
+        self,
+        info: strawberry.Info,
+        create_params: list[GenCreateParams] = [],  # noqa: B006 Strawberry assigns from GraphQL input
     ) -> bool:
         assert settings.DJANGO_ENV is DjangoEnv.DEV_TEST_E2E
-        await test_reset_and_gen(create_params)
+        await reset_db_and_gen(create_params)
         return True
 
     # #AI

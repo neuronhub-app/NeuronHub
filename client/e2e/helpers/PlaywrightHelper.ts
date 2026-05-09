@@ -32,12 +32,10 @@ export class PlaywrightHelper {
     this.page.setDefaultTimeout(this.actionTimeoutMs);
   }
 
-  async reset_db() {
-    return client.mutate({ mutation: TestGenResetMutate });
-  }
-
-  async reset_db_and_gen(create_params: VariablesOf<typeof TestGenMutate>["create_params"]) {
-    return client.mutate({ mutation: TestGenMutate, variables: { create_params } });
+  async reset_db_and_gen(
+    create_params?: VariablesOf<typeof ResetDbAndGenMutate>["create_params"],
+  ) {
+    return client.mutate({ mutation: ResetDbAndGenMutate, variables: { create_params } });
   }
 
   async dbStubsRepopulateAndLogin(options?: {
@@ -259,16 +257,13 @@ const DbStubsRepopulateMutate = graphql.persisted(
   `),
 );
 
-const TestGenResetMutate = graphql.persisted(
-  "test_gen_reset",
-  graphql(`mutation test_gen_reset { test_gen_reset }`),
-);
-
-const TestGenMutate = graphql.persisted(
-  "test_gen",
-  graphql(
-    `mutation test_gen($create_params: [GenCreateParams!]!) { test_gen(create_params: $create_params) }`,
-  ),
+const ResetDbAndGenMutate = graphql.persisted(
+  "reset_db_and_gen",
+  graphql(`
+    mutation reset_db_and_gen($create_params: [GenCreateParams!]! = []) {
+      reset_db_and_gen(create_params: $create_params)
+    }
+  `),
 );
 
 export const TestCreateFailedTaskMutate = graphql.persisted(

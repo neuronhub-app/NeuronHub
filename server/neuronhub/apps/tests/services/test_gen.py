@@ -97,7 +97,7 @@ class GenCreateParams:
     profiles_match: ProfilesMatchParams | None = None
 
 
-async def test_reset_and_gen(create_params: list[GenCreateParams]) -> None:
+async def reset_db_and_gen(create_params: list[GenCreateParams]) -> None:
     await test_gen_reset()
 
     gen = await Gen.create(is_user_default_superuser=True)

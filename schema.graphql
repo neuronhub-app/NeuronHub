@@ -270,8 +270,7 @@ type Mutation {
   post_tag_vote_create_or_update(post_id: ID!, tag_id: ID!, is_vote_positive: Boolean, comment: String = null): Boolean! @IsAuthenticated
   update_post_seen_status(id: ID!): Boolean! @IsAuthenticated
   test_db_stubs_repopulate(is_import_HN_post: Boolean = true, is_create_single_review: Boolean = false, is_create_profiles: Boolean = false, is_create_jobs: Boolean = false): String!
-  test_gen_reset: Boolean!
-  test_gen(create_params: [GenCreateParams!]!): Boolean!
+  reset_db_and_gen(create_params: [GenCreateParams!]! = []): Boolean!
   test_create_failed_task: Boolean!
   post_highlight_create(data: PostHighlightTypeInput!): Boolean! @IsAuthenticated
   post_highlight_delete(data: DjangoModelInput!): Boolean! @IsAuthenticated
