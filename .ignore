@@ -1,0 +1,5 @@
+# generated
+schema.graphql
+client/graphql/
+client/.react-router/
+persisted-queries.json
