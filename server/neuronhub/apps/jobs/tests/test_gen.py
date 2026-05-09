@@ -23,7 +23,7 @@ class JobsGen:
     async def job(
         self,
         org: Org = None,
-        title: str | None = "",
+        title: str | None = None,
         slug: str = None,
         description: str = "",
         url_external: str = "",

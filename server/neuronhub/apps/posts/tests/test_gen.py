@@ -24,7 +24,7 @@ class PostsGen:
         type: PostTypeEnum = Post.Type.Post
         parent: Post | None = None
         parent_root: Post | None = None
-        title: str | None = ""
+        title: str | None = None
         content_polite: str = ""
         content_direct: str = ""
         content_rant: str = ""
@@ -69,7 +69,7 @@ class PostsGen:
             )
         )
 
-    async def post(self, title: str = None) -> Post:
+    async def post(self, title: str | None = None) -> Post:
         return await self.create(self.Params(title=title))
 
     async def tool(self, title: str = None, visibility=Visibility.PUBLIC) -> Post:

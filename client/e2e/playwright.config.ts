@@ -53,7 +53,6 @@ export default defineConfig({
             "**/comment.spec.ts",
             "**/comment-hn.spec.ts",
             "**/tool.spec.ts",
-            "**/library.spec.ts",
             "**/vote-and-reading-list.spec.ts",
             "**/profile-list.spec.ts",
             "**/login.spec.ts",

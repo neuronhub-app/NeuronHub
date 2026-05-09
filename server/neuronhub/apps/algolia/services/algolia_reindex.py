@@ -48,7 +48,7 @@ def algolia_reindex_sync(models: list[AlgoliaModel] | None = None, limit: int | 
                 setup_virtual_replica_sorted_by_votes()
 
 
-# #prod-redundant since we created [[algolia_reindex_partial.py]]
+# #prob-redundant since we created [[algolia_reindex_partial.py]]
 def _partial_update_all(model: AlgoliaModel, limit: int):
     from algoliasearch_django import algolia_engine
 

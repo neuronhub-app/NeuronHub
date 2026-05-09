@@ -41,7 +41,7 @@ async def publish_job_versions(draft_ids: list[ID]):
         ),
     )
 
-    # for django-simple-history, JIC
+    # non-bilk for django-simple-history, JIC
     async for job_pub in Job.objects.filter(id__in=ids.deleted):
         try:
             await job_pub.adelete()
