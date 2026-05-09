@@ -38,16 +38,6 @@ export class PlaywrightHelper {
     return client.mutate({ mutation: ResetDbAndGenMutate, variables: { create_params } });
   }
 
-  async dbStubsRepopulateAndLogin(options?: {
-    is_import_HN_post?: boolean;
-    is_create_single_review?: boolean;
-    is_create_profiles?: boolean;
-    is_create_jobs?: boolean;
-  }) {
-    await this.dbStubsRepopulate(options);
-    await this.login();
-  }
-
   // #AI, but reviewed. Seems ok. Mb use the fixed on 2025-10-28 [[useApolloQuery.ts]] types.
   async graphqlQuery<TData, TVariables extends OperationVariables>(
     query: TadaDocumentNode<TData, TVariables>,
@@ -158,15 +148,6 @@ export class PlaywrightHelper {
     );
   }
 
-  async dbStubsRepopulate(options?: {
-    is_import_HN_post?: boolean;
-    is_create_single_review?: boolean;
-    is_create_profiles?: boolean;
-    is_create_jobs?: boolean;
-  }) {
-    return client.mutate({ mutation: DbStubsRepopulateMutate, variables: options });
-  }
-
   async navigate(
     path:
       | typeof urls.posts.list
@@ -247,15 +228,6 @@ export class PlaywrightHelper {
     await this.page.waitForSelector('text="Site administration"');
   }
 }
-
-const DbStubsRepopulateMutate = graphql.persisted(
-  "db_stubs_repopulate",
-  graphql(`
-    mutation db_stubs_repopulate($is_import_HN_post: Boolean, $is_create_single_review: Boolean, $is_create_profiles: Boolean, $is_create_jobs: Boolean) {
-      test_db_stubs_repopulate(is_import_HN_post: $is_import_HN_post, is_create_single_review: $is_create_single_review, is_create_profiles: $is_create_profiles, is_create_jobs: $is_create_jobs)
-    }
-  `),
-);
 
 const ResetDbAndGenMutate = graphql.persisted(
   "reset_db_and_gen",

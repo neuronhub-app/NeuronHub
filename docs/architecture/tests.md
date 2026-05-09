@@ -22,9 +22,12 @@ Never leave third-party libraries tests in the codebase (Strawberry, GraphQL, et
 
 ## Test data: `test_gen`, `db_stubs_repopulate`, `{app}/tests/db_stubs`
 
-- `apps/tests/test_gen.py::Gen` - faker factories mostly for pytest. Start by reading its headers as the file is 600+ LOC, then the specific sections you need.
-- `apps/tests/services/db_stubs_repopulate.py` - seeds dev DB and E2E DB.
-- `{app}/tests/db_stubs.py` - in April we started refactoring `db_stubs_repopulate` (600+ LOC) into app-specific files. WIP - ATM implemented only for `jobs`.
+- `apps/tests/test_gen.py::Gen` - Faker factories, mostly for pytest.
+    - Creates 1 class for each app (users, posts, etc).
+    - Start by reading its headers as the file is 600+ LOC, then the specific classes you need.
+- `apps/tests/services/db_stubs_repopulate.py` - seeds dev DB in `mise db_stubs_repopulate`.
+- `{app}/tests/db_stubs.py` - fixtures used by `db_stubs_repopulate`.
+- `apps/tests/services/test_gen.py` - if for Playwright.
 
 ## Mandatory task-specific docs
 

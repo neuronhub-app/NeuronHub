@@ -17,17 +17,7 @@ from neuronhub.apps.users.models import UserConnectionGroup
 logger = logging.getLogger(__name__)
 
 
-async def db_stubs_repopulate(
-    is_create_single_review: bool = False,
-    is_import_HN_post: bool = True,
-    is_create_profiles: bool = True,
-    is_create_jobs: bool = True,
-) -> Gen:
-    """
-    Populates the db with Posts, Tools, Reviews, tags, votes, etc.
-
-    E2E tests run on it, so it includes edge cases.
-    """
+async def db_stubs_repopulate(is_create_single_review=False, is_import_HN_post=True) -> Gen:
     await test_gen_reset()
 
     with disable_auto_indexing_if_enabled():
@@ -41,18 +31,12 @@ async def db_stubs_repopulate(
             is_import_HN_post=is_import_HN_post,
         )
 
-        if is_create_profiles:
-            await create_profiles_stubs(gen)
+        await create_profiles_stubs(gen)
 
-        if is_create_jobs:
-            await create_jobs_stubs(gen)
+        await create_jobs_stubs(gen)
 
-    models_to_reindex = [AlgoliaModel.Post]
-    if is_create_profiles:
-        models_to_reindex.append(AlgoliaModel.Profile)
-    if is_create_jobs:
-        models_to_reindex.append(AlgoliaModel.Job)
-    await algolia_reindex(models_to_reindex)
+    # todo ! fix: simply call eg the default reindex of all registered models
+    await algolia_reindex([AlgoliaModel.Post, AlgoliaModel.Profile, AlgoliaModel.Job])
 
     return gen
 

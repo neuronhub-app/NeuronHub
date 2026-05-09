@@ -11,7 +11,7 @@ from django.db.models import Model
 logger = logging.getLogger(__name__)
 
 
-# todo !! refac: change to list[int] - drop idiotic list() converters (which i almost finished doing.
+# todo !! refac: change to list[int]
 @dataclass
 class AlgoliaChangedIds:
     model: type[Model]
