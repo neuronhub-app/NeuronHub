@@ -11,6 +11,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     rclone = "1.73.4"
     killport = "2.0.0"
     ripgrep = "15"
+    ast-grep = "latest"
 
     node = "25.9.0"
 

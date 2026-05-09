@@ -48,6 +48,42 @@ url = "https://github.com/nushell/nushell/releases/download/0.112.1/nu-0.112.1-x
 checksum = "sha256:e5f909b4168ec225c761f2a29f86473c1152197f6aeea139469933d1e48eeb9d"
 url = "https://github.com/nushell/nushell/releases/download/0.112.1/nu-0.112.1-x86_64-pc-windows-msvc.zip"
 
+[[tools.ast-grep]]
+version = "0.42.1"
+backend = "aqua:ast-grep/ast-grep"
+
+[tools.ast-grep."platforms.linux-arm64"]
+checksum = "sha256:3ba383839044cf9817929435f5ce0027f91d06931e8efb32d942e58d73d92be5"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.42.1/app-aarch64-unknown-linux-gnu.zip"
+
+[tools.ast-grep."platforms.linux-x64"]
+checksum = "sha256:5de8b87cba67fc8dc3e239d54b6484802ad745a7ae3de76be4fe89661dc52657"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.42.1/app-x86_64-unknown-linux-gnu.zip"
+
+[tools.ast-grep."platforms.linux-x64-baseline"]
+checksum = "sha256:5de8b87cba67fc8dc3e239d54b6484802ad745a7ae3de76be4fe89661dc52657"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.42.1/app-x86_64-unknown-linux-gnu.zip"
+
+[tools.ast-grep."platforms.macos-arm64"]
+checksum = "sha256:c3961d8e8a4ee0ce2d0d98c7beeb168bb331cdc766b53630118a7b6c4fd39015"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.42.1/app-aarch64-apple-darwin.zip"
+
+[tools.ast-grep."platforms.macos-x64"]
+checksum = "sha256:a038965bfd7fe44257c771cdf8918dc3467dd8ec0eef673b8b14f639b144cdbd"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.42.1/app-x86_64-apple-darwin.zip"
+
+[tools.ast-grep."platforms.macos-x64-baseline"]
+checksum = "sha256:a038965bfd7fe44257c771cdf8918dc3467dd8ec0eef673b8b14f639b144cdbd"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.42.1/app-x86_64-apple-darwin.zip"
+
+[tools.ast-grep."platforms.windows-x64"]
+checksum = "sha256:fe34f631bb24c08ad146f92ca2a92971a53d179461b509fd8d32dc863bff9f83"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.42.1/app-x86_64-pc-windows-msvc.zip"
+
+[tools.ast-grep."platforms.windows-x64-baseline"]
+checksum = "sha256:fe34f631bb24c08ad146f92ca2a92971a53d179461b509fd8d32dc863bff9f83"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.42.1/app-x86_64-pc-windows-msvc.zip"
+
 [[tools.biome]]
 version = "2.4.11"
 backend = "aqua:biomejs/biome"
