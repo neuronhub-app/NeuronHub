@@ -29,7 +29,7 @@ from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
 
 
-async def test_gen_reset() -> None:
+async def db_reset_and_partial_reindex() -> None:
     with disable_auto_indexing_if_enabled():
         algolia_ids: list[AlgoliaChangedIds] = []
         for model in _models_to_drop_ordered:
