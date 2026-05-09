@@ -2,8 +2,8 @@ import strawberry
 from django.conf import settings
 from django.utils import timezone
 
-from neuronhub.apps.tests.services.test_gen import GenCreateParams
-from neuronhub.apps.tests.services.test_gen import reset_db_and_gen
+from neuronhub.apps.tests.services.reset_db_and_gen import GenCreateParams
+from neuronhub.apps.tests.services.reset_db_and_gen import reset_db_and_gen
 from neuronhub.settings import DjangoEnv
 
 
