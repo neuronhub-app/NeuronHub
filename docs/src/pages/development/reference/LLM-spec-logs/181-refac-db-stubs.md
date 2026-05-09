@@ -38,8 +38,7 @@ The E2E doesn't need many co-dependant models (unlike pytests), and when it does
     - [x] move out `posts/tests/db_stubs.py`
     - [x] drop redundant GraphQL `test_gen_reset`; rename GraphQL `test_gen` to `reset_db_and_gen`.
     - [x] drop `test_db_stubs_repopulate`
-    - [x] move out user stubs to `users/tests/db_stubs.py`.
-- [x] split `test_gen.py` onto `apps/{app}/tests/test_gen.py`
+- [x] code review the gen/E2E refactor
 
 ## Relevant-Files
 
@@ -80,7 +79,6 @@ Remaining (out-of-scope for this branch):
 - Refs as natural-key strings (`parent`, `author`) -> Avoids returning IDs to TS.
 - Shared auth via PW Project dep + `use.storageState` at project level (still needed for unmigrated specs).
     - Tradeoff: edit default user leaks across e2e -> it's never edited.
-    - `test_db_stubs_repopulate` flips `is_delete_user_default=False` deleted sessions don't break the cookie.
 - Auth refactor: `e2e/test.ts` (`test`/`testNoAuth`).
     - `auth.setup.ts` kept PW-idiomatic.
     - `e2e/auth.state.json`.
@@ -120,9 +118,3 @@ Remaining (out-of-scope for this branch):
 ### db_stubs_repopulate
 - `posts/tests/db_stubs.py`
     - `users` co-located w/ `_create_review_pycharm` (uses `users.random_1`)
-    - `_create_users` stays in `db_stubs_repopulate.py` (not posts logic)
-- `_create_users` → `create_users_stubs` (matches `create_{posts,jobs,profiles}_stubs`)
-    - moved both `users` class + `create_users_stubs` to `users/tests/db_stubs.py` (overrides prior decision to keep `_create_users` in repopulate)
-- `apps/tests/test_gen.py` keeps only `Gen`; per-app `*Gen` classes split out
-    - no re-exports from hub: `db_reset_and_partial_reindex` updated to import `UsersGen` from `users.tests.test_gen` directly
-    - `JobsGen` imports `OrgsGen` (typed field dep) — only cross-app dep

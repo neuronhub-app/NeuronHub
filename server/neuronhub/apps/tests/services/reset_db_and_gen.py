@@ -1,7 +1,9 @@
 from dataclasses import dataclass
+from dataclasses import fields
 
 import strawberry
 from django.db.models import Model
+from strawberry import UNSET
 
 from neuronhub.apps.algolia.services.algolia_reindex_partial import AlgoliaChangedIds
 from neuronhub.apps.algolia.services.algolia_reindex_partial import algolia_reindex_partial
@@ -119,6 +121,11 @@ async def _create(
     create_params: GenCreateParams,
     ids_per_model: dict[type[Model], list[int]],
 ) -> None:
+    params = [
+        field.name for field in fields(create_params) if getattr(create_params, field.name)
+    ]
+    assert len(params) == 1, f"GenCreateParams accepts only 1 param, given: {params}"
+
     if tool_raw := create_params.posts_tool:
         tool = await gen.posts.tool(title=tool_raw.title)
         await _add_tags(tool, tool_raw.tags, author=gen.users.user_default)
@@ -193,7 +200,7 @@ async def _add_tags(post: Post, params: list[PostsTagParams] | None, author: Use
             name_raw=param.name,
             post=post,
             author=author,
-            is_vote_positive=param.is_vote_pos,
+            is_vote_positive=param.is_vote_pos if param.is_vote_pos is not None else UNSET,
             is_important=param.is_important,
         )
         await post.tags.aadd(tag)
