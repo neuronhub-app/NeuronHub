@@ -206,7 +206,7 @@ export class PlaywrightHelper {
     return this.page.screenshot({
       path: `e2e/screenshots/${this.screenshotCounter}-${name}.jpeg`,
       type: "jpeg",
-      quality: 84,
+      quality: 90,
       caret: "initial",
       fullPage,
       clip: { x: 0, y: 0, height: maxH, width: 1280 },
