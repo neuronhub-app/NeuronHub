@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import warnings
 from enum import Enum
 from logging import getLogger
@@ -15,6 +16,7 @@ import sentry_sdk
 from corsheaders.defaults import default_headers
 from django.utils.functional import SimpleLazyObject
 from environs import Env
+from sentry_sdk import capture_exception
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.strawberry import StrawberryIntegration
 from strawberry_django.settings import strawberry_django_settings
@@ -432,16 +434,33 @@ LOGGING = {
 warnings.filterwarnings(
     "ignore", category=UserWarning, module="strawberry.utils.deprecations", lineno=26
 )
-# supress CancelledError: raised by Strawberry historically for no reason. See their github for details.
-_asyncio_cancel_filter = "asyncio_cancel_filter"
+
+
+def _is_strawberry_cancelled_error(record: logging.LogRecord) -> bool:
+    """
+    suppress CancelledError raised by Strawberry historically for no reason
+    (only when passes through a `strawberry` frame)
+    """
+    try:
+        if not record.exc_info or record.exc_info[0] is not asyncio.exceptions.CancelledError:
+            return False
+        traceback = record.exc_info[2]
+        while traceback is not None:
+            if "strawberry" in traceback.tb_frame.f_code.co_filename:
+                return True
+            traceback = traceback.tb_next
+    except Exception:
+        capture_exception()
+    return False
+
+
+_strawberry_cancelled_error_filter = "_strawberry_cancelled_error_filter"
 LOGGING.setdefault("filters", {})
-LOGGING["filters"][_asyncio_cancel_filter] = {
+LOGGING["filters"][_strawberry_cancelled_error_filter] = {
     "()": "django.utils.log.CallbackFilter",
-    "callback": lambda record: (
-        not (record.exc_info and record.exc_info[0] == asyncio.exceptions.CancelledError)
-    ),
+    "callback": lambda record: not _is_strawberry_cancelled_error(record),
 }
-LOGGING["handlers"]["console"]["filters"] = [_asyncio_cancel_filter]
+LOGGING["handlers"]["console"]["filters"] = [_strawberry_cancelled_error_filter]
 
 DJANGO_IS_E2E_LOGS_ENABLED = env.bool("DJANGO_IS_E2E_LOGS_ENABLED", False)
 if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E and not DJANGO_IS_E2E_LOGS_ENABLED:
