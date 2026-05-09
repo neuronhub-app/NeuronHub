@@ -38,6 +38,8 @@ The E2E doesn't need many co-dependant models (unlike pytests), and when it does
     - [x] move out `posts/tests/db_stubs.py`
     - [x] drop redundant GraphQL `test_gen_reset`; rename GraphQL `test_gen` to `reset_db_and_gen`.
     - [x] drop `test_db_stubs_repopulate`
+    - [x] move out user stubs to `users/tests/db_stubs.py`.
+- [x] split `test_gen.py` onto `apps/{app}/tests/test_gen.py`
 
 ## Relevant-Files
 
@@ -46,7 +48,6 @@ The E2E doesn't need many co-dependant models (unlike pytests), and when it does
 - server/neuronhub/apps/tests/services/test_gen.py - `test_gen` + `GenCreateParams` dispatcher
 - server/neuronhub/apps/tests/services/test_gen_reset.py - delete all + recreate default user
 - server/neuronhub/apps/tests/graphql/mutations.py - `test_db_stubs_repopulate`, `test_gen_reset`, `test_gen`
-- server/neuronhub/apps/tests/test_gen.py - faker `Gen` factories
 - server/neuronhub/apps/jobs/tests/db_stubs.py - sibling template
 - server/neuronhub/apps/profiles/tests/db_stubs.py - sibling (#AI #quality-25)
 - client/e2e/test.ts
@@ -55,7 +56,6 @@ The E2E doesn't need many co-dependant models (unlike pytests), and when it does
 - client/e2e/tests/{login,vote-and-reading-list,post,review,job-alert,job-versions,job-location-facets,tool,comment,comment-hn,profile-list}.spec.ts - migrated
 - client/e2e/helpers/selectTextInPage.ts - `selectTextHighlightable` for highlight tests
 - server/neuronhub/apps/algolia/services/algolia_reindex_partial.py - generic partial reindex (`AlgoliaPartialChange` per model)
-- server/neuronhub/apps/jobs/services/publish_job_versions.py - `JobChanges` (pks_created/pks_updated, slugs_deleted)
 
 ## Exec-Plan
 
@@ -121,3 +121,8 @@ Remaining (out-of-scope for this branch):
 - `posts/tests/db_stubs.py`
     - `users` co-located w/ `_create_review_pycharm` (uses `users.random_1`)
     - `_create_users` stays in `db_stubs_repopulate.py` (not posts logic)
+- `_create_users` → `create_users_stubs` (matches `create_{posts,jobs,profiles}_stubs`)
+    - moved both `users` class + `create_users_stubs` to `users/tests/db_stubs.py` (overrides prior decision to keep `_create_users` in repopulate)
+- `apps/tests/test_gen.py` keeps only `Gen`; per-app `*Gen` classes split out
+    - no re-exports from hub: `db_reset_and_partial_reindex` updated to import `UsersGen` from `users.tests.test_gen` directly
+    - `JobsGen` imports `OrgsGen` (typed field dep) — only cross-app dep

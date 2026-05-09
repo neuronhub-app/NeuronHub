@@ -24,9 +24,9 @@ from neuronhub.apps.profiles.models import Profile
 from neuronhub.apps.profiles.models import ProfileGroup
 from neuronhub.apps.profiles.models import ProfileInvite
 from neuronhub.apps.profiles.models import ProfileMatch
-from neuronhub.apps.tests.test_gen import UsersGen
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserConnectionGroup
+from neuronhub.apps.users.tests.test_gen import UsersGen
 
 
 async def db_reset_and_partial_reindex() -> None:

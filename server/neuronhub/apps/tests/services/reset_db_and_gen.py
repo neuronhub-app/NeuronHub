@@ -16,7 +16,9 @@ from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 from neuronhub.apps.profiles.models import Profile
-from neuronhub.apps.tests.services.db_reset_and_partial_reindex import db_reset_and_partial_reindex
+from neuronhub.apps.tests.services.db_reset_and_partial_reindex import (
+    db_reset_and_partial_reindex,
+)
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.users.models import User
 

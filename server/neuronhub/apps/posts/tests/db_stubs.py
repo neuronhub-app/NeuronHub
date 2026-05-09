@@ -17,6 +17,7 @@ from neuronhub.apps.posts.models.tools import ToolCompanyOwnership
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.users.models import User
+from neuronhub.apps.users.tests.db_stubs import users
 
 
 post_HN_id = 45487476
@@ -104,16 +105,6 @@ class tags:
     jetbrains = "Dev / JetBrains"
     kotlin = "Dev / Kotlin"
     hacker_news = "Source / HackerNews"
-
-
-class users:
-    connected_1 = "john_connected"
-    connected_2 = "max_connected"
-    engineer_1 = "david_swe"
-    engineer_2 = "dane_swe"
-    engineer_3 = "dove_swe"
-    random_1 = "mark_random"
-    random_2 = "mole_random"
 
 
 async def _create_review_pycharm(user: User, gen: Gen):
