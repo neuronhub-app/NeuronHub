@@ -33,7 +33,6 @@ export default defineConfig(config => ({
       {
         authToken: process.env.SENTRY_AUTH_TOKEN,
         release: { name: process.env.VITE_RELEASE_NAME },
-        debug: true,
         telemetry: false,
 
         org: process.env.SENTRY_ORG,
