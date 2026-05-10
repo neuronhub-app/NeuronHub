@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.core import mail
 from django.test import override_settings
@@ -14,6 +15,7 @@ from neuronhub.apps.jobs.templatetags.job_detail_url import job_detail_url
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.tests.test_cases import NeuronTestCase
+from neuronhub.apps.tests.utils import assert_max_queries
 
 
 @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
@@ -160,6 +162,15 @@ class TestSendJobAlertEmails(NeuronTestCase):
         email_html = mail.outbox[0].body
         assert test_name in email_html
         assert test_addr in email_html
+
+    async def test_job_alert_confirmation_email(self):
+        alert = await self.gen.jobs.job_alert(
+            tags=[await self.gen.posts.tag(category=Category.Skill)],
+            salary_min=50_000,
+            is_orgs_highlighted=True,
+        )
+        await send_job_alert_confirmation_email(alert)
+        assert len(mail.outbox) == 1
 
     async def test_email_template_has_alert_id_ext_in_job_urls(self):
         site = await SiteConfig.get_solo()
@@ -308,6 +319,30 @@ class TestSendJobAlertEmails(NeuronTestCase):
         await self.gen.jobs.job(org=org_norm)
 
         assert 1 == len(await _get_jobs_by_alert(alert))
+
+    def test_query_count_bounded_per_alert(self):
+        """
+        #AI #quality-10%
+        Guards against re-introducing N+1 in the per-alert hot path.
+        Prod load: hourly run with hundreds of alerts on 4GB box.
+        Tags+locations are prefetched once for all alerts.
+        """
+        tag_skill = async_to_sync(self.gen.posts.tag)(category=Category.Skill)
+        tag_area = async_to_sync(self.gen.posts.tag)(category=Category.Area)
+        loc = async_to_sync(self.gen.jobs.location)("London")
+        for _ in range(2):
+            async_to_sync(self.gen.jobs.job_alert)(
+                tags=[tag_skill, tag_area],
+                locations=[loc],
+                salary_min=50_000,
+            )
+        for _ in range(3):
+            async_to_sync(self.gen.jobs.job)(tags=[tag_skill, tag_area], locations=[loc])
+
+        # 6 amortized + ~10 per alert (jobs, log overlap, UserAnon, log INSERT, M2M, alert UPDATE).
+        # Pre-opt baseline 36; current 25 (-31%).
+        with assert_max_queries(self, 26):
+            async_to_sync(send_job_alerts)(is_include_test_jobs=True)
 
 
 Category = TagCategoryEnum

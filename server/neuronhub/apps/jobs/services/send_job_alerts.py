@@ -44,7 +44,10 @@ async def send_job_alerts(
     if not site.is_enable_job_alerts and is_non_test_run:
         return report
 
-    alerts_qs = JobAlert.objects.filter(is_active=True)
+    alerts_qs = JobAlert.objects.filter(is_active=True).prefetch_related(
+        "tags__categories",
+        "locations",
+    )
     if alert_ids is not None:
         alerts_qs = alerts_qs.filter(id__in=alert_ids)
 
@@ -276,26 +279,13 @@ async def _get_jobs_by_alert(
         published_at__gte=alert.created_at,
     )
 
-    if tag_ids := [tag_id async for tag_id in alert.tags.values_list("id", flat=True)]:
-        tag_fields = [
-            "tags_skill",
-            "tags_area",
-            "tags_education",
-            "tags_experience",
-            "tags_workload",
-            "tags_country_visa_sponsor",
-        ]
-        for tag_id in tag_ids:
-            tag_Qs = Q()
-            for tag_field in tag_fields:
-                tag_Qs |= Q(**{f"{tag_field}__id": tag_id})
-            qs = qs.filter(tag_Qs)
-        qs = qs.distinct()
+    for tag_id in [tag.id async for tag in alert.tags.all()]:
+        qs = qs.filter(id__in=Job.objects.filter(_q_job_has_tag(tag_id)).values("id"))
 
     if alert.is_orgs_highlighted:
         qs = qs.filter(org__is_highlighted=True)
 
-    if location_ids := [loc_id async for loc_id in alert.locations.values_list("id", flat=True)]:
+    if location_ids := [loc.id async for loc in alert.locations.all()]:
         qs = qs.filter(locations__id__in=location_ids).distinct()
 
     if alert.salary_min:
@@ -315,10 +305,19 @@ async def _get_jobs_by_alert(
     return [job async for job in qs.order_by("-posted_at")]
 
 
-async def _get_alert_filters_dict(alert: JobAlert) -> dict[str, str]:
+def _q_job_has_tag(tag_id: int) -> Q:
+    q = Q()
+    for tag_field_name in Job.tag_category_to_field.values():
+        q |= Q(**{f"{tag_field_name}__id": tag_id})
+    return q
+
+
+@sync_to_async
+def _get_alert_filters_dict(alert: JobAlert) -> dict[str, str]:
     filters_by_category: dict[str, list[str]] = defaultdict(list)
-    async for tag in alert.tags.prefetch_related("categories").all():
-        category = await tag.categories.afirst()
+    for tag in alert.tags.all():
+        # next() instead of first() to hit the prefetch_related()
+        category = next(iter(tag.categories.all()), None)
         category_key = category.name if category else "other"
         filters_by_category[category_key].append(tag.name)
 
@@ -336,7 +335,7 @@ async def _get_alert_filters_dict(alert: JobAlert) -> dict[str, str]:
         if filter_names := filters_by_category.get(category_key):
             filters[label] = ", ".join(filter_names)
 
-    location_names = [loc.name async for loc in alert.locations.all()]
+    location_names = [loc.name for loc in alert.locations.all()]
     if location_names:
         filters["Locations"] = ", ".join(location_names)
     salary_parts: list[str] = []
