@@ -33,8 +33,6 @@ export const JobFragment = graphql(
         algolia_filter_name
       }
       url_external
-      url_external_with_utm
-      is_published
       posted_at
       closes_at
       description

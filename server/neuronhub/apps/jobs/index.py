@@ -4,6 +4,7 @@ See [[docs/architecture/Algolia.md]]
 
 import logging
 
+from algoliasearch_django import AlgoliaIndex
 from django.conf import settings
 
 from neuronhub.apps.jobs.models import Job
@@ -40,108 +41,110 @@ def setup_replica_sorted_by_closes_at():
     )
 
 
-if settings.ALGOLIA["IS_ENABLED"]:
-    from algoliasearch_django import AlgoliaIndex
-    from algoliasearch_django.decorators import register
+# defined so index__test can import it
+class JobIndex(AlgoliaIndex):
+    index_name = "jobs"
 
-    @register(Job)
-    class JobIndex(AlgoliaIndex):
-        index_name = "jobs"
+    custom_objectID = "slug"
 
-        custom_objectID = "slug"
+    should_index = "is_in_algolia_index"
 
-        should_index = "is_in_algolia_index"
+    # todo ? refac: move out to AlgoliaModel the [for..in] and gen f"get_json_{field}" methods,
+    # and type the names `tag_fields` and `datetime_fields`; create apps.aloglia.AlgoliaModelIndex.
+    # [Note: already moved to [[Job]].tag_category_to_field]
+    tag_fields = [
+        "tags_skill",
+        "tags_area",
+        "tags_education",
+        "tags_experience",
+        "tags_workload",
+        "tags_country_visa_sponsor",
+    ]
+    datetime_fields = [
+        "created_at",
+        "updated_at",
+        "posted_at",
+        "closes_at",
+    ]
 
-        # todo ? refac: move out to AlgoliaModel the [for..in] and gen f"get_json_{field}" methods,
-        # and type the names `tag_fields` and `datetime_fields`; create apps.aloglia.AlgoliaModelIndex.
-        # [Note: already moved to [[Job]].tag_category_to_field]
-        tag_fields = [
-            "tags_skill",
-            "tags_area",
-            "tags_education",
-            "tags_experience",
-            "tags_workload",
-            "tags_country_visa_sponsor",
-        ]
-        datetime_fields = [
-            "created_at",
-            "updated_at",
-            "posted_at",
-            "closes_at",
-        ]
-
-        fields = [
-            ["get_id_as_str", "id"],
-            "slug",
+    fields = [
+        ["get_id_as_str", "id"],
+        "slug",
+        "title",
+        "description",
+        ["get_org_json", "org"],
+        "url_external",
+        "source_ext",
+        ["get_salary_min_or_zero", "salary_min"],
+        "salary_text",
+        ["get_visible_to", "visible_to"],
+        # GraphQL compatibility
+        *[(f"get_json_{field}", field) for field in tag_fields],
+        ["get_json_locations", "locations"],
+        *[(f"get_iso_{field}", field) for field in datetime_fields],
+        # unix for Algolia's sort/filter
+        *[(f"get_unix_{field}", f"{field}_unix") for field in datetime_fields],
+        # boolean facets (model_cached_property on Job)
+        *Job.boolean_facet_fields,
+    ]
+    settings = {
+        "searchableAttributes": [
             "title",
             "description",
-            ["get_org_json", "org"],
+            "org.name",
+            "locations.name",
+            "locations.city",
+            "locations.country",
+            "locations.region",
+            "job_title",
             "url_external",
+        ],
+        "attributesForFaceting": [
+            "searchable(org.name)",
+            *[f"searchable({field}.name)" for field in tag_fields],
+            "locations.algolia_filter_name",
+            "salary_min",
             "source_ext",
-            ["get_salary_min_or_zero", "salary_min"],
-            "salary_text",
-            ["get_visible_to", "visible_to"],
-            # GraphQL compatibility
-            *[(f"get_json_{field}", field) for field in tag_fields],
-            ["get_json_locations", "locations"],
-            *[(f"get_iso_{field}", field) for field in datetime_fields],
-            # unix for Algolia's sort/filter
-            *[(f"get_unix_{field}", f"{field}_unix") for field in datetime_fields],
-            # boolean facets (model_cached_property on Job)
+            "org.is_highlighted",
             *Job.boolean_facet_fields,
-        ]
-        settings = {
-            "searchableAttributes": [
-                "title",
-                "description",
-                "org.name",
-                "locations.name",
-                "locations.city",
-                "locations.country",
-                "locations.region",
-                "job_title",
-                "url_external",
-            ],
-            "attributesForFaceting": [
-                "searchable(org.name)",
-                *[f"searchable({field}.name)" for field in tag_fields],
-                "locations.algolia_filter_name",
-                "salary_min",
-                "source_ext",
-                "org.is_highlighted",
-                *Job.boolean_facet_fields,
-                "visible_to",
-            ],
-            "unretrievableAttributes": [
-                "visible_to",
-            ],
-            "customRanking": [
-                "desc(posted_at_unix)",
-            ],
-            "replicas": [
-                algolia_replica_jobs_sorted_by_closes_at,
-            ],
-            "advancedSyntax": True,
-        }
+            "visible_to",
+        ],
+        "unretrievableAttributes": [
+            "visible_to",
+        ],
+        "customRanking": [
+            "desc(posted_at_unix)",
+        ],
+        "replicas": [
+            algolia_replica_jobs_sorted_by_closes_at,
+        ],
+        "advancedSyntax": True,
+    }
 
-        # SQL perf fix
-        def get_queryset(self):
-            return (
-                Job.objects.filter(is_published=True)
-                .select_related(
-                    "author",
-                    "org",
-                )
-                .prefetch_related(
-                    "author__connection_groups",
-                    "visible_to_users",
-                    "visible_to_groups",
-                    "tags_skill",
-                    "tags_area",
-                    "tags_education",
-                    "tags_experience",
-                    "tags_workload",
-                    "tags_country_visa_sponsor",
-                    "locations",
-                )
+    # SQL perf fix
+    def get_queryset(self):
+        return (
+            Job.objects.filter(is_published=True)
+            .select_related(
+                "author",
+                "org",
             )
+            .prefetch_related(
+                "author__connection_groups",
+                "visible_to_users",
+                "visible_to_groups",
+                "tags_skill",
+                "tags_area",
+                "tags_education",
+                "tags_experience",
+                "tags_workload",
+                "tags_country_visa_sponsor",
+                "locations",
+            )
+        )
+
+
+if settings.ALGOLIA["IS_ENABLED"]:
+    from algoliasearch_django import register
+
+    register(Job, JobIndex)

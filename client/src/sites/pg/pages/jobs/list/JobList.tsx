@@ -64,7 +64,6 @@ export function JobList(props: { slug?: string }) {
       }
       subheader={<PgSubheaderLinks />}
       hits={{
-        enrichment: { query: JobsByIdsQuery, extractItems: data => data.jobs },
         renderHit: (job, ctx) => (
           <JobCard key={job.id} job={job} isSearchActive={ctx.isSearchActive} />
         ),
@@ -292,6 +291,10 @@ const pgSubheaderButtonStyle = {
   _hover: { color: "brand.green.light" },
 } as const;
 
+// Unused at runtime: PG renders Algolia JSON directly. Kept so gql.tada CLI emits
+// `JobsByIds` into `server/persisted-queries.json` - BE Algolia indexer
+// (`AlgoliaModel._get_graphql_field`) executes it to serialize the indexed JSON.
+// Contract: `apps/jobs/index__test.py` ⇒ paths(JobFragment) ⊆ paths(JobIndex record).
 const JobsByIdsQuery = graphql.persisted(
   "JobsByIds",
   graphql(

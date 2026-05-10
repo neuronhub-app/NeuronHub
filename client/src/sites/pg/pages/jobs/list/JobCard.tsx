@@ -33,7 +33,6 @@ import { LocationType } from "~/graphql/enums";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
 import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
-import { NhaErrorBoundary } from "@/root";
 
 const style = {
   markHighlight: {
@@ -558,7 +557,7 @@ function JobTitleLink(props: {
       {props.isOpen && props.job.url_external ? (
         <Link
           className="job-details"
-          href={appendUtmSource(props.job.url_external_with_utm || props.job.url_external)}
+          href={appendUtmSource(props.job.url_external)}
           target="_blank"
           rel="nofollow"
           color="fg"

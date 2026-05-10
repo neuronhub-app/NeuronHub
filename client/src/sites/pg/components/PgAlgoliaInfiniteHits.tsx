@@ -12,8 +12,7 @@
  *
  * todo ? refac-name: JobListAlgolia
  */
-import { Box, Flex, HStack, Skeleton, Stack, Text } from "@chakra-ui/react";
-import type { TadaDocumentNode } from "gql.tada";
+import { Box, Flex, HStack, Skeleton, Stack } from "@chakra-ui/react";
 import { type ReactNode, useEffect, useRef } from "react";
 import {
   useCurrentRefinements,
@@ -24,26 +23,16 @@ import {
 import type { ID } from "@/gql-tada";
 
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
 
-export type PgInfiniteHitsProps<TItem extends { id: ID }, TData = unknown> = {
-  enrichment: {
-    query: TadaDocumentNode<TData, { ids: ID[] }>;
-    extractItems: (data: Record<string, TItem[]>) => TItem[];
-  };
-  renderHit: (
-    item: TItem,
-    ctx: { isSearchActive: boolean; isEnrichedByGraphql: boolean },
-  ) => ReactNode;
+export type PgInfiniteHitsProps<TItem extends { id: ID }> = {
+  renderHit: (item: TItem, ctx: { isSearchActive: boolean }) => ReactNode;
   hitOpenedPinned?: { node?: ReactNode; id?: ID };
   noResultsNode: ReactNode;
   listTestId?: string;
   isExtraFilterActive?: boolean; // todo: #155 — remove with jobListFilters.ts Valtio cleanup
 };
 
-export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
-  props: PgInfiniteHitsProps<TItem, TData>,
-) {
+export function PgInfiniteHits<TItem extends { id: ID }>(props: PgInfiniteHitsProps<TItem>) {
   const searchBox = useSearchBox();
   const currentRefinements = useCurrentRefinements();
   const search = useInstantSearch();
@@ -58,12 +47,6 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
     isLoadingMore: false,
     prevCount: 0,
   });
-
-  const { items: jobsEnriched, isEnrichedByGraphql } = useAlgoliaEnrichmentByGraphql(
-    hits.items,
-    props.enrichment.query,
-    props.enrichment.extractItems,
-  );
 
   // Trigger showMore by scroll:
   useEffect(() => {
@@ -96,9 +79,9 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
     currentRefinements.items.length > 0 ||
     Boolean(props.isExtraFilterActive);
 
-  let jobsFiltered = jobsEnriched;
+  let jobsFiltered = hits.items;
   if (props.hitOpenedPinned?.id && !isSearchActive) {
-    jobsFiltered = jobsEnriched.filter(job => job.id !== props.hitOpenedPinned?.id);
+    jobsFiltered = hits.items.filter(job => job.id !== props.hitOpenedPinned?.id);
   }
 
   // Wrong. Beware: was "fixed" 3+ times.
@@ -122,9 +105,7 @@ export function PgInfiniteHits<TItem extends { id: ID }, TData = unknown>(
         ) : isNoResults ? (
           props.noResultsNode
         ) : (
-          jobsFiltered.map(item =>
-            props.renderHit(item, { isSearchActive, isEnrichedByGraphql }),
-          )
+          jobsFiltered.map(item => props.renderHit(item, { isSearchActive }))
         )}
         {state.snap.isLoadingMore && <PgJobCardSkeletons />}
       </Stack>

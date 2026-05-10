@@ -18,11 +18,11 @@ import { PgAlgoliaSortSelect } from "@/sites/pg/components/PgAlgoliaSortSelect";
 import { PgSearchInput } from "@/sites/pg/components/PgSearchInput";
 import { type AlgoliaIndexKey, useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
-export function PgAlgoliaList<TItem extends { id: ID }, TData = unknown>(props: {
+export function PgAlgoliaList<TItem extends { id: ID }>(props: {
   index: AlgoliaIndexKey;
   label: string;
   searchInputTestId?: string;
-  hits: Omit<PgInfiniteHitsProps<TItem, TData>, "label">;
+  hits: Omit<PgInfiniteHitsProps<TItem>, "label">;
   sort?: { items: Array<{ value: string; label: string }> };
   subheader?: ReactNode;
   facetsTopbar: ReactNode;
