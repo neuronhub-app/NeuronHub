@@ -56,15 +56,22 @@ def _is_query_allowed(query: str) -> bool:
     op_name = _get_operation_name(query_doc)
     assert op_name, _error_msg(query, "no OP name")
 
-    graphql_whitelist_FE = _load_client_persisted_queries_json()
-    graphql_whitelist = {**graphql_whitelist_FE, **graphql_whitelist_BE.queries}
-    assert op_name in graphql_whitelist, f"wrong OP name, {_error_msg(query)}"
+    graphql_whitelists: dict[str, list[str]] = {}
+    for graphql_whitelist in [
+        _load_client_persisted_queries_json(whitelist_file_current),
+        _load_client_persisted_queries_json(whitelist_file_previous),
+        graphql_whitelist_BE.queries,
+    ]:
+        for whitelist_op_name, whitelist_query in graphql_whitelist.items():
+            graphql_whitelists.setdefault(whitelist_op_name, []).append(whitelist_query)
+    assert op_name in graphql_whitelists, f"wrong OP name, {_error_msg(query)}"
 
-    query_normalized = _normalize_query(query)
-    query_whitelisted_normalized = _normalize_query(graphql_whitelist[op_name])
-    assert print_ast(query_normalized) == print_ast(query_whitelisted_normalized), _error_msg(
-        query
+    query_normalized = print_ast(_normalize_query(query))
+    is_match = any(
+        print_ast(_normalize_query(query_whitelisted)) == query_normalized
+        for query_whitelisted in graphql_whitelists[op_name]
     )
+    assert is_match, _error_msg(query)
     return True
 
 
@@ -76,20 +83,32 @@ def _get_operation_name(doc: DocumentNode) -> str | None:
     return None
 
 
-class whitelist_file:
-    name = "persisted-queries.json"  # todo ! refac: use a Mise env
+@dataclass
+class WhitelistFile:
+    name: str  # todo ! refac: use a Mise env
     cache_in_RAM: dict[str, str] | None = None
     cache_in_RAM_timestamp: datetime | None = None
 
 
+whitelist_file_current = WhitelistFile(name="persisted-queries.json")
+
+# Support the prev release for outdated FE clients.
+whitelist_file_previous = WhitelistFile(name="persisted-queries-prev-release.json")
+
+
 def _error_msg(query_name: str, error: str = "") -> str:
-    msg_base = f"query not in {whitelist_file.name} or `graphql_whitelist_BE`: `{query_name}`"
+    msg_base = (
+        f"query not in {whitelist_file_current.name},"
+        f" {whitelist_file_previous.name}, or `graphql_whitelist_BE`: `{query_name}`"
+    )
     if error:
         return f"{msg_base}: error '{error}'"
     return msg_base
 
 
-def _load_client_persisted_queries_json() -> dict[str, str]:
+def _load_client_persisted_queries_json(
+    whitelist_file: WhitelistFile = whitelist_file_current,
+) -> dict[str, str]:
     whitelist_path = settings.BASE_DIR / whitelist_file.name
     assert whitelist_path.exists()
 

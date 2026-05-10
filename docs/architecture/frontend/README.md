@@ -36,6 +36,8 @@ paths:
 
 We save all `client/` queries to the whitelist at [[server/persisted-queries.json]] with gql.tada CLI (during `mise lint`) - Strawberry rejects all by default.
 
+[[persisted-queries-prev-release.json]] is for outdated by deploy FE clients.
+
 ## Error handling
 
 Note: `toast.error()` from [[client/src/utils/toast.tsx]] also calls `Sentry.captureException`.
