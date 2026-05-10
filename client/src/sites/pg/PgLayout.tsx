@@ -31,6 +31,7 @@ import { FooterLinkIcon, FooterSectionKind } from "~/graphql/enums";
 import { useSnapshot } from "valtio";
 import { siteConfigState, type FooterSection } from "@/sites/pg/siteConfigState";
 import { PgHeroHeader } from "@/sites/pg/components/PgHeader";
+import { PgScrollToTop } from "@/sites/pg/components/PgScrollToTop";
 import { layout } from "@/sites/pg/PgLayoutConfig";
 import { ErrorBoundary as NhaErrorBoundary } from "@/root";
 
@@ -71,6 +72,8 @@ export default function PgLayout() {
           </ErrorBoundary>
         </Container>
       </Stack>
+
+      <PgScrollToTop />
 
       <PgFooter footer={footer} isLoading={configSnap.isLoading} />
     </Flex>
