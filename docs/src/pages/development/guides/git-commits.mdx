@@ -22,9 +22,9 @@ The main differences:
     - For <PageLink id="Linear" /> use its `magic words` - `Refs: {id}`, `Closes {id}, {id}, and {id}`.
 
 Conventions:
-- capitalize the domain language: Django models, React components, etc - to visually distinct them
-- model sub-types as `Post(type=Review)` are shortened to `Review`
-- React components are placed in brackets as `<LayoutSidebar/>`
+- Capitalize the domain language: Django models, React components, etc - to visually distinct them.
+- Django sub-types as `Post(type=Review)` are shortened to `Review`.
+- React components wrap in brackets as `<LayoutSidebar>`.
 
 Examples:
 - `feat(post-form): add 7 required fields`
@@ -40,12 +40,13 @@ Examples:
 - `refac` - refactor, cleanups, performance, etc - non-breaking/critical changes
 - `test` - E2E or pytest - no runtime impact
 - `build` - CI, dependencies, dev containers, dev tools, etc
-- `UI` - UI-only changes, eg when no code review is needed
+
+Usually don't require a code review:
+- `UI` - UI-only changes
 - `format` - code style or formating
 - `docs`
-- `track` - analytics tracking, eg PostHog
 
-If you're unsure which `Type` to use - use the highest, as they're sorted by importance.
+Pick the highest in order `Type` when unsure - they're sorted by importance.
 
 ### Scopes
 
@@ -59,16 +60,16 @@ If you're unsure which `Type` to use - use the highest, as they're sorted by imp
   - `profile` - for `apps.profiles`
   - `profile/score` - ProfileMatch scoring by LLM
   - `site` - `apps.sites`
-  - `{app}/sync` - depending on the app - the HackerNews or Airtable sync
 - `upgrade[<uv|pnpm>]` - pyproject.toml, package.json, lock files, or related changes
 - `API` - API layers: Apollo GraphQL, Strawberry resolvers, etc
 - `sec` - security, unrelated to `apps.users`
 - `Algol` - <Term id="algolia"/>'s integration
-- `monitor` - eg Sentry
 - `types` - TypeScript or Python typings
 - `admin` - Django Admin, ie no impact on the user-facing logic
 - `perf` - performance of SQL, UI, etc
 - `docs` - React static site generator in `docs/`
+- `track` - analytics tracking, eg PostHog
+- `monitor` - eg Sentry
 
 Sites:
 - `<Scope>/PG` - for ProbablyGood.org specific changes in `client/src/sites/pg/`

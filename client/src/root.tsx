@@ -1,3 +1,4 @@
+import { NhaPosthogProvider } from "@/providers/NhaPosthogProvider";
 import { ApolloProvider } from "@apollo/client/react";
 import { Box, ChakraProvider } from "@chakra-ui/react";
 import * as Sentry from "@sentry/react-router";
@@ -24,21 +25,23 @@ export default function App() {
 
 function AppProviders(props: { children: ReactNode }) {
   return (
-    <ApolloProvider client={client}>
-      <ChakraProvider value={siteConfig.theme}>
-        <ColorModeProvider
-          enableSystem={env.isTiredOwlDev ? true : !siteConfig.forcedColorMode}
-          forcedTheme={env.isTiredOwlDev ? undefined : siteConfig.forcedColorMode}
-        >
-          {props.children}
+    <NhaPosthogProvider>
+      <ApolloProvider client={client}>
+        <ChakraProvider value={siteConfig.theme}>
+          <ColorModeProvider
+            enableSystem={env.isTiredOwlDev ? true : !siteConfig.forcedColorMode}
+            forcedTheme={env.isTiredOwlDev ? undefined : siteConfig.forcedColorMode}
+          >
+            {props.children}
 
-          <Toaster position="bottom-center" gutter={8} />
-          <ChakraToaster />
+            <Toaster position="bottom-center" gutter={8} />
+            <ChakraToaster />
 
-          <AdminMenuFloatButton isThemeSwitcher={env.site.isProbablyGood} />
-        </ColorModeProvider>
-      </ChakraProvider>
-    </ApolloProvider>
+            <AdminMenuFloatButton isThemeSwitcher={env.site.isProbablyGood} />
+          </ColorModeProvider>
+        </ChakraProvider>
+      </ApolloProvider>
+    </NhaPosthogProvider>
   );
 }
 

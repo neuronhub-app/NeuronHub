@@ -1,4 +1,4 @@
-import { analytics } from "@/utils/analytics";
+import { track } from "@/utils/track";
 import {
   Box,
   Code,
@@ -40,7 +40,7 @@ export function JobList(props: { slug?: string }) {
   const [searchParams] = useSearchParams();
   const alertId = searchParams.get("alert");
 
-  analytics.useTrackJobView({ alertId, slug: props.slug });
+  track.useTrackJobView({ alertId, slug: props.slug });
 
   return (
     <AlgoliaList<JobFragmentType>

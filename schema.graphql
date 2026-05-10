@@ -333,6 +333,7 @@ enum Ordering {
 type OrgType {
   id: ID!
   name: String!
+  slug: String!
   website: String!
   website_with_utm: String!
   jobs_page_url: String!

@@ -6,6 +6,7 @@ import { proxy } from "valtio";
 import { useSnapshot } from "valtio/react";
 import { graphql } from "@/gql-tada";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { track } from "@/utils/track";
 
 export namespace user {
   export const state = proxy({
@@ -23,6 +24,8 @@ export function useUser() {
   useEffect(() => {
     if (data?.user_current) {
       Sentry.setUser(data.user_current);
+
+      track.setUser({ user: data.user_current });
 
       user.state.current = data.user_current;
 

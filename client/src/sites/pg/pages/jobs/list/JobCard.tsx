@@ -1,4 +1,5 @@
 import { icons } from "@neuronhub/shared/theme/icons";
+import { track } from "@/utils/track";
 import {
   Badge,
   Box,
@@ -19,13 +20,12 @@ import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import { captureException } from "@sentry/react";
 import { ErrorBoundary } from "@sentry/react";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { GoAlert } from "react-icons/go";
 import { IoLocationSharp } from "react-icons/io5";
 import { LuChevronDown, LuExternalLink } from "react-icons/lu";
-import { Highlight, Snippet, useHits, useInstantSearch } from "react-instantsearch";
+import { Highlight, Snippet, useInstantSearch } from "react-instantsearch";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
@@ -60,7 +60,6 @@ export function JobCard(props: {
   isInitiallyOpen?: boolean;
 }) {
   const { results } = useInstantSearch();
-  const hits = useHits<JobFragmentType>();
 
   const state = useStateValtio({
     card: props.isInitiallyOpen ? CardState.OpenByUser : CardState.Closed,
@@ -82,14 +81,6 @@ export function JobCard(props: {
   function toggleCardCollapse() {
     const isOpenByUser = state.mutable.card === CardState.OpenByUser;
     state.mutable.card = isOpenByUser ? CardState.Closed : CardState.OpenByUser;
-  }
-
-  function trackUrlClick(extras?: Record<string, any>) {
-    try {
-      hits.sendEvent("click", jobHit, "Job.click_url_ext", extras);
-    } catch (err) {
-      captureException(err);
-    }
   }
 
   const isCardOpen = cardState === CardState.OpenByUser;
@@ -183,7 +174,6 @@ export function JobCard(props: {
                   isHighlightable={isHighlightable}
                   jobHit={jobHit}
                   isOpen={isCardOpen}
-                  onUrlClick={trackUrlClick}
                 />
 
                 <JobOrgLink
@@ -276,12 +266,21 @@ export function JobCard(props: {
 
         <Collapsible.Root open={isCardOpen} unmountOnExit lazyMount>
           <Collapsible.Content animationDuration={style.duration}>
-            <JobExpanded job={props.job} onUrlClick={trackUrlClick} />
+            <JobExpanded job={props.job} jobHit={jobHit} />
           </Collapsible.Content>
         </Collapsible.Root>
 
         <Box
-          onClick={toggleCardCollapse}
+          onClick={() => {
+            toggleCardCollapse();
+
+            if (state.mutable.card === CardState.OpenByUser) {
+              track.ui("Job.card.expand", props.job.slug);
+            }
+            if (state.mutable.card === CardState.Closed) {
+              track.ui("Job.card.close", props.job.slug);
+            }
+          }}
           pos="absolute"
           inset="0"
           borderRadius="lg"
@@ -309,7 +308,8 @@ export function JobCard(props: {
   );
 }
 
-function JobExpanded(props: { job: JobFragmentType; onUrlClick: () => void }) {
+function JobExpanded(props: { job: JobFragmentType; jobHit: Hit<BaseHit> }) {
+  const trackUrlClick = track.useJobUrlClick({ slug: props.job.slug, jobHit: props.jobHit });
   return (
     <Stack gap={{ base: "gap.md", md: "gap.lg" }}>
       {props.job.description && (
@@ -367,9 +367,7 @@ function JobExpanded(props: { job: JobFragmentType; onUrlClick: () => void }) {
             w={{ base: "150px", md: "190px" }}
             h="10"
             focusRingColor="transparent"
-            onClick={() => {
-              props.onUrlClick();
-            }}
+            onClick={() => trackUrlClick("JobCard.button")}
           >
             <Link
               className="job-details"
@@ -516,6 +514,11 @@ function JobOrgLink(props: {
       <Link
         className="org-link"
         href={appendUtmSource(props.job.org.website_with_utm || props.job.org.website)}
+        onClick={() =>
+          track.event("Job.click_org_url_ext", props.job.slug, {
+            org_slug: props.job.org.slug,
+          })
+        }
         target="_blank"
         rel="nofollow"
         {...textStyle}
@@ -533,8 +536,9 @@ function JobTitleLink(props: {
   isHighlightable?: boolean;
   jobHit: Hit<BaseHit>;
   isOpen: boolean;
-  onUrlClick: (extras: Record<string, any>) => void;
 }) {
+  const trackUrlClick = track.useJobUrlClick({ slug: props.job.slug, jobHit: props.jobHit });
+
   const title = props.isHighlightable ? (
     <Highlight attribute="title" hit={props.jobHit} />
   ) : (
@@ -556,14 +560,14 @@ function JobTitleLink(props: {
     <Heading {...headingStyle} {...aboveOverlay}>
       {props.isOpen && props.job.url_external ? (
         <Link
-          className="job-details"
           href={appendUtmSource(props.job.url_external)}
+          className="job-details"
           target="_blank"
           rel="nofollow"
           color="fg"
           textDecoration="none"
           _hover={{ textDecoration: "underline", color: "currentColor" }}
-          onClick={() => props.onUrlClick({ location: "title" })}
+          onClick={() => trackUrlClick("JobCard.title")}
         >
           {title}
         </Link>

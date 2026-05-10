@@ -1,3 +1,4 @@
+import { track } from "@/utils/track";
 import { Badge, Button, Flex, Group, Icon, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -65,30 +66,13 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
   );
 
   async function handleSubscribe(fields: z.infer<typeof FormSchema>) {
-    const salaryRefinement = refinesCurrent.items.find(item => item.attribute === "salary_min");
+    const vars = buildJobAlertVars(refinesCurrent.items, locationsData?.job_locations);
+
+    track.event("JobAlert.create", fields.email, vars);
 
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,
-      tag_names: refinesCurrent.items
-        .filter(item => item.attribute.startsWith("tags_"))
-        .flatMap(item => item.refinements.map(tag => String(tag.value))),
-      location_ids: getLocationIdsActive(
-        refinesCurrent.items,
-        locationsData?.job_locations ?? [],
-      ),
-      is_orgs_highlighted:
-        refinesCurrent.items.some(item => item.attribute === "is_orgs_highlighted") || null,
-      salary_min:
-        salaryRefinement?.refinements[0]?.value != null
-          ? Number(salaryRefinement.refinements[0].value)
-          : null,
-      is_exclude_no_salary:
-        refinesCurrent.items.some(item => item.attribute === "has_salary") ?? false,
-      is_exclude_career_capital:
-        refinesCurrent.items.some(item => item.attribute === "is_not_career_capital") || null,
-      is_exclude_profit_for_good:
-        refinesCurrent.items.some(item => item.attribute === "is_not_profit_for_good") || null,
-      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      ...vars,
       is_subscribe_to_newsletter: false,
     });
     if (result.success) {
@@ -270,4 +254,25 @@ export function getLocationIdsActive(
   return jobLocations
     .filter(loc => facetValues.has(loc.algolia_filter_name))
     .map(loc => Number(loc.id));
+}
+
+export function buildJobAlertVars(
+  items: ReturnType<typeof useCurrentRefinements>["items"],
+  jobLocations?: JobLocation[],
+  jobFilters?: { salaryMin: number | null; excludeNoSalary: boolean },
+) {
+  return {
+    tag_names: items
+      .filter(item => item.attribute.startsWith("tags_"))
+      .flatMap(item => item.refinements.map(tag => String(tag.value))),
+    location_ids: getLocationIdsActive(items, jobLocations ?? []),
+    is_orgs_highlighted: items.some(item => item.attribute === "is_orgs_highlighted") || null,
+    salary_min: jobFilters?.salaryMin ?? null,
+    is_exclude_no_salary: jobFilters?.excludeNoSalary ?? false,
+    is_exclude_career_capital:
+      items.some(item => item.attribute === "is_not_career_capital") || null,
+    is_exclude_profit_for_good:
+      items.some(item => item.attribute === "is_not_profit_for_good") || null,
+    tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  };
 }

@@ -1,4 +1,4 @@
-import { analytics } from "@/utils/analytics";
+import { track } from "@/utils/track";
 import { Box, Button, Flex, HStack, Icon, Separator, Stack, Text } from "@chakra-ui/react";
 import { type ReactNode, useRef } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
@@ -28,7 +28,7 @@ import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 import { useInit } from "@/utils/useInit";
 
 /**
- * #quality-25% duplicate of [[JobList.tsx]]
+ * #quality-21% duplicate of [[JobList.tsx]] - overcomplicated wo/ its dedup benefits
  */
 export function JobList(props: { slug?: string }) {
   const [searchParams] = useSearchParams();
@@ -40,7 +40,7 @@ export function JobList(props: { slug?: string }) {
 
   const alertId = searchParams.get("alert");
 
-  analytics.useTrackJobView({ alertId, slug: props.slug });
+  track.useTrackJobView({ alertId, slug: props.slug });
 
   const jobOpenPinned = useJobOpenPinned(props.slug);
   const algolia = useAlgoliaSearchClient();

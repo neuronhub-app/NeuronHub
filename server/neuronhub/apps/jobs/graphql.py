@@ -57,6 +57,7 @@ class JobFaqQuestionType:
 class OrgType:
     id: auto
     name: auto
+    slug: auto
     website: auto
     website_with_utm: auto
     jobs_page_url: auto

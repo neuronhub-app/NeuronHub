@@ -37,6 +37,7 @@ const envCleaned = createEnv({
 
   VITE_POSTHOG_TOKEN: str({ default: "" }),
   VITE_POSTHOG_HOST: url({ default: "" }),
+  VITE_POSTHOG_IS_ENABLED: bool({ default: false }),
 
   CLIENT_PORT: port({ default: 3000 }),
   CLIENT_PORT_E2E: port({ default: 3001 }),

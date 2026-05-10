@@ -9,6 +9,7 @@ export const JobFragment = graphql(
       slug
       org {
         id
+        slug
         name
         website
         website_with_utm

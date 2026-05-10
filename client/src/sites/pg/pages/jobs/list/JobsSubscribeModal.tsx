@@ -27,9 +27,10 @@ import { FaBell } from "react-icons/fa6";
 import { useCurrentRefinements } from "react-instantsearch";
 import { z } from "zod";
 import {
-  getLocationIdsActive,
+  buildJobAlertVars,
   JobAlertSubscribeMutation,
 } from "@/apps/jobs/list/JobsSubscribeModal";
+import { track } from "@/utils/track";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
@@ -88,24 +89,17 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
 
   // todo ! refac: duplicate of [[client/src/apps/jobs/list/JobsSubscribeModal.tsx]]
   async function handleSubscribe(fields: z.infer<typeof FormSchema>) {
+    const vars = buildJobAlertVars(
+      refinesCurrent.items,
+      locationsData?.job_locations,
+      jobFilters.snap,
+    );
+
+    track.event("JobAlert.create", fields.email, vars);
+
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,
-      tag_names: refinesCurrent.items
-        .filter(item => item.attribute.startsWith("tags_"))
-        .flatMap(item => item.refinements.map(tag => String(tag.value))),
-      location_ids: getLocationIdsActive(
-        refinesCurrent.items,
-        locationsData?.job_locations ?? [],
-      ),
-      is_orgs_highlighted:
-        refinesCurrent.items.some(item => item.attribute === "is_orgs_highlighted") || null,
-      salary_min: jobFilters.mutable.salaryMin ?? null,
-      is_exclude_no_salary: jobFilters.mutable.excludeNoSalary,
-      is_exclude_career_capital:
-        refinesCurrent.items.some(item => item.attribute === "is_not_career_capital") || null,
-      is_exclude_profit_for_good:
-        refinesCurrent.items.some(item => item.attribute === "is_not_profit_for_good") || null,
-      tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      ...vars,
       is_subscribe_to_newsletter: state.mutable.is_subscribe_to_newsletter,
     });
     if (result.success) {
