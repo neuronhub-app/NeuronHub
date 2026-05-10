@@ -340,7 +340,7 @@ function JobExpanded(props: { job: JobFragmentType; onUrlClick: () => void }) {
             {props.job.closes_at ? datetime.date(props.job.closes_at) : "Rolling applications"}
           </Text>
         </Stack>
-        {(props.job.salary_text || props.job.salary_min) && (
+        {(!!props.job.salary_text || !!props.job.salary_min) && (
           <Stack gap={{ base: "gap.sm", md: "gap.xs" }} flex="1">
             <Text fontSize="sm" color="fg.muted" fontWeight="medium">
               Salary

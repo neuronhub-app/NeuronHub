@@ -263,6 +263,9 @@ class Job(AlgoliaModel):
         return not any(tag.name == self.Tags.ProfitForGood.value for tag in self.tags_area.all())
 
     def get_salary_min_or_zero(self) -> int:
+        """
+        Because Algolia range facet can't process nulls.
+        """
         return self.salary_min or 0
 
     def is_in_algolia_index(self) -> bool:
