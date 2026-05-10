@@ -82,7 +82,7 @@ async def send_job_alerts(
                 if report_send.matched_total == 0:
                     report.skipped_due_to_no_new_matches_or_new_alert += 1
 
-            logger.info(
+            logger.debug(
                 f"{send_job_alert_emails_task.name} _send_job_alert: {asdict(report_send)}"
             )
         except Exception:
