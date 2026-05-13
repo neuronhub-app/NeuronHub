@@ -33,7 +33,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         "devops/db.mise.toml",
         "devops/docker.mise.toml",
         "devops/e2e.mise.toml",
-        "devops/claude.mise.toml",
+        "devops/agents/claude.mise.toml",
     ]
 
 [env]
