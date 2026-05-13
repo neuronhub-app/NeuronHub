@@ -1,5 +1,5 @@
 import type { OperationVariables } from "@apollo/client";
-import { Locator, Page } from "@playwright/test";
+import { Locator, Page, Response } from "@playwright/test";
 import type { TadaDocumentNode } from "gql.tada";
 import { print } from "graphql";
 import { config } from "@/e2e/config";
@@ -38,7 +38,11 @@ export class PlaywrightHelper {
     return client.mutate({ mutation: ResetDbAndGenMutate, variables: { create_params } });
   }
 
-  // #AI, but reviewed. Seems ok. Mb use the fixed on 2025-10-28 [[useApolloQuery.ts]] types.
+  /**
+   * Prefer the `.waitForResponseGraphql(query)` below most of the time.
+   *
+   * #AI, but reviewed. Seems ok. Mb use the fixed on 2025-10-28 [[useApolloQuery.ts]] types.
+   */
   async graphqlQuery<TData, TVariables extends OperationVariables>(
     query: TadaDocumentNode<TData, TVariables>,
     variables?: TVariables,
@@ -96,56 +100,41 @@ export class PlaywrightHelper {
     }
   }
 
-  // todo ! refac-name: waitForGraphqlJson
+  /**
+   * #AI
+   *
+   * Read body inside `page.on("response")` handler to start the CDP
+   * `Network.getResponseBody` fetch before subsequent actions (eg navigation)
+   * evict the body from Chrome's network cache - which manifested as:
+   * > response.json: Protocol error (Network.getResponseBody): No resource with given identifier found
+   */
   waitForResponseGraphql<
     TData = unknown,
     TVariables extends OperationVariables = OperationVariables,
   >(query: TadaDocumentNode<TData, TVariables>): Promise<{ data: TData }> {
-    return this.waitForGraphqlQuery(query).then(response => {
-      try {
-        return response.json();
-      } catch (err: unknown) {
-        if (String(err).includes("No resource with given identifier found")) {
-          throw new Error(
-            `Failed to get JSON of GraphQL ${query}. Likely due to Playwright flakiness.`,
-          );
-        }
-        throw err;
-      }
-    });
-  }
-
-  isErrorHasMessage(err: unknown | Error, message: string): boolean {
-    if (err instanceof Error) {
-      return err.toString().includes(message);
-    }
-    console.log("error not error (wtf");
-    return false;
-  }
-
-  /**
-   * FYI .waitForResponse(`${env.VITE_SERVER_URL_API}/${queryName}`, { ... }) fails,
-   * likely because Playwright lacks [[fetchUsingReadableUrl]].
-   *
-   * #AI
-   * This function used only for await - it skips `.json()` which flaked with:
-   * > Network.getResponseBody: No resource with given identifier found
-   *
-   * Perhaps due to pruned network cache in the Chrome DevTools Protocol. But unlikely it's so simple.
-   */
-  waitForGraphqlQuery<
-    TData = unknown,
-    TVariables extends OperationVariables = OperationVariables,
-  >(query: TadaDocumentNode<TData, TVariables>) {
     // @ts-expect-error #bad-infer - gql.tada sets .name
     const queryName: string = query.definitions[0]!.name!.value;
 
-    return this.page.waitForResponse(
-      response =>
-        response.url().includes(env.VITE_SERVER_URL_API) &&
-        (response.request().postData()?.includes(queryName) ?? false),
-      { timeout: actionTimeoutMsGraphql },
-    );
+    return new Promise<{ data: TData }>((resolve, reject) => {
+      const handler = (response: Response) => {
+        if (!response.url().includes(env.VITE_SERVER_URL_API)) {
+          return;
+        }
+        if (!(response.request().postData()?.includes(queryName) ?? false)) {
+          return;
+        }
+        this.page.off("response", handler);
+        clearTimeout(responseTimer);
+        response.json().then(resolve, reject);
+      };
+      const responseTimer = setTimeout(() => {
+        this.page.off("response", handler);
+        reject(
+          new Error(`Timeout ${actionTimeoutMsGraphql}ms waiting for GraphQL ${queryName}`),
+        );
+      }, actionTimeoutMsGraphql);
+      this.page.on("response", handler);
+    });
   }
 
   async navigate(

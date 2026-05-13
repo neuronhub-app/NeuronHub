@@ -117,7 +117,7 @@ test.describe("Job Alert", () => {
 
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
-    const responseSubscribe = play.waitForGraphqlQuery(JobAlertSubscribeMutation);
+    const responseSubscribe = play.waitForResponseGraphql(JobAlertSubscribeMutation);
     await play.click(ids.job.alert.submitBtn);
     if (env.site.isProbablyGood) {
       // wo filters PG shows a confirm Popover
