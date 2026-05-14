@@ -30,6 +30,7 @@ const envCleaned = createEnv({
   VITE_SENTRY_DSN_FRONTEND: str({ default: "" }),
 
   VITE_SERVER_URL: url({ default: "http://localhost:8000" }),
+  VITE_CLIENT_URL: url({ default: "http://localhost:3000" }),
 
   VITE_RELEASE_NAME: str(), // for Sentry Source Maps, defined in [[mise.toml]]
 
@@ -72,5 +73,14 @@ export const env = {
   },
   get isTiredOwlDev(): boolean {
     return this.VITE_IS_TIRED_OWL_DEV;
+  },
+  // Vite sets `import.meta.env.SSR=true` in RR prerender.
+  // Getter: vite.config.ts imports `env` before Vite has injected `import.meta.env`.
+  get mode() {
+    const isSSR = Boolean(import.meta.env?.SSR);
+    return {
+      isSSR,
+      isClient: !isSSR,
+    };
   },
 };

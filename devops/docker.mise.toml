@@ -29,7 +29,12 @@
         flag "--version <version>" env="VITE_RELEASE_VERSION"
         flag "--no_cache" default=#false
     """
+    # todo !! fix: in deploy.mdx explain: docker:build <-> Dockerfile <-> build_and_push <-> 2 env.ts files; + env prefixes re DJANGO_ and VITE_.
+    description = """
+        Build Docker by docker-compose temp file & inject envs as ARGS.
 
+        If you alter envs -> alter Dockerfile ARGs + `build_and_push` CI task envs.
+    """
     run = """
         # Sentry env.PROJECT_NAME mapping
         # ------------------------------------------------------------
