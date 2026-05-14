@@ -64,7 +64,7 @@ async def _add_connection(user: User, connection_new: User):
 
 ### DB reuse
 
-Pytest runs with `--reuse-db` in `pyproject.toml`. If you change applied migrations - you must reset the test db.
+Pytest runs with `--reuse-db` in `pyproject.toml`. If you change old migrations - reset the db by `--create-db` flag.
 
 ### Slow tests
 

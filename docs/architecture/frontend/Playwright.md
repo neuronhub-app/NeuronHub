@@ -75,3 +75,10 @@ test("Upvote", async () => {
 Replaces:
 - `.toHaveAttribute("data-state", true)` -> `except($[ids.value]).checked(locator)`
 - `.localor(text="{value}")` -> `epxect(page).toHaveText`
+
+### Flaky errors
+
+Might fail randomly on:
+> TimeoutError: page.waitForLoadState: Timeout 7500ms exceeded.
+
+Rerun 1-3 times before debugging.
