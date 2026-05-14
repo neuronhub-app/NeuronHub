@@ -1,3 +1,5 @@
+## Server
+
 - rename `server` to `backend`, and `client` to `frontend`
 - rename GraphQL mutations to `{noun}_{verb}`
 - shorten Post subset names as `PostTool`/`PostReview` to `Tool`/`Review`
@@ -5,7 +7,12 @@
     - Replace magic strings in python docstrings as `jobs/drafts`.
 - prefix all NHA Django envs with `DJANGO_` (same as `VITE_`)
 
-### Client
+### Small
+
+- utilize `@strawberry_django.mutation(handle_django_errors=True)` param for returning `ValidationError`
+- add `server/generated/` (move persisted-queries) and `client/generated/` (move gql tada and landing pages)
+
+## Client
 
 - rename `jobs/subscriptions` to `jobs/alerts`
 - restructure `client/` per #59
