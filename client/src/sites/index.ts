@@ -44,7 +44,7 @@ const pgConfig: SiteConfig = {
     webmanifest: "/favicon/site.webmanifest",
   },
   meta: {
-    title: "High-Impact Job Board | Probably Good",
+    title: "High-Impact Job Board",
     description:
       "Find a job that's good for you and good for the world. A continuously updated, curated list of high-impact job opportunities for people who want to make a difference.",
     ogImage: "https://media.neuronhub.app/meta/og-image.png",

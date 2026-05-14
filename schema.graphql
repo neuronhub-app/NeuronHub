@@ -116,6 +116,7 @@ input GenCreateParams {
   posts_comment: PostsCommentParams = null
   posts_import_hn: PostsImportHnParams = null
   jobs_job: JobsJobParams = null
+  jobs_landing_page: JobsLandingPageParams = null
   profiles_profile: ProfilesProfileParams = null
   profiles_match: ProfilesMatchParams = null
 }
@@ -226,6 +227,26 @@ input JobsJobParams {
   org_name: String = null
   locations: [String!] = null
   is_published: Boolean! = true
+  tags: [PostsTagParams!] = null
+}
+
+input JobsLandingPageParams {
+  slug: String!
+  title: String!
+  meta_description: String! = ""
+  tags: [PostsTagParams!] = null
+}
+
+type JobsLandingPageType {
+  id: ID!
+  slug: String!
+  title: String!
+  meta_description: String!
+  meta_image_url: String!
+  tags(filters: PostTagFilter): [PostTagType!]!
+  locations: [JobLocationType!]!
+  salary_min: Int
+  is_orgs_highlighted: Boolean
 }
 
 enum LocationType {
@@ -844,6 +865,7 @@ input PostsTagParams {
   name: String!
   is_vote_pos: Boolean = null
   is_important: Boolean = null
+  category: TagCategoryEnum = null
 }
 
 input PostsToolParams {
@@ -955,6 +977,7 @@ type Query {
   jobs(filters: JobFilter): [JobType!]!
   job_locations: [JobLocationType!]!
   job_faq_questions: [JobFaqQuestionType!]!
+  jobs_landing_pages: [JobsLandingPageType!]!
   job_by_slug(slug: String!): JobType
   job_alerts: [JobAlertType!]!
   job_versions_pending: [JobVersionType!]! @IsStaff

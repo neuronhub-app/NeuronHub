@@ -2,4 +2,5 @@
 schema.graphql
 client/graphql/
 client/.react-router/
-persisted-queries.json
+server/persisted-queries.json
+server/persisted-queries-prev-release.json

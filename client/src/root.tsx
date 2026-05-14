@@ -9,7 +9,7 @@ import { AdminMenuFloatButton } from "@/components/AdminMenuFloatButton";
 import { ErrorState } from "@/components/ErrorState";
 import { ColorModeProvider } from "@/components/ui/color-mode";
 import { Toaster as ChakraToaster } from "@/components/ui/toaster";
-import { useMetaTitle } from "@/components/useMetaTitle";
+import { useHeadMeta } from "@/components/useHeadMeta";
 import { env } from "@/env";
 import { client } from "@/graphql/client";
 import { siteConfig } from "@/sites";
@@ -46,12 +46,11 @@ function AppProviders(props: { children: ReactNode }) {
 }
 
 export function Layout(props: { children: ReactNode }) {
-  const title = useMetaTitle();
+  const meta = useHeadMeta();
 
   return (
     <html lang="en">
       <head>
-        <title>{title.value}</title>
         <LayoutHead />
       </head>
 
@@ -59,6 +58,8 @@ export function Layout(props: { children: ReactNode }) {
         {env.VITE_GTM_ID && <GtmNoscript gtmId={env.VITE_GTM_ID} />}
 
         {props.children}
+
+        <meta.Hoisted />
 
         <Scripts />
 
@@ -79,24 +80,6 @@ function LayoutHead() {
       {!env.isProd && <meta name="robots" content="noindex, follow" />}
 
       <meta name="color-scheme" content={siteConfig.forcedColorMode ?? "light dark"} />
-
-      {siteConfig.meta && (
-        <>
-          <meta name="description" content={siteConfig.meta.description} />
-          <meta property="og:title" content={siteConfig.meta.title} />
-          <meta property="og:description" content={siteConfig.meta.description} />
-          <meta property="og:type" content="website" />
-          {siteConfig.meta.ogImage && (
-            <meta property="og:image" content={siteConfig.meta.ogImage} />
-          )}
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content={siteConfig.meta.title} />
-          <meta name="twitter:description" content={siteConfig.meta.description} />
-          {siteConfig.meta.ogImage && (
-            <meta name="twitter:image" content={siteConfig.meta.ogImage} />
-          )}
-        </>
-      )}
 
       {siteConfig.googleFontsHref && (
         <>

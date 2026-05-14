@@ -145,6 +145,9 @@ export namespace ids {
   export const job = {
     list: "job.list",
     searchInput: "job.search-input",
+    landingPage: {
+      title: "job.landing-page.title",
+    },
     card: {
       container: "job.card.container",
       tags: "job.card.tags",
@@ -217,6 +220,9 @@ export namespace ids {
     salaryInput: "facet.salary-input",
     excludeNoSalary: "facet.exclude-no-salary",
     excludeCareerCapital: "facet.exclude-career-capital",
+    activeTag(value: string) {
+      return `facet.active-tag.${value}` as TestId;
+    },
     clear(attribute: string) {
       return `facet.clear.${attribute}` as TestId;
     },

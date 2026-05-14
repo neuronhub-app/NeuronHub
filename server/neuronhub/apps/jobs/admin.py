@@ -16,6 +16,7 @@ from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobAlertLog
 from neuronhub.apps.jobs.models import JobLocation
+from neuronhub.apps.jobs.models import JobsLandingPage
 from neuronhub.apps.jobs.tasks import airtable_sync_task
 from neuronhub.apps.jobs.tasks import send_job_alert_emails_by_ids_task
 
@@ -220,6 +221,27 @@ class JobAlertLogAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         ("jobs", DALFRelatedFieldAjaxMulti),
         ("job_alert", DALFRelatedFieldAjaxMulti),
         "sent_at",
+        "created_at",
+        "updated_at",
+    ]
+
+
+@admin.register(JobsLandingPage)
+class JobsLandingPageAdmin(SimpleHistoryAdmin, DALFModelAdmin):
+    list_display = [
+        "slug",
+        "title",
+        "is_published",
+        "salary_min",
+        "updated_at",
+    ]
+    autocomplete_fields = ["tags", "locations"]
+    search_fields = ["slug", "title"]
+    list_filter = [
+        ("tags", DALFRelatedFieldAjaxMulti),
+        ("locations", DALFRelatedFieldAjaxMulti),
+        "is_orgs_highlighted",
+        "is_published",
         "created_at",
         "updated_at",
     ]

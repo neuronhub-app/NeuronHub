@@ -1,5 +1,6 @@
 import type { Config } from "@react-router/dev/config";
 import { sentryOnBuildEnd } from "@sentry/react-router";
+import jobsLandingPages from "./graphql/prefetch/JobsLandingPages.json" with { type: "json" };
 
 export default {
   ssr: false,
@@ -16,4 +17,5 @@ export default {
     };
     await sentryOnBuildEnd(args);
   },
+  prerender: () => jobsLandingPages?.jobs_landing_pages?.map((page) => `/${page.slug}`),
 } satisfies Config;

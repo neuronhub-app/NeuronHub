@@ -78,7 +78,10 @@ Replaces:
 
 ### Flaky errors
 
-Might fail randomly on:
+A common error is caused by `waitForResponseGraphql`:
+> Error: response.json: Protocol error (Network.getResponseBody): No resource with given identifier found
+
+Also might fail randomly on:
 > TimeoutError: page.waitForLoadState: Timeout 7500ms exceeded.
 
 Rerun 1-3 times before debugging.

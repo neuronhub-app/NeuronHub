@@ -3,6 +3,7 @@ import { fromUnixTime } from "date-fns";
 import { LuX } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { ids } from "@/e2e/ids";
 
 export type RefinementActive = ReturnType<
   typeof useCurrentRefinements
@@ -86,7 +87,12 @@ export function PgAlgoliaFacetsActive(props: { config: FacetsActiveConfig }) {
 
 function FilterTag(props: { label: string; onRemove: () => void }) {
   return (
-    <Badge {...tagStyle} onClick={props.onRemove} maxW="full">
+    <Badge
+      {...tagStyle}
+      onClick={props.onRemove}
+      maxW="full"
+      data-testid={ids.facet.activeTag(props.label)}
+    >
       <HStack gap="gap.xs" alignItems="center" overflow="hidden">
         <Text truncate>{props.label}</Text>
         <Icon boxSize="2.5" color="inherit" className="close-icon">

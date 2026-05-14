@@ -7,7 +7,7 @@ import { env } from "@/env";
 import { ReactNode } from "react";
 
 export function NhaPosthogProvider(props: { children: ReactNode }) {
-  if (env.VITE_POSTHOG_IS_ENABLED) {
+  if (env.mode.isClient && env.VITE_POSTHOG_IS_ENABLED) {
     posthog.init(env.VITE_POSTHOG_TOKEN, {
       api_host: env.VITE_POSTHOG_HOST,
       loaded: posthog => {

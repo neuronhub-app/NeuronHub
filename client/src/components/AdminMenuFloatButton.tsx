@@ -18,7 +18,7 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
   const storageKey = "is_admin_menu_hidden";
 
   const state = useStateValtio({
-    isHidden: Boolean(localStorage.getItem(storageKey) ?? false),
+    isHidden: env.mode.isClient && Boolean(localStorage.getItem(storageKey) ?? false),
   });
 
   if (!(user?.is_superuser || user?.is_staff)) {

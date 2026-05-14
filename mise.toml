@@ -50,6 +50,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     SERVER_DOMAIN = "{{ env.SERVER_DOMAIN | default(value = 'localhost') }}"
     SERVER_PORT = "{{ env.SERVER_PORT | default(value = 8000) }}"
     SERVER_URL = "http://{{ env.SERVER_DOMAIN }}:{{ env.SERVER_PORT }}"
+    VITE_SERVER_URL = "{{ env.SERVER_URL }}"
 
     CLIENT_DOMAIN = "{{ env.CLIENT_DOMAIN | default(value = 'localhost') }}"
     CLIENT_PORT = "{{ env.CLIENT_PORT | default(value = 3000) }}"
@@ -151,7 +152,6 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         depends = "dev:db"
         dir = "client"
         run = "pnpm exec react-router dev --host --port={{ env.CLIENT_PORT }}"
-        env.VITE_SERVER_URL = "{{ env.SERVER_URL }}"
 
     [tasks."dev:s3"]
         dir = "server"
@@ -255,6 +255,11 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     run = "uv run manage.py shell"
     interactive = true
     alias = "s"
+
+[tasks."client:prefetch-from-server"]
+    description = "POST JobsLandingPagesForPrefetch => saves JSON for RR prerender"
+    dir = "client"
+    run = "pnpm exec vite-node src/prefetch/runPrefetch.ts"
 
 [tasks."django:algolia-reindex"]
     dir = "server"

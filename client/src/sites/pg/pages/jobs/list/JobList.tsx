@@ -1,15 +1,16 @@
 import { track } from "@/utils/track";
 import { Box, Button, Flex, HStack, Icon, Separator, Stack, Text } from "@chakra-ui/react";
-import { type ReactNode, useRef } from "react";
+import { type ReactNode, useEffect, useRef } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
 import { Configure, useClearRefinements } from "react-instantsearch";
-import { Link, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { layout } from "@/components/LayoutSidebar";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import type { JobsLandingPage } from "@/prefetch/JobsLandingPage";
 import { PgJobCardSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
 import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
@@ -26,11 +27,15 @@ import {
 import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 import { useInit } from "@/utils/useInit";
+import { useRequiredLandingPageRefinements } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
 
 /**
- * #quality-21% duplicate of [[JobList.tsx]] - overcomplicated wo/ its dedup benefits
+ * #quality-19% copy-paste of [[client/src/apps/jobs/list/JobList.tsx]].
+ *
+ * Now it's just overcomplicated wo/ the original dedup benefits.
+ * If PG wants unique layout -> JobList & PgAlgoliaList must be 1 comp, not a generic of 1.
  */
-export function JobList(props: { slug?: string }) {
+export function JobList(props: { slug?: string; jobsLandingPage?: JobsLandingPage }) {
   const [searchParams] = useSearchParams();
 
   useInit({
@@ -46,10 +51,17 @@ export function JobList(props: { slug?: string }) {
   const algolia = useAlgoliaSearchClient();
   const algoliaFilters = useJobListAlgoliaFilters();
   const extraTags = useJobListExtraTags();
+
   return (
     <PgAlgoliaList<JobFragmentType>
       index="indexNameJobs"
       label="job"
+      jobsLandingPage={props.jobsLandingPage}
+      // uiStateForLandingPage={
+      //   props.jobsLandingPage
+      //     ? landingPageToAlgoliaState(props.jobsLandingPage)
+      //     : undefined
+      // }
       cta={<JobsSubscribeModal testId={ids.job.alert.subscribeBtn} />}
       ctaMobile={<JobsSubscribeModal testId={ids.job.alert.subscribeBtnMobile} />}
       sort={
@@ -103,6 +115,13 @@ export function JobList(props: { slug?: string }) {
         ]}
         attributesToSnippet={["description:30"]}
       />
+
+      {props.jobsLandingPage && (
+        <>
+          <RedirectOnFiltersReset to={urls.jobs.list} />
+          <RegisterLandingPageRefinements />
+        </>
+      )}
     </PgAlgoliaList>
   );
 }
@@ -166,6 +185,29 @@ function ResetFiltersButton() {
       Reset filters
     </Button>
   );
+}
+
+function RegisterLandingPageRefinements() {
+  useRequiredLandingPageRefinements();
+  return null;
+}
+
+// #AI, e2e tested.
+function RedirectOnFiltersReset(props: { to: string }) {
+  const clearRefines = useClearRefinements();
+  const navigate = useNavigate();
+
+  const isRefinesWereActive = useRef(false);
+
+  useEffect(() => {
+    if (clearRefines.canRefine) {
+      isRefinesWereActive.current = true;
+    } else if (isRefinesWereActive.current) {
+      navigate(props.to);
+    }
+  }, [clearRefines.canRefine, navigate, props.to]);
+
+  return null;
 }
 
 function useJobOpenPinned(slug?: string): { node?: ReactNode; id?: ID } {
@@ -291,10 +333,12 @@ const pgSubheaderButtonStyle = {
   _hover: { color: "brand.green.light" },
 } as const;
 
-// Unused at runtime: PG renders Algolia JSON directly. Kept so gql.tada CLI emits
-// `JobsByIds` into `server/persisted-queries.json` - BE Algolia indexer
-// (`AlgoliaModel._get_graphql_field`) executes it to serialize the indexed JSON.
-// Contract: `apps/jobs/index__test.py` ⇒ paths(JobFragment) ⊆ paths(JobIndex record).
+/**
+ * Unused at runtime.
+ * Kept for TS types &  server/persisted-queries.json & `AlgoliaModel._get_graphql_field` serializers.
+ *
+ * Contract: `apps/jobs/index__test.py` ⇒ paths(JobFragment) ⊆ paths(JobIndex record).
+ */
 const JobsByIdsQuery = graphql.persisted(
   "JobsByIds",
   graphql(

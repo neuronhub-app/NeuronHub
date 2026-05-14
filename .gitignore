@@ -12,6 +12,7 @@ node_modules/
 *.dump
 *.csv
 client/e2e/auth.state.json
+client/graphql/prefetch/
 
 # caches
 __pycache__

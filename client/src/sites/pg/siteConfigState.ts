@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/react";
 import { proxy, useSnapshot } from "valtio";
+import { env } from "@/env";
 import { graphql, type ResultOf } from "@/gql-tada";
 import { client } from "@/graphql/client";
 
@@ -47,10 +48,12 @@ export const siteConfigState = proxy<{
   isLoading: true,
 });
 
-client.query({ query: SiteConfigQuery }).then(result => {
-  siteConfigState.data = result.data?.site ?? null;
-  siteConfigState.isLoading = false;
-});
+if (env.mode.isClient) {
+  client.query({ query: SiteConfigQuery }).then(result => {
+    siteConfigState.data = result.data?.site ?? null;
+    siteConfigState.isLoading = false;
+  });
+}
 
 export function useSiteConfig() {
   return useSnapshot(siteConfigState).data;

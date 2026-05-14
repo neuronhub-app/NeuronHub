@@ -12,6 +12,7 @@ from neuronhub.apps.importer.models import PostSource
 from neuronhub.apps.importer.models import UserSource
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.jobs.models import JobsLandingPage
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.models import PostRelated
 from neuronhub.apps.posts.models.posts import Post
@@ -68,6 +69,7 @@ async def _get_algolia_ids_to_delete(model: type[Model]) -> AlgoliaChangedIds | 
     return None
 
 
+# todo !! fix: enforce extension on creation of a new model - eg by a runtime check in dev.
 _models_to_drop_ordered = [
     PostHighlight,
     PostRelated,
@@ -84,6 +86,7 @@ _models_to_drop_ordered = [
     Profile,
     ProfileGroup,
     JobAlert,
+    JobsLandingPage,
     Job,
     Org,
     UserConnectionGroup,

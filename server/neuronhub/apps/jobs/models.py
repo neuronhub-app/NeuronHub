@@ -379,6 +379,49 @@ class JobAlert(TimeStampedModel):
         return f"Alert(#{self.pk}, {self.email}{is_active_flag})"
 
 
+class JobsLandingPage(TimeStampedModel):
+    """
+    #AI Landing pages: `/{slug}` + filters. See [[184-feat-jobs-landing-pages.md]] and [[landingPageToAlgoliaState.ts]].
+    """
+
+    slug = models.SlugField(max_length=255, unique=True)
+    title = models.CharField(
+        max_length=255,
+        help_text="H1 + default <title>. Eg `Climate Change Jobs in France`.",
+    )
+    meta_description = models.CharField(max_length=512, blank=True, default="")
+    meta_image_url = models.URLField(max_length=512, blank=True, default="")
+
+    tags = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
+        "posts.PostTag",
+        # For admin panel, as FE drops unmapped categories.
+        limit_choices_to={"categories__name__in": list(Job.tag_category_to_field.keys())},
+        related_name="landing_pages",
+        blank=True,
+    )
+    locations: ManyToManyField[JobLocation, JobLocation] = models.ManyToManyField(
+        JobLocation,
+        blank=True,
+    )
+    salary_min = models.PositiveIntegerField(blank=True, null=True)
+    is_orgs_highlighted = models.BooleanField(blank=True, null=True)
+
+    is_published = models.BooleanField(
+        default=True,
+        help_text="Note: prerender runs at build - changes only apply on next deploy.",
+    )
+
+    history = HistoricalRecords(
+        m2m_fields=[
+            tags,
+            locations,
+        ]
+    )
+
+    def __str__(self):
+        return f"/{self.slug}"
+
+
 class JobFaqQuestion(models.Model):
     site = models.ForeignKey(
         "sites.SiteConfig",

@@ -11,6 +11,7 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "resolveJsonModule": true,
 
     // - zod.js requires strict=true (and probably strictNullChecks=true) to mark fields as "required" by default.
     // - gql.tada doesn't work without it.

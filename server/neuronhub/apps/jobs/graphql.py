@@ -17,6 +17,7 @@ from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobFaqQuestion
 from neuronhub.apps.jobs.models import JobLocation
+from neuronhub.apps.jobs.models import JobsLandingPage
 from neuronhub.apps.jobs.services.airtable_sync_jobs import get_jobs_qs_prefetched
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
@@ -134,6 +135,19 @@ class JobAlertType:
     sent_count: auto
 
 
+@strawberry_django.type(JobsLandingPage)
+class JobsLandingPageType:
+    id: auto
+    slug: auto
+    title: auto
+    meta_description: auto
+    meta_image_url: auto
+    tags: list[PostTagType]
+    locations: list[JobLocationType]
+    salary_min: auto
+    is_orgs_highlighted: auto
+
+
 @strawberry.type
 class JobVersionType:
     id: strawberry.ID
@@ -172,6 +186,13 @@ class JobsQuery:
     @strawberry_django.field
     async def job_faq_questions(self) -> list[JobFaqQuestionType]:
         return await get_list_cached(JobFaqQuestion, cache_key=JobsQuery.CacheKey.Faq)
+
+    @strawberry_django.field
+    async def jobs_landing_pages(self, info: strawberry.Info) -> list[JobsLandingPageType]:
+        pages = JobsLandingPage.objects.filter(is_published=True).prefetch_related(
+            "tags__categories", "locations"
+        )
+        return cast(list[JobsLandingPageType], [page async for page in pages])
 
     @strawberry_django.field
     async def job_by_slug(self, info: strawberry.Info, slug: str) -> JobType | None:

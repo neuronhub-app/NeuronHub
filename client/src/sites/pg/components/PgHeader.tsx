@@ -17,7 +17,9 @@ import {
 import { useEffect, useRef } from "react";
 import { LuChevronDown, LuMenu, LuX } from "react-icons/lu";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { ids } from "@/e2e/ids";
 import { layout } from "@/sites/pg/PgLayoutConfig";
+import { useHeroHeader } from "@/sites/pg/components/useHeroHeader";
 
 const style = {
   nav: {
@@ -90,6 +92,8 @@ export type NavLinkChild = { id: string; label: string; href: string };
 export type NavLink = { id: string; label: string; href: string; links: NavLinkChild[] };
 
 export function PgHeroHeader(props: { navLinks: NavLink[]; isLoading: boolean }) {
+  const hero = useHeroHeader();
+
   return (
     <Box as="header" bg="brand.green">
       <PgNav navLinks={props.navLinks} isLoading={props.isLoading} />
@@ -106,27 +110,16 @@ export function PgHeroHeader(props: { navLinks: NavLink[]; isLoading: boolean })
           fontFamily="heading"
           fontSize={{ base: "26px", md: "6xl" }}
           lineHeight={{ base: "32px", md: "1.2" }}
+          data-testid={hero.isOverridden ? ids.job.landingPage.title : undefined}
         >
-          Find a job that&apos;s good,
-          <br />
-          for you{" "}
-          <Box
-            as="span"
-            fontFamily="heading"
-            fontStyle="italic"
-            fontSize={{ base: "26px", md: "6xl" }}
-            lineHeight={{ base: "32px", md: "1.2" }}
-          >
-            and
-          </Box>{" "}
-          for the world.
+          {hero.title}
         </Text>
         <Text
           fontSize={{ base: "19px", md: "23px" }}
           lineHeight={{ base: "25px", md: "1.4" }}
           mt={{ base: "4", md: "12" }}
         >
-          Curated high-impact jobs for people who want to make a difference.
+          {hero.description}
         </Text>
       </Container>
     </Box>

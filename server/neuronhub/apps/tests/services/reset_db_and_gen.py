@@ -1,3 +1,7 @@
+"""
+todo ! refac-name: db_reset_and_gen
+"""
+
 from dataclasses import dataclass
 from dataclasses import fields
 
@@ -15,6 +19,7 @@ from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _parse_location_field
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _sync_locations
 from neuronhub.apps.orgs.models import Org
+from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 from neuronhub.apps.profiles.models import Profile
@@ -25,6 +30,7 @@ from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.users.models import User
 
 
+# todo ! refac: move into test_gen, as it should be possible to accept in there - GraphQL def is for HTTP layer, not kwargs duplication.
 @strawberry.input
 @dataclass
 class PostsTagParams:
@@ -32,6 +38,8 @@ class PostsTagParams:
     name: str  # supports "Category / Tag" parsing
     is_vote_pos: bool | None = None
     is_important: bool | None = None
+    # #AI: for jobs/profiles: tag.categories filter category (eg "area"), separate from `tag_parent`
+    category: TagCategoryEnum | None = None
 
 
 @strawberry.input
@@ -66,6 +74,16 @@ class JobsJobParams:
     # todo !! refac: use JobLocation from main API
     locations: list[str] | None = None
     is_published: bool = True
+    tags: list[PostsTagParams] | None = None
+
+
+@strawberry.input
+@dataclass
+class JobsLandingPageParams:
+    slug: str
+    title: str
+    meta_description: str = ""
+    tags: list[PostsTagParams] | None = None
 
 
 @strawberry.input
@@ -97,6 +115,7 @@ class GenCreateParams:
     posts_comment: PostsCommentParams | None = None
     posts_import_hn: PostsImportHnParams | None = None
     jobs_job: JobsJobParams | None = None
+    jobs_landing_page: JobsLandingPageParams | None = None
     profiles_profile: ProfilesProfileParams | None = None
     profiles_match: ProfilesMatchParams | None = None
 
@@ -150,6 +169,7 @@ async def _create(
         return
 
     if hn_raw := create_params.posts_import_hn:
+        # todo ! refac: takes 50s - use a small HN post
         importer = ImporterHackerNews(is_use_cache=True, is_logging_enabled=False)
         post = await importer.import_post(hn_raw.id_external)
         ids_per_model.setdefault(Post, []).append(post.id)
@@ -187,8 +207,35 @@ async def _create(
             title=job_raw.title,
             locations=locations,
             is_published=job_raw.is_published,
+            tags=[
+                # #AI
+                await gen.posts.tag(
+                    name=tag_param.name,
+                    category=tag_param.category,
+                    author=gen.users.user_default,
+                )
+                for tag_param in job_raw.tags or []
+            ],
         )
         ids_per_model.setdefault(Job, []).append(job.id)
+        return
+
+    # #AI
+    if landing_raw := create_params.jobs_landing_page:
+        tags = [
+            await gen.posts.tag(
+                name=tag_param.name,
+                category=tag_param.category,
+                author=gen.users.user_default,
+            )
+            for tag_param in landing_raw.tags or []
+        ]
+        await gen.jobs.jobs_landing_page(
+            slug=landing_raw.slug,
+            title=landing_raw.title,
+            meta_description=landing_raw.meta_description,
+            tags=tags,
+        )
         return
 
     raise ValueError(f"Missing handler in GenCreateParams: {create_params}")
@@ -204,3 +251,5 @@ async def _add_tags(post: Post, params: list[PostsTagParams] | None, author: Use
             is_important=param.is_important,
         )
         await post.tags.aadd(tag)
+        # #AI: `param.category` is intentionally ignored — posts don't use tag
+        # categories (jobs/profiles do; see `_create` `jobs_job`/`jobs_landing_page`).

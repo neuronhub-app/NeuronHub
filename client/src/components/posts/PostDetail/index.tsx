@@ -20,10 +20,9 @@ import { PostCard } from "@/components/posts/PostCard/PostCard";
 import { CommentForm } from "@/components/posts/PostDetail/CommentForm";
 import { CommentThread } from "@/components/posts/PostDetail/CommentThread";
 import { useCommentTree } from "@/components/posts/PostDetail/useCommentTree";
-import { useMetaTitle } from "@/components/useMetaTitle";
+import { useHeadMeta } from "@/components/useHeadMeta";
 import type { PostDetailFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
-import { useInit } from "@/utils/useInit";
 
 export function PostDetail(props: {
   post?: PostDetailFragmentType | PostReviewDetailFragmentType;
@@ -37,14 +36,7 @@ export function PostDetail(props: {
 
   useHighlighter({ commentIds: comments.ids });
 
-  const title = useMetaTitle({ isLoading: true });
-
-  useInit({
-    isReady: Boolean(props.post?.id),
-    onInit: () => {
-      title.set(props.post!.title);
-    },
-  });
+  useHeadMeta({ title: props.post?.title });
 
   return (
     <Stack>

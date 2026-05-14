@@ -1,4 +1,7 @@
+import type { JobsLandingPage } from "@/prefetch/JobsLandingPage";
+import { landingPageToAlgoliaState } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
 import { Box, Grid, HStack, Stack } from "@chakra-ui/react";
+import type { IndexUiState, UiState } from "instantsearch.js";
 import { useRef, type ReactNode } from "react";
 import { InstantSearch } from "react-instantsearch";
 import type { ID } from "@/gql-tada";
@@ -30,6 +33,7 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
   children?: ReactNode;
   cta?: ReactNode;
   ctaMobile?: ReactNode;
+  jobsLandingPage?: JobsLandingPage;
 }) {
   const algolia = useAlgoliaSearchClient();
 
@@ -41,30 +45,51 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
     return <PgAlgoliaListSkeleton />;
   }
 
+  const uiStateForLandingPage: IndexUiState | undefined = landingPageToAlgoliaState(
+    props.jobsLandingPage,
+  );
+
+  // #AI: Landing-page: clean URL if state == preset => URL params on user edits.
+  // `routeToState({}) → preset` survives empty URL on initial load + reloads.
+  const routing = {
+    stateMapping: {
+      stateToRoute: (uiState: UiState) => {
+        const urlParamsExcludedForInfiniteScroll = [
+          "page",
+          "configure", // i confirmed by Algolia docs eye-scan that its is redundant.
+        ];
+        const stateFiltered = Object.fromEntries(
+          Object.entries(uiState[indexName] ?? {}).filter(
+            entry => !urlParamsExcludedForInfiniteScroll.includes(entry[0]),
+          ),
+        );
+
+        if (
+          uiStateForLandingPage &&
+          JSON.stringify(uiStateForLandingPage) === JSON.stringify(stateFiltered)
+        ) {
+          return {};
+        }
+        return { [indexName]: stateFiltered };
+      },
+      routeToState: (routeState: UiState) => {
+        const isStateEmpty = !routeState[indexName];
+        if (uiStateForLandingPage && isStateEmpty) {
+          return { [indexName]: uiStateForLandingPage };
+        }
+        return routeState;
+      },
+    },
+  };
+
   const labelPlural = `${props.label}s`;
 
   return (
     <InstantSearch
       searchClient={algolia.client}
       indexName={indexName}
-      routing={{
-        stateMapping: {
-          // for infinite scroll: drop pagination from URL
-          stateToRoute: uiState => {
-            // (LLM said "configure" is redundant, and iirc i 'confirmed' it by docs)
-            const params = { pagination: "page", configRedundant: "configure" };
-            const paramsExcluded = [params.pagination, params.configRedundant];
-            return {
-              [indexName]: Object.fromEntries(
-                Object.entries(uiState[indexName] ?? {}).filter(
-                  stateAttrName => !paramsExcluded.includes(stateAttrName[0]),
-                ),
-              ),
-            };
-          },
-          routeToState: routeState => routeState,
-        },
-      }}
+      initialUiState={uiStateForLandingPage ? { [indexName]: uiStateForLandingPage } : undefined}
+      routing={routing}
       future={{ preserveSharedStateOnUnmount: true }}
       insights={true}
     >

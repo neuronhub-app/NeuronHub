@@ -14,7 +14,9 @@ export const routes = [
     route("/jobs/:slug", "./sites/pg/pages/jobs/list/slug.tsx"),
     // legacy redirects
     route("/job-postings/:slug", "./sites/pg/redirects/slug-legacy-redirect-1.tsx"),
-    route("/:slug", "./sites/pg/redirects/slug-legacy-redirect-2.tsx"),
+    // For landing pages.
+    // OR the legacy /:slug -> /jobs/:slug redirect (see #169).
+    route("/:slug", "./sites/pg/pages/jobs-landing-page/[slug].tsx"),
     route("*", "./page-404.tsx"),
   ]),
 

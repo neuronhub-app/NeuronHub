@@ -9,6 +9,7 @@ from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobLocation
+from neuronhub.apps.jobs.models import JobsLandingPage
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.orgs.tests.test_gen import OrgsGen
 from neuronhub.apps.posts.models import PostTag
@@ -178,3 +179,33 @@ class JobsGen:
         if locations:
             await alert.locations.aset(locations)
         return alert
+
+    async def jobs_landing_page(
+        self,
+        slug: str,
+        title: str,
+        meta_description: str = "",
+        meta_image_url: str = "",
+        tags: list[PostTag] | None = None,
+        locations: list[JobLocation] | None = None,
+        salary_min: int | None = None,
+        is_orgs_highlighted: bool | None = None,
+        is_published: bool = True,
+    ) -> JobsLandingPage:
+        """
+        #AI
+        """
+        page = await JobsLandingPage.objects.acreate(
+            slug=slug,
+            title=title,
+            meta_description=meta_description,
+            meta_image_url=meta_image_url,
+            salary_min=salary_min,
+            is_orgs_highlighted=is_orgs_highlighted,
+            is_published=is_published,
+        )
+        if tags:
+            await page.tags.aset(tags)
+        if locations:
+            await page.locations.aset(locations)
+        return page

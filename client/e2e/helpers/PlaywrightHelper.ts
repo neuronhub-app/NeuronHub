@@ -101,7 +101,7 @@ export class PlaywrightHelper {
   }
 
   /**
-   * #AI
+   * #AI-slop: failed LLM refactor that tried to fix the flakiness.
    *
    * Read body inside `page.on("response")` handler to start the CDP
    * `Network.getResponseBody` fetch before subsequent actions (eg navigation)

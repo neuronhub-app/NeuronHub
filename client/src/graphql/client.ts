@@ -16,6 +16,7 @@ function createApolloClient() {
   }
 
   const client = new ApolloClient({
+    ssrMode: env.mode.isSSR, // For RR prerender
     cache: new InMemoryCache({
       // Fix for nested fragment spreading when gql.tada disableMasking is true
       // Apollo needs explicit possibleTypes for interfaces to properly handle fragments (see #40)
