@@ -405,6 +405,12 @@ class JobsLandingPage(TimeStampedModel):
     )
     salary_min = models.PositiveIntegerField(blank=True, null=True)
     is_orgs_highlighted = models.BooleanField(blank=True, null=True)
+    source_ext = TextChoicesField(
+        choices_enum=Job.SourceExt,
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     is_published = models.BooleanField(
         default=True,

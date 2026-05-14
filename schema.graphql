@@ -227,6 +227,7 @@ input JobsJobParams {
   org_name: String = null
   locations: [String!] = null
   is_published: Boolean! = true
+  source_ext: String = null
   tags: [PostsTagParams!] = null
 }
 
@@ -234,6 +235,7 @@ input JobsLandingPageParams {
   slug: String!
   title: String!
   meta_description: String! = ""
+  source_ext: String = null
   tags: [PostsTagParams!] = null
 }
 
@@ -247,6 +249,7 @@ type JobsLandingPageType {
   locations: [JobLocationType!]!
   salary_min: Int
   is_orgs_highlighted: Boolean
+  source_ext: SourceExt
 }
 
 enum LocationType {

@@ -9,6 +9,7 @@ export const jobsLandingPagesDoc = graphql(`
       meta_image_url
       salary_min
       is_orgs_highlighted
+      source_ext
       tags {
         name
         category_name

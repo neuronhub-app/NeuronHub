@@ -25,13 +25,13 @@ The main long-term complexity may be in reliably converting Django filters to Al
     - [x] removal of the prop `uiStateForLandingPage?: IndexUiState`
 - [x] Fix e2e requiring the file `JobsLandingPages.json` file. 
 - [x] Docs: `Algolia.md`; `adding-job-alert-filters.mdx`; a subfile in `frontend/README.md` re prerender + prefetch.
+- [x] Add a field `JobsLandingPage.source_ext` as `Job.source_ext`
 
 ## Relevant-Files
 
 BE:
-- `server/neuronhub/apps/jobs/{models,admin,graphql,index}.py` — `JobsLandingPage` (slug+SEO+filters).
-- `server/neuronhub/apps/jobs/tests/test_gen.py` + `db_reset_and_partial_reindex.py`, `reset_db_and_gen.py`.
-- `_get_jobs_by_alert` — Django mirror of FE translator.
+- `server/neuronhub/apps/jobs/{models,admin,graphql,index}.py` — `JobsLandingPage` (slug+SEO+filters; `source_ext` TextChoices).
+- `server/neuronhub/apps/jobs/tests/test_gen.py` + `db_reset_and_partial_reindex.py`, `reset_db_and_gen.py` (gen params expose `source_ext`).
 
 FE — landing page core:
 - `client/src/prefetch/JobsLandingPage.ts` — gql doc + `graphql.persisted` reg + exported types.
@@ -60,18 +60,10 @@ FE — prerender + SEO meta:
 - `client/src/sites/pg/siteConfigState.ts` — module-init `client.query` guarded by `env.mode.isClient`.
 - `client/src/components/AdminMenuFloatButton.tsx` — `localStorage` guarded by `env.mode.isClient`.
 
-## Exec-Plan
-
-### Open items (carried)
-1. Wire `client:prefetch-from-server` into Docker build (sibling to `typegen:server`).
-2. Sentry env vars for build pipeline (sourcemap auth token).
-
-Latent: `PgAlgoliaList` mobile+desktop CSS-hide → duplicate testids; replace `useBreakpointValue("md")`.
-
 ## Decision-Log
 
 #### v0 implementation
-- kept prerender despite CLAUDE.md SSR ban — CTO: prefetch JSON + prerender ≠ unwanted SSR. Future refactors must not strip prerender to "comply" with the SSR ban.
+- kept prerender despite CLAUDE.md SSR ban: prefetch JSON + prerender ≠ unwanted SSR. Future refactors must not strip prerender to "comply" with the SSR ban.
 
 #### drop complexity out of `client:prefetch-from-server`
 - prefetch script logic → vite-node module (fetch + fs).
@@ -108,3 +100,9 @@ Latent: `PgAlgoliaList` mobile+desktop CSS-hide → duplicate testids; replace `
 - `<RegisterLandingPageRefinements />` must live inside `<InstantSearch>` ctx (refactor trap).
 - rejected: hoisting hooks into `PgFacetAttribute` — unrelated to feature.
 - `NhaPosthogProvider`: gated `posthog.init` on `env.mode.isClient` — vite-node prerender stubs `posthog.default` (no `.init`) → SSR threw.
+
+#### JobsLandingPage.source_ext
+- routed via `refinementList["source_ext"]` (not `<Configure filters>` like `?source=` URL param) — preset surfaces in active facets + reset triggers `RedirectOnFiltersReset` like other landing-page presets.
+- `formatAttribute.source_ext = r => "Source: ${r.label}"` — labelsOverride alone drops the value ("Source" w/o "AIM").
+- `useRequiredLandingPageRefinements` claims `source_ext` ref-list — same lazyMount trap as tags.
+- `JobsJobParams.source_ext` added to test_gen pipe so e2e can seed jobs with the source.

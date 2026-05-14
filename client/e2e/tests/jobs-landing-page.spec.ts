@@ -13,11 +13,21 @@ import { env } from "@/env";
 import { urls } from "@/urls";
 import { TagCategoryEnum } from "~/graphql/enums";
 
-const slug = "e2e-climate-jobs";
-const title = "Climate Jobs (e2e)";
-const metaDescription = "Latest climate jobs around the world.";
-const jobTitle = "Climate Researcher";
-const tagName = "Climate Change";
+const pages = {
+  climate_change: {
+    slug: "e2e-climate-jobs",
+    title: "Climate Jobs (e2e)",
+    meta_description: "Latest climate jobs around the world.",
+    job_title: "Climate Researcher",
+    tag_name: "Climate Change",
+  },
+  charity_entrepreneurship: {
+    slug: "e2e-aim-jobs",
+    title: "AIM Jobs (e2e)",
+    source_ext: "AIM",
+    job_title: "AIM-sourced Researcher",
+  },
+} as const;
 
 const prefetchJsonPath = fileURLToPath(
   new URL("../../graphql/prefetch/JobsLandingPages.json", import.meta.url),
@@ -33,15 +43,27 @@ test.describe("PG Jobs Landing Page", () => {
         {
           jobs_landing_pages: [
             {
-              slug,
-              title,
-              meta_description: metaDescription,
+              slug: pages.climate_change.slug,
+              title: pages.climate_change.title,
+              meta_description: pages.climate_change.meta_description,
               meta_image_url: "",
               salary_min: null,
               is_orgs_highlighted: null,
+              source_ext: null,
               // `category_name` is the lowercase data value (BE wire format),
               // not the gql-enum name (`TagCategoryEnum.Area === "Area"`).
-              tags: [{ name: tagName, category_name: "area" }],
+              tags: [{ name: pages.climate_change.tag_name, category_name: "area" }],
+              locations: [],
+            },
+            {
+              slug: pages.charity_entrepreneurship.slug,
+              title: pages.charity_entrepreneurship.title,
+              meta_description: "",
+              meta_image_url: "",
+              salary_min: null,
+              is_orgs_highlighted: null,
+              source_ext: pages.charity_entrepreneurship.source_ext,
+              tags: [],
               locations: [],
             },
           ],
@@ -53,43 +75,84 @@ test.describe("PG Jobs Landing Page", () => {
     await play.reset_db_and_gen([
       {
         jobs_landing_page: {
-          slug,
-          title,
-          meta_description: metaDescription,
-          tags: [{ name: tagName, category: TagCategoryEnum.Area }],
+          slug: pages.climate_change.slug,
+          title: pages.climate_change.title,
+          meta_description: pages.climate_change.meta_description,
+          tags: [{ name: pages.climate_change.tag_name, category: TagCategoryEnum.Area }],
+        },
+      },
+      {
+        jobs_landing_page: {
+          slug: pages.charity_entrepreneurship.slug,
+          title: pages.charity_entrepreneurship.title,
+          source_ext: pages.charity_entrepreneurship.source_ext,
         },
       },
       {
         jobs_job: {
-          title: jobTitle,
-          tags: [{ name: tagName, category: TagCategoryEnum.Area }],
+          title: pages.climate_change.job_title,
+          tags: [{ name: pages.climate_change.tag_name, category: TagCategoryEnum.Area }],
+        },
+      },
+      {
+        jobs_job: {
+          title: pages.charity_entrepreneurship.job_title,
+          source_ext: pages.charity_entrepreneurship.source_ext,
         },
       },
       { jobs_job: { title: "Unrelated Engineer" } },
     ]);
   });
 
-  test("renders title + preset filter chip + filtered jobs", async ({ page, play }) => {
-    await play.navigate(urls.jobs.landingPage(slug), { idleWait: true });
+  test("source_ext preset filters jobs + chip resets to /jobs", async ({ page, play }) => {
+    await play.navigate(urls.jobs.landingPage(pages.charity_entrepreneurship.slug), {
+      idleWait: true,
+    });
 
-    await expectBase(play.get(ids.job.landingPage.title)).toHaveText(title);
-    await expectBase(page).toHaveTitle(`${title} | ${env.VITE_PROJECT_NAME}`);
+    await expectBase(play.get(ids.job.landingPage.title)).toHaveText(
+      pages.charity_entrepreneurship.title,
+    );
+
+    const sourceChip = page.locator(
+      `[data-testid="${ids.facet.activeTag(`Source: ${pages.charity_entrepreneurship.source_ext}`)}"]:visible`,
+    );
+    await expectBase(sourceChip).toBeVisible();
+
+    const jobCards = play.getAll(ids.job.card.container);
+    await expectBase(jobCards).toHaveCount(1);
+    await expectBase(jobCards.first()).toContainText(pages.charity_entrepreneurship.job_title);
+
+    expectBase(new URL(page.url()).search).toBe("");
+
+    await sourceChip.click();
+    await expectBase(page).toHaveURL(urls.jobs.list);
+  });
+
+  test("renders title + preset filter chip + filtered jobs", async ({ page, play }) => {
+    await play.navigate(urls.jobs.landingPage(pages.climate_change.slug), { idleWait: true });
+
+    await expectBase(play.get(ids.job.landingPage.title)).toHaveText(pages.climate_change.title);
+    await expectBase(page).toHaveTitle(
+      `${pages.climate_change.title} | ${env.VITE_PROJECT_NAME}`,
+    );
 
     // Replaces dropped pytest field-shape test: prove `meta_description`
     // flows BE→prefetch JSON→hero render & `<meta name="description">`.
-    await expectBase(page.getByText(metaDescription)).toBeVisible();
+    await expectBase(page.getByText(pages.climate_change.meta_description)).toBeVisible();
     await expectBase(page.locator('meta[name="description"]')).toHaveAttribute(
       "content",
-      metaDescription,
+      pages.climate_change.meta_description,
     );
 
     // `:visible` — the testid also exists on the hidden mobile `PgMobileCollapsible` copy (first in DOM).
-    const activeChip = page.locator(`[data-testid="${ids.facet.activeTag(tagName)}"]:visible`);
+    const activeChip = page.locator(
+      `[data-testid="${ids.facet.activeTag(pages.climate_change.tag_name)}"]:visible`,
+    );
     await expectBase(activeChip).toBeVisible();
 
     const jobCards = play.getAll(ids.job.card.container);
     await expectBase(jobCards).toHaveCount(1);
-    await expectBase(jobCards.first()).toContainText(jobTitle);
+    await expectBase(jobCards.first()).toContainText(pages.climate_change.job_title);
 
     // Initial URL is clean (preset state ≡ `stateMapping.stateToRoute(preset) → {}`).
     expectBase(new URL(page.url()).search).toBe("");

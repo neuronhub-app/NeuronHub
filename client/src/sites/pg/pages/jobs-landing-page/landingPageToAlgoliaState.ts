@@ -29,6 +29,7 @@ export function useRequiredLandingPageRefinements() {
   for (const attribute of Object.values(algoliaTagAttrByCategory)) {
     useRefinementList({ attribute });
   }
+  useRefinementList({ attribute: "source_ext" });
 }
 
 // #AI, e2e tested. #quality-19%. unfuck by #187.
@@ -52,6 +53,10 @@ export function landingPageToAlgoliaState(page?: JobsLandingPage): IndexUiState 
     refinementList["locations.algolia_filter_name"] = page.locations.map(
       loc => loc.algolia_filter_name,
     );
+  }
+
+  if (page.source_ext) {
+    refinementList.source_ext = [page.source_ext];
   }
 
   const uiState: IndexUiState = {};

@@ -95,6 +95,7 @@ export function JobList(props: { slug?: string; jobsLandingPage?: JobsLandingPag
         },
         formatAttribute: {
           "locations.algolia_filter_name": r => r.label.replace(/^\[.+?] /, ""),
+          source_ext: refineParam => `Source: ${refineParam.label}`,
         },
         dateAttributes: ["posted_at_unix"],
         extraTags,

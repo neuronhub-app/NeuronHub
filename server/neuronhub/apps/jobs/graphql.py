@@ -146,6 +146,7 @@ class JobsLandingPageType:
     locations: list[JobLocationType]
     salary_min: auto
     is_orgs_highlighted: auto
+    source_ext: auto
 
 
 @strawberry.type

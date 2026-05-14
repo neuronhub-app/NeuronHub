@@ -190,6 +190,7 @@ class JobsGen:
         locations: list[JobLocation] | None = None,
         salary_min: int | None = None,
         is_orgs_highlighted: bool | None = None,
+        source_ext: Job.SourceExt | None = None,
         is_published: bool = True,
     ) -> JobsLandingPage:
         """
@@ -202,6 +203,7 @@ class JobsGen:
             meta_image_url=meta_image_url,
             salary_min=salary_min,
             is_orgs_highlighted=is_orgs_highlighted,
+            source_ext=source_ext,
             is_published=is_published,
         )
         if tags:

@@ -241,6 +241,7 @@ class JobsLandingPageAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         ("tags", DALFRelatedFieldAjaxMulti),
         ("locations", DALFRelatedFieldAjaxMulti),
         "is_orgs_highlighted",
+        "source_ext",
         "is_published",
         "created_at",
         "updated_at",

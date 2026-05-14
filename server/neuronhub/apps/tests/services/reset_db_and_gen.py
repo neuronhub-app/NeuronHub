@@ -74,6 +74,7 @@ class JobsJobParams:
     # todo !! refac: use JobLocation from main API
     locations: list[str] | None = None
     is_published: bool = True
+    source_ext: str | None = None
     tags: list[PostsTagParams] | None = None
 
 
@@ -83,6 +84,7 @@ class JobsLandingPageParams:
     slug: str
     title: str
     meta_description: str = ""
+    source_ext: str | None = None
     tags: list[PostsTagParams] | None = None
 
 
@@ -207,6 +209,7 @@ async def _create(
             title=job_raw.title,
             locations=locations,
             is_published=job_raw.is_published,
+            source_ext=Job.SourceExt(job_raw.source_ext) if job_raw.source_ext else None,
             tags=[
                 # #AI
                 await gen.posts.tag(
@@ -234,6 +237,7 @@ async def _create(
             slug=landing_raw.slug,
             title=landing_raw.title,
             meta_description=landing_raw.meta_description,
+            source_ext=Job.SourceExt(landing_raw.source_ext) if landing_raw.source_ext else None,
             tags=tags,
         )
         return
