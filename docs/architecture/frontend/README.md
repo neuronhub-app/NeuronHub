@@ -63,6 +63,7 @@ Must read when working with any of those module.
 - [How to use Playwright](./Playwright.md)
 - [How to use Chakra UI](Chakra-UI.md)
 - [How to work with sub-sites as `VITE_SITE="pg"`](Sub-sites-with-VITE_SITE.md) from `src/sites/`
+- [Prerender + prefetch](Prerender-and-Prefetch.md) — build-time static HTML for SEO without SSR
 
 ## `packages/shared/` — pnpm Workspace
 

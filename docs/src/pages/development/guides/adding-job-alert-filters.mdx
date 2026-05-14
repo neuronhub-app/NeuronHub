@@ -8,7 +8,7 @@ the tech debt of this simple subscribe modal has become.
 
 Every time you add/modify a filter, add the logic to to:
 - [ ] create a ticket in `LLM-spec-logs/` and copy there this checklist
-- [ ] `[[send_job_alerts.py]]::_get_jobs_qs_by_alert`
+- [ ] `[[send_job_alerts.py]]::_get_jobs_by_alert`
 - [ ] test in `[[send_job_alerts__test.py]]`
 - [ ] `jobs/graphql.py`
     - [ ] `JobType`
@@ -20,5 +20,11 @@ Every time you add/modify a filter, add the logic to to:
 - [ ] `[[PgFiltersTopbar.tsx]]`
 - [ ] ensure the Algolia JSON matches GraphQL per `[[Algolia.md]]`
 - [ ] consider extending the e2e in [[job-alert.spec.ts]]
+- [ ] #AI: Landing pages mirror — they share filter semantics with alerts:
+    - [ ] `[[JobsLandingPage]]` model + admin field (if new tag category / new scalar)
+    - [ ] `[[JobsLandingPagesForPrefetch]]` query in [[client/src/prefetch/JobsLandingPage.ts]]
+    - [ ] `[[landingPageToAlgoliaState.ts]]::algoliaTagAttrByCategory` map + scalar branches (salary, toggles)
+    - [ ] `[[useRequiredLandingPageRefinements]]` — claim Algolia state for new attrs to defeat `PgFacetPopover` `lazyMount`
+    - [ ] extend [[jobs-landing-page.spec.ts]] e2e if new filter is preset-relevant
 - [ ] review by LLM your code and the ticket
 - [ ] commit the ticket to Git along with your changes

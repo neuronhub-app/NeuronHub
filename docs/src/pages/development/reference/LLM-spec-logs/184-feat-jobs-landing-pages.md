@@ -24,6 +24,7 @@ The main long-term complexity may be in reliably converting Django filters to Al
 - [x] code review #3
     - [x] removal of the prop `uiStateForLandingPage?: IndexUiState`
 - [x] Fix e2e requiring the file `JobsLandingPages.json` file. 
+- [x] Docs: `Algolia.md`; `adding-job-alert-filters.mdx`; a subfile in `frontend/README.md` re prerender + prefetch.
 
 ## Relevant-Files
 
@@ -96,14 +97,14 @@ Latent: `PgAlgoliaList` mobile+desktop CSS-hide → duplicate testids; replace `
 #### CR-2: split prefetch — query / lookup / runner
 - split avoids re-export footgun: prior `JobsLandingPages.ts` re-exported types from a module w/ top-level `await runPrefetch()`.
 
-#### restore PgFacetPopover lazyMount
-- `<RegisterLandingPageRefinements />` must live inside `<InstantSearch>` ctx (refactor trap).
-- rejected: hoisting hooks into `PgFacetAttribute` — unrelated to feature.
-- `NhaPosthogProvider`: gated `posthog.init` on `env.mode.isClient` — vite-node prerender stubs `posthog.default` (no `.init`) → SSR threw.
-
 #### tolerate missing prefetch JSON
 - Vite eagerly resolves `[slug].tsx` JSON import at react-router-dev startup (not lazy as I first assumed — verified by cold-start e2e run).
 - `react-router.config.ts`:
     - top-of-module `existsSync`/`writeFileSync` stub so `[slug].tsx`'s static import resolves at vite startup.
     - own `prerender` switched to `readFileSync` (ESM static imports are hoisted ⇒ can't sit below the stub side-effect).
 - `client/src/prefetch/JobsLandingPages.json.d.ts`: `declare module` shim for tsgo (config side-effect doesn't run during type-check).
+
+#### restore PgFacetPopover lazyMount
+- `<RegisterLandingPageRefinements />` must live inside `<InstantSearch>` ctx (refactor trap).
+- rejected: hoisting hooks into `PgFacetAttribute` — unrelated to feature.
+- `NhaPosthogProvider`: gated `posthog.init` on `env.mode.isClient` — vite-node prerender stubs `posthog.default` (no `.init`) → SSR threw.

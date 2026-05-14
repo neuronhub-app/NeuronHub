@@ -53,6 +53,12 @@ Facet components: `AlgoliaFacetAttribute` (checkbox), `AlgoliaFacetBoolean`, `Al
 
 Sub-sites (eg `sites/pg/`) reuse these components without changes - see [Sub-sites](/docs/architecture/frontend/Sub-sites-with-VITE_SITE.md).
 
+## JobsLandingPage(Model) → Algolia state filter
+
+The filters are converted to `IndexUiState` at [[landingPageToAlgoliaState.ts]].
+
+For details see the [FE docs re prerender](/docs/architecture/frontend/Prerender-and-Prefetch.md).
+
 ## Testing
 
 - Pytest: Algolia is disabled.
