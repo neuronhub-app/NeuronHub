@@ -16,7 +16,14 @@ import {
   GoTools,
 } from "react-icons/go";
 import { IoInvertMode } from "react-icons/io5";
-import { LuChevronLeft, LuChevronRight, LuLink, LuShieldAlert, LuWrench } from "react-icons/lu";
+import {
+  LuChevronLeft,
+  LuChevronRight,
+  LuLink,
+  LuPanelTop,
+  LuShieldAlert,
+  LuWrench,
+} from "react-icons/lu";
 
 /**
  * Use this object to keep icons consistent.
@@ -58,6 +65,7 @@ export const icons = {
   users: GoPeople,
   job_alert: GoBell,
   job: GoBriefcase,
+  job_landing_page: LuPanelTop,
   get profiles() {
     return this.users;
   },

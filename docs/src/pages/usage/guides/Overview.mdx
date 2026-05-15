@@ -12,13 +12,7 @@ import { GuideCard } from "@/components"
 
 <Text color="fg.muted">Welcome.</Text>
 
-<SimpleGrid columns={{ base: 1, md: 3 }} gap="gap.md" mt="gap.md">
-  <GuideCard
-    icon={SiLinear}
-    title="Linear"
-    description="The single source of truth for specification."
-    path="/usage/guides/linear"
-  />
+<SimpleGrid columns={{ base: 1, md: 3 }} gap="gap.md" mt="gap.md" minW="750px">
   <GuideCard
     icon={icons.site_config}
     title="Site Config"
@@ -42,5 +36,17 @@ import { GuideCard } from "@/components"
     title="Admin Panel"
     description="Django admin for managing users and jobs."
     path="/usage/guides/admin-panel"
+  />
+  <GuideCard
+    icon={icons.job_landing_page}
+    title="Job Landing Pages"
+    description="Job boards with custom filters & SEO."
+    path="/usage/guides/job-landing-pages"
+  />
+  <GuideCard
+    icon={SiLinear}
+    title="Linear"
+    description="The single source of truth for specification."
+    path="/usage/guides/linear"
   />
 </SimpleGrid>

@@ -1,0 +1,37 @@
+---
+order: 2
+is_new: true
+---
+
+import {
+	ImageWithDialog,
+	SourceLink,
+	AdminLink,
+	Term,
+} from "@/components";
+
+A simple CMS for creating Landing Pages with a custom url, pre-selected filters, hero header overrides, and SEO (title, desc, image).
+
+The <AdminLink id="JobsLandingPage">admin panel form</AdminLink>:
+<ImageWithDialog size="sm"  src="https://media.neuronhub.app/docs/jobs/job-landing-page-admin.avif" />
+
+Press `Preview Saved Page` in the admin top-right corner to preview the page (filters + SEO) before a deploy. Example:
+
+<ImageWithDialog size="sm" isDimmed src="https://media.neuronhub.app/docs/jobs/job-landing-page-preview.avif" />
+
+
+### Publishing
+
+Press `Request to Publish` in the admin to email staff a deploy request. ETA: 4-16h.
+
+Once live, you'll receive an email notification.
+
+*Auto-deploy is WIP.*
+
+### Tech Details
+
+UI: If the user presses `Reset filters` they'll be redirected to the default job board (homepage).
+
+On <Term id="frontend" /> deployment those pages are built as static HTML files, optimizing SEO for static-focused bots (Facebook, Twitter, etc).
+
+For tech implementation details see <SourceLink id="llm_spec_landing_pages">LLM-spec-logs/184-feat-jobs-landing-pages.md</SourceLink>.

@@ -13,4 +13,5 @@ const paths = {
 
 const links = {
   jobs: `${paths.github}${paths.apps}/jobs/models.py`,
+  llm_spec_landing_pages: `${paths.github}/docs/src/pages/development/reference/LLM-spec-logs/184-feat-jobs-landing-pages.md`,
 } as const;

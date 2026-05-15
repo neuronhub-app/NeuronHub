@@ -379,6 +379,7 @@ class JobAlert(TimeStampedModel):
         return f"Alert(#{self.pk}, {self.email}{is_active_flag})"
 
 
+# todo ? refac-name: JobLandingPage
 class JobsLandingPage(TimeStampedModel):
     """
     See [[184-feat-jobs-landing-pages.md]] and [[landingPageToAlgoliaState.ts]].

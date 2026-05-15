@@ -14,4 +14,5 @@ const links = {
   Home: "/admin/",
   SiteConfig: "/admin/sites/siteconfig/",
   JobAlert: "/admin/jobs/jobalert/",
+  JobsLandingPage: "/admin/jobs/jobslandingpage/",
 } as const;
