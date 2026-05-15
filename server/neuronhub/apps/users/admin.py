@@ -1,9 +1,30 @@
+from adminutils import form_processing_action
+from django import forms
 from django.contrib import admin
+from django.contrib import messages
 from django.contrib.auth.admin import UserAdmin as DjangoUserAdmin
+from django.http import HttpRequest
+from django.utils.html import escape
+from django_object_actions import DjangoObjectActions
+from django_object_actions import action
 
+from neuronhub.apps.sites.services.send_email import send_mail_sync
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserAnon
 from neuronhub.apps.users.models import UserConnectionGroup
+
+
+class SendUserEmailForm(forms.Form):
+    subject = forms.CharField(max_length=512)
+    body = forms.CharField(
+        widget=forms.Textarea(attrs={"rows": 16}),
+        help_text="Plain text. Newlines preserved.",
+    )
+
+    def __init__(self, *args, instance: User | None = None, **kwargs):
+        # #AI
+        # form_processing_action(takes_object=True) passes `instance=` kwarg.
+        super().__init__(*args, **kwargs)
 
 
 class UserConnectionGroupInline(admin.TabularInline):
@@ -45,7 +66,7 @@ class UserListPostsSeenInline(admin.TabularInline):
 
 
 @admin.register(User)
-class UserAdmin(DjangoUserAdmin):
+class UserAdmin(DjangoObjectActions, DjangoUserAdmin):
     list_display = [
         "username",
         "email",
@@ -114,6 +135,23 @@ class UserAdmin(DjangoUserAdmin):
         UserListCollapsedInline,
         UserListPostsSeenInline,
     ]
+
+    change_actions = ["send_email"]
+
+    @action(label="Send Email")
+    @form_processing_action(
+        form_class=SendUserEmailForm,
+        takes_object=True,
+        action_label="Send",
+    )
+    def send_email(self, request: HttpRequest, obj: User, form: SendUserEmailForm):
+        body_html = escape(form.cleaned_data["body"]).replace("\n", "<br>")
+        send_mail_sync(
+            subject=form.cleaned_data["subject"],
+            message_html=body_html,
+            email_to=obj.email,
+        )
+        messages.success(request, f"Email sent to {obj.email}.")
 
 
 @admin.register(UserConnectionGroup)

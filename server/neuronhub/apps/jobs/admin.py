@@ -9,6 +9,7 @@ from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django_object_actions import DjangoObjectActions
 from django_object_actions import action
@@ -21,6 +22,8 @@ from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.models import JobsLandingPage
 from neuronhub.apps.jobs.tasks import airtable_sync_task
 from neuronhub.apps.jobs.tasks import send_job_alert_emails_by_ids_task
+from neuronhub.apps.sites.services.send_email import send_mail_sync
+from neuronhub.apps.users.models import User
 
 
 @admin.register(Job)
@@ -249,11 +252,30 @@ class JobsLandingPageAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdm
         "created_at",
         "updated_at",
     ]
-    change_actions = ["preview"]
+    change_actions = ["preview", "request_to_publish"]
 
     @action(label="Preview Saved Page")
     def preview(self, request: HttpRequest, obj: JobsLandingPage):
         return HttpResponseRedirect(f"{settings.CLIENT_URL}/jobs/drafts/landing-pages/{obj.pk}")
+
+    @action(label="Request to Publish", description="Email admin asking to deploy it in 4-16h.")
+    def request_to_publish(self, request: HttpRequest, obj: JobsLandingPage):
+        assert isinstance(request.user, User)
+        admin_url = request.build_absolute_uri(
+            reverse("admin:jobs_jobslandingpage_change", args=[obj.pk])
+        )
+        send_mail_sync(
+            subject=f"Request to Publish JobsLandingPage: /{obj.slug}",
+            message_html=(
+                f"Requested by {request.user.email}.<br>"
+                f'Admin: <a href="{admin_url}">{admin_url}</a>'
+            ),
+            email_to=settings.ADMIN_EMAIL,
+        )
+        messages.success(
+            request,
+            "Request sent. Will be deployed in 4-16h. You'll get an email once it's live.",
+        )
 
 
 @admin.register(JobLocation)

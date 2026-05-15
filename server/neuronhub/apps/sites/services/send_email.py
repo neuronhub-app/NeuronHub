@@ -34,7 +34,7 @@ async def send_email(
         from_email=email_from,
         to=[email_to],
         reply_to=[email_reply_to or site.contact_email],
-        # todo ? feat: BE url
+        # todo ? feat: BE url to one-click unsubscribe
         # headers={"List-Unsubscribe": "<mailto:unsub@example.com>"},
     )
     email.content_subtype = "html"

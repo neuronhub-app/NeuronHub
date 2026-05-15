@@ -28,11 +28,18 @@ The main long-term complexity may be in reliably converting Django filters to Al
 - [x] Add a field `JobsLandingPage.source_ext` as `Job.source_ext`
 - [x] add 2 fields `JobsLandingPage.subtitle` and `.meta_title`
 - [x] Add a "Preview" button to the admin.
+- [x] add `Request to Publish` to send an email to `settings.ADMIN_EMAIL` asking to deploy it, and `message` to the user with ETA of 4-16h.
+    - And add a django form to the User admin to send that email. 
+
+## Exec-Plan
+
+(empty — all tasks complete)
 
 ## Relevant-Files
 
 BE:
-- `server/neuronhub/apps/jobs/{models,admin,graphql,index}.py` — `JobsLandingPage` (slug+SEO+filters; `source_ext` TextChoices).
+- `server/neuronhub/apps/jobs/{models,admin,graphql,index}.py` — `JobsLandingPage` (slug+SEO+filters; `source_ext` TextChoices; admin `request_to_publish` action emails `ADMIN_EMAIL`).
+- `server/neuronhub/apps/users/admin.py` — `SendUserEmailForm` + `send_email` change action via `adminutils.form_processing_action`.
 - `server/neuronhub/apps/jobs/tests/test_gen.py` + `db_reset_and_partial_reindex.py`, `reset_db_and_gen.py` (gen params expose `source_ext`).
 
 FE — landing page core:
@@ -113,3 +120,7 @@ FE — prerender + SEO meta:
 - BE `job_landing_page` = strawberry-django field + `IsStaff()`.
 - `JobsLandingPageView` extracted to sibling file → consumed by `[slug].tsx` (prod) + `draft.tsx` (admin preview).
 - consumer no longer does `meta_title || title`; `useHeadMeta` reader does `(isCurrentPage && snap.title) || dflt.title || "Loading..."` so empty `meta_title` falls back to siteConfig defaults (matches model help_text).
+
+#### Request to Publish + UserAdmin send-email form
+- `adminutils.form_processing_action`
+- `SendUserEmailForm` accepts/ignores `instance=` kwarg (passed by `takes_object=True`) w/o becoming a ModelForm.
