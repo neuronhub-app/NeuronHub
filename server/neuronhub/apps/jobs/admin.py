@@ -2,11 +2,13 @@ from zoneinfo import ZoneInfo
 
 from dalf.admin import DALFModelAdmin
 from dalf.admin import DALFRelatedFieldAjaxMulti
+from django.conf import settings
 from django.contrib import admin
 from django.contrib import messages
 from django.db.models import QuerySet
 from django.http import HttpRequest
 from django.http import HttpResponseForbidden
+from django.http import HttpResponseRedirect
 from django.utils.safestring import mark_safe
 from django_object_actions import DjangoObjectActions
 from django_object_actions import action
@@ -227,7 +229,7 @@ class JobAlertLogAdmin(SimpleHistoryAdmin, DALFModelAdmin):
 
 
 @admin.register(JobsLandingPage)
-class JobsLandingPageAdmin(SimpleHistoryAdmin, DALFModelAdmin):
+class JobsLandingPageAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdmin):
     list_display = [
         "slug",
         "title",
@@ -247,6 +249,11 @@ class JobsLandingPageAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         "created_at",
         "updated_at",
     ]
+    change_actions = ["preview"]
+
+    @action(label="Preview Saved Page")
+    def preview(self, request: HttpRequest, obj: JobsLandingPage):
+        return HttpResponseRedirect(f"{settings.CLIENT_URL}/jobs/drafts/landing-pages/{obj.pk}")
 
 
 @admin.register(JobLocation)

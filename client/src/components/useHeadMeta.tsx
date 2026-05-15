@@ -27,7 +27,7 @@ function HeadMetaHoisted() {
   const snap = useSnapshot(state);
   const dflt = defaults();
   const isCurrentPage = snap.pathname === location.pathname;
-  const title = `${isCurrentPage ? snap.title : dflt.title || "Loading..."} | ${env.VITE_PROJECT_NAME}`;
+  const title = `${(isCurrentPage && snap.title) || dflt.title || "Loading..."} | ${env.VITE_PROJECT_NAME}`;
   const description = isCurrentPage ? snap.description || dflt.description : dflt.description;
   const ogImage = isCurrentPage ? snap.ogImage || dflt.ogImage : dflt.ogImage;
 

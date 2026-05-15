@@ -1,9 +1,7 @@
 import { Navigate, useParams } from "react-router";
-import { useHeadMeta } from "@/components/useHeadMeta";
-import { useHeroHeader } from "@/sites/pg/components/useHeroHeader";
-import { JobList } from "@/sites/pg/pages/jobs/list/JobList";
+import type { JobsLandingPagesData } from "@/prefetch/JobsLandingPage";
+import { JobsLandingPageView } from "@/sites/pg/pages/jobs-landing-page/JobsLandingPageView";
 import { urls } from "@/urls";
-import type { JobsLandingPage, JobsLandingPagesData } from "@/prefetch/JobsLandingPage";
 import jobsLandingPagesPrefetch from "~/graphql/prefetch/JobsLandingPages.json";
 
 /**
@@ -25,20 +23,4 @@ export default function JobsLandingPageRoute() {
   }
 
   return <Navigate to={urls.jobs.slug(slug)} replace />;
-}
-
-// #AI-slop
-// todo ! refac: move ot JobList.tsx - this is not a router concern.
-function JobsLandingPageView(props: { page: JobsLandingPage }) {
-  useHeadMeta({
-    title: props.page.meta_title || props.page.title,
-    description: props.page.meta_description,
-    ogImage: props.page.meta_image_url,
-  });
-  useHeroHeader({
-    title: props.page.title,
-    description: props.page.subtitle,
-  });
-
-  return <JobList jobsLandingPage={props.page} />;
 }

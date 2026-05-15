@@ -17,6 +17,7 @@ const PostListQuery = graphql.persisted(
 );
 ```
 
+gql.tada runs with `disableMasking: true` because it's useless.
 
 ### Types
 

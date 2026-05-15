@@ -62,6 +62,7 @@ export const urls = {
     subscriptions: env.VITE_SITE === "pg" ? "/subscriptions" : "/jobs/subscriptions",
     slug: (slug: string) => `/jobs/${slug}` as const,
     landingPage: (slug: string) => `/${slug}` as const,
+    draftLandingPage: (id: ID) => `/jobs/drafts/landing-pages/${id}` as const,
     subscriptionsManage(idExt: string) {
       return `${this.subscriptions}/${idExt}` as const;
     },

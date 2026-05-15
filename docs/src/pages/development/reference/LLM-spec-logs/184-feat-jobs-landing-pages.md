@@ -27,6 +27,7 @@ The main long-term complexity may be in reliably converting Django filters to Al
 - [x] Docs: `Algolia.md`; `adding-job-alert-filters.mdx`; a subfile in `frontend/README.md` re prerender + prefetch.
 - [x] Add a field `JobsLandingPage.source_ext` as `Job.source_ext`
 - [x] add 2 fields `JobsLandingPage.subtitle` and `.meta_title`
+- [x] Add a "Preview" button to the admin.
 
 ## Relevant-Files
 
@@ -107,3 +108,8 @@ FE — prerender + SEO meta:
 - `formatAttribute.source_ext = r => "Source: ${r.label}"` — labelsOverride alone drops the value ("Source" w/o "AIM").
 - `useRequiredLandingPageRefinements` claims `source_ext` ref-list — same lazyMount trap as tags.
 - `JobsJobParams.source_ext` added to test_gen pipe so e2e can seed jobs with the source.
+
+#### Preview button on admin
+- BE `job_landing_page` = strawberry-django field + `IsStaff()`.
+- `JobsLandingPageView` extracted to sibling file → consumed by `[slug].tsx` (prod) + `draft.tsx` (admin preview).
+- consumer no longer does `meta_title || title`; `useHeadMeta` reader does `(isCurrentPage && snap.title) || dflt.title || "Loading..."` so empty `meta_title` falls back to siteConfig defaults (matches model help_text).

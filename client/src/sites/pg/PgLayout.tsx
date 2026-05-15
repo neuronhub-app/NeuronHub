@@ -42,7 +42,7 @@ export default function PgLayout() {
   const configSnap = useSnapshot(siteConfigState);
 
   // todo ? refac: dumb. move to routes.ts param or similar
-  const isJobDraftsPage = location.pathname.startsWith(urls.jobs.drafts);
+  const isJobDraftsPage = location.pathname === urls.jobs.drafts;
 
   const footer = useFooterSections(configSnap.data?.footer_sections);
 

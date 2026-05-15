@@ -197,6 +197,10 @@ class JobsQuery:
         )
         return cast(list[JobsLandingPageType], [page async for page in pages])
 
+    job_landing_page: JobsLandingPageType | None = strawberry_django.field(
+        extensions=[IsStaff()]
+    )
+
     @strawberry_django.field
     async def job_by_slug(self, info: strawberry.Info, slug: str) -> JobType | None:
         user = await get_user_maybe(info)

@@ -11,6 +11,7 @@ export const routes = [
     ),
     route("/subscriptions/remove/:id_ext", "./sites/pg/pages/jobs/subscriptions/remove.tsx"),
     route("/jobs/drafts", "./apps/jobs/drafts/index.tsx"),
+    route("/jobs/drafts/landing-pages/:id", "./sites/pg/pages/jobs-landing-page/draft.tsx"),
     route("/jobs/:slug", "./sites/pg/pages/jobs/list/slug.tsx"),
     // legacy redirects
     route("/job-postings/:slug", "./sites/pg/redirects/slug-legacy-redirect-1.tsx"),
