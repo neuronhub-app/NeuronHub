@@ -56,6 +56,7 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
   const jobHit = props.job as unknown as Hit<BaseHit>;
   const hits = useHits<JobFragmentType>();
 
+  // todo ! refac: migrate to `track.useJobUrlClick` to also fire Posthog event
   function trackUrlClick() {
     hits.sendEvent(
       "click",

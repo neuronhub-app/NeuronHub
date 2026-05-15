@@ -1,5 +1,4 @@
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import { captureException } from "@sentry/react";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { posthog } from "posthog-js";
 import { useHits } from "react-instantsearch";
@@ -70,14 +69,23 @@ export namespace track {
     }
   }
 
-  export function setUser(opts: { user?: User; email?: string }) {
-    const email = opts.email ?? opts.user?.email;
-
-    if (opts.user?.is_staff) {
-      posthog.setInternalOrTestUser();
+  export function setUser(opts: { user?: User }) {
+    try {
+      if (opts.user?.is_staff) {
+        posthog.setInternalOrTestUser();
+      }
+    } catch (error) {
+      errors.report(error, { isShowFeedbackPopup: false });
     }
-    if (email) {
-      posthog.setPersonProperties({ email });
+  }
+
+  export async function getAnonName(email: string): Promise<string> {
+    try {
+      const res = await client.mutate({ mutation: GenAnonNameMutation, variables: { email } });
+      return res.data?.gen_anon_name_from_email ?? "";
+    } catch (error) {
+      errors.report(error, { isShowFeedbackPopup: false });
+      return "";
     }
   }
 
@@ -89,8 +97,8 @@ export namespace track {
 
       try {
         hits.sendEvent("click", args.jobHit, "Job.click_url_ext", { view });
-      } catch (err) {
-        captureException(err);
+      } catch (error) {
+        errors.report(error, { isShowFeedbackPopup: false });
       }
     };
   }
@@ -118,18 +126,23 @@ export namespace track {
         variables: { id: alertId, jobSlug: jobSlug },
       });
       if (!res.data?.job_alert_track_click) {
-        captureException(new Error("JobAlert click track failed"));
+        errors.report(new Error("JobAlert click track failed"), { isShowFeedbackPopup: false });
       }
     } catch (error) {
-      captureException(error);
+      errors.report(error, { isShowFeedbackPopup: false });
     }
   }
 }
 const JobAlertTrackClickMutation = graphql.persisted(
   "JobAlertTrackClick",
-  graphql(`mutation JobAlertTrackClick($id: ID!, $jobSlug: String!) {
-      job_alert_track_click(id: $id, job_slug: $jobSlug)
-    }`),
+  graphql(
+    `mutation JobAlertTrackClick($id: ID!, $jobSlug: String!) { job_alert_track_click(id: $id, job_slug: $jobSlug) }`,
+  ),
+);
+
+const GenAnonNameMutation = graphql.persisted(
+  "GenAnonName",
+  graphql(`mutation GenAnonName($email: String!) { gen_anon_name_from_email(email: $email) }`),
 );
 
 type Schema = typeof EventSchema;

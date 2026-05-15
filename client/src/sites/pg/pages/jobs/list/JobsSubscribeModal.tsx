@@ -95,7 +95,8 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
       jobFilters.snap,
     );
 
-    track.event("JobAlert.create", fields.email, vars);
+    const anonName = await track.getAnonName(fields.email);
+    track.event("JobAlert.create", anonName, vars);
 
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,
