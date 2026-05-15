@@ -1,5 +1,4 @@
 import { captureException } from "@sentry/react";
-import * as Sentry from "@sentry/react-router";
 import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { proxy } from "valtio";
@@ -23,8 +22,6 @@ export function useUser() {
 
   useEffect(() => {
     if (data?.user_current) {
-      Sentry.setUser(data.user_current);
-
       track.setUser({ user: data.user_current });
 
       user.state.current = data.user_current;
@@ -39,8 +36,7 @@ export function useUser() {
         user.state.connections = Array.from(connectionsUniqueMap.values());
       }
     } else if (data) {
-      // Sentry org strips IPs => wo an `id` it counts affected users as 0.
-      Sentry.setUser({ id: getOrCreateAnonId() });
+      track.setUser(); // wo args uses UUID
     }
 
     if (error) {
@@ -49,21 +45,6 @@ export function useUser() {
   }, [data]);
 
   return snap.current;
-}
-
-function getOrCreateAnonId(): string {
-  const storageKey = "nha-sentry-anon-id";
-  try {
-    const idExisting = localStorage.getItem(storageKey);
-    if (idExisting) {
-      return idExisting;
-    }
-    const idNew = crypto.randomUUID();
-    localStorage.setItem(storageKey, idNew);
-    return idNew;
-  } catch {
-    return crypto.randomUUID();
-  }
 }
 
 export function useAuth() {

@@ -3,6 +3,7 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
+import { track } from "@/utils/track";
 import { useInit } from "@/utils/useInit";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
@@ -20,7 +21,9 @@ export function useJobUnsubscribeHandler(alertIdExt?: string) {
       const result = await mutateAndRefetchMountedQueries(JobAlertUnsubscribeMutation, {
         id_ext: alertIdExt!,
       });
-      if (!result.success) {
+      if (result.success) {
+        await track.setUser({ email: result.data.job_alert_unsubscribe });
+      } else {
         state.mutable.unsubscribeError =
           typeof result.errorMessage === "string"
             ? result.errorMessage

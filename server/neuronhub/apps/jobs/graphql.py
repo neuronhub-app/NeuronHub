@@ -343,7 +343,7 @@ class JobsMutation:
         return True
 
     @strawberry.mutation
-    async def job_alert_unsubscribe(self, id_ext: uuid.UUID, info: strawberry.Info) -> bool:
+    async def job_alert_unsubscribe(self, id_ext: uuid.UUID, info: strawberry.Info) -> str:
         # No session check/login - .id_ext is enough
         alert = await JobAlert.objects.filter(id_ext=id_ext).afirst()
         if not alert:
@@ -353,7 +353,7 @@ class JobsMutation:
             )
         alert.is_active = False
         await alert.asave()
-        return True
+        return alert.email
 
 
 class _session:

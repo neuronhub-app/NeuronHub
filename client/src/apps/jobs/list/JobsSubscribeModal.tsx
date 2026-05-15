@@ -68,8 +68,10 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
   async function handleSubscribe(fields: z.infer<typeof FormSchema>) {
     const vars = buildJobAlertVars(refinesCurrent.items, locationsData?.job_locations);
 
-    const anonName = await track.getAnonName(fields.email);
-    track.event("JobAlert.create", anonName, vars);
+    const anonName = await track.setUser({ email: fields.email });
+    if (anonName) {
+      track.event("JobAlert.create", anonName, vars);
+    }
 
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,

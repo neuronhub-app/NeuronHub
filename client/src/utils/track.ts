@@ -1,4 +1,5 @@
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import * as Sentry from "@sentry/react-router";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { posthog } from "posthog-js";
 import { useHits } from "react-instantsearch";
@@ -69,14 +70,72 @@ export namespace track {
     }
   }
 
-  export function setUser(opts: { user?: User }) {
+  /**
+   * #AI: cached to stop a dozen on mount triggers; deduped by identity key so PostHog/Sentry/GenAnonName are hit once.
+   * Failed promises are cached too — transient errors won't retry until the identity key changes.
+   */
+  export function setUser(opts?: { user?: User; email?: string }): Promise<string> {
+    const key = opts?.user?.id ?? opts?.email ?? "__anon__";
+    if (userCache.key === key && userCache.promise) {
+      return userCache.promise;
+    }
+    userCache.key = key;
+    userCache.promise = _setUser(opts);
+    return userCache.promise;
+  }
+
+  /**
+   * #AI
+   */
+  async function _setUser(opts?: { user?: User; email?: string }): Promise<string> {
     try {
-      if (opts.user?.is_staff) {
-        posthog.setInternalOrTestUser();
+      if (opts?.user) {
+        Sentry.setUser(opts.user);
+
+        // posthog
+        if (opts.user.is_staff) {
+          posthog.setInternalOrTestUser();
+        }
+        const anonName = await getAnonName(opts.user.email);
+        if (anonName) {
+          posthog.identify(anonName);
+        }
+        return anonName;
       }
+
+      if (opts?.email) {
+        const anonName = await getAnonName(opts.email);
+        if (anonName) {
+          posthog.identify(anonName);
+          Sentry.setUser({ id: anonName });
+        }
+        return anonName;
+      }
+
+      const anonId = getOrCreateAnonId();
+      Sentry.setUser({ id: anonId });
+
+      return anonId;
     } catch (error) {
       errors.report(error, { isShowFeedbackPopup: false });
+      return "";
     }
+  }
+
+  export function useSetUserByJobAlertId(args: {
+    idExt?: string;
+    alerts?: ReadonlyArray<{ id_ext: string; email: string }>;
+  }) {
+    // #AI: `email` dep avoids refires on `args.alerts` ref churn from useApolloQuery refetches.
+    // Module cache in `setUser` handles any residual refire (eg navigation remount).
+    const email = args.alerts?.find(alert => alert.id_ext === args.idExt)?.email;
+    useInit({
+      isReady: Boolean(email),
+      onInit: async () => {
+        await setUser({ email: email! });
+      },
+      dependencies: [email],
+    });
   }
 
   export async function getAnonName(email: string): Promise<string> {
@@ -144,6 +203,27 @@ const GenAnonNameMutation = graphql.persisted(
   "GenAnonName",
   graphql(`mutation GenAnonName($email: String!) { gen_anon_name_from_email(email: $email) }`),
 );
+
+const userCache: { key: string | null; promise: Promise<string> | null } = {
+  key: null,
+  promise: null,
+};
+
+// Sentry org settings strip IPs => without an `id` it counts error-affected users as "0".
+function getOrCreateAnonId(): string {
+  const storageKey = "nha-sentry-anon-id";
+  try {
+    const idExisting = localStorage.getItem(storageKey);
+    if (idExisting) {
+      return idExisting;
+    }
+    const idNew = crypto.randomUUID();
+    localStorage.setItem(storageKey, idNew);
+    return idNew;
+  } catch {
+    return crypto.randomUUID();
+  }
+}
 
 type Schema = typeof EventSchema;
 

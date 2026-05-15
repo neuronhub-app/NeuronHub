@@ -13,6 +13,7 @@ Notes:
 - If e2e needs timeouts as `waitForTimeout` - it is trash and must be rewritten.
 - Use `data-testid` for locators, in JSX set with `{...ids.set(ids.post.btn.submit)}` - see `client/e2e/ids.ts`
 - For auth we use Django `/admin/login/` and cookies - CORS 100% works.
+- To debug by logs - capture `console.log` by PW.
 
 ### PlaywrightHelper.ts
 
@@ -85,3 +86,5 @@ Also might fail randomly on:
 > TimeoutError: page.waitForLoadState: Timeout 7500ms exceeded.
 
 Rerun 1-3 times before debugging.
+
+Note: BE sometimes throws a `CancelledError` in the logs - that's normal.

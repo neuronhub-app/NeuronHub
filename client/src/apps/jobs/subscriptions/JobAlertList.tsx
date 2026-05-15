@@ -25,6 +25,7 @@ import { urls } from "@/urls";
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { format } from "@neuronhub/shared/utils/format";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
+import { track } from "@/utils/track";
 import { useInit } from "@/utils/useInit";
 import { useIsLoading } from "@/utils/useIsLoading";
 
@@ -43,6 +44,8 @@ export function JobAlertList(props: {
   });
 
   const { data, isLoadingFirstTime } = useApolloQuery(JobAlertListQuery);
+
+  track.useSetUserByJobAlertId({ idExt: props.accessSessionByIdExt, alerts: data?.job_alerts });
 
   const unsubscribe = useJobUnsubscribeHandler(props.unsubscribeByIdExt);
 
