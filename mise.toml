@@ -47,19 +47,19 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     DEPENDENCY_COOLDOWN_DAYS = 8
 
-    SERVER_DOMAIN = "{{ env.SERVER_DOMAIN | default(value = 'localhost') }}"
-    SERVER_PORT = "{{ env.SERVER_PORT | default(value = 8000) }}"
-    SERVER_URL = "http://{{ env.SERVER_DOMAIN }}:{{ env.SERVER_PORT }}"
-    VITE_SERVER_URL = "{{ env.SERVER_URL }}"
+    SERVER_DOMAIN = "${SERVER_DOMAIN:-localhost}"
+    SERVER_PORT = "${SERVER_PORT:-8000}"
+    SERVER_URL = "${SERVER_URL:-'http://{{env.SERVER_DOMAIN}}:{{env.SERVER_PORT}}'}"
+    VITE_SERVER_URL = "${SERVER_URL}"
 
-    CLIENT_DOMAIN = "{{ env.CLIENT_DOMAIN | default(value = 'localhost') }}"
-    CLIENT_PORT = "{{ env.CLIENT_PORT | default(value = 3000) }}"
-    CLIENT_URL = "http://{{ env.CLIENT_DOMAIN }}:{{ env.CLIENT_PORT }}"
-    VITE_CLIENT_URL = "{{ env.CLIENT_URL }}"
+    CLIENT_DOMAIN = "${CLIENT_DOMAIN:-localhost}"
+    CLIENT_PORT = "${CLIENT_PORT:-3000}"
+    CLIENT_URL = "${CLIENT_URL:-'http://{{env.CLIENT_DOMAIN}}:{{env.CLIENT_PORT}}'}"
+    VITE_CLIENT_URL = "${CLIENT_URL}"
 
-    DOCS_DOMAIN = "{{ env.DOCS_DOMAIN | default(value = 'localhost') }}"
-    DOCS_PORT = "{{ env.DOCS_PORT | default(value = 4000) }}"
-    DOCS_URL = "http://{{ env.DOCS_DOMAIN }}:{{ env.DOCS_PORT }}"
+    DOCS_DOMAIN = "${DOCS_DOMAIN:-localhost}"
+    DOCS_PORT = "${DOCS_PORT:-4000}"
+    DOCS_URL = "http://${DOCS_DOMAIN}:${DOCS_PORT}"
 
     DB_USER = "${PROJECT_NAME}"
     DB_NAME = "${PROJECT_NAME}"
