@@ -26,6 +26,7 @@ The main long-term complexity may be in reliably converting Django filters to Al
 - [x] Fix e2e requiring the file `JobsLandingPages.json` file. 
 - [x] Docs: `Algolia.md`; `adding-job-alert-filters.mdx`; a subfile in `frontend/README.md` re prerender + prefetch.
 - [x] Add a field `JobsLandingPage.source_ext` as `Job.source_ext`
+- [x] add 2 fields `JobsLandingPage.subtitle` and `.meta_title`
 
 ## Relevant-Files
 

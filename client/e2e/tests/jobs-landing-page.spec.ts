@@ -17,6 +17,8 @@ const pages = {
   climate_change: {
     slug: "e2e-climate-jobs",
     title: "Climate Jobs (e2e)",
+    subtitle: "Find jobs fighting climate change.",
+    meta_title: "Climate Jobs | NeuronHub e2e",
     meta_description: "Latest climate jobs around the world.",
     job_title: "Climate Researcher",
     tag_name: "Climate Change",
@@ -45,6 +47,8 @@ test.describe("PG Jobs Landing Page", () => {
             {
               slug: pages.climate_change.slug,
               title: pages.climate_change.title,
+              subtitle: pages.climate_change.subtitle,
+              meta_title: pages.climate_change.meta_title,
               meta_description: pages.climate_change.meta_description,
               meta_image_url: "",
               salary_min: null,
@@ -58,6 +62,8 @@ test.describe("PG Jobs Landing Page", () => {
             {
               slug: pages.charity_entrepreneurship.slug,
               title: pages.charity_entrepreneurship.title,
+              subtitle: "",
+              meta_title: "",
               meta_description: "",
               meta_image_url: "",
               salary_min: null,
@@ -77,6 +83,8 @@ test.describe("PG Jobs Landing Page", () => {
         jobs_landing_page: {
           slug: pages.climate_change.slug,
           title: pages.climate_change.title,
+          subtitle: pages.climate_change.subtitle,
+          meta_title: pages.climate_change.meta_title,
           meta_description: pages.climate_change.meta_description,
           tags: [{ name: pages.climate_change.tag_name, category: TagCategoryEnum.Area }],
         },
@@ -133,12 +141,12 @@ test.describe("PG Jobs Landing Page", () => {
 
     await expectBase(play.get(ids.job.landingPage.title)).toHaveText(pages.climate_change.title);
     await expectBase(page).toHaveTitle(
-      `${pages.climate_change.title} | ${env.VITE_PROJECT_NAME}`,
+      `${pages.climate_change.meta_title} | ${env.VITE_PROJECT_NAME}`,
     );
 
-    // Replaces dropped pytest field-shape test: prove `meta_description`
-    // flows BE→prefetch JSON→hero render & `<meta name="description">`.
-    await expectBase(page.getByText(pages.climate_change.meta_description)).toBeVisible();
+    // Replaces dropped pytest field-shape test: prove `subtitle`/`meta_description`
+    // flow BE→prefetch JSON→hero render & `<meta name="description">`.
+    await expectBase(page.getByText(pages.climate_change.subtitle)).toBeVisible();
     await expectBase(page.locator('meta[name="description"]')).toHaveAttribute(
       "content",
       pages.climate_change.meta_description,

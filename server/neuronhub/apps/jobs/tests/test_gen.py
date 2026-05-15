@@ -184,6 +184,8 @@ class JobsGen:
         self,
         slug: str,
         title: str,
+        subtitle: str = "",
+        meta_title: str = "",
         meta_description: str = "",
         meta_image_url: str = "",
         tags: list[PostTag] | None = None,
@@ -199,6 +201,8 @@ class JobsGen:
         page = await JobsLandingPage.objects.acreate(
             slug=slug,
             title=title,
+            subtitle=subtitle,
+            meta_title=meta_title,
             meta_description=meta_description,
             meta_image_url=meta_image_url,
             salary_min=salary_min,

@@ -381,16 +381,28 @@ class JobAlert(TimeStampedModel):
 
 class JobsLandingPage(TimeStampedModel):
     """
-    #AI Landing pages: `/{slug}` + filters. See [[184-feat-jobs-landing-pages.md]] and [[landingPageToAlgoliaState.ts]].
+    See [[184-feat-jobs-landing-pages.md]] and [[landingPageToAlgoliaState.ts]].
     """
 
-    slug = models.SlugField(max_length=255, unique=True)
     title = models.CharField(
         max_length=255,
-        help_text="H1 + default <title>. Eg `Climate Change Jobs in France`.",
+        help_text="The Hero Header H1. Eg the homepage has `Find a job that's good, for you and for the world`.",
     )
-    meta_description = models.CharField(max_length=512, blank=True, default="")
-    meta_image_url = models.URLField(max_length=512, blank=True, default="")
+    subtitle = models.CharField(
+        max_length=512,
+        blank=True,
+        help_text="The Hero Header subtitle, eg `Curated high-impact jobs for people who want to make a difference.`",
+    )
+
+    slug = models.SlugField(max_length=255, unique=True, help_text="Root level slug")
+
+    meta_title = models.CharField(
+        max_length=512,
+        blank=True,
+        help_text="If not set - the default from the homepage will be used for title/desc/image.",
+    )
+    meta_description = models.CharField(max_length=512, blank=True)
+    meta_image_url = models.URLField(max_length=512, blank=True)
 
     tags = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
         "posts.PostTag",

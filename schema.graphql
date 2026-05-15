@@ -234,6 +234,8 @@ input JobsJobParams {
 input JobsLandingPageParams {
   slug: String!
   title: String!
+  subtitle: String! = ""
+  meta_title: String! = ""
   meta_description: String! = ""
   source_ext: String = null
   tags: [PostsTagParams!] = null
@@ -243,6 +245,8 @@ type JobsLandingPageType {
   id: ID!
   slug: String!
   title: String!
+  subtitle: String!
+  meta_title: String!
   meta_description: String!
   meta_image_url: String!
   tags(filters: PostTagFilter): [PostTagType!]!

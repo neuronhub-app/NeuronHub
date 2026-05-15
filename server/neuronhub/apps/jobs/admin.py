@@ -231,9 +231,10 @@ class JobsLandingPageAdmin(SimpleHistoryAdmin, DALFModelAdmin):
     list_display = [
         "slug",
         "title",
-        "is_published",
         "salary_min",
+        "is_published",
         "updated_at",
+        "created_at",
     ]
     autocomplete_fields = ["tags", "locations"]
     search_fields = ["slug", "title"]

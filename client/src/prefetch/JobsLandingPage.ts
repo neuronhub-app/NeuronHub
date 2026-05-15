@@ -5,6 +5,8 @@ export const jobsLandingPagesDoc = graphql(`
     jobs_landing_pages {
       slug
       title
+      subtitle
+      meta_title
       meta_description
       meta_image_url
       salary_min

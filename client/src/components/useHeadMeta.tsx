@@ -27,14 +27,17 @@ function HeadMetaHoisted() {
   const snap = useSnapshot(state);
   const dflt = defaults();
   const isCurrentPage = snap.pathname === location.pathname;
-  const title = isCurrentPage ? snap.title : dflt.title;
-  const description = isCurrentPage ? snap.description : dflt.description;
-  const ogImage = isCurrentPage ? snap.ogImage : dflt.ogImage;
+  const title = `${isCurrentPage ? snap.title : dflt.title || "Loading..."} | ${env.VITE_PROJECT_NAME}`;
+  const description = isCurrentPage ? snap.description || dflt.description : dflt.description;
+  const ogImage = isCurrentPage ? snap.ogImage || dflt.ogImage : dflt.ogImage;
+
   return (
     <>
-      <title>{`${title || "Loading..."} | ${env.VITE_PROJECT_NAME}`}</title>
+      <title>{title}</title>
       {description && <meta name="description" content={description} />}
       <meta property="og:title" content={title} />
+      <meta property="og:site_name" content={env.VITE_PROJECT_NAME} />
+      <meta property="og:description" content={description} />
       {description && <meta property="og:description" content={description} />}
       <meta property="og:type" content="website" />
       {ogImage && <meta property="og:image" content={ogImage} />}

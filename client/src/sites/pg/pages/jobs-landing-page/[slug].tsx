@@ -31,13 +31,13 @@ export default function JobsLandingPageRoute() {
 // todo ! refac: move ot JobList.tsx - this is not a router concern.
 function JobsLandingPageView(props: { page: JobsLandingPage }) {
   useHeadMeta({
-    title: props.page.title,
+    title: props.page.meta_title || props.page.title,
     description: props.page.meta_description,
     ogImage: props.page.meta_image_url,
   });
   useHeroHeader({
     title: props.page.title,
-    description: props.page.meta_description,
+    description: props.page.subtitle,
   });
 
   return <JobList jobsLandingPage={props.page} />;

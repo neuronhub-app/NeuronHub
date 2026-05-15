@@ -140,6 +140,8 @@ class JobsLandingPageType:
     id: auto
     slug: auto
     title: auto
+    subtitle: auto
+    meta_title: auto
     meta_description: auto
     meta_image_url: auto
     tags: list[PostTagType]

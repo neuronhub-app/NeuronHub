@@ -83,6 +83,8 @@ class JobsJobParams:
 class JobsLandingPageParams:
     slug: str
     title: str
+    subtitle: str = ""
+    meta_title: str = ""
     meta_description: str = ""
     source_ext: str | None = None
     tags: list[PostsTagParams] | None = None
@@ -236,6 +238,8 @@ async def _create(
         await gen.jobs.jobs_landing_page(
             slug=landing_raw.slug,
             title=landing_raw.title,
+            subtitle=landing_raw.subtitle,
+            meta_title=landing_raw.meta_title,
             meta_description=landing_raw.meta_description,
             source_ext=Job.SourceExt(landing_raw.source_ext) if landing_raw.source_ext else None,
             tags=tags,
