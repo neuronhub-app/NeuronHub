@@ -49,12 +49,12 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     SERVER_DOMAIN = "${SERVER_DOMAIN:-localhost}"
     SERVER_PORT = "${SERVER_PORT:-8000}"
-    SERVER_URL = "${SERVER_URL:-'http://{{env.SERVER_DOMAIN}}:{{env.SERVER_PORT}}'}"
+    SERVER_URL = "${SERVER_URL:-http://{{env.SERVER_DOMAIN}}:{{env.SERVER_PORT}}}"
     VITE_SERVER_URL = "${SERVER_URL}"
 
     CLIENT_DOMAIN = "${CLIENT_DOMAIN:-localhost}"
     CLIENT_PORT = "${CLIENT_PORT:-3000}"
-    CLIENT_URL = "${CLIENT_URL:-'http://{{env.CLIENT_DOMAIN}}:{{env.CLIENT_PORT}}'}"
+    CLIENT_URL = "${CLIENT_URL:-http://{{env.CLIENT_DOMAIN}}:{{env.CLIENT_PORT}}}"
     VITE_CLIENT_URL = "${CLIENT_URL}"
 
     DOCS_DOMAIN = "${DOCS_DOMAIN:-localhost}"
