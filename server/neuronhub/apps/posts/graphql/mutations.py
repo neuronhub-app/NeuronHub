@@ -8,7 +8,8 @@ from strawberry_django.permissions import IsAuthenticated
 from neuronhub.apps.posts.graphql.types import PostType
 from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.models import Post
-from neuronhub.apps.posts.models.posts import PostVote, PostTagVote
+from neuronhub.apps.posts.models.posts import PostTagVote
+from neuronhub.apps.posts.models.posts import PostVote
 from neuronhub.apps.posts.services.post_update_or_create import post_update_or_create
 from neuronhub.apps.users.graphql.resolvers import get_user
 from neuronhub.apps.users.models import User
@@ -62,7 +63,7 @@ class PostsMutation:
     ) -> bool:
         await PostTagVote.objects.aupdate_or_create(
             post_id=post_id,
-            tag_id=tag_id,
+            tag_id=tag_id,  # type: ignore[misc] #bad-infer - `str == int` for ID
             author=info.context.request.user,
             defaults={
                 "is_vote_positive": is_vote_positive,

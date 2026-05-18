@@ -1,5 +1,5 @@
 from django.utils import timezone
-from django_tasks.backends.database.models import DBTaskResult
+from django_tasks_db.models import DBTaskResult
 from django_tasks.base import TaskResultStatus
 
 from neuronhub.apps.profiles.graphql import SCORE_PROFILES_TASK
@@ -50,7 +50,7 @@ class ProfileMatchGraphqlTest(NeuronTestCase):
         assert result.total == 0
 
     async def test_returns_no_error_when_latest_task_succeeded(self):
-        await _create_task_result(status=TaskResultStatus.SUCCEEDED, user_id=self.user.id)
+        await _create_task_result(status=TaskResultStatus.SUCCESSFUL, user_id=self.user.id)
 
         result = await _check_failed_task(self.user)
         assert result.is_processing is False

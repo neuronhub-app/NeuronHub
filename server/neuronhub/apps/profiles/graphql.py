@@ -6,7 +6,7 @@ from asgiref.sync import sync_to_async
 from django.db.models import F
 from django.db.models import Q
 from django.db.models import QuerySet
-from django_tasks.backends.database.models import DBTaskResult
+from django_tasks_db.models import DBTaskResult
 from django_tasks.base import TaskResultStatus
 from strawberry import ID
 from strawberry import auto
@@ -299,7 +299,7 @@ class ProfilesMutation:
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def profile_matches_cancel_llm(self, info: strawberry.Info) -> bool:
-        from django_tasks.backends.database.models import DBTaskResult
+        from django_tasks_db.models import DBTaskResult
         from django_tasks.base import TaskResultStatus
 
         user = await get_user(info)

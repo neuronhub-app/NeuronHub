@@ -70,7 +70,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.headless",
     "django_tasks",
-    "django_tasks.backends.database",
+    "django_tasks_db",
     "django_object_actions",
     "django_countries",
     "django_rich",
@@ -125,8 +125,6 @@ SITE_ID = 1
 
 SECRET_KEY = env.str("SECRET_KEY", "django-insecure-c611a&dwbs58ziu4=o3ps@4zpv9=8ix&8k7i")
 
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 DEBUG = env.bool("DJANGO_DEBUG", DJANGO_ENV.is_dev())
 
 LANGUAGE_CODE = "en-us"
@@ -138,7 +136,7 @@ DATETIME_FORMAT = "Y.m.d H:i"
 
 
 TASKS = {
-    "default": {"BACKEND": "django_tasks.backends.database.DatabaseBackend"},
+    "default": {"BACKEND": "django_tasks_db.backend.DatabaseBackend"},
 }
 is_tasks_backend_immediate = env.bool("IS_TASKS_BACKEND_IMMEDIATE", DJANGO_ENV.is_dev())
 if is_tasks_backend_immediate:

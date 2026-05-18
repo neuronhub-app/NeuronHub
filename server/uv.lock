@@ -486,16 +486,16 @@ wheels = [
 
 [[package]]
 name = "django"
-version = "5.2.13"
+version = "6.0.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "sqlparse" },
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1f/c5/c69e338eb2959f641045802e5ea87ca4bf5ac90c5fd08953ca10742fad51/django-5.2.13.tar.gz", hash = "sha256:a31589db5188d074c63f0945c3888fad104627dfcc236fb2b97f71f89da33bc4", size = 10890368, upload-time = "2026-04-07T14:02:15.072Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5e/f1/bf85f0d29ef76abf901f193fe8fef4769d3da7794197832bc30151c071d8/django-6.0.5.tar.gz", hash = "sha256:bc6d6872e98a2864c836e42edd644b362db311147dd5aa8d5b82ba7a032f5269", size = 10924131, upload-time = "2026-05-05T13:54:39.329Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/59/b1/51ab36b2eefcf8cdb9338c7188668a157e29e30306bfc98a379704c9e10d/django-5.2.13-py3-none-any.whl", hash = "sha256:5788fce61da23788a8ce6f02583765ab060d396720924789f97fa42119d37f7a", size = 8310982, upload-time = "2026-04-07T14:02:08.883Z" },
+    { url = "https://files.pythonhosted.org/packages/94/5b/1328f8b84fce040c404f76822bf8c57d254e368e8cbd8bd67ec2b26d75f5/django-6.0.5-py3-none-any.whl", hash = "sha256:9d58a7cb49244e74c8e161d5e403a46d6209f1009ba40f5a66d6aa0d0786a8f0", size = 8368680, upload-time = "2026-05-05T13:54:33.532Z" },
 ]
 
 [[package]]
@@ -538,16 +538,17 @@ wheels = [
 
 [[package]]
 name = "django-anymail"
-version = "13.1"
+version = "15.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
+    { name = "idna" },
     { name = "requests" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a3/a5/258d7b7bc1b0ca91791c25c704fa4c2d500727d0c3e29843c182f9f9c4be/django_anymail-13.1.tar.gz", hash = "sha256:b51783176f8a8382e958808151551558e4a46d1375fbc343742d1ebd06ce8e9e", size = 96518, upload-time = "2025-09-03T20:00:21.071Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/00/43/f0aadb31f2c58afcd9f001f4291998cbd6d289898167e79d908506fc6faf/django_anymail-15.0.tar.gz", hash = "sha256:23d8ab6589afe8cc1ae7665c26879814ad192f4c3ed837a2a1868b0a056869e0", size = 106985, upload-time = "2026-04-18T20:44:19.237Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c9/ba/d34a011cb8da04ed4a7c60b9a7aa25eed61348d1f6113af66ba725b56ae4/django_anymail-13.1-py3-none-any.whl", hash = "sha256:63e48402ec8258f17640eb73c8c64141f16d2f8ae7d448d0fb1c66e82b7cbcf6", size = 134063, upload-time = "2025-09-03T20:00:19.427Z" },
+    { url = "https://files.pythonhosted.org/packages/75/d1/daae99ec3b30886010a499975880ec20c32c622bee6b92c226b715e42f0c/django_anymail-15.0-py3-none-any.whl", hash = "sha256:64d33dd1084bfc8e4e12245f56629be40aa0b0498fc7fc7544d87b9b2048be1e", size = 147229, upload-time = "2026-04-18T20:44:17.323Z" },
 ]
 
 [[package]]
@@ -734,7 +735,7 @@ boto3 = [
 
 [[package]]
 name = "django-stubs"
-version = "5.2.9"
+version = "6.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
@@ -742,9 +743,9 @@ dependencies = [
     { name = "types-pyyaml" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9c/01/86c921e0e19c9fa7e705bf795998dbf55eb183e7be0342a3027dc1bcbc9f/django_stubs-5.2.9.tar.gz", hash = "sha256:c192257120b08785cfe6f2f1c91f1797aceae8e9daa689c336e52c91e8f6a493", size = 257970, upload-time = "2026-01-20T23:59:27.018Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f9/82/ccf2a2dc9cdb4bd9cbe91f11e887589bf2da7609506db00ccbc73bd8a6da/django_stubs-6.0.4.tar.gz", hash = "sha256:7aee77e8de9c14c0d9cf84988befe826d93cbc15a87e0ade2943f14d553451cf", size = 280019, upload-time = "2026-05-09T21:24:30.436Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/0d/05/4c9c419b7051eb4b350100b086be6df487f968ab672d3d370f8ccf7c3746/django_stubs-5.2.9-py3-none-any.whl", hash = "sha256:2317a7130afdaa76f6ff7f623650d7f3bf1b6c86a60f95840e14e6ec6de1a7cd", size = 508656, upload-time = "2026-01-20T23:59:25.12Z" },
+    { url = "https://files.pythonhosted.org/packages/ba/e7/5128914ada94dd6277626ef5a4a5680a4def7d2f9366214d26c1cd86723b/django_stubs-6.0.4-py3-none-any.whl", hash = "sha256:e991c68f77239663577a5f4fc75e99c84f867f378cafc97cbf4acc5aff378279", size = 543791, upload-time = "2026-05-09T21:24:28.218Z" },
 ]
 
 [package.optional-dependencies]
@@ -767,16 +768,31 @@ wheels = [
 
 [[package]]
 name = "django-tasks"
-version = "0.10.0"
+version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "django" },
     { name = "django-stubs-ext" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c3/77/4f987e168ed75840fac277f3d6edfb5de2ea43a92723dcfe6e5510dbb232/django_tasks-0.10.0.tar.gz", hash = "sha256:1505d52e35b354091fc9a24d1446323c12d99c63fe58b63c31b5a1304177d8e8", size = 31297, upload-time = "2025-12-03T20:43:35.91Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1d/6e/34d4e77bb7951e5a5acbd846f43240f062c68bb04d9c246cb446a55d4cbc/django_tasks-0.12.0.tar.gz", hash = "sha256:58be66c1e487da32a3ce7320bd1949d0d1dc381b9004819f92591eb37fb2c1b8", size = 15445, upload-time = "2026-02-06T16:15:33.593Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c3/ae/161e7559ba6c6177ffa39854d80735c68e12680380322eec5752eca13987/django_tasks-0.10.0-py3-none-any.whl", hash = "sha256:1869e6bbfd0151c87cc711c0a377450f06b805b9da9556ba09dd32b4a0f4cb0a", size = 43071, upload-time = "2025-12-03T20:43:33.755Z" },
+    { url = "https://files.pythonhosted.org/packages/07/e7/40c45768e84efd77e3ae6ffdcd2b5540011036cbb00c6df6ef2a2ad69551/django_tasks-0.12.0-py3-none-any.whl", hash = "sha256:ffcc1d7bdfad3bc5ef9c2d498596c6546484c9ec6b182fb9709c691eb66a8709", size = 15758, upload-time = "2026-02-06T16:15:32.168Z" },
+]
+
+[[package]]
+name = "django-tasks-db"
+version = "0.12.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "django-stubs-ext" },
+    { name = "django-tasks" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f4/25/bc21ad4a610634f0a66f4faea4522eed26b55dbd50c4ac853128d24091d3/django_tasks_db-0.12.0.tar.gz", hash = "sha256:314d486b8c1786705b4afaf03dadaf0b1b104163acce9c5d9c9bb2aef205c501", size = 26724, upload-time = "2026-02-06T16:54:33.021Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/09/1c/e14198615e22df28b333540f2e506d6ddef7aff16d510818e94ebc01440c/django_tasks_db-0.12.0-py3-none-any.whl", hash = "sha256:69e3a1edcbf1efeeb1268da465e8ea5296ddd80834719769acc719b82da2d62e", size = 28832, upload-time = "2026-02-06T16:54:31.564Z" },
 ]
 
 [[package]]
@@ -1312,6 +1328,7 @@ dependencies = [
     { name = "django-storages", extra = ["boto3"] },
     { name = "django-stubs", extra = ["compatible-mypy"] },
     { name = "django-tasks" },
+    { name = "django-tasks-db" },
     { name = "django-timezone-field" },
     { name = "environs" },
     { name = "httpxyz" },
@@ -1356,11 +1373,11 @@ requires-dist = [
     { name = "dalf", specifier = "==0.7.1" },
     { name = "daphne", specifier = "==4.*" },
     { name = "dj-database-url", specifier = "==3.*" },
-    { name = "django", specifier = "==5.2.*" },
+    { name = "django", specifier = "==6.0.*" },
     { name = "django-admin-sortable2", specifier = "==2.*" },
     { name = "django-adminutils", specifier = "==0.0.28" },
     { name = "django-allauth", specifier = "==65.*" },
-    { name = "django-anymail", specifier = "==13.*" },
+    { name = "django-anymail", specifier = "==15.*" },
     { name = "django-choices-field", specifier = "==4.*" },
     { name = "django-codemirror2", specifier = "==0.2" },
     { name = "django-cors-headers", specifier = "==4.*" },
@@ -1376,8 +1393,9 @@ requires-dist = [
     { name = "django-simple-history", specifier = "==3.*" },
     { name = "django-solo", specifier = "==2.*" },
     { name = "django-storages", extras = ["boto3"], specifier = "==1.14.6" },
-    { name = "django-stubs", extras = ["compatible-mypy"], specifier = "==5.*" },
-    { name = "django-tasks", specifier = "==0.10.*" },
+    { name = "django-stubs", extras = ["compatible-mypy"], specifier = "==6.*" },
+    { name = "django-tasks", specifier = "==0.12.*" },
+    { name = "django-tasks-db", specifier = "==0.12.*" },
     { name = "django-timezone-field", specifier = "==7.*" },
     { name = "environs", specifier = "==14.*" },
     { name = "httpxyz", specifier = "==0.31.0" },
@@ -1396,7 +1414,7 @@ requires-dist = [
     { name = "rich", specifier = "==14.*" },
     { name = "sentry-sdk", extras = ["django"], specifier = "==2.*" },
     { name = "strawberry-graphql", specifier = "~=0.315.0" },
-    { name = "strawberry-graphql-django", specifier = "~=0.82.1" },
+    { name = "strawberry-graphql-django", specifier = "~=0.84.0" },
     { name = "whitenoise", specifier = "==6.*" },
 ]
 
@@ -1985,16 +2003,16 @@ wheels = [
 
 [[package]]
 name = "strawberry-graphql-django"
-version = "0.82.1"
+version = "0.84.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "asgiref" },
     { name = "django" },
     { name = "strawberry-graphql" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/77/91/b3eb1b6cf6eeb38c9991d2b6a7c9ca8d57f7e9f014eda9f72f3ce3340eca/strawberry_graphql_django-0.82.1.tar.gz", hash = "sha256:a6fa235e4ada110d8e8aff82d12317535e63123f294fbcd6287af68895167a9c", size = 92838, upload-time = "2026-03-28T11:16:23.656Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/24/ae/c705e61e8813ff127c9ff92bd086560ac8b2a8f3ba6efab0da852bb7c4a8/strawberry_graphql_django-0.84.0.tar.gz", hash = "sha256:83b4c90f083883f542ddfdb5af64389bed5c1d2bb3112dec23b0d1ca7659bed2", size = 92310, upload-time = "2026-05-03T10:20:35.898Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/62/0e/df3278171e6b501df3e9f2ff236e359ee72f429d2ec035068952fc3c4488/strawberry_graphql_django-0.82.1-py3-none-any.whl", hash = "sha256:4fd54cd4cd17d3dae111c433a4a3aeaa10b98e4abeefc9614cbb6f28f9dbc51c", size = 117192, upload-time = "2026-03-28T11:16:22.523Z" },
+    { url = "https://files.pythonhosted.org/packages/48/62/5e227cd55d491e20b1d818a612fd8500cd417545dcadebac8a5ac2726a5e/strawberry_graphql_django-0.84.0-py3-none-any.whl", hash = "sha256:af20838ce7f01f71a86651156d967b69b495a43d479a5531f60ea381ccc973fb", size = 116219, upload-time = "2026-05-03T10:20:37.17Z" },
 ]
 
 [[package]]

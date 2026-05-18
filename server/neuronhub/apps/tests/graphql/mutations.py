@@ -23,7 +23,7 @@ class TestsMutation:
     @strawberry.mutation
     async def test_create_failed_task(self, info: strawberry.Info) -> bool:
         from django.contrib.auth import get_user_model
-        from django_tasks.backends.database.models import DBTaskResult
+        from django_tasks_db.models import DBTaskResult
         from django_tasks.base import TaskResultStatus
 
         from neuronhub.apps.profiles.graphql import SCORE_PROFILES_TASK

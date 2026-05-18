@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.db.models import Model
-from django_tasks.backends.database.models import DBTaskResult
+from django_tasks_db.models import DBTaskResult
 
 from neuronhub.apps.algolia.services.algolia_reindex_partial import AlgoliaChangedIds
 from neuronhub.apps.algolia.services.algolia_reindex_partial import algolia_reindex_partial

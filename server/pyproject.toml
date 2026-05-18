@@ -9,19 +9,20 @@ requires-python = "~=3.14.0"
 # [i={importance for this project}, rep={reputation online: blogs, socials, etc}, GH={github history amount & quality}, @{GH username}, {number of GH stars}k] {comments}
 dependencies = [
     # django
-    "django == 5.2.*",
+    "django == 6.0.*",
         "pillow == 12.*", # [i=high, rep=high, GH=high, @hugovk, 13.1k] for ImageField, by CPython core dev; used by Django
-    "django-tasks == 0.10.*", # @RealOrangeOne, Django Security Team
+    "django-tasks == 0.12.*", # @RealOrangeOne, Django Security Team
+        "django-tasks-db == 0.12.*", # split out from django-tasks in 0.12
     "django-allauth == 65.*",
-    "django-anymail == 13.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, weird KLOC: +84/-40
+    "django-anymail == 15.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, weird KLOC: +84/-40
     "django-cors-headers == 4.*", # [i=high, rep=highest, @adamchainz] Django Security Team
     "django-rich == 2.*", # [i=norm, rep=highest, @adamchainz] Django Security Team
     "django-extensions == 4.*", #[i=norm, rep=high, GH=high, @trbs, 6.8k] author is actively maintaining it since 2007
         "ipython == 9.*",
     "strawberry-graphql ~= 0.315.0",
-        "strawberry-graphql-django ~= 0.82.1",
+        "strawberry-graphql-django ~= 0.84.0",
         "django-choices-field == 4.*", # [i=norm, rep=high, GH=high, @bellini666] Strawberry maintainer
-    "django-stubs[compatible-mypy] == 5.*",
+    "django-stubs[compatible-mypy] == 6.*",
     "django-health-check == 4.*", # [i=low, rep=norm, GH=norm, @revsys, 1.3k] a US dev agency
         "psutil == 7.2.*", # [i=low, rep=highest, GH=highest, @giampaolo, 11.2k] Python core dev since 2010. (needed as /healthcheck throws 500 wo it)
     "django-simple-history == 3.*", # [i=high, rep=norm, GH=norm, @django-commons, 2.4k]
