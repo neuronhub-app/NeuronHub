@@ -1,10 +1,10 @@
 FROM codercom/example-base:ubuntu
 
 ARG VITE_RELEASE_VERSION
-ARG GITHUB_PATH
+ARG GHCR_REPO
 
 LABEL org.opencontainers.image.description="Coder.com image for local dev"
-LABEL org.opencontainers.image.source="https://github.com/${GITHUB_PATH}/blob/${VITE_RELEASE_VERSION}/devops/coder/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/${GHCR_REPO}/blob/${VITE_RELEASE_VERSION}/devops/coder/Dockerfile"
 LABEL org.opencontainers.image.version="${VITE_RELEASE_VERSION}"
 
 USER coder

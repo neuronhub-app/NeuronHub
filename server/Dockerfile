@@ -1,7 +1,7 @@
 FROM astral/uv:python3.14-bookworm
 
 ARG SERVER_PORT=8000
-ARG GITHUB_PATH
+ARG GHCR_REPO
 ARG VITE_RELEASE_VERSION
 ARG DJANGO_ENV="prod"
 
@@ -17,7 +17,7 @@ ENV SENTRY_DSN_BACKEND=$SENTRY_DSN_BACKEND
 ENV VITE_RELEASE_NAME=$VITE_RELEASE_NAME
 
 LABEL org.opencontainers.image.description="Daphne serving Django ASGI"
-LABEL org.opencontainers.image.source="https://github.com/${GITHUB_PATH}/blob/${VITE_RELEASE_VERSION}/server/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/${GHCR_REPO}/blob/${VITE_RELEASE_VERSION}/server/Dockerfile"
 LABEL org.opencontainers.image.version="$VITE_RELEASE_VERSION"
 
 

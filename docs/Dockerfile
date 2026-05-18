@@ -47,11 +47,11 @@ RUN cp --recursive /app/docs/build $DEPLOY_DIR/build
 FROM node:24-slim
 
 ARG VITE_RELEASE_VERSION
-ARG GITHUB_PATH
+ARG GHCR_REPO
 ARG DEPLOY_DIR=/deploy
 
 LABEL org.opencontainers.image.description="React Router SSR docs site"
-LABEL org.opencontainers.image.source="https://github.com/${GITHUB_PATH}/blob/${VITE_RELEASE_VERSION}/docs/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/${GHCR_REPO}/blob/${VITE_RELEASE_VERSION}/docs/Dockerfile"
 LABEL org.opencontainers.image.version="$VITE_RELEASE_VERSION"
 
 ENV DOCS_PORT=3000

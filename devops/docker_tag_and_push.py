@@ -14,7 +14,7 @@ from typing import Literal
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--app", default="server", choices=["server", "client", "docs", "coder"])
-parser.add_argument("--github_path")
+parser.add_argument("--ghcr_repo")
 parser.add_argument("--version")
 parser.add_argument("--tag_only", action="store_true")
 parser.add_argument("--pre_release", action="store_true")
@@ -23,7 +23,7 @@ parser.add_argument("--pre_release", action="store_true")
 class NamespaceKwargs(Namespace):
     app: Literal["server", "client", "docs", "coder"]
     version: str
-    github_path: str
+    ghcr_repo: str
     tag_only: bool
     pre_release: bool
     no_sudo: bool
@@ -43,7 +43,7 @@ def main(kwargs: NamespaceKwargs):
         ]
 
     for tag_version in tag_versions:
-        container_path = f"ghcr.io/{kwargs.github_path}/{kwargs.app}"
+        container_path = f"ghcr.io/{kwargs.ghcr_repo}/{kwargs.app}"
         subprocess.run(
             [
                 "docker",

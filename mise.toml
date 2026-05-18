@@ -70,7 +70,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     ADMIN_EMAIL = "support@{{ env.CLIENT_DOMAIN }}"
     VITE_ADMIN_EMAIL = "{{ env.ADMIN_EMAIL }}"
 
-    GITHUB_PATH = "neuronhub-app/neuronhub"
+    GHCR_REPO = "${GHCR_REPO:-neuronhub-app/neuronhub}"
 
     # Sentry
 

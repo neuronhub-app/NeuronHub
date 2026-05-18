@@ -11,7 +11,7 @@
     run = """
         sudo -E python3 docker_tag_and_push.py \
             --app=($env.usage_app) \
-            --github_path="{{ env.GITHUB_PATH }}" \
+            --ghcr_repo="{{ env.GHCR_REPO }}" \
             --version="{{ env.VITE_RELEASE_VERSION }}" \
             ...(if $env.usage_pre_release? == "true" { ["--pre_release"] } else { [] })
     """
@@ -21,7 +21,7 @@
         flag "--app <name>" { choices "server" "client" "docs" "coder" }
         flag "--version <version>" env="VITE_RELEASE_VERSION"
     """
-    run = "sudo -E docker rmi ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)"
+    run = "sudo -E docker rmi ghcr.io/{{ env.GHCR_REPO }}/($env.usage_app):($env.usage_version)"
 
 ["docker:build"]
     usage = """
@@ -52,7 +52,7 @@
         let compose_content = $"
             services:
               ($env.usage_app):
-                image: ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)
+                image: ghcr.io/{{ env.GHCR_REPO }}/($env.usage_app):($env.usage_version)
                 pull_policy: always
                 build:
                   context: (
@@ -74,6 +74,7 @@
                   )
                   args:
                     VITE_RELEASE_VERSION: ($env.usage_version)
+                    GHCR_REPO: {{ env.GHCR_REPO }}
 
                     # for React Router build: Must match the {client|docs}/Dockerfile ARG names
 
@@ -137,7 +138,7 @@
 #         flag "--version <version>" env="VITE_RELEASE_VERSION"
 #     """
 #     run = """
-#         let image = $"ghcr.io/{{ env.GITHUB_PATH }}/($env.usage_app):($env.usage_version)"
+#         let image = $"ghcr.io/{{ env.GHCR_REPO }}/($env.usage_app):($env.usage_version)"
 #         let name = $"verify-($env.usage_app)"
 #
 #         # cleanup previous run

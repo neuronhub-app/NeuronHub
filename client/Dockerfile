@@ -45,10 +45,10 @@ FROM nginx:alpine
 
 # after the FROM need to re-declare ARGs:
 ARG VITE_RELEASE_VERSION
-ARG GITHUB_PATH
+ARG GHCR_REPO
 
 LABEL org.opencontainers.image.description="Nginx serving React Router static index.html"
-LABEL org.opencontainers.image.source="https://github.com/${GITHUB_PATH}/blob/${VITE_RELEASE_VERSION}/client/Dockerfile"
+LABEL org.opencontainers.image.source="https://github.com/${GHCR_REPO}/blob/${VITE_RELEASE_VERSION}/client/Dockerfile"
 LABEL org.opencontainers.image.version="$VITE_RELEASE_VERSION"
 
 ENV CLIENT_PORT=3000
