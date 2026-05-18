@@ -1,9 +1,0 @@
-[env]
-    IS_POSTGRES_EXTERNAL = "false"
-    IS_POSTGRES_MACOS = "true"
-    DB_HOST = "localhost"
-
-# optional
-[tools]
-    node = "24"
-    claude= "latest"

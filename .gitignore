@@ -24,6 +24,8 @@ server/.venv/
 mise.local.toml
 mise.*.local.toml
 **/.env*
+!.env.local.example
+!.env.local.*.example
 
 # docker
 /docker-compose.build.*.yaml

@@ -41,14 +41,14 @@ The [mise.toml](/mise.toml) has all tasks and scripts.
 FE will work only partially without an Algolia app.
 
 - <a href="https://dashboard.algolia.com/users/sign_in" rel="nofollow">Create a free account</a>
-- `cp mise.local.toml.example mise.local.toml`
+- `cp .env.local.example .env.local`
 - In this file populate App ID, API key, and Search API key
 - `mise run django:algolia-reindex`
 
 ### MacOS
 
 To run without Docker, after `git clone`:
-- `cp devops/env-examples/mise.macos.toml.example mise.local.toml`
+- `cp devops/env-examples/.env.local.macos.example .env.local`
 
 The rest is same as for Linux.
 
