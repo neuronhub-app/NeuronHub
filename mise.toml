@@ -120,14 +120,17 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     # Claude
 
     CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS = 1
-
     CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = 1
     DISABLE_ERROR_REPORTING = 1
     DISABLE_BUG_COMMAND = 1
     #ENABLE_PROMPT_CACHING_1H = 1 # default has been 5m since March 6th
     CLAUDE_CODE_ENABLE_AWAY_SUMMARY = 1 # gets disabled by telemetry drop below
-
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1 # drops telemetry & npm updates
+    # Claude /commands
+    DOCS_DIR_GLOB = "docs/src/pages/development/**"
+    DOCS_DIR_ARCH = "docs/architecture/"
+    DOCS_CODE_STYLE = "docs/src/pages/development/how-to/code-style.md"
+    DOCS_CODE_STYLE_DETAILED = "docs/src/pages/development/how-to/code-style-detailed.md"
 
     # todo ! docs: mise caveats - we can't use "${DJANGO_ENV:-dev}", maybe the { env.$ } syntax would work
     # using ${DJANGO_ENV} breaks Tasks with `env.DJANGO_ENV = "dev_test_e2e"` - it gets ignored
