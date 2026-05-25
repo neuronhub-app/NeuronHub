@@ -227,8 +227,6 @@ class Job(AlgoliaModel):
     graphql_query_for_algolia_field: str = "jobs"
 
     # Algolia bool facets - inverted for exclude-filter FE UX.
-    #
-    # Uses .all() to hit prefetch_related cache - not .filter()
     boolean_facet_fields = [
         "has_salary",
         "is_orgs_highlighted",

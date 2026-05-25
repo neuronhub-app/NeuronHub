@@ -11,6 +11,7 @@ from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
     disable_auto_indexing_if_enabled,
 )
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.services.get_jobs_public_from_ram import clear_jobs_public_ram_cache
 
 
 # todo ! refac: drop and use [[AlgoliaChangedIds]]
@@ -47,6 +48,8 @@ async def publish_job_versions(draft_ids: list[ID]):
             await job_pub.adelete()
         except Exception:
             sentry_sdk.capture_exception()
+
+    clear_jobs_public_ram_cache()
 
 
 async def _publish_changes_to_db(draft_ids: list[ID]) -> JobIds:

@@ -345,7 +345,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
                 pnpm exec chakra typegen src/theme/theme.ts | ignore
             }
         """
-        sources = ["src/theme/**/*.ts"]
+        sources = ["src/**/*.ts"]
         silent = true # quiet doesn't work
 
     [tasks."typegen:client:chakra:pg"]
@@ -370,7 +370,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     [tasks."typegen:docs:chakra"]
         dir = "docs/"
         run = "mise typegen:chakra --dir=docs/"
-        sources = ["src/theme/**/*"]
+        sources = ["src/**/*"]
         quiet = true
 
     [tasks."typegen:docs:react-router"]

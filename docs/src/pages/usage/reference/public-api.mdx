@@ -1,0 +1,31 @@
+---
+title: Public API
+order: 3
+is_new: true
+---
+
+import { CodeBlockText, SourceLink } from "@/components"
+
+# Jobs Public API
+
+- No rate-limit.
+- Caching TTL ≈ time-to-next-publish.
+  Backend serves the RAM snapshot until an admin publishes a new draft batch.
+
+
+## CSV
+
+<CodeBlockText lang="bash">{`
+  curl --location https://jobs.probablygood.org/api/jobs.csv --output jobs.csv
+`}</CodeBlockText>
+
+Columns are derived from the GraphQL `JobsPublic` query (see below) — nested objects use dot-notation (like `pd.json_normalize`),
+array-of-object cells join `.name` with `; `.
+
+## GraphQL
+
+The query name must be exactly `JobsPublic` and the body must match the whitelisted <SourceLink id="jobs_public_graphql">get_jobs_public_from_ram.py</SourceLink> query — the backend will reject it otherwise.
+
+<CodeBlockText lang="bash">{`
+  curl --json '{"query": "[copy from above]"}' https://jobs.probablygood.org/api/graphql
+`}</CodeBlockText>

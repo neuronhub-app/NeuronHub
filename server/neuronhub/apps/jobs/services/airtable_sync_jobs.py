@@ -25,6 +25,7 @@ from neuronhub.apps.algolia.services.disable_auto_indexing_if_enabled import (
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobLocation
+from neuronhub.apps.jobs.services.get_jobs_qs_prefetched import get_jobs_qs_prefetched
 from neuronhub.apps.jobs.services.serialize_job_to_md import serialize_job_to_md
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types_lazy import TagCategory
@@ -225,19 +226,6 @@ async def _sync_job_draft(job_parsed: JobParsed, job_pub_current: Job | None) ->
     await job_draft.locations.aset(await _sync_locations(job_parsed.locations))
 
     return job_draft
-
-
-def get_jobs_qs_prefetched():
-    return Job.objects.select_related("org").prefetch_related(
-        "tags_skill",
-        "tags_area",
-        "tags_education",
-        "tags_experience",
-        "tags_workload",
-        "tags_country_visa_sponsor",
-        "locations",
-        "org__tags_area",
-    )
 
 
 async def _resolve_tags_by_field(job_parsed: JobParsed) -> dict[str, list[PostTag]]:

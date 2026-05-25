@@ -8,6 +8,7 @@ from django.views.static import serve
 from health_check.views import HealthCheckView
 from strawberry.django.views import AsyncGraphQLView
 
+from neuronhub.apps.jobs.views import jobs_csv
 from neuronhub.apps.jobs.views import send_emails_cron
 from neuronhub.apps.profiles.views import accept_invite
 from neuronhub.graphql import schema
@@ -32,6 +33,7 @@ urlpatterns = [
                 # extra for [[client.ts#fetchUsingReadableUrl]]
                 path("graphql/<operation>", csrf_exempt(graphql_view)),
                 path("graphql/mutate/<operation>", csrf_exempt(graphql_view)),
+                path("jobs.csv", jobs_csv, name="jobs_csv"),
             ]
         ),
     ),

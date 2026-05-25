@@ -987,6 +987,7 @@ type Query {
   job_faq_questions: [JobFaqQuestionType!]!
   jobs_landing_pages: [JobsLandingPageType!]!
   job_by_slug(slug: String!): JobType
+  jobs_public: [JobType!]!
   job_alerts: [JobAlertType!]!
   job_versions_pending: [JobVersionType!]! @IsStaff
   site: SiteConfigType!

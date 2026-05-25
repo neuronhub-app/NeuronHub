@@ -18,8 +18,9 @@ from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobFaqQuestion
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.models import JobsLandingPage
-from neuronhub.apps.jobs.services.airtable_sync_jobs import get_jobs_qs_prefetched
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
+from neuronhub.apps.jobs.services.get_jobs_public_from_ram import get_jobs_public_from_ram
+from neuronhub.apps.jobs.services.get_jobs_qs_prefetched import get_jobs_qs_prefetched
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.serialize_job_to_md import serialize_job_to_md
@@ -206,6 +207,10 @@ class JobsQuery:
         user = await get_user_maybe(info)
         job = await filter_jobs_by_user(user).filter(slug=slug).afirst()
         return cast(JobType | None, job)
+
+    @strawberry_django.field
+    async def jobs_public(self) -> list[JobType]:
+        return cast(list[JobType], await get_jobs_public_from_ram())
 
     @strawberry_django.field
     async def job_alerts(self, info: strawberry.Info) -> list[JobAlertType]:

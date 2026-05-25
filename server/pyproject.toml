@@ -5,7 +5,7 @@ version = "0.0.0.0"
 description = ""
 requires-python = "~=3.14.0"
 
-# For audit, we document packages trustworthyness. The format:
+# For audit, we document packages trustworthiness. The format:
 # [i={importance for this project}, rep={reputation online: blogs, socials, etc}, GH={github history amount & quality}, @{GH username}, {number of GH stars}k] {comments}
 dependencies = [
     # django
