@@ -1,5 +1,5 @@
 import { env } from "@neuronhub/shared/createEnv";
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { subscribe } from "valtio";
 import { useSnapshot } from "valtio/react";
 import { devtools, proxySet } from "valtio/utils";
@@ -13,27 +13,29 @@ import { proxy } from "valtio/vanilla";
  * And the [devtools](https://github.com/pmndrs/valtio/blob/main/docs/api/utils/devtools.mdx)
  * easily show every mutation.
  *
- * Warning: Vite's HMR resets the state of everything outside a React Component, eg Valtio's `proxy()`.
+ * Note: Vite's HMR resets the state of everything outside a React Component, eg Valtio's `proxy()`
+ * (unless its imported from another file).
  *
- * todo refac: assert that any keys in `val` are not Set() or Map() - as proxy() won't handle them
+ * todo ! refac: assert that any keys in `val` are not Set() or Map() - as proxy() won't handle them
  */
-export function useStateValtio<T extends object>(val: T, devtoolsName?: string) {
-  const ref = useRef(proxy(val));
-  const state = ref.current;
+export function useStateValtio<T extends object>(val: T) {
+  const [state] = useState(() => proxy(val));
 
   useEffect(() => {
     if (env.isDev) {
-      devtools(state, { name: devtoolsName, enabled: true });
+      // devtools(state, { name: devtoolsName, enabled: true });
     }
   }, []);
+
+  function useSubscribe(callback: () => void) {
+    useEffect(() => subscribe(state, callback), [callback]);
+  }
 
   return {
     mutable: state,
     mut: state,
     snap: useSnapshot(state),
-    subscribe: (callback: () => void) => {
-      subscribe(state, callback);
-    },
+    useSubscribe: useSubscribe,
   };
 }
 
@@ -41,8 +43,7 @@ export function useStateValtio<T extends object>(val: T, devtoolsName?: string) 
  * Valtio doesn't support Map() and Set() objects with the `proxy()` construct.
  */
 export function useStateValtioSet<T>(val: Iterable<T> | null, opts?: { devtoolsName?: string }) {
-  const ref = useRef(proxySet(val));
-  const state = ref.current;
+  const [state] = useState(() => proxySet(val));
 
   useEffect(() => {
     if (env.isDev) {
@@ -50,11 +51,13 @@ export function useStateValtioSet<T>(val: Iterable<T> | null, opts?: { devtoolsN
     }
   }, []);
 
+  function useSubscribe(callback: () => void) {
+    useEffect(() => subscribe(state, callback), [callback]);
+  }
+
   return {
     mutable: state,
     snap: useSnapshot(state),
-    subscribe: (callback: () => void) => {
-      subscribe(state, callback);
-    },
+    useSubscribe: useSubscribe,
   };
 }
