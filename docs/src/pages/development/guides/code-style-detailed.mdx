@@ -79,6 +79,7 @@ As `{category}? {noun} {verb} {adjective}`: `{category}` creates logical modules
 For vars use `{noun} {adjective}` - to let the brain auto-create a `category` out of the `noun`. Eg `value_current`, not `current_value`.
 
 All boolean variable names start with `is`.
+If a file exports a single function - name it identically.
 
 
 #### Existing Conventions
@@ -91,6 +92,14 @@ All boolean variable names start with `is`.
     - PG -> `Probablygood`
 
 CamelCase in JS. snake_case in Python.
+
+#### Named parameters
+
+For multiple params -> prefer named over positional.
+
+- `opts` for optional. Especially if it's the only param.
+- `args` for required. Ok to merge `opts` into it for simplicity.
+- `props` for a React component or hook.
 
 ### TODO comments
 
@@ -115,8 +124,6 @@ TypeScript
 
 - Always `ESNext`.
 - Named exports only.
-- Use `Boolean` instead of `!!`.
-- Never inline conditions as `if (condition) result;`.
 
 ### No destructuring
 

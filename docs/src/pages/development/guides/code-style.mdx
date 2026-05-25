@@ -45,6 +45,8 @@ In the order of importance:
 - 2+ uses of a magic string → define as a var.
 - Functions > 20 lines → decompose. Think of later debugging prod at 3am.
 - Define explanatory variables (or functions when it's worth the complexity cost).
+- Never artificially shorten a declaration. If the concept it covers is too moody for a short name - the long name is an informative and reliable indicator of its bad quality.
+- Place files nearby the caller. Especially if only one exists.
 - In functions that have a hard dependency on the parent - accept objects over primitives: eg `update(user: User)` over `update(id: string)` - do not conceal the origin.
 
 Extra guidelines:
@@ -62,9 +64,11 @@ Extra guidelines:
 #### TypeScript
 
 - Use `??` for null/undefined. Never use `||` (preserves falsy).
+- Use `Boolean()` instead of `!!`.
 - No inline conditionals: `if (x) action();` write as `if (x) {\n action()\n }`.
 - Functions are declared as `function`, not `const`.
 - Never use `export default`. Except when react-router requires it.
+- Keep `interface`s inlined if nothing is using them.
 - No destructuring - it obscures the origin. The only exceptions:
     - Single-per-function `useApolloQuery`.
     - React soft-mandatory API: `useTransition`, `useState`, etc.
@@ -73,6 +77,7 @@ Extra guidelines:
 
 Code blocks can be marked with:
 - <TagLg>#bad-infer</TagLg> - broken TS type inference. Over time we'll check if it was fixed.
+- <TagLg>#bad-infer-expl-var</TagLg> - when you move out `if (...)` into an explanatory variable TS drops `if` body inference. Will be fixed, someday.
 - <TagLg>#prob-redundant</TagLg> - but removal isn't a priority.
 - <TagLg>#draft</TagLg> - not tested, not working, or not ready for prod.
 - <TagLg>#E2E-fails</TagLg> - may be in Git commit body, because we still lack E2E CI.

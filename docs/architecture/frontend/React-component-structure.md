@@ -48,8 +48,22 @@ export function Card(props: { id: ID; }) {
   }
 
   // 4. JSX variables
+  //
+  // Group for readability.
+  // Never obscure any inter-dependence (eg in symmetry, colors, etc).
+  // Not everything needs to be placed under the `jsx` object.
+  // Avoid obscuring the origin and grouping in jsx what was declared above.
+  // Do not put in jsx independent vars used only once.
 
-  const name = user.name ?? "Anonymous";
+  const jsx = {
+    name: user.name ?? "Anonymous",
+    css: {
+      padding: "gap.md",
+      get ml() {
+        return this.padding;
+      },
+    },
+  } as const;
 
   return (
     <DialogRoot
@@ -58,7 +72,7 @@ export function Card(props: { id: ID; }) {
 		state.mutable.isDialogOpen = event.open;
       }}
     >
-	  <Button onClick={() => { loading.track(hidePost) }} loading={loading.isActive}>Hide</Button>
+	  <Button onClick={() => { loading.track(hidePost) }} loading={loading.isActive} ml={jsx.css.ml}>Hide {jsx.name}</Button>
     </DialogRoot>
   );
 }
