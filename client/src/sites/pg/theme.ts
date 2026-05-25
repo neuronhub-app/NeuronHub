@@ -19,7 +19,8 @@ const pgBadgeBase = {
 
 const chakraBadge = defaultConfig.theme?.recipes?.badge;
 
-const pgRecipes = {
+// exported for client/src/theme/theme.typegen.ts to union pg variants into chakra typegen output
+export const pgRecipes = {
   ...recipes,
 
   badge: defineRecipe({

@@ -12,18 +12,16 @@
     "jsx": "react-jsx",
 
     "strict": true,
-    "skipLibCheck": true, // needed because of broken @types/mdx
+    "skipLibCheck": true, // for the broken @types/mdx
 
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
 
-    // from react-router docs
-    "rootDirs": [".", "./.react-router/types"],
+    "rootDirs": [".", "./.react-router/types"], // from react-router docs
 
     "paths": {
       "@/e2e/*": ["./e2e/*"],
       "@/*": ["./src/*"],
-      "#chakra-internal/*": ["./node_modules/@chakra-ui/react/dist/types/styled-system/*"], // #122
       "~/react-router/*": ["./.react-router/types/src/apps/*"],
     },
   },
@@ -32,8 +30,6 @@
     "e2e",
     "scripts",
     "vite.config.ts",
-    ".chakra/types",
-    // from react-router docs
-    "./.react-router/types",
+    "./.react-router/types", // from react-router doc
   ],
 }

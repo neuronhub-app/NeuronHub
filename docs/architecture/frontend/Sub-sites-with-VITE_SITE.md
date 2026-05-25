@@ -11,11 +11,17 @@ A Docker build ARG.
 `src/sites/{slug}/`:
 - `routes.ts` - `RouteConfig` with own `layout()` - `NeuronLayout.tsx` or `PgLayout.tsx`
 - `redirects/` - backward compatibility URL redirects
-- `theme.ts`
+- `theme.ts` - exports `system` for runtime and `pgRecipes` for typegen
 - `colors.ts`
 - `pages/
 
 `src/sites/index.ts` exports `const siteConfig` (build-time chakra `theme`, `favicon`, `meta`) selected by `env.VITE_SITE`.
+
+## Chakra Typegen
+
+`mise typegen:chakra` covers both sites.
+
+`client/src/theme/theme.typegen.ts` imports `pgRecipes` + NHA `recipes` => unions their variants into chakra's generated types.
 
 ## apps.sites.SiteConfig by django-solo
 

@@ -75,5 +75,7 @@ Must read when working with any of those module.
 
 Import as `@neuronhub/shared/utils/format`, etc.
 
-Chakra typegen runs separately for shared (`mise typegen:packages:chakra`) 
-with `--outdir .chakra/types` and a post-process to rewrite import paths to `#chakra-internal/`.
+Chakra typegen runs once via `mise typegen:chakra` from `client/src/theme/theme.typegen.ts`
+— a combined NHA + pg theme that unions both sites' recipe variants. Output lands in
+`node_modules/@chakra-ui/react/dist/types/styled-system/generated/`, shared across
+`client/`, `packages/shared/`, and `docs/` via pnpm dedupe.

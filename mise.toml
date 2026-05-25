@@ -41,6 +41,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     # Global
 
+    VITE_SITE = "${VITE_SITE:-}" # or "pg"
+
     PROJECT_NAME = "${PROJECT_NAME:-neuronhub}"
     VITE_PROJECT_NAME = "NeuronHub" # for FE HTML
     VITE_RELEASE_VERSION = "${VITE_RELEASE_VERSION:-0.3.4.0}" # used in GitHub and Sentry
@@ -295,8 +297,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 [tasks.typegen]
     depends = "typegen:server"
     run = [
+        "mise typegen:chakra",
         "mise typegen:client",
-        "mise typegen:packages:chakra",
         "mise typegen:docs",
     ]
     description = "Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries; @chakra-ui; etc"
@@ -314,7 +316,6 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         depends = [
             "typegen:client:graphql-codegen",
             "typegen:client:gql-tada",
-            "typegen:client:chakra:*",
         ]
         quiet = true
 
@@ -336,41 +337,8 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         sources = ["src/**/*", "e2e/**/*"]
         silent = true # quiet doesn't work
 
-    [tasks."typegen:client:chakra:neuron"]
-        dir = "client"
-        run = """
-            let is_overrides_shared_node_modules = ($env.VITE_SITE? | default "") == "pg"; # see #123
-            if not $is_overrides_shared_node_modules {
-                # todo ? fix: still clashes with `pg`, "| ignore" for now
-                pnpm exec chakra typegen src/theme/theme.ts | ignore
-            }
-        """
-        sources = ["src/**/*.ts"]
-        silent = true # quiet doesn't work
-
-    [tasks."typegen:client:chakra:pg"]
-        dir = "client"
-        run = "pnpm exec chakra typegen src/sites/pg/theme.ts"
-        sources = ["src/sites/theme/**/*.ts", "src/sites/pg/theme.ts"]
-        silent = true # quiet doesn't work
-
-    [tasks."typegen:packages:chakra"]
-        dir = "packages/shared"
-        run = "mise typegen:chakra --dir=packages/shared/"
-        sources = ["src/theme/**/*"]
-        quiet = true
-
     [tasks."typegen:docs"]
-        depends = [
-            "typegen:docs:chakra",
-            "typegen:docs:react-router",
-        ]
-        quiet = true
-
-    [tasks."typegen:docs:chakra"]
-        dir = "docs/"
-        run = "mise typegen:chakra --dir=docs/"
-        sources = ["src/**/*"]
+        depends = ["typegen:docs:react-router"]
         quiet = true
 
     [tasks."typegen:docs:react-router"]
@@ -379,25 +347,15 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         sources = ["src/**/*.mdx"]
         quiet = true
 
+    # pnpm dedupes @chakra-ui/react -> one typegen run updates the shared node_modules install used by client/, packages/shared/, docs/.
     [tasks."typegen:chakra"]
-        usage = """
-            flag "--dir <dir>"
-        """
-        # chakra modifies node_modules -> pnpm dedups @chakra-ui/react -> chakra overrides client/ or shared/ types -> fixed by --outdir
-        run = """
-            cd $env.usage_dir
-
-            let output_dir = ".chakra/types"
-            pnpm exec chakra typegen src/theme/theme.ts --outdir $output_dir
-
-            # Generated .d.ts use rel imports `"../css.types"` -> breaks outside node_modules -> remap to #chakra-internal/ tsconfig path
-            glob $"($output_dir)/*.d.ts" | each { |file|
-                open $file --raw
-                | str replace --all 'from "../' 'from "#chakra-internal/'
-                | save --force $file
-            }
-        """
-        silent = true
+        dir = "client"
+        run = "pnpm exec chakra typegen src/theme/theme.typegen.ts"
+        sources = [
+            "src/theme/**",
+            "src/sites/pg/theme.ts", # mirrored into theme.typegen.ts
+        ]
+        quiet = true
 
 [tasks.format]
     depends = ["format:server", "format:biome"]

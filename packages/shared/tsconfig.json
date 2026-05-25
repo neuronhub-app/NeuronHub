@@ -18,8 +18,7 @@
 
     "paths": {
       "@neuronhub/shared/*": ["./src/*"],
-      "#chakra-internal/*": ["./node_modules/@chakra-ui/react/dist/types/styled-system/*"], // #122
     },
   },
-  "include": ["src", ".chakra/types"],
+  "include": ["src"],
 }
