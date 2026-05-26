@@ -1,5 +1,5 @@
 name: "Deploy"
-run-name: "Deploy ${{ inputs.target_deploy_env }}"
+run-name: "Deploy ${{ inputs.target_deploy_env }} @ ${{ inputs.release_version }}"
 
 on:
   workflow_dispatch:
@@ -7,6 +7,10 @@ on:
       target_deploy_env:
         description: "Target deploy env"
         type: environment
+        required: true
+      release_version:
+        description: "Release version (eg `0.3.6.0-rc.1`); becomes VITE_RELEASE_VERSION + image tag"
+        type: string
         required: true
 
 jobs:
@@ -22,6 +26,7 @@ jobs:
       REGISTRY: ghcr.io
       # ghcr.io rejects uppercase; `github.repository` keeps repo casing
       GHCR_REPO: neuronhub-app/neuronhub
+      VITE_RELEASE_VERSION: ${{ inputs.release_version }}
 
       # env-scoped vars from the selected GH Environment
       DJANGO_ENV: ${{ vars.DJANGO_ENV }}
@@ -59,8 +64,8 @@ jobs:
         run: |
           mise run docker:build --app=server
           mise run docker:build --app=client
-          mise run docker:tag-and-push --app=server
-          mise run docker:tag-and-push --app=client
+          mise run docker:tag-and-push --app=server --pre_release
+          mise run docker:tag-and-push --app=client --pre_release
 
       - name: Get image digests
         id: digests
