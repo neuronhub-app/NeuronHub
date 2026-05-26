@@ -82,22 +82,29 @@ jobs:
         id: digests
         shell: nu {0}
         run: |
-          def get_digest [app: string] {
-            let image = $"ghcr.io/($env.GHCR_REPO)/($app):($env.VITE_RELEASE_VERSION)"
+          def get_digest [image_name: string] {
+            let image = $"ghcr.io/($env.GHCR_REPO)/($image_name):($env.VITE_RELEASE_VERSION)"
 
             let inspect = docker inspect $image | from json | first
 
             # `{registry/repo}@sha256:…` once per alias; all have the same digest -> first works.
             let repo_digest = $inspect.RepoDigests | first
 
-            # keep `sha256:…` <- drop `{registry/repo}@` prefix 
+            # keep `sha256:…` <- drop `{registry/repo}@` prefix
             $repo_digest | split row '@' | last
           }
-          let server_digest = get_digest server
-          let client_digest = get_digest client
+          # Per-site client image name; server stays site-agnostic.
+          let client_image_name = if ($env.VITE_SITE? | default "") != "" {
+              $"client-($env.VITE_SITE)"
+          } else {
+              "client"
+          }
+          let server_digest = get_digest "server"
+          let client_digest = get_digest $client_image_name
           [
             $"server=($server_digest)"
             $"client=($client_digest)"
+            $"client_image_name=($client_image_name)"
           ] | str join "\n" | save --append $env.GITHUB_OUTPUT
 
       - name: Attest server image
@@ -109,5 +116,5 @@ jobs:
       - name: Attest client image
         uses: actions/attest-build-provenance@v3
         with:
-          subject-name: ghcr.io/${{ env.GHCR_REPO }}/client
+          subject-name: ghcr.io/${{ env.GHCR_REPO }}/${{ steps.digests.outputs.client_image_name }}
           subject-digest: ${{ steps.digests.outputs.client }}

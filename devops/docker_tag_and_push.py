@@ -14,6 +14,7 @@ from typing import Literal
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--app", default="server", choices=["server", "client", "docs", "coder"])
+parser.add_argument("--vite_site", default="")
 parser.add_argument("--ghcr_repo")
 parser.add_argument("--version")
 parser.add_argument("--tag_only", action="store_true")
@@ -22,6 +23,7 @@ parser.add_argument("--pre_release", action="store_true")
 
 class NamespaceKwargs(Namespace):
     app: Literal["server", "client", "docs", "coder"]
+    vite_site: str
     version: str
     ghcr_repo: str
     tag_only: bool
@@ -42,8 +44,14 @@ def main(kwargs: NamespaceKwargs):
             "latest",
         ]
 
+    image_name = (
+        f"{kwargs.app}-{kwargs.vite_site}"
+        if kwargs.app == "client" and kwargs.vite_site
+        else kwargs.app
+    )
+
     for tag_version in tag_versions:
-        container_path = f"ghcr.io/{kwargs.ghcr_repo}/{kwargs.app}"
+        container_path = f"ghcr.io/{kwargs.ghcr_repo}/{image_name}"
         subprocess.run(
             [
                 "docker",

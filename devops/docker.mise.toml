@@ -11,6 +11,7 @@
     run = """
         sudo -E python3 docker_tag_and_push.py \
             --app=($env.usage_app) \
+            --vite_site="{{ env.VITE_SITE | default(value="") }}" \
             --ghcr_repo="{{ env.GHCR_REPO }}" \
             --version="{{ env.VITE_RELEASE_VERSION }}" \
             ...(if $env.usage_pre_release? == "true" { ["--pre_release"] } else { [] })
@@ -21,7 +22,14 @@
         flag "--app <name>" { choices "server" "client" "docs" "coder" }
         flag "--version <version>" env="VITE_RELEASE_VERSION"
     """
-    run = "sudo -E docker rmi ghcr.io/{{ env.GHCR_REPO }}/($env.usage_app):($env.usage_version)"
+    run = """
+        let image_name = if $env.usage_app == "client" and ($env.VITE_SITE? | default "") != "" {
+            $"client-($env.VITE_SITE)"
+        } else {
+            $env.usage_app
+        }
+        sudo -E docker rmi $"ghcr.io/{{ env.GHCR_REPO }}/($image_name):($env.usage_version)"
+    """
 
 ["docker:build"]
     usage = """
@@ -48,11 +56,17 @@
         # Force-pass Mise env & tag to the Docker build
         # ------------------------------------------------------------
 
+        let image_name = if $env.usage_app == "client" and ($env.VITE_SITE? | default "") != "" {
+            $"client-($env.VITE_SITE)"
+        } else {
+            $env.usage_app
+        }
+
         let compose_file = $"docker-compose.build.($env.usage_app).yaml"
         let compose_content = $"
             services:
               ($env.usage_app):
-                image: ghcr.io/{{ env.GHCR_REPO }}/($env.usage_app):($env.usage_version)
+                image: ghcr.io/{{ env.GHCR_REPO }}/($image_name):($env.usage_version)
                 pull_policy: always
                 build:
                   context: (
