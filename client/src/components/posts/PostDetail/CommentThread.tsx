@@ -14,6 +14,9 @@ import {
 } from "@chakra-ui/react";
 import { type ComponentProps, type JSX, useEffect, useMemo, useRef } from "react";
 import { GoPencil } from "react-icons/go";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import { useAuth } from "@/apps/users/useUserCurrent";
 import { getAvatarColorForUsername, PostAuthor } from "@/components/posts/PostCard/PostAuthor";
@@ -36,7 +39,6 @@ import {
 } from "@/graphql/fragments/posts";
 import type { PostReviewDetailFragmentType } from "@/graphql/fragments/reviews";
 import { toast } from "@/utils/toast";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 const styleGlobal = {
   indent: 9,
@@ -463,9 +465,13 @@ function useCommentLeftLine(props: ComponentProps<typeof CommentThread>) {
 const CommentEditQuery = graphql.persisted(
   "CommentEdit",
   graphql(
-    `query CommentEdit($id: ID!) {
-      post_comment(pk: $id) { ...PostEditFragment }
-    }`,
+    `
+      query CommentEdit($id: ID!) {
+        post_comment(pk: $id) {
+          ...PostEditFragment
+        }
+      }
+    `,
     [PostEditFragment],
   ),
 );

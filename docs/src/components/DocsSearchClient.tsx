@@ -3,16 +3,18 @@
  */
 "use client";
 
-import { useEffect, useRef } from "react";
 import { Box, Dialog, Flex, HStack, Kbd, Input, Portal, Text, chakra } from "@chakra-ui/react";
-import { LuArrowDown, LuArrowUp, LuCornerDownLeft } from "react-icons/lu";
 import { liteClient } from "algoliasearch/lite";
+import { useEffect, useRef } from "react";
+import { LuArrowDown, LuArrowUp, LuCornerDownLeft } from "react-icons/lu";
 import { Highlight, InstantSearch, Snippet, useHits, useSearchBox } from "react-instantsearch";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import { BadgeNew } from "@/components/BadgeNew";
-import { env } from "@/env";
-import { ids } from "@/e2e/ids";
 import { NavLink, useNavigate } from "react-router";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
+import { BadgeNew } from "@/components/BadgeNew";
+import { ids } from "@/e2e/ids";
+import { env } from "@/env";
 
 export function DocsSearchClient() {
   return (
@@ -211,6 +213,7 @@ function HitsList(props: {
 
 function HitItem(props: {
   // #bad-infer untyped instantsearch
+  // oxlint-disable-next-line typescript/no-explicit-any
   hit: DocHit & Record<string, any>;
   isActive: boolean;
   onMouseEnter: () => void;

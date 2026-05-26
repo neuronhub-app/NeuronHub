@@ -1,9 +1,9 @@
+import type { TadaDocumentNode } from "gql.tada";
 import { useMemo } from "react";
 import { useDebounce } from "use-debounce";
-import type { TadaDocumentNode } from "gql.tada";
 
-import { useApolloQuery } from "@/graphql/useApolloQuery";
 import type { ID } from "@/gql-tada";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 /**
  * If we store eg `.votes` in Algolia, then voting with `mutateAndRefetchMountedQueries` won't refetch `.votes` from BE.

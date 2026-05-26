@@ -1,5 +1,6 @@
-import { LinkExt } from "@/components/LinkExt";
 import { ReactNode } from "react";
+
+import { LinkExt } from "@/components/LinkExt";
 
 export function SourceLink(props: { id: keyof typeof links; children?: ReactNode }) {
   const path = links[props.id];

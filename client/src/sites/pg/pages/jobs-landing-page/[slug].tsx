@@ -1,8 +1,10 @@
 import { Navigate, useParams } from "react-router";
+
+import jobsLandingPagesPrefetch from "~/graphql/prefetch/JobsLandingPages.json";
+
 import type { JobsLandingPagesData } from "@/prefetch/JobsLandingPage";
 import { JobsLandingPageView } from "@/sites/pg/pages/jobs-landing-page/JobsLandingPageView";
 import { urls } from "@/urls";
-import jobsLandingPagesPrefetch from "~/graphql/prefetch/JobsLandingPages.json";
 
 /**
  * todo ! fix: makes page-404.tsx unreachable -> drop once old JobAlerts using /:slug are unused (ie June/July). See #169.

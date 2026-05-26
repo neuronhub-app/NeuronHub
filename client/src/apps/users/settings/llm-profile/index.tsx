@@ -5,6 +5,9 @@ import { Container, HStack, Span, Stack, Text, Textarea } from "@chakra-ui/react
 import { useRef } from "react";
 import { LuCheck } from "react-icons/lu";
 import { useDebouncedCallback } from "use-debounce";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { ProfileUserLlmMdQuery } from "@/apps/profiles/list/AiMatchingButtonTrigger";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -21,7 +24,6 @@ import {
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export default function LlmProfile() {
   const { data, isLoadingFirstTime, refetch } = useApolloQuery(MyLlmProfileQuery);

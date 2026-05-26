@@ -4,12 +4,14 @@ import { useFormContext, useWatch } from "react-hook-form";
 import { FaAppStoreIos, FaBook, FaCode, FaServer, FaShoppingCart } from "react-icons/fa";
 import { LuGithub } from "react-icons/lu";
 import { SiCrunchbase } from "react-icons/si";
+
+import { ToolType } from "~/graphql/enums";
+
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
 import { PostFields } from "@/components/posts/form/PostFields";
 import type { schemas } from "@/components/posts/form/schemas";
 import { ToolAsyncSelect } from "@/components/posts/form/ToolAsyncSelect";
-import { ToolType } from "~/graphql/enums";
 
 export function PostToolFields(props: { isToolSelectAllowed?: boolean }) {
   const form = useFormContext<schemas.Tool>();

@@ -1,6 +1,11 @@
 import type * as React from "react";
 import { useEffect } from "react";
 import { subscribe } from "valtio/vanilla";
+
+import { Prose } from "@neuronhub/shared/components/ui/prose";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { isHTMLElement } from "@/apps/highlighter/HighlightActionBar";
 import { PostContentHighlightMenu } from "@/apps/highlighter/PostContentHighlightMenu";
 import {
@@ -8,12 +13,9 @@ import {
   type PostHighlight,
   removeHighlight,
 } from "@/apps/highlighter/useHighlighter";
-import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
-import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export const highlight_attrs = {
   flag: "highlightable",
@@ -114,7 +116,6 @@ export function PostContentHighlighted(props: {
     >
       <Prose
         onClick={onHighlightClick}
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
         dangerouslySetInnerHTML={{ __html: contentHTML }}
         size="sm"
         maxW="3xl"

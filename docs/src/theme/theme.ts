@@ -5,6 +5,7 @@ import {
   defineRecipe,
   mergeConfigs,
 } from "@chakra-ui/react";
+
 import { theme } from "@neuronhub/shared/theme/colors";
 import { gap } from "@neuronhub/shared/theme/spacings";
 

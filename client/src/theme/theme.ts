@@ -5,8 +5,10 @@ import {
   defineTokens,
   mergeConfigs,
 } from "@chakra-ui/react";
+
 import { theme } from "@neuronhub/shared/theme/colors";
 import { gap } from "@neuronhub/shared/theme/spacings";
+
 import { recipes, slotRecipes } from "@/theme/recipes";
 
 const tokens = defineTokens({

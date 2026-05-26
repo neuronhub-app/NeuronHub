@@ -2,6 +2,7 @@ import type { OperationVariables } from "@apollo/client";
 import { Locator, Page, Response } from "@playwright/test";
 import type { TadaDocumentNode } from "gql.tada";
 import { print } from "graphql";
+
 import { config } from "@/e2e/config";
 import { expect } from "@/e2e/helpers/expect";
 import { ids, type TestId } from "@/e2e/ids";
@@ -229,5 +230,9 @@ const ResetDbAndGenMutate = graphql.persisted(
 
 export const TestCreateFailedTaskMutate = graphql.persisted(
   "test_create_failed_task",
-  graphql(`mutation test_create_failed_task { test_create_failed_task }`),
+  graphql(`
+    mutation test_create_failed_task {
+      test_create_failed_task
+    }
+  `),
 );

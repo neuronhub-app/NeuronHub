@@ -1,5 +1,6 @@
 import { HStack, Icon, IconButton } from "@chakra-ui/react";
 import { BsCaretDownFill, BsCaretUpFill } from "react-icons/bs";
+
 import { usePostVoting } from "@/components/posts/usePostVoting";
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";

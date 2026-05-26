@@ -10,11 +10,13 @@ import {
   type StackProps,
   Text,
 } from "@chakra-ui/react";
-import { icons } from "@neuronhub/shared/theme/icons";
 import type { ComponentType } from "react";
 import { LuLogIn, LuLogOut } from "react-icons/lu";
-import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
 import { type LinkProps, NavLink, useLocation } from "react-router";
+
+import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
+import { icons } from "@neuronhub/shared/theme/icons";
+
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { Avatar } from "@/components/ui/avatar";
@@ -275,4 +277,11 @@ export function UserProfile() {
     </Stack>
   );
 }
-const LogoutMutation = graphql.persisted("Logout", graphql(`mutation Logout { logout }`));
+const LogoutMutation = graphql.persisted(
+  "Logout",
+  graphql(`
+    mutation Logout {
+      logout
+    }
+  `),
+);

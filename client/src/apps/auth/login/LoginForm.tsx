@@ -4,12 +4,14 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { z } from "zod";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function LoginForm() {
   const navigate = useNavigate();
@@ -109,5 +111,12 @@ export function LoginForm() {
 }
 const LoginMutation = graphql.persisted(
   "Login",
-  graphql(`mutation Login($data: LoginInput!) { login(data: $data) { success error } }`),
+  graphql(`
+    mutation Login($data: LoginInput!) {
+      login(data: $data) {
+        success
+        error
+      }
+    }
+  `),
 );

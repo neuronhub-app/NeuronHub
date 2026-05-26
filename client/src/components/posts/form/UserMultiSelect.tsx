@@ -3,10 +3,13 @@ import { AsyncCreatableSelect, components } from "chakra-react-select";
 import { useEffect, useRef } from "react";
 import { useWatch } from "react-hook-form";
 import { subscribe } from "valtio/vanilla";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { user } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
-import type { SelectVotableOption } from "@/components/posts/form/SelectVotable";
 import { type schemas, UserType } from "@/components/posts/form/schemas";
+import type { SelectVotableOption } from "@/components/posts/form/SelectVotable";
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -16,7 +19,6 @@ import {
   DialogRoot,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export type UserSelectOption =
   | NonNullable<schemas.sharable.Schema["recommend_to"]>[number]

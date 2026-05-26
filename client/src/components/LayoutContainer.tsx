@@ -1,10 +1,10 @@
-import { AdminMenuFloatButton } from "@/components/AdminMenuFloatButton";
 import { Container, Flex, HStack, IconButton, Stack } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { LuAlignRight } from "react-icons/lu";
 import { Outlet, useLocation } from "react-router";
 
 import { HighlightActionBar } from "@/apps/highlighter/HighlightActionBar";
+import { AdminMenuFloatButton } from "@/components/AdminMenuFloatButton";
 import { LayoutSidebar, NeuronLogoLinked } from "@/components/LayoutSidebar";
 import {
   DrawerBackdrop,

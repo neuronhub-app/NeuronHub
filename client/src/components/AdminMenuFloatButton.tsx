@@ -1,14 +1,14 @@
-import { toaster } from "@/components/ui/toaster";
-import { env } from "@/env";
 import { Box, chakra, IconButton, Menu, Float, Portal } from "@chakra-ui/react";
-
 import * as Sentry from "@sentry/react";
+
 import { admin } from "@neuronhub/shared/admin-urls";
 import { icons } from "@neuronhub/shared/theme/icons";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 import { useUser } from "@/apps/users/useUserCurrent";
 import { ColorModeIcon, useColorMode } from "@/components/ui/color-mode";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { toaster } from "@/components/ui/toaster";
+import { env } from "@/env";
 
 export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
   const mode = useColorMode();

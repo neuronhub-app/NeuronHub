@@ -4,6 +4,7 @@ import { captureException } from "@sentry/react";
 import type { TadaDocumentNode } from "gql.tada";
 import type { OperationDefinitionNode } from "graphql/language/ast";
 import type { JSX } from "react";
+
 import { client } from "@/graphql/client";
 
 export function mutateAndRefetchMountedQueries<TData, TVariables extends OperationVariables>(

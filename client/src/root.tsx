@@ -1,10 +1,10 @@
-import { NhaPosthogProvider } from "@/providers/NhaPosthogProvider";
 import { ApolloProvider } from "@apollo/client/react";
 import { Box, ChakraProvider } from "@chakra-ui/react";
 import * as Sentry from "@sentry/react-router";
 import type { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { Outlet, Scripts, ScrollRestoration } from "react-router";
+
 import { AdminMenuFloatButton } from "@/components/AdminMenuFloatButton";
 import { ErrorState } from "@/components/ErrorState";
 import { ColorModeProvider } from "@/components/ui/color-mode";
@@ -12,7 +12,9 @@ import { Toaster as ChakraToaster } from "@/components/ui/toaster";
 import { useHeadMeta } from "@/components/useHeadMeta";
 import { env } from "@/env";
 import { client } from "@/graphql/client";
+import { NhaPosthogProvider } from "@/providers/NhaPosthogProvider";
 import { siteConfig } from "@/sites";
+
 import type { Route } from "./+types/root";
 
 export default function App() {

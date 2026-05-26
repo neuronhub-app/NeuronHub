@@ -1,15 +1,16 @@
 /**
  * #draft, untested
  */
-import { PostFragmentType } from "@/graphql/fragments/posts";
 import type { ErrorLike } from "@apollo/client";
 import { EmptyState } from "@chakra-ui/react";
 import { captureException } from "@sentry/react";
+import * as Sentry from "@sentry/react";
 import { ReactNode } from "react";
 import toastLib from "react-hot-toast";
 import { IconType } from "react-icons";
 import { GoAlert, GoInfo } from "react-icons/go";
-import * as Sentry from "@sentry/react";
+
+import { PostFragmentType } from "@/graphql/fragments/posts";
 
 export namespace errors {
   export function report(error: Error | unknown, opts = { isShowFeedbackPopup: true }) {

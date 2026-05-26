@@ -3,9 +3,10 @@ import type { ReactNode } from "react";
 import { GoX } from "react-icons/go";
 import { LuChevronDown } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
+
 import { Button } from "@/components/ui/button";
-import { ids } from "@/e2e/ids";
 import type { TestId } from "@/e2e/ids";
+import { ids } from "@/e2e/ids";
 
 export function PgFacetPopover(props: {
   attribute?: string;

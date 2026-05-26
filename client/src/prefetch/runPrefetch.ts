@@ -3,6 +3,7 @@
  * For mise client:prefetch-from-server. Client lookup in [[getLandingPageBySlug.ts]].
  */
 import { print } from "graphql";
+
 import { env } from "@/env";
 import { type JobsLandingPagesData, jobsLandingPagesDoc } from "@/prefetch/JobsLandingPage";
 

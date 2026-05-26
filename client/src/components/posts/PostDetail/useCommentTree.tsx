@@ -2,6 +2,7 @@ import { useCallback, useEffect, useTransition } from "react";
 import { useSnapshot } from "valtio/react";
 import { proxy } from "valtio/vanilla";
 import { subscribeKey } from "valtio/vanilla/utils";
+
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { CommentFieldsFragment, type PostCommentType } from "@/graphql/fragments/posts";
@@ -123,11 +124,13 @@ export function useCommentTree(props: { postId?: ID }) {
 const PostCommentsQuery = graphql.persisted(
   "PostComments",
   graphql(
-    `query PostComments($parent_root_id: ID!) {
-      post_comments(filters: { parent_root_id: { exact: $parent_root_id } }) {
-        ...CommentFieldsFragment
+    `
+      query PostComments($parent_root_id: ID!) {
+        post_comments(filters: { parent_root_id: { exact: $parent_root_id } }) {
+          ...CommentFieldsFragment
+        }
       }
-    }`,
+    `,
     [CommentFieldsFragment],
   ),
 );

@@ -7,6 +7,7 @@
  */
 import type { IndexUiState } from "instantsearch.js";
 import { useRefinementList } from "react-instantsearch";
+
 import type { JobsLandingPage } from "@/prefetch/JobsLandingPage";
 
 // todo ! refac: dedup with Job.tag_category_to_field (#187)

@@ -3,6 +3,7 @@
  */
 import { Flex, NumberInput, Stack, Switch, Text } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
+
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { ids } from "@/e2e/ids";
 import { useJobListFilters } from "@/sites/pg/pages/jobs/list/jobListFilters";

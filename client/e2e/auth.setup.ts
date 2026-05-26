@@ -3,6 +3,7 @@
  * #AI
  */
 import { test as setup } from "@playwright/test";
+
 import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { authSetupStatePath } from "@/e2e/test";
 

@@ -17,13 +17,16 @@
  */
 import { readFileSync } from "node:fs";
 import path from "node:path";
+
 import { createProcessor } from "@mdx-js/mdx";
 import { algoliasearch } from "algoliasearch";
-import remarkGfm from "remark-gfm";
 import remarkFrontmatter from "remark-frontmatter";
+import remarkGfm from "remark-gfm";
+
 import { format } from "@neuronhub/shared/utils/format";
-import { findMdxFiles } from "@/utils/findMdxFiles";
+
 import { frontmatter } from "@/components/frontmatter";
+import { findMdxFiles } from "@/utils/findMdxFiles";
 
 const config = {
   pagesDir: path.join(import.meta.dirname, "../src/pages"),

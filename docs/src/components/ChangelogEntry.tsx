@@ -1,5 +1,6 @@
 import { Badge, Flex, HStack, Heading, Stack, Text } from "@chakra-ui/react";
 import type { PropsWithChildren } from "react";
+
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 
 /**

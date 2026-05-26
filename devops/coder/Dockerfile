@@ -73,7 +73,7 @@ RUN mise completion fish > $XDG_CONFIG_HOME/fish/completions/mise.fish
 # Mise tools
 # -----------------------------------
 RUN sudo apt install --yes gpg-agent # for node
-RUN mise install uv pnpm biome node claude
+RUN mise install uv pnpm node claude
 
 RUN mise exec node --command "npx playwright install-deps"
 RUN mise exec node --command "npx playwright install chromium --with-deps"

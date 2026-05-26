@@ -1,4 +1,5 @@
 import { Center, Dialog, Image, Portal, SystemStyleObject } from "@chakra-ui/react";
+
 import { ids } from "@/e2e/ids";
 
 export function ImageWithDialog(props: {

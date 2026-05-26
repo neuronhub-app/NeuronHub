@@ -1,14 +1,16 @@
 import { HStack, Show } from "@chakra-ui/react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { FaLightbulb, FaNewspaper, FaQuestion, FaThumbsUp } from "react-icons/fa";
+
+import { PostCategory } from "~/graphql/enums";
+
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
 import { ImageUpload } from "@/components/posts/form/ImageUpload";
 import { PostContentFields } from "@/components/posts/form/PostContentFields";
-import { SelectVotable } from "@/components/posts/form/SelectVotable";
 import type { schemas } from "@/components/posts/form/schemas";
+import { SelectVotable } from "@/components/posts/form/SelectVotable";
 import { ids } from "@/e2e/ids";
-import { PostCategory } from "~/graphql/enums";
 
 export function PostFields(props: {
   titleLabel?: string;

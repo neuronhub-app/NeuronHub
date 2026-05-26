@@ -2,6 +2,7 @@ import { Field, HStack, Icon, SegmentGroup, Text } from "@chakra-ui/react";
 import type { ComponentProps, JSX } from "react";
 import type { FieldPath, FieldValues } from "react-hook-form";
 import { type UseControllerProps, useController } from "react-hook-form";
+
 import { ids } from "@/e2e/ids";
 
 export function FormChakraSegmentControl<

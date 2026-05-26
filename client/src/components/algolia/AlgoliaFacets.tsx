@@ -1,9 +1,11 @@
 import { Flex, SkeletonText, Stack } from "@chakra-ui/react";
 import { type ReactNode, useEffect } from "react";
 import { useSearchBox, useStats } from "react-instantsearch";
+
 import { gap } from "@neuronhub/shared/theme/spacings";
-import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
+import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 export const facetStyle = {
   label: {

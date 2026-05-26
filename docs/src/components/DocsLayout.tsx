@@ -19,21 +19,23 @@ import {
 import { GoCommandPalette, GoPerson } from "react-icons/go";
 import { LuFolder, LuMenu, LuUser } from "react-icons/lu";
 import { Outlet, useLocation, useNavigate } from "react-router";
+
 import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
 import { getProseHeadingStyle, Prose } from "@neuronhub/shared/components/ui/prose";
-import { env } from "@/env";
+
+import { BadgeNew } from "@/components/BadgeNew";
 import {
   type NavNode,
   navTree,
   pageLinks,
   findFirstChildHrefRecursively,
 } from "@/components/buildNavTree";
-import { Toc } from "@/components/Toc";
-import { DocsSearch } from "@/components/DocsSearch";
-import { ReactRouterPath } from "@/utils/types";
 import { CodeBlockShikiAdapter } from "@/components/CodeBlockShikiAdapter";
-import { BadgeNew } from "@/components/BadgeNew";
+import { DocsSearch } from "@/components/DocsSearch";
+import { Toc } from "@/components/Toc";
 import { ids } from "@/e2e/ids";
+import { env } from "@/env";
+import { ReactRouterPath } from "@/utils/types";
 
 export default function DocsLayout() {
   const location = useLocation();

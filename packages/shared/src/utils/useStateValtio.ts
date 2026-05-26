@@ -1,9 +1,10 @@
-import { env } from "@neuronhub/shared/createEnv";
 import { useEffect, useState } from "react";
 import { subscribe } from "valtio";
 import { useSnapshot } from "valtio/react";
 import { devtools, proxySet } from "valtio/utils";
 import { proxy } from "valtio/vanilla";
+
+import { env } from "@neuronhub/shared/createEnv";
 
 /**
  * Used instead of useState by default.

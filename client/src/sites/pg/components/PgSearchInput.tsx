@@ -2,6 +2,7 @@ import { CloseButton, Flex, Icon, Input, InputGroup, Collapsible } from "@chakra
 import { ReactNode, useRef } from "react";
 import { LuSearch } from "react-icons/lu";
 import { useSearchBox } from "react-instantsearch";
+
 import { ids } from "@/e2e/ids";
 
 export function PgSearchInput(props: { endElementText: ReactNode; testId?: string }) {

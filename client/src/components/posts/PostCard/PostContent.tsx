@@ -1,10 +1,12 @@
 import { Stack } from "@chakra-ui/react";
-import type { PostContentField, PostListItemType } from "@/components/posts/ListContainer";
+
 import { Prose } from "@neuronhub/shared/components/ui/prose";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
+
+import type { PostContentField, PostListItemType } from "@/components/posts/ListContainer";
 import { Tag } from "@/components/ui/tag";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
-import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 
 // todo refac-name: PostCardContent
 export function PostContent(props: { post: PostListItemType }) {
@@ -50,7 +52,6 @@ export function PostContent(props: { post: PostListItemType }) {
 
     const prose = (
       <Prose
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
         dangerouslySetInnerHTML={{
           __html: getAlgoliaContentHTML(props.post, field.name, field.value),
         }}
@@ -90,7 +91,6 @@ export function PostContent(props: { post: PostListItemType }) {
             </Tag>
           </Tooltip>
           <Prose
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
             dangerouslySetInnerHTML={{
               __html: getAlgoliaContentHTML(props.post, field.name, field.value),
             }}

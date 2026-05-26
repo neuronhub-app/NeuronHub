@@ -6,15 +6,15 @@ const ProfilesSortedByMatchQuery = graphql.persisted(
   "ProfilesSortedByMatch",
   graphql(
     `
-    query ProfilesSortedByMatch($sort: String!, $offset: Int!, $limit: Int!) {
-      profiles_sorted_by_match(sort: $sort, pagination: { offset: $offset, limit: $limit }) {
-        total_count
-        results {
-          ...ProfileFragment
+      query ProfilesSortedByMatch($sort: String!, $offset: Int!, $limit: Int!) {
+        profiles_sorted_by_match(sort: $sort, pagination: { offset: $offset, limit: $limit }) {
+          total_count
+          results {
+            ...ProfileFragment
+          }
         }
       }
-    }
-  `,
+    `,
     [ProfileFragment],
   ),
 );

@@ -60,8 +60,6 @@
     "@chakra-ui/cli": "^3.35.0",
       "globby": "^16.2.0",
 
-    "@biomejs/biome": "^2.4.4",
-
     "@graphql-codegen/cli": "^6.3.1",
     "@graphql-codegen/client-preset": "^5.3.0",
 

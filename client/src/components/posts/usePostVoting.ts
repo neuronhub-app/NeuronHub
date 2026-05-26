@@ -1,10 +1,12 @@
 import toast from "react-hot-toast";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { useUser } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useInit } from "@/utils/useInit";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function usePostVoting(props: {
   postId: ID;

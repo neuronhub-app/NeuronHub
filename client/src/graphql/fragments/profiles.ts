@@ -26,10 +26,10 @@ export const ProfileFragment = graphql(
       biography
       seeks
       offers
-        
+
       recruitment
       seeking_work
-        
+
       country
       city
 

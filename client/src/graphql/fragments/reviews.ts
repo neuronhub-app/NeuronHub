@@ -11,9 +11,9 @@ export const PostReviewFragment = graphql(
     fragment PostReviewFragment on PostReviewType {
       ...PostFragment
 
-			review_tags {
-				...PostTagFragment
-			}
+      review_tags {
+        ...PostTagFragment
+      }
       review_importance
       review_usage_status
       review_rating
@@ -41,7 +41,7 @@ export const PostReviewEditFragment = graphql(
       ...PostEditFragment
       ...PostReviewFragment
 
-			is_review_later
+      is_review_later
     }
   `,
   [PostReviewFragment, PostEditFragment],

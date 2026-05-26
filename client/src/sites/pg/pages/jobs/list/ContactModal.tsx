@@ -1,10 +1,11 @@
-import { useSiteConfig } from "@/sites/pg/siteConfigState";
 import { Button, Grid, Link, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import type { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import {
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { useSiteConfig } from "@/sites/pg/siteConfigState";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
 
@@ -77,7 +79,7 @@ export function ContactModal(props: { children: ReactNode }) {
             color="brand.green.light"
             _hover={{ textDecoration: "underline" }}
           >
-            {site?.contact_email && site.contact_email}
+            {site?.contact_email}
           </Link>
         </Text>
         <DialogCloseTrigger

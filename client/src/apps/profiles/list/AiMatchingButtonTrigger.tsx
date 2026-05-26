@@ -16,6 +16,7 @@ import {
 import { useState } from "react";
 import { LuChevronDown, LuTriangleAlert } from "react-icons/lu";
 import { NavLink } from "react-router";
+
 import { ProfileMatchProgressQuery } from "@/apps/profiles/list/AiMatchingProgressBar";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -29,8 +30,16 @@ import { useIsLoading } from "@/utils/useIsLoading";
 const ProfileMatchesTriggerLlmMutation = graphql.persisted(
   "ProfileMatchesTriggerLlm",
   graphql(`
-    mutation ProfileMatchesTriggerLlm($limit: Int!, $model: String!, $includeReprocessing: Boolean!) {
-      profile_matches_trigger_llm(limit: $limit, model: $model, include_reprocessing: $includeReprocessing) {
+    mutation ProfileMatchesTriggerLlm(
+      $limit: Int!
+      $model: String!
+      $includeReprocessing: Boolean!
+    ) {
+      profile_matches_trigger_llm(
+        limit: $limit
+        model: $model
+        include_reprocessing: $includeReprocessing
+      ) {
         total
         processed
         is_processing

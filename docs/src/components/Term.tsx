@@ -1,14 +1,13 @@
-"use client";
-
-import { PageLink } from "@/components/PageLink";
 import { Code, CodeProps, Popover, Portal, Text, VStack } from "@chakra-ui/react";
-import { theme } from "@neuronhub/shared/theme/colors";
 import { type ReactNode, createContext, useContext } from "react";
 
-import { ReactRouterPath } from "@/utils/types";
-import { ids } from "@/e2e/ids";
+import { theme } from "@neuronhub/shared/theme/colors";
+
 import { LinkExt } from "@/components/LinkExt";
 import { LinkInt } from "@/components/LinkInt";
+import { PageLink } from "@/components/PageLink";
+import { ids } from "@/e2e/ids";
+import { ReactRouterPath } from "@/utils/types";
 
 export type TermId = keyof typeof glossary;
 

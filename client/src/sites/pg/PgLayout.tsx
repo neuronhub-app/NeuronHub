@@ -1,4 +1,3 @@
-import { urls } from "@/urls";
 import {
   type StackProps,
   Box,
@@ -13,9 +12,7 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { Outlet, useLocation } from "react-router";
 import { ErrorBoundary } from "@sentry/react";
-import { SlEnvolope } from "react-icons/sl";
 import {
   FaLinkedin,
   FaGithub,
@@ -27,12 +24,17 @@ import {
   FaMastodon,
 } from "react-icons/fa";
 import { SiMatrix, SiSubstack } from "react-icons/si";
-import { FooterLinkIcon, FooterSectionKind } from "~/graphql/enums";
+import { SlEnvolope } from "react-icons/sl";
+import { Outlet, useLocation } from "react-router";
 import { useSnapshot } from "valtio";
-import { siteConfigState, type FooterSection } from "@/sites/pg/siteConfigState";
+
+import { FooterLinkIcon, FooterSectionKind } from "~/graphql/enums";
+
+import { ErrorBoundary as NhaErrorBoundary } from "@/root";
 import { PgHeroHeader } from "@/sites/pg/components/PgHeader";
 import { layout } from "@/sites/pg/PgLayoutConfig";
-import { ErrorBoundary as NhaErrorBoundary } from "@/root";
+import { siteConfigState, type FooterSection } from "@/sites/pg/siteConfigState";
+import { urls } from "@/urls";
 
 const style = layout.style.container;
 

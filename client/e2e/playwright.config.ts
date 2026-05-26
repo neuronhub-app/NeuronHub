@@ -1,4 +1,5 @@
 import { defineConfig } from "@playwright/test";
+
 import { authSetupStatePath } from "@/e2e/test";
 import { env } from "@/env";
 import { urls } from "@/urls";

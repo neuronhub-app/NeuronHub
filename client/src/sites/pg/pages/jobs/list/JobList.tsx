@@ -1,9 +1,9 @@
-import { track } from "@/utils/track";
 import { Box, Button, Flex, HStack, Icon, Separator, Stack, Text } from "@chakra-ui/react";
 import { type ReactNode, useEffect, useRef } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
 import { Configure, useClearRefinements } from "react-instantsearch";
 import { Link, useNavigate, useSearchParams } from "react-router";
+
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { layout } from "@/components/LayoutSidebar";
 import { ids } from "@/e2e/ids";
@@ -14,20 +14,21 @@ import type { JobsLandingPage } from "@/prefetch/JobsLandingPage";
 import { PgJobCardSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
 import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
+import { useRequiredLandingPageRefinements } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
 import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
 import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
-import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
 import {
   resetJobListFilters,
   setJobListSource,
   useJobListAlgoliaFilters,
   useJobListExtraTags,
 } from "@/sites/pg/pages/jobs/list/jobListFilters";
+import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
 import { urls } from "@/urls";
+import { track } from "@/utils/track";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 import { useInit } from "@/utils/useInit";
-import { useRequiredLandingPageRefinements } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
 
 /**
  * #quality-19% copy-paste of [[client/src/apps/jobs/list/JobList.tsx]].
@@ -343,11 +344,13 @@ const pgSubheaderButtonStyle = {
 const JobsByIdsQuery = graphql.persisted(
   "JobsByIds",
   graphql(
-    `query JobsByIds($ids: [ID!]!) {
-      jobs(filters: { id: { in_list: $ids } }) {
-        ...JobFragment
+    `
+      query JobsByIds($ids: [ID!]!) {
+        jobs(filters: { id: { in_list: $ids } }) {
+          ...JobFragment
+        }
       }
-    }`,
+    `,
     [JobFragment],
   ),
 );
@@ -355,11 +358,13 @@ const JobsByIdsQuery = graphql.persisted(
 const JobBySlugQuery = graphql.persisted(
   "JobBySlug",
   graphql(
-    `query JobBySlug($slug: String!) {
-      job_by_slug(slug: $slug) {
-        ...JobFragment
+    `
+      query JobBySlug($slug: String!) {
+        job_by_slug(slug: $slug) {
+          ...JobFragment
+        }
       }
-    }`,
+    `,
     [JobFragment],
   ),
 );

@@ -2,11 +2,13 @@ import { Text, VStack } from "@chakra-ui/react";
 import { useWatch } from "react-hook-form";
 import { FaGlobe, FaShieldHalved, FaUsers, FaUsersGear } from "react-icons/fa6";
 import { HiLockClosed } from "react-icons/hi2";
+
+import { Visibility } from "~/graphql/enums";
+
 import { FormChakraSegmentControl } from "@/components/forms/FormChakraSegmentControl";
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { schemas } from "@/components/posts/form/schemas";
 import { UserMultiSelect } from "@/components/posts/form/UserMultiSelect";
-import { Visibility } from "~/graphql/enums";
 
 export function PostSharableFields(props: {
   isShowContentPrivate?: boolean;

@@ -2,6 +2,9 @@ import { Fieldset, Heading, HStack, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+
+import { PostTypeEnum, Visibility } from "~/graphql/enums";
+
 import { PostDeleteButton } from "@/apps/posts/PostDeleteButton";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostFields } from "@/components/posts/form/PostFields";
@@ -14,7 +17,6 @@ import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
-import { PostTypeEnum, Visibility } from "~/graphql/enums";
 
 export namespace PostCreateForm {
   export function Comp(props: { post?: PostEditFragmentType }) {
@@ -104,13 +106,21 @@ export function isEditMode(post?: PostEditFragmentType): post is PostEditFragmen
 }
 const PostUpdateMutation = graphql.persisted(
   "PostUpdate",
-  graphql(
-    `mutation PostUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
-  ),
+  graphql(`
+    mutation PostUpdate($data: PostTypeInput!) {
+      post_update_or_create(data: $data) {
+        id
+      }
+    }
+  `),
 );
 const PostCreateMutation = graphql.persisted(
   "PostCreate",
-  graphql(
-    `mutation PostCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }`,
-  ),
+  graphql(`
+    mutation PostCreate($input: PostTypeInput!) {
+      post_update_or_create(data: $input) {
+        id
+      }
+    }
+  `),
 );

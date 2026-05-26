@@ -1,5 +1,6 @@
 import { Tag, Wrap } from "@chakra-ui/react";
 import { HiMinus, HiPlus } from "react-icons/hi2";
+
 import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
 import type { PostTagFragmentType } from "@/graphql/fragments/tags";

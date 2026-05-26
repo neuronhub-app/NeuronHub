@@ -1,8 +1,9 @@
+import { PostCategory } from "~/graphql/enums";
+
 import { expect } from "@/e2e/helpers/expect";
 import { ids } from "@/e2e/ids";
 import { test } from "@/e2e/test";
 import { urls } from "@/urls";
-import { PostCategory } from "~/graphql/enums";
 
 test.describe("Post", () => {
   test("Create with few content_* text", async ({ page, play, $ }) => {

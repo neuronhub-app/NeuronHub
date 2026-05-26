@@ -1,8 +1,9 @@
-import { ReactRouterPath } from "@/utils/types";
 import { Icon, Link } from "@chakra-ui/react";
 import { ReactNode } from "react";
 import { IconType } from "react-icons";
 import { NavLink as ReactRouterNavLink, href } from "react-router";
+
+import { ReactRouterPath } from "@/utils/types";
 
 export function LinkInt(props: {
   path: ReactRouterPath;

@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { Control } from "react-hook-form";
 import { Controller } from "react-hook-form";
 import { LuUpload, LuX } from "react-icons/lu";
+
 import type { schemas } from "@/components/posts/form/schemas";
 import { FileUploadRoot, FileUploadTrigger } from "@/components/ui/file-button";
 

@@ -2,6 +2,7 @@ import { CloseButton, Input, InputGroup } from "@chakra-ui/react";
 import { useRef } from "react";
 import { LuSearch } from "react-icons/lu";
 import { useSearchBox } from "react-instantsearch";
+
 import { ids } from "@/e2e/ids";
 
 export function AlgoliaSearchInput(props: { testId?: string }) {

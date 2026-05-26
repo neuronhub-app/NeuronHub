@@ -1,9 +1,11 @@
 import { type UseFormReturn, useFormContext as useFormContextOriginal } from "react-hook-form";
 import { z } from "zod/v4";
+
+import { PostCategory, PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
+
 import type { User } from "@/apps/users/useUserCurrent";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
-import { PostCategory, PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
 export const UserType = z.enum(["User", "Group"]);
 
@@ -261,8 +263,8 @@ export namespace schemas {
   }
 }
 
-// unfuck TS enums
+/** unfuck TS enums */
 function enumConvert<E extends Record<string, string>>(enumObj: E): Array<E[keyof E]> {
-  // @ts-expect-error
+  // @ts-expect-error ↑
   return Object.values(enumObj);
 }

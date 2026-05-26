@@ -6,6 +6,7 @@
 
 declare module "*.mdx" {
   import type { ComponentType } from "react";
+
   import type { frontmatter } from "@/components/frontmatter";
 
   export const frontmatter: frontmatter.SchemaType;

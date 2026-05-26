@@ -2,11 +2,13 @@ import { Icon, IconButton } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { FaShare } from "react-icons/fa6";
 import { useSnapshot } from "valtio/react";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import type { UserListName } from "~/graphql/enums";
+
 import { user } from "@/apps/users/useUserCurrent";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { ID } from "@/gql-tada";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import type { UserListName } from "~/graphql/enums";
 
 // todo ? refac-name: PostActionsShare
 // todo ? feat(UI): mutate Post.recommended_to_users/groups

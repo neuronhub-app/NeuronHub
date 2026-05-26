@@ -2,7 +2,9 @@ import { Badge, HStack, Icon, Text } from "@chakra-ui/react";
 import { fromUnixTime } from "date-fns";
 import { LuX } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
+
 import { datetime } from "@neuronhub/shared/utils/date-fns";
+
 import { ids } from "@/e2e/ids";
 
 export type RefinementActive = ReturnType<

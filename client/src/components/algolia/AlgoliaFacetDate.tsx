@@ -2,6 +2,7 @@ import { For, RadioGroup, Stack, Text } from "@chakra-ui/react";
 import { addDays, addMonths, getUnixTime, subDays, subMonths } from "date-fns";
 import { useMemo } from "react";
 import { useNumericMenu } from "react-instantsearch";
+
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 

@@ -14,6 +14,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import type { ReactNode } from "react";
+
 import { useHighlighter } from "@/apps/highlighter/useHighlighter";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCard } from "@/components/posts/PostCard/PostCard";

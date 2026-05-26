@@ -1,7 +1,8 @@
-import { layout } from "@/components/LayoutSidebar";
 import { type Locator, expect as expectBase } from "@playwright/test";
+
 import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
+import { layout } from "@/components/LayoutSidebar";
 import { expect } from "@/e2e/helpers/expect";
 import { ids } from "@/e2e/ids";
 import { test } from "@/e2e/test";

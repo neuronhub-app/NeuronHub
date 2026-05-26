@@ -1,3 +1,5 @@
+import { PostTypeEnum } from "~/graphql/enums";
+
 import { AlgoliaFacetAttribute } from "@/components/algolia/AlgoliaFacetAttribute";
 import { AlgoliaFacetBoolean } from "@/components/algolia/AlgoliaFacetBoolean";
 import { AlgoliaList } from "@/components/algolia/AlgoliaList";
@@ -6,7 +8,6 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { PostFragment, type PostFragmentType } from "@/graphql/fragments/posts";
 import { urls } from "@/urls";
-import { PostTypeEnum } from "~/graphql/enums";
 
 export function ToolListAlgolia() {
   return (
@@ -35,12 +36,12 @@ const ToolsByIdsQuery = graphql.persisted(
   "ToolsByIds",
   graphql(
     `
-    query ToolsByIds($ids: [ID!]!) {
-      post_tools(filters: { id: { in_list: $ids } }) {
-        ...PostFragment
+      query ToolsByIds($ids: [ID!]!) {
+        post_tools(filters: { id: { in_list: $ids } }) {
+          ...PostFragment
+        }
       }
-    }
-  `,
+    `,
     [PostFragment],
   ),
 );

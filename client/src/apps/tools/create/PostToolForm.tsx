@@ -2,6 +2,9 @@ import { Fieldset, Heading, VStack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+
+import { PostTypeEnum } from "~/graphql/enums";
+
 import { PostToolFields } from "@/components/posts/form/PostToolFields";
 import { schemas } from "@/components/posts/form/schemas";
 import { Button } from "@/components/ui/button";
@@ -10,7 +13,6 @@ import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
-import { PostTypeEnum } from "~/graphql/enums";
 
 // todo !(review): compare to ReviewForm re its update needs after #44
 export namespace PostToolForm {
@@ -78,7 +80,11 @@ export namespace PostToolForm {
 }
 const ToolCreate = graphql.persisted(
   "ToolCreate",
-  graphql(
-    `mutation ToolCreate($input: PostTypeInput!) { post_update_or_create(data: $input) { id } }`,
-  ),
+  graphql(`
+    mutation ToolCreate($input: PostTypeInput!) {
+      post_update_or_create(data: $input) {
+        id
+      }
+    }
+  `),
 );

@@ -1,6 +1,7 @@
 import { Box, Flex, For, HStack, Icon, type JsxStyleProps, Stack, Text } from "@chakra-ui/react";
 import { FaStar, FaUserClock } from "react-icons/fa6";
 import { GoAlertFill } from "react-icons/go";
+
 import { Tooltip } from "@/components/ui/tooltip";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 

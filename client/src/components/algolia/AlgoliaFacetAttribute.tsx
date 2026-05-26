@@ -1,5 +1,6 @@
 import { Checkbox, Input, Stack, Text, useToken } from "@chakra-ui/react";
 import { useRefinementList } from "react-instantsearch";
+
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { Button } from "@/components/ui/button";
 
@@ -104,7 +105,6 @@ function FacetCheckboxItem(props: {
       <Checkbox.Control />
       <Checkbox.Label {...facetStyle.value} mt="-3px">
         <Text
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
           dangerouslySetInnerHTML={{
             __html:
               (props.labelOverride ?? props.item.highlighted!) +

@@ -26,6 +26,7 @@ import {
 import { createPatch } from "diff";
 import { html } from "diff2html";
 import { ColorSchemeType } from "diff2html/lib/types";
+
 import "diff2html/bundles/css/diff2html.min.css";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { LuChevronDown, LuEllipsisVertical, LuExternalLink } from "react-icons/lu";
@@ -38,6 +39,7 @@ import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { icons } from "@neuronhub/shared/theme/icons";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { JobDraftsApproveMutation, JobDraftsQuery } from "@/apps/jobs/drafts/queries";
 import { ids } from "@/e2e/ids";
 import type { ID, ResultOf } from "@/gql-tada";
@@ -426,7 +428,6 @@ function JobDraftBody(props: { draft: DraftType; section: DraftSection }) {
       <Prose
         size="sm"
         maxW="none"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: BE
         dangerouslySetInnerHTML={{ __html: markedConfigured.parse(mdWoDuplicatedJobTitle) }}
       />
     );
@@ -463,7 +464,6 @@ function JobDraftBody(props: { draft: DraftType; section: DraftSection }) {
         },
         "& .d2h-file-wrapper": { border: 0, marginBottom: 0 },
       }}
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: BE
       dangerouslySetInnerHTML={{ __html: htmlDiff }}
     />
   );

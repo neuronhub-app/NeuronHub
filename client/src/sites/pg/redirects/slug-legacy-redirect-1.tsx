@@ -1,4 +1,5 @@
 import { Navigate } from "react-router";
+
 import { urls } from "@/urls";
 
 export default function SlugLegacyRedirect1(props: { params: { slug: string } }) {

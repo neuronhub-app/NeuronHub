@@ -1,6 +1,7 @@
 import type { ResultOf } from "gql.tada";
 import { useTransition } from "react";
 import { proxyMap } from "valtio/utils";
+
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { isQueryDataComplete } from "@/graphql/useApolloQuery";
@@ -102,39 +103,47 @@ export const HighlightCreate = graphql.persisted(
   "HighlighterCreate",
   graphql(`
     mutation HighlighterCreate(
-      $id: ID!,
-      $text: String!,
-      $text_prefix: String,
-      $text_postfix: String,
+      $id: ID!
+      $text: String!
+      $text_prefix: String
+      $text_postfix: String
     ) {
-      post_highlight_create(data: {
-        post: { set: $id }
-        text: $text
-        text_postfix: $text_postfix
-        text_prefix: $text_prefix
-      })
+      post_highlight_create(
+        data: {
+          post: { set: $id }
+          text: $text
+          text_postfix: $text_postfix
+          text_prefix: $text_prefix
+        }
+      )
     }
   `),
 );
 
 export const HighlightDelete = graphql.persisted(
   "HighlighterDelete",
-  graphql(`mutation HighlighterDelete($id: ID!) { post_highlight_delete(data: { id: $id }) }`),
+  graphql(`
+    mutation HighlighterDelete($id: ID!) {
+      post_highlight_delete(data: { id: $id })
+    }
+  `),
 );
 
 export const PostHighlightsQuery = graphql.persisted(
   "PostHighlightsQuery",
-  graphql(
-    `query PostHighlightsQuery($ids: [ID!]!) {
+  graphql(`
+    query PostHighlightsQuery($ids: [ID!]!) {
       post_highlights(post_ids: $ids) {
         id
-        post { id }
+        post {
+          id
+        }
         text
         text_prefix
         text_postfix
       }
-    }`,
-  ),
+    }
+  `),
 );
 
 type PostHighlights = ResultOf<typeof PostHighlightsQuery>;

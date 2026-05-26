@@ -19,17 +19,17 @@ export const PostFragment = graphql(
         id
         id_external
         created_at_external
-				score
-				rank
-				url_of_source
+        score
+        rank
+        url_of_source
 
-				user_source {
-					id
-					username
-					score
-					about
-					created_at_external
-				}
+        user_source {
+          id
+          username
+          score
+          about
+          created_at_external
+        }
       }
       image {
         url
@@ -39,9 +39,9 @@ export const PostFragment = graphql(
       github_url
       url
       domain
-        
+
       comment_count
-      
+
       author {
         id
         username
@@ -81,49 +81,47 @@ export const PostFragment = graphql(
   [PostTagFragment],
 );
 
-export const CommentFieldsFragment = graphql(
-  `
-    fragment CommentFieldsFragment on PostTypeI {
+export const CommentFieldsFragment = graphql(`
+  fragment CommentFieldsFragment on PostTypeI {
+    id
+    type
+    __typename
+
+    content_polite
+
+    created_at
+    updated_at
+
+    parent {
       id
-      type
-      __typename
-
-      content_polite
-
-      created_at
-      updated_at
-
-      parent {
-        id
-      }
-      parent_root {
-        id
-      }
-      votes {
-        id
-        is_vote_positive
-      }
-      author {
-        id
-        username
-        avatar {
-          url
-        }
-      }
-      post_source {
-        id
-        id_external
-        created_at_external
-        rank
-  
-        user_source {
-          id
-          username
-        }
+    }
+    parent_root {
+      id
+    }
+    votes {
+      id
+      is_vote_positive
+    }
+    author {
+      id
+      username
+      avatar {
+        url
       }
     }
-  `,
-);
+    post_source {
+      id
+      id_external
+      created_at_external
+      rank
+
+      user_source {
+        id
+        username
+      }
+    }
+  }
+`);
 
 // todo ! refac-name: PostSourceAuthorFragment
 export const PostAuthorFragment = graphql(`

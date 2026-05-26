@@ -2,6 +2,7 @@ import { Icon, Popover, Portal } from "@chakra-ui/react";
 import toast from "react-hot-toast";
 import { FiTrash2 } from "react-icons/fi";
 import { useNavigate } from "react-router";
+
 import { Button } from "@/components/ui/button";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateDeleteAndResetStore } from "@/graphql/mutateAndRefetchMountedQueries";
@@ -62,5 +63,11 @@ export function PostDeleteButton(props: { id: ID; title: string }) {
 }
 const PostDeleteMutation = graphql.persisted(
   "PostDelete",
-  graphql(`mutation PostDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
+  graphql(`
+    mutation PostDelete($id: ID!) {
+      post_delete(data: { id: $id }) {
+        id
+      }
+    }
+  `),
 );

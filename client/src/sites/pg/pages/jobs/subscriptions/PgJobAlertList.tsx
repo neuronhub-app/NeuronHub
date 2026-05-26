@@ -4,7 +4,6 @@
  * todo ! refac: replace by [[JobAlertList.tsx]] with [[JsxStyleProps]] - they're identical.
  * But this had layout bugs I fixed. Not sure what issues they were addressing - in my testing appeared to be redundant.
  */
-import { layout } from "@/sites/pg/PgLayoutConfig";
 import {
   Badge,
   Container,
@@ -19,6 +18,10 @@ import {
 } from "@chakra-ui/react";
 import { LuPause, LuPlay, LuTrash2 } from "react-icons/lu";
 import { NavLink } from "react-router";
+
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { format } from "@neuronhub/shared/utils/format";
+
 import {
   JobAlertListQuery,
   JobAlertAccessSessionByIdMutation,
@@ -31,9 +34,8 @@ import { ids } from "@/e2e/ids";
 import { type ResultOf } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { layout } from "@/sites/pg/PgLayoutConfig";
 import { urls } from "@/urls";
-import { datetime } from "@neuronhub/shared/utils/date-fns";
-import { format } from "@neuronhub/shared/utils/format";
 import { useInit } from "@/utils/useInit";
 import { useIsLoading } from "@/utils/useIsLoading";
 

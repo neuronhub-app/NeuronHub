@@ -2,11 +2,13 @@ import { Icon, Popover, Portal } from "@chakra-ui/react";
 import toast from "react-hot-toast";
 import { FiTrash2 } from "react-icons/fi";
 import { useNavigate } from "react-router";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { Button } from "@/components/ui/button";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateDeleteAndResetStore } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
   const navigate = useNavigate();
@@ -70,5 +72,11 @@ export function PostReviewDeleteButton(props: { id: ID; toolTitle: string }) {
 }
 const ReviewDeleteMutation = graphql.persisted(
   "ReviewDelete",
-  graphql(`mutation ReviewDelete($id: ID!) { post_delete(data: { id: $id }) { id } }`),
+  graphql(`
+    mutation ReviewDelete($id: ID!) {
+      post_delete(data: { id: $id }) {
+        id
+      }
+    }
+  `),
 );

@@ -1,6 +1,8 @@
 import { Text } from "@chakra-ui/react";
-import { Tooltip } from "@/components/ui/tooltip";
+
 import { datetime } from "@neuronhub/shared/utils/date-fns";
+
+import { Tooltip } from "@/components/ui/tooltip";
 
 // todo ? UI: show hours even when larger than 1-7 days - as chronology is important for a ~week
 export function PostDatetime(props: { datetimeStr: string | unknown; size?: "xs" | "sm" }) {

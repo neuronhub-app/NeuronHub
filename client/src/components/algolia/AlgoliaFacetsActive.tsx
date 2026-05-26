@@ -3,9 +3,11 @@ import { fromUnixTime } from "date-fns";
 import { useCallback } from "react";
 import { LuX } from "react-icons/lu";
 import { useClearRefinements, useCurrentRefinements } from "react-instantsearch";
+
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { Button } from "@/components/ui/button";
-import { datetime } from "@neuronhub/shared/utils/date-fns";
 
 export function AlgoliaFacetsActive(props: {
   labelsOverride?: Record<string, string>;

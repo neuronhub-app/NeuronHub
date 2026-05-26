@@ -4,14 +4,16 @@ import { type ComponentProps, type ReactNode, useEffect } from "react";
 import toast from "react-hot-toast";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa6";
 import { useSnapshot } from "valtio/react";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { UserListName } from "~/graphql/enums";
+
 import { user } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import { UserListName } from "~/graphql/enums";
 
 // this is overly complex & abstract for a child component
 // todo refac-name: PostCardActions
@@ -118,11 +120,7 @@ const UpdateUserListMutation = graphql.persisted(
   "UpdateUserList",
   graphql(`
     mutation UpdateUserList($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
-      update_user_list(
-        id: $id
-        list_field_name: $list_field_name
-        is_added: $is_added
-      )
+      update_user_list(id: $id, list_field_name: $list_field_name, is_added: $is_added)
     }
   `),
 );

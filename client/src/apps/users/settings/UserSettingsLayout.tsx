@@ -1,6 +1,7 @@
 import { For, Tabs } from "@chakra-ui/react";
 import { FaRobot, FaUser } from "react-icons/fa";
 import { NavLink, Outlet, useLocation } from "react-router";
+
 import { urls } from "@/urls";
 
 export default function UserSettingsLayout() {

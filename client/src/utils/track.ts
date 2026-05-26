@@ -1,8 +1,9 @@
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import * as Sentry from "@sentry/react-router";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { posthog } from "posthog-js";
 import { useHits } from "react-instantsearch";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 import type { buildJobAlertVars } from "@/apps/jobs/list/JobsSubscribeModal";
 import type { User } from "@/apps/users/useUserCurrent";
@@ -11,7 +12,7 @@ import { client } from "@/graphql/client";
 import { errors } from "@/utils/errors";
 import { useInit } from "@/utils/useInit";
 
-// biome-ignore format: ...
+// prettier-ignore
 const EventSchema = {
   "Job.create":             { group: "event", model: "Job" },
   "Job.read":               { group: "event", model: "Job",      extras: { view: "" as View } },
@@ -194,14 +195,20 @@ export namespace track {
 }
 const JobAlertTrackClickMutation = graphql.persisted(
   "JobAlertTrackClick",
-  graphql(
-    `mutation JobAlertTrackClick($id: ID!, $jobSlug: String!) { job_alert_track_click(id: $id, job_slug: $jobSlug) }`,
-  ),
+  graphql(`
+    mutation JobAlertTrackClick($id: ID!, $jobSlug: String!) {
+      job_alert_track_click(id: $id, job_slug: $jobSlug)
+    }
+  `),
 );
 
 const GenAnonNameMutation = graphql.persisted(
   "GenAnonName",
-  graphql(`mutation GenAnonName($email: String!) { gen_anon_name_from_email(email: $email) }`),
+  graphql(`
+    mutation GenAnonName($email: String!) {
+      gen_anon_name_from_email(email: $email)
+    }
+  `),
 );
 
 const userCache: { key: string | null; promise: Promise<string> | null } = {

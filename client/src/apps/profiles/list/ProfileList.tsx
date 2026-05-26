@@ -6,6 +6,7 @@ import {
   useCurrentRefinements,
   useSearchBox,
 } from "react-instantsearch";
+
 import { AiMatchingButtonTrigger } from "@/apps/profiles/list/AiMatchingButtonTrigger";
 import { AiMatchingProgressBar } from "@/apps/profiles/list/AiMatchingProgressBar";
 import { ProfileCard } from "@/apps/profiles/list/ProfileCard/ProfileCard";
@@ -243,12 +244,12 @@ const ProfilesByIdsQuery = graphql.persisted(
   "ProfilesByIds",
   graphql(
     `
-    query ProfilesByIds($ids: [ID!]!) {
-      profiles(filters: { id: { in_list: $ids } }) {
-        ...ProfileFragment
+      query ProfilesByIds($ids: [ID!]!) {
+        profiles(filters: { id: { in_list: $ids } }) {
+          ...ProfileFragment
+        }
       }
-    }
-  `,
+    `,
     [ProfileFragment],
   ),
 );

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import type { UseRefinementListProps } from "react-instantsearch";
+
 import type { TestId } from "@/e2e/ids";
 import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";

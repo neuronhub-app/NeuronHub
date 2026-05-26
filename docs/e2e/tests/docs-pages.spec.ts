@@ -1,11 +1,12 @@
 /**
  * #AI
  */
-import { ReactRouterPath } from "@/utils/types";
 import { expect, type Locator, type Page, test } from "@playwright/test";
+import { href } from "react-router";
+
 import { ids } from "@/e2e/ids";
 import { env } from "@/env";
-import { href } from "react-router";
+import { ReactRouterPath } from "@/utils/types";
 
 const routes = {
   home: path("/"),

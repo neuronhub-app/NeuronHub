@@ -17,20 +17,21 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { datetime } from "@neuronhub/shared/utils/date-fns";
-import { format } from "@neuronhub/shared/utils/format";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { fromUnixTime } from "date-fns";
 import { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { FaBell } from "react-icons/fa6";
 import { useCurrentRefinements } from "react-instantsearch";
 import { z } from "zod";
+
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { format } from "@neuronhub/shared/utils/format";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import {
   buildJobAlertVars,
   JobAlertSubscribeMutation,
 } from "@/apps/jobs/list/JobsSubscribeModal";
-import { track } from "@/utils/track";
 import { useUser } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import {
@@ -46,6 +47,7 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { JobLocationsQuery } from "@/sites/pg/components/PgFacetLocation";
 import { useJobListFilters } from "@/sites/pg/pages/jobs/list/jobListFilters";
 import { toast } from "@/utils/toast";
+import { track } from "@/utils/track";
 import { useIsLoading } from "@/utils/useIsLoading";
 
 const FormSchema = z.object({

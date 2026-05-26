@@ -2,6 +2,7 @@
  * #AI
  */
 import { redirect } from "react-router";
+
 import { type NavNode, navTree, findFirstChildHrefRecursively } from "@/components/buildNavTree";
 
 export default function DirRedirect() {

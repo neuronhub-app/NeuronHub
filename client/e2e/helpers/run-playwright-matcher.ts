@@ -19,7 +19,7 @@ export async function runPlaywrightMatcher(params: {
   try {
     await params.assertion();
     isPassed = !params.context.isNot;
-    // biome-ignore lint/suspicious/noExplicitAny: no type exist
+    // oxlint-disable-next-line typescript/no-explicit-any
   } catch (e: any) {
     matcherResult = e.matcherResult;
     isPassed = params.context.isNot;

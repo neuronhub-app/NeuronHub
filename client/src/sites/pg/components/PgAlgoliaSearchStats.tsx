@@ -1,8 +1,10 @@
 import { Flex, FormatNumber, SkeletonText, Text } from "@chakra-ui/react";
 import { useEffect } from "react";
 import { useStats } from "react-instantsearch";
-import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
+
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
+import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 // #AI
 export function PgAlgoliaSearchStats(props: { label: string; indexName: string }) {

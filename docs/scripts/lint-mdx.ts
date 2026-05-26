@@ -6,13 +6,15 @@
  *
  * Called by `mise lint`.
  */
-import { compile } from "@mdx-js/mdx";
 import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
+
+import { compile } from "@mdx-js/mdx";
 import remarkFrontmatter from "remark-frontmatter";
 import remarkGfm from "remark-gfm";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
+
 import { frontmatter } from "@/components/frontmatter";
 import { findMdxFiles } from "@/utils/findMdxFiles";
 
@@ -92,7 +94,7 @@ async function main() {
       rootDirs: ["..", "../.react-router/types", "."],
       paths: readParentPaths(),
     },
-    include: ["./**/*.tsx", "../src/types.d.ts", "../.react-router/types", "../.chakra/types"],
+    include: ["./**/*.tsx", "../src/types.d.ts", "../.react-router/types"],
   };
 
   writeFileSync(path.join(outDir, "tsconfig.json"), JSON.stringify(tsconfig, null, 2));

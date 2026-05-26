@@ -1,4 +1,5 @@
 import { Box, Grid, HStack, Skeleton, Stack } from "@chakra-ui/react";
+
 import { PgFilterCardWithSplitBg } from "@/sites/pg/components/PgAlgoliaFilterCard";
 import { PgJobCardSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
 

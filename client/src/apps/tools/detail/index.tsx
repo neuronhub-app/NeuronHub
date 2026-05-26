@@ -24,7 +24,14 @@ export default function PostToolDetailRoute(props: { params: { id: string } }) {
 }
 const PostToolDetailQuery = graphql.persisted(
   "PostToolDetail",
-  graphql(`query PostToolDetail($pk: ID!) { post_tool(pk: $pk) { ...PostDetailFragment } }`, [
-    PostDetailFragment,
-  ]),
+  graphql(
+    `
+      query PostToolDetail($pk: ID!) {
+        post_tool(pk: $pk) {
+          ...PostDetailFragment
+        }
+      }
+    `,
+    [PostDetailFragment],
+  ),
 );

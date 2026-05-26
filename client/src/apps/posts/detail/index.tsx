@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/react";
 import toast from "react-hot-toast";
+
 import { PostDetail } from "@/components/posts/PostDetail";
 import { graphql } from "@/gql-tada";
 import { PostDetailFragment } from "@/graphql/fragments/posts";
@@ -26,7 +27,14 @@ export default function PostDetailRoute(props: { params: { id: string } }) {
 }
 const PostDetailQuery = graphql.persisted(
   "PostDetail",
-  graphql(`query PostDetail($pk: ID!) { post(pk: $pk) { ...PostDetailFragment } }`, [
-    PostDetailFragment,
-  ]),
+  graphql(
+    `
+      query PostDetail($pk: ID!) {
+        post(pk: $pk) {
+          ...PostDetailFragment
+        }
+      }
+    `,
+    [PostDetailFragment],
+  ),
 );

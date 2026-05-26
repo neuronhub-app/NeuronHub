@@ -2,9 +2,10 @@
  * #AI
  */
 import { Kbd, Text, chakra, Flex } from "@chakra-ui/react";
+
+import { DocsSearchClient } from "@/components/DocsSearchClient";
 import { ids } from "@/e2e/ids";
 import { env } from "@/env";
-import { DocsSearchClient } from "@/components/DocsSearchClient";
 
 export function DocsSearch() {
   return (
@@ -45,6 +46,6 @@ export function DocsSearch() {
 
 const isAlgoliaEnabled = Boolean(
   env.VITE_ALGOLIA_APPLICATION_ID &&
-    env.VITE_ALGOLIA_SEARCH_API_KEY &&
-    env.VITE_ALGOLIA_INDEX_DOCS,
+  env.VITE_ALGOLIA_SEARCH_API_KEY &&
+  env.VITE_ALGOLIA_INDEX_DOCS,
 );

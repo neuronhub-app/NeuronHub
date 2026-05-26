@@ -1,5 +1,6 @@
 import { Box, Heading, HStack, Stack, Text } from "@chakra-ui/react";
 import { type ComponentProps, useMemo } from "react";
+
 import { PostContentHighlighted } from "@/apps/highlighter/PostContentHighlighted";
 import { highlightsMap } from "@/apps/highlighter/useHighlighter";
 import { PostCard } from "@/components/posts/PostCard/PostCard";
@@ -167,22 +168,24 @@ export function Library() {
 const UserHighlightsQuery = graphql.persisted(
   "UserHighlights",
   graphql(
-    `query UserHighlights {
-      user_highlights {
-        id
-        text
-        text_prefix
-        text_postfix
-        created_at
-  
-        post {
-          ...CommentFieldsFragment
-          parent_root {
-            ...PostFragment
+    `
+      query UserHighlights {
+        user_highlights {
+          id
+          text
+          text_prefix
+          text_postfix
+          created_at
+
+          post {
+            ...CommentFieldsFragment
+            parent_root {
+              ...PostFragment
+            }
           }
         }
       }
-    }`,
+    `,
     [CommentFieldsFragment, PostFragment],
   ),
 );

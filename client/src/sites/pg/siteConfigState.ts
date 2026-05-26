@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/react";
 import { proxy, useSnapshot } from "valtio";
+
 import { env } from "@/env";
 import { graphql, type ResultOf } from "@/gql-tada";
 import { client } from "@/graphql/client";
@@ -66,6 +67,7 @@ export function appendUtmSource(url: string): string {
   }
   try {
     if (!url.includes("http")) {
+      // oxlint-disable-next-line no-param-reassign
       url = `https://${url}`;
     }
     const urlParsed = new URL(url);

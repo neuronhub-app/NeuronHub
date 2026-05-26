@@ -1,10 +1,11 @@
 /**
  * todo ? refac: don't have a folder with a single Comp. Move it up, or place more Providers in this dir.
  */
-import posthog from "posthog-js";
 import { PostHogProvider } from "@posthog/react";
-import { env } from "@/env";
+import posthog from "posthog-js";
 import { ReactNode } from "react";
+
+import { env } from "@/env";
 
 export function NhaPosthogProvider(props: { children: ReactNode }) {
   if (env.mode.isClient && env.VITE_POSTHOG_IS_ENABLED) {

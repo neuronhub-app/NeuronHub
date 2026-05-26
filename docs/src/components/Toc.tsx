@@ -1,12 +1,12 @@
 /**
  * #AI #122
  */
-"use client";
-
 import { Box, Stack, Text, chakra } from "@chakra-ui/react";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { ids } from "@/e2e/ids";
 
 export function Toc() {

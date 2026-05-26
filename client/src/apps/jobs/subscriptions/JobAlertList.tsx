@@ -15,6 +15,10 @@ import {
 } from "@chakra-ui/react";
 import { LuPause, LuPlay, LuTrash2 } from "react-icons/lu";
 import { NavLink } from "react-router";
+
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { format } from "@neuronhub/shared/utils/format";
+
 import { useJobUnsubscribeHandler } from "@/apps/jobs/subscriptions/useJobUnsubscribeHandler";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
@@ -22,8 +26,6 @@ import { graphql, type ResultOf } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
-import { datetime } from "@neuronhub/shared/utils/date-fns";
-import { format } from "@neuronhub/shared/utils/format";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { track } from "@/utils/track";
 import { useInit } from "@/utils/useInit";

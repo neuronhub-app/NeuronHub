@@ -1,4 +1,5 @@
 import { Badge, SystemStyleObject } from "@chakra-ui/react";
+
 import { theme } from "@neuronhub/shared/theme/colors";
 
 export function BadgeNew(props: { isHeading?: boolean }) {

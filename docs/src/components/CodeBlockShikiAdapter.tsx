@@ -3,8 +3,8 @@
  */
 "use client";
 
-import type { ReactNode } from "react";
 import { CodeBlock, createShikiAdapter } from "@chakra-ui/react";
+import type { ReactNode } from "react";
 import type { HighlighterGeneric } from "shiki";
 
 export function CodeBlockShikiAdapter(props: { children: ReactNode }) {
@@ -13,6 +13,7 @@ export function CodeBlockShikiAdapter(props: { children: ReactNode }) {
   );
 }
 
+// oxlint-disable-next-line typescript/no-explicit-any
 const shikiAdapter = createShikiAdapter<HighlighterGeneric<any, any>>({
   async load() {
     const { createHighlighter } = await import("shiki");

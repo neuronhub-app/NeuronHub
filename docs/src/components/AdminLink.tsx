@@ -1,6 +1,7 @@
+import { ReactNode } from "react";
+
 import { LinkExt } from "@/components/LinkExt";
 import { env } from "@/env";
-import { ReactNode } from "react";
 
 export function AdminLink(props: { id: keyof typeof links; children?: ReactNode }) {
   return (

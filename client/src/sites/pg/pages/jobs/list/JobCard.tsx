@@ -1,5 +1,3 @@
-import { icons } from "@neuronhub/shared/theme/icons";
-import { track } from "@/utils/track";
 import {
   Badge,
   Box,
@@ -16,23 +14,27 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import { Prose } from "@neuronhub/shared/components/ui/prose";
-import { datetime } from "@neuronhub/shared/utils/date-fns";
-import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { ErrorBoundary } from "@sentry/react";
 import type { BaseHit, Hit } from "instantsearch.js";
 import { GoAlert } from "react-icons/go";
 import { IoLocationSharp } from "react-icons/io5";
 import { LuChevronDown, LuExternalLink } from "react-icons/lu";
 import { Highlight, Snippet, useInstantSearch } from "react-instantsearch";
+
+import { Prose } from "@neuronhub/shared/components/ui/prose";
+import { icons } from "@neuronhub/shared/theme/icons";
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { LocationType } from "~/graphql/enums";
+
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
-import { LocationType } from "~/graphql/enums";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
 import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
+import { track } from "@/utils/track";
 
 const style = {
   markHighlight: {
@@ -324,7 +326,6 @@ function JobExpanded(props: { job: JobFragmentType; jobHit: Hit<BaseHit> }) {
               "& ul > li::marker": { color: "brand.black" },
               "& ul": { paddingInlineStart: "0", listStylePosition: "inside" },
             }}
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
             dangerouslySetInnerHTML={{
               __html: markedConfigured.parse(props.job.description),
             }}

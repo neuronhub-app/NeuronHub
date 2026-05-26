@@ -5,7 +5,6 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     uv = "0.11.6"
     pnpm = "10.33.0" # also match [[package.json]] packageManager
-    biome = "2.4.11"
 
 	usage = "3.2.0"
     rclone = "1.73.4"
@@ -17,9 +16,12 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
 [settings]
 	lockfile = true
-    python.uv_venv_auto = true # let uv manage .venv/ <- should be default
+    minimum_release_age = "10d"
+
 	task.timings = false # noise for LLMs
     env_shell_expand = true # the default in v2026.7.0
+
+    python.uv_venv_auto = true # let uv manage .venv/ <- should be default
 
     # Nushell for everything:
     unix_default_file_shell_args = "nu"
@@ -214,9 +216,11 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         """
         alias = "pytest"
         env.DJANGO_ENV = "dev_test_unit"
+        raw_args = true
 
     [tasks."test:pytest:all"]
         run = "mise pytest --include-all"
+        raw_args = true
 
     [tasks."test:e2e"]
         dir = "client"
@@ -230,6 +234,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         env.E2E_DB_NAME = "{{ env.E2E_DB_NAME }}"
         env.IS_TASKS_BACKEND_IMMEDIATE = "false"
         env.FORCE_COLOR = "false"
+        raw_args = true
 
     [tasks."test:e2e:docs"]
         dir = "docs"
@@ -238,6 +243,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
             "killport {{env.DOCS_PORT_E2E}} | ignore",
             "pnpm exec playwright test --config=e2e/playwright.config.ts",
         ]
+        raw_args = true
 
 # Django
 # -----------------------------------------------------
@@ -355,10 +361,10 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
             "src/theme/**",
             "src/sites/pg/theme.ts", # mirrored into theme.typegen.ts
         ]
-        quiet = true
+        silent = true # quiet doesn't work
 
 [tasks.format]
-    depends = ["format:server", "format:biome"]
+    depends = ["format:server", "format:oxfmt"]
     quiet = true
 
     [tasks."format:server"]
@@ -367,9 +373,14 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         sources = ["neuronhub/**/*.py"]
         quiet = true
 
-    [tasks."format:biome"]
-        run = "biome format --write"
+    [tasks."format:oxfmt"]
+        run = "pnpm exec oxfmt packages/shared/src client/src client/e2e docs/src docs/e2e docs/scripts"
         sources = [
+            "oxfmt.config.ts",
+            "oxlint.config.ts",
+            "package.json",
+            "*/package.json",
+
             "packages/shared/src/**/*",
             "client/src/**/*",
             "client/e2e/**/*",
@@ -378,6 +389,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
             "docs/scripts/**/*",
         ]
         quiet = true
+        raw_args = true
 
 
 [tasks.lint]
@@ -388,6 +400,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     depends_post = [
         "lint:server",
         "lint:client",
+        "lint:oxlint",
         "lint:docs",
         "lint:packages",
     ]
@@ -398,25 +411,42 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         run = "uv run mypy neuronhub"
         sources = ["neuronhub/**/*.py"]
         quiet = true
+        raw_args = true
 
-    [tasks."lint:biome"]
-        run = [
-            "biome lint --write --unsafe",
-        ]
+    [tasks."lint:oxlint"]
+        run = "pnpm exec oxlint --fix"
         sources = [
-            "packages/shared/src/**/*",
+            "oxfmt.config.ts",
+            "oxlint.config.ts",
+            "package.json",
+            "*/package.json",
+            "*/tsconfig.json",
+
             "client/src/**/*",
             "client/e2e/**/*",
-            "docs/src/**/*",
-            "docs/e2e/**/*",
+            "packages/shared/src/**/*",
+            "packages/shared/e2e/**/*",
+            "docs/shared/src/**/*",
+            "docs/shared/e2e/**/*",
         ]
         quiet = true
+        raw_args = true
 
     [tasks."lint:client"]
         dir = "client/"
         run = "pnpm exec tsgo --noEmit"
-        sources = ["src/**/*", "e2e/**/*", "tsconfig.json", "package.json"]
+        sources = [
+            "../oxfmt.config.ts",
+            "../oxlint.config.ts",
+            "../package.json",
+            "package.json",
+            "tsconfig.json",
+
+            "e2e/**/*",
+            "src/**/*",
+        ]
         quiet = true
+        raw_args = true
 
     [tasks."lint:docs"]
         dir = "docs/"
@@ -426,9 +456,12 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         ]
         sources = ["src/**/*", "e2e/**/*", "scripts/**/*", "tsconfig.json", "package.json"]
         quiet = true
+        raw_args = true
 
     [tasks."lint:packages"]
         dir = "packages/shared/"
         run = "pnpm exec tsgo --noEmit"
-        sources = ["src/**/*", "package.json"]
+        sources = ["src/**/*", "tsconfig.json", "package.json"]
         quiet = true
+        raw_args = true
+

@@ -2,11 +2,13 @@ import { Box, Collapsible, Flex, HStack, Icon, Stack } from "@chakra-ui/react";
 import React, { useEffect, useRef, type ReactNode, type RefObject } from "react";
 import { LuChevronDown, LuSquareX } from "react-icons/lu";
 import { useClearRefinements } from "react-instantsearch";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import {
   PgAlgoliaFacetsActive,
   type FacetsActiveConfig,
 } from "@/sites/pg/components/PgAlgoliaFacetsActive";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function PgFilterCardWithSplitBg(props: {
   children: ReactNode;

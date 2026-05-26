@@ -3,10 +3,11 @@
  *
  * [[155-review-fixes-salary-filter.md]]
  */
-import { format } from "@neuronhub/shared/utils/format";
-import { SourceExt } from "~/graphql/enums";
 import { useSnapshot } from "valtio/react";
 import { proxy } from "valtio/vanilla";
+
+import { format } from "@neuronhub/shared/utils/format";
+import { SourceExt } from "~/graphql/enums";
 
 const state = proxy({
   salaryMin: null as number | null,

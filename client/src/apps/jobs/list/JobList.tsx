@@ -1,4 +1,3 @@
-import { track } from "@/utils/track";
 import {
   Box,
   Code,
@@ -15,6 +14,7 @@ import { type ReactNode, useEffect } from "react";
 import { GoComment, GoQuestion } from "react-icons/go";
 import { Configure, useRefinementList } from "react-instantsearch";
 import { NavLink, useSearchParams } from "react-router";
+
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 import { JobCard } from "@/apps/jobs/list/JobCard/JobCard";
@@ -22,14 +22,15 @@ import { JobsSubscribeModal } from "@/apps/jobs/list/JobsSubscribeModal";
 import { AlgoliaFacetAttribute } from "@/components/algolia/AlgoliaFacetAttribute";
 import { AlgoliaFacetBoolean } from "@/components/algolia/AlgoliaFacetBoolean";
 import { AlgoliaFacetDate } from "@/components/algolia/AlgoliaFacetDate";
-import { AlgoliaFacetSalary } from "@/components/algolia/AlgoliaFacetSalary";
 import { AlgoliaFacetsActive } from "@/components/algolia/AlgoliaFacetsActive";
+import { AlgoliaFacetSalary } from "@/components/algolia/AlgoliaFacetSalary";
 import { AlgoliaList } from "@/components/algolia/AlgoliaList";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
+import { track } from "@/utils/track";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function JobList(props: { slug?: string }) {
@@ -221,11 +222,13 @@ function AlgoliaSourceFilter() {
 const JobsByIdsQuery = graphql.persisted(
   "JobsByIds",
   graphql(
-    `query JobsByIds($ids: [ID!]!) {
-      jobs(filters: { id: { in_list: $ids } }) {
-        ...JobFragment
+    `
+      query JobsByIds($ids: [ID!]!) {
+        jobs(filters: { id: { in_list: $ids } }) {
+          ...JobFragment
+        }
       }
-    }`,
+    `,
     [JobFragment],
   ),
 );
@@ -233,11 +236,13 @@ const JobsByIdsQuery = graphql.persisted(
 const JobBySlugQuery = graphql.persisted(
   "JobBySlug",
   graphql(
-    `query JobBySlug($slug: String!) {
-      job_by_slug(slug: $slug) {
-        ...JobFragment
+    `
+      query JobBySlug($slug: String!) {
+        job_by_slug(slug: $slug) {
+          ...JobFragment
+        }
       }
-    }`,
+    `,
     [JobFragment],
   ),
 );

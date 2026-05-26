@@ -1,12 +1,14 @@
 import { Field } from "@chakra-ui/react";
 import { AsyncCreatableSelect } from "chakra-react-select";
 import { useWatch } from "react-hook-form";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { schemas } from "@/components/posts/form/schemas";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { useInit } from "@/utils/useInit";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 /**
  * Note: in the future replace with @chakra-ui Combobox with render of .image & .content.
@@ -123,25 +125,25 @@ type ToolOption = {
 const ToolQuery = graphql.persisted(
   "SearchToolsForSelection",
   graphql(`
-  query SearchToolsForSelection($filterBy: String) {
-    post_tools(filters: { title: { i_contains: $filterBy } }) {
-      id
-      title
-      tool_type
-      content_polite
-      content_direct
-      content_rant
-      github_url
-      crunchbase_url
-      domain
-      source
-      source_author
-      tags {
+    query SearchToolsForSelection($filterBy: String) {
+      post_tools(filters: { title: { i_contains: $filterBy } }) {
         id
-        name
-        label
+        title
+        tool_type
+        content_polite
+        content_direct
+        content_rant
+        github_url
+        crunchbase_url
+        domain
+        source
+        source_author
+        tags {
+          id
+          name
+          label
+        }
       }
     }
-  }
-`),
+  `),
 );

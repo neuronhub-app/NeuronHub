@@ -1,7 +1,8 @@
+import { PostTypeEnum } from "~/graphql/enums";
+
 import { schemas } from "@/components/posts/form/schemas";
 import { graphql, type ID } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { PostTypeEnum } from "~/graphql/enums";
 
 export async function mutateReview(values: schemas.Review & { parent?: { id: ID } }) {
   const { recommend_to, visible_to, parent, tags, review_tags, ...valuesRest } = values;
@@ -37,7 +38,12 @@ const ReviewUpdateOrCreateMutation = graphql.persisted(
   "ReviewUpdateOrCreate",
   graphql(`
     mutation ReviewUpdateOrCreate($input: PostTypeInput!) {
-      post_update_or_create(data: $input) { id parent { id } }
+      post_update_or_create(data: $input) {
+        id
+        parent {
+          id
+        }
+      }
     }
   `),
 );

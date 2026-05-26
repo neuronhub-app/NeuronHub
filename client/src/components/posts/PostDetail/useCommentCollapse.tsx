@@ -1,11 +1,13 @@
 import { useCallback, useTransition } from "react";
 import { proxySet } from "valtio/utils";
+
+import { UserListName } from "~/graphql/enums";
+
 import { useAuth } from "@/apps/users/useUserCurrent";
 import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
-import { UserListName } from "~/graphql/enums";
 
 const collapsedIds = proxySet();
 
@@ -82,7 +84,11 @@ const UserCollapsedCommentsQuery = graphql.persisted(
 const UpdateCollapsedCommentsMutation = graphql.persisted(
   "UpdateCollapsedComments",
   graphql(`
-    mutation UpdateCollapsedComments($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {
+    mutation UpdateCollapsedComments(
+      $id: ID!
+      $list_field_name: UserListName!
+      $is_added: Boolean!
+    ) {
       update_user_list(id: $id, list_field_name: $list_field_name, is_added: $is_added)
     }
   `),

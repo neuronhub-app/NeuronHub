@@ -2,8 +2,9 @@
  * #AI
  */
 import { expect, type Locator, type Page, test } from "@playwright/test";
-import { ReactRouterPath } from "@/utils/types";
 import { href } from "react-router";
+
+import { ReactRouterPath } from "@/utils/types";
 
 const mobile = { width: 390, height: 844 };
 

@@ -1,13 +1,15 @@
 import { Flex, Grid, Stack, Switch } from "@chakra-ui/react";
 import type { UseRefinementListProps } from "react-instantsearch";
 import { useRefinementList, useToggleRefinement } from "react-instantsearch";
+
+import { LocationType } from "~/graphql/enums";
+
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { ids } from "@/e2e/ids";
 import { PgFacet } from "@/sites/pg/components/PgFacet";
 import { ALGOLIA_ATTR_LOCATION, PgFacetLocation } from "@/sites/pg/components/PgFacetLocation";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 import { PgFacetSalary } from "@/sites/pg/components/PgFacetSalary";
-import { LocationType } from "~/graphql/enums";
 
 const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
 

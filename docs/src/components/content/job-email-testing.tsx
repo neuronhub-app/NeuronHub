@@ -1,4 +1,5 @@
 import { Box } from "@chakra-ui/react";
+
 import { format } from "@neuronhub/shared/utils/format";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 
@@ -12,6 +13,6 @@ export function JobEmailTesting() {
             - \`Send test confirm email to yourself\`
           `),
       }}
-    ></Box>
+    />
   );
 }

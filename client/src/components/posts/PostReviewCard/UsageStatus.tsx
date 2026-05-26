@@ -1,5 +1,6 @@
 import { Flex, Icon, type JsxStyleProps, Text } from "@chakra-ui/react";
 import { FaHeartPulse } from "react-icons/fa6";
+
 import type { PostReviewFragmentType } from "@/graphql/fragments/reviews";
 
 export function UsageStatusBlock(props: {

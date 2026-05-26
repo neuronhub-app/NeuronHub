@@ -1,4 +1,3 @@
-import { track } from "@/utils/track";
 import { Badge, Button, Flex, Group, Icon, Stack, Text } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,8 +7,11 @@ import { useCurrentRefinements } from "react-instantsearch";
 import { z } from "zod";
 
 import { format } from "@neuronhub/shared/utils/format";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { useUser } from "@/apps/users/useUserCurrent";
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
+import type { ButtonProps } from "@/components/ui/button";
 import {
   DialogBody,
   DialogCloseTrigger,
@@ -21,17 +23,16 @@ import {
 } from "@/components/ui/dialog";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
-import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 import {
   ALGOLIA_ATTR_LOCATION,
   type JobLocation,
   JobLocationsQuery,
 } from "@/sites/pg/components/PgFacetLocation";
 import { toast } from "@/utils/toast";
-import type { ButtonProps } from "@/components/ui/button";
+import { track } from "@/utils/track";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 const FormSchema = z.object({
   email: z.email("Invalid email address"),

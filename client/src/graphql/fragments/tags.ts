@@ -5,9 +5,9 @@ export const PostTagFragment = graphql(`
     id
     votes {
       id
-			post {
-				id
-			}
+      post {
+        id
+      }
       author {
         id
         # todo ! is this a sec leak? can we use hashes?
@@ -30,9 +30,9 @@ export const PostTagFragment = graphql(`
       id
       username
     }
-		tag_children {
-			id
-		}
+    tag_children {
+      id
+    }
   }
 `);
 
@@ -58,9 +58,9 @@ export const PostTagLeanFragment = graphql(`
       id
       name
     }
-		tag_children {
-			id
-		}
+    tag_children {
+      id
+    }
   }
 `);
 

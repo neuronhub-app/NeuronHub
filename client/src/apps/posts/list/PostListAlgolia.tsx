@@ -25,6 +25,10 @@ import {
   useSortBy,
 } from "react-instantsearch";
 import { NavLink } from "react-router";
+
+import { gap } from "@neuronhub/shared/theme/spacings";
+import type { PostCategory } from "~/graphql/enums";
+
 import { useUser } from "@/apps/users/useUserCurrent";
 import { PostCardSmall } from "@/components/posts/PostCard/PostCardSmall";
 import { Button } from "@/components/ui/button";
@@ -32,10 +36,8 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { PostFragment, type PostFragmentType } from "@/graphql/fragments/posts";
 import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
-import { gap } from "@neuronhub/shared/theme/spacings";
 import { urls } from "@/urls";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
-import type { PostCategory } from "~/graphql/enums";
 
 export function PostListAlgolia(props: { category?: PostCategory }) {
   const algolia = useAlgoliaSearchClient();
@@ -307,11 +309,7 @@ function FacetFilter(props: {
               <Checkbox.HiddenInput />
               <Checkbox.Control />
               <Checkbox.Label textWrap="nowrap" display="flex" gap="gap.sm" color="fg.muted">
-                <Text
-                  // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
-                  dangerouslySetInnerHTML={{ __html: item.highlighted! }}
-                  as="span"
-                />{" "}
+                <Text dangerouslySetInnerHTML={{ __html: item.highlighted! }} as="span" />{" "}
                 <Text as="span" color="fg.subtle" fontSize="xs">
                   {item.count}
                 </Text>
@@ -339,12 +337,12 @@ const PostsByIdsQuery = graphql.persisted(
   "PostsByIds",
   graphql(
     `
-    query PostsByIds($ids: [ID!]!) {
-      posts(filters: { id: { in_list: $ids } }) {
-        ...PostFragment
+      query PostsByIds($ids: [ID!]!) {
+        posts(filters: { id: { in_list: $ids } }) {
+          ...PostFragment
+        }
       }
-    }
-  `,
+    `,
     [PostFragment],
   ),
 );

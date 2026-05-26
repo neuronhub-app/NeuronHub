@@ -1,5 +1,6 @@
 import { Accordion } from "@chakra-ui/react";
 import { useFormContext, useWatch } from "react-hook-form";
+
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import type { schemas } from "@/components/posts/form/schemas";
 import type { PostContentField } from "@/components/posts/ListContainer";

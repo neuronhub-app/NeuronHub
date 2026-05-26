@@ -8,6 +8,7 @@
  * - ID
  */
 import { initGraphQLTada } from "gql.tada";
+
 import type { introspection } from "~/graphql/gql-tada/graphql-env.d.ts";
 
 export const graphql = initGraphQLTada<{

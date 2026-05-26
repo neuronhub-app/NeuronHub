@@ -20,9 +20,10 @@ import {
   useInstantSearch,
   useSearchBox,
 } from "react-instantsearch";
-import type { ID } from "@/gql-tada";
 
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
+import type { ID } from "@/gql-tada";
 
 export type PgInfiniteHitsProps<TItem extends { id: ID }> = {
   renderHit: (item: TItem, ctx: { isSearchActive: boolean }) => ReactNode;

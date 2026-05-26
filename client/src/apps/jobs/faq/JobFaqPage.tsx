@@ -1,9 +1,10 @@
 import { Accordion, Skeleton, Stack, Text } from "@chakra-ui/react";
 
-import { graphql } from "@/gql-tada";
-import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
+
+import { graphql } from "@/gql-tada";
+import { useApolloQuery } from "@/graphql/useApolloQuery";
 
 const style = {
   heading: {
@@ -86,7 +87,6 @@ export function JobFaqPage() {
               <Prose
                 maxW="none"
                 css={{ ...style.answer, "& a": style.link }}
-                // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
                 dangerouslySetInnerHTML={{
                   __html: markedConfigured.parse(item.answer_md),
                 }}

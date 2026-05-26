@@ -1,5 +1,6 @@
 import { Checkbox, Text } from "@chakra-ui/react";
 import { useToggleRefinement } from "react-instantsearch";
+
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 
 export function AlgoliaFacetBoolean(props: { attribute: string; label: string }) {

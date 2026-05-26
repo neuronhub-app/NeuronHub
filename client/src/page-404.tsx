@@ -1,6 +1,7 @@
 import { Button, EmptyState, Icon, Link, Stack } from "@chakra-ui/react";
 import { PiFileDashedThin } from "react-icons/pi";
 import { NavLink } from "react-router";
+
 import { urls } from "@/urls";
 
 export default function Page404() {

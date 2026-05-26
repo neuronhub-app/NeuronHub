@@ -8,11 +8,9 @@
     """
     env = { TSC_CONFIG = "tsconfig.quiet.json" } # #prob-redundant
     interactive = true
-
-["claude:med"]
-    run = "mise claude --effort=medium"
-    interactive = true
+    hide = true
 
 ["claude:usage"]
     run = "mise claude '/usage'"
     interactive = true
+    hide = true

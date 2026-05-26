@@ -1,7 +1,6 @@
+import * as Sentry from "@sentry/react";
 import { StrictMode, startTransition, useEffect } from "react";
 import { hydrateRoot } from "react-dom/client";
-import { HydratedRouter } from "react-router/dom";
-import { env } from "@/env";
 import {
   Routes,
   createBrowserRouter,
@@ -10,7 +9,9 @@ import {
   useLocation,
   useNavigationType,
 } from "react-router";
-import * as Sentry from "@sentry/react";
+import { HydratedRouter } from "react-router/dom";
+
+import { env } from "@/env";
 
 Sentry.init({
   // debug: env.isDev,

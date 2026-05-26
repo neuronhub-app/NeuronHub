@@ -1,11 +1,13 @@
 import { Alert, CloseButton, Spinner } from "@chakra-ui/react";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 import { track } from "@/utils/track";
 import { useInit } from "@/utils/useInit";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 export function useJobUnsubscribeHandler(alertIdExt?: string) {
   const state = useStateValtio({

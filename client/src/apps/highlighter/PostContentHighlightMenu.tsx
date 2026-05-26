@@ -1,6 +1,7 @@
 import { Icon, Menu, Portal, Spinner } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { FaTrashCan } from "react-icons/fa6";
+
 import { highlight_attrs } from "@/apps/highlighter/PostContentHighlighted";
 import { ids } from "@/e2e/ids";
 

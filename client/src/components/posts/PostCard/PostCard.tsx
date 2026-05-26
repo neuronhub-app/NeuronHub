@@ -17,6 +17,7 @@ import { FaHackerNewsSquare } from "react-icons/fa";
 import { FaGithub, FaPenToSquare } from "react-icons/fa6";
 import { SiCrunchbase } from "react-icons/si";
 import { NavLink } from "react-router";
+
 import { useUser } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import { PostAuthor } from "@/components/posts/PostCard/PostAuthor";
@@ -25,8 +26,8 @@ import { PostButtonsVote } from "@/components/posts/PostCard/PostButtonsVote";
 import { PostCommentsLink } from "@/components/posts/PostCard/PostCommentsLink";
 import { PostContent } from "@/components/posts/PostCard/PostContent";
 import { PostDatetime } from "@/components/posts/PostCard/PostDatetime";
-import { PostTags } from "@/components/posts/PostCard/PostTags";
 import { PostHeading } from "@/components/posts/PostCard/PostHeading";
+import { PostTags } from "@/components/posts/PostCard/PostTags";
 import { ReviewTagsWithVotes } from "@/components/posts/PostCard/ReviewTagsWithVotes";
 import { RatingBars } from "@/components/posts/PostReviewCard/RatingBars";
 import { ReviewTags } from "@/components/posts/PostReviewCard/ReviewTags";

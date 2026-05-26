@@ -1,4 +1,4 @@
-// @ts-expect-error
+// @ts-expect-error #bad-infer
 import type { SemanticTokenDefinition } from "@chakra-ui/react";
 
 export namespace theme {

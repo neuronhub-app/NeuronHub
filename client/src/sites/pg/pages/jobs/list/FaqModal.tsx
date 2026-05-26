@@ -1,8 +1,10 @@
 import { Accordion, Skeleton, Stack } from "@chakra-ui/react";
+import type { ReactNode } from "react";
+
 import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import type { ReactNode } from "react";
+
 import {
   DialogCloseTrigger,
   DialogContent,
@@ -68,7 +70,6 @@ export function FaqModal(props: { children: ReactNode }) {
                   <Prose
                     maxW="none"
                     css={{ ...style.answer, "& a": style.link }}
-                    // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
                     dangerouslySetInnerHTML={{
                       __html: markedConfigured.parse(item.answer_md),
                     }}

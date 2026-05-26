@@ -1,8 +1,9 @@
-import { env } from "@/env";
 import { Button, EmptyState, HStack, Icon, Stack } from "@chakra-ui/react";
+import * as Sentry from "@sentry/react";
 import type { ReactNode } from "react";
 import { GoAlert } from "react-icons/go";
-import * as Sentry from "@sentry/react";
+
+import { env } from "@/env";
 
 export function ErrorState(props: { title?: string; description?: ReactNode }) {
   return (

@@ -4,6 +4,7 @@
 // @ts-expect-error #bad-infer
 import type { SemanticTokenDefinition } from "@chakra-ui/react";
 import { defaultConfig } from "@chakra-ui/react";
+
 import { theme as neuronTheme } from "@neuronhub/shared/theme/colors";
 
 export namespace theme {

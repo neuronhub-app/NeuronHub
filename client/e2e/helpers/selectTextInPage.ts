@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+
 import { highlight_attrs } from "@/apps/highlighter/PostContentHighlighted";
 
 /**

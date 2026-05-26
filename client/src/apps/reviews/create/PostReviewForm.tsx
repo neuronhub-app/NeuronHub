@@ -7,6 +7,11 @@ import { FaBookmark, FaCircleXmark, FaClockRotateLeft, FaHeartPulse } from "reac
 import { FiSave } from "react-icons/fi";
 import { HiOutlineClock } from "react-icons/hi2";
 import { useNavigate } from "react-router";
+
+import { Prose } from "@neuronhub/shared/components/ui/prose";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
+import { PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
+
 import { mutateReview } from "@/apps/reviews/create/mutateReview";
 import { PostReviewDeleteButton } from "@/apps/reviews/create/PostReviewDeleteButton";
 import { useUser } from "@/apps/users/useUserCurrent";
@@ -17,19 +22,16 @@ import { FormChakraSlider } from "@/components/forms/FormChakraSlider";
 import { PostContentFields } from "@/components/posts/form/PostContentFields";
 import { PostSharableFields } from "@/components/posts/form/PostSharableFields";
 import { PostToolFields } from "@/components/posts/form/PostToolFields";
-import { SelectVotable } from "@/components/posts/form/SelectVotable";
 import { schemas } from "@/components/posts/form/schemas";
+import { SelectVotable } from "@/components/posts/form/SelectVotable";
 import { Button } from "@/components/ui/button";
-import { Prose } from "@neuronhub/shared/components/ui/prose";
 import { ids } from "@/e2e/ids";
 import { graphql, type ID } from "@/gql-tada";
 import { isEditMode, type PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
-import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { toast } from "@/utils/toast";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
 export namespace PostReviewForm {
   export function Comp(props: { review?: PostReviewEditFragmentType }) {
@@ -201,7 +203,6 @@ export namespace PostReviewForm {
                         }
                       >
                         <Prose
-                          // biome-ignore lint/security/noDangerouslySetInnerHtml: cleaned by server
                           dangerouslySetInnerHTML={{
                             __html: markedConfigured.parse(
                               props.review.parent.content_polite ||
@@ -369,7 +370,9 @@ const ToolCreateMutation = graphql.persisted(
   "ToolCreate",
   graphql(`
     mutation ToolCreate($input: PostTypeInput!) {
-      post_update_or_create(data: $input) { id }
+      post_update_or_create(data: $input) {
+        id
+      }
     }
   `),
 );

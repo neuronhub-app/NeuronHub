@@ -11,6 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { LuSearch, LuUserPlus } from "react-icons/lu";
+
 import { MemberActions } from "@/apps/users/settings/connections/ConnectionActions";
 import { Avatar } from "@/components/ui/avatar";
 

@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/react";
 import toast from "react-hot-toast";
+
 import { PostReviewForm } from "@/apps/reviews/create/PostReviewForm";
 import { graphql } from "@/gql-tada";
 import { PostReviewEditFragment } from "@/graphql/fragments/reviews";
@@ -27,7 +28,13 @@ export default function PostReviewEditRoute(props: { params: { id: string } }) {
 const PostReviewEditQuery = graphql.persisted(
   "PostReviewEdit",
   graphql(
-    `query PostReviewEdit($pk: ID!) { post_review(pk: $pk) { ...PostReviewEditFragment } }`,
+    `
+      query PostReviewEdit($pk: ID!) {
+        post_review(pk: $pk) {
+          ...PostReviewEditFragment
+        }
+      }
+    `,
     [PostReviewEditFragment],
   ),
 );

@@ -6,12 +6,15 @@
  */
 import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+
 import { expect as expectBase } from "@playwright/test";
+
+import { TagCategoryEnum } from "~/graphql/enums";
+
 import { ids } from "@/e2e/ids";
 import { test } from "@/e2e/test";
 import { env } from "@/env";
 import { urls } from "@/urls";
-import { TagCategoryEnum } from "~/graphql/enums";
 
 const pages = {
   climate_change: {

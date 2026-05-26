@@ -2,6 +2,7 @@ import { Box, Field, Slider, VStack } from "@chakra-ui/react";
 import type { ComponentProps } from "react";
 import type { FieldPath } from "react-hook-form";
 import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tag } from "@/components/ui/tag";
 

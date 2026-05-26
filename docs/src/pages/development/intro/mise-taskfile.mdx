@@ -15,9 +15,9 @@ Mise is using Nushell for all tasks.
     - `devops/e2e.mise.toml` - just `runserver`, `db_worker`, and `react-router dev`.
 - `mise e2e:docs` - for `docs/e2e/`.
 - `mise lint` runs:
-    - `format` - Ruff, Biome
+    - `format` - Ruff, oxfmt
     - `typegen` - Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries (aka Backend whitelist); @chakra-ui; etc
-    - `lint:biome` - for `client/`, `docs/`, and `packages/shared/`
+    - `lint:oxlint` - for `client/`, `docs/`, and `packages/shared/`
     - `lint:client`, `lint:docs`, `lint:packages` - tsgo
     - `lint:` tasks drop their stdout, except stderr.
     - If you see errors re `pg-primary` or `pg-highlighted` -> run `touch mise.toml && mise lint` once. That's just a chakra theme type bug.

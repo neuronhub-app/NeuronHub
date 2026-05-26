@@ -3,6 +3,7 @@ import type { ResultOf } from "gql.tada";
 import { useEffect } from "react";
 import { proxy } from "valtio";
 import { useSnapshot } from "valtio/react";
+
 import { graphql } from "@/gql-tada";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { track } from "@/utils/track";
@@ -60,53 +61,57 @@ export function useAuth() {
 export const UserQueryDoc = graphql.persisted(
   "UserCurrent",
   graphql(`
-  query UserCurrent {
-    user_current {
-      id
-      username
-      name: username
-      email
-      is_superuser
-      is_staff
-      has_profile_groups
-
-      library { pk }
-
-      read_later { pk }
-
-      post_votes {
+    query UserCurrent {
+      user_current {
         id
-        is_vote_positive
-        post {
-          id
-          type
-        }
-      }
-      post_tag_votes {
-        id
-        is_vote_positive
-        is_changed_my_mind
-        post {
-          id
-        }
-        tag {
-          id
-        }
-      }
+        username
+        name: username
+        email
+        is_superuser
+        is_staff
+        has_profile_groups
 
-      connection_groups {
-        id
-        name
+        library {
+          pk
+        }
 
-        connections {
+        read_later {
+          pk
+        }
+
+        post_votes {
           id
-          username
-          name: username
+          is_vote_positive
+          post {
+            id
+            type
+          }
+        }
+        post_tag_votes {
+          id
+          is_vote_positive
+          is_changed_my_mind
+          post {
+            id
+          }
+          tag {
+            id
+          }
+        }
+
+        connection_groups {
+          id
+          name
+
+          connections {
+            id
+            username
+            name: username
+          }
         }
       }
     }
-  }
-`),
+  `),
 );
 
 type UserQuery = ResultOf<typeof UserQueryDoc>;

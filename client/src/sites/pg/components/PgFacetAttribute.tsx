@@ -10,9 +10,11 @@ import {
 } from "@chakra-ui/react";
 import { useCallback, useRef } from "react";
 import { LuX } from "react-icons/lu";
-import { useRefinementList } from "react-instantsearch";
 import type { UseRefinementListProps } from "react-instantsearch";
+import { useRefinementList } from "react-instantsearch";
+
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { ids } from "@/e2e/ids";
 
 export function PgFacetAttribute(props: {
@@ -200,7 +202,6 @@ function FacetCheckboxItem(props: {
       <Checkbox.HiddenInput />
       <Checkbox.Control _groupHover={{ borderColor: "brand.green.light" }} />
       <Text
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
         dangerouslySetInnerHTML={{
           __html: props.labelOverride ?? props.item.highlighted ?? props.item.label,
         }}

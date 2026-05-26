@@ -1,10 +1,10 @@
-import type { JobsLandingPage } from "@/prefetch/JobsLandingPage";
-import { landingPageToAlgoliaState } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
 import { Box, Grid, HStack, Stack } from "@chakra-ui/react";
 import type { IndexUiState, UiState } from "instantsearch.js";
 import { useRef, type ReactNode } from "react";
 import { InstantSearch } from "react-instantsearch";
+
 import type { ID } from "@/gql-tada";
+import type { JobsLandingPage } from "@/prefetch/JobsLandingPage";
 import type { FacetsActiveConfig } from "@/sites/pg/components/PgAlgoliaFacetsActive";
 import {
   PgFilterCardWithSplitBg,
@@ -19,6 +19,7 @@ import { PgAlgoliaListSkeleton } from "@/sites/pg/components/PgAlgoliaListSkelet
 import { PgAlgoliaSearchStats } from "@/sites/pg/components/PgAlgoliaSearchStats";
 import { PgAlgoliaSortSelect } from "@/sites/pg/components/PgAlgoliaSortSelect";
 import { PgSearchInput } from "@/sites/pg/components/PgSearchInput";
+import { landingPageToAlgoliaState } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
 import { type AlgoliaIndexKey, useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function PgAlgoliaList<TItem extends { id: ID }>(props: {

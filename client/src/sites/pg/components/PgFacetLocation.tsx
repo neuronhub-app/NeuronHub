@@ -1,16 +1,18 @@
 import { Checkbox, Icon, Input, InputGroup, Stack, Text } from "@chakra-ui/react";
 import { captureException, setExtra } from "@sentry/react";
 import { setExtras } from "@sentry/react-router";
+import type { ResultOf } from "gql.tada";
 import { LuX } from "react-icons/lu";
 import { useCurrentRefinements } from "react-instantsearch";
-import type { ResultOf } from "gql.tada";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import type { LocationType } from "~/graphql/enums";
+
+import type { TestId } from "@/e2e/ids";
+import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
-import { ids } from "@/e2e/ids";
-import type { TestId } from "@/e2e/ids";
-import type { LocationType } from "~/graphql/enums";
 
 export const ALGOLIA_ATTR_LOCATION = "locations.algolia_filter_name";
 
@@ -136,7 +138,6 @@ function FacetCheckbox(props: {
       <Checkbox.HiddenInput />
       <Checkbox.Control _groupHover={{ borderColor: "brand.green.light" }} />
       <Text
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: BE; query is escaped
         dangerouslySetInnerHTML={{
           __html: highlightMatch(getCityOrFullName(loc), props.searchQuery),
         }}

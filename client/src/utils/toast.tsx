@@ -2,6 +2,7 @@ import type { ErrorLike } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
 import { captureException } from "@sentry/react";
 import toastLib, { ToastOptions } from "react-hot-toast";
+
 import { ids } from "@/e2e/ids";
 import { errors } from "@/utils/errors";
 

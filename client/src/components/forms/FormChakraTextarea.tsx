@@ -2,6 +2,7 @@ import { Field, Flex, Float, Icon, Textarea, type TextareaProps } from "@chakra-
 import type { ReactNode } from "react";
 import { type FieldValues, type UseControllerProps, useController } from "react-hook-form";
 import { FaMarkdown } from "react-icons/fa";
+
 import { Tooltip } from "@/components/ui/tooltip";
 
 export function FormChakraTextarea<TFieldValues extends FieldValues>(props: {

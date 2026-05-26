@@ -3,6 +3,7 @@ import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { RemoveTypenameFromVariablesLink } from "@apollo/client/link/remove-typename";
 // @ts-expect-error - apollo-upload-client doesn't provide types for .mjs files
 import UploadHttpLink from "apollo-upload-client/UploadHttpLink.mjs";
+
 import { env } from "@/env";
 
 export const client = createApolloClient();

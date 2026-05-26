@@ -10,12 +10,15 @@ import {
   useSortBy,
 } from "react-instantsearch";
 import { NavLink } from "react-router";
+
+import type { PostTypeEnum } from "~/graphql/enums";
+
 import { useUser } from "@/apps/users/useUserCurrent";
 import { Button } from "@/components/ui/button";
 import type { ID } from "@/gql-tada";
 import { useAlgoliaEnrichmentByGraphql } from "@/graphql/useAlgoliaEnrichmentByGraphql";
 import { type AlgoliaIndexKey, useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
-import type { PostTypeEnum } from "~/graphql/enums";
+
 import { AlgoliaFacets } from "./AlgoliaFacets";
 import { AlgoliaPagination } from "./AlgoliaPagination";
 import { AlgoliaSearchInput } from "./AlgoliaSearchInput";

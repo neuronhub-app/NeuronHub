@@ -1,3 +1,5 @@
+import { PostTypeEnum } from "~/graphql/enums";
+
 import { AlgoliaFacetAttribute } from "@/components/algolia/AlgoliaFacetAttribute";
 import { AlgoliaFacetDate } from "@/components/algolia/AlgoliaFacetDate";
 import { AlgoliaList } from "@/components/algolia/AlgoliaList";
@@ -6,7 +8,6 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { PostReviewFragment, type PostReviewFragmentType } from "@/graphql/fragments/reviews";
 import { urls } from "@/urls";
-import { PostTypeEnum } from "~/graphql/enums";
 
 export function ReviewListAlgolia() {
   return (
@@ -38,12 +39,12 @@ const ReviewsByIdsQuery = graphql.persisted(
   "ReviewsByIds",
   graphql(
     `
-    query ReviewsByIds($ids: [ID!]!) {
-      post_reviews(filters: { id: { in_list: $ids } }) {
-        ...PostReviewFragment
+      query ReviewsByIds($ids: [ID!]!) {
+        post_reviews(filters: { id: { in_list: $ids } }) {
+          ...PostReviewFragment
+        }
       }
-    }
-  `,
+    `,
     [PostReviewFragment],
   ),
 );

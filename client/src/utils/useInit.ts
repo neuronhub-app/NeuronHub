@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/react";
 import { type DependencyList, useEffect } from "react";
+
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 /**

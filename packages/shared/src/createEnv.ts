@@ -1,5 +1,6 @@
 import { cleanEnv, str, url } from "envalid";
 
+// oxlint-disable-next-line typescript/ban-ts-comment
 // @ts-ignore #bad-infer only for local IDE, VM is ok
 const envRaw = typeof process === "undefined" ? import.meta.env : process.env;
 

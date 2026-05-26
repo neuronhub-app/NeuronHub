@@ -16,6 +16,8 @@ import toast from "react-hot-toast";
 import { FaMessage, FaRegMessage } from "react-icons/fa6";
 import { MdOutlineThumbDown, MdOutlineThumbUp, MdThumbDown, MdThumbUp } from "react-icons/md";
 
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
 import type { schemas } from "@/components/posts/form/schemas";
 import {
@@ -32,7 +34,6 @@ import { graphql, type ID } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useIsLoading } from "@/utils/useIsLoading";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 // Post.tags, .review_tags, .alternatives
 export interface SelectVotableOption {
@@ -349,20 +350,21 @@ const ToolTagsQuery = graphql.persisted(
   "ToolTagsQuery",
   graphql(`
     query ToolTagsQuery($name: String, $is_review_tag: Boolean!) {
-      tags(filters: {
-        is_review_tag: { exact: $is_review_tag }
-        name: { i_contains: $name }
-
-        OR: {
+      tags(
+        filters: {
           is_review_tag: { exact: $is_review_tag }
-          description: { i_contains: $name }
+          name: { i_contains: $name }
+          OR: { is_review_tag: { exact: $is_review_tag }, description: { i_contains: $name } }
         }
-      }) {
+      ) {
         id
         name
         label
         is_review_tag
-        tag_parent { id name }
+        tag_parent {
+          id
+          name
+        }
       }
     }
   `),

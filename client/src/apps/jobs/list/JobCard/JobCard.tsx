@@ -21,12 +21,14 @@ import { IoLocationSharp } from "react-icons/io5";
 import { LuGlobe } from "react-icons/lu";
 import { PiClockClockwiseFill } from "react-icons/pi";
 import { Highlight, useHits } from "react-instantsearch";
+
+import { datetime } from "@neuronhub/shared/utils/date-fns";
+import { format } from "@neuronhub/shared/utils/format";
+
 import { Tag } from "@/components/ui/tag";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
-import { datetime } from "@neuronhub/shared/utils/date-fns";
-import { format } from "@neuronhub/shared/utils/format";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
 
 const style = {

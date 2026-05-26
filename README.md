@@ -3,7 +3,7 @@ NeuronHub is privacy-first directory for: news, tools, products, jobs, profiles,
 ## Tech Stack
 
 - Server: Django v5.2, Strawberry GraphQL, PostgreSQL, pytest, uv, mypy
-- Client: React Router v7, @chakra-ui v3, react-hook-form, Zod, Valtio, Apollo, gql-tada, pnpm, Biome
+- Client: React Router v7, @chakra-ui v3, react-hook-form, Zod, Valtio, Apollo, gql-tada, pnpm, oxc
 - Search: Algolia
 - DevOps: Mise, Docker, Sentry
 

@@ -1,8 +1,6 @@
-"use client";
-
-import { chakra } from "@chakra-ui/react";
 import type { RecipeVariantRecord } from "@chakra-ui/react";
 import type { RecipeDefinition } from "@chakra-ui/react";
+import { chakra } from "@chakra-ui/react";
 
 export const Prose = chakra("div", {
   ...getProseBaseStyle(),

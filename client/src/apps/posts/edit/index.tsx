@@ -1,5 +1,6 @@
 import { captureException } from "@sentry/react";
 import toast from "react-hot-toast";
+
 import { PostCreateForm } from "@/apps/posts/create/PostCreateForm";
 import { graphql } from "@/gql-tada";
 import { PostEditFragment } from "@/graphql/fragments/posts";
@@ -24,7 +25,14 @@ export default function PostEditRoute(props: { params: { id: string } }) {
 }
 const PostEditQuery = graphql.persisted(
   "PostEdit",
-  graphql(`query PostEdit($id: ID!) { post(pk: $id) { ...PostEditFragment } }`, [
-    PostEditFragment,
-  ]),
+  graphql(
+    `
+      query PostEdit($id: ID!) {
+        post(pk: $id) {
+          ...PostEditFragment
+        }
+      }
+    `,
+    [PostEditFragment],
+  ),
 );

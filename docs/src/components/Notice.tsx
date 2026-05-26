@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
 import { Badge, Blockquote, Box, Float, Icon, SystemStyleObject } from "@chakra-ui/react";
+import { ReactNode } from "react";
 import { GoInfo } from "react-icons/go";
 
 export function Notice(props: { children: ReactNode }) {

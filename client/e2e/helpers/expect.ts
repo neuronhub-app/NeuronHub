@@ -1,5 +1,6 @@
 import type { Locator, Page } from "@playwright/test";
 import { expect as expectBase } from "@playwright/test";
+
 import { runPlaywrightMatcher } from "@/e2e/helpers/run-playwright-matcher";
 
 export const expect = expectBase.extend({

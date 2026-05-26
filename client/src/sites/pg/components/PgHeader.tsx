@@ -16,10 +16,12 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useRef } from "react";
 import { LuChevronDown, LuMenu, LuX } from "react-icons/lu";
+
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
 import { ids } from "@/e2e/ids";
-import { layout } from "@/sites/pg/PgLayoutConfig";
 import { useHeroHeader } from "@/sites/pg/components/useHeroHeader";
+import { layout } from "@/sites/pg/PgLayoutConfig";
 
 const style = {
   nav: {

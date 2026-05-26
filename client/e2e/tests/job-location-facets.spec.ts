@@ -4,6 +4,7 @@
  * - facetItemCount
  */
 import { type Page, expect as expectBase, type Locator } from "@playwright/test";
+
 import { ids } from "@/e2e/ids";
 import { test } from "@/e2e/test";
 import { env } from "@/env";

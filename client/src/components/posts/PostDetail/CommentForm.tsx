@@ -2,6 +2,10 @@ import { Button, HStack, Stack } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+import { PostTypeEnum, Visibility } from "~/graphql/enums";
+
 import { FormChakraTextarea } from "@/components/forms/FormChakraTextarea";
 import { PostSharableFields } from "@/components/posts/form/PostSharableFields";
 import { schemas } from "@/components/posts/form/schemas";
@@ -11,8 +15,6 @@ import { graphql, type ID } from "@/gql-tada";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { toast } from "@/utils/toast";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
-import { PostTypeEnum, Visibility } from "~/graphql/enums";
 
 const schema = z
   .object({ content_polite: z.string().min(1).max(5000) })
@@ -156,7 +158,11 @@ async function commentUpdate(
 }
 const CommentUpdateMutation = graphql.persisted(
   "CommentUpdate",
-  graphql(
-    `mutation CommentUpdate($data: PostTypeInput!) { post_update_or_create(data: $data) { id } }`,
-  ),
+  graphql(`
+    mutation CommentUpdate($data: PostTypeInput!) {
+      post_update_or_create(data: $data) {
+        id
+      }
+    }
+  `),
 );

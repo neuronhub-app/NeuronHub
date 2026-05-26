@@ -31,16 +31,18 @@ import { MdInfoOutline, MdUnfoldLess, MdUnfoldMore } from "react-icons/md";
 import { RiRobot2Line } from "react-icons/ri";
 import { Highlight, Snippet } from "react-instantsearch";
 import { useDebouncedCallback } from "use-debounce";
-import { Button } from "@/components/ui/button";
+
 import { Prose } from "@neuronhub/shared/components/ui/prose";
+import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
+import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
+
+import { Button } from "@/components/ui/button";
 import { Tag } from "@/components/ui/tag";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import type { ProfileFragmentType } from "@/graphql/fragments/profiles";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
-import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 const style = {
   collapseHeight: {
@@ -510,13 +512,6 @@ function MatchRating(props: {
           onValueChange={props.onValueChange}
         >
           {!props.readOnly && <RatingGroup.HiddenInput />}
-          {/* custom icon doesn't work with _hover */}
-          {/*{[1, 2, 3, 4, 5].map((_, index) => (*/}
-          {/*  // biome-ignore lint/suspicious/noArrayIndexKey: static*/}
-          {/*  <RatingGroup.Item key={index} index={index + 1}>*/}
-          {/*    <RatingGroup.ItemIndicator icon={<FaStar />} />*/}
-          {/*  </RatingGroup.Item>*/}
-          {/*))}*/}
           <RatingGroup.Control />
         </RatingGroup.Root>
         {props.helpText && (
@@ -603,7 +598,6 @@ function ProfileContentSection(props: {
     </Text>
   ) : (
     <Prose
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: clean
       dangerouslySetInnerHTML={{ __html: markedConfigured.parse(props.text) }}
       size="sm"
       maxW="3xl"

@@ -42,6 +42,7 @@ export function FormChakraInput<
 
   let startElementProps = {};
   if (isUrlPrefix) {
+    // oxlint-disable-next-line no-param-reassign
     startElement = "https://";
     startElementProps = { color: "fg.muted" };
   }

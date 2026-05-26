@@ -1,4 +1,7 @@
 import type { Locator } from "@playwright/test";
+
+import { Visibility } from "~/graphql/enums";
+
 import { highlight_attrs } from "@/apps/highlighter/PostContentHighlighted";
 import {
   HighlightCreate,
@@ -12,7 +15,6 @@ import { selectTextHighlightable } from "@/e2e/helpers/selectTextInPage";
 import { ids } from "@/e2e/ids";
 import { test } from "@/e2e/test";
 import { urls } from "@/urls";
-import { Visibility } from "~/graphql/enums";
 
 const tool = "PyCharm";
 const review = "Fine review";
