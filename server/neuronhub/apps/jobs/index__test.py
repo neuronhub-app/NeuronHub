@@ -17,12 +17,12 @@ Refs: #182
 
 from collections.abc import Iterator
 
+import pytest
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.test import RequestFactory
 
 from neuronhub.apps.graphql.persisted_query_extension import _load_client_persisted_queries_json
-from neuronhub.apps.jobs.index import JobIndex
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.tests.test_cases import NeuronTestCase
@@ -31,7 +31,10 @@ from neuronhub.graphql import schema
 
 
 class JobIndexContractTest(NeuronTestCase):
+    @pytest.mark.skipif(not settings.ALGOLIA["IS_ENABLED"])
     async def test_algolia_record_covers_jobsbyids_paths(self):
+        from neuronhub.apps.jobs.index import JobIndex
+
         tags = [
             await self.gen.posts.tag(category=TagCategoryEnum.Skill),
             await self.gen.posts.tag(category=TagCategoryEnum.Area),
