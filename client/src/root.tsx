@@ -15,8 +15,6 @@ import { client } from "@/graphql/client";
 import { NhaPosthogProvider } from "@/providers/NhaPosthogProvider";
 import { siteConfig } from "@/sites";
 
-import type { Route } from "./+types/root";
-
 export default function App() {
   return (
     <AppProviders>
@@ -125,7 +123,7 @@ function GtmNoscript(props: { gtmId: string }) {
   );
 }
 
-export function ErrorBoundary(props?: Route.ErrorBoundaryProps) {
+export function ErrorBoundary(props?: { error?: unknown }) {
   const isNotFound = props?.error instanceof Error && props?.error.name === ErrorNotFound.name;
 
   if (!isNotFound && props?.error instanceof Error) {
@@ -164,8 +162,6 @@ export function ErrorBoundary(props?: Route.ErrorBoundaryProps) {
     </AppProviders>
   );
 }
-
-export const NhaErrorBoundary = ErrorBoundary;
 
 export class ErrorNotFound extends Error {
   static message = "Page not found";

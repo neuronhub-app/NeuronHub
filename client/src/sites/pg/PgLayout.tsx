@@ -67,7 +67,6 @@ export default function PgLayout() {
           px={isJobDraftsPage ? 0 : style.paddingX}
           maxW={isJobDraftsPage ? "100%" : ""}
         >
-          {/* @ts-expect-error #bad-infer */}
           <ErrorBoundary fallback={<NhaErrorBoundary />}>
             <Outlet />
           </ErrorBoundary>

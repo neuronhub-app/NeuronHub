@@ -31,7 +31,7 @@ from neuronhub.graphql import schema
 
 
 class JobIndexContractTest(NeuronTestCase):
-    @pytest.mark.skipif(not settings.ALGOLIA["IS_ENABLED"], "Required")
+    @pytest.mark.skipif(not settings.ALGOLIA["IS_ENABLED"], reason="Required")
     async def test_algolia_record_covers_jobsbyids_paths(self):
         from neuronhub.apps.jobs.index import JobIndex
 

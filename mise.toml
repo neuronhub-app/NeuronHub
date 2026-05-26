@@ -303,11 +303,13 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 # -----------------------------------------------------
 
 [tasks.typegen]
-    depends = "typegen:server"
+    depends = [
+        "typegen:server",
+        "typegen:chakra",
+    ]
     run = [
-        "mise typegen:chakra",
         "mise typegen:client",
-        "mise typegen:docs",
+        "mise typegen:docs:react-router",
     ]
     description = "Strawberry → schema.graphql → TS enums; gql.tada Persisted Queries; @chakra-ui; etc"
     quiet = true
@@ -344,10 +346,6 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         """
         sources = ["src/**/*", "e2e/**/*"]
         silent = true # quiet doesn't work
-
-    [tasks."typegen:docs"]
-        depends = ["typegen:docs:react-router"]
-        quiet = true
 
     [tasks."typegen:docs:react-router"]
         dir = "docs"
