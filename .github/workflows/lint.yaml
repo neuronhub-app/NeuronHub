@@ -37,5 +37,4 @@ jobs:
       - run: mise run install-deps:client
 
       - run: "mise run typegen ::: format"
-      # excluded lint:client due to VITE_SITE=pg issues
-      - run: "mise run lint:server ::: lint:docs ::: lint:packages"
+      - run: "mise run lint"
