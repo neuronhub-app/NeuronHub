@@ -20,7 +20,8 @@ jobs:
       attestations: write
     env:
       REGISTRY: ghcr.io
-      GHCR_REPO: ${{ github.repository }}
+      # ghcr.io rejects uppercase; `github.repository` keeps repo casing
+      GHCR_REPO: neuronhub-app/neuronhub
 
       # env-scoped vars from the selected GH Environment
       DJANGO_ENV: ${{ vars.DJANGO_ENV }}
@@ -75,13 +76,13 @@ jobs:
       - name: Attest server image
         uses: actions/attest-build-provenance@v3
         with:
-          subject-name: ghcr.io/${{ github.repository }}/server
+          subject-name: ghcr.io/${{ env.GHCR_REPO }}/server
           subject-digest: ${{ steps.digests.outputs.server }}
           push-to-registry: true
 
       - name: Attest client image
         uses: actions/attest-build-provenance@v3
         with:
-          subject-name: ghcr.io/${{ github.repository }}/client
+          subject-name: ghcr.io/${{ env.GHCR_REPO }}/client
           subject-digest: ${{ steps.digests.outputs.client }}
           push-to-registry: true
