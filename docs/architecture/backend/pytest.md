@@ -1,6 +1,6 @@
 ## Pytest
 
-Run by `mise pytest`. Pass any args/kwargs only after `--`.
+Run by `mise pytest`.
 
 Subclass `NeuronTestCase`, from [test_cases](/server/neuronhub/apps/tests/test_cases.py). It's code structure:
 

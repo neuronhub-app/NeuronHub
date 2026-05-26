@@ -23,3 +23,5 @@ Mise is using Nushell for all tasks.
     - If you see errors re `pg-primary` or `pg-highlighted` -> run `touch mise.toml && mise lint` once. That's just a chakra theme type bug.
 - `mise django:migrate`
 - `mise django:makemigrations`
+
+Those Tasks have the flag `raw_args = true` - ie they accept args directly, without Mise's `--`.

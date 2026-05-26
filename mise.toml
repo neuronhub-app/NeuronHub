@@ -251,11 +251,13 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 [tasks."django:migrate"]
     dir = "server"
     run = "uv run manage.py migrate"
+    raw_args = true
 
 [tasks."django:makemigrations"]
     dir = "server"
     run = "uv run manage.py makemigrations"
     interactive = true
+    raw_args = true
 
 [tasks."django:db-stubs-repopulate"]
     dir = "server"
