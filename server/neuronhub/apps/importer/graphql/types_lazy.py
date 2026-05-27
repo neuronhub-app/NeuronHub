@@ -1,8 +1,11 @@
+from typing import TYPE_CHECKING
 from typing import Annotated
 
-import strawberry
+from strawberry import lazy
 
-UserSourceTypeLazy = Annotated[
-    "UserSourceType",
-    strawberry.lazy("neuronhub.apps.importer.graphql.types"),  # type: ignore[name-defined] #bad-infer
-]
+
+if TYPE_CHECKING:
+    from neuronhub.apps.importer.graphql.types import UserSourceType
+
+
+UserSourceTypeLazy = Annotated["UserSourceType", lazy("neuronhub.apps.importer.graphql.types")]

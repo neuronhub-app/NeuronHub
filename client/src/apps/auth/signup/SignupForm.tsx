@@ -17,18 +17,10 @@ import { z } from "zod";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 import { FormChakraInput } from "@/components/forms/FormChakraInput";
+import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetch } from "@/graphql/mutateAndRefetchMountedQueries";
 import { urls } from "@/urls";
-
-const signupSchema = z.object({
-  username: z
-    .string()
-    .min(3, "Username must be at least 3 characters")
-    .max(150, "Username must be less than 150 characters")
-    .regex(/^[\w.@+-]+$/, "Username can only contain letters, digits, @/./+/-/_"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-});
 
 export function SignupForm() {
   const navigate = useNavigate();
@@ -37,8 +29,20 @@ export function SignupForm() {
     error: null as string | null,
   });
 
-  const form = useForm<z.infer<typeof signupSchema>>({
-    resolver: zodResolver(signupSchema),
+  const form = useForm({
+    resolver: zodResolver(
+      z.object({
+        username: z
+          .string()
+          .min(3, "Username must be at least 3 characters")
+          .max(150, "Username must be less than 150 characters")
+          .regex(
+            /^[\w.@+-]+$/,
+            "Username can only contain letters, digits, and chars: @ / . / + / - / _",
+          ),
+        password: z.string().min(4, "Password must be at least 4 characters"),
+      }),
+    ),
     defaultValues: {
       username: "",
       password: "",
@@ -66,6 +70,8 @@ export function SignupForm() {
 
                 if (result.data?.signup?.success) {
                   navigate(urls.home);
+                } else if (!result.success && typeof result.errorMessage === "string") {
+                  state.mutable.error = result.errorMessage;
                 } else {
                   state.mutable.error = "Failed to sign up";
                 }
@@ -80,6 +86,7 @@ export function SignupForm() {
                       label="Username"
                       inputProps={{
                         autoComplete: "username",
+                        ...ids.set(ids.auth.signup.username),
                         autoFocus: true,
                       }}
                     />
@@ -91,14 +98,21 @@ export function SignupForm() {
                       inputProps={{
                         type: "password",
                         autoComplete: "new-password",
+                        ...ids.set(ids.auth.signup.password),
                       }}
                     />
 
                     {state.snap.error && (
-                      <Fieldset.ErrorText>{state.snap.error}</Fieldset.ErrorText>
+                      <Fieldset.ErrorText {...ids.set(ids.auth.signup.error)}>
+                        {state.snap.error}
+                      </Fieldset.ErrorText>
                     )}
 
-                    <Button type="submit" loading={form.formState.isSubmitting}>
+                    <Button
+                      type="submit"
+                      loading={form.formState.isSubmitting}
+                      {...ids.set(ids.auth.signup.submit)}
+                    >
                       Sign up
                     </Button>
 
@@ -119,7 +133,7 @@ export function SignupForm() {
   );
 }
 
-const SignupMutation = graphql.persisted(
+export const SignupMutation = graphql.persisted(
   "Signup",
   graphql(`
     mutation Signup($data: SignupInput!) {

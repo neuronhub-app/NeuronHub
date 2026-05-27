@@ -145,6 +145,7 @@ class UserAdmin(DjangoObjectActions, DjangoUserAdmin):
         action_label="Send",
     )
     def send_email(self, request: HttpRequest, obj: User, form: SendUserEmailForm):
+        assert obj.email, f"User #{obj.pk} has no email"
         body_html = escape(form.cleaned_data["body"]).replace("\n", "<br>")
         send_mail_sync(
             subject=form.cleaned_data["subject"],

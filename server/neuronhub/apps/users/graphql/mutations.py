@@ -2,14 +2,16 @@ from typing import cast
 
 import strawberry
 from asgiref.sync import sync_to_async
-from django.contrib.auth import aauthenticate, alogin
+from django.contrib.auth import aauthenticate
+from django.contrib.auth import alogin
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from strawberry_django import auth
 from strawberry_django.permissions import IsAuthenticated
 
-from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.graphql.types import UserType
 from neuronhub.apps.users.graphql.types import UserTypeInput
+from neuronhub.apps.users.graphql.types_lazy import UserListName
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.models import UserAnon
 
@@ -63,11 +65,23 @@ class UserMutation:
 
     @strawberry.mutation()
     async def signup(self, data: SignupInput, info: strawberry.Info) -> SignupResponse:
+        await sync_to_async(UnicodeUsernameValidator())(data.username)
         await sync_to_async(validate_password)(data.password)
 
-        user = await User.objects.acreate_user(username=data.username, password=data.password)
+        user = await User.objects.acreate_user(
+            username=data.username, password=data.password, email=None
+        )
+        # #AI: normalize_email(None) returns "" -> would IntegrityError on next empty null-email signup (caught by e2e)
+        if not user.email:
+            user.email = None
+            await user.asave(update_fields=["email"])
 
-        await alogin(info.context.request, user)
+        await alogin(
+            request=info.context.request,
+            user=user,
+            # #AI: required by multi-auth-backends django-allauth
+            backend="django.contrib.auth.backends.ModelBackend",
+        )
         return SignupResponse(success=True, user=cast(UserType, user))
 
     @strawberry.mutation(extensions=[IsAuthenticated()])

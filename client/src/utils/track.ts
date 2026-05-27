@@ -91,13 +91,17 @@ export namespace track {
   async function _setUser(opts?: { user?: User; email?: string }): Promise<string> {
     try {
       if (opts?.user) {
-        Sentry.setUser(opts.user);
+        const email = opts.user.email;
+        Sentry.setUser({ ...opts.user, email: email ?? undefined });
 
         // posthog
         if (opts.user.is_staff) {
           posthog.setInternalOrTestUser();
         }
-        const anonName = await getAnonName(opts.user.email);
+        if (!email) {
+          return "";
+        }
+        const anonName = await getAnonName(email);
         if (anonName) {
           posthog.identify(anonName);
         }

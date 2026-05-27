@@ -79,7 +79,7 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                 </Menu.Item>
 
                 {props.isThemeSwitcher &&
-                  (env.isTiredOwlDev || user?.email.includes("neuronhub.app")) && (
+                  (env.isTiredOwlDev || user?.email?.includes("neuronhub.app")) && (
                     <Menu.Item
                       value="toggle theme"
                       closeOnSelect={false}
