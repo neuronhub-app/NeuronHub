@@ -1,5 +1,5 @@
 ---
-paths: **/*.py
+paths: "**/*.py"
 ---
 
 ## Constraints
@@ -33,11 +33,11 @@ The structure of an App in `neuronhub.apps`:
 - `apps/graphql/persisted_query_extension.py` - gql.tada whitelist loader and enforcer
 - `apps/tests/` - `faker` `class Gen` factories, `db_stubs_repopulate`, pytest base class, etc
 - `apps/jobs/` - job listings with Algolia search and email alert subscriptions `services/send_alert_email.py`
-- `apps/profiles/` - [detailed doc](./profiles.md). Users' Profiles for Algolia directory, and LLM-powered matching.
+- `apps/profiles/` - [detailed doc](./profiles.mdx). Users' Profiles for Algolia directory, and LLM-powered matching.
 	- `services/score_matches_by_llm.py` - calls LLM API to populate `ProfileMatch.match_score_by_llm` and `.match_reason_by_llm`
 	- `services/summarize_match_reviews.py` - builds calibration examples from user review corrections, injected into LLM prompt
 - `apps/orgs/` - `Org` model
-- `apps/sites/` - `SiteConfig` django-solo: branding + feature flags. See [Sub-sites doc](/docs/architecture/frontend/Sub-sites-with-VITE_SITE.md).
+- `apps/sites/` - `SiteConfig` django-solo: branding + feature flags. See [Sub-sites doc](/development/intro/frontend/sub-sites-with-vite_site).
 
 Tests are placed nearby named `{module_name}__test.py`.
 
@@ -74,4 +74,4 @@ And the field `visible_to` is serialized for Algolia in posts/models/posts.py [[
 
 ## Mandatory task-specific docs
 
-- [How to use pytest](./pytest.md)
+- [How to use pytest](./pytest.mdx)

@@ -1,18 +1,24 @@
 <doc_architecture>
 
-@docs/architecture/README.md
+@docs/src/pages/development/README.md
 
-@docs/architecture/backend/README.md
+@docs/src/pages/development/intro/backend/README.md
 
-@docs/architecture/frontend/README.md
+@docs/src/pages/development/intro/frontend/README.md
 
 </doc_architecture>
 
 <code_style>
 
-@docs/src/pages/development/guides/code-style.md
+@docs/src/pages/development/intro/code-style.md
 
 </code_style>
+
+<code_style_detailed>
+
+@docs/src/pages/development/reference/code-style-detailed.md
+
+</code_style_detailed>
 
 <mise_tasks>
 

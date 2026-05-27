@@ -30,6 +30,6 @@ const links = {
   TaskResult: "/usage/reference/database-tables/taskresult",
   User: "/usage/reference/database-tables/user",
   // dev
-  "git-commits": "/development/guides/git-commits",
-  "code-style": "/development/guides/code-style",
+  "git-commits": "/development/reference/git-commits",
+  "code-style": "/development/intro/code-style",
 } satisfies Record<string, ReactRouterPath>;

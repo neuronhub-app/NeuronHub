@@ -1,5 +1,5 @@
 """
-See [[docs/architecture/Algolia.md]]
+See [[docs/src/pages/development/intro/Algolia.mdx]]
 """
 
 from django.conf import settings

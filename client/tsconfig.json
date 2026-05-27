@@ -36,7 +36,7 @@
         "name": "gql.tada/ts-plugin",
         "schema": "./../schema.graphql",
         "tadaOutputLocation": "./graphql/gql-tada/graphql-env.d.ts",
-        "shouldCheckForColocatedFragments": false, // see [[docs/caveats/client-caveats.md]]
+        "shouldCheckForColocatedFragments": false, // see [[docs/src/pages/development/reference/caveats/client-caveats.mdx]]
       },
     ],
   },

@@ -132,9 +132,9 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = 1 # drops telemetry & npm updates
     # Claude /commands
     DOCS_DIR_GLOB = "docs/src/pages/development/**"
-    DOCS_DIR_ARCH = "docs/architecture/"
-    DOCS_CODE_STYLE = "docs/src/pages/development/how-to/code-style.md"
-    DOCS_CODE_STYLE_DETAILED = "docs/src/pages/development/how-to/code-style-detailed.md"
+    DOCS_DIR_ARCH = "docs/src/pages/development/intro/**"
+    DOCS_CODE_STYLE = "docs/src/pages/development/intro/code-style.md"
+    DOCS_CODE_STYLE_DETAILED = "docs/src/pages/development/reference/code-style-detailed.md"
 
     # todo ! docs: mise caveats - we can't use "${DJANGO_ENV:-dev}", maybe the { env.$ } syntax would work
     # using ${DJANGO_ENV} breaks Tasks with `env.DJANGO_ENV = "dev_test_e2e"` - it gets ignored

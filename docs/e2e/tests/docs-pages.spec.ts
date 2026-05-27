@@ -21,9 +21,9 @@ const routes = {
     dir: path("/usage"),
   },
   development: {
-    codeStyle: path("/development/guides/code-style"),
-    codeStyleDetailed: path("/development/guides/code-style-detailed"),
-    gitCommits: path("/development/guides/git-commits"),
+    codeStyle: path("/development/intro/code-style"),
+    codeStyleDetailed: path("/development/reference/code-style-detailed"),
+    gitCommits: path("/development/reference/git-commits"),
     dirGuides: path("/development/guides"),
   },
 };
