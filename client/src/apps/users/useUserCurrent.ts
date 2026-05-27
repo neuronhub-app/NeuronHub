@@ -50,7 +50,7 @@ export function useUser() {
     if (error) {
       captureException(error);
     }
-  }, [data]);
+  }, [data, error]);
 
   return snap.current;
 }

@@ -98,12 +98,12 @@ export function CommentThread(props: {
   });
 
   useEffect(() => {
-    const updateHeight = () => {
+    function updateHeight() {
       if (refs.container.current && refs.content.current) {
         state.mutable.parentHeightPx = refs.container.current.offsetHeight;
         state.mutable.contentHeightPx = refs.content.current.offsetHeight;
       }
-    };
+    }
 
     updateHeight();
 
@@ -130,11 +130,17 @@ export function CommentThread(props: {
   ]);
 
   const username =
-    (props.comment?.post_source?.user_source?.username || props.comment.author?.username) ?? "";
+    props.comment.post_source?.user_source?.username ?? props.comment.author?.username ?? "";
 
   const avatarColorPalette = useMemo(() => {
     return getAvatarColorForUsername(username);
   }, [username]);
+
+  const commentAuthorUsername = props.comment.post_source?.user_source?.username;
+  const postAuthorUsername = props.post.post_source?.user_source?.username;
+  const isCommentAuthorOP = Boolean(
+    commentAuthorUsername && postAuthorUsername && commentAuthorUsername === postAuthorUsername,
+  );
 
   return (
     <Box
@@ -145,7 +151,12 @@ export function CommentThread(props: {
     >
       <Flex ref={refs.content} as="article" gap="gap.sm" tabIndex={-1}>
         <VStack aria-label="Comment Left Side Box" pos="relative" gap={0}>
-          <Box aria-label="Comment Avatar Box" pos="relative">
+          <Box
+            aria-label="Comment Avatar Box"
+            pos="relative"
+            data-state={threadGuide.isRead ? "read" : "unread"}
+            {...ids.set(ids.comment.thread.avatar)}
+          >
             {comments.isRenderLowPrioAvatars ? (
               <Box pos="relative" ref={refs.avatar}>
                 <Avatar.Root
@@ -154,7 +165,7 @@ export function CommentThread(props: {
                   zIndex={styleGlobal.zIndex.avatar}
                   filter={threadGuide.isRead ? "grayscale(100%)" : "none"}
                   transitionProperty="filter"
-                  transitionDuration="0.2s"
+                  transitionDuration="fast"
                 >
                   <Avatar.Fallback name={username} />
                   <Avatar.Image src={props.comment.author?.avatar?.url} />
@@ -165,7 +176,7 @@ export function CommentThread(props: {
                   bg="bg.light"
                   opacity={threadGuide.isRead ? 0.5 : 0}
                   transitionProperty="opacity"
-                  transitionDuration="0.2s"
+                  transitionDuration="fast"
                   zIndex={styleGlobal.zIndex.avatarOverlay}
                 />
               </Box>
@@ -191,13 +202,12 @@ export function CommentThread(props: {
         <VStack align="flex-start" gap={0} w="full">
           <Box aria-label="comment-box" px="1" rounded="l3" w="full">
             <HStack justify="space-between">
-              {/* Header: Name, Date, Tags */}
               <HStack gap="gap.sm">
                 <Flex
-                  fontSize="sm"
                   fontWeight={threadGuide.isRead ? "normal" : "semibold"}
+                  fontSize="sm"
                   transitionProperty="color"
-                  transitionDuration="0.2s"
+                  transitionDuration="fast"
                 >
                   <PostAuthor
                     post={props.comment}
@@ -206,8 +216,7 @@ export function CommentThread(props: {
                   />
                 </Flex>
 
-                {props.comment?.post_source?.user_source?.username ===
-                  props.post?.post_source?.user_source?.username && (
+                {isCommentAuthorOP && (
                   <Tooltip content="Original Poster" positioning={{ placement: "top" }}>
                     <Badge size="xs" variant="subtle" colorPalette="teal">
                       {" "}
@@ -253,8 +262,8 @@ export function CommentThread(props: {
           {auth.isLoggedIn && !threadGuide.isCollapsed && (
             <Flex ref={refs.toolbar} role="toolbar">
               <CommentToolbarButton
-                label="[-]"
                 onClick={() => props.collapse.toggle(props.comment.id)}
+                label="[-]"
                 id={ids.comment.btn.collapse}
                 fontWeight="bold"
               />
@@ -356,27 +365,17 @@ function CommentToolbarButton(props: {
 }) {
   return (
     <Button
+      onClick={props.onClick}
       variant="ghost"
       size="2xs"
       color="fg.subtle"
       gap="gap.sm"
-      onClick={props.onClick}
       fontWeight={props.fontWeight}
       {...ids.set(props.id)}
     >
       {props.icon} {props.label}
     </Button>
   );
-}
-
-function countRecursive(comment: PostCommentTree): number {
-  let count = 1;
-  if (comment.comments) {
-    for (const child of comment.comments) {
-      count += countRecursive(child);
-    }
-  }
-  return count;
 }
 
 function useCommentLeftLine(props: ComponentProps<typeof CommentThread>) {
@@ -495,6 +494,16 @@ function useCommentLeftLine(props: ComponentProps<typeof CommentThread>) {
     },
 
     CommentCollapsedStub: () => {
+      function countRecursive(comment: PostCommentTree): number {
+        let count = 1;
+        if (comment.comments) {
+          for (const child of comment.comments) {
+            count += countRecursive(child);
+          }
+        }
+        return count;
+      }
+
       const childrenCount = countRecursive(props.comment);
 
       return (

@@ -9,7 +9,7 @@ import { client } from "@/graphql/client";
 import { toast } from "@/utils/toast";
 import { useInit } from "@/utils/useInit";
 
-const readIds = proxySet();
+const readIds = proxySet<ID>();
 
 export function useCommentRead(props: { postId?: ID }) {
   const auth = useAuth();
@@ -92,7 +92,7 @@ const UserReadCommentsQuery = graphql.persisted(
   `),
 );
 
-const UpdateReadCommentsMutation = graphql.persisted(
+export const UpdateReadCommentsMutation = graphql.persisted(
   "UpdateReadComments",
   graphql(`
     mutation UpdateReadComments($id: ID!, $list_field_name: UserListName!, $is_added: Boolean!) {

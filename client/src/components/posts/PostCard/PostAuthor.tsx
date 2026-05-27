@@ -22,6 +22,7 @@ import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { user, UserQueryDoc } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import type { PostCommentTree } from "@/components/posts/PostDetail/useCommentTree";
+import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { client } from "@/graphql/client";
 import { PostAuthorFragment, type PostAuthorFragmentType } from "@/graphql/fragments/posts";
@@ -39,8 +40,6 @@ export function PostAuthor(props: {
   prefixColor?: JsxStyleProps["color"];
   prefixGap?: JsxStyleProps["gap"];
 }) {
-  const loadingFollow = useIsLoading();
-
   const state = useStateValtio({
     post: null as null | PostAuthorFragmentType, // todo ! refac-name: postSource
     isClicked: false,
@@ -50,9 +49,11 @@ export function PostAuthor(props: {
   const isImportedAuthor = Boolean(props.post.post_source?.id);
 
   const userSnap = useSnapshot(user.state);
+  const loadingFollow = useIsLoading();
 
   const authorId = props.post.post_source?.user_source?.id;
-  const isFollowed = Boolean(authorId) && userSnap.followedImporterUserSourceIds.has(authorId!);
+  // @ts-expect-error #bad-infer TS can't narrow through Boolean()
+  const isFollowed = Boolean(authorId) && userSnap.followedImporterUserSourceIds.has(authorId);
 
   const init = useInit({
     isReady: isImportedAuthor && !state.snap.post && state.snap.isClicked,
@@ -69,8 +70,14 @@ export function PostAuthor(props: {
     },
   });
 
+  if (!isImportedAuthor) {
+    return <PostAuthorUsername {...props} />;
+  }
+
   async function handleFollowClick() {
-    if (!authorId) return;
+    if (!authorId) {
+      return;
+    }
 
     await loadingFollow.track(async () => {
       const res = await client.mutate({
@@ -85,92 +92,90 @@ export function PostAuthor(props: {
     });
   }
 
-  if (isImportedAuthor) {
-    if (!state.snap.isMouseHoveredAndMustMount) {
-      return (
-        <Flex
-          onMouseEnter={() => {
-            state.mutable.isMouseHoveredAndMustMount = true;
-          }}
-        >
-          <PostAuthorUsername {...props} isPopover isFollowed={isFollowed} />
-        </Flex>
-      );
-    }
-
-    const author = state.snap.post?.post_source?.user_source;
-
+  if (!state.snap.isMouseHoveredAndMustMount) {
     return (
-      <Popover.Root
-        unmountOnExit
-        onOpenChange={_ => {
-          state.mutable.isClicked = true;
+      <Flex
+        onMouseEnter={() => {
+          state.mutable.isMouseHoveredAndMustMount = true;
         }}
       >
-        <Popover.Trigger>
-          <PostAuthorUsername {...props} isPopover isFollowed={isFollowed} />
-        </Popover.Trigger>
-
-        <Portal>
-          <Popover.Positioner>
-            <Popover.Content minWidth="fit-content">
-              <Popover.Arrow />
-              <Popover.Body gap="gap.sm" display="flex" flexDirection="column" maxW="345px">
-                {init.isLoading ? (
-                  <>
-                    <Flex>
-                      <SkeletonText noOfLines={1} />
-                    </Flex>
-                    <Flex>
-                      <SkeletonText noOfLines={1} />
-                    </Flex>
-                  </>
-                ) : (
-                  author && (
-                    <>
-                      <HStack gap="gap.md">
-                        <VStack gap="gap.sm" alignItems="left" flexGrow="1">
-                          <HStack whiteSpace="nowrap">
-                            <Text fontWeight="bold">Created:</Text>
-                            {datetime.relative(author.created_at_external)}
-                          </HStack>
-                          <HStack>
-                            <Text fontWeight="bold">Karma:</Text>
-                            <FormatNumber value={author.score} />
-                          </HStack>
-                        </VStack>
-
-                        <VStack gap="gap.sm">
-                          <Button
-                            size="sm"
-                            minW="24"
-                            variant="outline"
-                            loading={loadingFollow.isActive}
-                            onClick={handleFollowClick}
-                          >
-                            {isFollowed ? "Unfollow" : "Follow"}
-                          </Button>
-                        </VStack>
-                      </HStack>
-                      {author.about && (
-                        <Prose
-                          size="xs"
-                          dangerouslySetInnerHTML={{
-                            __html: markedConfigured.parse(author.about),
-                          }}
-                        />
-                      )}
-                    </>
-                  )
-                )}
-              </Popover.Body>
-            </Popover.Content>
-          </Popover.Positioner>
-        </Portal>
-      </Popover.Root>
+        <PostAuthorUsername {...props} isPopover isFollowed={isFollowed} />
+      </Flex>
     );
   }
-  return <PostAuthorUsername {...props} />;
+
+  const author = state.snap.post?.post_source?.user_source;
+
+  return (
+    <Popover.Root
+      unmountOnExit
+      onOpenChange={_ => {
+        state.mutable.isClicked = true;
+      }}
+    >
+      <Popover.Trigger>
+        <PostAuthorUsername {...props} isPopover isFollowed={isFollowed} />
+      </Popover.Trigger>
+
+      <Portal>
+        <Popover.Positioner>
+          <Popover.Content minWidth="fit-content">
+            <Popover.Arrow />
+            <Popover.Body gap="gap.sm" display="flex" flexDirection="column" maxW="345px">
+              {init.isLoading ? (
+                <>
+                  <Flex>
+                    <SkeletonText noOfLines={1} />
+                  </Flex>
+                  <Flex>
+                    <SkeletonText noOfLines={1} />
+                  </Flex>
+                </>
+              ) : (
+                author && (
+                  <>
+                    <HStack gap="gap.md">
+                      <VStack gap="gap.sm" alignItems="left" flexGrow="1">
+                        <HStack whiteSpace="nowrap">
+                          <Text fontWeight="bold">Created:</Text>
+                          {datetime.relative(author.created_at_external)}
+                        </HStack>
+                        <HStack>
+                          <Text fontWeight="bold">Karma:</Text>
+                          <FormatNumber value={author.score} />
+                        </HStack>
+                      </VStack>
+
+                      <VStack gap="gap.sm">
+                        <Button
+                          loading={loadingFollow.isActive}
+                          onClick={handleFollowClick}
+                          size="sm"
+                          variant="outline"
+                          minW="24"
+                          {...ids.set(ids.post.author.follow)}
+                        >
+                          {isFollowed ? "Unfollow" : "Follow"}
+                        </Button>
+                      </VStack>
+                    </HStack>
+                    {author.about && (
+                      <Prose
+                        size="xs"
+                        dangerouslySetInnerHTML={{
+                          __html: markedConfigured.parse(author.about),
+                        }}
+                      />
+                    )}
+                  </>
+                )
+              )}
+            </Popover.Body>
+          </Popover.Content>
+        </Popover.Positioner>
+      </Portal>
+    </Popover.Root>
+  );
 }
 
 // todo ? refac: drop isPopover - only tell it "you're a link" to add _hover={}
@@ -215,6 +220,7 @@ function PostAuthorUsername(
         transitionProperty="color, font-weight"
         transitionDuration="fast"
         _hover={props.isPopover ? { textDecoration: "underline", cursor: "pointer" } : {}}
+        {...ids.set(props.isPopover ? ids.post.author.username : undefined)}
       >
         {username}
       </Text>
@@ -260,7 +266,7 @@ const PostAuthorQuery = graphql.persisted(
   ),
 );
 
-const ToggleFollowUserSourceMutation = graphql.persisted(
+export const ToggleFollowUserSourceMutation = graphql.persisted(
   "ToggleFollowUserSource",
   graphql(`
     mutation ToggleFollowUserSource($user_source_id: ID!) {
