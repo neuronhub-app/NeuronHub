@@ -36,19 +36,18 @@ async def request_json(
             if is_use_cache:
                 cache_expiry_sec = None
                 if cache_expiry_days:
-                    cache_expiry_sec = cache_expiry_days * 24 * 60
+                    cache_expiry_sec = cache_expiry_days * 24 * 60 * 60
                 await cache.aset(
                     _get_cache_key(url), value=response_json, timeout=cache_expiry_sec
                 )
             return response_json
         except (requests.RequestException, JSONDecodeError, ApiLimitExceeded) as exc:
-            if retry_current >= retries_max:
+            is_last_retry = retry_current == retries_max - 1
+            if is_last_retry:
                 raise
             sleep_sec = 4**retry_current + 1
             logger.error(f"Error request_json({url}), retry in {sleep_sec}sec. Error: {exc}")
             await asyncio.sleep(sleep_sec)
-    else:
-        raise
 
 
 async def _increment_api_limit_and_confirm_allowance(url: str) -> bool:
