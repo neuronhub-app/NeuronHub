@@ -57,6 +57,9 @@ export default defineConfig({
             "**/vote-and-reading-list.spec.ts",
             "**/profile-list.spec.ts",
             "**/login.spec.ts",
+            "**/signup.spec.ts",
+            "**/hn-follow-user-source.spec.ts",
+            "**/comment-mark-as-read.spec.ts",
           ]
         : [],
     },

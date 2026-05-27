@@ -51,6 +51,10 @@ export namespace ids {
         edit: "post.card.link.edit",
       },
     },
+    author: {
+      username: "post.author.username",
+      follow: "post.author.follow",
+    },
     form: {
       title: "post.form.title",
       content_polite: "post.form.content_polite",
@@ -132,6 +136,7 @@ export namespace ids {
       line: "comment.thread.line",
       toggleButton: "comment.thread.toggle-button",
       container: "comment.thread.container",
+      avatar: "comment.thread.avatar",
     },
   } as const;
 
@@ -242,6 +247,12 @@ export namespace ids {
       password: "auth.login.password",
       submit: "auth.login.submit",
       error: "auth.login.error",
+    },
+    signup: {
+      username: "auth.signup.username",
+      password: "auth.signup.password",
+      submit: "auth.signup.submit",
+      error: "auth.signup.error",
     },
     // todo ? refac: move to ids.layout.sidebar
     logout: {

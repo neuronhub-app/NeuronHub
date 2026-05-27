@@ -93,7 +93,7 @@ const UserCollapsedCommentsQuery = graphql.persisted(
   `),
 );
 
-const UpdateCollapsedCommentsMutation = graphql.persisted(
+export const UpdateCollapsedCommentsMutation = graphql.persisted(
   "UpdateCollapsedComments",
   graphql(`
     mutation UpdateCollapsedComments(
