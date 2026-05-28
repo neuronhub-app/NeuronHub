@@ -6,8 +6,8 @@ from asgiref.sync import sync_to_async
 from django.db.models import F
 from django.db.models import Q
 from django.db.models import QuerySet
-from django_tasks_db.models import DBTaskResult
 from django_tasks.base import TaskResultStatus
+from django_tasks_db.models import DBTaskResult
 from strawberry import ID
 from strawberry import auto
 from strawberry_django.pagination import OffsetPaginated
@@ -206,8 +206,10 @@ class ProfilesMutation:
         profile = await Profile.objects.select_related("user").aget(id=profile_id)
         assert profile.user, "Profile has no user"
         assert profile.user.email, "Profile has no email"
-        await send_profile_dm(user_sender=sender, receiver=profile.user, message=message)
-        return True
+        is_sent = await send_profile_dm(
+            user_sender=sender, receiver=profile.user, message=message
+        )
+        return is_sent
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def profile_match_score_update(
@@ -299,9 +301,6 @@ class ProfilesMutation:
 
     @strawberry.mutation(extensions=[IsAuthenticated()])
     async def profile_matches_cancel_llm(self, info: strawberry.Info) -> bool:
-        from django_tasks_db.models import DBTaskResult
-        from django_tasks.base import TaskResultStatus
-
         user = await get_user(info)
         updated = await DBTaskResult.objects.filter(
             task_path=SCORE_PROFILES_TASK,

@@ -3,12 +3,11 @@ from neuronhub.apps.sites.services.send_email import send_email
 from neuronhub.apps.users.models import User
 
 
-async def send_profile_dm(*, user_sender: User, receiver: User, message: str):
+async def send_profile_dm(*, user_sender: User, receiver: User, message: str) -> bool:
     await ProfileMessage.objects.acreate(sender=user_sender, receiver=receiver)
 
-    # DMs require recipient email; users without one (signup w/o email) skip notifications.
     if not receiver.email:
-        return
+        return False
 
     await send_email(
         subject=f"Direct Message from {user_sender.username}",
@@ -16,3 +15,4 @@ async def send_profile_dm(*, user_sender: User, receiver: User, message: str):
         email_to=receiver.email,
         email_reply_to=user_sender.email,
     )
+    return True
