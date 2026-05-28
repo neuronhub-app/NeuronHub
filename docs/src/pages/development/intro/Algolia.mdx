@@ -5,19 +5,21 @@ paths:
   - client/src/components/algolia/**
 ---
 
+import { Src } from "@/components"
+
 ## Indexes
 
 Each Model has an Index with env postfix: `{name}_{DJANGO_ENV.value}`. Mise adds `env.USER` suffix as `posts_dev_john` to avoid clashes in dev.
 
-- `posts` - [[server/neuronhub/apps/posts/index.py]]
-- `jobs` - [[server/neuronhub/apps/jobs/index.py]]
-- `profiles` - [[server/neuronhub/apps/profiles/index.py]]
+- `posts` - <Src to="posts/index.py" />
+- `jobs` - <Src to="jobs/index.py" />
+- `profiles` - <Src to="profiles/index.py" />
 
-FE index names are in [[client/src/utils/useAlgoliaSearchClient.ts]].
+FE index names are in <Src to="useAlgoliaSearchClient.ts" />.
 
 ### 1:1 Algolia ↔ GraphQL compatibility
 
-We serialize models on BE using GraphQL queries (eg `PostsByIds`, `JobsByIds`) in `_get_graphql_field`. This keeps the single-place GraphQL [cache reset](/development/intro/frontend/graphql#cache-reset): on list pages, Algolia hits are enriched via [[useAlgoliaEnrichmentByGraphql.ts]] so `mutateAndRefetchMountedQueries` auto-refetches on mutations.
+We serialize models on BE using GraphQL queries (eg `PostsByIds`, `JobsByIds`) in `_get_graphql_field`. This keeps the single-place GraphQL [cache reset](/development/intro/frontend/graphql#cache-reset): on list pages, Algolia hits are enriched via <Src to="useAlgoliaEnrichmentByGraphql.ts" /> so `mutateAndRefetchMountedQueries` auto-refetches on mutations.
 
 ### Virtual replicas
 
@@ -25,7 +27,7 @@ For sorting both `posts` and `jobs` have replicas that need `client.set_settings
 
 ### apps.jobs
 
-Uses `custom_objectID = "slug"` as `Job.id` changes on [[publish_job_versions.py]]. Others use the default `id`.
+Uses `custom_objectID = "slug"` as `Job.id` changes on <Src to="jobs/services/publish_job_versions.py" />. Others use the default `id`.
 
 ### Bulk updates
 
@@ -55,7 +57,7 @@ Sub-sites (eg `sites/pg/`) reuse these components without changes - see [Sub-sit
 
 ## JobsLandingPage(Model) → Algolia state filter
 
-The filters are converted to `IndexUiState` at [[landingPageToAlgoliaState.ts]].
+The filters are converted to `IndexUiState` at <Src to="landingPageToAlgoliaState.ts" />.
 
 For details see the [FE docs re prerender](/development/intro/frontend/prerender-and-prefetch).
 

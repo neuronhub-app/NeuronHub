@@ -1,3 +1,5 @@
+import { Src } from "@/components"
+
 ## Client Caveats
 
 - `react-select` drops any custom `Option` properties on changes - and only keeps its native `value` and `label`
@@ -61,4 +63,4 @@ The difference:
 - `NODE_ENV`: changes compilation build (eg prod vs dev)
 - `MODE`: changes `.env.[mode]` it loads
 
-This is overcomplicated, hence we equal `env.NODE_ENV = env.MODE` in [[client/src/env.ts]].
+This is overcomplicated, hence we equal `env.NODE_ENV = env.MODE` in <Src to="env.ts" />.

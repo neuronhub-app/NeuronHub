@@ -1,3 +1,5 @@
+import { Src } from "@/components"
+
 `env.VITE_SITE: "" | "pg"`
 
 Defined in mise.toml, values:
@@ -30,7 +32,7 @@ BE-only:
 	- will be moved to `apps.jobs.Config` later.
 - Email/branding: `name`, `domain`, `sender_email`, `sender_email_name`, `logo_url`, `address`
 
-FE-fetched at boot via GraphQL `SiteConfigQuery`: `nav_links`, `footer_sections`, etc. [[client/src/sites/pg/siteConfigState.ts]] exposes a Valtio proxy via `useSiteConfig()`.
+FE-fetched at boot via GraphQL `SiteConfigQuery`: `nav_links`, `footer_sections`, etc. <Src to="siteConfigState.ts" /> exposes a Valtio proxy via `useSiteConfig()`.
 
 ## Future
 

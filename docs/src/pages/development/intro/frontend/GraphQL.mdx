@@ -4,6 +4,7 @@ paths:
   - "**/*.tsx?"
 ---
 
+import { Src } from "@/components"
 
 ### Persisted Queries
 
@@ -40,7 +41,7 @@ Note: strawberry export puts the Python's attribute `name` into the TS enum `val
 
 ### Reset the cache on every mutation
 
-You must use [[mutateAndRefetchMountedQueries.tsx]] function instead of `client.mutate`, to mitigate Apollo's dysfunctional caching. It also has `mutateDeleteAndResetStore()`, as `client.refetchQueries({ include: "all" })` does not refetch all queries.
+You must use <Src to="mutateAndRefetchMountedQueries.tsx" /> function instead of `client.mutate`, to mitigate Apollo's dysfunctional caching. It also has `mutateDeleteAndResetStore()`, as `client.refetchQueries({ include: "all" })` does not refetch all queries.
 
 By default it calls `refetchQueries({ include: "active" })`, but you can configure it with `options` as:
 - `{ isRefetchAll: true }` -> `client.refetchQueries({ include: "all" })`
@@ -56,6 +57,6 @@ Note: errors they already send to `Sentry.captureException` - no need to duplica
 
 ### Use `useApolloQuery` instead of `apollo.useQuery`
 
-Always use `[[useApolloQuery.ts]]` instead of the Apollo's `useQuery`.
+Always use <Src to="useApolloQuery.ts" /> instead of the Apollo's `useQuery`.
 
 And instead of its `.loading` var use `.isLoadingFirstTime` - which doesn't activate when we call `mutateAndRefetch*()` - ie when we soft-refetch the data, instead of being blocked by its first load.

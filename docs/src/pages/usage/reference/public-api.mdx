@@ -4,7 +4,7 @@ order: 3
 is_new: true
 ---
 
-import { CodeBlockText, SourceLink } from "@/components"
+import { CodeBlockText, Src } from "@/components"
 
 # Jobs Public API
 
@@ -24,7 +24,7 @@ array-of-object cells join `.name` with `; `.
 
 ## GraphQL
 
-The query name must be exactly `JobsPublic` and the body must match the whitelisted <SourceLink id="jobs_public_graphql">get_jobs_public_from_ram.py</SourceLink> query — the backend will reject it otherwise.
+The query name must be exactly `JobsPublic` and the body must match the whitelisted <Src to="jobs/services/get_jobs_public_from_ram.py" /> query — the backend will reject it otherwise.
 
 <CodeBlockText lang="bash">{`
   curl --json '{"query": "[copy from above]"}' https://jobs.probablygood.org/api/graphql

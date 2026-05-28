@@ -1,10 +1,12 @@
+import { Src } from "@/components"
+
 Prerender + prefetch is build-time static HTML - no Node runtime.
 
 Used by `JobsLandingPage(Model)` pages `/{slug}`: SEO needs real `<title>` / `<meta>` / `<h1>` before JS hydrates.
 
 ## Pipeline
 
-1. `mise client:prefetch-from-server` — runs `[[client/src/prefetch/runPrefetch.ts]]`. POSTs the `JobsLandingPagesForPrefetch` query (def for whitelist via [[client/src/prefetch/JobsLandingPage.ts]]) and writes `client/graphql/prefetch/JobsLandingPages.json` (gitignored).
+1. `mise client:prefetch-from-server` — runs <Src to="runPrefetch.ts" />. POSTs the `JobsLandingPagesForPrefetch` query (def for whitelist via <Src to="prefetch/JobsLandingPage.ts" />) and writes `client/graphql/prefetch/JobsLandingPages.json` (gitignored).
 2. `react-router build`: `react-router.config.ts` reads the JSON and emits one HTML file per `/{slug}`.
 3. `[slug].tsx` — static import + runtime load of JSON; the entry for prerender.
 
@@ -12,7 +14,7 @@ Used by `JobsLandingPage(Model)` pages `/{slug}`: SEO needs real `<title>` / `<m
 
 ## SEO meta
 
-`[[useHeadMeta.tsx]]` — keyed by `location.pathname`. Render-time writes (not `useEffect`) so prerender emits the override. Root renders `<headMeta.Hoisted />`.
+<Src to="useHeadMeta.tsx" /> — keyed by `location.pathname`. Render-time writes (not `useEffect`) so prerender emits the override. Root renders `<headMeta.Hoisted />`.
 
 Why not react-router's native `<title>`: its API emits two `<title>` tags during prerender (default + override) → breaks Playwright strict locator and OG-first crawlers.
 

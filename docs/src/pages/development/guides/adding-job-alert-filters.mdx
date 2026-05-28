@@ -3,28 +3,30 @@ title: Adding JobAlert filters
 order: 5
 ---
 
+import { Src, LinkInt } from "@/components"
+
 This checklist serves as a warning to how fast and inappropriate
 the tech debt of this simple subscribe modal has become.
 
 Every time you add/modify a filter, add the logic to to:
 - [ ] create a ticket in `LLM-spec-logs/` and copy there this checklist
-- [ ] `[[send_job_alerts.py]]::_get_jobs_by_alert`
-- [ ] test in `[[send_job_alerts__test.py]]`
+- [ ] <Src to="jobs/services/send_job_alerts.py" />::_get_jobs_by_alert
+- [ ] test in <Src to="jobs/services/send_job_alerts__test.py" />
 - [ ] `jobs/graphql.py`
     - [ ] `JobType`
     - [ ] `job_alert_subscribe`
 - [ ] smoke test in `jobs/graphql__test.py` (remove by the end of e2e if redundant)
-- [ ] `[[JobAlertList.tsx]]::AlertCard`, and its globally used query `JobAlertListQuery`
-- [ ] `[[PgJobAlertList.tsx]]::PgAlertCard` (duplicate of the first)
-- [ ] `[[JobsSubscribeModal.tsx]]`: mutation, `ATTRIBUTE_LABELS`
-- [ ] `[[PgFiltersTopbar.tsx]]`
-- [ ] ensure the Algolia JSON matches GraphQL per `[[Algolia.mdx]]`
-- [ ] consider extending the e2e in [[job-alert.spec.ts]]
+- [ ] <Src to="JobAlertList.tsx" />::AlertCard, and its globally used query `JobAlertListQuery`
+- [ ] <Src to="PgJobAlertList.tsx" />::PgAlertCard (duplicate of the first)
+- [ ] <Src to="JobsSubscribeModal.tsx" />: mutation, `ATTRIBUTE_LABELS`
+- [ ] <Src to="PgFiltersTopbar.tsx" />
+- [ ] ensure the Algolia JSON matches GraphQL per <LinkInt path="/development/intro/algolia">Algolia</LinkInt>
+- [ ] consider extending the e2e in <Src to="job-alert.spec.ts" />
 - [ ] #AI: Landing pages mirror — they share filter semantics with alerts:
-    - [ ] `[[JobsLandingPage]]` model + admin field (if new tag category / new scalar)
-    - [ ] `[[JobsLandingPagesForPrefetch]]` query in [[client/src/prefetch/JobsLandingPage.ts]]
-    - [ ] `[[landingPageToAlgoliaState.ts]]::algoliaTagAttrByCategory` map + scalar branches (salary, toggles)
-    - [ ] `[[useRequiredLandingPageRefinements]]` — claim Algolia state for new attrs to defeat `PgFacetPopover` `lazyMount`
-    - [ ] extend [[jobs-landing-page.spec.ts]] e2e if new filter is preset-relevant
+    - [ ] <Src to="jobs/models.py">JobsLandingPage</Src> model + admin field (if new tag category / new scalar)
+    - [ ] <Src to="prefetch/JobsLandingPage.ts">JobsLandingPagesForPrefetch</Src> query in <Src to="prefetch/JobsLandingPage.ts" />
+    - [ ] <Src to="landingPageToAlgoliaState.ts" />::algoliaTagAttrByCategory map + scalar branches (salary, toggles)
+    - [ ] <Src to="landingPageToAlgoliaState.ts">useRequiredLandingPageRefinements</Src> — claim Algolia state for new attrs to defeat `PgFacetPopover` `lazyMount`
+    - [ ] extend <Src to="jobs-landing-page.spec.ts" /> e2e if new filter is preset-relevant
 - [ ] review by LLM your code and the ticket
 - [ ] commit the ticket to Git along with your changes

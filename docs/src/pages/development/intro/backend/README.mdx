@@ -2,6 +2,8 @@
 paths: "**/*.py"
 ---
 
+import { Src } from "@/components"
+
 ## Constraints
 
 - Django core is mostly untyped tech debt.
@@ -62,14 +64,14 @@ class Visibility(TextChoices):
 ```
 
 Files:
-- [[server/neuronhub/apps/posts/graphql/types.py]]
-- [[server/neuronhub/apps/posts/services/filter_posts_by_user.py]]
+- <Src to="posts/graphql/types.py" />
+- <Src to="posts/services/filter_posts_by_user.py" />
 
 ### Algolia
 
-Because Posts are indexed by Algolia, we give each logged in User a personal Search API token with "Restriction" as `["visible_to:group/INTERNAL", "visible_to:group/PUBLIC", "visible_to:{username}"]` through users/graphql/resolvers [[UsersQuery#get_algolia_search_key_with_user_perms]].
+Because Posts are indexed by Algolia, we give each logged in User a personal Search API token with "Restriction" as `["visible_to:group/INTERNAL", "visible_to:group/PUBLIC", "visible_to:{username}"]` through users/graphql/resolvers <Src to="users/graphql/resolvers.py">UsersQuery#get_algolia_search_key_with_user_perms</Src>.
 
-And the field `visible_to` is serialized for Algolia in posts/models/posts.py [[Post#get_visible_to]].
+And the field `visible_to` is serialized for Algolia in posts/models/posts.py <Src to="posts/models/posts.py">Post#get_visible_to</Src>.
 
 
 ## Mandatory task-specific docs

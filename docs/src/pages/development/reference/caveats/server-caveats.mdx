@@ -26,7 +26,7 @@ Error like `RuntimeError: max slug attempts for {value} exceeded (100)` on delet
 
 ### Django Debug Toolbar "store" has no "set" method
 
-[[StoredDebugToolbar]] v6.0.0 `init_store` method doesn't work, to fix it it in `debug_toolbar/toolbar.py` change:
+`StoredDebugToolbar` v6.0.0 `init_store` method doesn't work, to fix it it in `debug_toolbar/toolbar.py` change:
 ```py
 def init_store(self):
     # Store already initialized.
