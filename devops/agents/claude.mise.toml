@@ -3,7 +3,6 @@
         claude --dangerously-skip-permissions \
         --verbose \
         --thinking-display summarized \
-        --append-system-prompt-file devops/agents/AGENTS-system-prompt-appendix.md \
         --settings devops/agents/settings.json
     """
     env = { TSC_CONFIG = "tsconfig.quiet.json" } # #prob-redundant
