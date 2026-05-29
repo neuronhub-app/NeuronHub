@@ -31,3 +31,6 @@
 @docs/src/pages/development/reference/roadmap/roadmap-v0.3.md
 
 </doc_roadmap>
+
+
+Never use Git worktrees - they aren't usable - this project relies on db and ports infra to test and run.
