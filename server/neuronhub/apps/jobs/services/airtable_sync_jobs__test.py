@@ -52,7 +52,7 @@ class TestAirtableSyncJobs(NeuronTestCase):
                     _airtable.salary_min: "48,656.00",
                     _airtable.salary_text: "$40k - $60k",
                     _airtable.closes_at: "2026-05-01",
-                    _airtable.posted_at: "March 19, 2026",
+                    _airtable.created_at_in_airtable: "March 19, 2026",
                 },
             }
             for index in range(3)
@@ -212,7 +212,7 @@ class TestAirtableSyncJobs(NeuronTestCase):
                     _airtable.org_name: "Org",
                     _airtable.url_external: "https://ex.com/1",
                     _airtable.locations: '"London, UK"',
-                    _airtable.posted_at: "April 1, 2026",
+                    _airtable.created_at_in_airtable: "April 1, 2026",
                 },
             }
         ]
@@ -233,7 +233,7 @@ def _get_job_parsed(
         url_external=job.url_external,
         description=job.description,
         org_name=job.org.name,
-        posted_at=job.posted_at,
+        created_at_in_airtable=job.created_at_in_airtable,
         is_duplicate_url_valid=is_duplicate_url_valid or job.is_duplicate_url_valid,
     )
     if is_change_desc:
@@ -370,7 +370,7 @@ class TestParseDuplicateUrlFlag:
         _airtable.title: "T",
         _airtable.org_name: "O",
         _airtable.url_external: "u",
-        _airtable.posted_at: "April 4, 2026",
+        _airtable.created_at_in_airtable: "April 4, 2026",
     }
 
     def test_flag_true_when_checked(self):
@@ -395,15 +395,15 @@ class TestDuplicateUrlSync(NeuronTestCase):
         job_draft = await Job.objects.aget(is_published=False)
         assert job_draft.is_duplicate_url_valid
 
-    async def test_older_posted_at_dup_is_ignored_regardless_of_order(self):
+    async def test_older_created_at_in_airtable_dup_is_ignored_regardless_of_order(self):
         tz = ZoneInfo(settings.TIME_ZONE)
-        posted_newer = datetime(2026, 4, 20, tzinfo=tz)
-        posted_older = datetime(2026, 4, 1, tzinfo=tz)
+        created_newer = datetime(2026, 4, 20, tzinfo=tz)
+        created_older = datetime(2026, 4, 1, tzinfo=tz)
 
-        job_pub = await self.gen.jobs.job(posted_at=posted_newer)
+        job_pub = await self.gen.jobs.job(created_at_in_airtable=created_newer)
         job_parsed_newer = _get_job_parsed(job_pub, is_change_desc=True)
         job_parsed_older = _get_job_parsed(job_pub, is_change_desc=True)
-        job_parsed_older.posted_at = posted_older
+        job_parsed_older.created_at_in_airtable = created_older
         job_parsed_older.title = f"{job_pub.title} (older)"
 
         # Older listed after newer must not overwrite (last-wins forbidden).
@@ -411,20 +411,22 @@ class TestDuplicateUrlSync(NeuronTestCase):
 
         job_draft = await Job.objects.aget(is_published=False)
         assert job_draft.title == job_pub.title
-        assert job_draft.posted_at == posted_newer
+        assert job_draft.created_at_in_airtable == created_newer
 
     async def test_dedupe_propagates_is_duplicate_url_valid_across_group(self):
         """
         `is_duplicate_url_valid=True` on any row of a URL group means the
         reviewer approved the URL's duplicate existence - the flag must
-        survive onto the kept (latest posted_at) row.
+        survive onto the kept (latest created_at_in_airtable) row.
         """
         tz = ZoneInfo(settings.TIME_ZONE)
-        job_pub = await self.gen.jobs.job(posted_at=datetime(2026, 4, 20, tzinfo=tz))
+        job_pub = await self.gen.jobs.job(
+            created_at_in_airtable=datetime(2026, 4, 20, tzinfo=tz)
+        )
 
         job_parsed_newer = _get_job_parsed(job_pub, is_duplicate_url_valid=False)
         job_parsed_older = _get_job_parsed(job_pub, is_duplicate_url_valid=True)
-        job_parsed_older.posted_at = datetime(2026, 4, 1, tzinfo=tz)
+        job_parsed_older.created_at_in_airtable = datetime(2026, 4, 1, tzinfo=tz)
 
         await _sync_jobs_parsed_to_drafts([job_parsed_newer, job_parsed_older])
 

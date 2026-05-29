@@ -108,11 +108,11 @@ export function JobList(props: { slug?: string }) {
         labelsOverride={{
           "locations.remote_name": "Remote",
           "org.is_highlighted": "Highlighted",
-          posted_at_unix: "Posted",
+          published_at_unix: "Posted",
           salary_min: "Salary",
           source_ext: "Source",
         }}
-        dateAttributes={["posted_at_unix"]}
+        dateAttributes={["published_at_unix"]}
       />
 
       <Stack gap="1">
@@ -130,7 +130,7 @@ export function JobList(props: { slug?: string }) {
       />
       <AlgoliaFacetAttribute attribute="tags_area.name" label="Area" />
       <AlgoliaFacetAttribute attribute="tags_workload.name" label="Workload" />
-      <AlgoliaFacetDate attribute="posted_at_unix" label="Posted" />
+      <AlgoliaFacetDate attribute="published_at_unix" label="Posted" />
       <AlgoliaFacetAttribute attribute="tags_education.name" label="Education" />
       <AlgoliaFacetAttribute attribute="org.name" label="Organization" isSearchEnabled />
     </AlgoliaList>

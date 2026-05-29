@@ -33,7 +33,7 @@ class JobAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdmin):
         "org",
         "is_published",
         "salary_min",
-        "posted_at",
+        "created_at_in_airtable",
         "closes_at",
     ]
 
@@ -64,7 +64,7 @@ class JobAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdmin):
         "is_published",
         "created_at",
         "updated_at",
-        "posted_at",
+        "created_at_in_airtable",
         "published_at",
         "closes_at",
     ]
@@ -121,7 +121,13 @@ class JobAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdmin):
         (
             "Timestamps",
             {
-                "fields": ["published_at", "posted_at", "closes_at", "created_at", "updated_at"],
+                "fields": [
+                    "published_at",
+                    "created_at_in_airtable",
+                    "closes_at",
+                    "created_at",
+                    "updated_at",
+                ],
             },
         ),
     ]

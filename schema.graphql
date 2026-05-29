@@ -201,7 +201,8 @@ type JobType {
   url_external_with_utm: String!
   is_published: Boolean!
   is_pending_removal: Boolean!
-  posted_at: DateTime!
+  published_at: DateTime
+  posted_at: DateTime @deprecated(reason: "Replaced by .published_at")
   closes_at: DateTime
   tags_skill(filters: PostTagFilter): [PostTagType!]!
   tags_area(filters: PostTagFilter): [PostTagType!]!

@@ -90,7 +90,7 @@ async def _sync_jobs_parsed_to_drafts(
     stats = stats or SyncStats()
 
     with disable_auto_indexing_if_enabled():
-        jobs_parsed = _dedupe_by_url_keeping_latest_posted_at(jobs_parsed)
+        jobs_parsed = _dedupe_by_url_keeping_latest_created_at_in_airtable(jobs_parsed)
         jobs_parsed = jobs_parsed[:limit] if limit else jobs_parsed
 
         for job_parsed in jobs_parsed:
@@ -193,7 +193,7 @@ async def _sync_job_draft(job_parsed: JobParsed, job_pub_current: Job | None) ->
         source_ext=job_parsed.source_ext,
         salary_min=job_parsed.salary_min,
         salary_text=job_parsed.salary_text,
-        posted_at=job_parsed.posted_at,
+        created_at_in_airtable=job_parsed.created_at_in_airtable,
         closes_at=job_parsed.closes_at,
         is_duplicate_url_valid=job_parsed.is_duplicate_url_valid,
     )
@@ -254,7 +254,7 @@ async def _create_pending_deletion_draft(job_pub: Job) -> Job:
         source_ext=job_pub.source_ext,
         salary_min=job_pub.salary_min,
         salary_text=job_pub.salary_text,
-        posted_at=job_pub.posted_at,
+        created_at_in_airtable=job_pub.created_at_in_airtable,
         closes_at=job_pub.closes_at,
         org=job_pub.org,
         visibility=job_pub.visibility,
@@ -337,7 +337,7 @@ def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
 
     salary_min_raw = fields.get(_airtable.salary_min, "").strip()
     closes_at_raw = fields.get(_airtable.closes_at, "").strip()
-    posted_at_raw = fields.get(_airtable.posted_at, "").strip()
+    created_at_in_airtable_raw = fields.get(_airtable.created_at_in_airtable, "").strip()
 
     return JobParsed(
         title=fields.get(_airtable.title, "").strip(),
@@ -359,9 +359,9 @@ def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
         )
         if closes_at_raw
         else None,
-        posted_at=datetime.strptime(posted_at_raw, "%B %d, %Y").replace(
-            tzinfo=ZoneInfo(settings.TIME_ZONE)
-        ),
+        created_at_in_airtable=datetime.strptime(
+            created_at_in_airtable_raw, "%B %d, %Y"
+        ).replace(tzinfo=ZoneInfo(settings.TIME_ZONE)),
         is_duplicate_url_valid=bool(fields.get(_airtable.is_duplicate_url_valid, "").strip()),
     )
 
@@ -370,7 +370,7 @@ def _parse_job_raw(job_raw: RecordDict) -> JobParsed:
 class JobParsed:
     title: str
     url_external: str
-    posted_at: datetime
+    created_at_in_airtable: datetime
     description: str = ""
     org_name: str = ""
     locations: list[LocationParsed] = field(default_factory=list)
@@ -402,7 +402,7 @@ class _airtable:
     salary_min = "Min Salary (USD)"
     salary_text = "Salary Range"
     closes_at = "Deadline"
-    posted_at = "Date Added"
+    created_at_in_airtable = "Date Added"
     is_duplicate_url_valid = "Duplicate URL"
 
 
@@ -465,7 +465,9 @@ def _parse_location_field(raw: str) -> list[LocationParsed]:
     return locations
 
 
-def _dedupe_by_url_keeping_latest_posted_at(jobs_parsed: list[JobParsed]) -> list[JobParsed]:
+def _dedupe_by_url_keeping_latest_created_at_in_airtable(
+    jobs_parsed: list[JobParsed],
+) -> list[JobParsed]:
     """
     See [[Job]].is_duplicate_url_valid help_text.
     """
@@ -474,7 +476,7 @@ def _dedupe_by_url_keeping_latest_posted_at(jobs_parsed: list[JobParsed]) -> lis
         job_prev = latest_by_url.get(job_parsed.url_external)
         if job_prev is None:
             latest_by_url[job_parsed.url_external] = job_parsed
-        elif job_parsed.posted_at > job_prev.posted_at:
+        elif job_parsed.created_at_in_airtable > job_prev.created_at_in_airtable:
             job_parsed.is_duplicate_url_valid |= job_prev.is_duplicate_url_valid
             latest_by_url[job_parsed.url_external] = job_parsed
         else:

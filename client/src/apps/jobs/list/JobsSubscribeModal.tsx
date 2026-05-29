@@ -212,7 +212,7 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   is_not_profit_for_good: "Exclude Profit for Good",
   "org.name": "Organization",
   salary_min: "Min Salary",
-  posted_at: "Posted",
+  published_at: "Posted",
 } as const;
 
 export const JobAlertSubscribeMutation = graphql.persisted(

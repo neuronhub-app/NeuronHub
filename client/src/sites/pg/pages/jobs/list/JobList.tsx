@@ -92,13 +92,13 @@ export function JobList(props: { slug?: string; jobsLandingPage?: JobsLandingPag
           is_orgs_highlighted: "Highlighted",
           is_not_career_capital: "Excl. Career-Capital",
           is_not_profit_for_good: "Excl. Profit-for-Good",
-          posted_at_unix: "Posted",
+          published_at_unix: "Posted",
         },
         formatAttribute: {
           "locations.algolia_filter_name": r => r.label.replace(/^\[.+?] /, ""),
           source_ext: refineParam => `Source: ${refineParam.label}`,
         },
-        dateAttributes: ["posted_at_unix"],
+        dateAttributes: ["published_at_unix"],
         extraTags,
         onClearAdditional: resetJobListFilters,
       }}

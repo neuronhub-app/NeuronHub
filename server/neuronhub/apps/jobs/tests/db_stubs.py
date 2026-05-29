@@ -6,6 +6,7 @@ import textwrap
 from datetime import timedelta
 
 from asgiref.sync import sync_to_async
+from django.db.models import F
 from django.db.models import QuerySet
 from django.utils import timezone
 
@@ -22,7 +23,11 @@ async def create_jobs_stubs(gen: Gen) -> None:
     await _create_orgs()
 
     await _sync_jobs_parsed_to_drafts(_build_jobs_parsed())
-    await Job.objects.filter(is_published=False).aupdate(is_published=True)
+    # Bypasses publish_job_versions.py, so set published_at like its publish flow.
+    # Mirror created_at_in_airtable to keep stubs' varied "X days ago" display.
+    await Job.objects.filter(is_published=False).aupdate(
+        is_published=True, published_at=F("created_at_in_airtable")
+    )
 
     # create ~6 drafts:
     await gen.jobs.job_draft()
@@ -73,7 +78,7 @@ def _build_jobs_parsed() -> list[JobParsed]:
             source_ext=Job.SourceExt.AIM,
             salary_min=180_000,
             salary_text="$155,741 – $163,529",
-            posted_at=now - timedelta(days=1),
+            created_at_in_airtable=now - timedelta(days=1),
             locations=_locations("San Francisco CA, United States"),
             tags_skill=[val.skill.ML, val.skill.Research, val.skill.Python],
             tags_area=[val.area.AIS, val.area.CareerCapital],
@@ -93,7 +98,7 @@ def _build_jobs_parsed() -> list[JobParsed]:
             """),
             source_ext=Job.SourceExt.AIM,
             salary_min=75_000,
-            posted_at=now - timedelta(days=37),
+            created_at_in_airtable=now - timedelta(days=37),
             locations=_locations("Oakland CA, United States", "Washington DC, United States"),
             tags_skill=[val.skill.Operations, val.skill.Finance],
             tags_area=[val.area.GlobalHealth, val.area.ProfitForGood],
@@ -106,7 +111,7 @@ def _build_jobs_parsed() -> list[JobParsed]:
             url_external=url_ext_duplicate,
             org_name=_orgs.meridian.name,
             description="Earlier listing for the same role.",
-            posted_at=now - timedelta(days=120),
+            created_at_in_airtable=now - timedelta(days=120),
             locations=_locations("London, United Kingdom"),
             tags_skill=[val.skill.Policy],
             tags_area=[val.area.AIS],
@@ -124,7 +129,7 @@ def _build_jobs_parsed() -> list[JobParsed]:
                 - Engage with policymakers on AI regulation
             """),
             salary_text="$50,000 – $140,000; £37,500 – £105,000",
-            posted_at=now - timedelta(days=60),
+            created_at_in_airtable=now - timedelta(days=60),
             closes_at=now + timedelta(days=66),
             locations=_locations("London, United Kingdom", "Remote, United Kingdom"),
             tags_skill=[val.skill.Policy, val.skill.Research, val.skill.Writing],
@@ -145,7 +150,7 @@ def _build_jobs_parsed() -> list[JobParsed]:
             """),
             salary_min=84_984,
             salary_text="$7,200; €6,100; £5,400 per month",
-            posted_at=now,
+            created_at_in_airtable=now,
             locations=_locations("Nairobi, Kenya"),
             tags_skill=[val.skill.Operations, val.skill.Policy],
             tags_area=[val.area.GlobalHealth],
@@ -163,7 +168,7 @@ def _build_jobs_parsed() -> list[JobParsed]:
                 - Present findings at an end-of-programme symposium
             """),
             salary_text="$10,000 stipend",
-            posted_at=now - timedelta(days=23),
+            created_at_in_airtable=now - timedelta(days=23),
             closes_at=now + timedelta(days=21),
             locations=_locations("Berkeley CA, United States"),
             tags_skill=[val.skill.Research, val.skill.ML, val.skill.SWE],
@@ -183,7 +188,7 @@ def _build_jobs_parsed() -> list[JobParsed]:
             """),
             salary_min=110_000,
             salary_text="$110,000 – $130,000",
-            posted_at=now - timedelta(days=4),
+            created_at_in_airtable=now - timedelta(days=4),
             locations=_locations("San Francisco CA, United States", "Remote, United States"),
             tags_skill=[val.skill.Communications, val.skill.Writing],
             tags_area=[val.area.ClimateChange],
@@ -202,7 +207,7 @@ def _build_jobs_parsed() -> list[JobParsed]:
             """),
             salary_min=130_000,
             salary_text="$130,000 – $155,000",
-            posted_at=now - timedelta(days=12),
+            created_at_in_airtable=now - timedelta(days=12),
             locations=_locations("Washington DC, United States"),
             tags_skill=[val.skill.Legal, val.skill.Policy],
             tags_area=[val.area.NuclearSecurity],
@@ -219,7 +224,7 @@ def _build_jobs_parsed() -> list[JobParsed]:
                 - Write findings in clear, accessible reports
                 - Contribute to forecasting and prioritisation exercises
             """),
-            posted_at=now - timedelta(days=2),
+            created_at_in_airtable=now - timedelta(days=2),
             locations=_locations(
                 "Remote, Global", "Remote, United States", "Remote, United Kingdom"
             ),

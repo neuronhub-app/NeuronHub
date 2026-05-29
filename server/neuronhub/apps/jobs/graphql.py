@@ -96,7 +96,11 @@ class JobType:
     is_published: auto
     is_pending_removal: auto
 
-    posted_at: auto
+    published_at: auto
+    posted_at: auto = strawberry_django.field(
+        field_name="published_at",
+        deprecation_reason="Replaced by .published_at",
+    )
     closes_at: auto
 
     tags_skill: list[PostTagType]

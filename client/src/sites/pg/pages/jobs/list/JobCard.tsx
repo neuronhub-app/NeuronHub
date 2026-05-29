@@ -217,7 +217,7 @@ export function JobCard(props: {
                 whiteSpace="nowrap"
                 flexShrink="0"
               >
-                {datetime.relativeRounded(props.job.posted_at)}
+                {datetime.relativeRounded(props.job.published_at)}
               </Flex>
             </Flex>
           </Flex>

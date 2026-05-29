@@ -1,5 +1,5 @@
 """
-See [[docs/src/pages/development/intro/Algolia.mdx]]
+See [[Algolia.mdx]]
 """
 
 import logging
@@ -66,7 +66,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
         datetime_fields = [
             "created_at",
             "updated_at",
-            "posted_at",
+            "published_at",
             "closes_at",
         ]
 
@@ -116,7 +116,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "visible_to",
             ],
             "customRanking": [
-                "desc(posted_at_unix)",
+                "desc(published_at_unix)",
             ],
             "replicas": [
                 algolia_replica_jobs_sorted_by_closes_at,

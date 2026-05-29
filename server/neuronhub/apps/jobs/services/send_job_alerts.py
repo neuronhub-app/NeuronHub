@@ -302,7 +302,7 @@ async def _get_jobs_by_alert(
     if alert.is_exclude_profit_for_good:
         qs = qs.exclude(tags_area__name=Job.Tags.ProfitForGood)
 
-    return [job async for job in qs.order_by("-posted_at")]
+    return [job async for job in qs.order_by("-published_at")]
 
 
 def _q_job_has_tag(tag_id: int) -> Q:

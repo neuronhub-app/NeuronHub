@@ -228,7 +228,7 @@ export function JobCard(props: { job: JobFragmentType; isSearchActive?: boolean 
                 <Separator orientation="vertical" h="4" />
               </>
             )}
-            <Text color="fg.subtle">{datetime.relative(props.job.posted_at)}</Text>
+            <Text color="fg.subtle">{datetime.relative(props.job.published_at)}</Text>
           </HStack>
         </HStack>
       </Stack>

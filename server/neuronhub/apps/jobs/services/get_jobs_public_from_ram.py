@@ -50,7 +50,7 @@ graphql_whitelist_BE.register(
                     salary_text
                     source_ext
                     url_external
-                    posted_at
+                    published_at
                     closes_at
                     has_salary
                     is_orgs_highlighted

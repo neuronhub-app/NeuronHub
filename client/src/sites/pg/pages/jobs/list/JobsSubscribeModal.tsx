@@ -316,7 +316,7 @@ function getRefinementLabel(
   attribute: string,
   refinement: ReturnType<typeof useCurrentRefinements>["items"][number]["refinements"][number],
 ) {
-  if (attribute === "posted_at_unix") {
+  if (attribute === "published_at_unix") {
     return `${refinement.operator} ${datetime.relative(fromUnixTime(refinement.value as number))}`;
   }
   if (attribute === "locations.algolia_filter_name") {
@@ -350,6 +350,6 @@ const ATTRIBUTE_LABELS: Record<string, string> = {
   is_not_career_capital: "Exclude Career-Capital",
   is_not_profit_for_good: "Exclude Profit for Good",
   "org.name": "Organisation",
-  posted_at: "Posted",
-  posted_at_unix: "Posted",
+  published_at: "Posted",
+  published_at_unix: "Posted",
 };

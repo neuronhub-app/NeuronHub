@@ -33,8 +33,8 @@ async def serialize_job_to_md(job: Job, is_show_org_desc: bool | None = True) ->
     if location_names_wo_dups:
         lines.append(f"- `Locations`: {', '.join(location_names_wo_dups)}")
 
-    if job.posted_at:
-        lines.append(f"- `Posted`: {job.posted_at:%Y-%m-%d}")
+    if job.created_at_in_airtable:
+        lines.append(f"- `Posted`: {job.created_at_in_airtable:%Y-%m-%d}")
     if job.closes_at:
         lines.append(f"- `Closes`: {job.closes_at:%Y-%m-%d}")
 

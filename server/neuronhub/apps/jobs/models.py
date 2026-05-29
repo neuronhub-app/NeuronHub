@@ -160,7 +160,7 @@ class Job(AlgoliaModel):
     )
     is_duplicate_url_valid = models.BooleanField(
         default=False,
-        help_text="Set from Airtable `Duplicate URL` - approved duplicate by data manager. Same-URL Jobs are collapsed to the latest `posted_at`.",
+        help_text="Set from Airtable `Duplicate URL` - approved duplicate by data manager. Same-URL Jobs are collapsed to the latest `created_at_in_airtable`.",
     )
 
     is_test_job = models.BooleanField(
@@ -182,7 +182,9 @@ class Job(AlgoliaModel):
         User, related_name=UserListName.jobs_bookmarked.value, blank=True
     )
 
-    posted_at = models.DateTimeField()
+    created_at_in_airtable = models.DateTimeField(
+        help_text="Airtable 'Date Added'. Internal-only: drafts have no published_at, so URL-dedup tie-breaks on this."
+    )
     closes_at = models.DateTimeField(null=True, blank=True)
     published_at = models.DateTimeField(
         null=True,
@@ -272,14 +274,14 @@ class Job(AlgoliaModel):
     def get_json_locations(self):
         return self._get_graphql_field("locations")
 
-    def get_unix_posted_at(self) -> float | None:
-        return self.posted_at.timestamp() if self.posted_at else None
+    def get_unix_published_at(self) -> float | None:
+        return self.published_at.timestamp() if self.published_at else None
 
     def get_unix_closes_at(self) -> float | None:
         return self.closes_at.timestamp() if self.closes_at else None
 
-    def get_iso_posted_at(self) -> str:
-        return self.posted_at.isoformat() if self.posted_at else ""
+    def get_iso_published_at(self) -> str:
+        return self.published_at.isoformat() if self.published_at else ""
 
     def get_iso_closes_at(self) -> str:
         return self.closes_at.isoformat() if self.closes_at else ""

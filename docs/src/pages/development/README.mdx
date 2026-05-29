@@ -196,7 +196,8 @@ classDiagram
             locations: M2M~JobLocation~
             is_remote: bool?
             salary_min: int?
-            posted_at, closes_at: datetime?
+            published_at, closes_at: datetime?
+            created_at_in_airtable: datetime
             tags_skill, tags_area: M2M~PostTag~
             visible_to_users: M2M~User~
             visible_to_groups: M2M~UserConnectionGroup~
