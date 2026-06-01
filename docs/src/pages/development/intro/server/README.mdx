@@ -55,13 +55,13 @@ Other `@task`s are manually enqueued.
 As the core feature we override `PostTypeI.get_queryset` (`PostTypeI` is a Strawberry's `interface` for each `Post` projection) by adding there `return filter_posts_by_user(user, posts=queryset)`, which filters by `post.visilibity` values.
 
 <CodeBlockText lang="python">{`
-class Visibility(TextChoices):
-    PRIVATE
-    USERS_SELECTED
-    CONNECTIONS
-    SUBSCRIBERS
-    INTERNAL
-    PUBLIC
+    class Visibility(TextChoices):
+        PRIVATE
+        USERS_SELECTED
+        CONNECTIONS
+        SUBSCRIBERS
+        INTERNAL
+        PUBLIC
 `}</CodeBlockText>
 
 Files:

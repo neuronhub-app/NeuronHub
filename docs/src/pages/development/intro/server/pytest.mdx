@@ -11,18 +11,18 @@ Run by `mise pytest`.
 Subclass `NeuronTestCase`, from <Src to="tests/test_cases.py">test_cases</Src>. It's code structure:
 
 <CodeBlockText lang="python">{`
-class NeuronTestCase(TestCase):
-    gen: Gen
-    user: User
+    class NeuronTestCase(TestCase):
+        gen: Gen
+        user: User
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        cls.gen = Gen.create()
-        cls.user = cls.gen.users.user_default
+        @classmethod
+        def setUpClass(cls):
+            super().setUpClass()
+            cls.gen = Gen.create()
+            cls.user = cls.gen.users.user_default
 
-    async def graphql_query(self, query: str, variables: dict = None, user_authed: User = self.user) -> ExecutionResult:
-        ...
+        async def graphql_query(self, query: str, variables: dict = None, user_authed: User = self.user) -> ExecutionResult:
+            ...
 `}</CodeBlockText>
 
 - Each test name must convey its purpose. Docstrings are only allowed for bugs with exceptional complexity.
@@ -45,27 +45,27 @@ Read the `test_gen.py` classes & methods headers before writing tests.
 #### Decent test example
 
 <CodeBlockText lang="python">{`
-class VisibilityTest(NeuronTestCase):
-    async def test_visibility_by_connection(self):
-        post = await self.gen.posts.create()
-        user_author = await self.gen.users.user()
-        user_connection = await self.gen.users.user()
+    class VisibilityTest(NeuronTestCase):
+        async def test_visibility_by_connection(self):
+            post = await self.gen.posts.create()
+            user_author = await self.gen.users.user()
+            user_connection = await self.gen.users.user()
 
-        await self.gen.posts.comment(post, author=user_author, visibility=Visibility.PUBLIC)
-        await self.gen.posts.comment(post, author=user_author, visibility=Visibility.CONNECTIONS)
-        assert await _visible_comments(post, user_connection) == 1, "Not connected yet"
+            await self.gen.posts.comment(post, author=user_author, visibility=Visibility.PUBLIC)
+            await self.gen.posts.comment(post, author=user_author, visibility=Visibility.CONNECTIONS)
+            assert await _visible_comments(post, user_connection) == 1, "Not connected yet"
 
-        await _add_connection(user_author, connection_new=user_connection)
-        assert await _visible_comments(post, user_connection) == 2
+            await _add_connection(user_author, connection_new=user_connection)
+            assert await _visible_comments(post, user_connection) == 2
 
-        user_unrelated = await self.gen.users.user()
-        assert await _visible_comments(post, user_unrelated) == 1
+            user_unrelated = await self.gen.users.user()
+            assert await _visible_comments(post, user_unrelated) == 1
 
-async def _visible_comments(post: Post, user: User):
-    return await filter_posts_by_user(user, post.children.all()).acount()
+    async def _visible_comments(post: Post, user: User):
+        return await filter_posts_by_user(user, post.children.all()).acount()
 
-async def _add_connection(user: User, connection_new: User):
-	...
+    async def _add_connection(user: User, connection_new: User):
+        ...
 `}</CodeBlockText>
 
 ### DB reuse

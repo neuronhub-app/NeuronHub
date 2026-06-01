@@ -15,11 +15,11 @@ In custom fields of `@strawberry.type` or `@strawberry_django.type` - its `self`
 Treat this `self` as non-existent. Or type it as the model instance if you're sure.
 
 <CodeBlockText lang="python">{`
-@strawberry.type()
-class Query:
-    @strawberry_django.field()
-    async def post_highlights(self, ids: list[ID], info: Info) -> list[...]:
-		...
+    @strawberry.type()
+    class Query:
+        @strawberry_django.field()
+        async def post_highlights(self, ids: list[ID], info: Info) -> list[...]:
+            ...
 `}</CodeBlockText>
 
 ### django-simple-history
@@ -34,14 +34,14 @@ Error like `RuntimeError: max slug attempts for {value} exceeded (100)` on delet
 
 `StoredDebugToolbar` v6.0.0 `init_store` method doesn't work, to fix it it in `debug_toolbar/toolbar.py` change:
 <CodeBlockText lang="python">{`
-def init_store(self):
-    # Store already initialized.
-    if self.store is None:
-        self.store = get_store()
+    def init_store(self):
+        # Store already initialized.
+        if self.store is None:
+            self.store = get_store()
 `}</CodeBlockText>
 
 to:
 <CodeBlockText lang="python">{`
-def init_store(self):
-    self.store = get_store()
+    def init_store(self):
+        self.store = get_store()
 `}</CodeBlockText>

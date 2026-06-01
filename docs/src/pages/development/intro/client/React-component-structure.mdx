@@ -9,76 +9,76 @@ import { CodeBlockText } from "@/components"
 ### React Component hierarchy and imports
 
 <CodeBlockText lang="tsx">{`
-import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
-import { ID, graphql } from "@/gql-tada";
-import { useUser } from "@/apps/users/useUserCurrent";
-import { useInit } from "@/utils/useInit";
-import { useIsLoading } from "@/utils/useIsLoading";
+  import { useApolloQuery } from "@/graphql/useApolloQuery";
+  import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
+  import { ID, graphql } from "@/gql-tada";
+  import { useUser } from "@/apps/users/useUserCurrent";
+  import { useInit } from "@/utils/useInit";
+  import { useIsLoading } from "@/utils/useIsLoading";
 
-export function Card(props: { id: ID; }) {
-  // 1. Hooks
+  export function Card(props: { id: ID; }) {
+    // 1. Hooks
 
-  const user = useUser();
+    const user = useUser();
 
-  const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(\`query Post($id: ID!) { post(id: $id) { ... } }\`),
-    { id: props.id },
-  );
+    const { data, error, isLoadingFirstTime } = useApolloQuery(
+      graphql(\`query Post($id: ID!) { post(id: $id) { ... } }\`),
+      { id: props.id },
+    );
 
-  const loading = useIsLoading();
+    const loading = useIsLoading();
 
-  // 2. State
+    // 2. State
 
-  const state = useStateValtio({ isDialogOpen: false });
+    const state = useStateValtio({ isDialogOpen: false });
 
-  // 3. Functions, useInit, handlers
+    // 3. Functions, useInit, handlers
 
-  useInit({
-    isReady: !isLoadingFirstTime,
-    onInit: () => {
-      // ...
-    },
-    deps: [
-      // ...
-	],
-  });
-
-  async function hidePost() {
-    const response = await mutateAndRefetchMountedQueries({
-	  //...
-  	});
-  }
-
-  // 4. JSX variables
-  //
-  // Group for readability.
-  // Never obscure any inter-dependence (eg in symmetry, colors, etc).
-  // Not everything needs to be placed under the \`jsx\` object.
-  // Avoid obscuring the origin and grouping in jsx what was declared above.
-  // Do not put in jsx independent vars used only once.
-
-  const jsx = {
-    name: user.name ?? "Anonymous",
-    css: {
-      padding: "gap.md",
-      get ml() {
-        return this.padding;
+    useInit({
+      isReady: !isLoadingFirstTime,
+      onInit: () => {
+        // ...
       },
-    },
-  } as const;
+      deps: [
+        // ...
+      ],
+    });
 
-  return (
-    <DialogRoot
-      open={state.snap.isDialogOpen}
-      onOpenChange={event => {
-		state.mutable.isDialogOpen = event.open;
-      }}
-    >
-	  <Button onClick={() => { loading.track(hidePost) }} loading={loading.isActive} ml={jsx.css.ml}>Hide {jsx.name}</Button>
-    </DialogRoot>
-  );
-}
+    async function hidePost() {
+      const response = await mutateAndRefetchMountedQueries({
+        //...
+      });
+    }
+
+    // 4. JSX variables
+    //
+    // Group for readability.
+    // Never obscure any inter-dependence (eg in symmetry, colors, etc).
+    // Not everything needs to be placed under the \`jsx\` object.
+    // Avoid obscuring the origin and grouping in jsx what was declared above.
+    // Do not put in jsx independent vars used only once.
+
+    const jsx = {
+      name: user.name ?? "Anonymous",
+      css: {
+        padding: "gap.md",
+        get ml() {
+          return this.padding;
+        },
+      },
+    } as const;
+
+    return (
+      <DialogRoot
+        open={state.snap.isDialogOpen}
+        onOpenChange={event => {
+          state.mutable.isDialogOpen = event.open;
+        }}
+      >
+        <Button onClick={() => { loading.track(hidePost) }} loading={loading.isActive} ml={jsx.css.ml}>Hide {jsx.name}</Button>
+      </DialogRoot>
+    );
+  }
 `}</CodeBlockText>
 
 #### Types
@@ -86,11 +86,11 @@ export function Card(props: { id: ID; }) {
 To make your Component customizable with Chakra props, use the following pattern:
 
 <CodeBlockText lang="tsx">{`
-import { type BoxProps } from "@chakra-ui/react";
+  import { type BoxProps } from "@chakra-ui/react";
 
-function Component(props: { count?: number; chakra?: BoxProps }) {
-  return <Box {...props.chakra}>{props.count}</Box>
-}
+  function Component(props: { count?: number; chakra?: BoxProps }) {
+    return <Box {...props.chakra}>{props.count}</Box>
+  }
 `}</CodeBlockText>
 
 For a local child Component that uses most of its parent props - use `react`'s `ComponentProps<typeof Component>`.

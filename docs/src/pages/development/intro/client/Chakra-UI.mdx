@@ -12,22 +12,22 @@ import { CodeBlockText } from "@/components"
 We must avoid implicit dependencies in styling: if one part of a Component (or a page) uses the same gap/font/size/color for the symmetry or information hierarchy - it must have either a local `const style`, or a page-shared `export const style`, eg:
 
 <CodeBlockText lang="ts">{`
-const style = {
-  breakpoint: {
-    lg: "xl",
-    xl: "2xl",
-  },
-  padding: "gap.md",
-  label: {
-    color: "fg",
-    fontSize: "xs",
-    fontWeight: "bold",
-  },
-  zIndex: {
-    sidebar: 1,
-    overlay: 2,
-  },
-} as const;
+  const style = {
+    breakpoint: {
+      lg: "xl",
+      xl: "2xl",
+    },
+    padding: "gap.md",
+    label: {
+      color: "fg",
+      fontSize: "xs",
+      fontWeight: "bold",
+    },
+    zIndex: {
+      sidebar: 1,
+      overlay: 2,
+    },
+  } as const;
 `}</CodeBlockText>
 
 Then you can spread them as props as `<Box {...style.label}>`.

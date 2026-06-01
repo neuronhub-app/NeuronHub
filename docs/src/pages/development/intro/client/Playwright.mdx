@@ -57,21 +57,21 @@ To detect such errors instead of reading `| tail -30` - on unclear failures read
 ### Clean test example
 
 <CodeBlockText lang="ts">{`
-test("Upvote", async () => {
-  await play.navigate(urls.reviews.list);
+  test("Upvote", async () => {
+    await play.navigate(urls.reviews.list);
 
-  await expect($[ids.post.vote.up]).toBeVisible();
+    await expect($[ids.post.vote.up]).toBeVisible();
 
-  await expect($[ids.post.vote.up]).not.checked();
+    await expect($[ids.post.vote.up]).not.checked();
 
-  const mutation = play.waitForResponseGraphql(UserQueryDoc);
-  await $[ids.post.vote.up].click();
-  await mutation;
-  await expect($[ids.post.vote.up]).checked();
+    const mutation = play.waitForResponseGraphql(UserQueryDoc);
+    await $[ids.post.vote.up].click();
+    await mutation;
+    await expect($[ids.post.vote.up]).checked();
 
-  await play.reload();
-  await expect($[ids.post.vote.up]).checked();
-});
+    await play.reload();
+    await expect($[ids.post.vote.up]).checked();
+  });
 `}</CodeBlockText>
 
 ### `e2e/helpers/expect.ts`

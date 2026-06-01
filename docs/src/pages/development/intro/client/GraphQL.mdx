@@ -11,12 +11,12 @@ import { CodeBlockText, Src } from "@/components"
 
 You must define queries on the top module level for gql-tada CLI to detect them, and update the whitelist on `mise lint`, eg:
 <CodeBlockText lang="typescript">{`
-import { graphql } from "@/gql-tada";
+  import { graphql } from "@/gql-tada";
 
-const PostListQuery = graphql.persisted(
-  "PostList",
-  graphql(\`query PostList { posts { ...PostFragment } }\`, [PostFragment]),
-);
+  const PostListQuery = graphql.persisted(
+    "PostList",
+    graphql(\`query PostList { posts { ...PostFragment } }\`, [PostFragment]),
+  );
 `}</CodeBlockText>
 
 gql.tada runs with `disableMasking: true` because it's useless.
