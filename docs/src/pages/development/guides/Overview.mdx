@@ -1,0 +1,29 @@
+---
+title: Overview
+order: 0
+---
+
+import { SimpleGrid } from "@chakra-ui/react"
+import { LuNetwork, LuWrench, LuRocket } from "react-icons/lu"
+import { GuideCard } from "@/components"
+
+<SimpleGrid columns={{ base: 1, md: 3 }} gap="gap.md" mt="gap.md" minW="750px">
+  <GuideCard
+    icon={LuNetwork}
+    title="Architecture"
+    description="Tech stack, core models, and data flow."
+    path="/development/intro/architecture"
+  />
+  <GuideCard
+    icon={LuWrench}
+    title="Dev Setup"
+    description="Local dev environment."
+    path="/development/guides/setup"
+  />
+  <GuideCard
+    icon={LuRocket}
+    title="Deployment"
+    description="Self-hosting configs."
+    path="/development/guides/deploy"
+  />
+</SimpleGrid>
