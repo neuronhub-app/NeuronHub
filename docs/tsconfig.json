@@ -22,6 +22,7 @@
     "paths": {
       "@/e2e/*": ["./e2e/*"],
       "@/*": ["./src/*"],
+      "~/scripts/*": ["./scripts/*"],
       "~/react-router/*": ["./.react-router/types/src/apps/*"],
     },
   },

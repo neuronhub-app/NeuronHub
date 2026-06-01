@@ -1,5 +1,5 @@
 /**
- * #AI
+ * #AI #quality-25%
  *
  * # todo ? refac: #AI code
  *

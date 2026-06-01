@@ -454,7 +454,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         dir = "docs/"
         run = [
             "pnpm exec tsgo --noEmit",
-            "pnpm exec tsx scripts/lint-mdx.ts",
+            "pnpm exec tsx scripts/lint-mdx/lint-mdx.ts",
         ]
         sources = ["src/**/*", "e2e/**/*", "scripts/**/*", "tsconfig.json", "package.json"]
         quiet = true
