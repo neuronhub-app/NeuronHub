@@ -1,9 +1,12 @@
 ---
+order: 4
 paths:
   - "**/*__test.py"
   - "**/test_*.py"
   - "client/e2e/**/*"
 ---
+
+import { LinkInt } from "@/components"
 
 We use `pytest` for unit tests, and `playwright` in `client/e2e`.
 
@@ -32,5 +35,5 @@ Playwright uses the `reset_db_and_gen` mutation to invoke `test_gen` methods.
 
 ## Mandatory task-specific docs
 
-- [How to use pytest](./backend/pytest.mdx)
-- [How to use Playwright](./frontend/Playwright.mdx)
+- <LinkInt path="/development/intro/server/pytest">How to use pytest</LinkInt>
+- <LinkInt path="/development/intro/client/playwright">How to use Playwright</LinkInt>

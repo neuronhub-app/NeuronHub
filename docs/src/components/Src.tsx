@@ -2,17 +2,18 @@ import { ReactNode } from "react";
 
 import { LinkExt } from "@/components/LinkExt";
 
-// `to` is a source-path shorthand from `links`. Without children the path renders as the label.
+// Without children the `to` shorthand renders as the link label.
 export function Src(props: { to: keyof typeof links; children?: ReactNode }) {
   return <LinkExt href={links[props.to]}>{props.children ?? props.to}</LinkExt>;
 }
 
-const paths = {
+// Source-path shorthand → GitHub blob URL. Imported by `lint-mdx.ts` to verify paths.
+export const paths = {
   github: "https://github.com/neuronhub-app/NeuronHub/blob/master",
   apps: "/server/neuronhub/apps",
 };
 
-const links = {
+export const links = {
   // server
   "posts/index.py": `${paths.github}${paths.apps}/posts/index.py`,
   "jobs/index.py": `${paths.github}${paths.apps}/jobs/index.py`,
@@ -21,11 +22,14 @@ const links = {
   "posts/services/filter_posts_by_user.py": `${paths.github}${paths.apps}/posts/services/filter_posts_by_user.py`,
   "posts/models/posts.py": `${paths.github}${paths.apps}/posts/models/posts.py`,
   "users/graphql/resolvers.py": `${paths.github}${paths.apps}/users/graphql/resolvers.py`,
+  "tests/test_cases.py": `${paths.github}${paths.apps}/tests/test_cases.py`,
+  "tests/test_gen.py": `${paths.github}${paths.apps}/tests/test_gen.py`,
   "jobs/models.py": `${paths.github}${paths.apps}/jobs/models.py`,
   "jobs/services/send_job_alerts.py": `${paths.github}${paths.apps}/jobs/services/send_job_alerts.py`,
   "jobs/services/send_job_alerts__test.py": `${paths.github}${paths.apps}/jobs/services/send_job_alerts__test.py`,
   "jobs/services/publish_job_versions.py": `${paths.github}${paths.apps}/jobs/services/publish_job_versions.py`,
   "jobs/services/get_jobs_public_from_ram.py": `${paths.github}${paths.apps}/jobs/services/get_jobs_public_from_ram.py`,
+  "mise.toml": `${paths.github}/mise.toml`,
   "schema.graphql": `${paths.github}/schema.graphql`,
   "server/persisted-queries.json": `${paths.github}/server/persisted-queries.json`,
   "server/persisted-queries-prev-release.json": `${paths.github}/server/persisted-queries-prev-release.json`,

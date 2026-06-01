@@ -1,22 +1,23 @@
 ---
+order: 2
 reviewed_at: 2026.03.18
 paths:
   - "**/*.tsx?"
 ---
 
-import { Src } from "@/components"
+import { CodeBlockText, Src } from "@/components"
 
 ### Persisted Queries
 
 You must define queries on the top module level for gql-tada CLI to detect them, and update the whitelist on `mise lint`, eg:
-```ts
+<CodeBlockText lang="typescript">{`
 import { graphql } from "@/gql-tada";
 
 const PostListQuery = graphql.persisted(
   "PostList",
-  graphql(`query PostList { posts { ...PostFragment } }`, [PostFragment]),
+  graphql(\`query PostList { posts { ...PostFragment } }\`, [PostFragment]),
 );
-```
+`}</CodeBlockText>
 
 gql.tada runs with `disableMasking: true` because it's useless.
 
@@ -24,10 +25,10 @@ gql.tada runs with `disableMasking: true` because it's useless.
 
 Instead of writing types by hand, uou must use `gql-tada.ResultOf` or `FragmentOf`, eg:
 
-```ts
+<CodeBlockText lang="typescript">{`
 type PostList = ResultOf<typeof PostListQuery>;
 export type Post = NonNullable<PostList["posts"]>[number];
-```
+`}</CodeBlockText>
 
 If need to narrow the type - utilize the `is` keyword, eg: 
 `function isPost(post: Post | unkonwn): post is Post { return post.__typename === "PostType" }`.

@@ -1,8 +1,9 @@
 ---
+order: 2
 paths: "**/*.py"
 ---
 
-import { Src } from "@/components"
+import { CodeBlockText, LinkInt, Src } from "@/components"
 
 ## Constraints
 
@@ -35,11 +36,11 @@ The structure of an App in `neuronhub.apps`:
 - `apps/graphql/persisted_query_extension.py` - gql.tada whitelist loader and enforcer
 - `apps/tests/` - `faker` `class Gen` factories, `db_stubs_repopulate`, pytest base class, etc
 - `apps/jobs/` - job listings with Algolia search and email alert subscriptions `services/send_alert_email.py`
-- `apps/profiles/` - [detailed doc](./profiles.mdx). Users' Profiles for Algolia directory, and LLM-powered matching.
+- `apps/profiles/` - <LinkInt path="/development/intro/server/profiles">detailed doc</LinkInt>. Users' Profiles for Algolia directory, and LLM-powered matching.
 	- `services/score_matches_by_llm.py` - calls LLM API to populate `ProfileMatch.match_score_by_llm` and `.match_reason_by_llm`
 	- `services/summarize_match_reviews.py` - builds calibration examples from user review corrections, injected into LLM prompt
 - `apps/orgs/` - `Org` model
-- `apps/sites/` - `SiteConfig` django-solo: branding + feature flags. See [Sub-sites doc](/development/intro/frontend/sub-sites-with-vite_site).
+- `apps/sites/` - `SiteConfig` django-solo: branding + feature flags. See <LinkInt path="/development/intro/client/sub-sites-with-vite_site">Sub-sites doc</LinkInt>.
 
 Tests are placed nearby named `{module_name}__test.py`.
 
@@ -53,7 +54,7 @@ Other `@task`s are manually enqueued.
 
 As the core feature we override `PostTypeI.get_queryset` (`PostTypeI` is a Strawberry's `interface` for each `Post` projection) by adding there `return filter_posts_by_user(user, posts=queryset)`, which filters by `post.visilibity` values.
 
-```python
+<CodeBlockText lang="python">{`
 class Visibility(TextChoices):
     PRIVATE
     USERS_SELECTED
@@ -61,7 +62,7 @@ class Visibility(TextChoices):
     SUBSCRIBERS
     INTERNAL
     PUBLIC
-```
+`}</CodeBlockText>
 
 Files:
 - <Src to="posts/graphql/types.py" />
@@ -76,4 +77,4 @@ And the field `visible_to` is serialized for Algolia in posts/models/posts.py <S
 
 ## Mandatory task-specific docs
 
-- [How to use pytest](./pytest.mdx)
+- <LinkInt path="/development/intro/server/pytest">How to use pytest</LinkInt>

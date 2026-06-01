@@ -1,11 +1,14 @@
 ---
+order: 1
 paths:
   - "**/*.tsx"
 ---
 
+import { CodeBlockText } from "@/components"
+
 ### React Component hierarchy and imports
 
-```tsx
+<CodeBlockText lang="tsx">{`
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { ID, graphql } from "@/gql-tada";
@@ -19,10 +22,10 @@ export function Card(props: { id: ID; }) {
   const user = useUser();
 
   const { data, error, isLoadingFirstTime } = useApolloQuery(
-    graphql(`query Post($id: ID!) { post(id: $id) { ... } }`),
+    graphql(\`query Post($id: ID!) { post(id: $id) { ... } }\`),
     { id: props.id },
   );
-  
+
   const loading = useIsLoading();
 
   // 2. State
@@ -51,7 +54,7 @@ export function Card(props: { id: ID; }) {
   //
   // Group for readability.
   // Never obscure any inter-dependence (eg in symmetry, colors, etc).
-  // Not everything needs to be placed under the `jsx` object.
+  // Not everything needs to be placed under the \`jsx\` object.
   // Avoid obscuring the origin and grouping in jsx what was declared above.
   // Do not put in jsx independent vars used only once.
 
@@ -76,19 +79,19 @@ export function Card(props: { id: ID; }) {
     </DialogRoot>
   );
 }
-```
+`}</CodeBlockText>
 
 #### Types
 
 To make your Component customizable with Chakra props, use the following pattern:
 
-```tsx
+<CodeBlockText lang="tsx">{`
 import { type BoxProps } from "@chakra-ui/react";
 
 function Component(props: { count?: number; chakra?: BoxProps }) {
   return <Box {...props.chakra}>{props.count}</Box>
 }
-```
+`}</CodeBlockText>
 
 For a local child Component that uses most of its parent props - use `react`'s `ComponentProps<typeof Component>`.
 

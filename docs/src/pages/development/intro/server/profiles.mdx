@@ -1,8 +1,9 @@
 ---
+order: 1
 paths: "**/profiles/**/*.py"
 ---
 
-import { Src } from "@/components"
+import { CodeBlockText, LinkInt, Src } from "@/components"
 
 ## Profiles App
 
@@ -10,7 +11,7 @@ Professional profiles directory with LLM-powered matching by a 3-step LLM flow.
 
 ### Models
 
-For the UML overview of `profiles.models` see [arch/backend](/development/)
+For the UML overview of `profiles.models` see <LinkInt path="/development">arch/server</LinkInt>
 
 Models fields:
 ```
@@ -56,7 +57,7 @@ Re-runs Step 1 with calibration from Step 2. `build_calibration_examples(max=8)`
 #### Serialization — `serialize_to_md.py`
 
 `Profile.save()` auto-populates `profile_for_llm_md`. Format:
-```xml
+<CodeBlockText lang="xml">{`
 <Profile id="123" name="Jane Doe">
 	Job title: ML Engineer
 	Skills: Python; PyTorch
@@ -64,7 +65,7 @@ Re-runs Step 1 with calibration from Step 2. `build_calibration_examples(max=8)`
 	<seeks>...</seeks>
 	<offers>...</offers>
 </Profile>
-```
+`}</CodeBlockText>
 
 ### Visibility & Algolia
 
@@ -72,4 +73,4 @@ Mirrors <Src to="posts/services/filter_posts_by_user.py" />. Algolia index uses 
 
 ### Testing
 
-![](/development/intro/backend/pytest#llm-api-tests)
+See <LinkInt path="/development/intro/server/pytest" hash="slow-tests">LLM API tests</LinkInt>.

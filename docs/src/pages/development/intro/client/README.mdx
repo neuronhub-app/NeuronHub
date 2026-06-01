@@ -1,9 +1,10 @@
 ---
+order: 3
 paths:
   - "**/*.tsx?"
 ---
 
-import { Src } from "@/components"
+import { LinkInt, Src } from "@/components"
 
 ## Structure
 
@@ -28,8 +29,8 @@ import { Src } from "@/components"
 	- <Src to="useApolloQuery.ts" /> - use instead of the broken `useQuery`, including its `isLoadingFirstTime` instead of `loading`
 	- <Src to="graphql/client.ts" /> - Apollo `export const client` for when you need exceptions
 	- <Src to="codegen.ts" /> - is only used for TS enums generation - all GraphQL types are handled by gql.tada.
-- `src/components/algolia/` - see `Algolia.mdx` if needed
-- `src/sites/` - per-site `theme`, `routes`, `layout`, `redirects` selected by build-time `env.VITE_SITE`. See [Sub-sites doc](Sub-sites-with-VITE_SITE.mdx).
+- `src/components/algolia/` - see <LinkInt path="/development/intro/algolia">Algolia</LinkInt> if needed
+- `src/sites/` - per-site `theme`, `routes`, `layout`, `redirects` selected by build-time `env.VITE_SITE`. See <LinkInt path="/development/intro/client/sub-sites-with-vite_site">Sub-sites doc</LinkInt>.
 - `src/theme/` - @chakra-ui theme config and semantic tokens
 - `src/env.ts` - typed `export const env`
 - `e2e/` - Playwright with its `e2e/tests`
@@ -60,12 +61,12 @@ Note: `toast.error()` from <Src to="toast.tsx" /> also calls `Sentry.captureExce
 
 Must read when working with any of those module.
 
-- [How to structure a React Component](./React-component-structure.mdx)
-- [How to use GraphQL](./GraphQL.mdx)
-- [How to use Playwright](./Playwright.mdx)
-- [How to use Chakra UI](Chakra-UI.mdx)
-- [How to work with sub-sites as `VITE_SITE="pg"`](Sub-sites-with-VITE_SITE.mdx) from `src/sites/`
-- [Prerender + prefetch](Prerender-and-Prefetch.mdx) — build-time static HTML for SEO without SSR
+- <LinkInt path="/development/intro/client/react-component-structure">How to structure a React Component</LinkInt>
+- <LinkInt path="/development/intro/client/graphql">How to use GraphQL</LinkInt>
+- <LinkInt path="/development/intro/client/playwright">How to use Playwright</LinkInt>
+- <LinkInt path="/development/intro/client/chakra-ui">How to use Chakra UI</LinkInt>
+- <LinkInt path="/development/intro/client/sub-sites-with-vite_site">How to work with sub-sites as `VITE_SITE="pg"`</LinkInt> from `src/sites/`
+- <LinkInt path="/development/intro/client/prerender-and-prefetch">Prerender + prefetch</LinkInt> — build-time static HTML for SEO without SSR
 
 ## `packages/shared/` — pnpm Workspace
 

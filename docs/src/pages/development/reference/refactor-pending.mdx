@@ -1,24 +1,31 @@
+---
+order: 24
+---
+
+import { LinkExt } from "@/components"
+
 ## Server
 
 - unfuck `neuronhub/apps/tests/services/db_reset_and_partial_reindex.py::_models_to_drop_ordered`.
-- rename GraphQL mutations to `{noun}_{verb}`.
-- shorten Post subset names as `PostTool`/`PostReview` to `Tool`/`Review`.
 - store URLs of FE used by BE in a single file (eg typed JSON) that both can import.
     - Replace magic strings in python docstrings as `jobs/drafts`.
-- prefix all Django envs with `DJANGO_` (same as `VITE_`).
 - migrate to Mise experimental monorepo to split out `mise.toml`.
+- prefix all Django envs with `DJANGO_` (same as `VITE_`).
 
-### Small
+### Low prio
 
+- install `strawberry-graphql[cli]` and `libcst` to enable rich errors (<LinkExt href="https://strawberry.rocks/docs/errors">strawberry.rocks/docs/errors</LinkExt>).
 - utilize `@strawberry_django.mutation(handle_django_errors=True)` param for returning `ValidationError`.
 - add `server/generated/` (move persisted-queries) and `client/generated/` (move gql tada and landing pages).
+- rename GraphQL mutations to `{noun}_{verb}`.
+- shorten Post subset names as `PostTool`/`PostReview` to `Tool`/`Review`.
 
 ## Client
 
 - unfuck `client/src/sites/pg/routes.ts`.
 - deploy `docs/` and `client/` as static sites on Render.
-- rename `jobs/subscriptions` to `jobs/alerts`.
 - restructure `client/` per #59.
+- rename `jobs/subscriptions` to `jobs/alerts`.
 - merge detail pages logic of `apps/<type>/edit/index.tsx`.
 - use `index.tsx` files only for `export` -> name the main files same as comp, eg `PostCard.tsx`.
 - prefix `components/posts/PostCard/*` components with `PostCard*` - to show they're not react-hook-from, but for render-only.

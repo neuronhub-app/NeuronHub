@@ -1,10 +1,10 @@
 <doc_architecture>
 
-@docs/src/pages/development/README.md
+@docs/src/pages/development/intro/architecture.md
 
-@docs/src/pages/development/intro/backend/README.md
+@docs/src/pages/development/intro/server/README.md
 
-@docs/src/pages/development/intro/frontend/README.md
+@docs/src/pages/development/intro/client/README.md
 
 </doc_architecture>
 
@@ -31,6 +31,9 @@
 @docs/src/pages/development/reference/roadmap/roadmap-v0.3.md
 
 </doc_roadmap>
+
+
+Never use Git worktrees - they aren't usable - this project relies on db and ports infra to test and run.
 
 
 Never use Git worktrees - they aren't usable - this project relies on db and ports infra to test and run.

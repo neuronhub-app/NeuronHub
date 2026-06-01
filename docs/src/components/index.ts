@@ -11,6 +11,7 @@ export { GuideCard } from "@/components/GuideCard";
 export { ImageWithDialog } from "@/components/ImageWithDialog";
 export { LinkExt } from "@/components/LinkExt";
 export { LinkInt } from "@/components/LinkInt";
+export { Mermaid } from "@/components/Mermaid";
 export { Notice } from "@/components/Notice";
 export { PageLink } from "@/components/PageLink";
 export { Src } from "@/components/Src";

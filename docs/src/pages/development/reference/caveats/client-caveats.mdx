@@ -1,4 +1,8 @@
-import { Src } from "@/components"
+---
+order: 31
+---
+
+import { CodeBlockText, LinkExt, Src } from "@/components"
 
 ## Client Caveats
 
@@ -10,7 +14,7 @@ import { Src } from "@/components"
 Side-effects will be discarded.
 
 v7 react-hook-form:
-```typescript
+<CodeBlockText lang="typescript">{`
 // broken - no re-render
 const form = useForm();
 form.watch("field"); 
@@ -23,19 +27,19 @@ useWatch("field");
 const form = useForm();
 const useWatch = form.watch;
 useWatch("field");
-```
+`}</CodeBlockText>
 
-For more see [react-hook-form#12298](https://github.com/react-hook-form/react-hook-form/issues/12298). The v8 release renamed the hooks to fix this.
+For more see <LinkExt href="https://github.com/react-hook-form/react-hook-form/issues/12298">react-hook-form#12298</LinkExt>. The v8 release renamed the hooks to fix this.
 
 ### react-hook-form `ref` passing breaks <input/> `onChange`
 
-See [react-hook-form docs](https://www.react-hook-form.com/faqs/#Howtosharerefusage)
+See <LinkExt href="https://www.react-hook-form.com/faqs/#Howtosharerefusage">react-hook-form docs</LinkExt>
 
 ### react-router on `navigate()` will not trigger newly mounted `useEffect(..., [])` due to its secret cache
 
 Previous pages are *sometimes* kept in RAM (cached) - hence "mounting" them again will not trigger their `useEffect(..., [])`.
 
-It's known, but [the report #12790](https://github.com/remix-run/react-router/issues/12790) was rejected, as the maintainer thought it only affects direct uses of `window`.
+It's known, but <LinkExt href="https://github.com/remix-run/react-router/issues/12790">the report #12790</LinkExt> was rejected, as the maintainer thought it only affects direct uses of `window`.
 
 #### Analysis by an LLM
 

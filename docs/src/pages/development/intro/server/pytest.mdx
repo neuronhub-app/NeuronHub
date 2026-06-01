@@ -1,10 +1,16 @@
+---
+order: 2
+---
+
+import { CodeBlockText, Src } from "@/components"
+
 ## Pytest
 
 Run by `mise pytest`.
 
-Subclass `NeuronTestCase`, from [test_cases](/server/neuronhub/apps/tests/test_cases.py). It's code structure:
+Subclass `NeuronTestCase`, from <Src to="tests/test_cases.py">test_cases</Src>. It's code structure:
 
-```python
+<CodeBlockText lang="python">{`
 class NeuronTestCase(TestCase):
     gen: Gen
     user: User
@@ -17,7 +23,7 @@ class NeuronTestCase(TestCase):
 
     async def graphql_query(self, query: str, variables: dict = None, user_authed: User = self.user) -> ExecutionResult:
         ...
-```
+`}</CodeBlockText>
 
 - Each test name must convey its purpose. Docstrings are only allowed for bugs with exceptional complexity.
 - Store tests in their target module with a `__test` postfix, eg `apps.posts.services.filter_posts_by_user` is covered by `filter_posts_by_user__test.py`.
@@ -25,7 +31,7 @@ class NeuronTestCase(TestCase):
 - Never prefer testing Python business logic though GraphQL - test functions directly. The API is covered by Playwright.
 - Use subagents to read `pytest-rich` output: it has local vars, source code, etc
 
-### [Gen](/server/neuronhub/apps/tests/test_gen.py)
+### <Src to="tests/test_gen.py">Gen</Src>
 
 All kwargs of `Gen` methods are optional with fallbacks.
 - so we can easily create many `await self.gen.posts.review()`
@@ -38,7 +44,7 @@ Read the `test_gen.py` classes & methods headers before writing tests.
 
 #### Decent test example
 
-```python
+<CodeBlockText lang="python">{`
 class VisibilityTest(NeuronTestCase):
     async def test_visibility_by_connection(self):
         post = await self.gen.posts.create()
@@ -60,7 +66,7 @@ async def _visible_comments(post: Post, user: User):
 
 async def _add_connection(user: User, connection_new: User):
 	...
-```
+`}</CodeBlockText>
 
 ### DB reuse
 

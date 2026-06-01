@@ -9,7 +9,7 @@ NeuronHub is privacy-first directory for: news, tools, products, jobs, profiles,
 
 ### Architecture Overview
 
-See [docs/src/pages/development/README.mdx](/docs/src/pages/development/README.mdx).
+See [docs/src/pages/development/README.mdx](/docs/src/pages/development/intro/architecture.mdx).
 
 For development setup, see [docs/src/pages/development/guides/setup.mdx](/docs/src/pages/development/guides/setup.mdx).
 

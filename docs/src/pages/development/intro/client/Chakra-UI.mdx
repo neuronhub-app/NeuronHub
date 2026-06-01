@@ -1,14 +1,17 @@
 ---
+order: 3
 paths:
   - "**/*.tsx"
   - "**/client/src/theme/*"
 ---
 
+import { CodeBlockText } from "@/components"
+
 ### Styles
 
 We must avoid implicit dependencies in styling: if one part of a Component (or a page) uses the same gap/font/size/color for the symmetry or information hierarchy - it must have either a local `const style`, or a page-shared `export const style`, eg:
 
-```ts
+<CodeBlockText lang="ts">{`
 const style = {
   breakpoint: {
     lg: "xl",
@@ -25,7 +28,7 @@ const style = {
     overlay: 2,
   },
 } as const;
-```
+`}</CodeBlockText>
 
 Then you can spread them as props as `<Box {...style.label}>`.
 

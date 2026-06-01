@@ -1,10 +1,13 @@
 ---
 title: Development Setup
+order: 10
 ---
+
+import { LinkExt, Src } from "@/components"
 
 ## Linux & Docker
 
-1. Install <a href="https://mise.jdx.dev/getting-started" rel="nofollow">Mise</a>, eg `curl https://mise.run | sh`
+1. Install <LinkExt href="https://mise.jdx.dev/getting-started">Mise</LinkExt>, eg `curl https://mise.run | sh`
 2. `git clone {url}`
 3. `cd neuronhub`
 4. ```shell
@@ -21,13 +24,13 @@ dev URLs:
     - login/pass: admin/admin
 - http://localhost:3000
 
-The [mise.toml](/mise.toml) has all tasks and scripts.
+The <Src to="mise.toml" /> has all tasks and scripts.
 
 ## Algolia
 
 FE will work only partially without an Algolia app.
 
-- <a href="https://dashboard.algolia.com/users/sign_in" rel="nofollow">Create a free account</a>
+- <LinkExt href="https://dashboard.algolia.com/users/sign_in">Create a free account</LinkExt>
 - `cp .env.local.example .env.local`
 - In this file populate App ID, API key, and Search API key
 - `mise run django:algolia-reindex`

@@ -34,11 +34,15 @@ function buildDirRedirects() {
     const slug = "/" + path.relative(pagesDir, dir).toLowerCase();
     const isHasReadme = existsSync(path.join(dir, `${frontmatter.consts.readme}.mdx`));
 
+    // A README dir already has a content route at `slug` (see fileToSlug), so a
+    // dir-redirect here would shadow it and loop back to itself.
+    if (isHasReadme) {
+      continue;
+    }
+
     const redirect = "dir-redirect.tsx";
     routes.push(route(slug, `pages/${redirect}`, { id: `redirect:${slug}` }));
-    if (!isHasReadme) {
-      routes.push(route(slug + "/", `pages/${redirect}`, { id: `redirect:${slug}/` }));
-    }
+    routes.push(route(slug + "/", `pages/${redirect}`, { id: `redirect:${slug}/` }));
   }
 
   return routes;
@@ -52,8 +56,9 @@ function fileToSlug(file: string): string {
   if (fm.slug) {
     return `/${dirPath}/${fm.slug}`;
   }
-  if (path.basename(rel) === frontmatter.consts.readme) {
-    return `/${dirPath}/`;
+  // Compare the original-case basename - `rel` is lowercased.
+  if (path.basename(file, ".mdx") === frontmatter.consts.readme) {
+    return `/${dirPath}`;
   }
   return `/${rel}`;
 }
