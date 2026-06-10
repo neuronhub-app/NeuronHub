@@ -32,27 +32,23 @@ class AlgoliaModel(AnonimazableTimeStampedModel):
         return True
 
     def get_visible_to(self) -> list[str]:
-        if self.visibility is Visibility.PRIVATE:
-            assert self.author
-            return [self.author.username]
-
+        # prob-redundant todo refac: Post.get_visible_to is an identical copy - keep in sync until Post subclasses AlgoliaModel.
         if self.visibility in [Visibility.INTERNAL, Visibility.PUBLIC]:
             return [f"group/{self.visibility.value}"]
 
-        visible_to: list[str] = []
+        assert self.author
+        visible_to: list[str] = [self.author.username]
 
         if self.visibility in [Visibility.USERS_SELECTED, Visibility.CONNECTIONS]:
-            # `list()` are only for Mypy #bad-infer
-            visible_to.extend(list(*self.visible_to_users.all().values_list("username")))
+            visible_to.extend(user.username for user in self.visible_to_users.all())
 
         if self.visibility is Visibility.USERS_SELECTED:
             for group in self.visible_to_groups.all():
-                visible_to.extend(list(*group.connections.all().values_list("username")))
+                visible_to.extend(user.username for user in group.connections.all())
 
         if self.visibility is Visibility.CONNECTIONS:
-            assert self.author
             for group in self.author.connection_groups.all():
-                visible_to.extend(list(*group.connections.all().values_list("username")))
+                visible_to.extend(user.username for user in group.connections.all())
 
         return visible_to
 
