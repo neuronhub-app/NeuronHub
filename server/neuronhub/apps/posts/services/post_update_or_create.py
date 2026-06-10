@@ -6,6 +6,8 @@ But `tags` are different - the separator `/` must be parsed on backend/frontend.
 
 from strawberry import UNSET
 
+from neuronhub.apps.algolia.services.algolia_reindex_partial import AlgoliaChangedIds
+from neuronhub.apps.algolia.services.algolia_reindex_partial import algolia_reindex_partial
 from neuronhub.apps.posts.models import Post, PostRelated
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 from neuronhub.apps.users.models import User
@@ -13,9 +15,20 @@ from neuronhub.apps.posts.graphql.types import PostTypeInput, PostTagTypeInput
 
 
 async def post_update_or_create(author: User, data: PostTypeInput) -> Post:
+    is_edit_mode = bool(data.id)
     post = await _update_or_create(data, author)
     await _post_visibility_update(post, data)
     await _tags_update_or_create(post, data, author)
+
+    # todo refac: band-aid local to this service - other Post/Job/Profile save+M2M
+    # paths have the same stale-index bug. Deep fix: reindex on m2m_changed/after-commit.
+    changed = (
+        AlgoliaChangedIds(model=Post, updated=[post.id])
+        if is_edit_mode
+        else AlgoliaChangedIds(model=Post, created=[post.id])
+    )
+    await algolia_reindex_partial(changed)
+
     return post
 
 

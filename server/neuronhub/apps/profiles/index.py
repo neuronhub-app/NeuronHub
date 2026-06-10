@@ -104,7 +104,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
                     # todo ! fix: rename user -> author
                     # "author__connection_groups",
                     "visible_to_users",
-                    "visible_to_groups",
+                    "visible_to_groups__connections",
                     "skills",
                     "interests",
                 )
