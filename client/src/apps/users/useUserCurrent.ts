@@ -102,6 +102,7 @@ export const UserQueryDoc = graphql.persisted(
           id
           is_vote_positive
           is_changed_my_mind
+          comment
           post {
             id
           }

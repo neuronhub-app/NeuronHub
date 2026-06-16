@@ -78,15 +78,34 @@ export function SelectVotable(
   const state = useStateValtio({
     isDialogOpen: false,
     optionSelected: null as SelectVotableOption | null,
+    commentOnDialogOpen: "",
   });
 
   function getOptionIndex(option: SelectVotableOption): number {
-    return options.findIndex(opt => opt.id === option.id);
+    return form.getValues(props.fieldName).findIndex(opt => opt.id === option.id);
   }
 
   function getOptionComment(option: SelectVotableOption): string {
-    const optionNumber = getOptionIndex(option);
-    return options[optionNumber]?.comment ?? "";
+    return options.find(opt => opt.id === option.id)?.comment ?? "";
+  }
+
+  function onCommentDialogClose() {
+    const optionSelected = state.mutable.optionSelected;
+    if (!isSelectReadOnlyInReviewForm || !optionSelected) {
+      return;
+    }
+    const optionIndex = getOptionIndex(optionSelected);
+    const isCommentUnchanged =
+      (form.getValues(`${props.fieldName}.${optionIndex}.comment`) ?? "") ===
+      state.mutable.commentOnDialogOpen;
+    if (isCommentUnchanged) {
+      return;
+    }
+    void mutatePostTagVote({
+      // @ts-expect-error #bad-infer
+      postId: props.postId,
+      optionNew: form.getValues(`${props.fieldName}.${optionIndex}`),
+    });
   }
 
   const isSelectReadOnlyInReviewForm = Boolean(
@@ -104,6 +123,7 @@ export function SelectVotable(
         {props.helpText && <Field.HelperText>{props.helpText}</Field.HelperText>}
 
         <AsyncCreatableSelect
+          placeholder={isSelectReadOnlyInReviewForm ? "No tags" : "Select..."}
           isDisabled={props.isReadOnly}
           cacheOptions
           defaultOptions
@@ -183,6 +203,9 @@ export function SelectVotable(
                       <OptionButton
                         onClick={() => {
                           state.mutable.optionSelected = propsMultiVal.data;
+                          state.mutable.commentOnDialogOpen = getOptionComment(
+                            propsMultiVal.data,
+                          );
                           state.mutable.isDialogOpen = true;
                         }}
                         icon={getOptionComment(propsMultiVal.data) ? FaMessage : FaRegMessage}
@@ -210,6 +233,9 @@ export function SelectVotable(
           initialFocusEl={() => commentInputRef.current}
           open={state.snap.isDialogOpen}
           onOpenChange={event => {
+            if (!event.open) {
+              onCommentDialogClose();
+            }
             state.mutable.isDialogOpen = event.open;
           }}
         >
@@ -217,7 +243,9 @@ export function SelectVotable(
           <DialogContent>
             <DialogCloseTrigger />
             <DialogHeader>
-              <DialogTitle>{state.snap.optionSelected?.name}</DialogTitle>
+              <DialogTitle>
+                {state.snap.optionSelected?.label ?? state.snap.optionSelected?.name}
+              </DialogTitle>
             </DialogHeader>
             <DialogBody>
               {state.snap.isDialogOpen && state.snap.optionSelected && (
@@ -226,6 +254,7 @@ export function SelectVotable(
                   control={form.control}
                   key={state.snap.optionSelected.name}
                   onKeyEnter={() => {
+                    onCommentDialogClose();
                     state.mutable.isDialogOpen = false;
                   }}
                   inputProps={{
@@ -316,7 +345,14 @@ export function OptionButton(props: {
 }) {
   return (
     <IconButton
-      onClick={props.onClick}
+      onMouseDown={event => {
+        event.stopPropagation();
+        event.preventDefault();
+      }}
+      onClick={event => {
+        event.stopPropagation();
+        props.onClick();
+      }}
       color={props.color}
       p={0}
       h={6}
@@ -341,6 +377,7 @@ async function mutatePostTagVote(opts: { postId: ID; optionNew: SelectVotableOpt
     post_id: opts.postId,
     tag_id: opts.optionNew.id,
     is_vote_positive: opts.optionNew.is_vote_positive,
+    comment: opts.optionNew.comment ?? null,
   });
   if (!response.success) {
     toast.error(`Vote failed: ${response.errorMessage}`);
@@ -372,11 +409,17 @@ const ToolTagsQuery = graphql.persisted(
 const CreateOrUpdatePostTagVote = graphql.persisted(
   "CreateOrUpdatePostTagVote",
   graphql(`
-    mutation CreateOrUpdatePostTagVote($post_id: ID!, $tag_id: ID!, $is_vote_positive: Boolean) {
+    mutation CreateOrUpdatePostTagVote(
+      $post_id: ID!
+      $tag_id: ID!
+      $is_vote_positive: Boolean
+      $comment: String
+    ) {
       post_tag_vote_create_or_update(
         post_id: $post_id
         tag_id: $tag_id
         is_vote_positive: $is_vote_positive
+        comment: $comment
       )
     }
   `),

@@ -30,13 +30,11 @@ export function FormChakraCheckboxCard<
   return (
     <CheckboxCard.Root
       {...checkboxCardProps}
+      checked={Boolean(field.value)}
+      onCheckedChange={details => field.onChange(details.checked === true)}
       _hover={{ bg: "bg.light", _dark: { bg: "bg.light" }, cursor: "pointer" }}
     >
-      <CheckboxCard.HiddenInput
-        {...field}
-        checked={field.value}
-        onChange={e => field.onChange(e.currentTarget.checked)}
-      />
+      <CheckboxCard.HiddenInput ref={field.ref} name={field.name} onBlur={field.onBlur} />
       <CheckboxCard.Control>
         <CheckboxCard.Content gap={3}>
           <Icon fontSize="2xl">{icon}</Icon>

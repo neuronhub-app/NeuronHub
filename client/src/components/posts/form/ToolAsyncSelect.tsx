@@ -33,6 +33,7 @@ export function ToolAsyncSelect(props: { form: schemas.ToolForm }) {
   };
 
   useInit({
+    isReady: true,
     onInit: async () => {
       const res = await client.query({ query: ToolQuery, variables: { filterBy: null } });
       if (res.data?.post_tools) {

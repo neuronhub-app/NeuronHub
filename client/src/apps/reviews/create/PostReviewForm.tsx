@@ -39,41 +39,28 @@ export namespace PostReviewForm {
     const user = useUser();
     const loading = useIsLoading();
 
-    // todo refac(UX): fix broken `reValidateMode: "onChange"` - after refactor to 2 forms validates only on <button type="submit"> click
     const forms = {
       tool: useForm<schemas.Tool>({
         resolver: zodResolver(schemas.Tool),
+        mode: "onBlur",
         reValidateMode: "onChange",
         defaultValues: {
           id: null,
           title: "",
           tool_type: "Program",
-          tags: loadTags(props.review?.parent?.tags),
+          tags: schemas.tags.deserialize({
+            tags: props.review?.parent?.tags,
+            user,
+            postIdForVote: props.review?.parent?.id,
+          }),
         },
       }),
       review: useForm<schemas.Review>({
         resolver: zodResolver(schemas.Review),
+        mode: "onBlur",
         reValidateMode: "onChange",
         defaultValues: props.review
-          ? {
-              id: props.review.id,
-              title: props.review.title,
-              content_polite: props.review.content_polite,
-              content_direct: props.review.content_direct,
-              content_rant: props.review.content_rant,
-              // todo refac: move to schemas.props.review.deserialize()
-              review_rating: props.review.review_rating,
-              review_importance: props.review.review_importance,
-              review_usage_status: schemas.Review.shape.review_usage_status.parse(
-                props.review.review_usage_status,
-              ),
-              reviewed_at: formatISO(new Date(props.review.reviewed_at), {
-                representation: "date",
-              }),
-              tags: loadTags(props.review.tags),
-              review_tags: loadTags(props.review.review_tags, { isReviewTags: true }),
-              ...schemas.sharable.deserialize(props.review),
-            }
+          ? schemas.review.deserialize({ review: props.review, user })
           : {
               id: null,
               title: "",
@@ -89,27 +76,6 @@ export namespace PostReviewForm {
     };
 
     const reviewTags = useWatch({ control: forms.review.control, name: "tags" });
-
-    function loadTags(tags?: schemas.PostAbstract["tags"], opts?: { isReviewTags: true }) {
-      if (!tags) {
-        return [];
-      }
-      return tags.map(tag => {
-        const userTagVote = user?.post_tag_votes.find(vote => {
-          const isThisPostVote = [props.review?.id, props.review?.parent?.id].includes(
-            vote.post.id,
-          );
-          return isThisPostVote && vote.tag.id === tag.id;
-        });
-        return {
-          id: tag.id,
-          name: tag.name,
-          is_vote_positive: userTagVote?.is_vote_positive ?? null,
-          // non-review_tags .label includes all `tag_parent.name`s - verbose af
-          label: opts?.isReviewTags && tag.label,
-        };
-      });
-    }
 
     async function handleSubmit() {
       const isFormInvalid = !(await forms.review.trigger());

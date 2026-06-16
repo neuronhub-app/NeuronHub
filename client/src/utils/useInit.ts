@@ -14,6 +14,7 @@ export function useInit(options: {
   const state = useStateValtio({ isLoading: false });
 
   useEffect(() => {
+    // todo refac: default isReady to true - a missing isReady silently no-ops instead of running
     if (!options.isReady) {
       return;
     }
