@@ -268,6 +268,7 @@ class PostTagVoteType:
 
     is_vote_positive: auto
     is_changed_my_mind: auto
+    comment: auto
 
 
 @strawberry_django.input(PostTag, partial=True)

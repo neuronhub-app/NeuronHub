@@ -1,9 +1,11 @@
+import { formatISO } from "date-fns";
 import { type UseFormReturn, useFormContext as useFormContextOriginal } from "react-hook-form";
 import { z } from "zod/v4";
 
 import { PostCategory, PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
 import type { User } from "@/apps/users/useUserCurrent";
+import type { ID } from "@/gql-tada";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 
@@ -171,17 +173,12 @@ export namespace schemas {
         source_author: data.source_author,
         category: data.category as PostCategory | null,
         tags:
-          data.tags?.map(tag => {
-            const userTagVote = user?.post_tag_votes.find(vote => {
-              return vote.post.id === data.id && vote.tag.id === tag.id;
-            });
-            return {
-              id: tag.id,
-              name: tag.name,
-              label: tag.label,
-              is_vote_positive: userTagVote?.is_vote_positive ?? null,
-            };
-          }) ?? [],
+          data.tags?.map(tag => ({
+            id: tag.id,
+            name: tag.name,
+            label: tag.label,
+            ...getTagVoteFields({ user, postIdForVote: data.id, tagId: tag.id }),
+          })) ?? [],
         ...sharable.deserialize(data),
       };
     }
@@ -212,6 +209,39 @@ export namespace schemas {
     }
   }
 
+  export namespace tags {
+    export function deserialize(args: {
+      tags?: PostAbstract["tags"];
+      user?: User | null;
+      postIdForVote?: ID;
+      isReviewTags?: boolean;
+    }) {
+      return (
+        args.tags?.map(tag => ({
+          id: tag.id,
+          name: tag.name,
+          // non-review_tags .label includes all `tag_parent.name`s - verbose af
+          label: args.isReviewTags ? tag.label : undefined,
+          ...getTagVoteFields({
+            user: args.user,
+            postIdForVote: args.postIdForVote,
+            tagId: tag.id,
+          }),
+        })) ?? []
+      );
+    }
+  }
+
+  function getTagVoteFields(args: { user?: User | null; postIdForVote?: ID; tagId: ID }) {
+    const userTagVote = args.user?.post_tag_votes.find(
+      vote => vote.post.id === args.postIdForVote && vote.tag.id === args.tagId,
+    );
+    return {
+      is_vote_positive: userTagVote?.is_vote_positive ?? null,
+      comment: userTagVote?.comment ?? undefined,
+    };
+  }
+
   export const Review = Abstract.safeExtend(sharable.Schema.shape).safeExtend({
     review_rating: z.number().min(0).max(100).nullable(),
     review_importance: z.number().min(0).max(100).nullable(),
@@ -222,6 +252,35 @@ export namespace schemas {
   });
   export type Review = z.infer<typeof Review>;
   export type ReviewForm = UseFormReturn<Review>;
+
+  export namespace review {
+    export function deserialize(args: {
+      review: PostReviewEditFragmentType;
+      user?: User | null;
+    }): Review {
+      const review = args.review;
+      return {
+        id: review.id,
+        title: review.title,
+        content_polite: review.content_polite,
+        content_direct: review.content_direct,
+        content_rant: review.content_rant,
+        review_rating: review.review_rating,
+        review_importance: review.review_importance,
+        review_usage_status: Review.shape.review_usage_status.parse(review.review_usage_status),
+        reviewed_at: formatISO(new Date(review.reviewed_at), { representation: "date" }),
+        is_review_later: review.is_review_later,
+        tags: tags.deserialize({ tags: review.tags, user: args.user, postIdForVote: review.id }),
+        review_tags: tags.deserialize({
+          tags: review.review_tags,
+          user: args.user,
+          postIdForVote: review.id,
+          isReviewTags: true,
+        }),
+        ...sharable.deserialize(review),
+      };
+    }
+  }
 
   // excludes `sharable.Schema`, because it's always public
   export const Tool = Abstract.safeExtend({

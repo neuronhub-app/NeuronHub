@@ -636,6 +636,7 @@ type PostTagVoteType {
   post: PostSimpleType!
   is_vote_positive: Boolean
   is_changed_my_mind: Boolean!
+  comment: String!
 }
 
 type PostToolType implements PostTypeI {

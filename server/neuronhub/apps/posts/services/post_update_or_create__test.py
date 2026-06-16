@@ -1,4 +1,5 @@
 from strawberry import UNSET
+from strawberry_django.fields.types import ManyToManyInput
 
 from neuronhub.apps.posts.graphql.types import PostTagTypeInput
 from neuronhub.apps.posts.graphql.types import PostTypeInput
@@ -242,6 +243,43 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         # Tool.tags is kept
         tool_tags = {tag.name async for tag in tool.tags.all()}
         assert tool_tags == {tag_name_1, tag_name_2}
+
+    async def test_recommended_to_users_is_saved(self):
+        tool = await self.gen.posts.tool()
+        recommended_to = await self.gen.users.user()
+
+        review = await post_update_or_create(
+            author=self.user,
+            data=PostTypeInput(
+                parent=PostTypeInput(id=tool.id),
+                type=Post.Type.Review,
+                title="Review",
+                recommended_to_users=ManyToManyInput(set=[recommended_to.id]),
+            ),
+        )
+
+        assert [user.id async for user in review.recommended_to_users.all()] == [
+            recommended_to.id
+        ]
+
+    async def test_tag_vote_comment_is_saved_and_exposed_via_graphql(self):
+        tool = await self.gen.posts.tool()
+        await post_update_or_create(
+            author=self.user,
+            data=PostTypeInput(
+                parent=PostTypeInput(id=tool.id),
+                type=Post.Type.Review,
+                title="Review",
+                tags=[PostTagTypeInput(name="Python", comment="my note")],
+            ),
+        )
+
+        result = await self.graphql_query(
+            "query UserCurrent { user_current { post_tag_votes { comment tag { id } } } }"
+        )
+        assert not result.errors
+        comments = [vote["comment"] for vote in result.data["user_current"]["post_tag_votes"]]
+        assert "my note" in comments
 
     # #AI
     async def test_votes_persist_after_save_without_changes(self):
