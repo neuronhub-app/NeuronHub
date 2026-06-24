@@ -1,18 +1,18 @@
 redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
 [tools]
-    "aqua:nushell/nushell" = "0.112.1"
+    "aqua:nushell/nushell" = "0.112"
 
-    uv = "0.11.6"
-    pnpm = "10.33.0" # also match [[package.json]] packageManager
+    uv = "latest"
+    pnpm = "10.33" # also match [[package.json]] packageManager
 
-	usage = "3.2.0"
-    rclone = "1.73.4"
-    killport = "2.0.0"
+	usage = "latest"
+    rclone = "1"
+    killport = "2"
     ripgrep = "15"
     ast-grep = "latest"
 
-    node = "25.9.0"
+    node = "25"
 
 [settings]
 	lockfile = true
