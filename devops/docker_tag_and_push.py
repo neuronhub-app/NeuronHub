@@ -12,18 +12,25 @@ import subprocess
 from argparse import Namespace
 from typing import Literal
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument("--app", default="server", choices=["server", "client", "docs", "coder"])
-parser.add_argument("--vite_site", default="")
+parser.add_argument("--vite_site", default="", choices=["", "pg"])
+parser.add_argument("--django_env", default="", choices=["", "prod", "stage", "dev"])
 parser.add_argument("--ghcr_repo")
 parser.add_argument("--version")
 parser.add_argument("--tag_only", action="store_true")
 parser.add_argument("--pre_release", action="store_true")
 
 
+type ViteSite = Literal["", "pg"]
+type DjangoEnv = Literal["", "prod", "stage", "dev"]
+
+
 class NamespaceKwargs(Namespace):
     app: Literal["server", "client", "docs", "coder"]
-    vite_site: str
+    vite_site: ViteSite
+    django_env: DjangoEnv
     version: str
     ghcr_repo: str
     tag_only: bool
@@ -44,14 +51,12 @@ def main(kwargs: NamespaceKwargs):
             "latest",
         ]
 
-    image_name = (
-        f"{kwargs.app}-{kwargs.vite_site}"
-        if kwargs.app == "client" and kwargs.vite_site
-        else kwargs.app
-    )
+    image_name = kwargs.app
+    if kwargs.app == "client":
+        image_name = _get_client_image_name(kwargs.vite_site, kwargs.django_env)
+    container_path = f"ghcr.io/{kwargs.ghcr_repo}/{image_name}"
 
     for tag_version in tag_versions:
-        container_path = f"ghcr.io/{kwargs.ghcr_repo}/{image_name}"
         subprocess.run(
             [
                 "docker",
@@ -67,6 +72,12 @@ def main(kwargs: NamespaceKwargs):
                 ["docker", "push", f"{container_path}:{tag_version}"],
                 check=True,
             )
+
+
+def _get_client_image_name(vite_site: ViteSite, django_env: DjangoEnv) -> str:
+    site_suffix = f"-{vite_site}" if vite_site else ""
+    stage_postfix = "-stage" if django_env == "stage" else ""
+    return f"client{site_suffix}{stage_postfix}"
 
 
 if __name__ == "__main__":

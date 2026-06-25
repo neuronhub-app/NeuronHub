@@ -8,7 +8,6 @@ import {
   LinkExt,
   Notice,
   PageLink,
-  BadgeNew,
   ImageWithDialog,
 } from "@/components";
 
@@ -98,13 +97,19 @@ Replace all the `$variable` placeholders below.
 
 ### Site selection: `VITE_SITE` is a Docker build ARG
 
-`VITE_SITE` (and `VITE_ENV`) are baked into the `client` image at the static site build time. See `client/Dockerfile` and `devops/docker.mise.toml` for the full ARG list (`VITE_GTM_ID`, `VITE_SERVER_URL`, Sentry, Algolia FE keys, …).
+`VITE_SITE` and `DJANGO_ENV` are baked into the `client` image at the JS build time.
 
- To deploy a different `VITE_SITE` -> rebuild.
+See `client/Dockerfile` and `devops/docker.mise.toml` for the full ARG list (`VITE_GTM_ID`, `VITE_SERVER_URL`, Sentry, Algolia, etc).
 
-Per-site client image names (server image is site-agnostic):
-- NHA → `ghcr.io/.../client:$tag`.
-- PG → `ghcr.io/.../client-pg:$tag`.
+To deploy a different `VITE_SITE` -> rebuild.
+
+The `client` images are split on 4 names by `VITE_SITE` and `DJANGO_ENV`:
+- NHA (`VITE_SITE = ""`):
+    - `ghcr.io/.../client:$tag` - prod.
+    - `ghcr.io/.../client-stage:$tag`.
+- PG (`VITE_SITE = "pg"`):
+    - `ghcr.io/.../client-pg:$tag` - prod.
+    - `ghcr.io/.../client-pg-stage:$tag`.
 
 ### Postgres 18 database
 
@@ -205,7 +210,7 @@ In <LinkExt href="https://sentry.io/settings/security-and-privacy/">Security</Li
 <ImageWithDialog src="https://media.neuronhub.app/docs/sentry/integration-github.avif" />
 <ImageWithDialog src="https://media.neuronhub.app/docs/sentry/integration-github-code-map-backend.avif" />
 
-#### Slack <BadgeNew isHeading />
+#### Slack
 
 - Connect Slack on the <LinkExt href="https://sentry.io/settings/integrations/slack/">Integrations page</LinkExt> by `Add Workspace`.
 - I advise to add Alerts for `neuronhub-backend`, as frontend is too noisy. For more read <PageLink id="Sentry" />.

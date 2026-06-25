@@ -12,6 +12,7 @@
         sudo -E python3 docker_tag_and_push.py \
             --app=($env.usage_app) \
             --vite_site="{{ env.VITE_SITE | default(value="") }}" \
+            --django_env="{{ env.DJANGO_ENV | default(value="") }}" \
             --ghcr_repo="{{ env.GHCR_REPO }}" \
             --version="{{ env.VITE_RELEASE_VERSION }}" \
             ...(if $env.usage_pre_release? == "true" { ["--pre_release"] } else { [] })
@@ -23,8 +24,11 @@
         flag "--version <version>" env="VITE_RELEASE_VERSION"
     """
     run = """
-        let image_name = if $env.usage_app == "client" and ($env.VITE_SITE? | default "") != "" {
-            $"client-($env.VITE_SITE)"
+        let image_name = if $env.usage_app == "client" {
+            let site_suffix = if ($env.VITE_SITE? | default "") != "" { $"-($env.VITE_SITE)" } else { "" }
+            let stage_suffix = if ($env.DJANGO_ENV? | default "") == "stage" { "-stage" } else { "" }
+
+            $"client($site_suffix)($stage_suffix)"
         } else {
             $env.usage_app
         }
@@ -56,8 +60,11 @@
         # Force-pass Mise env & tag to the Docker build
         # ------------------------------------------------------------
 
-        let image_name = if $env.usage_app == "client" and ($env.VITE_SITE? | default "") != "" {
-            $"client-($env.VITE_SITE)"
+        let image_name = if $env.usage_app == "client" {
+            let site_suffix = if ($env.VITE_SITE? | default "") != "" { $"-($env.VITE_SITE)" } else { "" }
+            let stage_suffix = if ($env.DJANGO_ENV? | default "") == "stage" { "-stage" } else { "" }
+
+            $"client($site_suffix)($stage_suffix)"
         } else {
             $env.usage_app
         }
