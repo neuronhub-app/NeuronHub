@@ -22,6 +22,7 @@ from neuronhub.apps.sites.models import FooterSection
 from neuronhub.apps.sites.models import FooterSectionKind
 from neuronhub.apps.sites.models import NavbarLink
 from neuronhub.apps.sites.models import NavbarLinkSection
+from neuronhub.apps.sites.models import SeoMeta
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.users.models import User
 
@@ -102,6 +103,12 @@ class FooterSectionInline(SortableTabularInline):
 class FooterSectionAdmin(SortableAdminMixin, SortableAdminBase, admin.ModelAdmin):
     list_display = ["kind", "title"]
     inlines = [FooterSectionLinkInline]
+
+
+@admin.register(SeoMeta)
+class SeoMetaAdmin(admin.ModelAdmin):
+    list_display = ["path", "meta_title"]
+    search_fields = ["path"]
 
 
 @admin.register(SiteConfig)

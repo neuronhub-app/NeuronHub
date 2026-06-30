@@ -1,6 +1,7 @@
 import { captureException } from "@sentry/react";
 import { proxy, useSnapshot } from "valtio";
 
+import { seoMetaByPath } from "@/components/seoMetaByPath";
 import { env } from "@/env";
 import { graphql, type ResultOf } from "@/gql-tada";
 import { client } from "@/graphql/client";
@@ -9,6 +10,12 @@ const SiteConfigQuery = graphql.persisted(
   "SiteConfigQuery",
   graphql(`
     query SiteConfigQuery {
+      seo_metas {
+        path
+        meta_title
+        meta_description
+        meta_image_url
+      }
       site {
         contact_email
         jobs_url_utm_source
@@ -53,6 +60,13 @@ if (env.mode.isClient) {
   client.query({ query: SiteConfigQuery }).then(result => {
     siteConfigState.data = result.data?.site ?? null;
     siteConfigState.isLoading = false;
+    for (const seoMeta of result.data?.seo_metas ?? []) {
+      seoMetaByPath[seoMeta.path] = {
+        meta_title: seoMeta.meta_title,
+        meta_description: seoMeta.meta_description,
+        meta_image_url: seoMeta.meta_image_url,
+      };
+    }
   });
 }
 
