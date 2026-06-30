@@ -10,6 +10,7 @@ from neuronhub.apps.sites.models import FooterLink
 from neuronhub.apps.sites.models import FooterSection
 from neuronhub.apps.sites.models import NavbarLink
 from neuronhub.apps.sites.models import NavbarLinkSection
+from neuronhub.apps.sites.models import SeoMeta
 from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.sites.services.send_email import send_email
 
@@ -49,6 +50,14 @@ class FooterSectionType:
     links: list[FooterLinkType]
 
 
+@strawberry_django.type(SeoMeta)
+class SeoMetaType:
+    path: auto
+    meta_title: auto
+    meta_description: auto
+    meta_image_url: auto
+
+
 @strawberry_django.type(SiteConfig)
 class SiteConfigType:
     name: auto
@@ -86,6 +95,8 @@ class SitesQuery:
     class CacheKey:
         NavLinks = "SiteNavLinks"
         FooterSections = "SiteFooterSections"
+
+    seo_metas: list[SeoMetaType] = strawberry_django.field()
 
     # todo ? refac: cache in RAM -> then dorp get_list_cached
     # though django-solo caches it for 4h. I wonder if Strawberry ignores it.

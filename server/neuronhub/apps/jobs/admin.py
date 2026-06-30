@@ -258,6 +258,42 @@ class JobsLandingPageAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdm
         "created_at",
         "updated_at",
     ]
+    fieldsets = [
+        (
+            "",
+            {
+                "fields": [
+                    "title",
+                    "subtitle",
+                    "slug",
+                    "is_published",
+                ],
+            },
+        ),
+        (
+            "SEO / Search",
+            {
+                "fields": [
+                    "meta_title",
+                    "meta_description",
+                    "meta_image_url",
+                ],
+                "description": "Title, description and preview image shown by Google and social shares for this page. Leave blank to fall back to the homepage defaults.",
+            },
+        ),
+        (
+            "Filters",
+            {
+                "fields": [
+                    "tags",
+                    "locations",
+                    "salary_min",
+                    "is_orgs_highlighted",
+                    "source_ext",
+                ],
+            },
+        ),
+    ]
     change_actions = ["preview", "request_to_publish"]
 
     @action(label="Preview Saved Page")
