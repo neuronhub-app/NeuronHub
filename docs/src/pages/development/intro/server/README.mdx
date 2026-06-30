@@ -52,7 +52,7 @@ Other `@task`s are manually enqueued.
 
 ## Visibility
 
-As the core feature we override `PostTypeI.get_queryset` (`PostTypeI` is a Strawberry's `interface` for each `Post` projection) by adding there `return filter_posts_by_user(user, posts=queryset)`, which filters by `post.visilibity` values.
+As the core feature we override `PostTypeI.get_queryset` (`PostTypeI` is a Strawberry's `interface` for each `Post` projection) by adding there `return filter_posts_by_user(user, posts=queryset)`, which filters by `post.visibility` values.
 
 <CodeBlockText lang="python">{`
     class Visibility(TextChoices):
@@ -75,6 +75,6 @@ Because Posts are indexed by Algolia, we give each logged in User a personal Sea
 And the field `visible_to` is serialized for Algolia in posts/models/posts.py <Src to="posts/models/posts.py">Post#get_visible_to</Src>.
 
 
-## Mandatory task-specific docs
+## See also
 
 - <LinkInt path="/development/intro/server/pytest">How to use pytest</LinkInt>

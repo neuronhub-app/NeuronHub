@@ -19,7 +19,7 @@ The biggest test's issues are:
 
 Tests speed up development, but only when focused on the core business logic, and written using highly maintainable frameworks - eg our `test_gen.py` and `PlaywrightHelper.ts`.
 
-It's ok to create low-quality temporarily pytest or Playwright cases for TDD - make sure to remove them afterwards.
+It's ok to create low-quality temporary pytest or Playwright cases for TDD - make sure to remove them afterwards.
 
 Never leave third-party libraries tests in the codebase (Strawberry, GraphQL, etc).
 
@@ -29,11 +29,11 @@ Never leave third-party libraries tests in the codebase (Strawberry, GraphQL, et
     - `{app}/tests/test_gen.py` - ~5 apps imported.
 - `apps/tests/services/db_stubs_repopulate.py` - seeds dev DB in `mise db_stubs_repopulate`.
     - `{app}/tests/db_stubs.py` - ~4 apps imported.
-        - Each is 500+ LOC - mostly stubs for TextFields. Use a subagent if you need to search them.
+        - Each is 500+ LOC - mostly stubs for TextFields.
 
 Playwright uses the `reset_db_and_gen` mutation to invoke `test_gen` methods.
 
-## Mandatory task-specific docs
+## See also
 
 - <LinkInt path="/development/intro/server/pytest">How to use pytest</LinkInt>
 - <LinkInt path="/development/intro/client/playwright">How to use Playwright</LinkInt>

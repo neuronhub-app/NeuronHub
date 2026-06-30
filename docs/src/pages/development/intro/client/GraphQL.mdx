@@ -23,7 +23,7 @@ gql.tada runs with `disableMasking: true` because it's useless.
 
 ### Types
 
-Instead of writing types by hand, uou must use `gql-tada.ResultOf` or `FragmentOf`, eg:
+Instead of writing types by hand, you must use `gql-tada.ResultOf` or `FragmentOf`, eg:
 
 <CodeBlockText lang="typescript">{`
 type PostList = ResultOf<typeof PostListQuery>;
@@ -31,7 +31,7 @@ export type Post = NonNullable<PostList["posts"]>[number];
 `}</CodeBlockText>
 
 If need to narrow the type - utilize the `is` keyword, eg: 
-`function isPost(post: Post | unkonwn): post is Post { return post.__typename === "PostType" }`.
+`function isPost(post: Post | unknown): post is Post { return post.__typename === "PostType" }`.
 
 #### Enums
 

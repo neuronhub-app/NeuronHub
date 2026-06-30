@@ -14,27 +14,23 @@ Professional profiles directory with LLM-powered matching by a 3-step LLM flow.
 For the UML overview of `profiles.models` see <LinkInt path="/development">arch/server</LinkInt>
 
 Models fields:
-```
-Profile
-├── first_name, last_name, company, job_title, career_stage
-├── biography, seeks, offers
-├── tags: skills, interests
-├── visibility: same system as posts.Post (PRIVATE → PUBLIC)
-├── profile_for_llm_md: auto-serialized on save() via serialize_to_md(). And allows User to overwrite it.
-├── match_hash: SHA256 of bio+skills+interests+seeks+offers
-└── history
 
-ProfileMatch
-├── match_score_by_llm: 0-100
-├── match_reason_by_llm: str
-├── match_batch_id
-├── match_processed_at
-├── history
-│
-│review from User:
-├── match_score: 0-100 
-└── match_review
-```
+**Profile**
+- first_name, last_name, company, job_title, career_stage
+- biography, seeks, offers
+- tags: skills, interests
+- visibility: same system as posts.Post (PRIVATE → PUBLIC)
+- profile_for_llm_md: auto-serialized on save() via serialize_to_md(); user can overwrite it
+- match_hash: SHA256 of bio+skills+interests+seeks+offers
+- history
+
+**ProfileMatch**
+- match_score_by_llm: 0-100
+- match_reason_by_llm: str
+- match_batch_id
+- match_processed_at
+- history
+- review by User: match_score (0-100), match_review
 
 `Profile.match_hash` to detect changes — if differs from `Profile.compute_content_hash()` -> needs LLM reprocessing.
 
@@ -42,7 +38,7 @@ ProfileMatch
 
 #### Step 1: Cheap LLM Scoring (eg Haiku) — `score_matches_by_llm.py`
 
-- To stop context rot splits unscored Profiles into batches (10 by default).
+- To avoid context rot, splits unscored Profiles into batches (10 by default).
 - Prompt = `User.profile_for_llm_md` + `<Calibration_Examples>` (from step 2) + `<Profile_List>` (serialized batch).
 - Saves to `ProfileMatch.match_score_by_llm` + `.match_reason_by_llm`.
 

@@ -28,8 +28,7 @@ Subclass `NeuronTestCase`, from <Src to="tests/test_cases.py">test_cases</Src>. 
 - Each test name must convey its purpose. Docstrings are only allowed for bugs with exceptional complexity.
 - Store tests in their target module with a `__test` postfix, eg `apps.posts.services.filter_posts_by_user` is covered by `filter_posts_by_user__test.py`.
 - Always use `async`/`await`, or its decorators as `@sync_to_async`.
-- Never prefer testing Python business logic though GraphQL - test functions directly. The API is covered by Playwright.
-- Use subagents to read `pytest-rich` output: it has local vars, source code, etc
+- Never prefer testing Python business logic through GraphQL - test functions directly. The API is covered by Playwright.
 
 ### <Src to="tests/test_gen.py">Gen</Src>
 
@@ -39,8 +38,6 @@ All kwargs of `Gen` methods are optional with fallbacks.
 - the rest are provided by `faker.gen`
 
 Add more `Gen` methods when needed for more than one test function. Esp for several test files.
-
-Read the `test_gen.py` classes & methods headers before writing tests.
 
 #### Decent test example
 

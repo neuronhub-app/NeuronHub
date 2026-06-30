@@ -40,8 +40,8 @@ Comments:
 ### Best practices
 
 In the order of importance:
-- You must write using the inverted pyramid - declarations below their usage, not prior, etc.
-- You must pursue __scope minimization__:
+- Write using the inverted pyramid - declarations below their usage, not prior, etc.
+- Pursue __scope minimization__:
     - Keep live range low - declare at the usage.
     - Keep single-use declarations in their scopes/functions/file.
     - Inline the single-use vars as named args/kwargs.

@@ -1,6 +1,6 @@
 ---
 order: 20
-description: For LLM-driven code cleanup. A separate file to avoid context rot.
+description: Detailed code style conventions, complementing the code-style intro.
 ---
 
 import { CodeBlockText, LinkInt } from "@/components"
@@ -10,7 +10,7 @@ import { CodeBlockText, LinkInt } from "@/components"
 
 If there's a comment - human brain skips class/function naming (and whatever) to read the comments first.
 
-Hence a comment is not only the future tech debt - it is also the highest-level information noise, the damages code comprehension by its mere existence.
+Hence a comment is not only the future tech debt - it is also the highest-level information noise, that damages code comprehension by its mere existence.
 
 ### Group related variables by domain in an object
 
@@ -109,7 +109,7 @@ See <LinkInt path="/development/reference/todos">todos</LinkInt>.
 Python
 ----------------------------------------
 
-You should use the modern Python3.14 syntax, including:
+Use the modern Python3.14 syntax, including:
 - ternary operator
 - match/case
 - `Enum`s

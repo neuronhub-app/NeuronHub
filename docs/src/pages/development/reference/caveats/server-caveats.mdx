@@ -8,7 +8,7 @@ import { CodeBlockText } from "@/components"
 
 ### Strawberry
 
-In custom fields of `@strawberry.type` or `@strawberry_django.type` - its `self` is never the actually class, but:
+In custom fields of `@strawberry.type` or `@strawberry_django.type` - its `self` is never the actual class, but:
 - the Django `Model` instance, eg when it returns it.
 - `None` - for all other cases.
 
@@ -32,7 +32,7 @@ Error like `RuntimeError: max slug attempts for {value} exceeded (100)` on delet
 
 ### Django Debug Toolbar "store" has no "set" method
 
-`StoredDebugToolbar` v6.0.0 `init_store` method doesn't work, to fix it it in `debug_toolbar/toolbar.py` change:
+`StoredDebugToolbar` v6.0.0 `init_store` method doesn't work, to fix it in `debug_toolbar/toolbar.py` change:
 <CodeBlockText lang="python">{`
     def init_store(self):
         # Store already initialized.

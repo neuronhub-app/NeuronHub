@@ -32,10 +32,10 @@ Uses `custom_objectID = "slug"` as `Job.id` changes on <Src to="jobs/services/pu
 
 ### Bulk updates
 
-Algolia providers 3 undocumented methods (used in `publish_job_versions.py`):
-- `apapter.partial_update_objects`
-- `apapter.save_objects`
-- `apapter.delete_objects`
+Algolia provides 3 undocumented methods (used in `publish_job_versions.py`):
+- `adapter.partial_update_objects`
+- `adapter.save_objects`
+- `adapter.delete_objects`
 
 ```python
 adapter = algolia_engine.get_adapter(model=Job)
