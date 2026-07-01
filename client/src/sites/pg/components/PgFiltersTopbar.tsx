@@ -103,6 +103,7 @@ export function PgFiltersTopbar() {
         refine={locationFilters.refine}
         algoliaItems={locationFilters.items}
         order={{ base: 6, md: 2, lg: 6 }}
+        isSearchEnabled
         testId={ids.facet.popover.remote}
       />
 
