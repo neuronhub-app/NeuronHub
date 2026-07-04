@@ -314,7 +314,7 @@ type Mutation {
   profile_matches_trigger_llm(limit: Int! = 200, model: String! = "haiku", include_reprocessing: Boolean! = true, is_dry: Boolean! = false): ProgressType! @IsAuthenticated
   profile_matches_cancel_llm: Boolean! @IsAuthenticated
   job_versions_approve(draft_ids: [Int!]!): Boolean! @IsStaff
-  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_ids: [Int!] = null, is_orgs_highlighted: Boolean = null, salary_min: Int = null, is_exclude_no_salary: Boolean! = false, is_exclude_career_capital: Boolean = null, is_exclude_profit_for_good: Boolean = null, tz: String = null, is_subscribe_to_newsletter: Boolean! = false): Boolean!
+  job_alert_subscribe(email: String!, tag_names: [String!] = null, location_ids: [Int!] = null, is_orgs_highlighted: Boolean = null, salary_min: Int = null, is_exclude_no_salary: Boolean! = false, is_exclude_career_capital: Boolean = null, is_exclude_profit_for_good: Boolean = null, tz: String = null, is_subscribe_to_newsletter: Boolean! = false, utm_params: UtmParamsInput = null): Boolean!
   job_alert_toggle_active(id_ext: UUID!): Boolean!
   job_alert_remove(id_ext: UUID!): Boolean!
   job_alert_access_session_by_id_ext(id_ext: UUID!): Boolean!
@@ -1205,6 +1205,13 @@ input UserTypeInput {
   avatar: Upload
   read_later: ManyToManyInput
   library: ManyToManyInput
+}
+
+input UtmParamsInput {
+  utm_source: String = null
+  utm_medium: String = null
+  utm_campaign: String = null
+  utm_content: String = null
 }
 
 enum Visibility {

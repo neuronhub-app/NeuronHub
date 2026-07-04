@@ -2,7 +2,7 @@ import { Box, Button, Flex, HStack, Icon, Separator, Stack, Text } from "@chakra
 import { type ReactNode, useEffect, useRef } from "react";
 import { GoBell, GoComment, GoQuestion } from "react-icons/go";
 import { Configure, useClearRefinements } from "react-instantsearch";
-import { Link, useNavigate, useSearchParams } from "react-router";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router";
 
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { layout } from "@/components/LayoutSidebar";
@@ -198,6 +198,7 @@ function RegisterLandingPageRefinements() {
 function RedirectOnFiltersReset(props: { to: string }) {
   const clearRefines = useClearRefinements();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const isRefinesWereActive = useRef(false);
 
@@ -205,9 +206,9 @@ function RedirectOnFiltersReset(props: { to: string }) {
     if (clearRefines.canRefine) {
       isRefinesWereActive.current = true;
     } else if (isRefinesWereActive.current) {
-      navigate(props.to);
+      navigate({ pathname: props.to, search: location.search });
     }
-  }, [clearRefines.canRefine, navigate, props.to]);
+  }, [clearRefines.canRefine, navigate, props.to, location.search]);
 
   return null;
 }

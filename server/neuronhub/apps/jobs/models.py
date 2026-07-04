@@ -362,6 +362,11 @@ class JobAlert(TimeStampedModel):
         help_text="Whether the user checked the newsletter checkbox. The API sub may fail, but this flag will be checked still.",
     )
 
+    utm_source = models.CharField(max_length=255, blank=True)
+    utm_medium = models.CharField(max_length=255, blank=True)
+    utm_campaign = models.CharField(max_length=255, blank=True)
+    utm_content = models.CharField(max_length=255, blank=True)
+
     #: deprecated
     is_remote = models.BooleanField(blank=True, null=True)
 
