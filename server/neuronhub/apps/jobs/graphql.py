@@ -18,6 +18,7 @@ from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobFaqQuestion
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.models import JobsLandingPage
+from neuronhub.apps.jobs.services.create_job_alert import create_job_alert
 from neuronhub.apps.jobs.services.filter_jobs_by_user import filter_jobs_by_user
 from neuronhub.apps.jobs.services.get_jobs_public_from_ram import get_jobs_public_from_ram
 from neuronhub.apps.jobs.services.get_jobs_qs_prefetched import get_jobs_qs_prefetched
@@ -25,9 +26,9 @@ from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versio
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.serialize_job_to_md import serialize_job_to_md
 from neuronhub.apps.jobs.services.subscribe_to_mailerlite import subscribe_to_mailerlite
+from neuronhub.apps.jobs.services.utm import UtmParamsInput
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
-from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.sites.graphql import get_list_cached
 from neuronhub.apps.users.graphql.resolvers import get_user
 from neuronhub.apps.users.graphql.resolvers import get_user_maybe
@@ -269,9 +270,12 @@ class JobsMutation:
         is_exclude_profit_for_good: bool | None = None,
         tz: str | None = None,
         is_subscribe_to_newsletter: bool = False,
+        utm_params: UtmParamsInput | None = None,
     ) -> bool:
-        alert = await JobAlert.objects.acreate(
+        alert = await create_job_alert(
             email=email,
+            tag_names=tag_names,
+            location_ids=location_ids,
             is_orgs_highlighted=is_orgs_highlighted,
             salary_min=salary_min,
             is_exclude_no_salary=is_exclude_no_salary,
@@ -279,14 +283,8 @@ class JobsMutation:
             is_exclude_profit_for_good=is_exclude_profit_for_good,
             tz=tz,
             is_subscribe_to_newsletter=is_subscribe_to_newsletter,
+            utm=utm_params,
         )
-        if tag_names:
-            tags = PostTag.objects.filter(name__in=tag_names)
-            await alert.tags.aset([tag async for tag in tags])
-
-        if location_ids:
-            locations = JobLocation.objects.filter(id__in=location_ids)
-            await alert.locations.aset([loc async for loc in locations])
 
         await _save_session_job_alert(info=info, alert_id_ext=alert.id_ext)
         try:
@@ -295,7 +293,7 @@ class JobsMutation:
             sentry_sdk.capture_exception()
 
         if is_subscribe_to_newsletter:
-            await subscribe_to_mailerlite(email)
+            await subscribe_to_mailerlite(email, utm=utm_params)
 
         return True
 
