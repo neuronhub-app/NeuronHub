@@ -112,6 +112,7 @@ export function PgFacetPopover(props: {
       <Portal>
         <Popover.Positioner>
           <Popover.Content
+            data-testid={ids.facet.popover.content}
             css={{
               "--popover-size": "var(--reference-width)",
               "@media (min-width: 768px)": {
