@@ -68,7 +68,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
 
-    "@playwright/test": "^1.59.1",
+    "@playwright/test": "^1.61.1",
 
     "@redux-devtools/extension": "^4.0.0",
     "shiki": "^4.0.2",

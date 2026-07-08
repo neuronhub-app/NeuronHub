@@ -53,10 +53,10 @@ RUN echo "eval (brew shellenv)" >> $XDG_CONFIG_HOME/fish/config.fish
 
 # CLI tools
 # -----------------------------------
-RUN brew install --force-bottle nushell chezmoi ripgrep
+RUN brew install --force-bottle chezmoi ripgrep
 
 # Optional
-RUN brew install --force-bottle fd bat micro eza delta btop zoxide atuin fzf jq zellij
+RUN brew install --force-bottle fd bat micro eza delta zoxide atuin fzf jq
 ENV EDITOR=micro
 
 
