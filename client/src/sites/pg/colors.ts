@@ -16,20 +16,28 @@ export namespace theme {
     ...neuronTheme.colors,
 
     brand: {
-      green: { value: "#338050" },
-      "green.light": { value: "#4DB36D" },
-      "green.subtle": { value: { _light: "#DBEADD", _dark: "#202921" } },
+      green: {
+        DEFAULT: { value: "#338050" },
+        light: { value: "#4DB36D" },
+        subtle: { value: { _light: "#DBEADD", _dark: "#202921" } },
+      },
       seashell: { value: "#FFF7F0" },
-      black: { value: "#343232" },
-      "black.secondary": { value: "#484E51" },
-      gray: { value: "#DDDDDD" },
-      "gray.muted": { value: "#767676" },
-      "gray.backdrop": { value: "#8F9293" },
-      "footer.bg": { value: "#171616" },
+      black: {
+        DEFAULT: { value: "#343232" },
+        secondary: { value: "#484E51" },
+      },
+      gray: {
+        DEFAULT: { value: "#DDDDDD" },
+        muted: { value: "#767676" },
+        backdrop: { value: "#8F9293" },
+        warm: { value: "#A19B9B" },
+      },
+      footer: { bg: { value: "#171616" } },
       beige: { value: "#F3EDE7" },
-      "gray.warm": { value: "#A19B9B" },
-      "hover.background": { value: "#fff2cc" },
-      "hover.underline": { value: "#ffbe2e" },
+      hover: {
+        background: { value: "#fff2cc" },
+        underline: { value: "#ffbe2e" },
+      },
     },
 
     primary,
