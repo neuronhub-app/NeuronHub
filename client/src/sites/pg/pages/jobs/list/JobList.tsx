@@ -17,6 +17,10 @@ import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
 import { useRequiredLandingPageRefinements } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
 import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
 import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
+import {
+  seedJobAlertEdit,
+  useJobAlertEditIdExt,
+} from "@/sites/pg/pages/jobs/list/jobAlertEditState";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
 import {
   resetJobListFilters,
@@ -41,8 +45,13 @@ export function JobList(props: { slug?: string; jobsLandingPage?: JobsLandingPag
 
   useInit({
     isReady: true,
-    onInit: () => setJobListSource(searchParams.get("source") ?? ""),
+    onInit: () => {
+      setJobListSource(searchParams.get("source") ?? "");
+      seedJobAlertEdit(searchParams.get("edit_alert") ?? undefined);
+    },
   });
+
+  const alertEditIdExt = useJobAlertEditIdExt();
 
   const alertId = searchParams.get("alert");
 
@@ -58,13 +67,14 @@ export function JobList(props: { slug?: string; jobsLandingPage?: JobsLandingPag
       index="indexNameJobs"
       label="job"
       jobsLandingPage={props.jobsLandingPage}
+      alertEditIdExt={alertEditIdExt}
       // uiStateForLandingPage={
       //   props.jobsLandingPage
       //     ? landingPageToAlgoliaState(props.jobsLandingPage)
       //     : undefined
       // }
-      cta={<JobsSubscribeModal testId={ids.job.alert.subscribeBtn} />}
-      ctaMobile={<JobsSubscribeModal testId={ids.job.alert.subscribeBtnMobile} />}
+      cta={<JobsSubscribeModal testId={ids.job.alert.btn.subscribe} />}
+      ctaMobile={<JobsSubscribeModal testId={ids.job.alert.btn.subscribeMobile} />}
       sort={
         algolia.indexNameJobs && algolia.indexNameJobsSortedByClosesAt
           ? {

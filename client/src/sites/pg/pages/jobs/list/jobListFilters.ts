@@ -19,6 +19,11 @@ export function setJobListSource(source: string) {
   state.sourceExt = (source as SourceExt) || "";
 }
 
+export function setJobListSalary(args: { salaryMin: number | null; excludeNoSalary: boolean }) {
+  state.salaryMin = args.salaryMin;
+  state.excludeNoSalary = args.excludeNoSalary;
+}
+
 export function useJobListFilters() {
   return { snap: useSnapshot(state), mutable: state };
 }

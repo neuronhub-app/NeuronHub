@@ -7,6 +7,7 @@ import { useClearRefinements, useCurrentRefinements } from "react-instantsearch"
 import { Button } from "@/components/ui/button";
 import type { TestId } from "@/e2e/ids";
 import { ids } from "@/e2e/ids";
+import { usePgFacetEagerMount } from "@/sites/pg/components/pgFacetEditMode";
 
 export function PgFacetPopover(props: {
   attribute?: string;
@@ -28,6 +29,8 @@ export function PgFacetPopover(props: {
   const activeFacetCount = props.activeFacetCount ?? attrFacetCount;
   const canClear = props.onClear ? activeFacetCount > 0 : clear.canRefine && !!props.attribute;
 
+  const isEagerMount = usePgFacetEagerMount();
+
   return (
     <Popover.Root
       positioning={{
@@ -36,7 +39,7 @@ export function PgFacetPopover(props: {
         listeners: false, // fix CLS on filter add (ENG-56).
       }}
       onExitComplete={props.onClose}
-      lazyMount
+      lazyMount={!isEagerMount}
     >
       <Popover.Trigger asChild>
         <Box

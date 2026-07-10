@@ -16,8 +16,8 @@ import {
   Stack,
   Text,
 } from "@chakra-ui/react";
-import { LuPause, LuPlay, LuTrash2 } from "react-icons/lu";
-import { NavLink } from "react-router";
+import { LuPause, LuPencil, LuPlay, LuTrash2 } from "react-icons/lu";
+import { NavLink, useNavigate } from "react-router";
 
 import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { format } from "@neuronhub/shared/utils/format";
@@ -251,6 +251,7 @@ function PgAlertCard(props: { alert: AlertType }) {
 
 function AlertCardActions(props: { alert: AlertType }) {
   const loading = useIsLoading();
+  const navigate = useNavigate();
 
   const style = {
     size: ["2xs", "2xs", "sm"],
@@ -258,6 +259,17 @@ function AlertCardActions(props: { alert: AlertType }) {
 
   return (
     <Flex gap={["gap.xs", "gap.sm", "gap.md"]}>
+      <IconButton
+        {...style}
+        aria-label="Edit"
+        variant="subtle"
+        colorPalette="orange"
+        onClick={() => navigate(urls.jobs.listEdit(props.alert.id_ext))}
+        {...ids.set(ids.job.subscriptions.btn.edit)}
+      >
+        <LuPencil />
+      </IconButton>
+
       {/* Delete */}
       {!props.alert.is_active && (
         <IconButton
@@ -273,7 +285,7 @@ function AlertCardActions(props: { alert: AlertType }) {
             );
           }}
           loading={loading.isActive}
-          {...ids.set(ids.job.subscriptions.removeBtn)}
+          {...ids.set(ids.job.subscriptions.btn.delete)}
         >
           <LuTrash2 />
         </IconButton>
@@ -292,7 +304,7 @@ function AlertCardActions(props: { alert: AlertType }) {
           );
         }}
         loading={loading.isActive}
-        {...ids.set(ids.job.subscriptions.toggleBtn)}
+        {...ids.set(ids.job.subscriptions.btn.toggle)}
       >
         {props.alert.is_active ? <LuPause /> : <LuPlay />}
       </IconButton>

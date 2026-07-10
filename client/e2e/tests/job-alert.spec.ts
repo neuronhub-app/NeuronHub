@@ -1,9 +1,15 @@
-import { type Locator, expect as expectBase } from "@playwright/test";
+import { type Locator, type Page, expect as expectBase } from "@playwright/test";
 
-import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
+import { TagCategoryEnum } from "~/graphql/enums";
+
+import {
+  JobAlertSubscribeMutation,
+  JobAlertUpdateMutation,
+} from "@/apps/jobs/list/JobsSubscribeModal";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { layout } from "@/components/LayoutSidebar";
 import { expect } from "@/e2e/helpers/expect";
+import { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { test } from "@/e2e/test";
 import { env } from "@/env";
@@ -11,6 +17,15 @@ import { urls } from "@/urls";
 
 const openPopover = "[data-part=content][data-scope=popover][data-state=open]";
 const testEmail = "e2e@neuronhub.app";
+
+const aiSafetyJob = {
+  jobs_job: {
+    title: "AI Safety Researcher",
+    org_name: "Redwood Research",
+    locations: ["Berkeley CA, United States"],
+    tags: [{ name: "AI Safety & Policy", category: TagCategoryEnum.Area }],
+  },
+};
 
 test.describe("Job Alert", () => {
   test.beforeEach(async ({ play }) => {
@@ -65,7 +80,7 @@ test.describe("Job Alert", () => {
 
     // Subscribe
 
-    await play.click(ids.job.alert.subscribeBtn);
+    await play.click(ids.job.alert.btn.subscribe);
     await play.fill(ids.job.alert.emailInput, testEmail);
     const requestPromise = env.site.isProbablyGood
       ? page.waitForRequest(
@@ -75,7 +90,7 @@ test.describe("Job Alert", () => {
         )
       : null;
 
-    await play.click(ids.job.alert.submitBtn);
+    await play.click(ids.job.alert.btn.submit);
 
     if (env.site.isProbablyGood && requestPromise) {
       const body = JSON.parse((await requestPromise).postData()!);
@@ -97,17 +112,17 @@ test.describe("Job Alert", () => {
     await expect($[ids.job.subscriptions.card]).toHaveText(testEmail);
 
     // Toggle inactive
-    await play.click(ids.job.subscriptions.toggleBtn);
+    await play.click(ids.job.subscriptions.btn.toggle);
     await expect($[ids.job.subscriptions.status.inactive]).toBeVisible();
 
     // Reauth by id_ext after clearCookies
     await context.clearCookies();
-    const alert = alertsRes.data.job_alerts!.find(a => a.email === testEmail)!;
+    const alert = alertsRes.data.job_alerts!.find(jobAlert => jobAlert.email === testEmail)!;
     await play.navigate(urls.jobs.subscriptionsManage(alert.id_ext), { idleWait: true });
     await expect($[ids.job.subscriptions.card]).toHaveText(testEmail);
 
     // Delete
-    await play.click(ids.job.subscriptions.removeBtn);
+    await play.click(ids.job.subscriptions.btn.delete);
     await expect(page).not.toHaveText(testEmail);
   });
 
@@ -116,20 +131,20 @@ test.describe("Job Alert", () => {
 
     await play.navigate(urls.jobs.list, { idleWait: true });
 
-    await play.click(ids.job.alert.subscribeBtn);
+    await play.click(ids.job.alert.btn.subscribe);
     await play.fill(ids.job.alert.emailInput, testEmail);
     const responseSubscribe = play.waitForResponseGraphql(JobAlertSubscribeMutation);
-    await play.click(ids.job.alert.submitBtn);
+    await play.click(ids.job.alert.btn.submit);
     if (env.site.isProbablyGood) {
       // wo filters PG shows a confirm Popover
-      await play.click(ids.job.alert.submitAllBtn);
+      await play.click(ids.job.alert.btn.submitAll);
     }
     await responseSubscribe;
 
     const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);
     await play.navigate(urls.jobs.subscriptions);
     const alertsRes = await alertsQuery;
-    const alert = alertsRes.data.job_alerts!.find(a => a.email === testEmail)!;
+    const alert = alertsRes.data.job_alerts!.find(jobAlert => jobAlert.email === testEmail)!;
 
     await expect($[ids.job.subscriptions.unsubscribed.alert]).not.toBeVisible();
 
@@ -137,7 +152,115 @@ test.describe("Job Alert", () => {
     await expect($[ids.job.subscriptions.status.inactive]).toBeVisible();
     await expect($[ids.job.subscriptions.unsubscribed.alert]).toBeVisible();
   });
+
+  test("edit alert matching 0 jobs => Cause Area still lists selectable values", async ({
+    page,
+    play,
+  }) => {
+    test.skip(!env.site.isProbablyGood, "PG-only facet topbar");
+    test.slow();
+
+    await play.reset_db_and_gen([
+      aiSafetyJob,
+      {
+        jobs_job: {
+          title: "Global Health Lead",
+          org_name: "GiveWell",
+          locations: ["Nairobi, Kenya"],
+          tags: [{ name: "Global Health & Development", category: TagCategoryEnum.Area }],
+        },
+      },
+    ]);
+
+    await play.navigate(urls.jobs.list, { idleWait: true });
+
+    const popover = page.locator(openPopover);
+
+    await page.getByTestId(ids.facet.popover.causeArea).last().click();
+    await clickFacetCheckbox(popover, "Global Health & Development");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+
+    await page.getByTestId(ids.facet.popover.salary).last().click();
+    await play.click(ids.facet.excludeNoSalary);
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+
+    const alert = await subscribeAndEnterEdit(page, play);
+    await expect(page.getByTestId(ids.job.alert.edit.banner)).toBeVisible();
+    await play.waitForNetworkIdle();
+
+    await expect(page.getByTestId(ids.job.card.container)).toHaveCount(0);
+
+    await expect(
+      page.getByTestId(ids.facet.activeTag("Global Health & Development")).last(),
+    ).toBeVisible();
+
+    await page.getByTestId(ids.facet.popover.causeArea).last().click();
+
+    await clickFacetCheckbox(popover, "AI Safety & Policy");
+    await expect(
+      page.getByTestId(ids.facet.activeTag("AI Safety & Policy")).last(),
+    ).toBeVisible();
+
+    const updateRes = play.waitForResponseGraphql(JobAlertUpdateMutation);
+    await play.click(ids.job.alert.edit.save);
+    const updated = await updateRes;
+    expectBase(updated.data.job_alert_update).toBe(true);
+
+    await expect(page).toHaveURL(new RegExp(`${urls.jobs.subscriptions}$`));
+
+    await play.navigate(urls.jobs.listEdit(alert.id_ext), { idleWait: true });
+    await play.waitForNetworkIdle();
+    await expect(
+      page.getByTestId(ids.facet.activeTag("AI Safety & Policy")).last(),
+    ).toBeVisible();
+  });
+
+  test("edit alert => Cancel discards the preview without saving", async ({ page, play }) => {
+    test.skip(!env.site.isProbablyGood, "PG-only facet topbar");
+    test.slow();
+
+    await play.reset_db_and_gen([aiSafetyJob]);
+
+    await play.navigate(urls.jobs.list, { idleWait: true });
+
+    const popover = page.locator(openPopover);
+
+    await page.getByTestId(ids.facet.popover.causeArea).last().click();
+    await clickFacetCheckbox(popover, "AI Safety & Policy");
+    await play.waitForNetworkIdle();
+    await page.keyboard.press("Escape");
+
+    await subscribeAndEnterEdit(page, play);
+    await play.waitForNetworkIdle();
+    await expect(page.getByTestId(ids.job.alert.edit.banner)).toBeVisible();
+    await expect(
+      page.getByTestId(ids.facet.activeTag("AI Safety & Policy")).last(),
+    ).toBeVisible();
+
+    await play.click(ids.job.alert.edit.cancel);
+    await expect(page.getByTestId(ids.job.alert.edit.banner)).not.toBeVisible();
+    await expect(page.getByTestId(ids.facet.activeTag("AI Safety & Policy"))).not.toBeVisible();
+  });
 });
+
+async function subscribeAndEnterEdit(page: Page, play: PlaywrightHelper) {
+  await play.click(ids.job.alert.btn.subscribe);
+  await play.fill(ids.job.alert.emailInput, testEmail);
+  const subscribed = play.waitForResponseGraphql(JobAlertListQuery);
+  await play.click(ids.job.alert.btn.submit);
+  await subscribed;
+
+  const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);
+  await play.navigate(urls.jobs.subscriptions);
+  const alert = (await alertsQuery).data.job_alerts!.find(
+    jobAlert => jobAlert.email === testEmail,
+  )!;
+
+  await play.navigate(urls.jobs.listEdit(alert.id_ext), { idleWait: true });
+  return alert;
+}
 
 async function clickFacetCheckbox(popover: Locator, value: string) {
   const item = popover.locator(`[data-testid='${ids.facet.checkbox(value)}']`);
