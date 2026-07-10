@@ -235,7 +235,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
                       variant="pg-primary"
                       loading={loading.isActive}
                       flexShrink="0"
-                      {...ids.set(ids.job.alert.submitBtn)}
+                      {...ids.set(ids.job.alert.btn.submit)}
                     >
                       Subscribe
                     </Button>
@@ -257,7 +257,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
                                 size="sm"
                                 variant="outline"
                                 colorPalette="gray"
-                                {...ids.set(ids.job.alert.submitAllBtn)}
+                                {...ids.set(ids.job.alert.btn.submitAll)}
                               >
                                 Subscribe to all jobs
                               </Button>

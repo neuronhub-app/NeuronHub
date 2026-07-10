@@ -9,16 +9,10 @@ import type { IndexUiState } from "instantsearch.js";
 import { useRefinementList } from "react-instantsearch";
 
 import type { JobsLandingPage } from "@/prefetch/JobsLandingPage";
-
-// todo ! refac: dedup with Job.tag_category_to_field (#187)
-const algoliaTagAttrByCategory: Record<string, string> = {
-  area: "tags_area.name",
-  skill: "tags_skill.name",
-  education: "tags_education.name",
-  experience: "tags_experience.name",
-  workload: "tags_workload.name",
-  visa_sponsorship: "tags_country_visa_sponsor.name",
-} as const;
+import {
+  algoliaTagAttrByCategory,
+  buildJobTagRefinements,
+} from "@/sites/pg/pages/jobs/algoliaJobTagRefinements";
 
 /**
  * Why: claim Algolia state for each attr [[landingPageToAlgoliaState]] need to write to.
@@ -39,22 +33,10 @@ export function landingPageToAlgoliaState(page?: JobsLandingPage): IndexUiState 
     return undefined;
   }
 
-  const refinementList: NonNullable<IndexUiState["refinementList"]> = {};
-
-  for (const tag of page.tags) {
-    const attr = tag.category_name && algoliaTagAttrByCategory[tag.category_name];
-    // Unmapped categories (eg country/city) — admin uses the locations facet.
-    if (!attr) {
-      continue;
-    }
-    refinementList[attr] = [...(refinementList[attr] ?? []), tag.name];
-  }
-
-  if (page.locations.length > 0) {
-    refinementList["locations.algolia_filter_name"] = page.locations.map(
-      loc => loc.algolia_filter_name,
-    );
-  }
+  const refinementList = buildJobTagRefinements({
+    tags: page.tags,
+    locations: page.locations,
+  });
 
   if (page.source_ext) {
     refinementList.source_ext = [page.source_ext];

@@ -159,11 +159,18 @@ export namespace ids {
       tags: "job.card.tags",
     },
     alert: {
-      subscribeBtn: "job.alert.subscribe-btn",
-      subscribeBtnMobile: "job.alert.subscribe-btn-mobile",
+      btn: {
+        subscribe: "job.alert.btn.subscribe",
+        subscribeMobile: "job.alert.btn.subscribe-mobile",
+        submit: "job.alert.btn.submit",
+        submitAll: "job.alert.btn.submit-all",
+      },
       emailInput: "job.alert.email-input",
-      submitBtn: "job.alert.submit-btn",
-      submitAllBtn: "job.alert.submit-all-btn",
+      edit: {
+        save: "job.alert.edit.save",
+        cancel: "job.alert.edit.cancel",
+        banner: "job.alert.edit.banner",
+      },
     },
     drafts: {
       container: "job.drafts.container",
@@ -176,9 +183,11 @@ export namespace ids {
     subscriptions: {
       list: "job.subscriptions.list",
       card: "job.subscriptions.card",
-      // todo ? refac-name: `btn.toggle` and `btn.delete`
-      toggleBtn: "job.subscriptions.toggle-btn",
-      removeBtn: "job.subscriptions.remove-btn",
+      btn: {
+        edit: "job.subscriptions.btn.edit",
+        toggle: "job.subscriptions.btn.toggle",
+        delete: "job.subscriptions.btn.delete",
+      },
       status: {
         inactive: "job.subscriptions.status.inactive",
         active: "job.subscriptions.status.active",

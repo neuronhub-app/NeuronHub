@@ -185,6 +185,23 @@ class TestSendJobAlertEmails(NeuronTestCase):
         email_html = mail.outbox[0].body
         assert job_detail_url(slug=job.slug, alert_id=alert.id) in email_html
 
+    async def test_email_edit_url_applies_jobs_prefix_once(self):
+        site = await SiteConfig.get_solo()
+        site.email_template_job_alert = ""
+        await site.asave()
+
+        alert = await self.gen.jobs.job_alert()
+        await self.gen.jobs.job()
+
+        await send_job_alerts()
+
+        email_html = mail.outbox[0].body
+        expected_edit_url = (
+            f"{settings.CLIENT_URL}{settings.CLIENT_URL_JOBS_PREFIX}?edit_alert={alert.id_ext}"
+        )
+        assert expected_edit_url in email_html
+        assert "/jobs/jobs?edit_alert=" not in email_html
+
     async def test_jobs_notified_count_increment(self):
         alert = await self.gen.jobs.job_alert()
         await self.gen.jobs.job()

@@ -100,7 +100,7 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
           state.mutable.isOpen = true;
         }}
         {...props.buttonProps}
-        {...ids.set(ids.job.alert.subscribeBtn)}
+        {...ids.set(ids.job.alert.btn.subscribe)}
       >
         <Icon boxSize="3.5">
           <FaBell />
@@ -186,7 +186,7 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
                   colorPalette="blue"
                   loading={loading.isActive}
                   size="lg"
-                  {...ids.set(ids.job.alert.submitBtn)}
+                  {...ids.set(ids.job.alert.btn.submit)}
                 >
                   Subscribe
                 </Button>
@@ -241,6 +241,35 @@ export const JobAlertSubscribeMutation = graphql.persisted(
         is_exclude_profit_for_good: $is_exclude_profit_for_good
         tz: $tz
         is_subscribe_to_newsletter: $is_subscribe_to_newsletter
+      )
+    }
+  `),
+);
+
+export const JobAlertUpdateMutation = graphql.persisted(
+  "JobAlertUpdate",
+  graphql(`
+    mutation JobAlertUpdate(
+      $id_ext: UUID!
+      $tag_names: [String!]
+      $location_ids: [Int!]
+      $is_orgs_highlighted: Boolean
+      $salary_min: Int
+      $is_exclude_no_salary: Boolean!
+      $is_exclude_career_capital: Boolean
+      $is_exclude_profit_for_good: Boolean
+      $tz: String
+    ) {
+      job_alert_update(
+        id_ext: $id_ext
+        tag_names: $tag_names
+        location_ids: $location_ids
+        is_orgs_highlighted: $is_orgs_highlighted
+        salary_min: $salary_min
+        is_exclude_no_salary: $is_exclude_no_salary
+        is_exclude_career_capital: $is_exclude_career_capital
+        is_exclude_profit_for_good: $is_exclude_profit_for_good
+        tz: $tz
       )
     }
   `),
