@@ -97,7 +97,7 @@ jobs:
           # Per `VITE_SITE` and `DJANGO_ENV` client image names, ie `-stage` and `-pg-stage` postfixes: 
           # todo ? refac: shorten to `if ($env.VITE_SITE?) {}` #AI-slop
           let site_postfix = if ($env.VITE_SITE? | default "") != "" { $"-($env.VITE_SITE)" } else { "" }
-          let stage_postfix = if ($env.DJANGO_ENV? | default "") == "stage" {"-stage" } else { "" }
+          let stage_postfix = if ($env.DJANGO_ENV? | default "") == "stage" { "-stage" } else { "" }
           let client_image_name = $"client($site_postfix)($stage_postfix)"
 
           let server_digest = get_digest "server"

@@ -25,10 +25,10 @@
     """
     run = """
         let image_name = if $env.usage_app == "client" {
-            let site_suffix = if ($env.VITE_SITE? | default "") != "" { $"-($env.VITE_SITE)" } else { "" }
-            let stage_suffix = if ($env.DJANGO_ENV? | default "") == "stage" { "-stage" } else { "" }
+            let site_postfix = if ($env.VITE_SITE? | default "") != "" { $"-($env.VITE_SITE)" } else { "" }
+            let stage_postfix = if ($env.DJANGO_ENV? | default "") == "stage" { "-stage" } else { "" }
 
-            $"client($site_suffix)($stage_suffix)"
+            $"client($site_postfix)($stage_postfix)"
         } else {
             $env.usage_app
         }
@@ -61,10 +61,10 @@
         # ------------------------------------------------------------
 
         let image_name = if $env.usage_app == "client" {
-            let site_suffix = if ($env.VITE_SITE? | default "") != "" { $"-($env.VITE_SITE)" } else { "" }
-            let stage_suffix = if ($env.DJANGO_ENV? | default "") == "stage" { "-stage" } else { "" }
+            let site_postfix = if ($env.VITE_SITE? | default "") != "" { $"-($env.VITE_SITE)" } else { "" }
+            let stage_postfix = if ($env.DJANGO_ENV? | default "") == "stage" { "-stage" } else { "" }
 
-            $"client($site_suffix)($stage_suffix)"
+            $"client($site_postfix)($stage_postfix)"
         } else {
             $env.usage_app
         }

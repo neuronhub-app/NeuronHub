@@ -75,9 +75,9 @@ def main(kwargs: NamespaceKwargs):
 
 
 def _get_client_image_name(vite_site: ViteSite, django_env: DjangoEnv) -> str:
-    site_suffix = f"-{vite_site}" if vite_site else ""
+    site_postfix = f"-{vite_site}" if vite_site else ""
     stage_postfix = "-stage" if django_env == "stage" else ""
-    return f"client{site_suffix}{stage_postfix}"
+    return f"client{site_postfix}{stage_postfix}"
 
 
 if __name__ == "__main__":
