@@ -61,13 +61,7 @@ class UsersQuery:
         from neuronhub.apps.posts.index import algolia_replica_sorted_by_votes
 
         user = await get_user_maybe(info)
-        filters = ["visible_to:group/INTERNAL", "visible_to:group/PUBLIC"]
-        if username := user.username:
-            filters.append(f"visible_to:{username}")
-
-        if user.is_authenticated:
-            async for group in ProfileGroup.objects.filter(profiles__user=user):
-                filters.append(f"visible_to:profile_group/{group.name}")
+        filters = await build_algolia_visibility_filters(user)
 
         app_id = cast(str, settings.ALGOLIA["APPLICATION_ID"])
         search_api_key = cast(str, settings.ALGOLIA["SEARCH_API_KEY"])
@@ -88,3 +82,16 @@ class UsersQuery:
             index_name_jobs=f"jobs_{index_suffix}",
             index_name_jobs_sorted_by_closes_at=algolia_replica_jobs_sorted_by_closes_at,
         )
+
+
+async def build_algolia_visibility_filters(user: User | AnonymousUser) -> list[str]:
+    filters = ["visible_to:group/PUBLIC"]
+    if not user.is_authenticated:
+        return filters
+
+    filters.append("visible_to:group/INTERNAL")
+    if username := user.username:
+        filters.append(f"visible_to:{username}")
+    async for group in ProfileGroup.objects.filter(profiles__user=user):
+        filters.append(f"visible_to:profile_group/{group.name}")
+    return filters
