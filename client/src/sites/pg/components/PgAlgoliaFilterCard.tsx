@@ -1,5 +1,5 @@
 import { Box, Collapsible, Flex, HStack, Icon, Stack } from "@chakra-ui/react";
-import React, { useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { LuChevronDown, LuSquareX } from "react-icons/lu";
 import { useClearRefinements } from "react-instantsearch";
 
@@ -10,42 +10,32 @@ import {
   type FacetsActiveConfig,
 } from "@/sites/pg/components/PgAlgoliaFacetsActive";
 
-export function PgFilterCardWithSplitBg(props: {
-  children: ReactNode;
-  isOpenRef: RefObject<boolean>;
-}) {
-  const rootRef = useRef<HTMLDivElement>(null);
+export function PgFilterCardWithSplitBg(props: { children: ReactNode }) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const rootElement = rootRef.current;
-    if (!rootElement) {
-      return;
-    }
-    const observer = new ResizeObserver(() => {
-      if (!props.isOpenRef.current) {
+    function measureSplitHeight() {
+      const rootElement = rootRef.current;
+      if (rootElement) {
         rootElement.style.setProperty("--split-bg-h", `${rootElement.offsetHeight / 2}px`);
       }
-    });
-    observer.observe(rootElement);
-    return () => observer.disconnect();
+    }
+    measureSplitHeight();
+    window.addEventListener("resize", measureSplitHeight);
+    return () => window.removeEventListener("resize", measureSplitHeight);
   }, []);
 
   return (
-    <Box
-      position="relative"
-      ref={rootRef}
-      style={{ "--split-bg-h": "50%" } as React.CSSProperties}
-    >
+    <Box ref={rootRef} pos="relative">
       <Box
-        position="absolute"
+        pos="absolute"
         top="0"
         left="-9999px"
         right="-9999px"
         h="var(--split-bg-h)"
         bg="brand.green"
       />
-      <Box position="absolute" top="var(--split-bg-h)" left="-9999px" right="-9999px" bg="bg" />
-      <Box position="relative">{props.children}</Box>
+      <Box pos="relative">{props.children}</Box>
     </Box>
   );
 }
@@ -77,7 +67,6 @@ export function PgMobileCollapsible(props: {
   cta?: ReactNode;
   facetsTopbar: ReactNode;
   facetsActive: FacetsActiveConfig;
-  onOpenChange?: (open: boolean) => void;
 }) {
   const state = useStateValtio({ isOpen: false });
 
@@ -86,7 +75,6 @@ export function PgMobileCollapsible(props: {
       open={state.snap.isOpen}
       onOpenChange={details => {
         state.mutable.isOpen = details.open;
-        props.onOpenChange?.(details.open);
       }}
     >
       {!state.snap.isOpen && (
