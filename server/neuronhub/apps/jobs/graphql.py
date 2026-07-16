@@ -271,22 +271,19 @@ class JobsMutation:
         is_subscribe_to_newsletter: bool = False,
     ) -> bool:
         alert = await JobAlert.objects.acreate(
-            email=email,
+            email=email, is_subscribe_to_newsletter=is_subscribe_to_newsletter
+        )
+        await _apply_alert_filters(
+            alert,
+            tag_names=tag_names,
+            location_ids=location_ids,
             is_orgs_highlighted=is_orgs_highlighted,
             salary_min=salary_min,
             is_exclude_no_salary=is_exclude_no_salary,
             is_exclude_career_capital=is_exclude_career_capital,
             is_exclude_profit_for_good=is_exclude_profit_for_good,
             tz=tz,
-            is_subscribe_to_newsletter=is_subscribe_to_newsletter,
         )
-        if tag_names:
-            tags = PostTag.objects.filter(name__in=tag_names)
-            await alert.tags.aset([tag async for tag in tags])
-
-        if location_ids:
-            locations = JobLocation.objects.filter(id__in=location_ids)
-            await alert.locations.aset([loc async for loc in locations])
 
         await _save_session_job_alert(info=info, alert_id_ext=alert.id_ext)
         try:
@@ -297,6 +294,41 @@ class JobsMutation:
         if is_subscribe_to_newsletter:
             await subscribe_to_mailerlite(email)
 
+        return True
+
+    @strawberry.mutation()
+    async def job_alert_update(
+        self,
+        info: strawberry.Info,
+        id_ext: uuid.UUID,
+        tag_names: list[str] | None = None,
+        location_ids: list[int] | None = None,
+        is_orgs_highlighted: bool | None = None,
+        salary_min: int | None = None,
+        is_exclude_no_salary: bool = False,
+        is_exclude_career_capital: bool | None = None,
+        is_exclude_profit_for_good: bool | None = None,
+        tz: str | None = None,
+    ) -> bool:
+        if str(id_ext) not in await _read_session_job_alerts(info):
+            return False
+
+        # Session may hold a stale id_ext of a since-deleted alert - fail soft, not with a 500.
+        alert = await JobAlert.objects.filter(id_ext=id_ext).afirst()
+        if alert is None:
+            return False
+
+        await _apply_alert_filters(
+            alert,
+            tag_names=tag_names,
+            location_ids=location_ids,
+            is_orgs_highlighted=is_orgs_highlighted,
+            salary_min=salary_min,
+            is_exclude_no_salary=is_exclude_no_salary,
+            is_exclude_career_capital=is_exclude_career_capital,
+            is_exclude_profit_for_good=is_exclude_profit_for_good,
+            tz=tz,
+        )
         return True
 
     @strawberry.mutation
@@ -363,6 +395,34 @@ class JobsMutation:
         alert.is_active = False
         await alert.asave()
         return alert.email
+
+
+async def _apply_alert_filters(
+    alert: JobAlert,
+    *,
+    tag_names: list[str] | None,
+    location_ids: list[int] | None,
+    is_orgs_highlighted: bool | None,
+    salary_min: int | None,
+    is_exclude_no_salary: bool,
+    is_exclude_career_capital: bool | None,
+    is_exclude_profit_for_good: bool | None,
+    tz: str | None,
+) -> None:
+    # Full replace: caller sends complete state; any omitted field resets (incl. tz).
+    alert.is_orgs_highlighted = is_orgs_highlighted
+    alert.salary_min = salary_min
+    alert.is_exclude_no_salary = is_exclude_no_salary
+    alert.is_exclude_career_capital = is_exclude_career_capital
+    alert.is_exclude_profit_for_good = is_exclude_profit_for_good
+    alert.tz = tz  # type: ignore[assignment] #bad-infer TimeZoneField coerces str
+    await alert.asave()
+
+    # Unconditional .aset() so an edit can CLEAR all tags/locations.
+    tags = PostTag.objects.filter(name__in=tag_names or [])
+    await alert.tags.aset([tag async for tag in tags])
+    locations = JobLocation.objects.filter(id__in=location_ids or [])
+    await alert.locations.aset([loc async for loc in locations])
 
 
 class _session:

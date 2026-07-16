@@ -20,6 +20,7 @@ import { PgAlgoliaSearchStats } from "@/sites/pg/components/PgAlgoliaSearchStats
 import { PgAlgoliaSortSelect } from "@/sites/pg/components/PgAlgoliaSortSelect";
 import { PgSearchInput } from "@/sites/pg/components/PgSearchInput";
 import { landingPageToAlgoliaState } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
+import { JobAlertEditController } from "@/sites/pg/pages/jobs/list/JobAlertEditController";
 import { type AlgoliaIndexKey, useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function PgAlgoliaList<TItem extends { id: ID }>(props: {
@@ -35,6 +36,7 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
   cta?: ReactNode;
   ctaMobile?: ReactNode;
   jobsLandingPage?: JobsLandingPage;
+  alertEditIdExt?: string;
 }) {
   const algolia = useAlgoliaSearchClient();
 
@@ -95,6 +97,8 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
       insights={true}
     >
       {props.children}
+
+      {props.alertEditIdExt && <JobAlertEditController idExt={props.alertEditIdExt} />}
 
       <Stack gap="gap.sm" w="full">
         <PgFilterCardWithSplitBg isOpenRef={pgFilterCardIsOpenRef}>

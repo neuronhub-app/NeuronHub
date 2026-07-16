@@ -61,6 +61,9 @@ export const urls = {
     list: env.VITE_SITE === "pg" ? "/" : "/jobs",
     faq: env.VITE_SITE === "pg" ? "/faq" : "/jobs/faq",
     subscriptions: env.VITE_SITE === "pg" ? "/subscriptions" : "/jobs/subscriptions",
+    listEdit(idExt: string) {
+      return `${urls.jobs.list}?edit_alert=${idExt}` as const;
+    },
     slug: (slug: string) => `/jobs/${slug}` as const,
     landingPage: (slug: string) => `/${slug}` as const,
     draftLandingPage: (id: ID) => `/jobs/drafts/landing-pages/${id}` as const,
