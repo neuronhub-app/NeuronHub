@@ -14,7 +14,7 @@ const defaults: { title: ReactNode; description: string } = {
         as="span"
         fontFamily="heading"
         fontStyle="italic"
-        fontSize={{ base: "26px", md: "6xl" }}
+        fontSize={{ base: "26px", md: "53px", lg: "6xl" }}
         lineHeight={{ base: "32px", md: "1.2" }}
       >
         and
