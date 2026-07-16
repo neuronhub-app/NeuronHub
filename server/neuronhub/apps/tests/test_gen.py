@@ -11,6 +11,7 @@ from neuronhub.apps.jobs.tests.test_gen import JobsGen
 from neuronhub.apps.orgs.tests.test_gen import OrgsGen
 from neuronhub.apps.posts.tests.test_gen import PostsGen
 from neuronhub.apps.profiles.tests.test_gen import ProfilesGen
+from neuronhub.apps.sites.tests.test_gen import SitesGen
 from neuronhub.apps.users.models import User
 from neuronhub.apps.users.tests.test_gen import UsersGen
 
@@ -21,6 +22,7 @@ class Gen:
     posts: PostsGen
     profiles: ProfilesGen
     jobs: JobsGen
+    sites: SitesGen
     faker: UniqueProxy
     faker_non_unique: Faker
     random_gen_seeded: Random
@@ -50,6 +52,7 @@ class Gen:
         self.posts = PostsGen(faker=self.faker, user=self.users.user_default)
         self.profiles = ProfilesGen(faker=self.faker, user=self.users.user_default)
         self.jobs = JobsGen(faker=self.faker, orgs=self.orgs)
+        self.sites = SitesGen(faker=self.faker)
 
         return self
 

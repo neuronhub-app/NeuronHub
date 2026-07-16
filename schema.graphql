@@ -993,7 +993,15 @@ type Query {
   jobs_public: [JobType!]!
   job_alerts: [JobAlertType!]!
   job_versions_pending: [JobVersionType!]! @IsStaff
+  seo_metas: [SeoMetaType!]!
   site: SiteConfigType!
+}
+
+type SeoMetaType {
+  path: String!
+  meta_title: String!
+  meta_description: String!
+  meta_image_url: String!
 }
 
 input SignupInput {
