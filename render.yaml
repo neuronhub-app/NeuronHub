@@ -146,7 +146,7 @@ projects:
           image:
             url: ghcr.io/neuronhub-app/neuronhub/server:0.3.3.2
           dockerCommand: uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application
-          preDeployCommand: uv run manage.py migrate
+          preDeployCommand: uv run manage.py migrate && uv run manage.py algolia_reindex_with_replicas --model=Job
           domains:
             - backend.jobs.probablygood.org
           envVars:
