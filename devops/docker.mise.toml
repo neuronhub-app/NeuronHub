@@ -106,6 +106,7 @@
                     DJANGO_ENV: {{ env.DJANGO_ENV | default(value="") }}
 
                     VITE_SITE: {{ env.VITE_SITE | default(value="''") }}
+                    VITE_PROJECT_NAME: {{ env.VITE_PROJECT_NAME }}
                     VITE_GTM_ID: {{ env.VITE_GTM_ID | default(value="''") }}
                     VITE_SERVER_URL: https://{{ env.SERVER_DOMAIN }}
                     VITE_CLIENT_URL: {{ env.CLIENT_URL }}
