@@ -28,7 +28,7 @@ export const links = {
   "jobs/services/send_job_alerts.py": `${paths.github}${paths.apps}/jobs/services/send_job_alerts.py`,
   "jobs/services/send_job_alerts__test.py": `${paths.github}${paths.apps}/jobs/services/send_job_alerts__test.py`,
   "jobs/services/publish_job_versions.py": `${paths.github}${paths.apps}/jobs/services/publish_job_versions.py`,
-  "jobs/services/get_jobs_public_from_ram.py": `${paths.github}${paths.apps}/jobs/services/get_jobs_public_from_ram.py`,
+  "get_jobs_public_from_ram.py": `${paths.github}${paths.apps}/jobs/services/get_jobs_public_from_ram.py`,
   "mise.toml": `${paths.github}/mise.toml`,
   "schema.graphql": `${paths.github}/schema.graphql`,
   "server/persisted-queries.json": `${paths.github}/server/persisted-queries.json`,

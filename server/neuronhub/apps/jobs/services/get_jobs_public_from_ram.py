@@ -1,3 +1,7 @@
+"""
+[[public-api.mdx]]
+"""
+
 from django.contrib.auth.models import AnonymousUser
 from strawberry.dataloader import DataLoader
 
@@ -9,10 +13,6 @@ from neuronhub.apps.jobs.services.get_jobs_qs_prefetched import get_jobs_qs_pref
 
 
 async def get_jobs_public_from_ram() -> list[Job]:
-    """
-    [[public-api.mdx]]
-    """
-
     return await _jobs_loader.load(_jobs_loader_key)
 
 
@@ -21,11 +21,12 @@ def clear_jobs_public_ram_cache():
 
 
 async def _load_jobs(keys: list[str]) -> list[list[Job]]:
-    assert len(keys) == 1, keys
+    assert len(keys) == 1
     jobs = [
         job
         async for job in filter_jobs_by_user(
-            jobs=get_jobs_qs_prefetched().filter(is_published=True), user=AnonymousUser()
+            jobs=get_jobs_qs_prefetched().filter(is_published=True),
+            user=AnonymousUser(),
         )
     ]
     return [jobs]
@@ -100,7 +101,6 @@ graphql_whitelist_BE.register(
 def reset_jobs_loader_for_test():
     """
     #AI
-
     DataLoader caches `_loop` once; Django async test wrap closes & re-opens loops between methods.
     """
     _jobs_loader._loop = None

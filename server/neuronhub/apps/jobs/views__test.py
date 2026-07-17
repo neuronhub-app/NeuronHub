@@ -37,6 +37,10 @@ def _get_url(secret: str):
 
 
 class JobsCsvTest(NeuronTestCase):
+    """
+    #AI #quality-1%
+    """
+
     def setUp(self):
         super().setUp()
         reset_jobs_loader_for_test()
