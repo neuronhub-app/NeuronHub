@@ -42,6 +42,8 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
           <Menu.Positioner>
             <Menu.Content>
               <Menu.ItemGroup>
+                <Menu.ItemGroupLabel>{env.VITE_RELEASE_NAME}</Menu.ItemGroupLabel>
+
                 <Menu.Item
                   value="hide"
                   onClick={() => {
@@ -114,35 +116,30 @@ export function AdminMenuFloatButton(props: { isThemeSwitcher?: boolean }) {
                     <Menu.Content>
                       <Menu.Item value="users" asChild>
                         <LinkExt href={admin.urls.users}>
-                          <icons.users />
                           <Box>Users</Box>
                         </LinkExt>
                       </Menu.Item>
 
                       <Menu.Item value="tags" asChild>
                         <LinkExt href={admin.urls.tags}>
-                          <icons.tags />
                           <Box>Tags</Box>
                         </LinkExt>
                       </Menu.Item>
 
                       <Menu.Item value="job_alerts" asChild>
                         <LinkExt href={admin.urls.job_alerts}>
-                          <icons.job_alert />
                           <Box>Job Alerts</Box>
                         </LinkExt>
                       </Menu.Item>
 
                       <Menu.Item value="site_config" asChild>
                         <LinkExt href={admin.urls.site_config}>
-                          <icons.site_config />
                           <Box>Site Config</Box>
                         </LinkExt>
                       </Menu.Item>
 
                       <Menu.Item value="jobs" asChild>
                         <LinkExt href={admin.urls.jobs}>
-                          <icons.job />
                           <Box>Jobs</Box>
                         </LinkExt>
                       </Menu.Item>
