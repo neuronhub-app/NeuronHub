@@ -46,7 +46,7 @@ self.gen.jobs.job_alert(tags=[tag_us_visa])
     - `admin.py`: `assert isinstance(request.user, User)` (narrows union)
 - Fix: `_get_jobs_matching_qs` missing tags_country, tags_city, tags_country_visa_sponsor
     - Also added visa_sponsorship to `_get_alert_filters_dict`
-    - 3 new tests: test_matches_by_{country,city,country_visa_sponsor}_tag
+    - 3 new tests: `test_matches_by_{country,city,country_visa_sponsor}_tag`
 - Refac: `test_matches_by_*` → use `gen` helpers
     - `PostsGen.tag()`: added `category: TagCategoryEnum` param
     - `JobsGen.job()`: added `tags: list[PostTag]` param (auto-routes to M2M field via category)

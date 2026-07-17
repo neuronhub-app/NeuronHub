@@ -2,15 +2,14 @@
  * #AI
  */
 // Vite build: runs before aliases - requires node:fs and relative imports (no @/)
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readdirSync, statSync } from "node:fs";
 import path from "node:path";
 
 import { type RouteConfig, layout, route } from "@react-router/dev/routes";
 
 import { frontmatter } from "./components/frontmatter";
+import { getPageSlugByFilepath, pagesDir } from "./getPageSlugByFilepath";
 import { findMdxFiles } from "./utils/findMdxFiles";
-
-const pagesDir = path.join(import.meta.dirname, "pages");
 
 export default [
   layout("components/DocsLayout.tsx", [
@@ -23,7 +22,7 @@ export default [
 
 function buildMdxRoutes() {
   return findMdxFiles(pagesDir).map(file => {
-    return route(fileToSlug(file), path.relative(import.meta.dirname, file));
+    return route(getPageSlugByFilepath(file), path.relative(import.meta.dirname, file));
   });
 }
 
@@ -34,7 +33,7 @@ function buildDirRedirects() {
     const slug = "/" + path.relative(pagesDir, dir).toLowerCase();
     const isHasReadme = existsSync(path.join(dir, `${frontmatter.consts.readme}.mdx`));
 
-    // A README dir already has a content route at `slug` (see fileToSlug), so a
+    // A README dir already has a content route at `slug` (see [[getPageSlugByFilepath.ts]]), so a
     // dir-redirect here would shadow it and loop back to itself.
     if (isHasReadme) {
       continue;
@@ -46,21 +45,6 @@ function buildDirRedirects() {
   }
 
   return routes;
-}
-
-function fileToSlug(file: string): string {
-  const rel = path.relative(pagesDir, file).replace(".mdx", "").toLowerCase();
-  const dirPath = path.dirname(rel);
-  const fm = frontmatter.parse(readFileSync(file, "utf-8"));
-
-  if (fm.slug) {
-    return `/${dirPath}/${fm.slug}`;
-  }
-  // Compare the original-case basename - `rel` is lowercased.
-  if (path.basename(file, ".mdx") === frontmatter.consts.readme) {
-    return `/${dirPath}`;
-  }
-  return `/${rel}`;
 }
 
 function findDirsWithMdx(root: string): string[] {

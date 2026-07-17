@@ -6,38 +6,47 @@ import { href } from "react-router";
 
 import { ids } from "@/e2e/ids";
 import { env } from "@/env";
-import { ReactRouterPath } from "@/utils/types";
+import { getPageSlugByFilepath, pagesDir } from "@/getPageSlugByFilepath";
+import { findMdxFiles } from "@/utils/findMdxFiles";
 
 const routes = {
-  home: path("/"),
+  home: href("/"),
   usage: {
-    algolia: path("/usage/guides/algolia"),
-    analytics: path("/usage/guides/analytics"),
-    deploy: path("/development/guides/deploy"),
-    jobEmails: path("/usage/guides/job-emails-sending"),
-    sentry: path("/usage/guides/sentry"),
-    adminPanel: path("/usage/guides/admin-panel"),
-    jobAlertEmails: path("/usage/reference/job-alert-emails"),
-    dir: path("/usage"),
+    algolia: href("/usage/guides/algolia"),
+    deploy: href("/development/guides/deploy"),
+    sentry: href("/usage/guides/sentry"),
+    dir: href("/usage"),
   },
   development: {
-    codeStyle: path("/development/intro/code-style"),
-    codeStyleDetailed: path("/development/reference/code-style-detailed"),
-    gitCommits: path("/development/reference/git-commits"),
-    dirGuides: path("/development/guides"),
+    codeStyle: href("/development/intro/code-style"),
+    dirGuides: href("/development/guides"),
   },
 };
 
-test("pages render without errors", async ({ page }) => {
-  for (const url of [
-    routes.home,
-    ...Object.values(routes.usage),
-    ...Object.values(routes.development),
-  ]) {
-    await page.goto(url);
+const allSlugs = ["/", ...findMdxFiles(pagesDir).map(getPageSlugByFilepath)];
+for (const slug of allSlugs) {
+  test(`loads without errors: ${slug}`, async ({ page }) => {
+    const errors: string[] = [];
+    // client-side errors
+    page.on("pageerror", error => errors.push(`pageerror: ${error.message}`));
+
+    // console.error outside of "pageerror"
+    page.on("console", msg => {
+      if (msg.type() === "error" && isErrorAppRelevant(msg.text())) {
+        errors.push(`console: ${msg.text()}`);
+      }
+    });
+
+    const response = await page.goto(slug);
+    expect(response?.status()).toBeLessThan(400);
     await expect(page.getByText("Application Error")).not.toBeVisible();
-  }
-});
+
+    // eg Shiki client errors are a dynamic import - wait for it.
+    await page.waitForLoadState("networkidle");
+
+    expect(errors).toEqual([]);
+  });
+}
 
 test.describe("TOC", () => {
   test("highlights first heading on page load", async ({ page }) => {
@@ -128,8 +137,9 @@ test.describe("<Term/>", () => {
 
 // --- helpers ---
 
-function path(path: ReactRouterPath) {
-  return href(path);
+function isErrorAppRelevant(text: string): boolean {
+  const isViteDevNoise = text.includes("Outdated Optimize Dep") || text.includes("[vite]");
+  return !isViteDevNoise;
 }
 
 function $(page: Page): Record<string, Locator> {

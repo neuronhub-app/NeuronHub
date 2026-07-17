@@ -18,7 +18,7 @@ const shikiAdapter = createShikiAdapter<HighlighterGeneric<any, any>>({
   async load() {
     const { createHighlighter } = await import("shiki");
     return createHighlighter({
-      langs: ["yaml", "bash", "typescript", "python"],
+      langs: ["yaml", "bash", "typescript", "tsx", "python", "xml"],
       themes: ["github-dark", "github-light"],
     });
   },
