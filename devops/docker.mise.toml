@@ -75,6 +75,7 @@
               ($env.usage_app):
                 image: ghcr.io/{{ env.GHCR_REPO }}/($image_name):($env.usage_version)
                 pull_policy: always
+                platform: linux/amd64
                 build:
                   context: (
                     match $env.usage_app {
@@ -93,6 +94,8 @@
                       $"($env.usage_app)/Dockerfile"
                     }
                   )
+                  platforms:
+                    - linux/amd64
                   args:
                     VITE_RELEASE_VERSION: ($env.usage_version)
                     GHCR_REPO: {{ env.GHCR_REPO }}
@@ -129,13 +132,18 @@
         # Build
         # ------------------------------------------------------------
 
-        # local needs `sudo -E`
-        let docker_cmd = if $env.CI? == "true" { "docker" } else { "sudo -E docker" }
+        let no_cache_flag = if $env.usage_no_cache == "true" { "--no-cache" } else { "" }
 
-        if $env.usage_no_cache == "true" {
-          nu -c $"($docker_cmd) compose --file ($compose_file) --progress=plain build --no-cache"
+        if $env.CI? == "true" {
+          nu -c $"docker compose --file ($compose_file) --progress=plain build ($no_cache_flag)"
         } else {
-          nu -c $"($docker_cmd) compose --file ($compose_file) --progress=plain build"
+          let is_builder_missing = (do { sudo docker buildx inspect nhanative } | complete | get exit_code) != 0
+          if $is_builder_missing {
+            # eg on a macos vm to build for amd64 on arm
+            sudo docker buildx create --name nhanative --driver docker-container --config devops/buildkitd-native.toml --bootstrap
+          } else {
+            nu -c $"sudo docker buildx bake --builder nhanative --file ($compose_file) --load --progress=plain ($no_cache_flag)"
+          }
         }
 
         rm $compose_file

@@ -1,0 +1,6 @@
+# #AI:
+# OrbStack's kernel rejects overlay-on-overlay mounts (EPERM), which kills BuildKit's
+# default `overlayfs` snapshotter. The `native` snapshotter copies layers instead of
+# overlay-mounting them -> slower, but the only worker that builds locally on OrbStack.
+[worker.oci]
+  snapshotter = "native"
