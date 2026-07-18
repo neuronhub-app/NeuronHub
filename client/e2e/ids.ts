@@ -157,6 +157,9 @@ export namespace ids {
     card: {
       container: "job.card.container",
       tags: "job.card.tags",
+      tag(attribute: string) {
+        return `job.card.tag.${attribute}` as TestId;
+      },
     },
     alert: {
       subscribeBtn: "job.alert.subscribe-btn",

@@ -16,6 +16,9 @@ import { useRefinementList } from "react-instantsearch";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 import { ids } from "@/e2e/ids";
+import { ExplainerTooltip } from "@/sites/pg/components/ExplainerTooltip";
+
+export type FacetDescriptions = Record<string, { menu: string }>;
 
 export function PgFacetAttribute(props: {
   attribute: string;
@@ -25,6 +28,7 @@ export function PgFacetAttribute(props: {
   sortBy?: UseRefinementListProps["sortBy"];
   transformItems?: UseRefinementListProps["transformItems"];
   operator?: UseRefinementListProps["operator"];
+  descriptions?: FacetDescriptions;
 }) {
   const facetValuesInitialRef = useRef<Map<string, FacetItem>>(new Map());
   const searchQueryRef = useRef("");
@@ -152,6 +156,7 @@ export function PgFacetAttribute(props: {
                     <FacetCheckboxItem
                       item={item}
                       onRefine={() => refineMain(item.value, item.isRefined)}
+                      description={props.descriptions?.[item.value]?.menu}
                     />
                     {subItem && (
                       <FacetCheckboxItem
@@ -182,9 +187,22 @@ function FacetCheckboxItem(props: {
   };
   onRefine: () => void;
   labelOverride?: string;
+  description?: string;
   isSubItem?: boolean;
   disabled?: boolean;
 }) {
+  const label = (
+    <Text
+      dangerouslySetInnerHTML={{
+        __html: props.labelOverride ?? props.item.highlighted ?? props.item.label,
+      }}
+      justifySelf="start"
+      fontSize="13px"
+      color="fg"
+      _groupHover={{ color: "brand.green.light" }}
+    />
+  );
+
   const checkbox = (
     <Checkbox.Root
       checked={props.item.isRefined}
@@ -201,15 +219,10 @@ function FacetCheckboxItem(props: {
     >
       <Checkbox.HiddenInput />
       <Checkbox.Control _groupHover={{ borderColor: "brand.green.light" }} />
-      <Text
-        dangerouslySetInnerHTML={{
-          __html: props.labelOverride ?? props.item.highlighted ?? props.item.label,
-        }}
-        fontSize="13px"
-        color="fg"
-        _groupHover={{ color: "brand.green.light" }}
-      />
-      <Text fontSize="13px" color="fg.muted" _groupHover={{ color: " brand.green.light" }}>
+      <ExplainerTooltip content={props.description} placement="right">
+        {label}
+      </ExplainerTooltip>
+      <Text fontSize="13px" color="fg.muted" _groupHover={{ color: "brand.green.light" }}>
         {props.item.count}
       </Text>
     </Checkbox.Root>
