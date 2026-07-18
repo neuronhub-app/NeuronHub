@@ -7,7 +7,7 @@ import { SimpleGrid, Text } from "@chakra-ui/react"
 import { icons } from "@neuronhub/shared/theme/icons";
 import { SiLinear } from "react-icons/si";
 import { LuSearch, LuShieldAlert } from "react-icons/lu"
-import { GuideCard } from "@/components"
+import { GuideCard, Site } from "@/components"
 
 
 <Text color="fg.muted">Welcome.</Text>
@@ -43,10 +43,12 @@ import { GuideCard } from "@/components"
     description="Job boards with custom filters & SEO."
     path="/usage/guides/job-landing-pages"
   />
-  <GuideCard
-    icon={SiLinear}
-    title="Linear"
-    description="The single source of truth for specification."
-    path="/usage/guides/linear"
-  />
+  <Site slug="pg">
+    <GuideCard
+      icon={SiLinear}
+      title="Linear.app"
+      description="The single source of truth for specification."
+      path="/usage/guides/linear"
+    />
+  </Site>
 </SimpleGrid>

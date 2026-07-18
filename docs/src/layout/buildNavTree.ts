@@ -1,6 +1,7 @@
 import { format } from "@neuronhub/shared/utils/format";
 
 import { frontmatter } from "@/components/frontmatter";
+import { type SiteSlug } from "@/layout/siteState";
 import { ReactRouterPath } from "@/utils/types";
 
 const mdxModules = import.meta.glob("/src/pages/**/*.mdx", { eager: true }) as Record<
@@ -48,6 +49,9 @@ function buildNavTree(): NavNode[] {
       if (file.frontmatter.is_new) {
         parent.isNewBadge = true;
       }
+      if (file.frontmatter.site) {
+        parent.site = file.frontmatter.site;
+      }
     } else {
       const parent =
         file.dir.pathParts.length > 0
@@ -59,6 +63,7 @@ function buildNavTree(): NavNode[] {
         href: file.href,
         order: file.order,
         isNewBadge: file.frontmatter.is_new,
+        site: file.frontmatter.site,
         children: [],
       };
       if (parent) {
@@ -79,8 +84,25 @@ export type NavNode = {
   href?: string;
   order: number;
   isNewBadge?: boolean;
+  site?: "pg";
   children: NavNode[];
 };
+
+// Drop dir nodes (no `href`) once all their children got filtered out.
+export function filterNavBySite(nodes: NavNode[], site: SiteSlug): NavNode[] {
+  const nodesKept: NavNode[] = [];
+  for (const node of nodes) {
+    if (node.site !== undefined && node.site !== site) {
+      continue;
+    }
+    const children = filterNavBySite(node.children, site);
+    if (!node.href && children.length === 0 && node.children.length > 0) {
+      continue;
+    }
+    nodesKept.push({ ...node, children });
+  }
+  return nodesKept;
+}
 
 export function findFirstChildHrefRecursively(nodes: NavNode[]): string | undefined {
   for (const node of nodes) {

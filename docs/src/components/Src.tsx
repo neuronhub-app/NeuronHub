@@ -65,10 +65,10 @@ export const links = {
   "docs/react-router.config.ts": `${paths.github}/docs/react-router.config.ts`,
   "docs/vite.config.ts": `${paths.github}/docs/vite.config.ts`,
   "docs/src/routes.ts": `${paths.github}/docs/src/routes.ts`,
-  "DocsLayout.tsx": `${paths.github}/docs/src/components/DocsLayout.tsx`,
-  "Toc.tsx": `${paths.github}/docs/src/components/Toc.tsx`,
+  "DocsLayout.tsx": `${paths.github}/docs/src/layout/DocsLayout.tsx`,
+  "Toc.tsx": `${paths.github}/docs/src/layout/Toc.tsx`,
   "frontmatter.ts": `${paths.github}/docs/src/components/frontmatter.ts`,
-  "buildNavTree.ts": `${paths.github}/docs/src/components/buildNavTree.ts`,
+  "buildNavTree.ts": `${paths.github}/docs/src/layout/buildNavTree.ts`,
   "dir-redirect.tsx": `${paths.github}/docs/src/pages/dir-redirect.tsx`,
 
   // landing pages spec log

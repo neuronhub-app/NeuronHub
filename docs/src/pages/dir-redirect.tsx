@@ -3,7 +3,7 @@
  */
 import { redirect } from "react-router";
 
-import { type NavNode, navTree, findFirstChildHrefRecursively } from "@/components/buildNavTree";
+import { type NavNode, navTree, findFirstChildHrefRecursively } from "@/layout/buildNavTree";
 
 export default function DirRedirect() {
   return null;

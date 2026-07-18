@@ -8,10 +8,12 @@ import { useLocation } from "react-router";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 import { ids } from "@/e2e/ids";
+import { type SiteSlug, site } from "@/layout/siteState";
 
 export function Toc() {
   const location = useLocation();
-  const items = useHeadingItems(location.pathname);
+  const siteCurrent = site.useCurrent();
+  const items = useHeadingItems(location.pathname, siteCurrent);
   const idsVisible = useScrollSpy(items);
 
   const isRedundant = items.length <= 1 || (items.length === 2 && idsVisible.size === 2);
@@ -47,7 +49,7 @@ export function Toc() {
   );
 }
 
-function useHeadingItems(pathname: string): HeadingItem[] {
+function useHeadingItems(pathname: string, siteCurrent: SiteSlug): HeadingItem[] {
   const state = useStateValtio({
     items: [] as HeadingItem[],
   });
@@ -65,7 +67,7 @@ function useHeadingItems(pathname: string): HeadingItem[] {
       text: el.textContent ?? "",
       depth: Number.parseInt(el.tagName[1], 10),
     }));
-  }, [pathname]);
+  }, [pathname, siteCurrent]);
 
   return state.snap.items;
 }

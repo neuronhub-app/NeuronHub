@@ -2,7 +2,7 @@ import { ChakraProvider } from "@chakra-ui/react";
 import type { ReactNode } from "react";
 import { Outlet, Scripts, ScrollRestoration } from "react-router";
 
-import { ColorModeProvider } from "@/components/ColorModeProvider";
+import { ColorModeProvider } from "@/layout/ColorModeProvider";
 import { system } from "@/theme/theme";
 
 export default function App() {

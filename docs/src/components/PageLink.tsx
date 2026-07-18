@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 
-import { pageLinks } from "@/components/buildNavTree";
 import { LinkInt } from "@/components/LinkInt";
+import { pageLinks } from "@/layout/buildNavTree";
 import { ReactRouterPath } from "@/utils/types";
 
 export function PageLink(props: {

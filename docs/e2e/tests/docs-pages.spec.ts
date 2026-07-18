@@ -112,6 +112,71 @@ test.describe("Hidden pages", () => {
   });
 });
 
+test.describe("Site switcher", () => {
+  const siteParamPg = "?site=pg";
+  const pgLinearLabel = "Linear.app";
+
+  test("pg pages hidden by default, shown after switch, persisted on reload", async ({
+    page,
+  }) => {
+    await page.goto(routes.usage.sentry);
+    const nav = $(page)[ids.sidebar.root];
+
+    await expect(nav.getByText(pgLinearLabel)).not.toBeVisible();
+    await expect(nav.getByText("Render.com")).not.toBeVisible();
+
+    await $(page)[ids.siteSwitcher.trigger].click();
+    await $(page)[ids.siteSwitcher.item("pg")].click();
+
+    await expect(nav.getByText(pgLinearLabel)).toBeVisible();
+
+    await page.reload();
+    await expect(nav.getByText(pgLinearLabel)).toBeVisible();
+  });
+
+  test("ToC updates its headings when switching site", async ({ page }) => {
+    await page.goto(routes.usage.deploy);
+    const toc = $(page)[ids.toc.root];
+
+    await expect(toc.getByText("Linear", { exact: true })).not.toBeVisible();
+
+    await $(page)[ids.siteSwitcher.trigger].click();
+    await $(page)[ids.siteSwitcher.item("pg")].click();
+
+    await expect(toc.getByText("Linear", { exact: true })).toBeVisible();
+  });
+
+  test("?site=pg URL param auto-sets pg", async ({ page }) => {
+    await page.goto(routes.usage.sentry + siteParamPg);
+    await expect($(page)[ids.sidebar.root].getByText(pgLinearLabel)).toBeVisible();
+  });
+
+  test("switching writes ?site=pg to URL", async ({ page }) => {
+    await page.goto(routes.usage.sentry);
+
+    await $(page)[ids.siteSwitcher.trigger].click();
+    await $(page)[ids.siteSwitcher.item("pg")].click();
+
+    await expect(page).toHaveURL(/[?&]site=pg/);
+  });
+
+  test("pg logo shown when pg", async ({ page }) => {
+    await page.goto(routes.usage.sentry + siteParamPg);
+
+    const logo = $(page)[ids.sidebar.logo];
+    await expect(logo).toBeVisible();
+    await expect(logo).toContainText("Probably Good");
+    await expect(logo).toContainText("Jobs");
+    await expect(logo).toHaveAttribute("href", "https://jobs.probablygood.org/");
+  });
+
+  test("?site=pg persists across Usage↔Development tab navigation", async ({ page }) => {
+    await page.goto(routes.usage.sentry + siteParamPg);
+    await $(page)[ids.sidebar.root].getByRole("tab", { name: "Development" }).click();
+    await expect(page).toHaveURL(/[?&]site=pg/);
+  });
+});
+
 test.describe("Dir redirects", () => {
   test("dir URL redirects to child page", async ({ page }) => {
     await page.goto(routes.development.dirGuides);

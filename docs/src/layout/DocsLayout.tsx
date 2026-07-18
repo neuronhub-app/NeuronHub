@@ -16,29 +16,35 @@ import {
   Tabs,
   Text,
 } from "@chakra-ui/react";
+import { useEffect } from "react";
 import { GoCommandPalette, GoPerson } from "react-icons/go";
-import { LuFolder, LuMenu, LuUser } from "react-icons/lu";
+import { LuMenu } from "react-icons/lu";
 import { Outlet, useLocation, useNavigate } from "react-router";
 
-import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
 import { getProseHeadingStyle, Prose } from "@neuronhub/shared/components/ui/prose";
 
 import { BadgeNew } from "@/components/BadgeNew";
+import { CodeBlockShikiAdapter } from "@/components/CodeBlockShikiAdapter";
+import { ids } from "@/e2e/ids";
 import {
   type NavNode,
   navTree,
   pageLinks,
+  filterNavBySite,
   findFirstChildHrefRecursively,
-} from "@/components/buildNavTree";
-import { CodeBlockShikiAdapter } from "@/components/CodeBlockShikiAdapter";
-import { DocsSearch } from "@/components/DocsSearch";
-import { Toc } from "@/components/Toc";
-import { ids } from "@/e2e/ids";
-import { env } from "@/env";
+} from "@/layout/buildNavTree";
+import { DocsSearch } from "@/layout/DocsSearch";
+import { site } from "@/layout/siteState";
+import { SiteSwitcher } from "@/layout/SiteSwitcher";
+import { Toc } from "@/layout/Toc";
 import { ReactRouterPath } from "@/utils/types";
 
 export default function DocsLayout() {
   const location = useLocation();
+  const siteCurrent = site.useCurrent();
+
+  useEffect(() => site.hydrate(), []);
+  useEffect(() => site.reflectInUrl(siteCurrent), [siteCurrent, location.pathname]);
 
   return (
     <>
@@ -113,8 +119,10 @@ const style = {
 function SidebarContent() {
   const pathname = useLocation().pathname;
   const navigate = useNavigate();
+  const siteCurrent = site.useCurrent();
 
   const sectionActive = pathname.startsWith("/development/") ? "development" : "usage";
+  const navTreeForSite = filterNavBySite(navTree, siteCurrent);
 
   return (
     <Box
@@ -128,21 +136,14 @@ function SidebarContent() {
       px="5"
     >
       <Stack gap="6" align="flex-start">
-        <chakra.a
-          href={env.VITE_CLIENT_URL}
-          {...ids.set(ids.sidebar.logo)}
-          aria-label="NeuronHub"
-          display="flex"
-        >
-          <NeuronLogo breakpoint="2xl" />
-        </chakra.a>
+        <SiteSwitcher site={siteCurrent} />
 
         <DocsSearch />
 
         <SidebarTabs
           value={sectionActive}
           onValueChange={section => {
-            const node = navTree.find(node => node.slug === section);
+            const node = navTreeForSite.find(node => node.slug === section);
             const href = node ? findFirstChildHrefRecursively(node.children) : "/";
             navigate(href ?? "/");
           }}
@@ -150,7 +151,7 @@ function SidebarContent() {
 
         <SidebarLeft
           pathname={pathname}
-          nodes={navTree.find(node => node.slug === sectionActive)?.children ?? []}
+          nodes={navTreeForSite.find(node => node.slug === sectionActive)?.children ?? []}
           depth={0}
         />
       </Stack>

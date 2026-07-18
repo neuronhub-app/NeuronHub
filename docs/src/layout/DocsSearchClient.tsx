@@ -158,18 +158,22 @@ function SearchInput(props: {
   }
 
   return (
-    <Box p="3" pt="1" borderBottomWidth="1px">
-      <Input
-        {...ids.set(ids.search.input)}
-        ref={inputRef}
-        value={props.query}
-        onChange={event => props.onQueryChange(event.target.value)}
-        onKeyDown={handleKeyDown}
-        size="lg"
-        variant="flushed"
-        placeholder="Search docs..."
-      />
-    </Box>
+    <Input
+      {...ids.set(ids.search.input)}
+      ref={inputRef}
+      value={props.query}
+      onChange={event => props.onQueryChange(event.target.value)}
+      onKeyDown={handleKeyDown}
+      size="lg"
+      px="gap.md"
+      variant="flushed"
+      border="0"
+      _focusVisible={{
+        border: 0,
+        boxShadow: "none",
+      }}
+      placeholder="Search docs..."
+    />
   );
 }
 
@@ -182,9 +186,16 @@ function HitsList(props: {
 }) {
   const hits = useHits<DocHit>();
 
+  const jsx = {
+    border: {
+      borderTop: "xs",
+      borderColor: "border.emphasized",
+    },
+  } as const;
+
   if (hits.items.length === 0) {
     return (
-      <Box p="6">
+      <Box p="6" {...jsx.border}>
         <Text textAlign="center" color="fg.muted" textStyle="sm">
           No results
         </Text>
@@ -193,7 +204,7 @@ function HitsList(props: {
   }
 
   return (
-    <Box overflowY="auto" maxH="60vh" p="2" onMouseMove={props.onMouseMove}>
+    <Box {...jsx.border} overflowY="auto" maxH="60vh" p="2" onMouseMove={props.onMouseMove}>
       {hits.items.map((hit, index) => (
         <HitItem
           key={hit.objectID}
@@ -275,7 +286,7 @@ function HitItem(props: {
 
 function SearchFooter() {
   return (
-    <Flex gap="4" px="4" py="2" borderTopWidth="1px" color="fg.muted" textStyle="xs">
+    <Flex gap="4" px="4" py="2" pb="2.5" borderTopWidth="1px" color="fg.muted" textStyle="xs">
       <HStack gap="1">
         <Kbd size="sm">
           <LuCornerDownLeft size={10} />

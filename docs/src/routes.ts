@@ -12,7 +12,7 @@ import { getPageSlugByFilepath, pagesDir } from "./getPageSlugByFilepath";
 import { findMdxFiles } from "./utils/findMdxFiles";
 
 export default [
-  layout("components/DocsLayout.tsx", [
+  layout("layout/DocsLayout.tsx", [
     route("/", "pages/index.tsx"),
     // Split: mdx routes produce file routes, dir redirects produce loader-only routes
     ...buildMdxRoutes(),

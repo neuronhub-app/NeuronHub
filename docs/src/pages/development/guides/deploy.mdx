@@ -9,6 +9,7 @@ import {
   Notice,
   PageLink,
   ImageWithDialog,
+  Site,
 } from "@/components";
 
 
@@ -119,39 +120,6 @@ At your discretion.
 
 I recommend Cloudflare R2 - the free tier is 10M GET operations with unlimited data transfer.
 
-#### Rclone
-
-Not prod-ready, but will work. Unlike the dead MinIO.
-
-To create an Rclone "S3 bucket" create dir, eg `mkdir -p /srv/neuronhub/media/data/media`.
-
-<Notice>
-  `media` is the bucket name expected by Django's `settings.py` through the env `env.str("S3_STORAGE_BUCKET_NAME", "media")`.
-</Notice>
-
-<CodeBlockText lang="yaml" title="docker-compose.yaml">{`
-  services:
-    rclone:
-      image: rclone/rclone
-      volumes:
-        - /srv/neuronhub/media/config:/config/rclone
-        - /srv/neuronhub/media/data:/data
-      env_file:
-        - path: .env
-      command: serve s3 --auth-key $ACCESS_KEY_ID,$SECRET_ACCESS_KEY /data --addr :$s3_port
-      ports:
-        - "$s3_port:$s3_port"
-      expose:
-        - "$s3_port"
-`}</CodeBlockText>
-
-<br/>
-
-<CodeBlockText lang="bash" title=".env">{`
-  ACCESS_KEY_ID=$s3_key_id
-  SECRET_ACCESS_KEY=$s3_key_secret
-`}</CodeBlockText>
-
 ### Algolia setup
 
 I recommend creating `ALGOLIA_API_KEY` and `ALGOLIA_SEARCH_API_KEY` that are limited to `Indices: *_prod*` in <LinkExt href="https://dashboard.algolia.com/account/api-keys/restricted">the key settings</LinkExt> instead of using the global Write/Search API keys.
@@ -216,6 +184,8 @@ In <LinkExt href="https://sentry.io/settings/security-and-privacy/">Security</Li
 - I advise to add Alerts for `neuronhub-backend`, as frontend is too noisy. For more read <PageLink id="Sentry" />.
 
 
+<Site slug="pg">
+
 ### Linear
 
 When you first create a Workspace, in `Settings` -> `Team` -> `General` enable:
@@ -228,3 +198,5 @@ When you first create a Workspace, in `Settings` -> `Team` -> `General` enable:
 1. <LinkExt href="https://linear.app/settings/integrations/github">In Linear</LinkExt> enable `Link commits to issues with magic words`
 2. <LinkExt href="https://github.com/neuronhub-app/NeuronHub/settings/hooks/new">In Github create a new webhook</LinkExt>
 3. Copy `Payload URL` and `Secret` to Github.
+
+</Site>

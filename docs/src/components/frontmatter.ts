@@ -11,6 +11,7 @@ export namespace frontmatter {
     hidden: z.boolean().optional(),
     is_lintable: z.boolean().optional(),
     is_new: z.boolean().optional(),
+    site: z.enum(["pg"]).optional(),
   });
 
   export type SchemaType = z.infer<typeof schema>;

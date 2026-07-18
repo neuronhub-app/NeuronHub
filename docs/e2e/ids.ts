@@ -29,6 +29,11 @@ export namespace ids {
     input: "search.input",
   } as const;
 
+  export const siteSwitcher = {
+    trigger: "site-switcher.trigger",
+    item: (site: string) => `site-switcher.item.${site === "" ? "nha" : site}`,
+  } as const;
+
   export function selector<S extends TestId>(id: S): `[data-testid="${S}"]` {
     return `[data-testid="${id}"]`;
   }

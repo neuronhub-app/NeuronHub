@@ -1,19 +1,19 @@
 ---
 title: Public API
 order: 3
-is_new: true
 ---
 
 import { CodeBlockText, Src } from "@/components"
+import { env } from "@neuronhub/shared/createEnv";
 
 The API has no rate-limit and cached in RAM.
 
 The cache refreshes when an admin published any updates (daily at ~15:00 PT).
 
-## CSV
+### CSV
 
 <CodeBlockText lang="bash">{`
-  curl --location https://backend.jobs.probablygood.org/api/jobs.csv --output jobs.csv
+  curl --location ${env.VITE_SERVER_URL}/api/jobs.csv --output jobs.csv
 `}</CodeBlockText>
 
 Columns are derived from the GraphQL `JobsPublic` query (see <Src to="get_jobs_public_from_ram.py">the source code</Src>).
@@ -21,12 +21,12 @@ Columns are derived from the GraphQL `JobsPublic` query (see <Src to="get_jobs_p
 Nested objects as `job.locations: list[JobLocation] = [{city: "New York", is_remote: true}]` are serialized into a list
 split by `; `, eg `"London, UK; Berkeley CA, USA"`.
 
-## GraphQL
+### GraphQL
 
 The query content must match the whitelisted `JobsPublic`
 query from <Src to="get_jobs_public_from_ram.py" /> file - otherwise the server will reject it.
 Formatting doesn't matter (eg spaces/newlines).
 
 <CodeBlockText lang="bash">{`
-  curl --json '{"query": "query JobsPublic { jobs_public { ... } } fragment ... { ... }"}' https://backend.jobs.probablygood.org/api/graphql
+  curl --json '{"query": "query JobsPublic { jobs_public { ... } }"}' ${env.VITE_SERVER_URL_API}
 `}</CodeBlockText>
