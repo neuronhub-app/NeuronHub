@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { UseRefinementListProps } from "react-instantsearch";
 
 import type { TestId } from "@/e2e/ids";
+import type { FacetDescriptions } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetAttribute } from "@/sites/pg/components/PgFacetAttribute";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 
@@ -16,6 +17,7 @@ export function PgFacet(props: {
   sortBy?: UseRefinementListProps["sortBy"];
   transformItems?: UseRefinementListProps["transformItems"];
   operator?: UseRefinementListProps["operator"];
+  descriptions?: FacetDescriptions;
   testId?: TestId;
 }) {
   return (
@@ -34,6 +36,7 @@ export function PgFacet(props: {
         sortBy={props.sortBy}
         transformItems={props.transformItems}
         operator={props.operator}
+        descriptions={props.descriptions}
       />
     </PgFacetPopover>
   );

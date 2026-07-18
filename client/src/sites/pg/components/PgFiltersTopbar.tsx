@@ -6,10 +6,12 @@ import { LocationType } from "~/graphql/enums";
 
 import { facetStyle } from "@/components/algolia/AlgoliaFacets";
 import { ids } from "@/e2e/ids";
+import { ExplainerTooltip } from "@/sites/pg/components/ExplainerTooltip";
 import { PgFacet } from "@/sites/pg/components/PgFacet";
 import { ALGOLIA_ATTR_LOCATION, PgFacetLocation } from "@/sites/pg/components/PgFacetLocation";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 import { PgFacetSalary } from "@/sites/pg/components/PgFacetSalary";
+import { explainerByTagName, explainers } from "@/sites/pg/pages/jobs/explainers";
 
 const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
 
@@ -39,6 +41,7 @@ export function PgFiltersTopbar() {
         attribute={attr.causeArea}
         order={{ base: 1 }}
         sortBy={sortAlpha}
+        descriptions={explainerByTagName}
         testId={ids.facet.popover.causeArea}
       />
 
@@ -155,6 +158,7 @@ function OtherFiltersFacet() {
           label="Show only roles at highlighted orgs"
           checked={highlighted.value.isRefined}
           onToggle={() => highlighted.refine(highlighted.value)}
+          tooltip={explainers.highlighted.menu}
         />
         <BooleanSwitch
           label="Exclude career-capital roles"
@@ -176,22 +180,25 @@ function BooleanSwitch(props: {
   label: string;
   checked: boolean;
   onToggle: () => void;
+  tooltip?: string;
   testId?: string;
 }) {
   return (
-    <Switch.Root
-      checked={props.checked}
-      onCheckedChange={props.onToggle}
-      data-testid={props.testId}
-    >
-      <Switch.HiddenInput />
-      <Flex w="full" justify="space-between" align="center" gap="gap.md">
-        <Switch.Label {...facetStyle.value}>{props.label}</Switch.Label>
-        <Switch.Control bg="brand.green.subtle" _checked={{ bg: "brand.green.light" }}>
-          <Switch.Thumb />
-        </Switch.Control>
-      </Flex>
-    </Switch.Root>
+    <ExplainerTooltip content={props.tooltip} placement="right">
+      <Switch.Root
+        checked={props.checked}
+        onCheckedChange={props.onToggle}
+        data-testid={props.testId}
+      >
+        <Switch.HiddenInput />
+        <Flex w="full" justify="space-between" align="center" gap="gap.md">
+          <Switch.Label {...facetStyle.value}>{props.label}</Switch.Label>
+          <Switch.Control bg="brand.green.subtle" _checked={{ bg: "brand.green.light" }}>
+            <Switch.Thumb />
+          </Switch.Control>
+        </Flex>
+      </Switch.Root>
+    </ExplainerTooltip>
   );
 }
 
