@@ -13,12 +13,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { ErrorBoundary } from "@sentry/react";
+import { BsFacebook } from "react-icons/bs";
 import {
   FaLinkedin,
   FaGithub,
   FaYoutube,
   FaTwitter,
-  FaFacebookF,
   FaInstagram,
   FaDiscord,
   FaMastodon,
@@ -162,7 +162,7 @@ function FooterDescription(props: { socialLinks: FooterSection["links"]; isLoadi
     [FooterLinkIcon.Github]: <FaGithub />,
     [FooterLinkIcon.Youtube]: <FaYoutube />,
     [FooterLinkIcon.Twitter]: <FaTwitter />,
-    [FooterLinkIcon.Facebook]: <FaFacebookF />,
+    [FooterLinkIcon.Facebook]: <BsFacebook />,
     [FooterLinkIcon.Instagram]: <FaInstagram />,
     [FooterLinkIcon.Discord]: <FaDiscord />,
     [FooterLinkIcon.Mastodon]: <FaMastodon />,
