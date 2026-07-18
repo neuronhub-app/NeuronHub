@@ -31,6 +31,8 @@ import { LocationType } from "~/graphql/enums";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ids } from "@/e2e/ids";
 import type { JobFragmentType } from "@/graphql/fragments/jobs";
+import { ExplainerTooltip } from "@/sites/pg/components/ExplainerTooltip";
+import { explainerByTagName, explainers } from "@/sites/pg/pages/jobs/explainers";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
 import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
@@ -634,8 +636,12 @@ function JobTagGroups(props: {
   ].filter(group => group.tags?.length > 0);
 
   return (
-    <HStack gap={{ base: "gap.xs", md: "gap.md" }} flexWrap="wrap">
-      {props.isOrgHighlighted && <Badge variant="pg-highlighted">Highlighted Org</Badge>}
+    <HStack pos="relative" zIndex="2" gap={{ base: "gap.xs", md: "gap.md" }} flexWrap="wrap">
+      {props.isOrgHighlighted && (
+        <ExplainerTooltip content={explainers.highlighted.card} placement="top">
+          <Badge variant="pg-highlighted">Highlighted Org</Badge>
+        </ExplainerTooltip>
+      )}
       {tagGroups.map(tagGroup => {
         const tags = tagGroup.tags.filter(tag => !tagsHidden.includes(tag.name));
         if (tags.length === 0) {
@@ -656,17 +662,22 @@ function JobTagGroups(props: {
 
         const tag = tags[0];
         return (
-          <Badge
+          <ExplainerTooltip
             key={tagGroup.attribute}
-            variant={tagGroup.variant as never}
-            {...ids.set(ids.job.card.tags)}
+            content={explainerByTagName[tag.name]?.card}
+            placement="top"
           >
-            {props.highlightable.includes(tagGroup.attribute) ? (
-              <Highlight attribute={[tagGroup.attribute, "0", "name"]} hit={props.jobHit} />
-            ) : (
-              tag.name
-            )}
-          </Badge>
+            <Badge
+              variant={tagGroup.variant as never}
+              {...ids.set(ids.job.card.tag(tagGroup.attribute))}
+            >
+              {props.highlightable.includes(tagGroup.attribute) ? (
+                <Highlight attribute={[tagGroup.attribute, "0", "name"]} hit={props.jobHit} />
+              ) : (
+                tag.name
+              )}
+            </Badge>
+          </ExplainerTooltip>
         );
       })}
     </HStack>
