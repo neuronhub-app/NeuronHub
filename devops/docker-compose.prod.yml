@@ -2,23 +2,27 @@ name: neuronhub
 
 services:
   client:
-    image: ghcr.io/neuronhub-app/neuronhub/client:0.2
+    image: ghcr.io/neuronhub-app/neuronhub/client:0.3
     ports:
       - "3000:3000"
     pull_policy: always
     env_file:
       - path: .env
   server:
-    image: ghcr.io/neuronhub-app/neuronhub/server:0.2
-    command: bash -c "uv run manage.py migrate && uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application"
+    image: ghcr.io/neuronhub-app/neuronhub/server:0.3
     ports:
       - "8000:8000"
     pull_policy: always
     env_file:
       - path: .env
+    # Reindex Algolia if migrations applied & run daphne.
+    command: bash -c 'uv run manage.py migrate --check || (uv run manage.py migrate && uv run manage.py algolia_reindex_with_replicas) && exec uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application'
   server_background_tasks:
-    image: ghcr.io/neuronhub-app/neuronhub/server:0.2
-    command: bash -c "uv run manage.py db_worker"
+    image: ghcr.io/neuronhub-app/neuronhub/server:0.3
     pull_policy: always
     env_file:
       - path: .env
+    # Runs both `manage.py crontask` and `db_worker`:
+    # - `wait -n`: Exits if any of the 2 halt.
+    # - `kill 0`: Redirects the signal to 2 processes.
+    command: bash -c 'trap "kill 0" SIGTERM SIGINT; uv run manage.py crontask --no-heartbeat & uv run manage.py db_worker & wait -n'

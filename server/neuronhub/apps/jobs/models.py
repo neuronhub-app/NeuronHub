@@ -150,6 +150,7 @@ class Job(AlgoliaModel):
 
     is_published = models.BooleanField(default=True)
 
+    # todo ! refac-name: is_pending_deletion
     is_pending_removal = models.BooleanField(
         default=False,
         help_text="If this Job was removed in Airtable, the removal will have this flag, and will wait an approval on /jobs/drafts from an admin. Only meaningful when is_published=False.",

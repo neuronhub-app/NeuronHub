@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "allauth.headless",
     "django_tasks",
     "django_tasks_db",
+    "crontask",
     "django_object_actions",
     "django_countries",
     "django_rich",
@@ -334,11 +335,6 @@ ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 ACCOUNT_SESSION_REMEMBER = True
 if DJANGO_ENV.is_dev():
     ACCOUNT_DEFAULT_HTTP_PROTOCOL = "http"
-
-
-# Cron
-# ---------------------------------------------------------------------------------------------------------
-DJANGO_CRON_WEBHOOK_SECRET = env.str("DJANGO_CRON_WEBHOOK_SECRET", "")
 
 
 # Algolia

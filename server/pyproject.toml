@@ -13,6 +13,7 @@ dependencies = [
         "pillow == 12.*", # [i=high, rep=high, GH=high, @hugovk, 13.1k] for ImageField, by CPython core dev; used by Django
     "django-tasks == 0.12.*", # @RealOrangeOne, Django Security Team
         "django-tasks-db == 0.12.*", # split out from django-tasks in 0.12
+    "django-crontask == 1.*",  # same author as django-hijack below.
     "django-allauth == 65.*",
     "django-anymail == 15.*", # [i=low, rep=norm, GH=high, @medmunds, 1.8k] SF based, weird KLOC: +84/-40
     "django-cors-headers == 4.*", # [i=high, rep=highest, @adamchainz] Django Security Team

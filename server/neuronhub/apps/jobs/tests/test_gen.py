@@ -10,6 +10,7 @@ from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.models import JobsLandingPage
+from neuronhub.apps.jobs.services.airtable_sync_jobs import _airtable
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.orgs.tests.test_gen import OrgsGen
 from neuronhub.apps.posts.models import PostTag
@@ -97,6 +98,28 @@ class JobsGen:
         if job:
             await job.versions.aadd(job_draft)
         return job_draft
+
+    def airtable_row(
+        self,
+        job: Job = None,
+        url_external: str = "",
+        org_name: str = "",
+        description: str = "",
+    ) -> dict:
+        """One raw `_fetch_airtable_jobs` row for a job draft."""
+        url = url_external or (job.url_external if job else "")
+        return {
+            "id": url,
+            "fields": {
+                _airtable.title: job.title if job else "Role",
+                _airtable.org_name: f'"{org_name or (job.org.name if job else "")}"',
+                _airtable.url_external: url,
+                _airtable.description: description or (job.description if job else ""),
+                _airtable.created_at_in_airtable: (
+                    f"{job.created_at_in_airtable:%B %d, %Y}" if job else "July 19, 2026"
+                ),
+            },
+        }
 
     async def location(
         self,

@@ -48,6 +48,14 @@ class SyncStats:
     deleted: int = 0
     not_changed: int = 0
 
+    draft_ids_new: list[int] = field(default_factory=list)
+
+    def drop_verbose_values_for_logging(self):
+        """
+        draft_ids_new contains 50-200 ints.
+        """
+        self.draft_ids_new = []
+
 
 async def airtable_sync_jobs(limit: int = None) -> SyncStats:
     jobs_raw = _fetch_airtable_jobs()
@@ -112,8 +120,10 @@ async def _sync_jobs_parsed_to_drafts(
             match sync_output.result:
                 case SyncResult.Created:
                     stats.created += 1
+                    stats.draft_ids_new.append(sync_output.pk)
                 case SyncResult.Updated:
                     stats.updated += 1
+                    stats.draft_ids_new.append(sync_output.pk)
                 case SyncResult.NotChanged:
                     stats.not_changed += 1
 
@@ -124,8 +134,12 @@ async def _sync_jobs_parsed_to_drafts(
             .select_related("org")
         ):
             try:
-                if not await job_published.versions.filter(is_pending_removal=True).aexists():
-                    await _create_pending_deletion_draft(job_published)
+                draft_deletion = await job_published.versions.filter(
+                    is_pending_removal=True
+                ).afirst()
+                if draft_deletion is None:
+                    draft_deletion = await _create_pending_deletion_draft(job_published)
+                stats.draft_ids_new.append(draft_deletion.pk)
                 stats.deleted += 1
             except Exception:
                 stats.failed_to_sync += 1

@@ -46,7 +46,12 @@ Tests are placed nearby named `{module_name}__test.py`.
 
 ### Background Workers
 
-The only scheduled cron is @hourly `apps.jobs.tasks.send_job_alert_emails_task`, by GET `/jobs/send-emails/$DJANGO_CRON_WEBHOOK_SECRET`.
+Scheduled crons use `django-crontask`'s `@cron` decorator (eg in `apps/jobs/tasks.py`):
+- @hourly `send_job_alert_emails_task`
+- @daily `airtable_sync_and_publish_task` (Airtable sync → auto-publish)
+
+`manage.py crontask` runs the scheduler that enqueues them; `manage.py db_worker` executes.
+`crontask` is co-located in the `db_worker` deploy service.
 
 Other `@task`s are manually enqueued.
 

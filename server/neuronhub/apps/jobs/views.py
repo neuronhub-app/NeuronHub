@@ -1,21 +1,11 @@
 import csv
 from typing import Any
 
-from django.conf import settings
 from django.http import HttpRequest
 from django.http import HttpResponse
-from django.http import HttpResponseForbidden
 
 from neuronhub.apps.graphql.persisted_query_extension import graphql_whitelist_BE
-from neuronhub.apps.jobs.tasks import send_job_alert_emails_task
 from neuronhub.graphql import schema
-
-
-async def send_emails_cron(request: HttpRequest, secret: str) -> HttpResponse:
-    if secret != settings.DJANGO_CRON_WEBHOOK_SECRET:
-        return HttpResponseForbidden()
-    await send_job_alert_emails_task.aenqueue()
-    return HttpResponse("ok")
 
 
 async def jobs_csv(request: HttpRequest) -> HttpResponse:

@@ -1,3 +1,5 @@
+# Example below if from https://jobs.probablygood.org.
+# The source: [[docker-compose.prod.yml]].
 projects:
   - name: neuronhub
     environments:
@@ -15,7 +17,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/client:0.3.3.2
+            url: ghcr.io/neuronhub-app/neuronhub/client:0.3
           domains:
             - pg.stage.neuronhub.app
           envVars:
@@ -27,7 +29,7 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/docs:0.3.2.0-rc.11
+            url: ghcr.io/neuronhub-app/neuronhub/docs:0.3
           domains:
             - stage.docs.neuronhub.app
           envVars:
@@ -38,9 +40,9 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.3.2
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3
           dockerCommand: uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application
-          preDeployCommand: uv run manage.py migrate
+          preDeployCommand: bash -c 'uv run manage.py migrate --check || (uv run manage.py migrate && uv run manage.py algolia_reindex_with_replicas)'
           domains:
             - pg.stage.backend.neuronhub.app
           envVars:
@@ -58,8 +60,8 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.3.2
-          dockerCommand: uv run manage.py db_worker
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3
+          dockerCommand: bash -c 'trap "kill 0" SIGTERM SIGINT; uv run manage.py crontask --no-heartbeat & uv run manage.py db_worker & wait -n'
           envVars:
             - key: DATABASE_URL
               fromDatabase:
@@ -70,16 +72,6 @@ projects:
             - fromGroup: stage
             - fromGroup: stage-backend
 
-        - name: neuronhub-cron-stage
-          type: cron
-          runtime: python
-          schedule: "@hourly"
-          startCommand: "curl https://$SERVER_DOMAIN/jobs/send-emails/$DJANGO_CRON_WEBHOOK_SECRET"
-          buildCommand: "true" # must be a string
-          envVars:
-            - fromGroup: stage
-            - fromGroup: stage-backend
-
         envVarGroups:
           - name: stage-backend
             envVars:
@@ -87,8 +79,6 @@ projects:
               generateValue: true
             - key: DJANGO_ENV
               value: stage
-            - key: DJANGO_CRON_WEBHOOK_SECRET
-              generateValue: true
             - key: ALGOLIA_IS_ENABLED
               value: "true"
             - key: ALGOLIA_API_KEY
@@ -132,7 +122,7 @@ projects:
           plan: standard
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/client:0.3.3.2
+            url: ghcr.io/neuronhub-app/neuronhub/client:0.3
           domains:
             - jobs.probablygood.org
           envVars:
@@ -144,9 +134,9 @@ projects:
           plan: standard
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.3.2
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3
           dockerCommand: uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application
-          preDeployCommand: uv run manage.py migrate && uv run manage.py algolia_reindex_with_replicas --model=Job
+          preDeployCommand: bash -c 'uv run manage.py migrate --check || (uv run manage.py migrate && uv run manage.py algolia_reindex_with_replicas)'
           domains:
             - backend.jobs.probablygood.org
           envVars:
@@ -164,8 +154,8 @@ projects:
           plan: starter
           runtime: image
           image:
-            url: ghcr.io/neuronhub-app/neuronhub/server:0.3.3.2
-          dockerCommand: uv run manage.py db_worker
+            url: ghcr.io/neuronhub-app/neuronhub/server:0.3
+          dockerCommand: bash -c 'trap "kill 0" SIGTERM SIGINT; uv run manage.py crontask --no-heartbeat & uv run manage.py db_worker & wait -n'
           envVars:
             - key: DATABASE_URL
               fromDatabase:
@@ -176,16 +166,6 @@ projects:
             - fromGroup: prod
             - fromGroup: prod-backend
 
-        - name: neuronhub-cron-prod
-          type: cron
-          runtime: python
-          schedule: "@hourly"
-          startCommand: "curl https://$SERVER_DOMAIN/jobs/send-emails/$DJANGO_CRON_WEBHOOK_SECRET"
-          buildCommand: "true" # must be a string
-          envVars:
-            - fromGroup: prod
-            - fromGroup: prod-backend
-
         envVarGroups:
           - name: prod-backend
             envVars:
@@ -193,8 +173,6 @@ projects:
               generateValue: true
             - key: DJANGO_ENV
               value: prod
-            - key: DJANGO_CRON_WEBHOOK_SECRET
-              generateValue: true
             - key: ALGOLIA_IS_ENABLED
               value: "true"
             - key: ALGOLIA_API_KEY
