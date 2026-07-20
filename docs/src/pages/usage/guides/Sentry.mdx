@@ -11,7 +11,7 @@ import {
 	Term,
 } from "@/components"
 
-## Issue Reports
+### Issue Reports
 
 I recommend triaging the <Term id="backend" /> issues daily, and the <Term id="frontend" /> once every few weeks.
 
@@ -20,7 +20,12 @@ The <LinkExt href="https://sentry.io/issues/alerts/rules/">default Alerts settin
 - <Term id="backend" /> - immediate email.
 - <Term id="frontend" /> - if it affects 3+ users per month.
 
-## Feedback
+#### Slack
+
+- Connect Slack on the <LinkExt href="https://sentry.io/settings/integrations/slack/">Integrations page</LinkExt> by `Add Workspace`.
+- I advise to add Alerts for `neuronhub-backend`, as frontend is too noisy. For more read <PageLink id="Sentry" />.
+
+### Feedback
 
 On error, a user is presented with a low-key popup to submit the Feedback report form.
 
@@ -28,7 +33,7 @@ On error, a user is presented with a low-key popup to submit the Feedback report
 
 Each sends an email alert. You can also setup Slack or SMS.
 
-## Replays
+### Replays
 
 When a user encounters an error, an anonymized `Session Replay` is
 attached to the `Issue` report:
@@ -39,7 +44,7 @@ You can browse <LinkExt href="https://sentry.io/explore/replays">all Replays her
 
 <ImageWithDialog src="https://media.neuronhub.app/docs/sentry_explore_replays.avif" alt="Explore Replays" isDimmed />
 
-## Logs
+### Logs
 
 All logs from the <Term id="backend" />, <Term id="frontend" />, and <Term id="worker" /> are sent to
 <LinkExt href="https://sentry.io/explore/logs/">the Sentry Logs dashboard</LinkExt>.
@@ -51,7 +56,7 @@ You can use complex filters to either search or aggregate the logs data:
 
 <ImageWithDialog src="https://media.neuronhub.app/docs/sentry/logs.avif" alt="Logs" isDimmed />
 
-## Uptime
+### Uptime
 
 Sentry monitors the uptime of your <Term id="backend" /> and <Term id="frontend" /> every 5 minutes,
 and logs downtime if the response took more than 10 seconds. You'll receive email alerts if it detects any downtime.
@@ -60,9 +65,34 @@ You can view the statistics in the <LinkExt href="https://sentry.io/insights/upt
 
 <ImageWithDialog src="https://media.neuronhub.app/docs/sentry/uptime.avif" alt="Uptime" isDimmed />
 
-## Scheduled Tasks Monitor
+### Scheduled Tasks Monitor
 
 Similar to Uptime, Sentry monitors each run of your scheduled tasks (`crons`), eg hourly <PageLink id="job-alert-emails" />,
 and sends you email alerts if any task run failed to report its successful execution within 5 minutes of its start.
 
 <ImageWithDialog src="https://media.neuronhub.app/docs/sentry/crons.avif" alt="Crons" isDimmed />
+
+### Source code mapping
+
+- Connect GitHub on the <LinkExt href="https://sentry.io/settings/integrations/">Integrations page</LinkExt>.
+- Press `Configure` to open the page as `/settings/integrations/github/{id}/`, type `neuronhub` to trigger the search and select it.
+- Check `Sync Sentry Comments to GitHub`.
+- Press `Code Mappings` -> `Add Code Mapping`, values:
+  - `neuronhub-backend`:
+  - `master`
+  - `neuronhub/`
+  - `server/neuronhub/`
+  - `neuronhub-frontend`:
+  - `master`
+  - `client/`
+  - `client/src/`
+
+<ImageWithDialog src="https://media.neuronhub.app/docs/sentry/integration-github.avif" />
+<ImageWithDialog src="https://media.neuronhub.app/docs/sentry/integration-github-code-map-backend.avif" />
+
+### Settings (recommended)
+
+In <LinkExt href="https://sentry.io/settings/security-and-privacy/">Security</LinkExt> enable:
+- `Require Two-Factor Authentication`
+- `Enhanced Privacy`
+- `Prevent Storing of IP Addresses`

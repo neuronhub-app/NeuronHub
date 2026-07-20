@@ -6,9 +6,6 @@ order: 11
 import {
   CodeBlockText,
   LinkExt,
-  PageLink,
-  ImageWithDialog,
-  Site,
 } from "@/components";
 import prodYamlRaw from '../../../../../devops/docker-compose.prod.yml?raw'
 
@@ -91,70 +88,18 @@ After the first deploy, connect to the `server` docker container, and run:
 
 Watch out for the `BREAKING CHANGE` notes in the release descriptions - it's specifically for self-hosting.
 
-You may use `:latest` docker tag, but I advise to hardcode the non-breaking release eg `1.1`, as the two last numbers are for non-breaking changes, ie `1.1.2.2` won't break your deployment.
+You may use `:latest` docker tag, but I advise to hardcode the non-breaking release eg `1.1`, as the two last numbers are for non-breaking changes, ie `1.1.25.3` won't break your deployment.
 
 
 ## Caveats
 
-### Vite prod is using a wrong VITE_SERVER_URL
+### Vite prod might use a wrong VITE_SERVER_URL
 
-During the `docker build` step, the `pnpm exec react-router build` hardcodes `VITE_SERVER_URL`,
+During the `docker build` step, the `pnpm exec react-router build` hardcodes `VITE_SERVER_URL` (and similar envs),
 ie it's going to ignore the runtime envs as `SERVER_URL` and others.
 
 
-## Integrations Checklist
-
-### Algolia
+## Algolia
 
 For envs as `stage` the API key needs to match the `*_stage*` indexes.
     - Even if you need eg only `jobs_stage*` - it tries to modify `posts_stage` and others.
-
-### Sentry
-
-#### Settings
-
-In <LinkExt href="https://sentry.io/settings/security-and-privacy/">Security</LinkExt> enable:
-- `Require Two-Factor Authentication`
-- `Enhanced Privacy`
-- `Prevent Storing of IP Addresses`
-
-#### Github
-
-- Connect GitHub on the <LinkExt href="https://sentry.io/settings/integrations/">Integrations page</LinkExt>.
-- Press `Configure` to open the page as `/settings/integrations/github/{id}/`, type `neuronhub` to trigger the search and select it.
-- Check `Sync Sentry Comments to GitHub`.
-- Press `Code Mappings` -> `Add Code Mapping`, values:
-    - `neuronhub-backend`:
-        - `master`
-        - `neuronhub/`
-        - `server/neuronhub/`
-    - `neuronhub-frontend`:
-        - `master`
-        - `client/`
-        - `client/src/`
-
-<ImageWithDialog src="https://media.neuronhub.app/docs/sentry/integration-github.avif" />
-<ImageWithDialog src="https://media.neuronhub.app/docs/sentry/integration-github-code-map-backend.avif" />
-
-#### Slack
-
-- Connect Slack on the <LinkExt href="https://sentry.io/settings/integrations/slack/">Integrations page</LinkExt> by `Add Workspace`.
-- I advise to add Alerts for `neuronhub-backend`, as frontend is too noisy. For more read <PageLink id="Sentry" />.
-
-
-<Site slug="pg">
-
-### Linear
-
-When you first create a Workspace, in `Settings` -> `Team` -> `General` enable:
-- `Issue estimation` -> `T-Shirt`
-    - `Allow zero estimates`
-- `Enable detailed issue history`
-
-#### GitHub issues linking with `Refs` and `Closes`
-
-1. <LinkExt href="https://linear.app/settings/integrations/github">In Linear</LinkExt> enable `Link commits to issues with magic words`
-2. <LinkExt href="https://github.com/neuronhub-app/NeuronHub/settings/hooks/new">In Github create a new webhook</LinkExt>
-3. Copy `Payload URL` and `Secret` to Github.
-
-</Site>
