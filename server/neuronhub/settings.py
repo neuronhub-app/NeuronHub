@@ -448,13 +448,34 @@ def _is_strawberry_cancelled_error(record: logging.LogRecord) -> bool:
     return False
 
 
-_strawberry_cancelled_error_filter = "_strawberry_cancelled_error_filter"
+def _filter_crontask_useless_5s_logs(record):
+    """
+    Those `lock.extend` are only meaningful when using Redis, see django-crontask#18.
+
+    The flag `--no-heartbeat` should have killed this noise, but it doesn't.
+    """
+    # Note: to debug this function use print("...", flush=True).
+    return not any(message in record.getMessage() for message in ["crontask.utils.lock.extend"])
+
+
+class filters:
+    strawberry_cancelled_error_filter = "_strawberry_cancelled_error_filter"
+    filter_crontask_useless_5s_logs = "_filter_crontask_useless_5s_logs"
+
+
 LOGGING.setdefault("filters", {})
-LOGGING["filters"][_strawberry_cancelled_error_filter] = {
+LOGGING["filters"][filters.strawberry_cancelled_error_filter] = {
     "()": "django.utils.log.CallbackFilter",
     "callback": lambda record: not _is_strawberry_cancelled_error(record),
 }
-LOGGING["handlers"]["console"]["filters"] = [_strawberry_cancelled_error_filter]
+LOGGING["filters"][filters.filter_crontask_useless_5s_logs] = {
+    "()": "django.utils.log.CallbackFilter",
+    "callback": _filter_crontask_useless_5s_logs,
+}
+LOGGING["handlers"]["console"]["filters"] = [
+    filters.strawberry_cancelled_error_filter,
+    filters.filter_crontask_useless_5s_logs,
+]
 
 DJANGO_IS_E2E_LOGS_ENABLED = env.bool("DJANGO_IS_E2E_LOGS_ENABLED", False)
 if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E and not DJANGO_IS_E2E_LOGS_ENABLED:
