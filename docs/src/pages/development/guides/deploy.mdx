@@ -93,13 +93,17 @@ You may use `:latest` docker tag, but I advise to hardcode the non-breaking rele
 
 ## Caveats
 
-### Vite prod might use a wrong VITE_SERVER_URL
+### Vite build hardcodes build-time envs
 
 During the `docker build` step, the `pnpm exec react-router build` hardcodes `VITE_SERVER_URL` (and similar envs),
 ie it's going to ignore the runtime envs as `SERVER_URL` and others.
+
+### Unlike `client/` the `docs/` Docker image uses 6 runtime envs
+
+3x2 Algolia envs: the app id and the search key (twice) - 3 for PG and 3 for NHA.
 
 
 ## Algolia
 
 For envs as `stage` the API key needs to match the `*_stage*` indexes.
-    - Even if you need eg only `jobs_stage*` - it tries to modify `posts_stage` and others.
+- Even if you need eg only `jobs_stage*` - it tries to modify `posts_stage` and others.
