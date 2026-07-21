@@ -1,5 +1,5 @@
 name: "Deploy"
-run-name: "Deploy ${{ inputs.target_deploy_env }} @ ${{ inputs.release_version || github.ref_name }}"
+run-name: "Deploy ${{ inputs.target_deploy_env }} @ ${{ github.ref_name }}"
 
 on:
   workflow_dispatch:
@@ -8,15 +8,9 @@ on:
         description: "Target deploy env"
         type: environment
         required: true
-      release_version:
-        description: "Release version (eg 1.2.3.0-rc.1)"
-        type: string
-        required: false
-        default: ""
       is_pre_release:
         description: "Pre-release (not 'latest' tag)"
         type: boolean
-        default: true
 
 jobs:
   build_and_push:
@@ -29,7 +23,7 @@ jobs:
       attestations: write
     env:
       REGISTRY: ghcr.io
-      VITE_RELEASE_VERSION: ${{ inputs.release_version || github.ref_name }}
+      VITE_RELEASE_VERSION: ${{ github.ref_name }}
 
       DJANGO_ENV: ${{ vars.DJANGO_ENV }}
       PROJECT_NAME: ${{ vars.PROJECT_NAME }}
@@ -49,6 +43,12 @@ jobs:
       ALGOLIA_INDEX_POSTFIX_USER: ""
 
     steps:
+      - name: Require a Tag ref (no branches)
+        if: github.ref_type != 'tag'
+        run: |
+          echo "::error::Select a Tag, not a branch ('${{ github.ref_name }}' is a ${{ github.ref_type }})"
+          exit 1
+
       - name: Checkout
         uses: actions/checkout@v6
 
