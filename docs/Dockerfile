@@ -33,6 +33,8 @@ RUN pnpm install --frozen-lockfile
 
 COPY docs/ ./docs/
 COPY packages/shared/ ./packages/shared/
+# imported raw in deploy.mdx
+COPY devops/docker-compose.prod.yml ./devops/docker-compose.prod.yml
 
 WORKDIR /app/docs
 
