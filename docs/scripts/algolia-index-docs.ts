@@ -26,16 +26,21 @@ import remarkGfm from "remark-gfm";
 import { format } from "@neuronhub/shared/utils/format";
 
 import { frontmatter } from "@/components/frontmatter";
+import { siteSlug } from "@/layout/siteState";
 import { findMdxFiles } from "@/utils/findMdxFiles";
 
+const site = process.argv.includes(`--site=${siteSlug.pg}`) ? siteSlug.pg : siteSlug.nha;
+const isSitePg = site === siteSlug.pg;
+
 const config = {
+  site,
   pagesDir: path.join(import.meta.dirname, "../src/pages"),
   mdxProcessor: createProcessor({
     remarkPlugins: [remarkGfm, remarkFrontmatter],
   }),
   env: {
-    appId: process.env.ALGOLIA_APPLICATION_ID,
-    apiKey: process.env.ALGOLIA_API_KEY,
+    appId: isSitePg ? process.env.ALGOLIA_APPLICATION_ID_PG : process.env.ALGOLIA_APPLICATION_ID,
+    apiKey: isSitePg ? process.env.ALGOLIA_API_KEY_PG : process.env.ALGOLIA_API_KEY,
     indexName: process.env.ALGOLIA_INDEX_DOCS,
   },
   jsx_nodes: {
@@ -59,7 +64,7 @@ async function algoliaIndexDocs() {
   console.log(`Built ${records.length} records from docs`);
 
   if (process.argv.includes("--dry-run")) {
-    console.log(JSON.stringify(records.slice(0, 3), null, 2));
+    console.log(JSON.stringify(records, null, 2));
     return;
   }
 
@@ -95,6 +100,9 @@ function buildRecords(): DocRecord[] {
     const fm = frontmatter.parse(raw);
 
     if (fm.hidden || isHiddenByParent(file)) {
+      continue;
+    }
+    if (fm.site && fm.site !== config.site) {
       continue;
     }
 
@@ -220,6 +228,13 @@ function extractText(node: MdNode): string {
   if (node.type === "text" || node.type === "inlineCode") {
     return node.value ?? "";
   }
+  if (node.name === "Site") {
+    const slugRaw = node.attributes?.find(a => a.name === "slug")?.value;
+    const slug = slugRaw === siteSlug.nhaAlias ? siteSlug.nha : slugRaw;
+    if (slug !== config.site) {
+      return "";
+    }
+  }
   if (config.jsx_nodes.excluded.has(node.type)) {
     return "";
   }
@@ -239,6 +254,7 @@ function extractText(node: MdNode): string {
 
 type MdNode = {
   type: string;
+  name?: string;
   value?: string;
   depth?: number;
   children?: MdNode[];

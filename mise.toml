@@ -87,14 +87,19 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
     # Algolia
 
     ALGOLIA_APPLICATION_ID = "${ALGOLIA_APPLICATION_ID:-VN4ESP6QTP}"
+    ALGOLIA_APPLICATION_ID_PG = "${ALGOLIA_APPLICATION_ID_PG:-${ALGOLIA_APPLICATION_ID}}"
     ALGOLIA_SEARCH_API_KEY = "${ALGOLIA_SEARCH_API_KEY:-73e0fded909b86d55105cac456370c53}"
+    ALGOLIA_SEARCH_API_KEY_PG = "${ALGOLIA_SEARCH_API_KEY_PG:-${ALGOLIA_SEARCH_API_KEY}}"
     ALGOLIA_API_KEY = "${ALGOLIA_API_KEY:-}"
+    ALGOLIA_API_KEY_PG = "${ALGOLIA_API_KEY_PG:-${ALGOLIA_API_KEY}}"
     ALGOLIA_IS_ENABLED = "${ALGOLIA_IS_ENABLED:-false}"
     ALGOLIA_INDEX_POSTFIX_USER = "${USER:-'runner'}" # stop indexes clash between devs
     ALGOLIA_INDEX_DOCS = "${ALGOLIA_INDEX_DOCS:-docs_dev_{{ env.ALGOLIA_INDEX_POSTFIX_USER }}}"
 
     VITE_ALGOLIA_APPLICATION_ID = "${ALGOLIA_APPLICATION_ID}"
+    VITE_ALGOLIA_APPLICATION_ID_PG = "${ALGOLIA_APPLICATION_ID_PG}"
     VITE_ALGOLIA_SEARCH_API_KEY = "${ALGOLIA_SEARCH_API_KEY}"
+    VITE_ALGOLIA_SEARCH_API_KEY_PG = "${ALGOLIA_SEARCH_API_KEY_PG}"
     VITE_ALGOLIA_INDEX_DOCS = "${ALGOLIA_INDEX_DOCS}"
 
     # Analytics
@@ -283,6 +288,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
         "mise django:algolia-reindex:profile",
         "mise django:algolia-reindex:job",
         "mise algolia-reindex:docs",
+        "mise algolia-reindex:docs-pg",
     ]
 [tasks."django:algolia-reindex:profile"]
     dir = "server"
@@ -299,6 +305,10 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 [tasks."algolia-reindex:docs"]
     dir = "docs"
     run = "pnpm exec tsx scripts/algolia-index-docs.ts"
+
+[tasks."algolia-reindex:docs-pg"]
+    dir = "docs"
+    run = "pnpm exec tsx scripts/algolia-index-docs.ts --site=pg"
 
 
 # typegen → format → lint

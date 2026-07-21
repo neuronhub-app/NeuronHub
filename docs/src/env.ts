@@ -8,6 +8,8 @@ export const env = createEnv({
   DOCS_PORT_E2E: port({ default: 4010 }),
   DOCS_PORT: port({ default: 4000 }),
   VITE_ALGOLIA_APPLICATION_ID: str({ default: "" }),
+  VITE_ALGOLIA_APPLICATION_ID_PG: str({ default: "" }),
   VITE_ALGOLIA_SEARCH_API_KEY: str({ default: "" }),
+  VITE_ALGOLIA_SEARCH_API_KEY_PG: str({ default: "" }),
   VITE_ALGOLIA_INDEX_DOCS: str({ default: "" }),
 });

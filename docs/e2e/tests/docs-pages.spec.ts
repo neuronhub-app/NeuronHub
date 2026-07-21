@@ -1,6 +1,8 @@
 /**
  * #AI-slop #quality-0%
  */
+import { execFileSync } from "node:child_process";
+
 import { expect, type Locator, type Page, test } from "@playwright/test";
 import { href } from "react-router";
 
@@ -155,6 +157,38 @@ test.describe("Site switcher", () => {
   });
 });
 
+test.describe("Search index per site (live dev Algolia)", () => {
+  // Runs only when pg is a genuinely separate Algolia app (distinct app id) with a
+  // write key. Otherwise both reindexes hit one shared index — NHA can't be isolated.
+  const isPgSeparateApp =
+    Boolean(process.env.ALGOLIA_API_KEY) &&
+    process.env.ALGOLIA_APPLICATION_ID_PG !== process.env.ALGOLIA_APPLICATION_ID;
+  test.skip(!isPgSeparateApp, "pg is not a separate Algolia app");
+
+  const pgOnlyPage = "Linear.app";
+
+  test.beforeAll(() => {
+    reindexDocs();
+    reindexDocs("--site=pg");
+  });
+
+  test("NHA search excludes pg-only content", async ({ page }) => {
+    await page.goto(routes.usage.sentry);
+    await search(page, pgOnlyPage);
+    await expect($(page)[ids.search.dialog].getByText("No results")).toBeVisible();
+  });
+
+  test("pg search surfaces pg-only content", async ({ page }) => {
+    await page.goto(`${routes.usage.sentry}?site=pg`);
+    // Wait for pg hydration (nav shows pg-only page) so InstantSearch finished remounting.
+    await expect($(page)[ids.sidebar.root].getByText(pgOnlyPage)).toBeVisible();
+
+    await search(page, pgOnlyPage);
+    const hit = $(page)[ids.search.dialog].getByRole("link").filter({ hasText: pgOnlyPage });
+    await expect(hit.first()).toBeVisible();
+  });
+});
+
 test.describe("Dir redirects", () => {
   test("dir URL redirects to child page", async ({ page }) => {
     await page.goto(routes.development.dirGuides);
@@ -189,6 +223,17 @@ function $(page: Page): Record<string, Locator> {
   return new Proxy({} as Record<string, Locator>, {
     get: (_, id: string) => page.getByTestId(id).first(),
   });
+}
+
+function reindexDocs(siteFlag?: string) {
+  const args = ["exec", "tsx", "scripts/algolia-index-docs.ts"];
+  execFileSync("pnpm", siteFlag ? [...args, siteFlag] : args, { stdio: "ignore" });
+}
+
+async function search(page: Page, query: string) {
+  await $(page)[ids.search.trigger].click();
+  await expect($(page)[ids.search.dialog]).toBeVisible();
+  await $(page)[ids.search.input].fill(query);
 }
 
 function tocLinks(page: Page) {

@@ -15,10 +15,20 @@ import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 import { BadgeNew } from "@/components/BadgeNew";
 import { ids } from "@/e2e/ids";
 import { env } from "@/env";
+import { site, siteSlug } from "@/layout/siteState";
 
 export function DocsSearchClient() {
+  const search =
+    site.useCurrent() === siteSlug.pg
+      ? { client: algoliaClientPg, appId: env.VITE_ALGOLIA_APPLICATION_ID_PG }
+      : { client: algoliaClient, appId: env.VITE_ALGOLIA_APPLICATION_ID };
+
   return (
-    <InstantSearch searchClient={algoliaClient} indexName={env.VITE_ALGOLIA_INDEX_DOCS}>
+    <InstantSearch
+      key={search.appId}
+      searchClient={search.client}
+      indexName={env.VITE_ALGOLIA_INDEX_DOCS}
+    >
       <SearchOverlay />
     </InstantSearch>
   );
@@ -27,6 +37,11 @@ export function DocsSearchClient() {
 const algoliaClient = liteClient(
   env.VITE_ALGOLIA_APPLICATION_ID,
   env.VITE_ALGOLIA_SEARCH_API_KEY,
+);
+
+const algoliaClientPg = liteClient(
+  env.VITE_ALGOLIA_APPLICATION_ID_PG,
+  env.VITE_ALGOLIA_SEARCH_API_KEY_PG,
 );
 
 function SearchOverlay() {

@@ -5,6 +5,12 @@ import { proxy, useSnapshot } from "valtio";
 
 export type SiteSlug = "" | "pg" | "nha";
 
+export const siteSlug = {
+  nha: "",
+  nhaAlias: "nha",
+  pg: "pg",
+} as const satisfies Record<string, SiteSlug>;
+
 const state = proxy<{ current: SiteSlug }>({ current: "" });
 const storageKey = "nha-docs-site";
 const urlParam = "site";
@@ -26,8 +32,8 @@ export const site = {
   // A shared `?site=pg` link wins over localStorage, so fresh visitors see the pg view.
   hydrate() {
     const fromUrl = new URLSearchParams(window.location.search).get(urlParam);
-    const isPg = fromUrl === "pg" || localStorage.getItem(storageKey) === "pg";
-    state.current = isPg ? "pg" : "";
+    const isPg = fromUrl === siteSlug.pg || localStorage.getItem(storageKey) === siteSlug.pg;
+    state.current = isPg ? siteSlug.pg : siteSlug.nha;
     localStorage.setItem(storageKey, state.current);
     reflectInUrl(state.current);
   },
@@ -36,7 +42,7 @@ export const site = {
 // URL is a derived reflection of state: replaceState bypasses react-router.
 function reflectInUrl(value: SiteSlug) {
   const url = new URL(window.location.href);
-  if (value === "pg") {
+  if (value === siteSlug.pg) {
     url.searchParams.set(urlParam, value);
   } else {
     url.searchParams.delete(urlParam);
