@@ -1,6 +1,7 @@
 .DS_Store
 
 .local/
+.git/
 .idea/
 .run/
 .mutagen
@@ -15,7 +16,6 @@ server/.venv/
 
 # caches
 __pycache__
-server/.*_cache/
 .*_cache/
 
 # .env
