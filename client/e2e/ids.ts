@@ -150,6 +150,9 @@ export namespace ids {
 
   export const job = {
     list: "job.list",
+    btn: {
+      loadMore: "job.btn.load-more",
+    },
     searchInput: "job.search-input",
     landingPage: {
       title: "job.landing-page.title",

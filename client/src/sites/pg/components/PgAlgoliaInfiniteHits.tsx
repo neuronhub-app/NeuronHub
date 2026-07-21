@@ -1,18 +1,18 @@
 /**
- * #quality-9%
- * - Doesn't always show Skeletons or triggers `loadMore` - while we tried to fix this 3+ times.
- *    - Instead it waits for you to scroll up+down to re-trigger it.
- * - Takes 0.3s to render on the main thread - too hard to understand why.
- * - "React Compiler" can't put useMemo on it.
- * - Don't know why it calls useRef instead of Valtio, probably #AI-slop.
- * - Definitely #AI-slop React - destructs, `item` naming, etc.
+ * #quality-40%
+ * PG jobs-list infinite scroll. An IntersectionObserver on a bottom sentinel (with 400px
+ * rootMargin, so it pre-loads before the footer) only tracks visibility; an effect then calls
+ * showMore whenever the sentinel is visible AND `search.status` is "idle" AND not last page.
+ * Effect-driven (not one-shot in the observer) so the trigger is never dropped while the sentinel
+ * stays continuously in view - which is what stalled loading on mobile/footer. A "Load more"
+ * button is a deterministic fallback (and the e2e hook).
  *
  * This is a duplicate of [[AlgoliaList.tsx]] - uses its complex API wo/ any benefit of reuse.
  * // todo ! refac: drop -> use AlgoliaList. See [[ReviewListAlgolia.tsx]].
  *
  * todo ? refac-name: JobListAlgolia
  */
-import { Box, Flex, HStack, Skeleton, Stack } from "@chakra-ui/react";
+import { Box, Button, Flex, HStack, Skeleton, Stack } from "@chakra-ui/react";
 import { type ReactNode, useEffect, useRef } from "react";
 import {
   useCurrentRefinements,
@@ -23,7 +23,10 @@ import {
 
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
+import { ids } from "@/e2e/ids";
 import type { ID } from "@/gql-tada";
+
+export const skeletonCountInitial = 6;
 
 export type PgInfiniteHitsProps<TItem extends { id: ID }> = {
   renderHit: (item: TItem, ctx: { isSearchActive: boolean }) => ReactNode;
@@ -39,41 +42,30 @@ export function PgInfiniteHits<TItem extends { id: ID }>(props: PgInfiniteHitsPr
   const search = useInstantSearch();
   const hits = useInfiniteHits<TItem>();
 
-  const showMoreCallback = useRef(hits.showMore); // why? #prob-redundant
-  showMoreCallback.current = hits.showMore;
-
   const scrollSentinelRef = useRef<HTMLDivElement>(null);
+  const state = useStateValtio({ isSentinelVisible: false });
 
-  const state = useStateValtio({
-    isLoadingMore: false,
-    prevCount: 0,
-  });
-
-  // Trigger showMore by scroll:
   useEffect(() => {
-    if (!scrollSentinelRef.current) {
+    const sentinel = scrollSentinelRef.current;
+    if (!sentinel) {
       return;
     }
-    const observer = new IntersectionObserver(([entry]) => {
-      // why `&& !isLoadingMore`? sounds as the root of the non-triggering bug.
-      // I would just trigger it - and gave 0 fucks re what it's doing when `entry.isIntersecting`.
-      if (entry!.isIntersecting && !state.mutable.isLoadingMore) {
-        state.mutable.isLoadingMore = true;
-        showMoreCallback.current();
-      }
-    });
-    observer.observe(scrollSentinelRef.current);
+    const preloadNextPageMarginPx = 400;
+    const observer = new IntersectionObserver(
+      ([entry]) => (state.mutable.isSentinelVisible = entry!.isIntersecting),
+      { rootMargin: `${preloadNextPageMarginPx}px` },
+    );
+    observer.observe(sentinel);
     return () => observer.disconnect();
   }, []);
 
-  // Process showMore trigger:
+  // Re-checks on every dep change (not once in the observer), so a load is never dropped while
+  // the sentinel stays continuously in view - eg on mobile where the footer keeps it visible.
   useEffect(() => {
-    const isLoadedMore = hits.items.length !== state.mutable.prevCount;
-    if (isLoadedMore || hits.isLastPage) {
-      state.mutable.isLoadingMore = false;
-      state.mutable.prevCount = hits.items.length;
+    if (state.snap.isSentinelVisible && !hits.isLastPage && search.status === "idle") {
+      hits.showMore();
     }
-  }, [hits.items.length, hits.isLastPage]);
+  }, [state.snap.isSentinelVisible, hits.isLastPage, search.status]);
 
   const isSearchActive =
     searchBox.query.length > 0 ||
@@ -96,20 +88,40 @@ export function PgInfiniteHits<TItem extends { id: ID }>(props: PgInfiniteHitsPr
   const isJobOpen = props.hitOpenedPinned?.node && !isSearchActive;
   const isNoResults = isNoJobs && !isJobOpen;
 
+  const isLoadingMore = !isShowSkeleton && !hits.isLastPage && search.status !== "idle";
+
   return (
     <Stack gap="gap.xl" w="full">
       {props.hitOpenedPinned?.node && !isSearchActive && props.hitOpenedPinned.node}
 
-      <Stack data-testid={props.listTestId} gap="gap.md">
+      <Stack
+        data-testid={props.listTestId}
+        gap="gap.md"
+        minH={isLoadInitial ? "100dvh" : undefined}
+      >
         {isShowSkeleton ? (
-          <PgJobCardSkeletons />
+          <PgJobCardSkeletons count={skeletonCountInitial} />
         ) : isNoResults ? (
           props.noResultsNode
         ) : (
           jobsFiltered.map(item => props.renderHit(item, { isSearchActive }))
         )}
-        {state.snap.isLoadingMore && <PgJobCardSkeletons />}
+        {isLoadingMore && <PgJobCardSkeletons count={hits.results!.hitsPerPage} />}
       </Stack>
+
+      {!hits.isLastPage && (
+        <Flex justify="center">
+          <Button
+            {...ids.set(ids.job.btn.loadMore)}
+            loading={search.status !== "idle"}
+            onClick={() => hits.showMore()}
+            variant="outline"
+            size="sm"
+          >
+            Load more
+          </Button>
+        </Flex>
+      )}
 
       <Box ref={scrollSentinelRef} h="1" display={hits.isLastPage ? "none" : "block"} />
     </Stack>
@@ -117,10 +129,10 @@ export function PgInfiniteHits<TItem extends { id: ID }>(props: PgInfiniteHitsPr
 }
 
 // #AI
-export function PgJobCardSkeletons(props: { count?: number }) {
+export function PgJobCardSkeletons(props: { count: number }) {
   return (
     <>
-      {Array.from({ length: props.count ?? 4 }, (_, i) => (
+      {Array.from({ length: props.count }, (_, i) => (
         <Stack
           key={i}
           gap="gap.sm"
@@ -145,8 +157,8 @@ export function PgJobCardSkeletons(props: { count?: number }) {
           <HStack gap="gap.sm">
             <Skeleton h="6" w="24" borderRadius="sm" />
             <Skeleton h="6" w="28" borderRadius="sm" />
-            <Skeleton h="6" w="20" borderRadius="sm" />
           </HStack>
+          <Skeleton h="5" w="85%" borderRadius="sm" />
         </Stack>
       ))}
     </>

@@ -52,9 +52,16 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
 
   // #AI: Landing-page: clean URL if state == preset => URL params on user edits.
   // `routeToState({}) → preset` survives empty URL on initial load + reloads.
+  //
+  // No custom `router` push-guard needed: the duplicate history.pushState on page change
+  // (algolia/instantsearch.js#5044) was fixed upstream in 4.40.5.
   const routing = {
     stateMapping: {
       stateToRoute: (uiState: UiState) => {
+        // Strip `page`/`configure` so infinite hits always starts at page 0. Algolia infinite hits
+        // doesn't load previous pages when initialized mid-list - deep-link to page N renders only
+        // page N+, not 1..N (algolia/react-instantsearch#85, closed → use a persisting cache).
+        // Starting at page 0 sidesteps needing showPrevious.
         const urlParamsExcludedForInfiniteScroll = [
           "page",
           "configure", // i confirmed by Algolia docs eye-scan that its is redundant.
