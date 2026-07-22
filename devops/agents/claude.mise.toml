@@ -3,7 +3,8 @@
         claude --dangerously-skip-permissions \
         --verbose \
         --thinking-display summarized \
-        --settings devops/agents/settings.json
+        --settings devops/agents/settings.json \
+        --disallowedTools "Workflow", "CronCreate", "CronDelete", "CronList", "EnterPlanMode", "ExitPlanMode", "EnterWorktree", "ExitWorktree", "NotebookEdit", "PowerShell", "EndConversation", "DesignSync"
     """
     env = { TSC_CONFIG = "tsconfig.quiet.json" } # #prob-redundant
     interactive = true
