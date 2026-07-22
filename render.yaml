@@ -121,7 +121,7 @@ projects:
         - name: neuronhub-docs-prod
           type: web
           runtime: static
-          buildCommand: pnpm install --frozen-lockfile && pnpm --filter neuronhub-docs exec react-router build && pnpm exec tsx scripts/algolia-index-docs.ts && pnpm exec tsx scripts/algolia-index-docs.ts --site=pg
+          buildCommand: pnpm install --frozen-lockfile && pnpm --filter neuronhub-docs exec react-router build && pnpm exec tsx docs/scripts/algolia-index-docs.ts && pnpm exec tsx docs/scripts/algolia-index-docs.ts --site=pg
           staticPublishPath: docs/build/client
           routes:
             - type: rewrite
