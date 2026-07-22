@@ -10,6 +10,7 @@ import {
   Heading,
   HStack,
   Icon,
+  IconButton,
   Portal,
   Span,
   Stack,
@@ -17,7 +18,8 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
-import { GoCommandPalette, GoPerson } from "react-icons/go";
+import { FaGithub } from "react-icons/fa";
+import { GoCommandPalette, GoPerson, GoMail } from "react-icons/go";
 import { LuMenu } from "react-icons/lu";
 import { Outlet, useLocation, useNavigate } from "react-router";
 
@@ -33,6 +35,7 @@ import {
   filterNavBySite,
   findFirstChildHrefRecursively,
 } from "@/layout/buildNavTree";
+import { ColorModeButton } from "@/layout/ColorModeButton";
 import { DocsSearch } from "@/layout/DocsSearch";
 import { site } from "@/layout/siteState";
 import { SiteSwitcher } from "@/layout/SiteSwitcher";
@@ -127,15 +130,15 @@ function SidebarContent() {
   return (
     <Box
       {...ids.set(ids.sidebar.root)}
-      h="full"
+      display="flex"
+      flexDirection="column"
       overflowY="auto"
-      ps="2"
-      pe="2"
+      h="full"
       pt={style.p}
-      pb="10"
+      pb="gap.md"
       px="5"
     >
-      <Stack gap="6" align="flex-start">
+      <Stack flex="1" gap="6" align="flex-start">
         <SiteSwitcher site={siteCurrent} />
 
         <DocsSearch />
@@ -155,6 +158,39 @@ function SidebarContent() {
           depth={0}
         />
       </Stack>
+
+      <HStack mt="auto" pt="gap.md" borderTopWidth="1px" justify="space-between">
+        <HStack>
+          <IconButton
+            asChild
+            aria-label="GitHub repository"
+            variant="ghost"
+            colorPalette="gray"
+            size="md"
+          >
+            <a
+              href="https://github.com/neuronhub-app/NeuronHub"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <FaGithub />
+            </a>
+          </IconButton>
+          <IconButton
+            asChild
+            aria-label="Send feedback"
+            variant="ghost"
+            colorPalette="gray"
+            size="md"
+          >
+            <a href="mailto:support@neuronhub.app">
+              <GoMail />
+            </a>
+          </IconButton>
+        </HStack>
+
+        <ColorModeButton />
+      </HStack>
     </Box>
   );
 }
