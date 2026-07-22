@@ -153,6 +153,11 @@ class JobAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdmin):
 class JobAlertAdmin(SimpleHistoryAdmin, DjangoObjectActions, DALFModelAdmin):
     list_display = [
         "email",
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "utm_content",
+        "is_subscribe_to_newsletter",
         "is_active",
         "is_invalid_location",
         "salary_min",
@@ -167,10 +172,19 @@ class JobAlertAdmin(SimpleHistoryAdmin, DjangoObjectActions, DALFModelAdmin):
     ]
     search_fields = [
         "email",
+        "utm_source",
+        "utm_medium",
+        "utm_campaign",
+        "utm_content",
     ]
     list_filter = [
+        "utm_source",
+        "utm_campaign",
+        "utm_content",
+        "utm_medium",
         ("tags", DALFRelatedFieldAjaxMulti),
         ("locations", DALFRelatedFieldAjaxMulti),
+        "is_subscribe_to_newsletter",
         "is_orgs_highlighted",
         "is_active",
         "is_invalid_location",

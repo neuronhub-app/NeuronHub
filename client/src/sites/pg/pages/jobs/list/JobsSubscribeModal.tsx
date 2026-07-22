@@ -17,11 +17,13 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import * as Sentry from "@sentry/react";
 import { fromUnixTime } from "date-fns";
 import { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { FaBell } from "react-icons/fa6";
 import { useCurrentRefinements } from "react-instantsearch";
+import { useLocation } from "react-router";
 import { z } from "zod";
 
 import { datetime } from "@neuronhub/shared/utils/date-fns";
@@ -59,6 +61,7 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
   const loading = useIsLoading();
 
   const refinesCurrent = useCurrentRefinements();
+  const location = useLocation();
   const { data: locationsData } = useApolloQuery(JobLocationsQuery);
 
   const state = useStateValtio({
@@ -102,9 +105,18 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
       track.event("JobAlert.create", anonName, vars);
     }
 
+    const knownUtmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content"] as const;
+    const params = new URLSearchParams(location.search);
+    const utm_params = Object.fromEntries(
+      knownUtmKeys.map(key => [key, params.get(key)]).filter(entry => entry[1] !== null),
+    );
+
+    Sentry.setContext("utm", utm_params);
+
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,
       ...vars,
+      utm_params,
       is_subscribe_to_newsletter: state.mutable.is_subscribe_to_newsletter,
     });
     if (result.success) {

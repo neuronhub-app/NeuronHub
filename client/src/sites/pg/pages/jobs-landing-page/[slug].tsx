@@ -1,4 +1,4 @@
-import { Navigate, useParams } from "react-router";
+import { Navigate, useLocation, useParams } from "react-router";
 
 import jobsLandingPagesPrefetch from "~/graphql/prefetch/JobsLandingPages.json";
 
@@ -17,6 +17,7 @@ import { urls } from "@/urls";
  */
 export default function JobsLandingPageRoute() {
   const slug = useParams<{ slug: string }>().slug!;
+  const location = useLocation();
 
   const landingPages = (jobsLandingPagesPrefetch as JobsLandingPagesData).jobs_landing_pages;
   const landingPage = landingPages.find(page => page.slug === slug);
@@ -24,5 +25,5 @@ export default function JobsLandingPageRoute() {
     return <JobsLandingPageView page={landingPage} />;
   }
 
-  return <Navigate to={urls.jobs.slug(slug)} replace />;
+  return <Navigate to={{ pathname: urls.jobs.slug(slug), search: location.search }} replace />;
 }

@@ -222,6 +222,7 @@ export namespace ids {
       city: "facet.popover.city",
       salary: "facet.popover.salary",
       otherFilters: "facet.popover.other-filters",
+      content: "facet.popover.content",
     },
     salaryInput: "facet.salary-input",
     excludeNoSalary: "facet.exclude-no-salary",

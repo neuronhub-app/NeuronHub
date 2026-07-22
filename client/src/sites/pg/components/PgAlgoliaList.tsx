@@ -1,5 +1,6 @@
 import { Box, Grid, HStack, Stack } from "@chakra-ui/react";
-import type { IndexUiState, UiState } from "instantsearch.js";
+import type { IndexUiState, Router, UiState } from "instantsearch.js";
+import { history } from "instantsearch.js/es/lib/routers";
 import { useRef, type ReactNode } from "react";
 import { InstantSearch } from "react-instantsearch";
 
@@ -39,6 +40,7 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
   const algolia = useAlgoliaSearchClient();
 
   const pgFilterCardIsOpenRef = useRef(false);
+  const routerRef = useRef<Router<UiState>>(undefined);
 
   const indexName = algolia[props.index];
 
@@ -50,13 +52,33 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
     props.jobsLandingPage,
   );
 
+  const pageParamForInfiniteScroll = "page";
+
+  function pickNonAlgolia(params: Record<string, unknown>) {
+    return Object.fromEntries(
+      Object.entries(params).filter(
+        ([key]) => key !== indexName && key !== pageParamForInfiniteScroll,
+      ),
+    );
+  }
+
+  routerRef.current ??= history<UiState>({
+    createURL({ qsModule, routeState, location }) {
+      const paramsNonAlgolia = pickNonAlgolia(qsModule.parse(location.search.slice(1)));
+      const query = qsModule.stringify({ ...paramsNonAlgolia, ...routeState });
+      return `${location.protocol}//${location.host}${location.pathname}${query ? "?" + query : ""}${location.hash}`;
+    },
+  });
+  const router = routerRef.current;
+
   // #AI: Landing-page: clean URL if state == preset => URL params on user edits.
   // `routeToState({}) → preset` survives empty URL on initial load + reloads.
   const routing = {
+    router,
     stateMapping: {
       stateToRoute: (uiState: UiState) => {
         const urlParamsExcludedForInfiniteScroll = [
-          "page",
+          pageParamForInfiniteScroll,
           "configure", // i confirmed by Algolia docs eye-scan that its is redundant.
         ];
         const stateFiltered = Object.fromEntries(
