@@ -24,17 +24,6 @@ projects:
             - fromGroup: shared
             - fromGroup: stage
 
-        - name: neuronhub-docs-stage
-          type: web
-          plan: starter
-          runtime: image
-          image:
-            url: ghcr.io/neuronhub-app/neuronhub/docs:0.3
-          domains:
-            - stage.docs.neuronhub.app
-          envVars:
-            - fromGroup: shared
-
         - name: neuronhub-backend-stage
           type: web
           plan: starter
@@ -128,6 +117,44 @@ projects:
           envVars:
             - fromGroup: shared
             - fromGroup: prod
+
+        - name: neuronhub-docs-prod
+          type: web
+          runtime: static
+          buildCommand: pnpm install --frozen-lockfile && pnpm --filter neuronhub-docs exec react-router build && pnpm exec tsx scripts/algolia-index-docs.ts && pnpm exec tsx scripts/algolia-index-docs.ts --site=pg
+          staticPublishPath: docs/build/client
+          routes:
+            - type: rewrite
+              source: /*
+              destination: /__spa-fallback.html
+          domains:
+            - docs.neuronhub.app
+          envVars:
+            - fromGroup: shared
+            - key: ALGOLIA_API_KEY
+              sync: false
+            - key: ALGOLIA_API_KEY_PG
+              sync: false
+            # Algolia
+            - key: VITE_ALGOLIA_APPLICATION_ID
+              sync: false
+            - key: VITE_ALGOLIA_APPLICATION_ID_PG
+              sync: false
+            - key: VITE_ALGOLIA_SEARCH_API_KEY
+              sync: false
+            - key: VITE_ALGOLIA_SEARCH_API_KEY_PG
+              sync: false
+            - key: VITE_ALGOLIA_INDEX_DOCS
+              sync: false
+            # URLs
+            - key: VITE_SERVER_DOMAIN
+              value: backend.jobs.probablygood.org
+            - key: VITE_SERVER_URL
+              value: https://backend.jobs.probablygood.org
+            - key: VITE_CLIENT_DOMAIN
+              value: jobs.probablygood.org
+            - key: VITE_CLIENT_URL
+              value: https://jobs.probablygood.org
 
         - name: neuronhub-backend-prod
           type: web

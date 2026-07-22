@@ -25,9 +25,10 @@ import remarkGfm from "remark-gfm";
 
 import { format } from "@neuronhub/shared/utils/format";
 
-import { frontmatter } from "@/components/frontmatter";
-import { siteSlug } from "@/layout/siteState";
-import { findMdxFiles } from "@/utils/findMdxFiles";
+// rel imports for Render buildCommand
+import { frontmatter } from "../src/components/frontmatter";
+import { siteSlug } from "../src/layout/siteState";
+import { findMdxFiles } from "../src/utils/findMdxFiles";
 
 const site = process.argv.includes(`--site=${siteSlug.pg}`) ? siteSlug.pg : siteSlug.nha;
 const isSitePg = site === siteSlug.pg;
@@ -39,9 +40,11 @@ const config = {
     remarkPlugins: [remarkGfm, remarkFrontmatter],
   }),
   env: {
-    appId: isSitePg ? process.env.ALGOLIA_APPLICATION_ID_PG : process.env.ALGOLIA_APPLICATION_ID,
+    appId: isSitePg
+      ? process.env.VITE_ALGOLIA_APPLICATION_ID_PG
+      : process.env.VITE_ALGOLIA_APPLICATION_ID,
+    indexName: process.env.VITE_ALGOLIA_INDEX_DOCS,
     apiKey: isSitePg ? process.env.ALGOLIA_API_KEY_PG : process.env.ALGOLIA_API_KEY,
-    indexName: process.env.ALGOLIA_INDEX_DOCS,
   },
   jsx_nodes: {
     excluded: new Set([

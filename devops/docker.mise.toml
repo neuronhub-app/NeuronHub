@@ -3,7 +3,7 @@
 ["docker:tag-and-push"]
     alias = "docker:push"
     usage = """
-        flag "--app <name>" { choices "server" "client" "docs" "coder" }
+        flag "--app <name>" { choices "server" "client" "coder" }
         flag "--tag_only"
         flag "--pre_release"
     """
@@ -20,7 +20,7 @@
 
 ["docker:rm"]
     usage = """
-        flag "--app <name>" { choices "server" "client" "docs" "coder" }
+        flag "--app <name>" { choices "server" "client" "coder" }
         flag "--version <version>" env="VITE_RELEASE_VERSION"
     """
     run = """
@@ -37,7 +37,7 @@
 
 ["docker:build"]
     usage = """
-        flag "--app <name>" { choices "server" "client" "docs" "coder" }
+        flag "--app <name>" { choices "server" "client" "coder" }
         flag "--version <version>" env="VITE_RELEASE_VERSION"
         flag "--no_cache" default=#false
     """
@@ -84,7 +84,6 @@
 
                       # pnpm root
                       "client" => ".",
-                      "docs" => ".",
                     }
                   )
                   dockerfile: (

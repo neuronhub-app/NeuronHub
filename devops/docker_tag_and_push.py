@@ -14,7 +14,7 @@ from typing import Literal
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--app", default="server", choices=["server", "client", "docs", "coder"])
+parser.add_argument("--app", default="server", choices=["server", "client", "coder"])
 parser.add_argument("--vite_site", default="", choices=["", "pg"])
 parser.add_argument("--django_env", default="", choices=["", "prod", "stage", "dev"])
 parser.add_argument("--ghcr_repo")
@@ -28,7 +28,7 @@ type DjangoEnv = Literal["", "prod", "stage", "dev"]
 
 
 class NamespaceKwargs(Namespace):
-    app: Literal["server", "client", "docs", "coder"]
+    app: Literal["server", "client", "coder"]
     vite_site: ViteSite
     django_env: DjangoEnv
     version: str

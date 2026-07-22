@@ -9,7 +9,7 @@ export default function DirRedirect() {
   return null;
 }
 
-export function loader({ request }: { request: Request }) {
+export function clientLoader({ request }: { request: Request }) {
   const pathname = new URL(request.url).pathname.replace(/\/$/, "");
   const node = findNodeAtPath(navTree, pathname);
 
