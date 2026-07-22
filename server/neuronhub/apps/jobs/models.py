@@ -14,6 +14,7 @@ from strawberry_django.descriptors import model_cached_property
 from timezone_field import TimeZoneField
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
+from neuronhub.apps.anonymizer.registry import AnonymizableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable
 from neuronhub.apps.db.fields import MarkdownField
 from neuronhub.apps.db.models_abstract import TimeStampedModel
@@ -324,10 +325,10 @@ class Job(AlgoliaModel):
         ]
 
 
-class JobAlert(TimeStampedModel):
+class JobAlert(AnonymizableTimeStampedModel):
     id_ext = models.UUIDField(default=uuid.uuid4)
 
-    email = models.EmailField()
+    email = anonymizable(models.EmailField())
 
     tags = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
         "posts.PostTag",
@@ -352,10 +353,12 @@ class JobAlert(TimeStampedModel):
     sent_count = models.PositiveIntegerField(default=0)
     jobs_notified_count = models.PositiveIntegerField(default=0)
     jobs_clicked_count = models.PositiveIntegerField(default=0)
-    jobs_clicked = ArrayField(
-        models.CharField(max_length=1024),
-        default=list,
-        blank=True,
+    jobs_clicked = anonymizable(
+        ArrayField(
+            models.CharField(max_length=1024),
+            default=list,
+            blank=True,
+        ),
     )
 
     is_subscribe_to_newsletter = models.BooleanField(

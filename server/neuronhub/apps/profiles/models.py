@@ -13,7 +13,7 @@ from strawberry_django.descriptors import model_property
 
 from neuronhub.apps.algolia.models_abstract import AlgoliaModel
 from neuronhub.apps.anonymizer.fields import Visibility
-from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
+from neuronhub.apps.anonymizer.registry import AnonymizableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.profiles.services.serialize_to_md import serialize_profile_to_markdown
@@ -252,7 +252,7 @@ class Profile(AlgoliaModel):
         return f"{self.first_name} {self.last_name} | {self.company}"
 
 
-class ProfileMatch(AnonimazableTimeStampedModel):
+class ProfileMatch(AnonymizableTimeStampedModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="profile_matches")
     profile = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name="match")
 
@@ -287,7 +287,7 @@ class ProfileMatch(AnonimazableTimeStampedModel):
         return f"Match: {self.user} → {self.profile}"
 
 
-class ProfileInvite(AnonimazableTimeStampedModel):
+class ProfileInvite(AnonymizableTimeStampedModel):
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="invites")
     token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     user_email = models.EmailField()

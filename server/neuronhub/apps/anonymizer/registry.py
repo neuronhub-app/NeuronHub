@@ -5,7 +5,7 @@ Process:
 - randomize timestamps by few days (to prevent correlation back to the author)
 - set `author` to the "Anonym" User instance
 - erase HistoricalRecords if any
-- erase text content if needed
+- erase text content if any
 
 Potential issues:
 - forgetting to handle new fields and relationships
@@ -19,13 +19,16 @@ from datetime import datetime
 from datetime import timedelta
 
 from django.conf import settings
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Field
 from django.utils import timezone
+from faker.proxy import Faker
 from simple_history.models import HistoricalRecords
 
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.users.models import User
+
 
 
 async def anonymize_user_data(
@@ -41,7 +44,7 @@ async def anonymize_user_data(
         # All registered models have an author field, but mypy can't see it on the abstract base
         instances = list(model_anonymizable._default_manager.filter(author=user))  # type: ignore[misc]
         for instance in instances:
-            instance.anonymize(user_anon, is_erase_text_content)
+            instance.anonymize(user_anon=user_anon, is_erase_text_content=is_erase_text_content)
         if instances:
             await model_anonymizable._default_manager.abulk_update(
                 instances,
@@ -53,11 +56,11 @@ async def anonymize_user_data(
 
 
 class AnonymizerRegistry:
-    models: list[type[AnonimazableTimeStampedModel]] = []
+    models: list[type[AnonymizableTimeStampedModel]] = []
 
     # generic limiter prb breaks pycharm stubs, but adds mypy more useful checks
-    def register[M: AnonimazableTimeStampedModel](self, cls: type[M]) -> type[M]:
-        assert issubclass(cls, AnonimazableTimeStampedModel)
+    def register[M: AnonymizableTimeStampedModel](self, cls: type[M]) -> type[M]:
+        assert issubclass(cls, AnonymizableTimeStampedModel)
         self.models.append(cls)
         return cls
 
@@ -76,7 +79,7 @@ def anonymizable[F: Field](field: F) -> F:
     return field
 
 
-class AnonimazableTimeStampedModel(TimeStampedModel):
+class AnonymizableTimeStampedModel(TimeStampedModel):
     created_at = anonymizable(models.DateTimeField(default=timezone.now))
     updated_at = anonymizable(models.DateTimeField(auto_now=True))
 
@@ -98,8 +101,9 @@ class AnonimazableTimeStampedModel(TimeStampedModel):
         self,
         user_anon: User,
         is_erase_text_content: bool = False,
-    ) -> AnonimazableTimeStampedModel:
-        self.author = user_anon
+    ) -> AnonymizableTimeStampedModel:
+        if getattr(self, "author", None):
+            self.author = user_anon
 
         self.created_at = self._anonymize_datetime(self.created_at)
         self.updated_at = self._anonymize_datetime(self.updated_at, is_future_only=True)
@@ -107,13 +111,26 @@ class AnonimazableTimeStampedModel(TimeStampedModel):
         # todo ! auth: reset all anonymizable fields, confirm rels are reset, test
         # todo ! auth: respect is_erase_text_content
 
+        self._fake_anonymizable_fields()
+
         if self.history:
-            self.history.history_manager.all().delete()
+            self.history.all().delete()
 
         return self
 
+    def _fake_anonymizable_fields(self):
+        faker = Faker()
+        for field in self._meta.get_fields():
+            if getattr(field, is_anonymizable_attr_name, False):
+                match field:
+                    case models.EmailField():
+                        setattr(self, field.name, faker.email())
+                    case ArrayField() if isinstance(field.base_field, models.CharField):
+                        array_length = len(getattr(self, field.name) or [])
+                        setattr(self, field.name, faker.words(nb=array_length))
+
     def _anonymize_datetime(self, dt_base: datetime, is_future_only: bool = False):
-        max_days_diff = 5
+        max_days_diff = 10
 
         if is_future_only:
             days_offset = random.randint(0, max_days_diff)

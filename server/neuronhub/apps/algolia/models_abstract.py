@@ -6,7 +6,7 @@ from django.test import RequestFactory
 from django_choices_field import TextChoicesField
 
 from neuronhub.apps.anonymizer.fields import Visibility
-from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
+from neuronhub.apps.anonymizer.registry import AnonymizableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizer
 from neuronhub.apps.graphql.persisted_query_extension import _load_client_persisted_queries_json
 from neuronhub.apps.users.models import User
@@ -14,7 +14,7 @@ from neuronhub.apps.users.models import UserConnectionGroup
 
 
 @anonymizer.register
-class AlgoliaModel(AnonimazableTimeStampedModel):
+class AlgoliaModel(AnonymizableTimeStampedModel):
     visible_to_users: ManyToManyField[User, User]
     visible_to_groups: ManyToManyField[UserConnectionGroup, UserConnectionGroup]
     visibility = TextChoicesField(Visibility, default=Visibility.PRIVATE)

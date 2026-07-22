@@ -18,7 +18,7 @@ from strawberry_django.descriptors import model_property
 
 from neuronhub.apps.admin.utils.convert_md_to_html_for_admin import convert_md_to_html_for_admin
 from neuronhub.apps.anonymizer.fields import Visibility
-from neuronhub.apps.anonymizer.registry import AnonimazableTimeStampedModel
+from neuronhub.apps.anonymizer.registry import AnonymizableTimeStampedModel
 from neuronhub.apps.anonymizer.registry import anonymizable
 from neuronhub.apps.anonymizer.registry import anonymizer
 from neuronhub.apps.db.fields import MarkdownField
@@ -72,7 +72,7 @@ class PostCategory(models.TextChoices):
 
 
 @anonymizer.register
-class Post(AnonimazableTimeStampedModel):
+class Post(AnonymizableTimeStampedModel):
     objects = models.Manager()
     posts = PostManager()
     tools = ToolManager()
@@ -423,7 +423,7 @@ class PostConfig(SingletonModel):
 
 
 @anonymizer.register
-class PostVote(AnonimazableTimeStampedModel):
+class PostVote(AnonymizableTimeStampedModel):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="votes")
     author = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="post_votes"
@@ -446,7 +446,7 @@ class PostTagCategory(TimeStampedModel):
 
 
 @anonymizer.register
-class PostTag(AnonimazableTimeStampedModel):
+class PostTag(AnonymizableTimeStampedModel):
     tag_parent = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
@@ -540,7 +540,7 @@ class PostTag(AnonimazableTimeStampedModel):
 
 
 @anonymizer.register
-class PostTagVote(AnonimazableTimeStampedModel):
+class PostTagVote(AnonymizableTimeStampedModel):
     """
     A User's vote on a PostTag of the Post.
     """
@@ -566,7 +566,7 @@ class PostTagVote(AnonimazableTimeStampedModel):
 
 # todo maybe: rename to PostRelatedVote (to indicate it's a Vote first of all)
 @anonymizer.register
-class PostRelated(AnonimazableTimeStampedModel):
+class PostRelated(AnonymizableTimeStampedModel):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     post = models.ForeignKey(
         "Post",
