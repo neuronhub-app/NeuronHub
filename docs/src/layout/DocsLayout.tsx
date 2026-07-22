@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Box,
   Button,
@@ -64,7 +62,7 @@ export default function DocsLayout() {
           borderEndWidth="1px"
           bg="bg"
         >
-          <SidebarContent />
+          <SidebarLeft />
         </Box>
 
         <Box
@@ -119,13 +117,8 @@ const style = {
   },
 } as const;
 
-function SidebarContent() {
-  const pathname = useLocation().pathname;
-  const navigate = useNavigate();
+function SidebarLeft() {
   const siteCurrent = site.useCurrent();
-
-  const sectionActive = pathname.startsWith("/development/") ? "development" : "usage";
-  const navTreeForSite = filterNavBySite(navTree, siteCurrent);
 
   return (
     <Box
@@ -143,20 +136,7 @@ function SidebarContent() {
 
         <DocsSearch />
 
-        <SidebarTabs
-          value={sectionActive}
-          onValueChange={section => {
-            const node = navTreeForSite.find(node => node.slug === section);
-            const href = node ? findFirstChildHrefRecursively(node.children) : "/";
-            navigate(href ?? "/");
-          }}
-        />
-
-        <SidebarLeft
-          pathname={pathname}
-          nodes={navTreeForSite.find(node => node.slug === sectionActive)?.children ?? []}
-          depth={0}
-        />
+        <SidebarLeftPages />
       </Stack>
 
       <HStack mt="auto" pt="gap.md" borderTopWidth="1px" justify="space-between">
@@ -202,7 +182,7 @@ const sidebarTabs = {
 
 type SidebarTabId = keyof typeof sidebarTabs;
 
-function SidebarTabs(props: {
+function SidebarLeftPagesTabs(props: {
   value: SidebarTabId;
   onValueChange: (value: SidebarTabId) => void;
 }) {
@@ -242,11 +222,39 @@ function SidebarTabs(props: {
   );
 }
 
-function SidebarLeft(props: { pathname: string; nodes: NavNode[]; depth: number }) {
+function SidebarLeftPages() {
+  const pathname = useLocation().pathname;
+
+  const navigate = useNavigate();
+  const siteCurrent = site.useCurrent();
+
+  const sectionActive = pathname.startsWith("/development/") ? "development" : "usage";
+  const navTreeForSite = filterNavBySite(navTree, siteCurrent);
+
+  return (
+    <>
+      <SidebarLeftPagesTabs
+        value={sectionActive}
+        onValueChange={section => {
+          const node = navTreeForSite.find(node => node.slug === section);
+          const href = node ? findFirstChildHrefRecursively(node.children) : "/";
+          navigate(href ?? "/");
+        }}
+      />
+      <SidebarLeftPagesTree
+        pathname={pathname}
+        nodes={navTreeForSite.find(node => node.slug === sectionActive)?.children ?? []}
+        depth={0}
+      />
+    </>
+  );
+}
+
+function SidebarLeftPagesTree(props: { pathname: string; nodes: NavNode[]; depth: number }) {
   return (
     <Stack w="full" gap={props.depth === 0 ? "6" : "0"}>
       {props.nodes.map(node => (
-        <SidebarLeftNode
+        <SidebarLeftPagesNode
           key={node.slug}
           pathname={props.pathname}
           node={node}
@@ -257,7 +265,7 @@ function SidebarLeft(props: { pathname: string; nodes: NavNode[]; depth: number 
   );
 }
 
-function SidebarLeftNode(props: { pathname: string; node: NavNode; depth: number }) {
+function SidebarLeftPagesNode(props: { pathname: string; node: NavNode; depth: number }) {
   const isLeaf = props.node.children.length === 0;
 
   if (props.depth === 0) {
@@ -284,7 +292,11 @@ function SidebarLeftNode(props: { pathname: string; node: NavNode; depth: number
           </HStack>
         )}
         {props.node.children.length > 0 && (
-          <SidebarLeft pathname={props.pathname} nodes={props.node.children} depth={1} />
+          <SidebarLeftPagesTree
+            pathname={props.pathname}
+            nodes={props.node.children}
+            depth={1}
+          />
         )}
       </Stack>
     );
@@ -307,7 +319,7 @@ function SidebarLeftNode(props: { pathname: string; node: NavNode; depth: number
         </SidebarLink>
 
         {props.node.children.length > 0 && (
-          <SidebarLeft
+          <SidebarLeftPagesTree
             pathname={props.pathname}
             nodes={props.node.children}
             depth={props.depth + 1}
@@ -330,7 +342,7 @@ function SidebarLeftNode(props: { pathname: string; node: NavNode; depth: number
         {props.node.title}
       </Text>
 
-      <SidebarLeft
+      <SidebarLeftPagesTree
         pathname={props.pathname}
         nodes={props.node.children}
         depth={props.depth + 1}
@@ -367,7 +379,7 @@ function SidebarMobileDrawer() {
         <Drawer.Backdrop />
         <Drawer.Positioner>
           <Drawer.Content>
-            <SidebarContent />
+            <SidebarLeft />
           </Drawer.Content>
         </Drawer.Positioner>
       </Portal>
