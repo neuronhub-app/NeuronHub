@@ -16,6 +16,7 @@ services:
     env_file:
       - path: .env
     # Reindex Algolia if migrations applied & run daphne.
+    # Note: Render.com requires no single quotes after `bash -c`.
     command: bash -c 'uv run manage.py migrate --check || (uv run manage.py migrate && uv run manage.py algolia_reindex_with_replicas) && exec uv run daphne --bind 0.0.0.0 --port 8000 neuronhub.asgi:application'
   server_background_tasks:
     image: ghcr.io/neuronhub-app/neuronhub/server:0.3
