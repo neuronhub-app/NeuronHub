@@ -1,62 +1,53 @@
 /**
  * #AI
  */
-import { Button, chakra, HStack, Menu, Portal, Text } from "@chakra-ui/react";
-import { GoChevronDown } from "react-icons/go";
+import { chakra, SegmentGroup, Stack, Text } from "@chakra-ui/react";
 
 import { NeuronLogo } from "@neuronhub/shared/components/NeuronLogo";
 
 import { ids } from "@/e2e/ids";
 import { env } from "@/env";
-import { site, type SiteSlug } from "@/layout/siteState";
+import { site, siteSlug, type SiteSlug } from "@/layout/siteState";
 
-const sites = {
-  "": "NeuronHub",
-  pg: "Probably Good",
-} as const;
+// Zag treats the falsy "" SiteSlug as "no selection" → invisible active state on load.
+const items = [
+  { value: siteSlug.nhaAlias, label: "NeuronHub" },
+  { value: siteSlug.pg, label: "Probably Good" },
+] as const;
 
 export function SiteSwitcher(props: { site: SiteSlug }) {
   return (
-    <HStack gap="2" align="center" w="100%">
+    <Stack gap="3" align="stretch" w="100%">
       <SiteLogo site={props.site} />
 
-      <Menu.Root positioning={{ placement: "bottom-start" }}>
-        <Menu.Trigger asChild>
-          <Button
-            {...ids.set(ids.siteSwitcher.trigger)}
-            variant="ghost"
-            size="xs"
-            h="stretch"
-            px="0"
-            minW="fit-content"
-          >
-            <GoChevronDown />
-          </Button>
-        </Menu.Trigger>
+      <SegmentGroup.Root
+        value={props.site === siteSlug.nha ? siteSlug.nhaAlias : props.site}
+        onValueChange={details =>
+          site.set(details.value === siteSlug.nhaAlias ? siteSlug.nha : siteSlug.pg)
+        }
+        size="xs"
+        w="100%"
+      >
+        <SegmentGroup.Indicator />
 
-        <Portal>
-          <Menu.Positioner>
-            <Menu.Content minW="10rem">
-              <Menu.RadioItemGroup
-                value={props.site}
-                onValueChange={details => site.set(details.value as SiteSlug)}
-              >
-                {Object.entries(sites).map(([value, label]) => (
-                  <Menu.RadioItem
-                    key={value}
-                    {...ids.set(ids.siteSwitcher.item(value))}
-                    value={value}
-                  >
-                    {label}
-                    <Menu.ItemIndicator />
-                  </Menu.RadioItem>
-                ))}
-              </Menu.RadioItemGroup>
-            </Menu.Content>
-          </Menu.Positioner>
-        </Portal>
-      </Menu.Root>
-    </HStack>
+        {items.map(item => (
+          <SegmentGroup.Item
+            key={item.value}
+            value={item.value}
+            flex="1"
+            justifyContent="center"
+            css={{
+              "&[data-state=unchecked]:hover": { bg: "bg.emphasized/60", cursor: "pointer" },
+            }}
+          >
+            <SegmentGroup.ItemText {...ids.set(ids.siteSwitcher.item(item.value))}>
+              {item.label}
+            </SegmentGroup.ItemText>
+            <SegmentGroup.ItemHiddenInput />
+          </SegmentGroup.Item>
+        ))}
+      </SegmentGroup.Root>
+    </Stack>
   );
 }
 
@@ -68,14 +59,22 @@ function SiteLogo(props: { site: SiteSlug }) {
         {...ids.set(ids.sidebar.logo)}
         display="flex"
         h="stretch"
+        mt="-3px"
+        pb="0"
         alignItems="center"
       >
-        <Text color="gray.800" fontSize="21px" fontWeight="bold" fontFamily="serif">
+        <Text
+          color="gray.800"
+          fontSize="24px"
+          fontWeight="bold"
+          fontFamily="serif"
+          lineHeight="1.1"
+        >
           Probably{" "}
           <Text as="span" fontWeight="bolder" color="#338050">
             Good
           </Text>
-          <Text as="span" fontWeight="normal">
+          <Text as="span" fontWeight="bold">
             {" "}
             / Jobs
           </Text>

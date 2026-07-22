@@ -176,8 +176,9 @@ function SidebarTabs(props: {
       onValueChange={details => props.onValueChange(details.value as SidebarTabId)}
       variant="plain"
       size="sm"
+      w="full"
     >
-      <Tabs.List bg="bg.muted" rounded="l3" p="1" flex="1">
+      <Tabs.List bg="bg.muted" rounded="l3" p="1" flex="1" w="full">
         {Object.entries(sidebarTabs).map(([value, section]) => (
           <Tabs.Trigger
             key={value}

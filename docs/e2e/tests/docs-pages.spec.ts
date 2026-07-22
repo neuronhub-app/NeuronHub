@@ -127,7 +127,6 @@ test.describe("Site switcher", () => {
     await expect(nav.getByText(pgLinearLabel)).not.toBeVisible();
     await expect(nav.getByText("Render.com")).not.toBeVisible();
 
-    await $(page)[ids.siteSwitcher.trigger].click();
     await $(page)[ids.siteSwitcher.item("pg")].click();
 
     await expect(nav.getByText(pgLinearLabel)).toBeVisible();
@@ -144,7 +143,6 @@ test.describe("Site switcher", () => {
   test("switching writes ?site=pg to URL", async ({ page }) => {
     await page.goto(routes.usage.sentry);
 
-    await $(page)[ids.siteSwitcher.trigger].click();
     await $(page)[ids.siteSwitcher.item("pg")].click();
 
     await expect(page).toHaveURL(/[?&]site=pg/);

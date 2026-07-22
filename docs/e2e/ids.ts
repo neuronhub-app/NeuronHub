@@ -30,7 +30,6 @@ export namespace ids {
   } as const;
 
   export const siteSwitcher = {
-    trigger: "site-switcher.trigger",
     item: (site: string) => `site-switcher.item.${site === "" ? "nha" : site}`,
   } as const;
 
