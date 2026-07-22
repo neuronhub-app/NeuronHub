@@ -44,7 +44,6 @@ export function ColorModeButton() {
   return (
     <ClientOnly fallback={<Skeleton boxSize="8" />}>
       <IconButton
-        {...ids.set(ids.sidebar.colorMode)}
         onClick={toggleColorMode}
         aria-label="Toggle color mode"
         variant="ghost"
