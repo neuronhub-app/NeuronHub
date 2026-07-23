@@ -404,31 +404,6 @@ if IS_SENTRY_ENABLED:
         ],
     )
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "neuronhub": {
-            "handlers": ["console"],
-            "level": "DEBUG" if DJANGO_ENV is DjangoEnv.DEV else "INFO",
-            "propagate": False,
-        },
-    },
-}
-# supress warn from strawberry-django
-warnings.filterwarnings(
-    "ignore", category=UserWarning, module="strawberry.utils.deprecations", lineno=26
-)
-
 
 def _is_strawberry_cancelled_error(record: logging.LogRecord) -> bool:
     """
@@ -463,19 +438,49 @@ class filters:
     filter_crontask_useless_5s_logs = "_filter_crontask_useless_5s_logs"
 
 
-LOGGING.setdefault("filters", {})
-LOGGING["filters"][filters.strawberry_cancelled_error_filter] = {
-    "()": "django.utils.log.CallbackFilter",
-    "callback": lambda record: not _is_strawberry_cancelled_error(record),
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "filters": {
+        filters.strawberry_cancelled_error_filter: {
+            "()": "django.utils.log.CallbackFilter",
+            "callback": lambda record: not _is_strawberry_cancelled_error(record),
+        },
+        filters.filter_crontask_useless_5s_logs: {
+            "()": "django.utils.log.CallbackFilter",
+            "callback": _filter_crontask_useless_5s_logs,
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "neuronhub": {
+            "handlers": ["console"],
+            "level": "DEBUG" if DJANGO_ENV is DjangoEnv.DEV else "INFO",
+            "propagate": False,
+        },
+        # Filter logs before fan-out to *all* handlers - console (Render stdout) and Sentry's `callHandlers` patch.
+        "strawberry.execution": {
+            "filters": [filters.strawberry_cancelled_error_filter],
+            "propagate": True,
+        },
+        "apscheduler.executors.default": {
+            "filters": [filters.filter_crontask_useless_5s_logs],
+            "propagate": True,
+        },
+    },
 }
-LOGGING["filters"][filters.filter_crontask_useless_5s_logs] = {
-    "()": "django.utils.log.CallbackFilter",
-    "callback": _filter_crontask_useless_5s_logs,
-}
-LOGGING["handlers"]["console"]["filters"] = [
-    filters.strawberry_cancelled_error_filter,
-    filters.filter_crontask_useless_5s_logs,
-]
+# supress warn from strawberry-django
+warnings.filterwarnings(
+    "ignore", category=UserWarning, module="strawberry.utils.deprecations", lineno=26
+)
 
 DJANGO_IS_E2E_LOGS_ENABLED = env.bool("DJANGO_IS_E2E_LOGS_ENABLED", False)
 if DJANGO_ENV is DjangoEnv.DEV_TEST_E2E and not DJANGO_IS_E2E_LOGS_ENABLED:
