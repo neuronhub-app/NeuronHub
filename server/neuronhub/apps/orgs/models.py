@@ -12,7 +12,7 @@ from neuronhub.apps.sites.models import url_with_utm_help_text
 
 
 class Org(TimeStampedModel):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     slug = AutoSlugField(populate_from="name", unique=True)
     domain = models.CharField(max_length=255, blank=True, default="")
     tz: ZoneInfo = TimeZoneField(default="America/Los_Angeles")
