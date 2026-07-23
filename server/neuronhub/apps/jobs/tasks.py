@@ -27,8 +27,7 @@ if typing.TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-# todo ! feat: enable
-# @cron("0 * * * *", sentry_monitor_config=False)
+@cron("0 * * * *", sentry_monitor_config=False)
 @task()
 async def send_job_alert_emails_task():
     with monitor(
