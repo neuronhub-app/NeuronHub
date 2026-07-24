@@ -130,8 +130,9 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     # Claude
 
+    CLAUDE_CODE_DISABLE_AUTO_MEMORY = 1
     CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS = 1
-    CLAUDE_AUTOCOMPACT_PCT_OVERRIDE = 20 # After 200k+ - for rouge subagents.
+    CLAUDE_AUTOCOMPACT_PCT_OVERRIDE = 20 # 20% (200k) limit - mostly for sub-agents, to fix the context-rot past 110k+.
     CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY = 1
     DISABLE_ERROR_REPORTING = 1
     DISABLE_BUG_COMMAND = 1
