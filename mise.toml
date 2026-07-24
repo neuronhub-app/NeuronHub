@@ -130,6 +130,7 @@ redactions = ["*SECRET*", "*_API_KEY", "DATABASE_URL", "SENTRY_AUTH_TOKEN"]
 
     # Claude
 
+    CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH = 2 # ie max 1 subagetn per 1 subagent (default is 3 in 2.1.219)
     CLAUDE_CODE_DISABLE_AUTO_MEMORY = 1
     CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS = 1
     CLAUDE_AUTOCOMPACT_PCT_OVERRIDE = 20 # 20% (200k) limit - mostly for sub-agents, to fix the context-rot past 110k+.
