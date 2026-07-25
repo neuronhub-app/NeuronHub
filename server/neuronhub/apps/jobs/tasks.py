@@ -1,5 +1,5 @@
 """
-Not using `@cron(sentry_monitor_config=False)` as it's untyped - unlike the real one.
+Not using `@cron(sentry_monitor_config=False)` as it's typed in sentry_sdk and not in django-crontask.
 """
 
 import logging
@@ -21,17 +21,21 @@ from neuronhub.apps.sites.services.send_email import send_email
 
 if typing.TYPE_CHECKING:
     from sentry_sdk._types import MonitorConfig
-    from sentry_sdk._types import MonitorConfigScheduleUnit
 
 
 logger = logging.getLogger(__name__)
 
 
-@cron("0 * * * *", sentry_monitor_config=False)
+class crons:
+    airtable_sync = "0 15 * * *"  # daily at 15:00
+    job_alert_emails = "0 * * * *"  # hourly
+
+
+@cron(crons.job_alert_emails, sentry_monitor_config=False)
 @task()
 async def send_job_alert_emails_task():
     with monitor(
-        monitor_config=_monitor_config(unit="hour", max_runtime_min=40),
+        monitor_config=_monitor_config(crontab=crons.job_alert_emails, max_runtime_min=40),
         monitor_slug=send_job_alert_emails_task.name,
     ):
         logger.info(f"{send_job_alert_emails_task.name} started")
@@ -52,7 +56,7 @@ async def send_job_alert_emails_by_ids_task(alert_ids: list[int]):
 
 
 @task()
-async def airtable_sync_task(email_to_notify: str = None):
+async def airtable_sync_task(email_to_notify: str | None = None):
     with sentry_sdk.start_transaction(op="function", name=airtable_sync_task.name):
         with sentry_sdk.start_span(op="queue.process", name=airtable_sync_task.name) as span:
             sentry_sdk.set_tag("scope", "jobs/sync")
@@ -82,11 +86,11 @@ async def airtable_sync_task(email_to_notify: str = None):
                 )
 
 
-@cron("0 15 * * *", sentry_monitor_config=False)
+@cron(crons.airtable_sync, sentry_monitor_config=False)
 @task()
 async def airtable_sync_and_publish_task():
     with monitor(
-        monitor_config=_monitor_config(unit="day", max_runtime_min=60),
+        monitor_config=_monitor_config(crontab=crons.airtable_sync, max_runtime_min=60),
         monitor_slug=airtable_sync_and_publish_task.name,
     ):
         logger.info(f"{airtable_sync_and_publish_task.name} started")
@@ -99,9 +103,9 @@ async def airtable_sync_and_publish_task():
         logger.info(f"{airtable_sync_and_publish_task.name} report: {asdict(stats)}")
 
 
-def _monitor_config(unit: MonitorConfigScheduleUnit, max_runtime_min: int = 30) -> MonitorConfig:
+def _monitor_config(crontab: str, max_runtime_min: int = 30) -> MonitorConfig:
     return {
-        "schedule": {"type": "interval", "value": 1, "unit": unit},
+        "schedule": {"type": "crontab", "value": crontab, "unit": "minute"},
         "max_runtime": max_runtime_min,
         "failure_issue_threshold": 1,
         "recovery_threshold": 2,
