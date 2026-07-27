@@ -30,7 +30,6 @@ from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.users.models import User
 
 
-
 async def anonymize_user_data(
     user: User,
     is_delete_user: bool = False,
