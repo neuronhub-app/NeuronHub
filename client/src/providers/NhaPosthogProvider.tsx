@@ -11,6 +11,7 @@ export function NhaPosthogProvider(props: { children: ReactNode }) {
   if (env.mode.isClient && env.VITE_POSTHOG_IS_ENABLED) {
     posthog.init(env.VITE_POSTHOG_TOKEN, {
       api_host: env.VITE_POSTHOG_HOST,
+      ui_host: env.VITE_POSTHOG_HOST_UI, // needed if reverse-proxy is used.
       loaded: posthog => {
         if (env.isDev) {
           posthog.debug();

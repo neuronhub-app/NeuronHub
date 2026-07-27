@@ -107,6 +107,10 @@
                     VITE_SITE: {{ env.VITE_SITE | default(value="''") }}
                     VITE_PROJECT_NAME: {{ env.VITE_PROJECT_NAME }}
                     VITE_GTM_ID: {{ env.VITE_GTM_ID | default(value="''") }}
+                    VITE_POSTHOG_IS_ENABLED: {{ env.VITE_POSTHOG_IS_ENABLED }}
+                    VITE_POSTHOG_TOKEN: {{ env.VITE_POSTHOG_TOKEN }}
+                    VITE_POSTHOG_HOST: {{ env.VITE_POSTHOG_HOST }}
+                    VITE_POSTHOG_HOST_UI: {{ env.VITE_POSTHOG_HOST_UI }}
                     VITE_SERVER_URL: https://{{ env.SERVER_DOMAIN }}
                     VITE_CLIENT_URL: {{ env.CLIENT_URL }}
                     VITE_ALGOLIA_APPLICATION_ID: {{ env.VITE_ALGOLIA_APPLICATION_ID }}
