@@ -38,8 +38,8 @@ const envCleaned = createEnv({
   VITE_GTM_ID: str({ default: "" }),
 
   VITE_POSTHOG_TOKEN: str({ default: "" }),
-  VITE_POSTHOG_HOST: url({ default: "" }),
-  VITE_POSTHOG_HOST_UI: url({ default: "" }),
+  VITE_POSTHOG_HOST: str({ default: "" }),
+  VITE_POSTHOG_HOST_UI: str({ default: "" }),
   VITE_POSTHOG_IS_ENABLED: bool({ default: false }),
 
   CLIENT_PORT: port({ default: 3000 }),
