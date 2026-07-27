@@ -51,6 +51,8 @@ jobs:
 
       - name: Setup Mise
         uses: jdx/mise-action@v3
+        with:
+          version: 2026.7.13
 
       - name: Setup uv
         uses: astral-sh/setup-uv@v6

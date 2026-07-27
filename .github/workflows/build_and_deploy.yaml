@@ -54,6 +54,8 @@ jobs:
 
       - name: Setup Mise
         uses: jdx/mise-action@v4
+        with:
+          version: 2026.7.13
 
       # ghcr.io rejects uppercase paths (ie /NeuronHub)
       - name: Lowercase GHCR_REPO
