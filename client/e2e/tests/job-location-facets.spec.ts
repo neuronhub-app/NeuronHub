@@ -20,16 +20,18 @@ const loc = {
 
 test.skip(!env.site.isProbablyGood, "Location facets are PG-only");
 
+const jobsGenerated = [
+  { jobs_job: { locations: [`San Francisco CA, ${loc.US}`] } },
+  { jobs_job: { locations: [`Oakland CA, ${loc.US}`] } },
+  { jobs_job: { locations: [`Washington DC, ${loc.US}`] } },
+  { jobs_job: { locations: [`${loc.BerkeleyCa}, ${loc.US}`] } },
+  { jobs_job: { locations: [`Nairobi, ${loc.Kenya}`] } },
+  { jobs_job: { locations: ["Remote, Global"] } },
+];
+
 test.describe("PG Job Location Facets", () => {
   test.beforeEach(async ({ play }) => {
-    await play.reset_db_and_gen([
-      { jobs_job: { locations: [`San Francisco CA, ${loc.US}`] } },
-      { jobs_job: { locations: [`Oakland CA, ${loc.US}`] } },
-      { jobs_job: { locations: [`Washington DC, ${loc.US}`] } },
-      { jobs_job: { locations: [`${loc.BerkeleyCa}, ${loc.US}`] } },
-      { jobs_job: { locations: [`Nairobi, ${loc.Kenya}`] } },
-      { jobs_job: { locations: ["Remote, Global"] } },
-    ]);
+    await play.reset_db_and_gen(jobsGenerated);
   });
 
   test("cross-popover OR + Algolia counts", async ({ page, play }) => {
@@ -37,6 +39,9 @@ test.describe("PG Job Location Facets", () => {
     const popover = page.locator(openPopover);
     const jobCards = play.getAll(ids.job.card.container);
     const countryBtn = page.getByTestId(ids.facet.popover.country).last();
+
+    // Else a prev run's Algolia orphans would fail the counts below as a facet bug
+    await expectBase(jobCards).toHaveCount(jobsGenerated.length);
 
     // Country popover shows Algolia counts (no filters active)
     await countryBtn.click();

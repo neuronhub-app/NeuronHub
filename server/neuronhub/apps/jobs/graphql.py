@@ -29,6 +29,7 @@ from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
 from neuronhub.apps.posts.models import PostTag
 from neuronhub.apps.sites.graphql import get_list_cached
+from neuronhub.apps.sites.models import SiteConfig
 from neuronhub.apps.users.graphql.resolvers import get_user
 from neuronhub.apps.users.graphql.resolvers import get_user_maybe
 from neuronhub.apps.users.graphql.resolvers import get_user_sync
@@ -64,6 +65,7 @@ class OrgType:
     website_with_utm: auto
     jobs_page_url: auto
     is_highlighted: auto
+    org_type: auto
     logo: auto
     description: auto
     tags_area: list[PostTagType]
@@ -144,9 +146,6 @@ class JobAlertType:
 class JobsLandingPageType:
     id: auto
     slug: auto
-    title: auto
-    subtitle: auto
-    meta_title: auto
     meta_description: auto
     meta_image_url: auto
     tags: list[PostTagType]
@@ -154,6 +153,42 @@ class JobsLandingPageType:
     salary_min: auto
     is_orgs_highlighted: auto
     source_ext: auto
+    org_type: auto
+
+    # Every `only=` lists each column the resolver reads - a field with a base resolver
+    # is skipped by the optimizer, so an unlisted column is deferred and its `self.*`
+    # read does a sync DB load in this async ctx.
+    #
+    # Blank -> "" for title/meta_*: the FE owns richer defaults (a JSX H1, the homepage
+    # meta). Only `subtitle` needs a SiteConfig default - the FE falls back for it just
+    # when the title is blank too, so a titled page would render an empty subtitle.
+    #
+    # `.replace` not `.format` - a manager edits the templates in admin, and a stray `{`
+    # would make `.format` raise for every landing page.
+    @strawberry_django.field(only=["title", "label"])
+    async def title(self: JobsLandingPage) -> str:
+        if self.title:
+            return self.title
+        if not self.label:
+            return ""
+        site = await SiteConfig.get_solo()
+        return site.landing_title_template.replace("{label}", self.label)
+
+    @strawberry_django.field(only=["subtitle"])
+    async def subtitle(self: JobsLandingPage) -> str:
+        if self.subtitle:
+            return self.subtitle
+        site = await SiteConfig.get_solo()
+        return site.landing_subtitle_default
+
+    @strawberry_django.field(only=["meta_title", "label"])
+    async def meta_title(self: JobsLandingPage) -> str:
+        if self.meta_title:
+            return self.meta_title
+        if not self.label:
+            return ""
+        site = await SiteConfig.get_solo()
+        return site.landing_meta_title_template.replace("{label}", self.label)
 
 
 @strawberry.type

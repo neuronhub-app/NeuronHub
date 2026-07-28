@@ -144,6 +144,16 @@ class SiteConfigAdmin(
             },
         ),
         (
+            "Landing pages".upper(),
+            {
+                "fields": [
+                    "landing_title_template",
+                    "landing_subtitle_default",
+                    "landing_meta_title_template",
+                ],
+            },
+        ),
+        (
             "Jobs emails".upper(),
             {
                 "fields": [

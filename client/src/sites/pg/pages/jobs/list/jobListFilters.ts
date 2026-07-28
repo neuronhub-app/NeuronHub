@@ -16,7 +16,8 @@ const state = proxy({
 });
 
 export function setJobListSource(source: string) {
-  state.sourceExt = (source as SourceExt) || "";
+  state.sourceExt =
+    Object.values(SourceExt).find(member => member.toLowerCase() === source.toLowerCase()) ?? "";
 }
 
 export function useJobListFilters() {

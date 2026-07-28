@@ -125,11 +125,11 @@ class JobsGen:
         self,
         city: Literal["London", "Berlin", "Paris"] | str | None = None,
         code: str | None = None,
+        country: str = "",
         is_remote: bool = False,
         is_global: bool = False,
         is_add_country: bool = True,
     ) -> JobLocation:
-        country = ""
         if code:
             country = Country(code=code).name
 
@@ -142,13 +142,15 @@ class JobsGen:
                 case "Paris":
                     country = Country(code="FR").name
 
+        if is_global:
+            is_remote = True
+            country = "Global"
+
         name_composed = ""
         if city and country:
             name_composed = f"{city}, {country}"
-        elif is_global:
-            name_composed = "Remote, Global"
         elif country and is_remote:
-            name_composed = f"Remote, {country or f'{city}, {country}'}"
+            name_composed = f"Remote, {country}"
         elif city:
             name_composed = city
 

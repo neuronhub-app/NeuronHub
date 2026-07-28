@@ -7,8 +7,10 @@ from unittest.mock import patch
 from neuronhub.apps.jobs.services import airtable_sync_orgs
 from neuronhub.apps.jobs.services.airtable_sync_orgs import _parse_airtable_record
 from neuronhub.apps.jobs.services.airtable_sync_orgs import _parse_logo_field
+from neuronhub.apps.jobs.services.airtable_sync_orgs import _parse_org_type
 from neuronhub.apps.jobs.services.airtable_sync_orgs import airtable_sync_orgs as sync_orgs
 from neuronhub.apps.orgs.models import Org
+from neuronhub.apps.orgs.models import OrgTypeEnum
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
@@ -37,6 +39,11 @@ class TestAirtableSyncOrgs(NeuronTestCase):
         domain = "example.co.uk"
         record = {"id": "rec", "fields": {"Name": "X", "Website": f"https://www.{domain}/path"}}
         assert domain == _parse_airtable_record(record)["domain"]
+
+    async def test_org_type_parsed_from_column(self):
+        assert _parse_org_type("Government") == OrgTypeEnum.GOVERNMENT
+        assert _parse_org_type("") is None, "blank column"
+        assert _parse_org_type("NGO") is None, "value outside the enum"
 
 
 class TestParseLogoField:

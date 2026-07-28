@@ -15,6 +15,7 @@ export const JobFragment = graphql(
         website_with_utm
         jobs_page_url
         is_highlighted
+        org_type
         description
         logo {
           url

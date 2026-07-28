@@ -19,6 +19,7 @@ from neuronhub.apps.anonymizer.registry import anonymizable
 from neuronhub.apps.db.fields import MarkdownField
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.orgs.models import Org
+from neuronhub.apps.orgs.models import OrgTypeEnum
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.sites.models import url_with_utm_help_text
 from neuronhub.apps.users.graphql.types_lazy import UserListName
@@ -391,12 +392,18 @@ class JobsLandingPage(TimeStampedModel):
 
     title = models.CharField(
         max_length=255,
-        help_text="The Hero Header H1. Eg the homepage has `Find a job that's good, for you and for the world`.",
+        blank=True,
+        help_text="The Hero Header H1. Optional - if blank, it is generated from `SiteConfig.landing_title_template`.",
+    )
+    label = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="The page name the `{label}` templates fill in, eg `Impactful Climate Change Jobs`, `Impactful Jobs in London`. Must read as a plural noun - the H1 template appends `that are good for you...`.",
     )
     subtitle = models.CharField(
         max_length=512,
         blank=True,
-        help_text="The Hero Header subtitle, eg `Curated high-impact jobs for people who want to make a difference.`",
+        help_text="The Hero Header subtitle. Optional - if blank, `SiteConfig.landing_subtitle_default` fills it.",
     )
 
     slug = models.SlugField(max_length=255, unique=True, help_text="Root level slug")
@@ -404,7 +411,7 @@ class JobsLandingPage(TimeStampedModel):
     meta_title = models.CharField(
         max_length=512,
         blank=True,
-        help_text="If not set - the default from the homepage will be used for title/desc/image.",
+        help_text="Optional - if blank, it is generated from `SiteConfig.landing_meta_title_template`.",
     )
     meta_description = models.CharField(max_length=512, blank=True)
     meta_image_url = models.URLField(max_length=512, blank=True)
@@ -424,6 +431,12 @@ class JobsLandingPage(TimeStampedModel):
     is_orgs_highlighted = models.BooleanField(blank=True, null=True)
     source_ext = TextChoicesField(
         choices_enum=Job.SourceExt,
+        blank=True,
+        null=True,
+        default=None,
+    )
+    org_type = TextChoicesField(
+        choices_enum=OrgTypeEnum,
         blank=True,
         null=True,
         default=None,
