@@ -1,60 +1,14 @@
-import { captureException } from "@sentry/react";
-import type { ResultOf } from "gql.tada";
-import { useEffect } from "react";
+/**
+ * todo ! refac-name: useAuth.ts.
+ */
 import { proxy } from "valtio";
 import { useSnapshot } from "valtio/react";
 import { proxySet } from "valtio/utils";
 
-import { graphql, type ID } from "@/gql-tada";
-import { useApolloQuery } from "@/graphql/useApolloQuery";
-import { track } from "@/utils/track";
+import { User, UserConnection } from "@/apps/users/UserStateProvider";
+import { type ID } from "@/gql-tada";
 
-export namespace user {
-  export const state = proxy({
-    current: null as User | null,
-    connections: [] as UserConnection[],
-    postsCollapsed: [],
-    followedImporterUserSourceIds: proxySet<ID>(),
-  });
-}
-
-export function useUser() {
-  const { data, error } = useApolloQuery(UserQueryDoc);
-
-  const snap = useSnapshot(user.state);
-
-  useEffect(() => {
-    if (data?.user_current) {
-      track.setUser({ user: data.user_current });
-
-      user.state.current = data.user_current;
-
-      if (data.user_current.connection_groups) {
-        const connections = data.user_current.connection_groups
-          .flatMap(group => group?.connections)
-          .filter(Boolean);
-        const connectionsUniqueMap = new Map(
-          connections.map(conn => [`${conn.id}-${conn.username}`, conn]),
-        );
-        user.state.connections = Array.from(connectionsUniqueMap.values());
-      }
-
-      user.state.followedImporterUserSourceIds.clear();
-      for (const item of data.user_current.users_followed_sources) {
-        user.state.followedImporterUserSourceIds.add(item.id);
-      }
-    } else if (data) {
-      track.setUser(); // wo args uses UUID
-    }
-
-    if (error) {
-      captureException(error);
-    }
-  }, [data, error]);
-
-  return snap.current;
-}
-
+// todo ? refac-name: useUser.
 export function useAuth() {
   const snap = useSnapshot(user.state);
 
@@ -65,67 +19,26 @@ export function useAuth() {
   };
 }
 
-export const UserQueryDoc = graphql.persisted(
-  "UserCurrent",
-  graphql(`
-    query UserCurrent {
-      user_current {
-        id
-        username
-        name: username
-        email
-        is_superuser
-        is_staff
-        has_profile_groups
+// todo ? refac: Move out to user.ts & consolidate users ops in the namespace.
+export namespace user {
+  /**
+   * @deprecated: for read-only use `useAuth` instead.
+   *
+   * todo ? refac: make private & export mutable ref in `useAuth`.
+   */
+  export const state = proxy({
+    current: null as User | null,
+    connections: [] as UserConnection[],
+    postsCollapsed: [],
+    followedImporterUserSourceIds: proxySet<ID>(),
+  });
+}
 
-        library {
-          pk
-        }
+/**
+ * @deprecated: use `useAuth` instead.
+ */
+export function useUser() {
+  const snap = useSnapshot(user.state);
 
-        read_later {
-          pk
-        }
-
-        users_followed_sources {
-          id
-        }
-
-        post_votes {
-          id
-          is_vote_positive
-          post {
-            id
-            type
-          }
-        }
-        post_tag_votes {
-          id
-          is_vote_positive
-          is_changed_my_mind
-          post {
-            id
-          }
-          tag {
-            id
-          }
-        }
-
-        connection_groups {
-          id
-          name
-
-          connections {
-            id
-            username
-            name: username
-          }
-        }
-      }
-    }
-  `),
-);
-
-type UserQuery = ResultOf<typeof UserQueryDoc>;
-export type User = NonNullable<UserQuery["user_current"]>;
-export type UserConnectionGroup = User["connection_groups"][number];
-export type UserConnection = UserConnectionGroup["connections"][number];
+  return snap.current;
+}

@@ -44,11 +44,11 @@ export function UserMultiSelect(props: {
 
   useEffect(() => {
     if (user.state?.current) {
-      state.mutable.options = getOptionsFiltered({ filterBy: "" });
+      state.mutable.options = filterUserConnections({ filterBy: "" });
     }
 
     return subscribe(user.state, () => {
-      state.mutable.options = getOptionsFiltered({ filterBy: "" });
+      state.mutable.options = filterUserConnections({ filterBy: "" });
     });
   }, []);
 
@@ -75,7 +75,7 @@ export function UserMultiSelect(props: {
             }),
           );
         }}
-        loadOptions={async (input: string) => getOptionsFiltered({ filterBy: input })}
+        loadOptions={async (input: string) => filterUserConnections({ filterBy: input })}
         getOptionLabel={option => option.label ?? option.id}
         getOptionValue={option => {
           // `getOptionValue` is a bad name, it's only used for comparison
@@ -129,9 +129,9 @@ export function UserMultiSelect(props: {
   );
 }
 
-function getOptionsFiltered(opts?: { filterBy: string }): UserSelectOption[] {
-  const optionUsers = user.state.connections
-    .filter(user => isFilterMatched(user.username))
+function filterUserConnections(opts: { filterBy: string }): UserSelectOption[] {
+  const usersFiltered = user.state.connections
+    .filter(user => isFilterMatched({ optionName: user.username }))
     .map(user => ({
       id: user.id,
       type: UserType.enum.User,
@@ -140,26 +140,26 @@ function getOptionsFiltered(opts?: { filterBy: string }): UserSelectOption[] {
       message: null,
     }));
 
-  const optionUserGroups =
-    user.state
-      .current!.connection_groups.filter(group => isFilterMatched(group.name))
-      .map(group => ({
-        id: group.id,
-        type: UserType.enum.Group,
-        label: group.connections.length
-          ? `${group.name || "Default"} (${group.connections.length})`
-          : group.name,
-        group: group,
-        message: null,
-      })) ?? [];
+  const userGroupsFiltered = user.state
+    .current!.connection_groups
+    //
+    .filter(group => isFilterMatched({ optionName: group.name }))
+    .map(group => ({
+      id: group.id,
+      type: UserType.enum.Group,
+      label: group.connections.length
+        ? `${group.name || "Default"} (${group.connections.length})`
+        : group.name,
+      group: group,
+      message: null,
+    }));
 
-  function isFilterMatched(optionName: string): boolean {
-    const isFilterEmpty = opts?.filterBy === "" || !opts?.filterBy;
-    if (isFilterEmpty) {
-      return true;
+  function isFilterMatched(args: { optionName: string }): boolean {
+    if (opts.filterBy) {
+      return args.optionName.toLowerCase().includes(opts.filterBy.toLowerCase());
     }
-    return optionName.toLowerCase().includes(opts.filterBy.toLowerCase());
+    return true; // filter is empty
   }
 
-  return [...optionUserGroups, ...optionUsers];
+  return [...usersFiltered, ...userGroupsFiltered];
 }

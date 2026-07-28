@@ -47,7 +47,7 @@ import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { JobLocationsQuery } from "@/sites/pg/components/PgFacetLocation";
 import { useJobListFilters } from "@/sites/pg/pages/jobs/list/jobListFilters";
 import { toast } from "@/utils/toast";
-import { track } from "@/utils/track";
+import { track } from "@/utils/track/track";
 import { useIsLoading } from "@/utils/useIsLoading";
 
 const FormSchema = z.object({
@@ -97,10 +97,8 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
       jobFilters.snap,
     );
 
-    const anonName = await track.setUser({ email: fields.email });
-    if (anonName) {
-      track.event("JobAlert.create", anonName, vars);
-    }
+    await track.users.setUser({ email: fields.email });
+    track.event("JobAlert.create", vars);
 
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,

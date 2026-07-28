@@ -27,7 +27,7 @@ import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMounte
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
-import { track } from "@/utils/track";
+import { track } from "@/utils/track/track";
 import { useInit } from "@/utils/useInit";
 import { useIsLoading } from "@/utils/useIsLoading";
 
@@ -47,7 +47,10 @@ export function JobAlertList(props: {
 
   const { data, isLoadingFirstTime } = useApolloQuery(JobAlertListQuery);
 
-  track.useSetUserByJobAlertId({ idExt: props.accessSessionByIdExt, alerts: data?.job_alerts });
+  track.users.useSetUserByJobAlertId({
+    idExt: props.accessSessionByIdExt,
+    alerts: data?.job_alerts ?? [],
+  });
 
   const unsubscribe = useJobUnsubscribeHandler(props.unsubscribeByIdExt);
 
@@ -86,7 +89,7 @@ export function JobAlertList(props: {
   );
 }
 
-type AlertType = NonNullable<ResultOf<typeof JobAlertListQuery>["job_alerts"]>[number];
+export type AlertType = NonNullable<ResultOf<typeof JobAlertListQuery>["job_alerts"]>[number];
 
 function AlertCard(props: { alert: AlertType }) {
   const loading = useIsLoading();

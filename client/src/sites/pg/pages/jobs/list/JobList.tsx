@@ -26,7 +26,7 @@ import {
 } from "@/sites/pg/pages/jobs/list/jobListFilters";
 import { JobsSubscribeModal } from "@/sites/pg/pages/jobs/list/JobsSubscribeModal";
 import { urls } from "@/urls";
-import { track } from "@/utils/track";
+import { track } from "@/utils/track/track";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 import { useInit } from "@/utils/useInit";
 
@@ -34,19 +34,19 @@ import { useInit } from "@/utils/useInit";
  * #quality-19% copy-paste of [[client/src/apps/jobs/list/JobList.tsx]].
  *
  * Now it's just overcomplicated wo/ the original dedup benefits.
- * If PG wants unique layout -> JobList & PgAlgoliaList must be 1 comp, not a generic of 1.
+ * If PG needs a unique layout -> their JobList & PgAlgoliaList must be 1 comp for simplicity.
  */
 export function JobList(props: { slug?: string; jobsLandingPage?: JobsLandingPage }) {
-  const [searchParams] = useSearchParams();
-
   useInit({
     isReady: true,
     onInit: () => setJobListSource(searchParams.get("source") ?? ""),
   });
 
-  const alertId = searchParams.get("alert");
-
-  track.useTrackJobView({ alertId, slug: props.slug });
+  const [searchParams] = useSearchParams();
+  track.jobs.useTrackAlertClickOnMount({
+    alert_id: searchParams.get(track.jobs.AlertIdParamFromEmail),
+    job_slug: props.slug,
+  });
 
   const jobOpenPinned = useJobOpenPinned(props.slug);
   const algolia = useAlgoliaSearchClient();

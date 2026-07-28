@@ -1,4 +1,4 @@
-import { UserQueryDoc } from "@/apps/users/useUserCurrent";
+import { UserQueryDoc } from "@/apps/users/UserStateProvider";
 import { expect } from "@/e2e/helpers/expect";
 import type { LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { ids, type TestId } from "@/e2e/ids";

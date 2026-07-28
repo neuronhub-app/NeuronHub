@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import { Outlet, Scripts, ScrollRestoration } from "react-router";
 
+import { UserStateProvider } from "@/apps/users/UserStateProvider";
 import { AdminMenuFloatButton } from "@/components/AdminMenuFloatButton";
 import { ErrorState } from "@/components/ErrorState";
 import { ColorModeProvider } from "@/components/ui/color-mode";
@@ -27,19 +28,23 @@ function AppProviders(props: { children: ReactNode }) {
   return (
     <NhaPosthogProvider>
       <ApolloProvider client={client}>
-        <ChakraProvider value={siteConfig.theme}>
-          <ColorModeProvider
-            enableSystem={env.isTiredOwlDev ? true : !siteConfig.forcedColorMode}
-            forcedTheme={env.isTiredOwlDev ? undefined : siteConfig.forcedColorMode}
-          >
-            {props.children}
+        <UserStateProvider>
+          {/* <UI> */}
+          <ChakraProvider value={siteConfig.theme}>
+            <ColorModeProvider
+              enableSystem={env.isTiredOwlDev ? true : !siteConfig.forcedColorMode}
+              forcedTheme={env.isTiredOwlDev ? undefined : siteConfig.forcedColorMode}
+            >
+              {props.children}
 
-            <Toaster position="bottom-center" gutter={8} />
-            <ChakraToaster />
+              <Toaster position="bottom-center" gutter={8} />
+              <ChakraToaster />
 
-            <AdminMenuFloatButton isThemeSwitcher={env.site.isProbablyGood} />
-          </ColorModeProvider>
-        </ChakraProvider>
+              <AdminMenuFloatButton isThemeSwitcher={env.site.isProbablyGood} />
+            </ColorModeProvider>
+          </ChakraProvider>
+          {/* </UI> */}
+        </UserStateProvider>
       </ApolloProvider>
     </NhaPosthogProvider>
   );

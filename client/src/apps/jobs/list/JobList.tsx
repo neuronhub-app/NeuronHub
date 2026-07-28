@@ -30,7 +30,7 @@ import { graphql, type ID } from "@/gql-tada";
 import { JobFragment, type JobFragmentType } from "@/graphql/fragments/jobs";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { urls } from "@/urls";
-import { track } from "@/utils/track";
+import { track } from "@/utils/track/track";
 import { useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function JobList(props: { slug?: string }) {
@@ -39,9 +39,10 @@ export function JobList(props: { slug?: string }) {
   const algolia = useAlgoliaSearchClient();
 
   const [searchParams] = useSearchParams();
-  const alertId = searchParams.get("alert");
-
-  track.useTrackJobView({ alertId, slug: props.slug });
+  track.jobs.useTrackAlertClickOnMount({
+    alert_id: searchParams.get(track.jobs.AlertIdParamFromEmail),
+    job_slug: props.slug,
+  });
 
   return (
     <AlgoliaList<JobFragmentType>

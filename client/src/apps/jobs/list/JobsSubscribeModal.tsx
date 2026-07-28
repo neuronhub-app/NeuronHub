@@ -31,7 +31,7 @@ import {
   JobLocationsQuery,
 } from "@/sites/pg/components/PgFacetLocation";
 import { toast } from "@/utils/toast";
-import { track } from "@/utils/track";
+import { track } from "@/utils/track/track";
 import { useIsLoading } from "@/utils/useIsLoading";
 
 const FormSchema = z.object({
@@ -69,10 +69,8 @@ export function JobsSubscribeModal(props: { buttonProps?: ButtonProps }) {
   async function handleSubscribe(fields: z.infer<typeof FormSchema>) {
     const vars = buildJobAlertVars(refinesCurrent.items, locationsData?.job_locations);
 
-    const anonName = await track.setUser({ email: fields.email });
-    if (anonName) {
-      track.event("JobAlert.create", anonName, vars);
-    }
+    await track.users.setUser({ email: fields.email });
+    track.event("JobAlert.create", vars);
 
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,

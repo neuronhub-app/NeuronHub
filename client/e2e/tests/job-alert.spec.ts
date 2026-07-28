@@ -34,7 +34,7 @@ test.describe("Job Alert", () => {
 
   // todo ! refac: #AI-slop - magic strings wo testid
   // - replace "Subscriptions (1)" with a `data-{}` & testid
-  test("subscribe with locations => toggle inactive => reauth by id_ext => delete", async ({
+  test("subscribe with locations => toggle inactive => reauth by id_ext => delete (flaky - run twice)", async ({
     page,
     context,
     play,

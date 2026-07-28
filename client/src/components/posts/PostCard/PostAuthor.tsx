@@ -19,7 +19,8 @@ import { datetime } from "@neuronhub/shared/utils/date-fns";
 import { markedConfigured } from "@neuronhub/shared/utils/marked-configured";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
-import { user, UserQueryDoc } from "@/apps/users/useUserCurrent";
+import { UserQueryDoc } from "@/apps/users/UserStateProvider";
+import { user } from "@/apps/users/useUserCurrent";
 import type { PostListItemType } from "@/components/posts/ListContainer";
 import type { PostCommentTree } from "@/components/posts/PostDetail/useCommentTree";
 import { ids } from "@/e2e/ids";

@@ -23,6 +23,10 @@ export namespace errors {
     }
   }
 
+  export function reportSilent(error: Error | unknown) {
+    return report(error, { isShowFeedbackPopup: false });
+  }
+
   export function ErrorReport(props: {
     error: Error | unknown;
     isShowToast?: boolean;

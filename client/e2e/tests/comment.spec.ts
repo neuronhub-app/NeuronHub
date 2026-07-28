@@ -8,7 +8,7 @@ import {
   HighlightDelete,
   PostHighlightsQuery,
 } from "@/apps/highlighter/useHighlighter";
-import { UserQueryDoc } from "@/apps/users/useUserCurrent";
+import { UserQueryDoc } from "@/apps/users/UserStateProvider";
 import { expect } from "@/e2e/helpers/expect";
 import type { PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
 import { selectTextHighlightable } from "@/e2e/helpers/selectTextInPage";

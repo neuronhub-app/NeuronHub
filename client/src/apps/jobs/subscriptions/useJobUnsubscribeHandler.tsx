@@ -6,7 +6,7 @@ import { ids } from "@/e2e/ids";
 import { graphql } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { getOutlineBleedingProps } from "@/utils/getOutlineBleedingProps";
-import { track } from "@/utils/track";
+import { track } from "@/utils/track/track";
 import { useInit } from "@/utils/useInit";
 
 export function useJobUnsubscribeHandler(alertIdExt?: string) {
@@ -24,7 +24,7 @@ export function useJobUnsubscribeHandler(alertIdExt?: string) {
         id_ext: alertIdExt!,
       });
       if (result.success) {
-        await track.setUser({ email: result.data.job_alert_unsubscribe });
+        await track.users.setUser({ email: result.data.job_alert_unsubscribe });
       } else {
         state.mutable.unsubscribeError =
           typeof result.errorMessage === "string"

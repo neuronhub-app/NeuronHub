@@ -34,7 +34,7 @@ import type { JobFragmentType } from "@/graphql/fragments/jobs";
 import { appendUtmSource } from "@/sites/pg/siteConfigState";
 import { urls } from "@/urls";
 import { toast } from "@/utils/toast";
-import { track } from "@/utils/track";
+import { track } from "@/utils/track/track";
 
 const style = {
   markHighlight: {
@@ -278,10 +278,10 @@ export function JobCard(props: {
             toggleCardCollapse();
 
             if (state.mutable.card === CardState.OpenByUser) {
-              track.ui("Job.card.expand", props.job.slug);
+              track.event("ui.Job.card.expand", { slug: props.job.slug });
             }
             if (state.mutable.card === CardState.Closed) {
-              track.ui("Job.card.close", props.job.slug);
+              track.event("ui.Job.card.close", { slug: props.job.slug });
             }
           }}
           pos="absolute"
@@ -312,7 +312,10 @@ export function JobCard(props: {
 }
 
 function JobExpanded(props: { job: JobFragmentType; jobHit: Hit<BaseHit> }) {
-  const trackUrlClick = track.useJobUrlClick({ slug: props.job.slug, jobHit: props.jobHit });
+  const trackUrlClick = track.jobs.useTrackJobUrlClick({
+    slug: props.job.slug,
+    jobHit: props.jobHit,
+  });
   return (
     <Stack gap={{ base: "gap.md", md: "gap.lg" }}>
       {props.job.description && (
@@ -525,7 +528,8 @@ function JobOrgLink(props: {
         className="org-link"
         href={appendUtmSource(props.job.org.website_with_utm || props.job.org.website)}
         onClick={() =>
-          track.event("Job.click_org_url_ext", props.job.slug, {
+          track.event("Job.click_org_url_ext", {
+            slug: props.job.slug,
             org_slug: props.job.org.slug,
           })
         }
@@ -547,7 +551,10 @@ function JobTitleLink(props: {
   jobHit: Hit<BaseHit>;
   isOpen: boolean;
 }) {
-  const trackUrlClick = track.useJobUrlClick({ slug: props.job.slug, jobHit: props.jobHit });
+  const trackUrlClick = track.jobs.useTrackJobUrlClick({
+    slug: props.job.slug,
+    jobHit: props.jobHit,
+  });
 
   const title = props.isHighlightable ? (
     <Highlight attribute="title" hit={props.jobHit} />

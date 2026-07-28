@@ -1,4 +1,4 @@
-import { UserQueryDoc } from "@/apps/users/useUserCurrent";
+import { UserQueryDoc } from "@/apps/users/UserStateProvider";
 import { ToggleFollowUserSourceMutation } from "@/components/posts/PostCard/PostAuthor";
 import { expect } from "@/e2e/helpers/expect";
 import type { LocatorMapToGetFirstById, PlaywrightHelper } from "@/e2e/helpers/PlaywrightHelper";
