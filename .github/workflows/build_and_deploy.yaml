@@ -9,7 +9,7 @@ on:
         type: environment
         required: true
       is_pre_release:
-        description: "Pre-release (not 'latest' tag)"
+        description: "Pre-release (not tagged as `:latest`)"
         type: boolean
 
 jobs:
@@ -24,30 +24,21 @@ jobs:
     env:
       REGISTRY: ghcr.io
       VITE_RELEASE_VERSION: ${{ github.ref_name }}
-
-      DJANGO_ENV: ${{ vars.DJANGO_ENV }}
-      PROJECT_NAME: ${{ vars.PROJECT_NAME }}
-      VITE_SITE: ${{ vars.VITE_SITE }}
-      VITE_GTM_ID: ${{ vars.VITE_GTM_ID }}
-      VITE_PROJECT_NAME: ${{ vars.VITE_PROJECT_NAME }}
-      SERVER_DOMAIN: ${{ vars.SERVER_DOMAIN }}
-      CLIENT_DOMAIN: ${{ vars.CLIENT_DOMAIN }}
-      CLIENT_URL: ${{ vars.CLIENT_URL }}
-      SENTRY_ORG: ${{ vars.SENTRY_ORG }}
-      SENTRY_DSN_BACKEND: ${{ vars.SENTRY_DSN_BACKEND }}
-      SENTRY_DSN_FRONTEND: ${{ vars.SENTRY_DSN_FRONTEND }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      ALGOLIA_APPLICATION_ID: ${{ vars.ALGOLIA_APPLICATION_ID }}
-      ALGOLIA_SEARCH_API_KEY: ${{ vars.ALGOLIA_SEARCH_API_KEY }}
-      ALGOLIA_INDEX_DOCS: ${{ vars.ALGOLIA_INDEX_DOCS }}
       ALGOLIA_INDEX_POSTFIX_USER: ""
 
     steps:
-      - name: Require a Tag ref (no branches)
+      - name: Require a Tag ref
         if: github.ref_type != 'tag'
         run: |
-          echo "::error::Select a Tag, not a branch ('${{ github.ref_name }}' is a ${{ github.ref_type }})"
+          echo "::error::Select a Tag - can't deply ${{ github.ref_name }}."
           exit 1
+
+      - name: Set CI {{ vars.* }} to env.*
+        env:
+          VARS_JSON: ${{ toJSON(vars) }}
+        run: |
+          echo "$VARS_JSON" | jq -r 'keys[] as $key | "\($key)=\(.[$key])"' >> $GITHUB_ENV
 
       - name: Checkout
         uses: actions/checkout@v6
@@ -57,7 +48,7 @@ jobs:
         with:
           version: 2026.7.13
 
-      # ghcr.io rejects uppercase paths (ie /NeuronHub)
+      # ghcr.io/ rejects uppercase paths (ie /NeuronHub) -> lowercase
       - name: Lowercase GHCR_REPO
         shell: nu {0}
         run: |
