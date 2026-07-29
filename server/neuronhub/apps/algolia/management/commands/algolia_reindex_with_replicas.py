@@ -18,9 +18,16 @@ class Command(BaseCommand):
             default=None,
             help="partial_update_objects on first N records instead of full reindex",
         )
+        parser.add_argument(
+            "--batch_size",
+            type=int,
+            default=1000,
+            help="Reduce from 1000 if you're running out of RAM on execute",
+        )
 
-    def handle(self, *args, model: str, limit: int | None, **options):
+    def handle(self, *args, model: str, limit: int | None, batch_size: int = 1000, **options):
         algolia_reindex_sync(
             models=[AlgoliaModel[model]] if model else None,
             limit=limit,
+            batch_size=batch_size,
         )

@@ -18,11 +18,15 @@ class AlgoliaModel(Enum):
     Post = "post"
 
 
-async def algolia_reindex(models: list[AlgoliaModel] | None = None, limit: int | None = None):
+async def algolia_reindex(
+    models: list[AlgoliaModel] | None = None, limit: int | None = None, batch_size: int = 1000
+):
     await sync_to_async(algolia_reindex_sync)(models=models, limit=limit)
 
 
-def algolia_reindex_sync(models: list[AlgoliaModel] | None = None, limit: int | None = None):
+def algolia_reindex_sync(
+    models: list[AlgoliaModel] | None = None, limit: int | None = None, batch_size: int = 1000
+):
     if not settings.ALGOLIA["IS_ENABLED"]:
         logger.debug("Skipping reindex - Algolia is disabled")
         return
@@ -37,16 +41,16 @@ def algolia_reindex_sync(models: list[AlgoliaModel] | None = None, limit: int | 
     for model in models or list(AlgoliaModel):
         match model:
             case AlgoliaModel.Profile:
-                reindex_all(model=Profile)
+                reindex_all(model=Profile, batch_size=batch_size)
             case AlgoliaModel.Job:
                 from neuronhub.apps.jobs.index import setup_replica_sorted_by_closes_at
 
-                reindex_all(model=Job)
+                reindex_all(model=Job, batch_size=batch_size)
                 setup_replica_sorted_by_closes_at()
             case AlgoliaModel.Post:
                 from neuronhub.apps.posts.index import setup_virtual_replica_sorted_by_votes
 
-                reindex_all(model=Post)
+                reindex_all(model=Post, batch_size=batch_size)
                 setup_virtual_replica_sorted_by_votes()
 
 
