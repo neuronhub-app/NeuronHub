@@ -14,7 +14,7 @@ from neuronhub.apps.posts.graphql.types import PostTypeInput, PostTagTypeInput
 
 async def post_update_or_create(author: User, data: PostTypeInput) -> Post:
     post = await _update_or_create(data, author)
-    await _post_visibility_update(post, data)
+    await _post_sharable_update(post, data)
     await _tags_update_or_create(post, data, author)
     return post
 
@@ -84,11 +84,15 @@ def _parse_data(data: PostTypeInput) -> dict:
     return field_values
 
 
-async def _post_visibility_update(post: Post, data: PostTypeInput):
+async def _post_sharable_update(post: Post, data: PostTypeInput):
     if data.visible_to_users:
         await post.visible_to_users.aset(data.visible_to_users.set)
     if data.visible_to_groups:
         await post.visible_to_groups.aset(data.visible_to_groups.set)
+    if data.recommended_to_users:
+        await post.recommended_to_users.aset(data.recommended_to_users.set)
+    if data.recommended_to_groups:
+        await post.recommended_to_groups.aset(data.recommended_to_groups.set)
 
 
 async def _tags_update_or_create(
