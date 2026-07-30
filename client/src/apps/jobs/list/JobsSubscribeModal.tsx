@@ -229,6 +229,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
       $is_exclude_profit_for_good: Boolean
       $tz: String
       $is_subscribe_to_newsletter: Boolean!
+      $utm_params: UtmParamsInput
     ) {
       job_alert_subscribe(
         email: $email
@@ -241,6 +242,7 @@ export const JobAlertSubscribeMutation = graphql.persisted(
         is_exclude_profit_for_good: $is_exclude_profit_for_good
         tz: $tz
         is_subscribe_to_newsletter: $is_subscribe_to_newsletter
+        utm_params: $utm_params
       )
     }
   `),
