@@ -33,9 +33,9 @@ export function useAlgoliaSearchClient() {
       const data = res.data.algolia_search_key;
       state.mutable.client = liteClient(data.app_id, data.api_key);
       state.mutable.indexName = data.index_name;
-      state.mutable.indexNameSortedByVotes = data.index_name_sorted_by_votes;
       state.mutable.indexNameProfiles = data.index_name_profiles;
       state.mutable.indexNameJobs = data.index_name_jobs;
+      state.mutable.indexNameSortedByVotes = data.index_name_sorted_by_votes;
       state.mutable.indexNameJobsSortedByClosesAt = data.index_name_jobs_sorted_by_closes_at;
     },
   });

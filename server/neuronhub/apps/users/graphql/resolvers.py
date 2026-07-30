@@ -83,8 +83,9 @@ class UsersQuery:
             api_key=key_with_perms,
             app_id=app_id,
             index_name=f"posts_{index_suffix}",
-            index_name_sorted_by_votes=algolia_replica_sorted_by_votes,
             index_name_profiles=f"profiles_{index_suffix}",
             index_name_jobs=f"jobs_{index_suffix}",
             index_name_jobs_sorted_by_closes_at=algolia_replica_jobs_sorted_by_closes_at,
+            # todo ! refac-name: add _jobs_ as above
+            index_name_sorted_by_votes=algolia_replica_sorted_by_votes,
         )
