@@ -10,18 +10,11 @@ import { PgFacet } from "@/sites/pg/components/PgFacet";
 import { ALGOLIA_ATTR_LOCATION, PgFacetLocation } from "@/sites/pg/components/PgFacetLocation";
 import { PgFacetPopover } from "@/sites/pg/components/PgFacetPopover";
 import { PgFacetSalary } from "@/sites/pg/components/PgFacetSalary";
+import { pgTopbarTagAttr as attr } from "@/sites/pg/components/pgTopbarTagAttr";
 
 const sortAlpha = ["name:asc", "count:desc"] satisfies UseRefinementListProps["sortBy"];
 
 export function PgFiltersTopbar() {
-  const attr = {
-    causeArea: "tags_area.name",
-    roleType: "tags_workload.name",
-    experience: "tags_experience.name",
-    skillSet: "tags_skill.name",
-    education: "tags_education.name",
-  } as const;
-
   const locationFilters = useRefinementList({
     attribute: ALGOLIA_ATTR_LOCATION,
     limit: 200,

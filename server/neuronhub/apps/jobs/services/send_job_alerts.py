@@ -202,6 +202,9 @@ async def _get_email_context(
         "client_url": settings.CLIENT_URL,
         "unsubscribe_url": f"{subs_url}/remove/{alert.id_ext}",
         "job_alerts_management_url": f"{subs_url}/{alert.id_ext}",
+        "job_alert_edit_url": (
+            f"{settings.CLIENT_URL}{settings.CLIENT_URL_JOBS_PREFIX}?edit_alert={alert.id_ext}"
+        ),
         "filters": filters,
         "has_filters": any(filters.values()),
         "logo_url": site.logo_url,

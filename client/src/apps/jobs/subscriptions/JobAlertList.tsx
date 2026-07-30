@@ -140,7 +140,7 @@ function AlertCard(props: { alert: AlertType }) {
                   );
                 }}
                 loading={loading.isActive}
-                {...ids.set(ids.job.subscriptions.removeBtn)}
+                {...ids.set(ids.job.subscriptions.btn.delete)}
               >
                 <LuTrash2 />
               </IconButton>
@@ -158,7 +158,7 @@ function AlertCard(props: { alert: AlertType }) {
                 );
               }}
               loading={loading.isActive}
-              {...ids.set(ids.job.subscriptions.toggleBtn)}
+              {...ids.set(ids.job.subscriptions.btn.toggle)}
             >
               {props.alert.is_active ? <LuPause /> : <LuPlay />}
             </IconButton>
@@ -252,6 +252,7 @@ export const JobAlertListQuery = graphql.persisted(
           country
           is_remote
           remote_name
+          algolia_filter_name
         }
         is_orgs_highlighted
         is_remote

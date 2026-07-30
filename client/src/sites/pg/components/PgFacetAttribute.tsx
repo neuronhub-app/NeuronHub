@@ -16,6 +16,8 @@ import { useRefinementList } from "react-instantsearch";
 import { useStateValtio } from "@neuronhub/shared/utils/useStateValtio";
 
 import { ids } from "@/e2e/ids";
+import type { FacetItem } from "@/sites/pg/components/pgFacetEditMode";
+import { usePgFacetSeedInto } from "@/sites/pg/components/pgFacetEditMode";
 
 export function PgFacetAttribute(props: {
   attribute: string;
@@ -29,7 +31,7 @@ export function PgFacetAttribute(props: {
   const facetValuesInitialRef = useRef<Map<string, FacetItem>>(new Map());
   const searchQueryRef = useRef("");
 
-  type FacetItem = ReturnType<typeof useRefinementList>["items"][number];
+  usePgFacetSeedInto(props.attribute, facetValuesInitialRef);
 
   const refinements = useRefinementList({
     attribute: props.attribute,
