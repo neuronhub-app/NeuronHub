@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from strawberry import UNSET
 
 from neuronhub.apps.posts.graphql.types import PostTagTypeInput
@@ -5,6 +7,7 @@ from neuronhub.apps.posts.graphql.types import PostTypeInput
 from neuronhub.apps.posts.graphql.types_lazy import ReviewTagName
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.models import PostTagVote
+from neuronhub.apps.posts.services import post_update_or_create as post_service
 from neuronhub.apps.posts.services.post_update_or_create import post_update_or_create
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
@@ -365,3 +368,23 @@ class ReviewCreateOrUpdateTest(NeuronTestCase):
         )
         assert author_vote_after is not None, "vote disappeared after save without changes"
         assert author_vote_after["is_vote_positive"] is True
+
+
+class AlgoliaReindexOnSaveTest(NeuronTestCase):
+    async def test_create_uses_created_edit_uses_updated(self):
+        with patch.object(post_service, "algolia_reindex_partial") as reindex_mock:
+            post = await post_update_or_create(
+                author=self.user,
+                data=PostTypeInput(type=Post.Type.Post, title="Reindex create"),
+            )
+            changed_on_create = reindex_mock.call_args.args[0]
+            assert changed_on_create.created == [post.id]
+            assert not changed_on_create.updated
+
+            await post_update_or_create(
+                author=self.user,
+                data=PostTypeInput(id=post.id, type=Post.Type.Post, title="Reindex edit"),
+            )
+            changed_on_edit = reindex_mock.call_args.args[0]
+            assert changed_on_edit.updated == [post.id]
+            assert not changed_on_edit.created

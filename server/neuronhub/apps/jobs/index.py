@@ -131,9 +131,9 @@ if settings.ALGOLIA["IS_ENABLED"]:
                     "org",
                 )
                 .prefetch_related(
-                    "author__connection_groups",
+                    "author__connection_groups__connections",
                     "visible_to_users",
-                    "visible_to_groups",
+                    "visible_to_groups__connections",
                     "tags_skill",
                     "tags_area",
                     "tags_education",
