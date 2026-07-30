@@ -2,13 +2,24 @@ import datetime
 from zoneinfo import ZoneInfo
 
 from django.db import models
+from django.db.models import TextChoices
 from django.utils.timezone import localdate
+from django_choices_field.fields import TextChoicesField
 from django_extensions.db.fields import AutoSlugField
 from timezone_field import TimeZoneField
 
 from neuronhub.apps.db.models_abstract import TimeStampedModel
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.sites.models import url_with_utm_help_text
+
+
+class OrgTypeEnum(TextChoices):
+    NONPROFIT = "Nonprofit"
+    FOR_PROFIT = "For-Profit"
+    GOVERNMENT = "Government"
+    UNIVERSITY = "University"
+    INTERNATIONAL_INSTITUTION = "International Institution"
+    THINK_TANK = "Think Tank"
 
 
 class Org(TimeStampedModel):
@@ -27,6 +38,13 @@ class Org(TimeStampedModel):
     description = models.TextField(blank=True)
     is_highlighted = models.BooleanField(default=False)
     logo = models.ImageField(upload_to="orgs/logos/", blank=True, null=True)
+
+    org_type = TextChoicesField(
+        choices_enum=OrgTypeEnum,
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     tags_area = models.ManyToManyField(  # type: ignore[var-annotated]  #bad-infer
         "posts.PostTag",

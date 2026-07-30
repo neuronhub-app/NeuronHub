@@ -37,6 +37,15 @@ export enum Ordering {
   DescNullsLast = 'DESC_NULLS_LAST'
 }
 
+export enum OrgTypeEnum {
+  ForProfit = 'FOR_PROFIT',
+  Government = 'GOVERNMENT',
+  InternationalInstitution = 'INTERNATIONAL_INSTITUTION',
+  Nonprofit = 'NONPROFIT',
+  ThinkTank = 'THINK_TANK',
+  University = 'UNIVERSITY'
+}
+
 export enum PostCategory {
   Knowledge = 'Knowledge',
   News = 'News',

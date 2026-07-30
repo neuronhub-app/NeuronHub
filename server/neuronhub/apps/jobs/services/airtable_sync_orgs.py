@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from urllib.parse import urlparse
 
 import requests
+import sentry_sdk
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.files.base import ContentFile
@@ -22,6 +23,7 @@ from neuronhub.apps.jobs.services.airtable_sync_jobs import TagParams
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _list_split_and_strip
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _sync_tags
 from neuronhub.apps.orgs.models import Org
+from neuronhub.apps.orgs.models import OrgTypeEnum
 from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 
 
@@ -114,9 +116,20 @@ def _parse_airtable_record(org_raw: RecordDict) -> dict:
         "jobs_page_url": fields.get("Jobs Page", "").strip(),
         "description": fields.get("Org Description", "").strip(),
         "is_highlighted": fields.get("Impact Tags", "").strip() == HIGHLIGHTED_IMPACT_TAG,
+        "org_type": _parse_org_type(fields.get("Org Type", "").strip()),
         "tags_area": fields.get("Org Cause Area", ""),
         "logo_raw": fields.get("Logo", "").strip(),
     }
+
+
+def _parse_org_type(value: str) -> OrgTypeEnum | None:
+    if not value:
+        return None
+    if value not in OrgTypeEnum.values:
+        sentry_sdk.set_extra("org_type", value)
+        sentry_sdk.capture_message("Org type not in OrgTypeEnum", "error")
+        return None
+    return OrgTypeEnum(value)
 
 
 def _extract_domain(url: str) -> str:

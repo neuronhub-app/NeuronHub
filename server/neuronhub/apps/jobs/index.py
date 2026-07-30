@@ -107,6 +107,7 @@ if settings.ALGOLIA["IS_ENABLED"]:
                 "salary_min",
                 "source_ext",
                 "org.is_highlighted",
+                "org.org_type",
                 *Job.boolean_facet_fields,
                 "visible_to",
             ],

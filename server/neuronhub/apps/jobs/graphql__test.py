@@ -5,7 +5,9 @@
 
 from django.test import override_settings
 
+from neuronhub.apps.jobs.graphql import JobsLandingPageType
 from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.jobs.models import JobsLandingPage
 from neuronhub.apps.tests.test_cases import NeuronTestCase
 
 
@@ -84,3 +86,20 @@ class TestJobAlertSubscribe(NeuronTestCase):
 
         hist_latest = await alert.history.alatest()
         assert hist_latest.jobs_clicked == [job.slug_and_date_id]
+
+
+class TestLandingPageTemplateResolvers(NeuronTestCase):
+    async def test_resolver_reads_only_its_declared_columns(self):
+        label = "Impactful Climate Change Jobs"
+        await JobsLandingPage.objects.acreate(slug="climate", label=label)
+
+        rendered = {}
+        for name in ("title", "subtitle", "meta_title"):
+            field = JobsLandingPageType.__dict__[name]
+            page = await JobsLandingPage.objects.only(*field.store.only).aget(slug="climate")
+            rendered[name] = await field.base_resolver.wrapped_func(page)
+
+        assert label in rendered["title"], "the template got `{label}` substituted"
+        assert "{label}" not in rendered["title"], "no placeholder left unfilled"
+        assert rendered["meta_title"] == label
+        assert rendered["subtitle"], "the SiteConfig fallback filled it"

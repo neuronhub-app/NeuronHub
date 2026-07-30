@@ -20,17 +20,21 @@ const algoliaTagAttrByCategory: Record<string, string> = {
   visa_sponsorship: "tags_country_visa_sponsor.name",
 } as const;
 
+export const algoliaAttrOrgType = "org.org_type";
+
 /**
  * Why: claim Algolia state for each attr [[landingPageToAlgoliaState]] need to write to.
  *
  * Otherwise <PgFacetPopover>'s `lazyMount` keeps its `useRefinementList` unmounted
  * on first render → preset refinements drop from URL routing + active chips until the user opens each popover.
+ * `source_ext` and `org.org_type` have no facet UI at all, so nothing would ever mount them.
  */
 export function useRequiredLandingPageRefinements() {
   for (const attribute of Object.values(algoliaTagAttrByCategory)) {
     useRefinementList({ attribute });
   }
   useRefinementList({ attribute: "source_ext" });
+  useRefinementList({ attribute: algoliaAttrOrgType });
 }
 
 // #AI, e2e tested. #quality-19%. unfuck by #187.
@@ -60,6 +64,10 @@ export function landingPageToAlgoliaState(page?: JobsLandingPage): IndexUiState 
     refinementList.source_ext = [page.source_ext];
   }
 
+  if (page.org_type) {
+    refinementList[algoliaAttrOrgType] = [page.org_type];
+  }
+
   const uiState: IndexUiState = {};
   if (Object.keys(refinementList).length > 0) {
     uiState.refinementList = refinementList;
@@ -70,5 +78,6 @@ export function landingPageToAlgoliaState(page?: JobsLandingPage): IndexUiState 
   if (page.is_orgs_highlighted) {
     uiState.toggle = { is_orgs_highlighted: true };
   }
-  return uiState;
+  // Undefined, not `{}` - consumers gate on truthiness; admin pages can have zero filters.
+  return Object.keys(uiState).length > 0 ? uiState : undefined;
 }

@@ -4,7 +4,6 @@ import { useRef, type ReactNode } from "react";
 import { InstantSearch } from "react-instantsearch";
 
 import type { ID } from "@/gql-tada";
-import type { JobsLandingPage } from "@/prefetch/JobsLandingPage";
 import type { FacetsActiveConfig } from "@/sites/pg/components/PgAlgoliaFacetsActive";
 import {
   PgFilterCardWithSplitBg,
@@ -19,7 +18,6 @@ import { PgAlgoliaListSkeleton } from "@/sites/pg/components/PgAlgoliaListSkelet
 import { PgAlgoliaSearchStats } from "@/sites/pg/components/PgAlgoliaSearchStats";
 import { PgAlgoliaSortSelect } from "@/sites/pg/components/PgAlgoliaSortSelect";
 import { PgSearchInput } from "@/sites/pg/components/PgSearchInput";
-import { landingPageToAlgoliaState } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
 import { type AlgoliaIndexKey, useAlgoliaSearchClient } from "@/utils/useAlgoliaSearchClient";
 
 export function PgAlgoliaList<TItem extends { id: ID }>(props: {
@@ -34,7 +32,7 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
   children?: ReactNode;
   cta?: ReactNode;
   ctaMobile?: ReactNode;
-  jobsLandingPage?: JobsLandingPage;
+  uiStateForLandingPage?: IndexUiState;
 }) {
   const algolia = useAlgoliaSearchClient();
 
@@ -43,10 +41,6 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
   if (algolia.loading || !algolia.client || !indexName) {
     return <PgAlgoliaListSkeleton />;
   }
-
-  const uiStateForLandingPage: IndexUiState | undefined = landingPageToAlgoliaState(
-    props.jobsLandingPage,
-  );
 
   // #AI: Landing-page: clean URL if state == preset => URL params on user edits.
   // `routeToState({}) → preset` survives empty URL on initial load + reloads.
@@ -64,8 +58,8 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
         );
 
         if (
-          uiStateForLandingPage &&
-          JSON.stringify(uiStateForLandingPage) === JSON.stringify(stateFiltered)
+          props.uiStateForLandingPage &&
+          JSON.stringify(props.uiStateForLandingPage) === JSON.stringify(stateFiltered)
         ) {
           return {};
         }
@@ -73,8 +67,8 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
       },
       routeToState: (routeState: UiState) => {
         const isStateEmpty = !routeState[indexName];
-        if (uiStateForLandingPage && isStateEmpty) {
-          return { [indexName]: uiStateForLandingPage };
+        if (props.uiStateForLandingPage && isStateEmpty) {
+          return { [indexName]: props.uiStateForLandingPage };
         }
         return routeState;
       },
@@ -87,7 +81,9 @@ export function PgAlgoliaList<TItem extends { id: ID }>(props: {
     <InstantSearch
       searchClient={algolia.client}
       indexName={indexName}
-      initialUiState={uiStateForLandingPage ? { [indexName]: uiStateForLandingPage } : undefined}
+      initialUiState={
+        props.uiStateForLandingPage ? { [indexName]: props.uiStateForLandingPage } : undefined
+      }
       routing={routing}
       future={{ preserveSharedStateOnUnmount: true }}
       insights={true}

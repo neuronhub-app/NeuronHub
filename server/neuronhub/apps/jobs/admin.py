@@ -241,6 +241,7 @@ class JobAlertLogAdmin(SimpleHistoryAdmin, DALFModelAdmin):
 class JobsLandingPageAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdmin):
     list_display = [
         "slug",
+        "label",
         "title",
         "salary_min",
         "is_published",
@@ -248,7 +249,7 @@ class JobsLandingPageAdmin(DjangoObjectActions, SimpleHistoryAdmin, DALFModelAdm
         "created_at",
     ]
     autocomplete_fields = ["tags", "locations"]
-    search_fields = ["slug", "title"]
+    search_fields = ["slug", "title", "label"]
     list_filter = [
         ("tags", DALFRelatedFieldAjaxMulti),
         ("locations", DALFRelatedFieldAjaxMulti),

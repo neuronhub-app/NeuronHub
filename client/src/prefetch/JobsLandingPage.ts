@@ -11,6 +11,7 @@ export const JobsLandingPageFragment = graphql(`
     salary_min
     is_orgs_highlighted
     source_ext
+    org_type
     tags {
       name
       category_name

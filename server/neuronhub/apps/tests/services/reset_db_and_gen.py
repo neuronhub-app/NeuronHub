@@ -23,9 +23,7 @@ from neuronhub.apps.posts.graphql.types_lazy import TagCategoryEnum
 from neuronhub.apps.posts.models import Post
 from neuronhub.apps.posts.services.tag_create_or_update import tag_create_or_update
 from neuronhub.apps.profiles.models import Profile
-from neuronhub.apps.tests.services.db_reset_and_partial_reindex import (
-    db_reset_and_partial_reindex,
-)
+from neuronhub.apps.tests.services.db_reset_and_algolia_clear import db_reset_and_algolia_clear
 from neuronhub.apps.tests.test_gen import Gen
 from neuronhub.apps.users.models import User
 
@@ -125,7 +123,7 @@ class GenCreateParams:
 
 
 async def reset_db_and_gen(create_params: list[GenCreateParams]) -> None:
-    await db_reset_and_partial_reindex()
+    await db_reset_and_algolia_clear()
 
     gen = await Gen.create(is_user_default_superuser=True)
     ids_per_model: dict[type[Model], list[int]] = {}

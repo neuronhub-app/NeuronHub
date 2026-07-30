@@ -121,6 +121,25 @@ class SiteConfig(SingletonModel):
         help_text=f"Specify to override the jobs/job_alert_confirmation.html email template. {_help_text}",
     )
 
+    landing_title_template = models.CharField(
+        max_length=512,
+        blank=True,
+        default="Find {label} that are good for you and for the world.",
+        help_text="H1 template. `{label}` is the landing page's own `label` field, eg `Impactful Climate Change Jobs`. Used when the page's own title is blank.",
+    )
+    landing_subtitle_default = models.CharField(
+        max_length=512,
+        blank=True,
+        default="Curated high-impact jobs for people who want to make a difference.",
+        help_text="Shared subtitle fallback. Used when the page's own subtitle is blank.",
+    )
+    landing_meta_title_template = models.CharField(
+        max_length=512,
+        blank=True,
+        default="{label}",
+        help_text="Meta title template. `{label}` is the landing page's own `label` field. Shared fallback used when the page's own meta_title is blank. Append the site's brand here, eg `{label} | Probably Good`.",
+    )
+
     history = HistoricalRecords()
 
     def __str__(self):

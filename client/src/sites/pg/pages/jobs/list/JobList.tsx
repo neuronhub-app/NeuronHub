@@ -4,6 +4,8 @@ import { GoBell, GoComment, GoQuestion } from "react-icons/go";
 import { Configure, useClearRefinements } from "react-instantsearch";
 import { Link, useNavigate, useSearchParams } from "react-router";
 
+import { format } from "@neuronhub/shared/utils/format";
+
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { layout } from "@/components/LayoutSidebar";
 import { ids } from "@/e2e/ids";
@@ -14,7 +16,11 @@ import type { JobsLandingPage } from "@/prefetch/JobsLandingPage";
 import { PgJobCardSkeletons } from "@/sites/pg/components/PgAlgoliaInfiniteHits";
 import { PgAlgoliaList } from "@/sites/pg/components/PgAlgoliaList";
 import { PgFiltersTopbar } from "@/sites/pg/components/PgFiltersTopbar";
-import { useRequiredLandingPageRefinements } from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
+import {
+  algoliaAttrOrgType,
+  landingPageToAlgoliaState,
+  useRequiredLandingPageRefinements,
+} from "@/sites/pg/pages/jobs-landing-page/landingPageToAlgoliaState";
 import { ContactModal } from "@/sites/pg/pages/jobs/list/ContactModal";
 import { FaqModal } from "@/sites/pg/pages/jobs/list/FaqModal";
 import { JobCard } from "@/sites/pg/pages/jobs/list/JobCard";
@@ -53,16 +59,13 @@ export function JobList(props: { slug?: string; jobsLandingPage?: JobsLandingPag
   const algoliaFilters = useJobListAlgoliaFilters();
   const extraTags = useJobListExtraTags();
 
+  const uiStateForLandingPage = landingPageToAlgoliaState(props.jobsLandingPage);
+
   return (
     <PgAlgoliaList<JobFragmentType>
       index="indexNameJobs"
       label="job"
-      jobsLandingPage={props.jobsLandingPage}
-      // uiStateForLandingPage={
-      //   props.jobsLandingPage
-      //     ? landingPageToAlgoliaState(props.jobsLandingPage)
-      //     : undefined
-      // }
+      uiStateForLandingPage={uiStateForLandingPage}
       cta={<JobsSubscribeModal testId={ids.job.alert.subscribeBtn} />}
       ctaMobile={<JobsSubscribeModal testId={ids.job.alert.subscribeBtnMobile} />}
       sort={
@@ -97,6 +100,8 @@ export function JobList(props: { slug?: string; jobsLandingPage?: JobsLandingPag
         formatAttribute: {
           "locations.algolia_filter_name": r => r.label.replace(/^\[.+?] /, ""),
           source_ext: refineParam => `Source: ${refineParam.label}`,
+          [algoliaAttrOrgType]: refineParam =>
+            `Org type: ${format.slugToTitle(refineParam.label.toLowerCase())}`,
         },
         dateAttributes: ["published_at_unix"],
         extraTags,
@@ -118,7 +123,7 @@ export function JobList(props: { slug?: string; jobsLandingPage?: JobsLandingPag
         attributesToSnippet={["description:30"]}
       />
 
-      {props.jobsLandingPage && (
+      {uiStateForLandingPage && (
         <>
           <RedirectOnFiltersReset to={urls.jobs.list} />
           <RegisterLandingPageRefinements />

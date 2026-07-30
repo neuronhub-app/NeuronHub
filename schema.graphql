@@ -245,9 +245,6 @@ input JobsLandingPageParams {
 type JobsLandingPageType {
   id: ID!
   slug: String!
-  title: String!
-  subtitle: String!
-  meta_title: String!
   meta_description: String!
   meta_image_url: String!
   tags(filters: PostTagFilter): [PostTagType!]!
@@ -255,6 +252,10 @@ type JobsLandingPageType {
   salary_min: Int
   is_orgs_highlighted: Boolean
   source_ext: SourceExt
+  org_type: OrgTypeEnum
+  title: String!
+  subtitle: String!
+  meta_title: String!
 }
 
 enum LocationType {
@@ -369,9 +370,19 @@ type OrgType {
   website_with_utm: String!
   jobs_page_url: String!
   is_highlighted: Boolean!
+  org_type: OrgTypeEnum
   logo: DjangoImageType
   description: String!
   tags_area(filters: PostTagFilter): [PostTagType!]!
+}
+
+enum OrgTypeEnum {
+  NONPROFIT
+  FOR_PROFIT
+  GOVERNMENT
+  UNIVERSITY
+  INTERNATIONAL_INSTITUTION
+  THINK_TANK
 }
 
 enum PostCategory {
