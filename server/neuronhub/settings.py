@@ -348,8 +348,8 @@ class AlgoliaConfig(TypedDict):
     IS_ENABLED: bool
 
 
-is_not_unit_tests = DJANGO_ENV is not DjangoEnv.DEV_TEST_UNIT
-is_algolia_enabled = env.bool("ALGOLIA_IS_ENABLED", False) and is_not_unit_tests
+is_unit_tests = DJANGO_ENV is DjangoEnv.DEV_TEST_UNIT
+is_algolia_enabled = env.bool("ALGOLIA_IS_ENABLED", False) and not is_unit_tests
 if is_algolia_enabled:
     INSTALLED_APPS.append("algoliasearch_django")
 

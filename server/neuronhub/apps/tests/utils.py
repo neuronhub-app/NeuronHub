@@ -23,7 +23,9 @@ def assert_max_queries(test_case: TestCase, max_count: int):
     match = re.search(r"(\d+) queries executed", str(exc.exception))
     assert match, str(exc.exception)
     actual = int(match.group(1))
-    assert actual <= max_count, str(exc.exception)
+    assert actual <= max_count, (
+        f"SQL queries max={max_count} exceeded: {actual} queries executed."
+    )
 
 
 async def wat_log(*objects: QuerySet | Any, is_long: bool = False, title: str | None = None):
