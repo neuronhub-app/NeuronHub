@@ -1,15 +1,15 @@
 /**
- * #quality-40%
- * PG jobs-list infinite scroll. An IntersectionObserver on a bottom sentinel (with 400px
- * rootMargin, so it pre-loads before the footer) only tracks visibility; an effect then calls
- * showMore whenever the sentinel is visible AND `search.status` is "idle" AND not last page.
- * Effect-driven (not one-shot in the observer) so the trigger is never dropped while the sentinel
- * stays continuously in view - which is what stalled loading on mobile/footer. A "Load more"
- * button is a deterministic fallback (and the e2e hook).
+ * #quality-9%
+ * - Didn't always show Skeletons or triggers `loadMore` - while we tried to fix this 5+ times.
+ * - Takes 0.3s to render on the main thread - hard to see why.
+ * - Definitely #AI-slop React - destructs, `item` naming, etc.
+ *    - Instead it waits for you to scroll up+down to re-trigger it.
+ * - "React Compiler" can't put useMemo on it.
+ * - Don't know why it calls useRef instead of Valtio, probably #AI-slop.
  *
- * This is a duplicate of [[AlgoliaList.tsx]] - uses its complex API wo/ any benefit of reuse.
- * // todo ! refac: drop -> use AlgoliaList. See [[ReviewListAlgolia.tsx]].
+ * This is a duplicate of [[AlgoliaList.tsx]] - ie uses its complex TS Generics wo/ any of the original reuse benefits.
  *
+ * todo ! refac: drop -> use AlgoliaList. See [[ReviewListAlgolia.tsx]].
  * todo ? refac-name: JobListAlgolia
  */
 import { Box, Button, Flex, HStack, Skeleton, Stack } from "@chakra-ui/react";
@@ -59,61 +59,69 @@ export function PgInfiniteHits<TItem extends { id: ID }>(props: PgInfiniteHitsPr
     return () => observer.disconnect();
   }, []);
 
-  // Re-checks on every dep change (not once in the observer), so a load is never dropped while
-  // the sentinel stays continuously in view - eg on mobile where the footer keeps it visible.
+  const isSearchLoading = search.status !== "idle";
+  // #AI: IntersectionObserver fires only when visibility changes - `showMore` inside it
+  // stalled while the sentinel stayed in view. This re-runs on `isSearchLoading`, ie once
+  // per loaded page.
   useEffect(() => {
-    if (state.snap.isSentinelVisible && !hits.isLastPage && search.status === "idle") {
+    if (state.snap.isSentinelVisible && !hits.isLastPage && !isSearchLoading) {
       hits.showMore();
     }
-  }, [state.snap.isSentinelVisible, hits.isLastPage, search.status]);
+  }, [state.snap.isSentinelVisible, hits.isLastPage, isSearchLoading]);
 
-  const isSearchActive =
-    searchBox.query.length > 0 ||
-    currentRefinements.items.length > 0 ||
-    Boolean(props.isExtraFilterActive);
+  const jsx = getJsxVars();
 
-  let jobsFiltered = hits.items;
-  if (props.hitOpenedPinned?.id && !isSearchActive) {
-    jobsFiltered = hits.items.filter(job => job.id !== props.hitOpenedPinned?.id);
+  function getJsxVars() {
+    const isSearchActive =
+      searchBox.query.length > 0 ||
+      currentRefinements.items.length > 0 ||
+      Boolean(props.isExtraFilterActive);
+
+    let jobsFiltered = hits.items;
+    if (props.hitOpenedPinned?.id && !isSearchActive) {
+      jobsFiltered = hits.items.filter(job => job.id !== props.hitOpenedPinned?.id);
+    }
+
+    // Prob wrong. Beware: it was "fixed" 5+ times. Must be simpler, i think.
+    const isNoJobs = jobsFiltered.length === 0;
+    const isLoadInitial = !hits.results;
+    const isEmptyBeforeSearch = !isSearchActive && isNoJobs;
+    const isShowSkeleton = isLoadInitial || isEmptyBeforeSearch || (isNoJobs && isSearchLoading);
+
+    const isJobOpen = props.hitOpenedPinned?.node && !isSearchActive;
+    const isNoResults = isNoJobs && !isJobOpen;
+
+    return {
+      isSearchActive,
+      jobsFiltered,
+      isShowSkeleton,
+      isNoResults,
+      isLoadingMore: !isShowSkeleton && !hits.isLastPage && isSearchLoading,
+    };
   }
-
-  // Wrong. Beware: was "fixed" 3+ times.
-  // Must be simpler, i think.
-  const isNoJobs = jobsFiltered.length === 0;
-  const isLoadInitial = !hits.results;
-  const isEmptyBeforeSearch = !isSearchActive && isNoJobs;
-  const isShowSkeleton =
-    isLoadInitial || isEmptyBeforeSearch || (isNoJobs && search.status !== "idle");
-
-  const isJobOpen = props.hitOpenedPinned?.node && !isSearchActive;
-  const isNoResults = isNoJobs && !isJobOpen;
-
-  const isLoadingMore = !isShowSkeleton && !hits.isLastPage && search.status !== "idle";
 
   return (
     <Stack gap="gap.xl" w="full">
-      {props.hitOpenedPinned?.node && !isSearchActive && props.hitOpenedPinned.node}
+      {props.hitOpenedPinned?.node && !jsx.isSearchActive && props.hitOpenedPinned.node}
 
-      <Stack
-        data-testid={props.listTestId}
-        gap="gap.md"
-        minH={isLoadInitial ? "100dvh" : undefined}
-      >
-        {isShowSkeleton ? (
+      <Stack data-testid={props.listTestId} gap="gap.md">
+        {jsx.isShowSkeleton ? (
           <PgJobCardSkeletons count={skeletonCountInitial} />
-        ) : isNoResults ? (
+        ) : jsx.isNoResults ? (
           props.noResultsNode
         ) : (
-          jobsFiltered.map(item => props.renderHit(item, { isSearchActive }))
+          jsx.jobsFiltered.map(item =>
+            props.renderHit(item, { isSearchActive: jsx.isSearchActive }),
+          )
         )}
-        {isLoadingMore && <PgJobCardSkeletons count={hits.results!.hitsPerPage} />}
+        {jsx.isLoadingMore && <PgJobCardSkeletons count={hits.results!.hitsPerPage} />}
       </Stack>
 
       {!hits.isLastPage && (
         <Flex justify="center">
           <Button
             {...ids.set(ids.job.btn.loadMore)}
-            loading={search.status !== "idle"}
+            loading={isSearchLoading}
             onClick={() => hits.showMore()}
             variant="outline"
             size="sm"

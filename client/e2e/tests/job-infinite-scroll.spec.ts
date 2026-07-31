@@ -15,7 +15,18 @@ test.describe("PG Jobs Infinite Scroll", () => {
     await play.reset_db_and_gen(Array.from({ length: jobsSeeded }, () => ({ jobs_job: {} })));
   });
 
-  test("Load more button pages to the last page then hides", async ({ play }) => {
+  test("Scroll to the bottom loads the next page", async ({ play }) => {
+    await play.navigate(urls.jobs.list, { idleWait: true });
+
+    const jobCards = play.getAll(ids.job.card.container);
+    await expectBase(jobCards).toHaveCount(hitsPerPage);
+
+    await jobCards.last().scrollIntoViewIfNeeded();
+
+    await expectBase(jobCards).toHaveCount(jobsSeeded);
+  });
+
+  test("The `Load more` button loads the last page, then hides itself", async ({ play }) => {
     await play.navigate(urls.jobs.list, { idleWait: true });
 
     const jobCards = play.getAll(ids.job.card.container);
