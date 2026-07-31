@@ -13,6 +13,15 @@ class NavLinksCacheTest(NeuronTestCase):
         settings.CACHE_RAM.delete(SitesQuery.CacheKey.NavLinks)
         settings.CACHE_RAM.delete(SitesQuery.CacheKey.FooterSections)
 
+        site_config_seed, _ = SiteConfig.objects.get_or_create(
+            pk=SiteConfig.singleton_instance_id
+        )
+        NavbarLinkSection.objects.create(
+            site=site_config_seed,
+            label="Jobs",
+            href="https://neuronhub.app/jobs",
+        )
+
     async def test_cached_after_first_query(self):
         result = await self.graphql_query(self.site_query)
         print(result)

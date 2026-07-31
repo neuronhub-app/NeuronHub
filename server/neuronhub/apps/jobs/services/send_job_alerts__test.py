@@ -145,6 +145,21 @@ class TestSendJobAlertEmails(NeuronTestCase):
         assert stats.skipped_due_to_tz == 0
         assert stats.skipped_due_to_duplicates == 1
 
+    async def test_job_alert_email_shows_short_locations(self):
+        city_1 = "London"
+        city_2 = "Berlin"
+        await self.gen.jobs.job_alert(tz=None)
+        await self.gen.jobs.job(
+            locations=[
+                await self.gen.jobs.location(city_1),
+                await self.gen.jobs.location(city_2),
+            ],
+        )
+
+        await send_job_alerts()
+
+        assert f"{city_2}, DE • {city_1}, UK" in mail.outbox[0].body
+
     async def test_email_template_override(self):
         site = await SiteConfig.get_solo()
 
@@ -339,9 +354,7 @@ class TestSendJobAlertEmails(NeuronTestCase):
         for _ in range(3):
             async_to_sync(self.gen.jobs.job)(tags=[tag_skill, tag_area], locations=[loc])
 
-        # 6 amortized + ~10 per alert (jobs, log overlap, UserAnon, log INSERT, M2M, alert UPDATE).
-        # Pre-opt baseline 36; current 25 (-31%).
-        with assert_max_queries(self, 26):
+        with assert_max_queries(self, 27):
             async_to_sync(send_job_alerts)(is_include_test_jobs=True)
 
 

@@ -273,10 +273,14 @@ async def _get_jobs_by_alert(
     """
     see [[adding-job-alert-filters.mdx]] checklist
     """
-    qs = Job.objects.select_related("org").filter(
-        is_published=True,
-        is_test_job=is_include_test_jobs,
-        published_at__gte=alert.created_at,
+    qs = (
+        Job.objects.select_related("org")
+        .prefetch_related("locations")
+        .filter(
+            is_published=True,
+            is_test_job=is_include_test_jobs,
+            published_at__gte=alert.created_at,
+        )
     )
 
     for tag_id in [tag.id async for tag in alert.tags.all()]:

@@ -3,7 +3,7 @@ import { z } from "zod/v4";
 
 import { PostCategory, PostTypeEnum, UsageStatus, Visibility } from "~/graphql/enums";
 
-import type { User } from "@/apps/users/useUserCurrent";
+import type { User } from "@/apps/users/UserStateProvider";
 import type { PostEditFragmentType } from "@/graphql/fragments/posts";
 import type { PostReviewEditFragmentType } from "@/graphql/fragments/reviews";
 
