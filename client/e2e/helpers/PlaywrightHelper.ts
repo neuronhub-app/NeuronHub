@@ -138,6 +138,23 @@ export class PlaywrightHelper {
     });
   }
 
+  /**
+   * #AI: Call before the action triggering the request, await after it.
+   */
+  async waitForRequestGraphqlVars<TData, TVariables extends OperationVariables>(
+    query: TadaDocumentNode<TData, TVariables>,
+  ): Promise<TVariables> {
+    // @ts-expect-error #bad-infer - gql.tada sets .name
+    const queryName: string = query.definitions[0]!.name!.value;
+
+    const requestMatched = await this.page.waitForRequest(
+      request =>
+        request.url().includes(env.VITE_SERVER_URL_API) &&
+        (request.postData()?.includes(queryName) ?? false),
+    );
+    return JSON.parse(requestMatched.postData()!).variables;
+  }
+
   async navigate(
     path:
       | typeof urls.posts.list

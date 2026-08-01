@@ -1208,10 +1208,10 @@ input UserTypeInput {
 }
 
 input UtmParamsInput {
-  utm_source: String = null
-  utm_medium: String = null
-  utm_campaign: String = null
-  utm_content: String = null
+  utm_source: String! = ""
+  utm_medium: String! = ""
+  utm_campaign: String! = ""
+  utm_content: String! = ""
 }
 
 enum Visibility {

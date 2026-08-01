@@ -17,13 +17,11 @@ import {
   Checkbox,
 } from "@chakra-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as Sentry from "@sentry/react";
 import { fromUnixTime } from "date-fns";
 import { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { FaBell } from "react-icons/fa6";
 import { useCurrentRefinements } from "react-instantsearch";
-import { useLocation } from "react-router";
 import { z } from "zod";
 
 import { datetime } from "@neuronhub/shared/utils/date-fns";
@@ -47,6 +45,7 @@ import { ids } from "@/e2e/ids";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
 import { JobLocationsQuery } from "@/sites/pg/components/PgFacetLocation";
+import { utm } from "@/sites/pg/pages/jobs/list/jobAlertUtms";
 import { useJobListFilters } from "@/sites/pg/pages/jobs/list/jobListFilters";
 import { toast } from "@/utils/toast";
 import { track } from "@/utils/track/track";
@@ -61,7 +60,6 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
   const loading = useIsLoading();
 
   const refinesCurrent = useCurrentRefinements();
-  const location = useLocation();
   const { data: locationsData } = useApolloQuery(JobLocationsQuery);
 
   const state = useStateValtio({
@@ -103,18 +101,10 @@ export function JobsSubscribeModal(props: { testId?: string; trigger?: ReactNode
     await track.users.setUser({ email: fields.email });
     track.event("JobAlert.create", vars);
 
-    const knownUtmKeys = ["utm_source", "utm_medium", "utm_campaign", "utm_content"] as const;
-    const params = new URLSearchParams(location.search);
-    const utm_params = Object.fromEntries(
-      knownUtmKeys.map(key => [key, params.get(key)]).filter(entry => entry[1] !== null),
-    );
-
-    Sentry.setContext("utm", utm_params);
-
     const result = await mutateAndRefetchMountedQueries(JobAlertSubscribeMutation, {
       email: fields.email,
       ...vars,
-      utm_params,
+      utm_params: utm.getStored(),
       is_subscribe_to_newsletter: state.mutable.is_subscribe_to_newsletter,
     });
     if (result.success) {

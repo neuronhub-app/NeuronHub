@@ -67,19 +67,14 @@ test.describe("Job Alert", () => {
 
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
-    const requestPromise = env.site.isProbablyGood
-      ? page.waitForRequest(
-          req =>
-            req.url().includes("/graphql") &&
-            (req.postData()?.includes("JobAlertSubscribe") ?? false),
-        )
+    const requestVars = env.site.isProbablyGood
+      ? play.waitForRequestGraphqlVars(JobAlertSubscribeMutation)
       : null;
 
     await play.click(ids.job.alert.submitBtn);
 
-    if (env.site.isProbablyGood && requestPromise) {
-      const body = JSON.parse((await requestPromise).postData()!);
-      expectBase(body.variables?.location_ids?.length).toBeGreaterThanOrEqual(2);
+    if (requestVars) {
+      expectBase((await requestVars).location_ids?.length).toBeGreaterThanOrEqual(2);
     } else {
       await play.waitForNetworkIdle();
     }

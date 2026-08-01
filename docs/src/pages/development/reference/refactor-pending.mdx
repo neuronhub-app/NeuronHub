@@ -7,8 +7,10 @@ import { LinkExt } from "@/components"
 ## Server
 
 - unfuck `neuronhub/apps/tests/services/db_reset_and_partial_reindex.py::_models_to_drop_ordered`.
-- store URLs of FE used by BE in a single file (eg typed JSON) that both can import.
-    - Replace magic strings in python docstrings as `jobs/drafts`.
+- a single file (eg typed JSON) that both can import that both SE & CE can import:
+    - store URLs of FE used by BE.
+        - Replace magic strings in python docstrings as `jobs/drafts`.
+    - store both `env.VITE_SITE` values.
 - migrate to Mise experimental monorepo to split out `mise.toml`.
 - prefix all Django envs with `DJANGO_` (same as `VITE_`).
 

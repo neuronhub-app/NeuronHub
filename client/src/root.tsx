@@ -15,6 +15,13 @@ import { env } from "@/env";
 import { client } from "@/graphql/client";
 import { NhaPosthogProvider } from "@/providers/NhaPosthogProvider";
 import { siteConfig } from "@/sites";
+import { utm } from "@/sites/pg/pages/jobs/list/jobAlertUtms";
+
+// #AI, unverified:
+// On module load, not in `useEffect` as `InstantSearch` rewrites the URL and `<Navigate>` strips its query.
+if (env.mode.isClient) {
+  utm.saveToLocalStorageFromUrl();
+}
 
 export default function App() {
   return (
