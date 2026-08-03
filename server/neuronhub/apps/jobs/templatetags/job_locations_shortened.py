@@ -62,5 +62,6 @@ _country_code_by_name = {
     "Germany": "DE",
     "Japan": "JP",
     "Switzerland": "CH",
+    "United Kingdom": "UK",
     "Global": "",
 }
