@@ -133,6 +133,23 @@ class SiteConfig(SingletonModel):
         return super().get_solo()
 
 
+class SeoMeta(models.Model):
+    path = models.CharField(
+        max_length=255,
+        unique=True,
+        help_text='URL path, e.g. "/jobs". Use "/" for home.',
+    )
+    meta_title = models.CharField(max_length=512, blank=True)
+    meta_description = models.CharField(max_length=512, blank=True)
+    meta_image_url = models.URLField(max_length=512, blank=True)
+
+    class Meta:
+        ordering = ["path"]
+
+    def __str__(self):
+        return self.path
+
+
 class FooterSectionKind(TextChoices):
     Column = "column"
     Social = "social"

@@ -5,14 +5,16 @@ import { useLocation } from "react-router";
 import { proxy } from "valtio";
 import { useSnapshot } from "valtio/react";
 
+import { type SeoMeta, seoMetaByPath } from "@/components/seoMetaByPath";
 import { env } from "@/env";
 import { siteConfig } from "@/sites";
+import { urls } from "@/urls";
 
-function defaults() {
+function defaults(seoMeta?: SeoMeta) {
   return {
-    title: siteConfig.meta?.title,
-    description: siteConfig.meta?.description ?? "",
-    ogImage: siteConfig.meta?.ogImage ?? "",
+    title: seoMeta?.meta_title || siteConfig.meta?.title,
+    description: seoMeta?.meta_description || siteConfig.meta?.description || "",
+    ogImage: seoMeta?.meta_image_url || siteConfig.meta?.ogImage || "",
   };
 }
 
@@ -26,7 +28,16 @@ const state = proxy({ ...defaults(), pathname: "" });
 function HeadMetaHoisted() {
   const location = useLocation();
   const snap = useSnapshot(state);
-  const dflt = defaults();
+  const seoMetas = useSnapshot(seoMetaByPath);
+
+  const isJobsAlias = env.VITE_SITE === "pg" && location.pathname === "/jobs";
+  const isJobDetail = env.VITE_SITE === "pg" && location.pathname.startsWith("/jobs/");
+
+  const pathCanonical = isJobsAlias ? urls.jobs.list : location.pathname;
+  // Job pages borrow `/` meta (interim) yet stay self-canonical above. TODO: per-job meta.
+  const pathForMeta = isJobsAlias || isJobDetail ? urls.jobs.list : location.pathname;
+
+  const dflt = defaults(seoMetas[pathForMeta]);
   const isCurrentPage = snap.pathname === location.pathname;
   const title = `${(isCurrentPage && snap.title) || dflt.title || "Loading..."} | ${env.VITE_PROJECT_NAME}`;
   const description = isCurrentPage ? snap.description || dflt.description : dflt.description;
@@ -35,10 +46,10 @@ function HeadMetaHoisted() {
   return (
     <>
       <title>{title}</title>
+      <link rel="canonical" href={pathCanonical} />
       {description && <meta name="description" content={description} />}
       <meta property="og:title" content={title} />
       <meta property="og:site_name" content={env.VITE_PROJECT_NAME} />
-      <meta property="og:description" content={description} />
       {description && <meta property="og:description" content={description} />}
       <meta property="og:type" content="website" />
       {ogImage && <meta property="og:image" content={ogImage} />}
