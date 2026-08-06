@@ -12,6 +12,7 @@ from neuronhub.apps.importer.models import PostSource
 from neuronhub.apps.importer.models import UserSource
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.jobs.models import JobAlertUnsubscribeFeedback
 from neuronhub.apps.jobs.models import JobsLandingPage
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.models import PostRelated
@@ -85,6 +86,7 @@ _models_to_drop_ordered = [
     ProfileInvite,
     Profile,
     ProfileGroup,
+    JobAlertUnsubscribeFeedback,
     JobAlert,
     JobsLandingPage,
     Job,

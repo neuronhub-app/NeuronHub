@@ -46,6 +46,7 @@ export function useJobUnsubscribeHandler(alertIdExt?: string) {
 
   return {
     isUnsubscribeRequest: state.snap.isUnsubscribeRequest,
+    isUnsubscribed: state.snap.isUnsubscribeRequest && status === "success",
     Alert: () => (
       <Alert.Root
         status={status}
@@ -63,7 +64,8 @@ export function useJobUnsubscribeHandler(alertIdExt?: string) {
           <Alert.Title>
             {unsubscribeHook.isLoading
               ? "Unsubscribing..."
-              : (state.snap.unsubscribeError ?? "Unsubscribed.")}
+              : (state.snap.unsubscribeError ??
+                "Success! You will no longer receive this alert.")}
           </Alert.Title>
         </Alert.Content>
 

@@ -11,6 +11,7 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.safestring import mark_safe
+from django.utils.text import Truncator
 from django_object_actions import DjangoObjectActions
 from django_object_actions import action
 from simple_history.admin import SimpleHistoryAdmin
@@ -18,6 +19,7 @@ from simple_history.admin import SimpleHistoryAdmin
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
 from neuronhub.apps.jobs.models import JobAlertLog
+from neuronhub.apps.jobs.models import JobAlertUnsubscribeFeedback
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.models import JobsLandingPage
 from neuronhub.apps.jobs.tasks import airtable_sync_task
@@ -245,6 +247,39 @@ class JobAlertLogAdmin(SimpleHistoryAdmin, DALFModelAdmin):
         "created_at",
         "updated_at",
     ]
+
+
+@admin.register(JobAlertUnsubscribeFeedback)
+class JobAlertUnsubscribeFeedbackAdmin(DALFModelAdmin):
+    list_display = [
+        "email",
+        "reasons_labels",
+        "comment_short",
+        "created_at",
+    ]
+    list_filter = ["reasons", "created_at"]
+    search_fields = ["email", "comment"]
+    readonly_fields = ["alert", "reasons", "email", "comment", "created_at", "updated_at"]
+
+    # Answers are user data - hand-made rows would be indistinguishable in `list_filter`.
+    def has_add_permission(self, request: HttpRequest) -> bool:
+        return False
+
+    def has_change_permission(
+        self, request: HttpRequest, obj: JobAlertUnsubscribeFeedback | None = None
+    ) -> bool:
+        return False
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet:
+        return super().get_queryset(request).prefetch_related("reasons")
+
+    @admin.display(description="Reasons")
+    def reasons_labels(self, obj: JobAlertUnsubscribeFeedback) -> str:
+        return ", ".join(reason.label for reason in obj.reasons.all())
+
+    @admin.display(description="Comment")
+    def comment_short(self, obj: JobAlertUnsubscribeFeedback) -> str:
+        return Truncator(obj.comment).chars(120)
 
 
 @admin.register(JobsLandingPage)

@@ -467,6 +467,41 @@ class JobFaqQuestion(models.Model):
         return self.question
 
 
+class JobAlertUnsubscribeReason(models.Model):
+    class CommentPrompt(TextChoices):
+        NONE = "none", "No comment"
+        OPTIONAL = "optional", "Comment, optional"
+        REQUIRED = "required", "Comment, required"
+
+    site = models.ForeignKey(
+        "sites.SiteConfig",
+        on_delete=models.CASCADE,
+        related_name="unsubscribe_reasons",
+    )
+    label = models.CharField(max_length=256)
+    comment_prompt = TextChoicesField(choices_enum=CommentPrompt, default=CommentPrompt.NONE)
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0, db_index=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return self.label
+
+
+class JobAlertUnsubscribeFeedback(TimeStampedModel):
+    alert = models.OneToOneField(
+        JobAlert,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="unsubscribe_feedback",
+    )
+    email = models.EmailField()
+    reasons = models.ManyToManyField(JobAlertUnsubscribeReason, related_name="feedbacks")
+    comment = models.TextField(blank=True)
+
+
 class JobAlertLog(TimeStampedModel):
     job_alert = models.ForeignKey(
         JobAlert,

@@ -13,6 +13,7 @@ from django_object_actions import action
 from simple_history.admin import SimpleHistoryAdmin
 from solo.admin import SingletonModelAdmin
 
+from neuronhub.apps.jobs.models import JobAlertUnsubscribeReason
 from neuronhub.apps.jobs.models import JobFaqQuestion
 from neuronhub.apps.jobs.services.send_job_alerts import JobAlertTestContext
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
@@ -30,6 +31,18 @@ class JobFaqQuestionInline(SortableStackedInline):
     model = JobFaqQuestion
     extra = 0
     classes = ["collapse"]
+
+
+class JobAlertUnsubscribeReasonInline(SortableTabularInline):
+    model = JobAlertUnsubscribeReason
+    extra = 0
+    classes = ["collapse"]
+    fields = [
+        "label",
+        "comment_prompt",
+        "is_active",
+        "order",
+    ]
 
 
 class NavbarLinkInline(SortableTabularInline):
@@ -110,6 +123,7 @@ class SiteConfigAdmin(
 ):
     inlines = [
         JobFaqQuestionInline,
+        JobAlertUnsubscribeReasonInline,
         NavbarLinkSectionInline,
         FooterSectionInline,
     ]

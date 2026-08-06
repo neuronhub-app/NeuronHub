@@ -10,7 +10,8 @@ from neuronhub.apps.db.fields import HtmlField
 
 def populate_pg_data(apps, schema_editor):
     SiteConfig = apps.get_model("sites", "SiteConfig")
-    site = SiteConfig.objects.first()
+    # `.first()` was None on a fresh db - the `pg` branding was silently skipped
+    site, _ = SiteConfig.objects.get_or_create()
 
     if settings.VITE_SITE == "pg":
         site.logo_url = "https://probablygood.org/wp-content/uploads/probably-good-logo-540.png"

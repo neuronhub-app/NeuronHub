@@ -16,6 +16,7 @@ from strawberry_django.permissions import IsStaff
 
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.jobs.models import JobAlertUnsubscribeReason
 from neuronhub.apps.jobs.models import JobFaqQuestion
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.models import JobsLandingPage
@@ -25,6 +26,7 @@ from neuronhub.apps.jobs.services.get_jobs_qs_prefetched import get_jobs_qs_pref
 from neuronhub.apps.jobs.services.publish_job_versions import publish_job_versions
 from neuronhub.apps.jobs.services.send_job_alerts import send_job_alert_confirmation_email
 from neuronhub.apps.jobs.services.serialize_job_to_md import serialize_job_to_md
+from neuronhub.apps.jobs.services.submit_unsubscribe_feedback import submit_unsubscribe_feedback
 from neuronhub.apps.jobs.services.subscribe_to_mailerlite import subscribe_to_mailerlite
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.posts.graphql.types import PostTagType
@@ -53,6 +55,14 @@ class JobFaqQuestionType:
     id: auto
     question: auto
     answer_md: auto
+    order: auto
+
+
+@strawberry_django.type(JobAlertUnsubscribeReason)
+class JobAlertUnsubscribeReasonType:
+    id: auto
+    label: auto
+    comment_prompt: auto
     order: auto
 
 
@@ -173,6 +183,7 @@ class JobsQuery:
     class CacheKey:
         Faq = "JobFaqQuestions"
         Locations = "JobLocations"
+        UnsubscribeReasons = "JobAlertUnsubscribeReasons"
 
     @strawberry_django.field
     async def job_locations(self) -> list[JobLocationType]:
@@ -195,6 +206,14 @@ class JobsQuery:
     @strawberry_django.field
     async def job_faq_questions(self) -> list[JobFaqQuestionType]:
         return await get_list_cached(JobFaqQuestion, cache_key=JobsQuery.CacheKey.Faq)
+
+    @strawberry_django.field
+    async def job_alert_unsubscribe_reasons(self) -> list[JobAlertUnsubscribeReasonType]:
+        return await get_list_cached(
+            JobAlertUnsubscribeReason,
+            cache_key=JobsQuery.CacheKey.UnsubscribeReasons,
+            filters={"is_active": True},
+        )
 
     @strawberry_django.field
     async def jobs_landing_pages(self, info: strawberry.Info) -> list[JobsLandingPageType]:
@@ -365,16 +384,36 @@ class JobsMutation:
 
     @strawberry.mutation
     async def job_alert_unsubscribe(self, id_ext: uuid.UUID, info: strawberry.Info) -> str:
-        # No session check/login - .id_ext is enough
-        alert = await JobAlert.objects.filter(id_ext=id_ext).afirst()
-        if not alert:
-            # todo ? UX: shouldn't be an Error - it's a "success"/"info"
-            raise strawberry.exceptions.StrawberryGraphQLError(
-                "Subscription not found, or was deleted already."
-            )
+        alert = await _get_alert_by_id_ext(id_ext)
         alert.is_active = False
         await alert.asave()
         return alert.email
+
+    @strawberry.mutation
+    async def job_alert_unsubscribe_feedback(
+        self, id_ext: uuid.UUID, reason_ids: list[ID], comment: str = ""
+    ) -> None:
+        feedback = await submit_unsubscribe_feedback(
+            await _get_alert_by_id_ext(id_ext),
+            # Non-numeric ids are dropped like any unknown id - only a crafted client sends them.
+            reason_ids=[int(id_) for id_ in reason_ids if str(id_).isdecimal()],
+            comment=comment,
+        )
+        if not feedback:
+            raise strawberry.exceptions.StrawberryGraphQLError(
+                "No active reasons were selected."
+            )
+
+
+# No session check/login - .id_ext is enough
+async def _get_alert_by_id_ext(id_ext: uuid.UUID) -> JobAlert:
+    alert = await JobAlert.objects.filter(id_ext=id_ext).afirst()
+    if not alert:
+        # todo ? UX: shouldn't be an Error - it's a "success"/"info"
+        raise strawberry.exceptions.StrawberryGraphQLError(
+            "Subscription not found, or was deleted already."
+        )
+    return alert
 
 
 class _session:

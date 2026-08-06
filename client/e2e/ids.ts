@@ -187,6 +187,14 @@ export namespace ids {
         active: "job.subscriptions.status.active",
       },
       unsubscribed: { alert: "job.subscriptions.unsubscribed.alert" },
+      feedback: {
+        form: "job.subscriptions.feedback.form",
+        option: "job.subscriptions.feedback.option",
+        optionComment: "job.subscriptions.feedback.option-comment",
+        comment: "job.subscriptions.feedback.comment",
+        submit: "job.subscriptions.feedback.submit",
+        submitted: "job.subscriptions.feedback.submitted",
+      },
     },
   } as const;
 

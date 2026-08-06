@@ -2,6 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from neuronhub.apps.jobs.models import Job
+from neuronhub.apps.jobs.models import JobAlertUnsubscribeReason
 from neuronhub.apps.jobs.models import JobFaqQuestion
 from neuronhub.apps.jobs.models import JobLocation
 
@@ -14,6 +15,20 @@ def _drop_cache_job_faq(**kwargs):
 
 models.signals.post_save.connect(_drop_cache_job_faq, sender=JobFaqQuestion)
 models.signals.post_delete.connect(_drop_cache_job_faq, sender=JobFaqQuestion)
+
+
+def _drop_cache_unsubscribe_reasons(**kwargs):
+    from neuronhub.apps.jobs.graphql import JobsQuery
+
+    settings.CACHE_RAM.delete(JobsQuery.CacheKey.UnsubscribeReasons)
+
+
+models.signals.post_save.connect(
+    _drop_cache_unsubscribe_reasons, sender=JobAlertUnsubscribeReason
+)
+models.signals.post_delete.connect(
+    _drop_cache_unsubscribe_reasons, sender=JobAlertUnsubscribeReason
+)
 
 
 def _on_save_drop_cache_job_locations(sender, instance: Job, **kwargs):

@@ -34,6 +34,7 @@ import { ids } from "@/e2e/ids";
 import { type ResultOf } from "@/gql-tada";
 import { mutateAndRefetchMountedQueries } from "@/graphql/mutateAndRefetchMountedQueries";
 import { useApolloQuery } from "@/graphql/useApolloQuery";
+import { PgJobUnsubscribeFeedbackForm } from "@/sites/pg/pages/jobs/subscriptions/PgJobUnsubscribeFeedbackForm";
 import { layout } from "@/sites/pg/PgLayoutConfig";
 import { urls } from "@/urls";
 import { useInit } from "@/utils/useInit";
@@ -70,7 +71,14 @@ export function PgJobAlertList(props: {
     >
       <Heading size="3xl">Job Alerts</Heading>
 
-      {unsubscribe.isUnsubscribeRequest && <unsubscribe.Alert />}
+      {unsubscribe.isUnsubscribeRequest && (
+        <Stack gap="gap.lg" maxW="640px">
+          <unsubscribe.Alert />
+          {unsubscribe.isUnsubscribed && (
+            <PgJobUnsubscribeFeedbackForm alertIdExt={props.unsubscribeByIdExt!} />
+          )}
+        </Stack>
+      )}
 
       {isLoadingFirstTime && <Text color="fg.muted">Loading subscriptions...</Text>}
 
