@@ -125,12 +125,15 @@ async def get_list_cached[Return: type](
     model: type[Model],
     cache_key: str,
     prefetch_related: list[str] | None = None,
+    filters: dict | None = None,
 ) -> list[Return]:
     items_cached = await settings.CACHE_RAM.aget(cache_key)
     if items_cached is not None:
         return items_cached
 
     items_qs = model.objects.all()  # type: ignore[attr-defined] #bad-infer
+    if filters:
+        items_qs = items_qs.filter(**filters)
     if prefetch_related:
         items_qs = items_qs.prefetch_related(*prefetch_related)
     items = [link async for link in items_qs]

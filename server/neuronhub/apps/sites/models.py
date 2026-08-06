@@ -100,12 +100,12 @@ class SiteConfig(SingletonModel):
     email_html_about_us = HtmlField(
         blank=True,
         default="",
-        help_text="HTML for the 'About' paragraph in job alert emails. Supports inline-styled <a> tags. Leave blank for generic text.",
+        help_text="HTML for the 'About' paragraph in job alert emails. Supports inline-styled anchor tags. Leave blank for generic text.",
     )
     email_html_feedback_request = HtmlField(
         blank=True,
         default="",
-        help_text="HTML for the 'landed a role' section. Supports inline-styled <a> tags. Leave blank for generic text.",
+        help_text="HTML for the 'landed a role' section. Supports inline-styled anchor tags. Leave blank for generic text.",
     )
 
     email_template_job_alert = HtmlField(

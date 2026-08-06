@@ -8,12 +8,14 @@ from faker.proxy import UniqueProxy  # type: ignore[attr-defined] # Faker's bug
 from neuronhub.apps.anonymizer.fields import Visibility
 from neuronhub.apps.jobs.models import Job
 from neuronhub.apps.jobs.models import JobAlert
+from neuronhub.apps.jobs.models import JobAlertUnsubscribeReason
 from neuronhub.apps.jobs.models import JobLocation
 from neuronhub.apps.jobs.models import JobsLandingPage
 from neuronhub.apps.jobs.services.airtable_sync_jobs import _airtable
 from neuronhub.apps.orgs.models import Org
 from neuronhub.apps.orgs.tests.test_gen import OrgsGen
 from neuronhub.apps.posts.models import PostTag
+from neuronhub.apps.sites.models import SiteConfig
 
 
 @dataclass
@@ -202,6 +204,24 @@ class JobsGen:
         if locations:
             await alert.locations.aset(locations)
         return alert
+
+    async def unsubscribe_reason(
+        self,
+        label: str = "",
+        comment_prompt: JobAlertUnsubscribeReason.CommentPrompt = (
+            JobAlertUnsubscribeReason.CommentPrompt.NONE
+        ),
+        is_active: bool = True,
+        order: int = 0,
+    ) -> JobAlertUnsubscribeReason:
+        return await JobAlertUnsubscribeReason.objects.acreate(
+            site=await SiteConfig.get_solo(),
+            label=label or self.faker.sentence(),
+            comment_prompt=comment_prompt,
+            is_active=is_active,
+            # appends after the migration-seeded ones, so `Meta.ordering` stays deterministic
+            order=order or await JobAlertUnsubscribeReason.objects.acount() + 1,
+        )
 
     async def jobs_landing_page(
         self,

@@ -1,3 +1,9 @@
+export enum CommentPrompt {
+  None = 'NONE',
+  Optional = 'OPTIONAL',
+  Required = 'REQUIRED'
+}
+
 export enum FooterLinkIcon {
   Discord = 'Discord',
   Email = 'Email',

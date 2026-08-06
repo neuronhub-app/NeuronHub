@@ -47,6 +47,12 @@ input BoolBaseFilterLookup {
   in_list: [Boolean!]
 }
 
+enum CommentPrompt {
+  NONE
+  OPTIONAL
+  REQUIRED
+}
+
 """Date with time (isoformat)"""
 scalar DateTime
 
@@ -158,6 +164,13 @@ type JobAlertType {
   is_active: Boolean!
   created_at: DateTime!
   sent_count: Int!
+}
+
+type JobAlertUnsubscribeReasonType {
+  id: ID!
+  label: String!
+  comment_prompt: CommentPrompt!
+  order: Int!
 }
 
 type JobFaqQuestionType {
@@ -320,6 +333,7 @@ type Mutation {
   job_alert_access_session_by_id_ext(id_ext: UUID!): Boolean!
   job_alert_track_click(id: ID!, job_slug: String!): Boolean!
   job_alert_unsubscribe(id_ext: UUID!): String!
+  job_alert_unsubscribe_feedback(id_ext: UUID!, reason_ids: [ID!]!, comment: String! = ""): Void
   send_contact_message(message: String!, name: String = null, email: String = null): Boolean!
 }
 
@@ -988,6 +1002,7 @@ type Query {
   job_landing_page(pk: ID!): JobsLandingPageType @IsStaff
   job_locations: [JobLocationType!]!
   job_faq_questions: [JobFaqQuestionType!]!
+  job_alert_unsubscribe_reasons: [JobAlertUnsubscribeReasonType!]!
   jobs_landing_pages: [JobsLandingPageType!]!
   job_by_slug(slug: String!): JobType
   jobs_public: [JobType!]!
@@ -1223,3 +1238,6 @@ enum Visibility {
   INTERNAL
   PUBLIC
 }
+
+"""Represents NULL values"""
+scalar Void

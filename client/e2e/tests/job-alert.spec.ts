@@ -1,16 +1,19 @@
-import { type Locator, expect as expectBase } from "@playwright/test";
+import { type Locator, type Page, expect as expectBase } from "@playwright/test";
 
 import { JobAlertSubscribeMutation } from "@/apps/jobs/list/JobsSubscribeModal";
 import { JobAlertListQuery } from "@/apps/jobs/subscriptions/JobAlertList";
 import { layout } from "@/components/LayoutSidebar";
 import { expect } from "@/e2e/helpers/expect";
+import type { LocatorMapToGetFirstById } from "@/e2e/helpers/PlaywrightHelper";
 import { ids } from "@/e2e/ids";
 import { test } from "@/e2e/test";
 import { env } from "@/env";
+import { JobAlertUnsubscribeFeedbackMutation } from "@/sites/pg/pages/jobs/subscriptions/PgJobUnsubscribeFeedbackForm";
 import { urls } from "@/urls";
 
 const openPopover = "[data-part=content][data-scope=popover][data-state=open]";
 const testEmail = "e2e@neuronhub.app";
+const testComment = "I moved to a different field";
 
 test.describe("Job Alert", () => {
   test.beforeEach(async ({ play }) => {
@@ -79,11 +82,7 @@ test.describe("Job Alert", () => {
       await play.waitForNetworkIdle();
     }
 
-    if (env.site.isProbablyGood) {
-      await expect(page.getByRole("link", { name: layout.label.jobAlerts(1) })).toBeVisible();
-    } else {
-      await expect($[ids.layout.sidebar]).toHaveText(layout.label.jobAlerts(1));
-    }
+    await expectAlertsCountInNav(page, $, 1);
 
     // Navigate to subscriptions
     const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);
@@ -106,20 +105,20 @@ test.describe("Job Alert", () => {
     await expect(page).not.toHaveText(testEmail);
   });
 
-  test("unsubscribe by /jobs/subscriptions/remove/:id_ext", async ({ play, $ }) => {
+  test("unsubscribe by /jobs/subscriptions/remove/:id_ext", async ({ page, play, $ }) => {
     test.slow();
 
     await play.navigate(urls.jobs.list, { idleWait: true });
 
     await play.click(ids.job.alert.subscribeBtn);
     await play.fill(ids.job.alert.emailInput, testEmail);
-    const responseSubscribe = play.waitForResponseGraphql(JobAlertSubscribeMutation);
     await play.click(ids.job.alert.submitBtn);
     if (env.site.isProbablyGood) {
       // wo filters PG shows a confirm Popover
       await play.click(ids.job.alert.submitAllBtn);
     }
-    await responseSubscribe;
+    // not `waitForResponseGraphql` - the mutation refetches mounted queries, evicting its body
+    await expectAlertsCountInNav(page, $, 1);
 
     const alertsQuery = play.waitForResponseGraphql(JobAlertListQuery);
     await play.navigate(urls.jobs.subscriptions);
@@ -131,8 +130,32 @@ test.describe("Job Alert", () => {
     await play.navigate(urls.jobs.subscriptionsRemove(alert.id_ext), { idleWait: true });
     await expect($[ids.job.subscriptions.status.inactive]).toBeVisible();
     await expect($[ids.job.subscriptions.unsubscribed.alert]).toBeVisible();
+
+    if (env.site.isProbablyGood) {
+      await expect($[ids.job.subscriptions.feedback.form]).toBeVisible();
+      await play.click(ids.job.subscriptions.feedback.option);
+      await play.click(ids.job.subscriptions.feedback.optionComment);
+      await play.fill(ids.job.subscriptions.feedback.comment, testComment);
+
+      const requestFeedback = play.waitForRequestGraphqlVars(
+        JobAlertUnsubscribeFeedbackMutation,
+      );
+      await play.click(ids.job.subscriptions.feedback.submit);
+      const varsFeedback = await requestFeedback;
+      expectBase(varsFeedback.reason_ids).toHaveLength(2);
+      expectBase(varsFeedback.comment).toBe(testComment);
+      await expect($[ids.job.subscriptions.feedback.submitted]).toBeVisible();
+    }
   });
 });
+
+async function expectAlertsCountInNav(page: Page, $: LocatorMapToGetFirstById, count: number) {
+  if (env.site.isProbablyGood) {
+    await expect(page.getByRole("link", { name: layout.label.jobAlerts(count) })).toBeVisible();
+  } else {
+    await expect($[ids.layout.sidebar]).toHaveText(layout.label.jobAlerts(count));
+  }
+}
 
 async function clickFacetCheckbox(popover: Locator, value: string) {
   const item = popover.locator(`[data-testid='${ids.facet.checkbox(value)}']`);
